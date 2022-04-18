@@ -42,16 +42,13 @@ pub enum Route {
     ///
     /// The data is the relevant [`ChannelId`].
     ///
+    /// This route is a unique case. The ratelimit for message _deletions_ is
+    /// different than the overall route ratelimit.
+    ///
+    /// Refer to the docs on [Rate Limits] in the yellow warning section.
+    ///
     /// [`ChannelId`]: crate::model::id::ChannelId
-    // This route is a unique case. The ratelimit for message _deletions_ is
-    // different than the overall route ratelimit.
-    //
-    // Refer to the docs on [Rate Limits] in the yellow warning section.
-    //
-    // Additionally, this needs to be a `LightMethod` from the parent module
-    // and _not_ a `reqwest` `Method` due to `reqwest`'s not deriving `Copy`.
-    //
-    // [Rate Limits]: https://discord.com/developers/docs/topics/rate-limits
+    /// [Rate Limits]: https://discord.com/developers/docs/topics/rate-limits
     ChannelsIdMessagesId(LightMethod, u64),
     /// Route for the `/channels/:channel_id/messages/:message_id/ack` path.
     ///
