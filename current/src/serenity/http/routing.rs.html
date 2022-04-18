@@ -2652,9 +2652,6 @@
 <span id="2647">2647</span>
 <span id="2648">2648</span>
 <span id="2649">2649</span>
-<span id="2650">2650</span>
-<span id="2651">2651</span>
-<span id="2652">2652</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std</span>::{
     <span class="ident">borrow::Cow</span>,
     <span class="ident">fmt</span>::{<span class="ident">Display</span>, <span class="ident">Write</span>},
@@ -2699,16 +2696,13 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// The data is the relevant [`ChannelId`].</span>
     <span class="doccomment">///</span>
+    <span class="doccomment">/// This route is a unique case. The ratelimit for message _deletions_ is</span>
+    <span class="doccomment">/// different than the overall route ratelimit.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// Refer to the docs on [Rate Limits] in the yellow warning section.</span>
+    <span class="doccomment">///</span>
     <span class="doccomment">/// [`ChannelId`]: crate::model::id::ChannelId</span>
-    <span class="comment">// This route is a unique case. The ratelimit for message _deletions_ is</span>
-    <span class="comment">// different than the overall route ratelimit.</span>
-    <span class="comment">//</span>
-    <span class="comment">// Refer to the docs on [Rate Limits] in the yellow warning section.</span>
-    <span class="comment">//</span>
-    <span class="comment">// Additionally, this needs to be a `LightMethod` from the parent module</span>
-    <span class="comment">// and _not_ a `reqwest` `Method` due to `reqwest`&#39;s not deriving `Copy`.</span>
-    <span class="comment">//</span>
-    <span class="comment">// [Rate Limits]: https://discord.com/developers/docs/topics/rate-limits</span>
+    <span class="doccomment">/// [Rate Limits]: https://discord.com/developers/docs/topics/rate-limits</span>
     <span class="ident">ChannelsIdMessagesId</span>(<span class="ident">LightMethod</span>, <span class="ident">u64</span>),
     <span class="doccomment">/// Route for the `/channels/:channel_id/messages/:message_id/ack` path.</span>
     <span class="doccomment">///</span>
@@ -5308,5 +5302,5 @@
     }
 }
 </code></pre></div>
-</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.62.0-nightly (e745b4ddb 2022-04-07)" ></div>
+</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.62.0-nightly (ec77f2524 2022-04-17)" ></div>
 </body></html>
