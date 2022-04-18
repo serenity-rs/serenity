@@ -206,5 +206,5 @@ native_tls_backend = [
 ]
 
 [package.metadata.docs.rs]
-all-features = true
+features = ["default", "collector", "unstable_discord_api", "voice", "voice-model"]
 rustdoc-args = ["--cfg", "docsrs"]
