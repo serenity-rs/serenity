@@ -100,23 +100,15 @@
 <span id="95">95</span>
 <span id="96">96</span>
 <span id="97">97</span>
-<span id="98">98</span>
-<span id="99">99</span>
-<span id="100">100</span>
-<span id="101">101</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::sync::Arc</span>;
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tokio_compat&quot;</span>, <span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tokio&quot;</span>)))]</span>
-<span class="kw">use</span> <span class="ident">tokio::time::delay_for</span> <span class="kw">as</span> <span class="ident">sleep</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tokio&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident">tokio::time::sleep</span>;
-<span class="kw">use</span> <span class="ident">tokio</span>::{
-    <span class="ident">sync::oneshot</span>::{<span class="self">self</span>, <span class="ident">error::TryRecvError</span>, <span class="ident">Sender</span>},
-    <span class="ident">time::Duration</span>,
-};
+<span class="kw">use</span> <span class="ident">tokio::sync::oneshot::error::TryRecvError</span>;
+<span class="kw">use</span> <span class="ident">tokio::sync::oneshot</span>::{<span class="self">self</span>, <span class="ident">Sender</span>};
+<span class="kw">use</span> <span class="ident">tokio::time</span>::{<span class="ident">sleep</span>, <span class="ident">Duration</span>};
 
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::error::Result</span>;
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::http::Http</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::internal::tokio::spawn_named</span>;
-<span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">error::Result</span>, <span class="ident">http::Http</span>};
 
 <span class="doccomment">/// A struct to start typing in a [`Channel`] for an indefinite period of time.</span>
 <span class="doccomment">///</span>
@@ -141,7 +133,7 @@
 <span class="doccomment">/// #</span>
 <span class="doccomment">/// # fn long_process() {}</span>
 <span class="doccomment">/// # fn main() -&gt; Result&lt;()&gt; {</span>
-<span class="doccomment">/// # let http = Http::default();</span>
+<span class="doccomment">/// # let http = Http::new(&quot;token&quot;);</span>
 <span class="doccomment">/// // Initiate typing (assuming `http` is bound)</span>
 <span class="doccomment">/// let typing = Typing::start(Arc::new(http), 7)?;</span>
 <span class="doccomment">///</span>
@@ -206,5 +198,5 @@
     }
 }
 </code></pre></div>
-</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.62.0-nightly (ec77f2524 2022-04-17)" ></div>
+</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.61.0-nightly (3c17c84a3 2022-03-21)" ></div>
 </body></html>

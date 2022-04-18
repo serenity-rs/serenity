@@ -702,16 +702,12 @@
 <span id="697">697</span>
 <span id="698">698</span>
 <span id="699">699</span>
-<span id="700">700</span>
-<span id="701">701</span>
-<span id="702">702</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">borrow::Cow</span>, <span class="ident">sync::Arc</span>};
+</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::borrow::Cow</span>;
+<span class="kw">use</span> <span class="ident">std::sync::Arc</span>;
 
-<span class="kw">use</span> <span class="ident">async_tungstenite::tungstenite</span>::{
-    <span class="self">self</span>,
-    <span class="ident">error::Error</span> <span class="kw">as</span> <span class="ident">TungsteniteError</span>,
-    <span class="ident">protocol::frame::CloseFrame</span>,
-};
+<span class="kw">use</span> <span class="ident">async_tungstenite::tungstenite::error::Error</span> <span class="kw">as</span> <span class="ident">TungsteniteError</span>;
+<span class="kw">use</span> <span class="ident">async_tungstenite::tungstenite::protocol::frame::CloseFrame</span>;
+<span class="kw">use</span> <span class="ident">async_tungstenite::tungstenite</span>::{<span class="self">self</span>};
 <span class="kw">use</span> <span class="ident">futures::channel::mpsc</span>::{<span class="self">self</span>, <span class="ident">UnboundedReceiver</span> <span class="kw">as</span> <span class="ident">Receiver</span>, <span class="ident">UnboundedSender</span> <span class="kw">as</span> <span class="ident">Sender</span>};
 <span class="kw">use</span> <span class="ident">futures</span>::{<span class="ident">SinkExt</span>, <span class="ident">StreamExt</span>};
 <span class="kw">use</span> <span class="ident">serde::Deserialize</span>;
@@ -725,17 +721,23 @@
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::client::bridge::voice::VoiceGatewayManager</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::client::dispatch</span>::{<span class="ident">dispatch</span>, <span class="ident">DispatchEvent</span>};
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::client</span>::{<span class="ident">EventHandler</span>, <span class="ident">RawEventHandler</span>};
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;collector&quot;</span>))]</span>
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::collector</span>::{<span class="ident">ComponentInteractionFilter</span>, <span class="ident">ModalInteractionFilter</span>};
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;collector&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::collector</span>::{<span class="ident">EventFilter</span>, <span class="ident">LazyArc</span>, <span class="ident">LazyReactionAction</span>, <span class="ident">MessageFilter</span>, <span class="ident">ReactionFilter</span>};
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::collector</span>::{
+    <span class="ident">ComponentInteractionFilter</span>,
+    <span class="ident">EventFilter</span>,
+    <span class="ident">LazyArc</span>,
+    <span class="ident">LazyReactionAction</span>,
+    <span class="ident">MessageFilter</span>,
+    <span class="ident">ModalInteractionFilter</span>,
+    <span class="ident">ReactionFilter</span>,
+};
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;framework&quot;</span>)]</span>
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::framework::Framework</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::gateway</span>::{<span class="ident">GatewayError</span>, <span class="ident">InterMessage</span>, <span class="ident">ReconnectType</span>, <span class="ident">Shard</span>, <span class="ident">ShardAction</span>};
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::internal::prelude</span>::<span class="kw-2">*</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::internal::ws_impl</span>::{<span class="ident">ReceiverExt</span>, <span class="ident">SenderExt</span>};
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::event</span>::{<span class="ident">Event</span>, <span class="ident">GatewayEvent</span>};
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;collector&quot;</span>))]</span>
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;collector&quot;</span>)]</span>
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::interactions::Interaction</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::CacheAndHttp</span>;
 
@@ -745,7 +747,7 @@
     <span class="ident">event_handler</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">EventHandler</span><span class="op">&gt;</span><span class="op">&gt;</span>,
     <span class="ident">raw_event_handler</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">RawEventHandler</span><span class="op">&gt;</span><span class="op">&gt;</span>,
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;framework&quot;</span>)]</span>
-    <span class="ident">framework</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">Framework</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+    <span class="ident">framework</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">Framework</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span><span class="op">&gt;</span>,
     <span class="ident">manager_tx</span>: <span class="ident">Sender</span><span class="op">&lt;</span><span class="ident">ShardManagerMessage</span><span class="op">&gt;</span>,
     <span class="comment">// channel to receive messages from the shard manager and dispatches</span>
     <span class="ident">runner_rx</span>: <span class="ident">Receiver</span><span class="op">&lt;</span><span class="ident">InterMessage</span><span class="op">&gt;</span>,
@@ -761,9 +763,9 @@
     <span class="ident">message_filters</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">MessageFilter</span><span class="op">&gt;</span>,
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;collector&quot;</span>)]</span>
     <span class="ident">reaction_filters</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ReactionFilter</span><span class="op">&gt;</span>,
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;collector&quot;</span>))]</span>
+    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;collector&quot;</span>)]</span>
     <span class="ident">component_interaction_filters</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ComponentInteractionFilter</span><span class="op">&gt;</span>,
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;collector&quot;</span>))]</span>
+    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;collector&quot;</span>)]</span>
     <span class="ident">modal_interaction_filters</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ModalInteractionFilter</span><span class="op">&gt;</span>,
 }
 
@@ -791,9 +793,9 @@
             <span class="ident">message_filters</span>: <span class="ident">Vec::new</span>(),
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;collector&quot;</span>)]</span>
             <span class="ident">reaction_filters</span>: <span class="ident">Vec::new</span>(),
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;collector&quot;</span>))]</span>
+            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;collector&quot;</span>)]</span>
             <span class="ident">component_interaction_filters</span>: <span class="macro">vec!</span>[],
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;collector&quot;</span>))]</span>
+            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;collector&quot;</span>)]</span>
             <span class="ident">modal_interaction_filters</span>: <span class="macro">vec!</span>[],
         }
     }
@@ -942,7 +944,7 @@
                 <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">reaction</span> <span class="op">=</span> <span class="ident">LazyReactionAction::new</span>(<span class="kw-2">&amp;</span><span class="ident">reaction_event</span>.<span class="ident">reaction</span>, <span class="bool-val">false</span>);
                 <span class="ident">retain</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">reaction_filters</span>, <span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="ident">f</span>.<span class="ident">send_reaction</span>(<span class="kw-2">&amp;mut</span> <span class="ident">reaction</span>));
             },
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;collector&quot;</span>))]</span>
+            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;collector&quot;</span>)]</span>
             <span class="ident">Event::InteractionCreate</span>(<span class="kw-2">ref</span> <span class="ident">interaction_event</span>) =&gt; {
                 <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="ident">interaction_event</span>.<span class="ident">interaction</span> {
                     <span class="ident">Interaction::MessageComponent</span>(<span class="ident">interaction</span>) =&gt; {
@@ -1088,17 +1090,9 @@
                 },
                 <span class="ident">ShardClientMessage::Manager</span>(<span class="ident">ShardManagerMessage::ShardUpdate</span> {
                     ..
-                }) =&gt; {
-                    <span class="comment">// nb: not sent here</span>
-
-                    <span class="bool-val">true</span>
-                },
-                <span class="ident">ShardClientMessage::Manager</span>(<span class="ident">ShardManagerMessage::ShutdownInitiated</span>) =&gt; {
-                    <span class="comment">// nb: not sent here</span>
-
-                    <span class="bool-val">true</span>
-                },
-                <span class="ident">ShardClientMessage::Manager</span>(<span class="ident">ShardManagerMessage::ShutdownFinished</span>(<span class="kw">_</span>)) =&gt; {
+                })
+                <span class="op">|</span> <span class="ident">ShardClientMessage::Manager</span>(<span class="ident">ShardManagerMessage::ShutdownInitiated</span>)
+                <span class="op">|</span> <span class="ident">ShardClientMessage::Manager</span>(<span class="ident">ShardManagerMessage::ShutdownFinished</span>(<span class="kw">_</span>)) =&gt; {
                     <span class="comment">// nb: not sent here</span>
 
                     <span class="bool-val">true</span>
@@ -1120,7 +1114,7 @@
                     <span class="self">self</span>.<span class="ident">shard</span>.<span class="ident">chunk_guild</span>(<span class="ident">guild_id</span>, <span class="ident">limit</span>, <span class="ident">filter</span>, <span class="ident">nonce</span>.<span class="ident">as_deref</span>()).<span class="kw">await</span>.<span class="ident">is_ok</span>()
                 },
                 <span class="ident">ShardClientMessage::Runner</span>(<span class="ident">ShardRunnerMessage::Close</span>(<span class="ident">code</span>, <span class="ident">reason</span>)) =&gt; {
-                    <span class="kw">let</span> <span class="ident">reason</span> <span class="op">=</span> <span class="ident">reason</span>.<span class="ident">unwrap_or_else</span>(<span class="ident">String::new</span>);
+                    <span class="kw">let</span> <span class="ident">reason</span> <span class="op">=</span> <span class="ident">reason</span>.<span class="ident">unwrap_or_default</span>();
                     <span class="kw">let</span> <span class="ident">close</span> <span class="op">=</span> <span class="ident">CloseFrame</span> {
                         <span class="ident">code</span>: <span class="ident">code</span>.<span class="ident">into</span>(),
                         <span class="ident">reason</span>: <span class="ident">Cow::from</span>(<span class="ident">reason</span>),
@@ -1176,7 +1170,7 @@
 
                     <span class="bool-val">true</span>
                 },
-                <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;collector&quot;</span>))]</span>
+                <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;collector&quot;</span>)]</span>
                 <span class="ident">ShardClientMessage::Runner</span>(<span class="ident">ShardRunnerMessage::SetComponentInteractionFilter</span>(
                     <span class="ident">collector</span>,
                 )) =&gt; {
@@ -1184,7 +1178,7 @@
 
                     <span class="bool-val">true</span>
                 },
-                <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;collector&quot;</span>))]</span>
+                <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;collector&quot;</span>)]</span>
                 <span class="ident">ShardClientMessage::Runner</span>(<span class="ident">ShardRunnerMessage::SetModalInteractionFilter</span>(
                     <span class="ident">collector</span>,
                 )) =&gt; {
@@ -1216,7 +1210,7 @@
                     }
                 },
                 <span class="ident">Event::VoiceStateUpdate</span>(<span class="kw-2">ref</span> <span class="ident">event</span>) =&gt; {
-                    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">guild_id</span>) <span class="op">=</span> <span class="ident">event</span>.<span class="ident">guild_id</span> {
+                    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">guild_id</span>) <span class="op">=</span> <span class="ident">event</span>.<span class="ident">voice_state</span>.<span class="ident">guild_id</span> {
                         <span class="ident">voice_manager</span>.<span class="ident">state_update</span>(<span class="ident">guild_id</span>, <span class="kw-2">&amp;</span><span class="ident">event</span>.<span class="ident">voice_state</span>).<span class="kw">await</span>;
                     }
                 },
@@ -1351,7 +1345,7 @@
         <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;voice&quot;</span>)]</span>
         {
             <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Ok</span>(<span class="ident">GatewayEvent::Dispatch</span>(<span class="kw">_</span>, <span class="kw-2">ref</span> <span class="ident">event</span>)) <span class="op">=</span> <span class="ident">event</span> {
-                <span class="self">self</span>.<span class="ident">handle_voice_event</span>(<span class="kw-2">&amp;</span><span class="ident">event</span>).<span class="kw">await</span>;
+                <span class="self">self</span>.<span class="ident">handle_voice_event</span>(<span class="ident">event</span>).<span class="kw">await</span>;
             }
         }
 
@@ -1400,7 +1394,7 @@
     <span class="kw">pub</span> <span class="ident">event_handler</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">EventHandler</span><span class="op">&gt;</span><span class="op">&gt;</span>,
     <span class="kw">pub</span> <span class="ident">raw_event_handler</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">RawEventHandler</span><span class="op">&gt;</span><span class="op">&gt;</span>,
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;framework&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">framework</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">Framework</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">framework</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">Framework</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span><span class="op">&gt;</span>,
     <span class="kw">pub</span> <span class="ident">manager_tx</span>: <span class="ident">Sender</span><span class="op">&lt;</span><span class="ident">ShardManagerMessage</span><span class="op">&gt;</span>,
     <span class="kw">pub</span> <span class="ident">shard</span>: <span class="ident">Shard</span>,
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;voice&quot;</span>)]</span>
@@ -1408,5 +1402,5 @@
     <span class="kw">pub</span> <span class="ident">cache_and_http</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">CacheAndHttp</span><span class="op">&gt;</span>,
 }
 </code></pre></div>
-</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.62.0-nightly (ec77f2524 2022-04-17)" ></div>
+</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.61.0-nightly (3c17c84a3 2022-03-21)" ></div>
 </body></html>

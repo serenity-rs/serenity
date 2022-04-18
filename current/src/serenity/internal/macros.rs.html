@@ -101,6 +101,56 @@
 <span id="96">96</span>
 <span id="97">97</span>
 <span id="98">98</span>
+<span id="99">99</span>
+<span id="100">100</span>
+<span id="101">101</span>
+<span id="102">102</span>
+<span id="103">103</span>
+<span id="104">104</span>
+<span id="105">105</span>
+<span id="106">106</span>
+<span id="107">107</span>
+<span id="108">108</span>
+<span id="109">109</span>
+<span id="110">110</span>
+<span id="111">111</span>
+<span id="112">112</span>
+<span id="113">113</span>
+<span id="114">114</span>
+<span id="115">115</span>
+<span id="116">116</span>
+<span id="117">117</span>
+<span id="118">118</span>
+<span id="119">119</span>
+<span id="120">120</span>
+<span id="121">121</span>
+<span id="122">122</span>
+<span id="123">123</span>
+<span id="124">124</span>
+<span id="125">125</span>
+<span id="126">126</span>
+<span id="127">127</span>
+<span id="128">128</span>
+<span id="129">129</span>
+<span id="130">130</span>
+<span id="131">131</span>
+<span id="132">132</span>
+<span id="133">133</span>
+<span id="134">134</span>
+<span id="135">135</span>
+<span id="136">136</span>
+<span id="137">137</span>
+<span id="138">138</span>
+<span id="139">139</span>
+<span id="140">140</span>
+<span id="141">141</span>
+<span id="142">142</span>
+<span id="143">143</span>
+<span id="144">144</span>
+<span id="145">145</span>
+<span id="146">146</span>
+<span id="147">147</span>
+<span id="148">148</span>
 </pre><pre class="rust"><code><span class="doccomment">//! A set of macros for easily working with internals.</span>
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">any</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;utils&quot;</span>))]</span>
@@ -116,7 +166,7 @@
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http&quot;</span>)]</span>
 <span class="macro">macro_rules!</span> <span class="ident">api</span> {
     (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">e</span>:<span class="ident">expr</span>) =&gt; {
-        <span class="macro">concat!</span>(<span class="string">&quot;https://discord.com/api/v9&quot;</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">e</span>)
+        <span class="macro">concat!</span>(<span class="string">&quot;https://discord.com/api/v10&quot;</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">e</span>)
     };
     (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">e</span>:<span class="ident">expr</span>, $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">rest</span>:<span class="ident">tt</span>)<span class="kw-2">*</span>) =&gt; {
         <span class="macro">format!</span>(<span class="macro">api!</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">e</span>), $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">rest</span>)<span class="kw-2">*</span>)
@@ -199,6 +249,56 @@
         }
     }
 }
+
+<span class="doccomment">/// The macro forwards the generation to the `bitflags::bitflags!` macro and implements</span>
+<span class="doccomment">/// the default (de)serialization for Discord&#39;s bitmask values.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// The flags are created with `T::from_bits_truncate` for the deserialized integer value.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// Use the `bitflags::bitflags! macro directly if a different serde implementation is required.</span>
+<span class="macro">macro_rules!</span> <span class="ident">bitflags</span> {
+    (
+        $(<span class="attribute">#[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">outer</span>:<span class="ident">meta</span>]</span>)<span class="op">*</span>
+        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">vis</span>:<span class="ident">vis</span> <span class="kw">struct</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">BitFlags</span>:<span class="ident">ident</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">T</span>:<span class="ident">ty</span> {
+            $(
+                $(<span class="attribute">#[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">inner</span>:<span class="ident">ident</span> $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">args</span>:<span class="ident">tt</span>)<span class="kw-2">*</span>]</span>)<span class="op">*</span>
+                <span class="kw">const</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">Flag</span>:<span class="ident">ident</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">value</span>:<span class="ident">expr</span>;
+            )<span class="op">*</span>
+        }
+
+        $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span>:<span class="ident">tt</span>)<span class="op">*</span>
+    ) =&gt; {
+        <span class="macro">bitflags::bitflags!</span> {
+            $(<span class="attribute">#[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">outer</span>]</span>)<span class="op">*</span>
+            <span class="macro-nonterminal">$</span><span class="macro-nonterminal">vis</span> <span class="kw">struct</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">BitFlags</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">T</span> {
+                $(
+                    $(<span class="attribute">#[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">inner</span> $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">args</span>)<span class="kw-2">*</span>]</span>)<span class="op">*</span>
+                    <span class="kw">const</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">Flag</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">value</span>;
+                )<span class="op">*</span>
+            }
+        }
+
+        <span class="macro">bitflags!</span>(<span class="ident">__impl_serde</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">BitFlags</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">T</span>);
+
+        <span class="macro">bitflags!</span> {
+            $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span>)<span class="op">*</span>
+        }
+    };
+    (<span class="ident">__impl_serde</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">BitFlags</span>:<span class="ident">ident</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">T</span>:<span class="ident">tt</span>) =&gt; {
+        <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="ident">serde::de::Deserialize</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">BitFlags</span> {
+            <span class="kw">fn</span> <span class="ident">deserialize</span><span class="op">&lt;</span><span class="ident">D</span>: <span class="ident">serde::de::Deserializer</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">deserializer</span>: <span class="ident">D</span>) -&gt; <span class="ident">std::result::Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">D::Error</span><span class="op">&gt;</span> {
+                <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::from_bits_truncate</span>(<span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">T</span><span class="op">&gt;</span><span class="ident">::deserialize</span>(<span class="ident">deserializer</span>)<span class="question-mark">?</span>))
+            }
+        }
+
+        <span class="kw">impl</span> <span class="ident">serde::ser::Serialize</span> <span class="kw">for</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">BitFlags</span> {
+            <span class="kw">fn</span> <span class="ident">serialize</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">serde::ser::Serializer</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">serializer</span>: <span class="ident">S</span>) -&gt; <span class="ident">std::result::Result</span><span class="op">&lt;</span><span class="ident">S::Ok</span>, <span class="ident">S::Error</span><span class="op">&gt;</span> {
+                <span class="self">self</span>.<span class="ident">bits</span>().<span class="ident">serialize</span>(<span class="ident">serializer</span>)
+            }
+        }
+    };
+    () =&gt; {};
+}
 </code></pre></div>
-</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.62.0-nightly (ec77f2524 2022-04-17)" ></div>
+</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.61.0-nightly (3c17c84a3 2022-03-21)" ></div>
 </body></html>

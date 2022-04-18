@@ -401,35 +401,19 @@
 <span id="396">396</span>
 <span id="397">397</span>
 <span id="398">398</span>
-<span id="399">399</span>
-<span id="400">400</span>
-<span id="401">401</span>
-<span id="402">402</span>
-<span id="403">403</span>
-<span id="404">404</span>
-<span id="405">405</span>
-<span id="406">406</span>
-<span id="407">407</span>
-<span id="408">408</span>
-<span id="409">409</span>
-<span id="410">410</span>
-<span id="411">411</span>
-<span id="412">412</span>
-<span id="413">413</span>
-<span id="414">414</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::fmt</span>::{<span class="ident">Display</span>, <span class="ident">Formatter</span>, <span class="prelude-ty">Result</span> <span class="kw">as</span> <span class="ident">FmtResult</span>};
+</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::fmt</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
 <span class="kw">use</span> <span class="ident">std::sync::Arc</span>;
 
-<span class="kw">use</span> <span class="ident">chrono</span>::{<span class="ident">DateTime</span>, <span class="ident">Utc</span>};
-
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::builder</span>::{<span class="ident">CreateMessage</span>, <span class="ident">EditMessage</span>, <span class="ident">GetMessages</span>};
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::http::AttachmentType</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http&quot;</span>)]</span>
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::http</span>::{<span class="ident">Http</span>, <span class="ident">Typing</span>};
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::channel::AttachmentType</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::prelude</span>::<span class="kw-2">*</span>;
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::utils::single_recipient</span>;
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::Timestamp</span>;
 
 <span class="doccomment">/// A Direct Message text channel with another user.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
@@ -442,18 +426,14 @@
     <span class="doccomment">/// The Id of the last message sent.</span>
     <span class="kw">pub</span> <span class="ident">last_message_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">MessageId</span><span class="op">&gt;</span>,
     <span class="doccomment">/// Timestamp of the last time a [`Message`] was pinned.</span>
-    <span class="kw">pub</span> <span class="ident">last_pin_timestamp</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">DateTime</span><span class="op">&lt;</span><span class="ident">Utc</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">last_pin_timestamp</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Timestamp</span><span class="op">&gt;</span>,
     <span class="doccomment">/// Indicator of the type of channel this is.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// This should always be [`ChannelType::Private`].</span>
     <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename</span> <span class="op">=</span> <span class="string">&quot;type&quot;</span>)]</span>
     <span class="kw">pub</span> <span class="ident">kind</span>: <span class="ident">ChannelType</span>,
     <span class="doccomment">/// The recipient to the private channel.</span>
-    <span class="attribute">#[<span class="ident">serde</span>(
-        <span class="ident">deserialize_with</span> <span class="op">=</span> <span class="string">&quot;deserialize_single_recipient&quot;</span>,
-        <span class="ident">serialize_with</span> <span class="op">=</span> <span class="string">&quot;serialize_single_recipient&quot;</span>,
-        <span class="ident">rename</span> <span class="op">=</span> <span class="string">&quot;recipients&quot;</span>
-    )]</span>
+    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">with</span> <span class="op">=</span> <span class="string">&quot;single_recipient&quot;</span>, <span class="ident">rename</span> <span class="op">=</span> <span class="string">&quot;recipients&quot;</span>)]</span>
     <span class="kw">pub</span> <span class="ident">recipient</span>: <span class="ident">User</span>,
 }
 
@@ -462,8 +442,6 @@
     <span class="doccomment">/// Broadcasts that the current user is typing to the recipient.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// See [ChannelId::broadcast_typing] for more details.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`ChannelId::broadcast_typing`]: crate::model::channel::ChannelId::broadcast_typing</span>
     <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::missing_errors_doc</span>)]</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">broadcast_typing</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
@@ -514,7 +492,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// [Manage Messages]: Permissions::MANAGE_MESSAGES</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">delete_messages</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">MessageId</span><span class="op">&gt;</span>, <span class="ident">It</span>: <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span>(
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">delete_messages</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">It</span><span class="op">&gt;</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>,
         <span class="ident">message_ids</span>: <span class="ident">It</span>,
@@ -579,17 +557,16 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// Returns [`Error::Http`] if the current user is not the owner of the message.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [`EditMessage`]: crate::builder::EditMessage</span>
     <span class="doccomment">/// [`the limit`]: crate::builder::EditMessage::content</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">edit_message</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">edit_message</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">F</span><span class="op">&gt;</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>,
         <span class="ident">message_id</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">MessageId</span><span class="op">&gt;</span>,
         <span class="ident">f</span>: <span class="ident">F</span>,
     ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Message</span><span class="op">&gt;</span>
     <span class="kw">where</span>
-        <span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="kw-2">&amp;mut</span> <span class="ident">EditMessage</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="ident">EditMessage</span>,
+        <span class="ident">F</span>: <span class="kw">for</span><span class="op">&lt;</span><span class="lifetime">&#39;b</span><span class="op">&gt;</span> <span class="ident">FnOnce</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;b</span> <span class="kw-2">mut</span> <span class="ident">EditMessage</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;b</span> <span class="kw-2">mut</span> <span class="ident">EditMessage</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
     {
         <span class="self">self</span>.<span class="ident">id</span>.<span class="ident">edit_message</span>(<span class="kw-2">&amp;</span><span class="ident">http</span>, <span class="ident">message_id</span>, <span class="ident">f</span>).<span class="kw">await</span>
     }
@@ -625,8 +602,6 @@
     <span class="doccomment">/// # Errors</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// Returns [`Error::Http`] if an invalid value is set in the builder.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`GetMessages`]: crate::builder::GetMessages</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">messages</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>, <span class="ident">builder</span>: <span class="ident">F</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Message</span><span class="op">&gt;</span><span class="op">&gt;</span>
     <span class="kw">where</span>
@@ -697,11 +672,7 @@
     <span class="doccomment">/// is over the above limit, containing the number of unicode code points</span>
     <span class="doccomment">/// over the limit.</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">say</span>(
-        <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>,
-        <span class="ident">content</span>: <span class="kw">impl</span> <span class="ident">std::fmt::Display</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Message</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">say</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>, <span class="ident">content</span>: <span class="kw">impl</span> <span class="ident">fmt::Display</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Message</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">id</span>.<span class="ident">say</span>(<span class="kw-2">&amp;</span><span class="ident">http</span>, <span class="ident">content</span>).<span class="kw">await</span>
     }
 
@@ -745,8 +716,6 @@
     <span class="doccomment">/// Returns a [`ModelError::MessageTooLong`] if the content of the message</span>
     <span class="doccomment">/// is over the above limit, containing the number of unicode code points</span>
     <span class="doccomment">/// over the limit.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`CreateMessage`]: crate::builder::CreateMessage</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">send_message</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>, <span class="ident">f</span>: <span class="ident">F</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Message</span><span class="op">&gt;</span>
     <span class="kw">where</span>
@@ -782,10 +751,9 @@
     <span class="doccomment">/// # use std::sync::Arc;</span>
     <span class="doccomment">/// #</span>
     <span class="doccomment">/// # fn long_process() {}</span>
-    <span class="doccomment">/// # let http = Arc::new(Http::default());</span>
+    <span class="doccomment">/// # let http = Arc::new(Http::new(&quot;token&quot;));</span>
     <span class="doccomment">/// # let cache = Cache::default();</span>
     <span class="doccomment">/// # let channel = cache.private_channel(ChannelId(7))</span>
-    <span class="doccomment">/// #    .await</span>
     <span class="doccomment">/// #    .ok_or(ModelError::ItemMissing)?;</span>
     <span class="doccomment">/// // Initiate typing (assuming http is `Arc&lt;Http&gt;` and `channel` is bound)</span>
     <span class="doccomment">/// let typing = channel.start_typing(&amp;http)?;</span>
@@ -825,12 +793,12 @@
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Display</span> <span class="kw">for</span> <span class="ident">PrivateChannel</span> {
+<span class="kw">impl</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">PrivateChannel</span> {
     <span class="doccomment">/// Formats the private channel, displaying the recipient&#39;s username.</span>
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">FmtResult</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
         <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">recipient</span>.<span class="ident">name</span>)
     }
 }
 </code></pre></div>
-</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.62.0-nightly (ec77f2524 2022-04-17)" ></div>
+</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.61.0-nightly (3c17c84a3 2022-03-21)" ></div>
 </body></html>

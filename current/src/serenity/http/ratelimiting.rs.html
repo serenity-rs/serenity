@@ -467,15 +467,6 @@
 <span id="462">462</span>
 <span id="463">463</span>
 <span id="464">464</span>
-<span id="465">465</span>
-<span id="466">466</span>
-<span id="467">467</span>
-<span id="468">468</span>
-<span id="469">469</span>
-<span id="470">470</span>
-<span id="471">471</span>
-<span id="472">472</span>
-<span id="473">473</span>
 </pre><pre class="rust"><code><span class="doccomment">//! Routes are used for ratelimiting. These are to differentiate between the</span>
 <span class="doccomment">//! different _types_ of routes - such as getting the current user&#39;s channels -</span>
 <span class="doccomment">//! for the most part, with the exception being major parameters.</span>
@@ -488,26 +479,26 @@
 <span class="doccomment">//! &gt; account when generating rate limits since it&#39;s the major parameter. The</span>
 <span class="doccomment">//! only current major parameters are `channel_id`, `guild_id` and `webhook_id`.</span>
 <span class="doccomment">//!</span>
-<span class="doccomment">//! This results in the two URIs of `GET /channels/4/messages/7` and</span>
+<span class="doccomment">//! This results in the two URLs of `GET /channels/4/messages/7` and</span>
 <span class="doccomment">//! `GET /channels/5/messages/8` being rate limited _separately_. However, the</span>
-<span class="doccomment">//! two URIs of `GET /channels/10/messages/11` and</span>
+<span class="doccomment">//! two URLs of `GET /channels/10/messages/11` and</span>
 <span class="doccomment">//! `GET /channels/10/messages/12` will count towards the &quot;same ratelimit&quot;, as</span>
-<span class="doccomment">//! the major parameter - `10` is equivalent in both URIs&#39; format.</span>
+<span class="doccomment">//! the major parameter - `10` is equivalent in both URLs&#39; format.</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! # Examples</span>
 <span class="doccomment">//!</span>
-<span class="doccomment">//! First: taking the first two URIs - `GET /channels/4/messages/7` and</span>
+<span class="doccomment">//! First: taking the first two URLs - `GET /channels/4/messages/7` and</span>
 <span class="doccomment">//! `GET /channels/5/messages/8` - and assuming both buckets have a `limit` of</span>
-<span class="doccomment">//! `10`, requesting the first URI will result in the response containing a</span>
+<span class="doccomment">//! `10`, requesting the first URL will result in the response containing a</span>
 <span class="doccomment">//! `remaining` of `9`. Immediately after - prior to buckets resetting -</span>
-<span class="doccomment">//! performing a request to the _second_ URI will also contain a `remaining` of</span>
+<span class="doccomment">//! performing a request to the _second_ URL will also contain a `remaining` of</span>
 <span class="doccomment">//! `9` in the response, as the major parameter - `channel_id` - is different</span>
 <span class="doccomment">//! in the two requests (`4` and `5`).</span>
 <span class="doccomment">//!</span>
-<span class="doccomment">//! Second: take for example the last two URIs. Assuming the bucket&#39;s `limit` is</span>
-<span class="doccomment">//! `10`, requesting the first URI will return a `remaining` of `9` in the</span>
+<span class="doccomment">//! Second: take for example the last two URLs. Assuming the bucket&#39;s `limit` is</span>
+<span class="doccomment">//! `10`, requesting the first URL will return a `remaining` of `9` in the</span>
 <span class="doccomment">//! response. Immediately after - prior to buckets resetting - performing a</span>
-<span class="doccomment">//! request to the _second_ URI will return a `remaining` of `8` in the</span>
+<span class="doccomment">//! request to the _second_ URL will return a `remaining` of `8` in the</span>
 <span class="doccomment">//! response, as the major parameter - `channel_id` - is equivalent for the two</span>
 <span class="doccomment">//! requests (`10`).</span>
 <span class="doccomment">//!</span>
@@ -517,24 +508,16 @@
 <span class="doccomment">//!</span>
 <span class="doccomment">//! [Taken from]: https://discord.com/developers/docs/topics/rate-limits#rate-limits</span>
 
-<span class="kw">use</span> <span class="ident">std</span>::{
-    <span class="ident">collections::HashMap</span>,
-    <span class="ident">f64</span>,
-    <span class="ident">fmt</span>,
-    <span class="ident">i64</span>,
-    <span class="ident">str</span>::{<span class="self">self</span>, <span class="ident">FromStr</span>},
-    <span class="ident">sync::Arc</span>,
-    <span class="ident">time::SystemTime</span>,
-};
+<span class="kw">use</span> <span class="ident">std::collections::HashMap</span>;
+<span class="kw">use</span> <span class="ident">std::fmt</span>;
+<span class="kw">use</span> <span class="ident">std::str</span>::{<span class="self">self</span>, <span class="ident">FromStr</span>};
+<span class="kw">use</span> <span class="ident">std::sync::Arc</span>;
+<span class="kw">use</span> <span class="ident">std::time::SystemTime</span>;
 
-<span class="kw">use</span> <span class="ident">reqwest</span>::{<span class="ident">header::HeaderMap</span>, <span class="ident">StatusCode</span>};
-<span class="kw">use</span> <span class="ident">reqwest</span>::{<span class="ident">Client</span>, <span class="ident">Response</span>};
+<span class="kw">use</span> <span class="ident">reqwest::header::HeaderMap</span>;
+<span class="kw">use</span> <span class="ident">reqwest</span>::{<span class="ident">Client</span>, <span class="ident">Response</span>, <span class="ident">StatusCode</span>};
 <span class="kw">use</span> <span class="ident">tokio::sync</span>::{<span class="ident">Mutex</span>, <span class="ident">RwLock</span>};
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tokio_compat&quot;</span>, <span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tokio&quot;</span>)))]</span>
-<span class="kw">use</span> <span class="ident">tokio::time::delay_for</span> <span class="kw">as</span> <span class="ident">sleep</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tokio&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident">tokio::time::sleep</span>;
-<span class="kw">use</span> <span class="ident">tokio::time::Duration</span>;
+<span class="kw">use</span> <span class="ident">tokio::time</span>::{<span class="ident">sleep</span>, <span class="ident">Duration</span>};
 <span class="kw">use</span> <span class="ident">tracing</span>::{<span class="ident">debug</span>, <span class="ident">instrument</span>};
 
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::routing::Route</span>;
@@ -561,7 +544,7 @@
 <span class="doccomment">/// [`remaining`]: Ratelimit::remaining</span>
 <span class="doccomment">/// [`reset`]: Ratelimit::reset</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Ratelimiter</span> {
-    <span class="ident">client</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Client</span><span class="op">&gt;</span>,
+    <span class="ident">client</span>: <span class="ident">Client</span>,
     <span class="ident">global</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Mutex</span><span class="op">&lt;</span>()<span class="op">&gt;</span><span class="op">&gt;</span>,
     <span class="comment">// When futures is implemented, make tasks clear out their respective entry</span>
     <span class="comment">// when the &#39;reset&#39; passes.</span>
@@ -585,15 +568,15 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// The bot token must be prefixed with `&quot;Bot &quot;`. The ratelimiter does not</span>
     <span class="doccomment">/// prefix it.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">client</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Client</span><span class="op">&gt;</span>, <span class="ident">token</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">client</span>: <span class="ident">Client</span>, <span class="ident">token</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
         <span class="ident"><span class="self">Self</span>::_new</span>(<span class="ident">client</span>, <span class="ident">token</span>.<span class="ident">into</span>())
     }
 
-    <span class="kw">fn</span> <span class="ident">_new</span>(<span class="ident">client</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Client</span><span class="op">&gt;</span>, <span class="ident">token</span>: <span class="ident">String</span>) -&gt; <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">_new</span>(<span class="ident">client</span>: <span class="ident">Client</span>, <span class="ident">token</span>: <span class="ident">String</span>) -&gt; <span class="self">Self</span> {
         <span class="self">Self</span> {
             <span class="ident">client</span>,
-            <span class="ident">global</span>: <span class="ident">Default::default</span>(),
-            <span class="ident">routes</span>: <span class="ident">Default::default</span>(),
+            <span class="ident">global</span>: <span class="ident">Arc::default</span>(),
+            <span class="ident">routes</span>: <span class="ident">Arc::default</span>(),
             <span class="ident">token</span>,
         }
     }
@@ -613,7 +596,7 @@
     <span class="doccomment">/// # use serenity::http::Http;</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// # async fn run() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {</span>
-    <span class="doccomment">/// #     let http = Http::default();</span>
+    <span class="doccomment">/// #     let http = Http::new(&quot;token&quot;);</span>
     <span class="doccomment">/// let routes = http.ratelimiter.routes();</span>
     <span class="doccomment">/// let reader = routes.read().await;</span>
     <span class="doccomment">///</span>
@@ -637,7 +620,7 @@
     <span class="attribute">#[<span class="ident">instrument</span>]</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">perform</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">req</span>: <span class="ident">RatelimitedRequest</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Response</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">RatelimitedRequest</span> {
-            <span class="ident">req</span>,
+            <span class="kw-2">mut</span> <span class="ident">req</span>,
         } <span class="op">=</span> <span class="ident">req</span>;
 
         <span class="kw">loop</span> {
@@ -653,7 +636,7 @@
             <span class="comment">// amount.</span>
             <span class="comment">//</span>
             <span class="comment">// This isn&#39;t normally important, but might be for ratelimiting.</span>
-            <span class="kw">let</span> (<span class="kw">_</span>, <span class="ident">route</span>, <span class="kw">_</span>) <span class="op">=</span> <span class="ident">req</span>.<span class="ident">route</span>.<span class="ident">deconstruct</span>();
+            <span class="kw">let</span> (<span class="kw">_</span>, <span class="ident">route</span>, <span class="kw">_</span>) <span class="op">=</span> <span class="ident">req</span>.<span class="ident">route</span>.<span class="ident">clone</span>().<span class="ident">deconstruct</span>();
 
             <span class="comment">// Perform pre-checking here:</span>
             <span class="comment">//</span>
@@ -667,7 +650,8 @@
 
             <span class="ident">bucket</span>.<span class="ident">lock</span>().<span class="kw">await</span>.<span class="ident">pre_hook</span>(<span class="kw-2">&amp;</span><span class="ident">route</span>).<span class="kw">await</span>;
 
-            <span class="kw">let</span> <span class="ident">request</span> <span class="op">=</span> <span class="ident">req</span>.<span class="ident">build</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">client</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">token</span>, <span class="prelude-val">None</span>)<span class="question-mark">?</span>.<span class="ident">build</span>()<span class="question-mark">?</span>;
+            <span class="kw">let</span> <span class="ident">request</span> <span class="op">=</span> <span class="ident">req</span>.<span class="ident">build</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">client</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">token</span>, <span class="prelude-val">None</span>).<span class="kw">await</span><span class="question-mark">?</span>.<span class="ident">build</span>()<span class="question-mark">?</span>;
+
             <span class="kw">let</span> <span class="ident">response</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">client</span>.<span class="ident">execute</span>(<span class="ident">request</span>).<span class="kw">await</span><span class="question-mark">?</span>;
 
             <span class="comment">// Check if the request got ratelimited by checking for status 429,</span>
@@ -685,29 +669,29 @@
             <span class="comment">// header. If the limit was 5 and is now 7, add 2 to the &#39;remaining&#39;</span>
             <span class="kw">if</span> <span class="ident">route</span> <span class="op">==</span> <span class="ident">Route::None</span> {
                 <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">response</span>);
+            }
+
+            <span class="kw">let</span> <span class="ident">redo</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">response</span>.<span class="ident">headers</span>().<span class="ident">get</span>(<span class="string">&quot;x-ratelimit-global&quot;</span>).<span class="ident">is_some</span>() {
+                <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">global</span>.<span class="ident">lock</span>().<span class="kw">await</span>;
+
+                <span class="prelude-val">Ok</span>(
+                    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">retry_after</span>) <span class="op">=</span>
+                        <span class="ident">parse_header</span>::<span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>(<span class="ident">response</span>.<span class="ident">headers</span>(), <span class="string">&quot;retry-after&quot;</span>)<span class="question-mark">?</span>
+                    {
+                        <span class="macro">debug!</span>(<span class="string">&quot;Ratelimited on route {:?} for {:?}s&quot;</span>, <span class="ident">route</span>, <span class="ident">retry_after</span>);
+                        <span class="ident">sleep</span>(<span class="ident">Duration::from_secs_f64</span>(<span class="ident">retry_after</span>)).<span class="kw">await</span>;
+
+                        <span class="bool-val">true</span>
+                    } <span class="kw">else</span> {
+                        <span class="bool-val">false</span>
+                    },
+                )
             } <span class="kw">else</span> {
-                <span class="kw">let</span> <span class="ident">redo</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">response</span>.<span class="ident">headers</span>().<span class="ident">get</span>(<span class="string">&quot;x-ratelimit-global&quot;</span>).<span class="ident">is_some</span>() {
-                    <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">global</span>.<span class="ident">lock</span>().<span class="kw">await</span>;
+                <span class="ident">bucket</span>.<span class="ident">lock</span>().<span class="kw">await</span>.<span class="ident">post_hook</span>(<span class="kw-2">&amp;</span><span class="ident">response</span>, <span class="kw-2">&amp;</span><span class="ident">route</span>).<span class="kw">await</span>
+            };
 
-                    <span class="prelude-val">Ok</span>(
-                        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">retry_after</span>) <span class="op">=</span>
-                            <span class="ident">parse_header</span>::<span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>(<span class="ident">response</span>.<span class="ident">headers</span>(), <span class="string">&quot;retry-after&quot;</span>)<span class="question-mark">?</span>
-                        {
-                            <span class="macro">debug!</span>(<span class="string">&quot;Ratelimited on route {:?} for {:?}s&quot;</span>, <span class="ident">route</span>, <span class="ident">retry_after</span>);
-                            <span class="ident">sleep</span>(<span class="ident">Duration::from_secs_f64</span>(<span class="ident">retry_after</span>)).<span class="kw">await</span>;
-
-                            <span class="bool-val">true</span>
-                        } <span class="kw">else</span> {
-                            <span class="bool-val">false</span>
-                        },
-                    )
-                } <span class="kw">else</span> {
-                    <span class="ident">bucket</span>.<span class="ident">lock</span>().<span class="kw">await</span>.<span class="ident">post_hook</span>(<span class="kw-2">&amp;</span><span class="ident">response</span>, <span class="kw-2">&amp;</span><span class="ident">route</span>).<span class="kw">await</span>
-                };
-
-                <span class="kw">if</span> <span class="op">!</span><span class="ident">redo</span>.<span class="ident">unwrap_or</span>(<span class="bool-val">true</span>) {
-                    <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">response</span>);
-                }
+            <span class="kw">if</span> <span class="op">!</span><span class="ident">redo</span>.<span class="ident">unwrap_or</span>(<span class="bool-val">true</span>) {
+                <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">response</span>);
             }
         }
     }
@@ -742,26 +726,23 @@
             <span class="kw">return</span>;
         }
 
-        <span class="kw">let</span> <span class="ident">reset</span> <span class="op">=</span> <span class="kw">match</span> <span class="self">self</span>.<span class="ident">reset</span> {
-            <span class="prelude-val">Some</span>(<span class="ident">reset</span>) =&gt; <span class="ident">reset</span>,
-            <span class="prelude-val">None</span> =&gt; {
-                <span class="comment">// We&#39;re probably in the past.</span>
-                <span class="self">self</span>.<span class="ident">remaining</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">limit</span>;
+        <span class="kw">let</span> <span class="ident">reset</span> <span class="op">=</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">reset</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">reset</span> {
+            <span class="ident">reset</span>
+        } <span class="kw">else</span> {
+            <span class="comment">// We&#39;re probably in the past.</span>
+            <span class="self">self</span>.<span class="ident">remaining</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">limit</span>;
 
-                <span class="kw">return</span>;
-            },
+            <span class="kw">return</span>;
         };
 
-        <span class="kw">let</span> <span class="ident">delay</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">reset</span>.<span class="ident">duration_since</span>(<span class="ident">SystemTime::now</span>()) {
-            <span class="prelude-val">Ok</span>(<span class="ident">delay</span>) =&gt; <span class="ident">delay</span>,
-
+        <span class="kw">let</span> <span class="ident">delay</span> <span class="op">=</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Ok</span>(<span class="ident">delay</span>) <span class="op">=</span> <span class="ident">reset</span>.<span class="ident">duration_since</span>(<span class="ident">SystemTime::now</span>()) {
+            <span class="ident">delay</span>
+        } <span class="kw">else</span> {
             <span class="comment">// if duration is negative (i.e. adequate time has passed since last call to this api)</span>
-            <span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; {
-                <span class="kw">if</span> <span class="self">self</span>.<span class="ident">remaining</span>() <span class="op">!</span><span class="op">=</span> <span class="number">0</span> {
-                    <span class="self">self</span>.<span class="ident">remaining</span> <span class="op">-</span><span class="op">=</span> <span class="number">1</span>;
-                }
-                <span class="kw">return</span>;
-            },
+            <span class="kw">if</span> <span class="self">self</span>.<span class="ident">remaining</span>() <span class="op">!</span><span class="op">=</span> <span class="number">0</span> {
+                <span class="self">self</span>.<span class="ident">remaining</span> <span class="op">-</span><span class="op">=</span> <span class="number">1</span>;
+            }
+            <span class="kw">return</span>;
         };
 
         <span class="kw">if</span> <span class="self">self</span>.<span class="ident">remaining</span>() <span class="op">==</span> <span class="number">0</span> {
@@ -786,7 +767,7 @@
         }
 
         <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;absolute_ratelimits&quot;</span>)]</span>
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">_reset</span>) <span class="op">=</span> <span class="ident">parse_header</span>::<span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="ident">response</span>.<span class="ident">headers</span>(), <span class="string">&quot;x-ratelimit-reset&quot;</span>)<span class="question-mark">?</span> {
+        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">_reset</span>) <span class="op">=</span> <span class="ident">parse_header</span>::<span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>(<span class="ident">response</span>.<span class="ident">headers</span>(), <span class="string">&quot;x-ratelimit-reset&quot;</span>)<span class="question-mark">?</span> {
             <span class="self">self</span>.<span class="ident">reset</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">std::time::UNIX_EPOCH</span> <span class="op">+</span> <span class="ident">Duration::from_secs_f64</span>(<span class="ident">_reset</span>));
         }
 
@@ -884,16 +865,17 @@
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
 <span class="kw">mod</span> <span class="ident">tests</span> {
-    <span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">error::Error</span> <span class="kw">as</span> <span class="ident">StdError</span>, <span class="ident">result::Result</span> <span class="kw">as</span> <span class="ident">StdResult</span>};
+    <span class="kw">use</span> <span class="ident">std::error::Error</span> <span class="kw">as</span> <span class="ident">StdError</span>;
+    <span class="kw">use</span> <span class="ident">std::result::Result</span> <span class="kw">as</span> <span class="ident">StdResult</span>;
 
     <span class="kw">use</span> <span class="ident">reqwest::header</span>::{<span class="ident">HeaderMap</span>, <span class="ident">HeaderName</span>, <span class="ident">HeaderValue</span>};
 
     <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::parse_header</span>;
-    <span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">error::Error</span>, <span class="ident">http::HttpError</span>};
+    <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::error::Error</span>;
+    <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::http::HttpError</span>;
 
     <span class="kw">type</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">StdResult</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">StdError</span><span class="op">&gt;</span><span class="op">&gt;</span>;
 
-    <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::unwrap_used</span>)]</span>
     <span class="kw">fn</span> <span class="ident">headers</span>() -&gt; <span class="ident">HeaderMap</span> {
         <span class="kw">let</span> <span class="ident">pairs</span> <span class="op">=</span> <span class="kw-2">&amp;</span>[
             (<span class="ident">HeaderName::from_static</span>(<span class="string">&quot;x-ratelimit-limit&quot;</span>), <span class="ident">HeaderValue::from_static</span>(<span class="string">&quot;5&quot;</span>)),
@@ -919,7 +901,7 @@
     }
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::float_cmp</span>, <span class="ident">clippy::unwrap_used</span>)]</span>
+    <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::float_cmp</span>)]</span>
     <span class="kw">fn</span> <span class="ident">test_parse_header_good</span>() -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">headers</span> <span class="op">=</span> <span class="ident">headers</span>();
 
@@ -950,5 +932,5 @@
     }
 }
 </code></pre></div>
-</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.62.0-nightly (ec77f2524 2022-04-17)" ></div>
+</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.61.0-nightly (3c17c84a3 2022-03-21)" ></div>
 </body></html>

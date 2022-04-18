@@ -208,22 +208,9 @@
 <span id="203">203</span>
 <span id="204">204</span>
 <span id="205">205</span>
-<span id="206">206</span>
-<span id="207">207</span>
-<span id="208">208</span>
-<span id="209">209</span>
-<span id="210">210</span>
-<span id="211">211</span>
-<span id="212">212</span>
-<span id="213">213</span>
-<span id="214">214</span>
-<span id="215">215</span>
-<span id="216">216</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::collections::HashMap</span>;
 
-<span class="kw">use</span> <span class="ident">serde_json</span>::{<span class="ident">json</span>, <span class="ident">Value</span>};
-
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::internal::prelude</span>::<span class="kw-2">*</span>;
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::json</span>::{<span class="ident">from_number</span>, <span class="ident">json</span>, <span class="ident">Value</span>, <span class="ident">NULL</span>};
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::channel</span>::{<span class="ident">PermissionOverwrite</span>, <span class="ident">PermissionOverwriteType</span>, <span class="ident">VideoQualityMode</span>};
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::id::ChannelId</span>;
 
@@ -239,7 +226,7 @@
 <span class="doccomment">/// # use serenity::{http::Http, model::id::ChannelId};</span>
 <span class="doccomment">/// #</span>
 <span class="doccomment">/// # async fn run() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {</span>
-<span class="doccomment">/// #     let http = Http::default();</span>
+<span class="doccomment">/// #     let http = Http::new(&quot;token&quot;);</span>
 <span class="doccomment">/// #     let mut channel = ChannelId(0);</span>
 <span class="doccomment">/// // assuming a channel has already been bound</span>
 <span class="doccomment">/// if let Err(why) = channel.edit(&amp;http, |c| c.name(&quot;new name&quot;).topic(&quot;a test topic&quot;)).await {</span>
@@ -261,7 +248,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// [voice]: crate::model::channel::ChannelType::Voice</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">bitrate</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">bitrate</span>: <span class="ident">u64</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;bitrate&quot;</span>, <span class="ident">Value::Number</span>(<span class="ident">Number::from</span>(<span class="ident">bitrate</span>)));
+        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;bitrate&quot;</span>, <span class="ident">from_number</span>(<span class="ident">bitrate</span>));
         <span class="self">self</span>
     }
 
@@ -271,7 +258,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// [voice]: crate::model::channel::ChannelType::Voice</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">video_quality_mode</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">quality</span>: <span class="ident">VideoQualityMode</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;video_quality_mode&quot;</span>, <span class="ident">Value::Number</span>(<span class="ident">Number::from</span>(<span class="ident">quality</span> <span class="kw">as</span> <span class="ident">u8</span>)));
+        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;video_quality_mode&quot;</span>, <span class="ident">from_number</span>(<span class="ident">quality</span> <span class="kw">as</span> <span class="ident">u8</span>));
         <span class="self">self</span>
     }
 
@@ -283,8 +270,8 @@
     <span class="doccomment">/// [voice]: crate::model::channel::ChannelType::Voice</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">voice_region</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
         <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;rtc_region&quot;</span>, <span class="kw">match</span> <span class="ident">id</span> {
-            <span class="prelude-val">Some</span>(<span class="ident">region</span>) =&gt; <span class="ident">Value::String</span>(<span class="ident">region</span>),
-            <span class="prelude-val">None</span> =&gt; <span class="ident">Value::Null</span>,
+            <span class="prelude-val">Some</span>(<span class="ident">region</span>) =&gt; <span class="ident">Value::from</span>(<span class="ident">region</span>),
+            <span class="prelude-val">None</span> =&gt; <span class="ident">NULL</span>,
         });
         <span class="self">self</span>
     }
@@ -293,13 +280,13 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// Must be between 2 and 100 characters long.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">name</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">ToString</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">name</span>: <span class="ident">S</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;name&quot;</span>, <span class="ident">Value::String</span>(<span class="ident">name</span>.<span class="ident">to_string</span>()));
+        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;name&quot;</span>, <span class="ident">Value::from</span>(<span class="ident">name</span>.<span class="ident">to_string</span>()));
         <span class="self">self</span>
     }
 
     <span class="doccomment">/// The position of the channel in the channel list.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">position</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">position</span>: <span class="ident">u64</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;position&quot;</span>, <span class="ident">Value::Number</span>(<span class="ident">Number::from</span>(<span class="ident">position</span>)));
+        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;position&quot;</span>, <span class="ident">from_number</span>(<span class="ident">position</span>));
         <span class="self">self</span>
     }
 
@@ -311,7 +298,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// [text]: crate::model::channel::ChannelType::Text</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">topic</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">ToString</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">topic</span>: <span class="ident">S</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;topic&quot;</span>, <span class="ident">Value::String</span>(<span class="ident">topic</span>.<span class="ident">to_string</span>()));
+        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;topic&quot;</span>, <span class="ident">Value::from</span>(<span class="ident">topic</span>.<span class="ident">to_string</span>()));
         <span class="self">self</span>
     }
 
@@ -321,7 +308,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// [text]: crate::model::channel::ChannelType::Text</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">nsfw</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">nsfw</span>: <span class="ident">bool</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;nsfw&quot;</span>, <span class="ident">Value::Bool</span>(<span class="ident">nsfw</span>));
+        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;nsfw&quot;</span>, <span class="ident">Value::from</span>(<span class="ident">nsfw</span>));
 
         <span class="self">self</span>
     }
@@ -332,7 +319,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// [voice]: crate::model::channel::ChannelType::Voice</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">user_limit</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">user_limit</span>: <span class="ident">u64</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;user_limit&quot;</span>, <span class="ident">Value::Number</span>(<span class="ident">Number::from</span>(<span class="ident">user_limit</span>)));
+        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;user_limit&quot;</span>, <span class="ident">from_number</span>(<span class="ident">user_limit</span>));
         <span class="self">self</span>
     }
 
@@ -350,18 +337,9 @@
 
     <span class="kw">fn</span> <span class="ident">_category</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">category</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ChannelId</span><span class="op">&gt;</span>) {
         <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;parent_id&quot;</span>, <span class="kw">match</span> <span class="ident">category</span> {
-            <span class="prelude-val">Some</span>(<span class="ident">c</span>) =&gt; <span class="ident">Value::Number</span>(<span class="ident">Number::from</span>(<span class="ident">c</span>.<span class="number">0</span>)),
-            <span class="prelude-val">None</span> =&gt; <span class="ident">Value::Null</span>,
+            <span class="prelude-val">Some</span>(<span class="ident">c</span>) =&gt; <span class="ident">Value::from</span>(<span class="ident">c</span>.<span class="number">0</span>),
+            <span class="prelude-val">None</span> =&gt; <span class="ident">NULL</span>,
         });
-    }
-
-    <span class="doccomment">/// The seconds a user has to wait before sending another message.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// **Note**: Must be between 0 and 21600 seconds (360 minutes or 6 hours).</span>
-    <span class="attribute">#[<span class="ident">deprecated</span>(<span class="ident">note</span> <span class="op">=</span> <span class="string">&quot;replaced by `rate_limit_per_user`&quot;</span>)]</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">slow_mode_rate</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">seconds</span>: <span class="ident">u64</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">rate_limit_per_user</span>(<span class="ident">seconds</span>)
     }
 
     <span class="doccomment">/// How many seconds must a user wait before sending another message.</span>
@@ -375,7 +353,7 @@
     <span class="doccomment">/// [`MANAGE_CHANNELS`]: crate::model::permissions::Permissions::MANAGE_CHANNELS</span>
     <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">alias</span> <span class="op">=</span> <span class="string">&quot;slowmode&quot;</span>)]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">rate_limit_per_user</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">seconds</span>: <span class="ident">u64</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;rate_limit_per_user&quot;</span>, <span class="ident">Value::Number</span>(<span class="ident">Number::from</span>(<span class="ident">seconds</span>)));
+        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;rate_limit_per_user&quot;</span>, <span class="ident">from_number</span>(<span class="ident">seconds</span>));
 
         <span class="self">self</span>
     }
@@ -392,7 +370,7 @@
     <span class="doccomment">/// # use std::sync::Arc;</span>
     <span class="doccomment">/// #</span>
     <span class="doccomment">/// # async fn run() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {</span>
-    <span class="doccomment">/// #     let http = Arc::new(Http::default());</span>
+    <span class="doccomment">/// #     let http = Arc::new(Http::new(&quot;token&quot;));</span>
     <span class="doccomment">/// #     let mut channel = ChannelId(0);</span>
     <span class="doccomment">/// use serenity::model::channel::{PermissionOverwrite, PermissionOverwriteType};</span>
     <span class="doccomment">/// use serenity::model::id::UserId;</span>
@@ -400,7 +378,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// // Assuming a channel has already been bound.</span>
     <span class="doccomment">/// let permissions = vec![PermissionOverwrite {</span>
-    <span class="doccomment">///     allow: Permissions::READ_MESSAGES,</span>
+    <span class="doccomment">///     allow: Permissions::VIEW_CHANNEL,</span>
     <span class="doccomment">///     deny: Permissions::SEND_TTS_MESSAGES,</span>
     <span class="doccomment">///     kind: PermissionOverwriteType::Member(UserId(1234)),</span>
     <span class="doccomment">/// }];</span>
@@ -428,13 +406,13 @@
                     <span class="string">&quot;type&quot;</span>: <span class="ident">kind</span>,
                 })
             })
-            .<span class="ident">collect</span>();
+            .<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>();
 
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;permission_overwrites&quot;</span>, <span class="ident">Value::Array</span>(<span class="ident">overwrites</span>));
+        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;permission_overwrites&quot;</span>, <span class="ident">Value::from</span>(<span class="ident">overwrites</span>));
 
         <span class="self">self</span>
     }
 }
 </code></pre></div>
-</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.62.0-nightly (ec77f2524 2022-04-17)" ></div>
+</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.61.0-nightly (3c17c84a3 2022-03-21)" ></div>
 </body></html>

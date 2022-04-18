@@ -211,43 +211,24 @@
 <span id="206">206</span>
 <span id="207">207</span>
 <span id="208">208</span>
-<span id="209">209</span>
-<span id="210">210</span>
-<span id="211">211</span>
-<span id="212">212</span>
-<span id="213">213</span>
-<span id="214">214</span>
-<span id="215">215</span>
-<span id="216">216</span>
-<span id="217">217</span>
-<span id="218">218</span>
-<span id="219">219</span>
-<span id="220">220</span>
-<span id="221">221</span>
-<span id="222">222</span>
-<span id="223">223</span>
-<span id="224">224</span>
-<span id="225">225</span>
-<span id="226">226</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">serde::de::Error</span> <span class="kw">as</span> <span class="ident">DeError</span>;
 <span class="kw">use</span> <span class="ident">serde</span>::{<span class="ident">Deserialize</span>, <span class="ident">Deserializer</span>};
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident">serde_json::json</span>;
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;simd-json&quot;</span>)]</span>
+<span class="kw">use</span> <span class="ident">simd_json::ValueAccess</span>;
 
 <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::prelude</span>::<span class="kw-2">*</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http&quot;</span>)]</span>
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::builder::CreateAutocompleteResponse</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http&quot;</span>)]</span>
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::http::Http</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::internal::prelude</span>::{<span class="ident">JsonMap</span>, <span class="ident">StdResult</span>, <span class="ident">Value</span>};
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::internal::prelude::StdResult</span>;
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http&quot;</span>)]</span>
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::json</span>::{<span class="self">self</span>, <span class="ident">json</span>};
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::json</span>::{<span class="ident">from_number</span>, <span class="ident">JsonMap</span>, <span class="ident">Value</span>};
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::id</span>::{<span class="ident">ApplicationId</span>, <span class="ident">ChannelId</span>, <span class="ident">GuildId</span>, <span class="ident">InteractionId</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::interactions</span>::{
-    <span class="ident">application_command::ApplicationCommandInteractionData</span>,
-    <span class="ident">InteractionType</span>,
-};
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::interactions::application_command::ApplicationCommandInteractionData</span>;
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::interactions::InteractionType</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::prelude::User</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::utils</span>;
 
 <span class="doccomment">/// An interaction received when the user fills in an autocomplete option</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Serialize</span>)]</span>
@@ -284,7 +265,7 @@
     <span class="kw">pub</span> <span class="ident">locale</span>: <span class="ident">String</span>,
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http&quot;</span>)]</span>
 <span class="kw">impl</span> <span class="ident">AutocompleteInteraction</span> {
     <span class="doccomment">/// Creates a response to an autocomplete interaction.</span>
     <span class="doccomment">///</span>
@@ -299,7 +280,7 @@
     {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">response</span> <span class="op">=</span> <span class="ident">CreateAutocompleteResponse::default</span>();
         <span class="ident">f</span>(<span class="kw-2">&amp;mut</span> <span class="ident">response</span>);
-        <span class="kw">let</span> <span class="ident">data</span> <span class="op">=</span> <span class="ident">utils::hashmap_to_json_map</span>(<span class="ident">response</span>.<span class="number">0</span>);
+        <span class="kw">let</span> <span class="ident">data</span> <span class="op">=</span> <span class="ident">json::hashmap_to_json_map</span>(<span class="ident">response</span>.<span class="number">0</span>);
 
         <span class="comment">// Autocomplete response type is 8</span>
         <span class="kw">let</span> <span class="ident">map</span> <span class="op">=</span> <span class="macro">json!</span>({
@@ -319,7 +300,7 @@
 
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">guild_id</span>) <span class="op">=</span> <span class="ident">id</span> {
             <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">member</span>) <span class="op">=</span> <span class="ident">map</span>.<span class="ident">get_mut</span>(<span class="string">&quot;member&quot;</span>).<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">x</span><span class="op">|</span> <span class="ident">x</span>.<span class="ident">as_object_mut</span>()) {
-                <span class="ident">member</span>.<span class="ident">insert</span>(<span class="string">&quot;guild_id&quot;</span>.<span class="ident">to_string</span>(), <span class="ident">Value::Number</span>(<span class="ident">Number::from</span>(<span class="ident">guild_id</span>)));
+                <span class="ident">member</span>.<span class="ident">insert</span>(<span class="string">&quot;guild_id&quot;</span>.<span class="ident">to_string</span>(), <span class="ident">from_number</span>(<span class="ident">guild_id</span>));
             }
 
             <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">data</span>) <span class="op">=</span> <span class="ident">map</span>.<span class="ident">get_mut</span>(<span class="string">&quot;data&quot;</span>) {
@@ -329,7 +310,7 @@
                             <span class="kw">for</span> <span class="ident">value</span> <span class="kw">in</span> <span class="ident">values</span>.<span class="ident">values_mut</span>() {
                                 <span class="ident">value</span>.<span class="ident">as_object_mut</span>().<span class="ident">expect</span>(<span class="string">&quot;couldn&#39;t deserialize&quot;</span>).<span class="ident">insert</span>(
                                     <span class="string">&quot;guild_id&quot;</span>.<span class="ident">to_string</span>(),
-                                    <span class="ident">Value::String</span>(<span class="ident">guild_id</span>.<span class="ident">to_string</span>()),
+                                    <span class="ident">Value::from</span>(<span class="ident">guild_id</span>.<span class="ident">to_string</span>()),
                                 );
                             }
                         }
@@ -343,7 +324,7 @@
                                     .<span class="ident">expect</span>(<span class="string">&quot;couldn&#39;t deserialize application command&quot;</span>)
                                     .<span class="ident">insert</span>(
                                         <span class="string">&quot;guild_id&quot;</span>.<span class="ident">to_string</span>(),
-                                        <span class="ident">Value::String</span>(<span class="ident">guild_id</span>.<span class="ident">to_string</span>()),
+                                        <span class="ident">Value::from</span>(<span class="ident">guild_id</span>.<span class="ident">to_string</span>()),
                                     );
                             }
                         }
@@ -376,15 +357,11 @@
             .<span class="ident">and_then</span>(<span class="ident">ApplicationCommandInteractionData::deserialize</span>)
             .<span class="ident">map_err</span>(<span class="ident">DeError::custom</span>)<span class="question-mark">?</span>;
 
-        <span class="kw">let</span> <span class="ident">guild_id</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">map</span>.<span class="ident">contains_key</span>(<span class="string">&quot;guild_id&quot;</span>) {
-            <span class="bool-val">true</span> =&gt; <span class="prelude-val">Some</span>(
-                <span class="ident">map</span>.<span class="ident">remove</span>(<span class="string">&quot;guild_id&quot;</span>)
-                    .<span class="ident">ok_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">DeError::custom</span>(<span class="string">&quot;expected guild_id&quot;</span>))
-                    .<span class="ident">and_then</span>(<span class="ident">GuildId::deserialize</span>)
-                    .<span class="ident">map_err</span>(<span class="ident">DeError::custom</span>)<span class="question-mark">?</span>,
-            ),
-            <span class="bool-val">false</span> =&gt; <span class="prelude-val">None</span>,
-        };
+        <span class="kw">let</span> <span class="ident">guild_id</span> <span class="op">=</span> <span class="ident">map</span>
+            .<span class="ident">remove</span>(<span class="string">&quot;guild_id&quot;</span>)
+            .<span class="ident">map</span>(<span class="ident">GuildId::deserialize</span>)
+            .<span class="ident">transpose</span>()
+            .<span class="ident">map_err</span>(<span class="ident">DeError::custom</span>)<span class="question-mark">?</span>;
 
         <span class="kw">let</span> <span class="ident">channel_id</span> <span class="op">=</span> <span class="ident">map</span>
             .<span class="ident">remove</span>(<span class="string">&quot;channel_id&quot;</span>)
@@ -392,24 +369,15 @@
             .<span class="ident">and_then</span>(<span class="ident">ChannelId::deserialize</span>)
             .<span class="ident">map_err</span>(<span class="ident">DeError::custom</span>)<span class="question-mark">?</span>;
 
-        <span class="kw">let</span> <span class="ident">member</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">map</span>.<span class="ident">contains_key</span>(<span class="string">&quot;member&quot;</span>) {
-            <span class="bool-val">true</span> =&gt; <span class="prelude-val">Some</span>(
-                <span class="ident">map</span>.<span class="ident">remove</span>(<span class="string">&quot;member&quot;</span>)
-                    .<span class="ident">ok_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">DeError::custom</span>(<span class="string">&quot;expected member&quot;</span>))
-                    .<span class="ident">and_then</span>(<span class="ident">Member::deserialize</span>)
-                    .<span class="ident">map_err</span>(<span class="ident">DeError::custom</span>)<span class="question-mark">?</span>,
-            ),
-            <span class="bool-val">false</span> =&gt; <span class="prelude-val">None</span>,
-        };
+        <span class="kw">let</span> <span class="ident">member</span> <span class="op">=</span>
+            <span class="ident">map</span>.<span class="ident">remove</span>(<span class="string">&quot;member&quot;</span>).<span class="ident">map</span>(<span class="ident">Member::deserialize</span>).<span class="ident">transpose</span>().<span class="ident">map_err</span>(<span class="ident">DeError::custom</span>)<span class="question-mark">?</span>;
 
-        <span class="kw">let</span> <span class="ident">user</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">map</span>.<span class="ident">contains_key</span>(<span class="string">&quot;user&quot;</span>) {
-            <span class="bool-val">true</span> =&gt; <span class="ident">map</span>
-                .<span class="ident">remove</span>(<span class="string">&quot;user&quot;</span>)
-                .<span class="ident">ok_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">DeError::custom</span>(<span class="string">&quot;expected user&quot;</span>))
-                .<span class="ident">and_then</span>(<span class="ident">User::deserialize</span>)
-                .<span class="ident">map_err</span>(<span class="ident">DeError::custom</span>)<span class="question-mark">?</span>,
-            <span class="bool-val">false</span> =&gt; <span class="ident">member</span>.<span class="ident">as_ref</span>().<span class="ident">expect</span>(<span class="string">&quot;expected user or member&quot;</span>).<span class="ident">user</span>.<span class="ident">clone</span>(),
-        };
+        <span class="kw">let</span> <span class="ident">user</span> <span class="op">=</span>
+            <span class="ident">map</span>.<span class="ident">remove</span>(<span class="string">&quot;user&quot;</span>).<span class="ident">map</span>(<span class="ident">User::deserialize</span>).<span class="ident">transpose</span>().<span class="ident">map_err</span>(<span class="ident">DeError::custom</span>)<span class="question-mark">?</span>;
+
+        <span class="kw">let</span> <span class="ident">user</span> <span class="op">=</span> <span class="ident">user</span>
+            .<span class="ident">or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">member</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">m</span><span class="op">|</span> <span class="ident">m</span>.<span class="ident">user</span>.<span class="ident">clone</span>()))
+            .<span class="ident">ok_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">DeError::custom</span>(<span class="string">&quot;expected user or member&quot;</span>))<span class="question-mark">?</span>;
 
         <span class="kw">let</span> <span class="ident">token</span> <span class="op">=</span> <span class="ident">map</span>
             .<span class="ident">remove</span>(<span class="string">&quot;token&quot;</span>)
@@ -423,15 +391,11 @@
             .<span class="ident">and_then</span>(<span class="ident">u8::deserialize</span>)
             .<span class="ident">map_err</span>(<span class="ident">DeError::custom</span>)<span class="question-mark">?</span>;
 
-        <span class="kw">let</span> <span class="ident">guild_locale</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">map</span>.<span class="ident">contains_key</span>(<span class="string">&quot;guild_locale&quot;</span>) {
-            <span class="bool-val">true</span> =&gt; <span class="prelude-val">Some</span>(
-                <span class="ident">map</span>.<span class="ident">remove</span>(<span class="string">&quot;guild_locale&quot;</span>)
-                    .<span class="ident">ok_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">DeError::custom</span>(<span class="string">&quot;expected guild_locale&quot;</span>))
-                    .<span class="ident">and_then</span>(<span class="ident">String::deserialize</span>)
-                    .<span class="ident">map_err</span>(<span class="ident">DeError::custom</span>)<span class="question-mark">?</span>,
-            ),
-            <span class="bool-val">false</span> =&gt; <span class="prelude-val">None</span>,
-        };
+        <span class="kw">let</span> <span class="ident">guild_locale</span> <span class="op">=</span> <span class="ident">map</span>
+            .<span class="ident">remove</span>(<span class="string">&quot;guild_locale&quot;</span>)
+            .<span class="ident">map</span>(<span class="ident">String::deserialize</span>)
+            .<span class="ident">transpose</span>()
+            .<span class="ident">map_err</span>(<span class="ident">DeError::custom</span>)<span class="question-mark">?</span>;
 
         <span class="kw">let</span> <span class="ident">locale</span> <span class="op">=</span> <span class="ident">map</span>
             .<span class="ident">remove</span>(<span class="string">&quot;locale&quot;</span>)
@@ -456,5 +420,5 @@
     }
 }
 </code></pre></div>
-</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.62.0-nightly (ec77f2524 2022-04-17)" ></div>
+</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.61.0-nightly (3c17c84a3 2022-03-21)" ></div>
 </body></html>

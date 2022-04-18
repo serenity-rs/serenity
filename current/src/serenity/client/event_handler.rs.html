@@ -521,53 +521,14 @@
 <span id="516">516</span>
 <span id="517">517</span>
 <span id="518">518</span>
-<span id="519">519</span>
-<span id="520">520</span>
-<span id="521">521</span>
-<span id="522">522</span>
-<span id="523">523</span>
-<span id="524">524</span>
-<span id="525">525</span>
-<span id="526">526</span>
-<span id="527">527</span>
-<span id="528">528</span>
-<span id="529">529</span>
-<span id="530">530</span>
-<span id="531">531</span>
-<span id="532">532</span>
-<span id="533">533</span>
-<span id="534">534</span>
-<span id="535">535</span>
-<span id="536">536</span>
-<span id="537">537</span>
-<span id="538">538</span>
-<span id="539">539</span>
-<span id="540">540</span>
-<span id="541">541</span>
-<span id="542">542</span>
-<span id="543">543</span>
-<span id="544">544</span>
-<span id="545">545</span>
-<span id="546">546</span>
-<span id="547">547</span>
-<span id="548">548</span>
-<span id="549">549</span>
-<span id="550">550</span>
-<span id="551">551</span>
-<span id="552">552</span>
-<span id="553">553</span>
-<span id="554">554</span>
-<span id="555">555</span>
-<span id="556">556</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::collections::HashMap</span>;
 
 <span class="kw">use</span> <span class="ident">async_trait::async_trait</span>;
-<span class="kw">use</span> <span class="ident">serde_json::Value</span>;
 
 <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::context::Context</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::client::bridge::gateway::event</span>::<span class="kw-2">*</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::interactions</span>::{<span class="ident">application_command::ApplicationCommand</span>, <span class="ident">Interaction</span>};
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::json::Value</span>;
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::interactions::Interaction</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::prelude</span>::<span class="kw-2">*</span>;
 
 <span class="doccomment">/// The core trait for handling events by serenity.</span>
@@ -654,12 +615,12 @@
     <span class="doccomment">/// If the flag is false, the bot was removed from the guild, either by being</span>
     <span class="doccomment">/// kicked or banned. If the flag is true, the guild went offline.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [`unavailable`]: GuildUnavailable::unavailable</span>
+    <span class="doccomment">/// [`unavailable`]: UnavailableGuild::unavailable</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">guild_delete</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">_ctx</span>: <span class="ident">Context</span>,
-        <span class="ident">_incomplete</span>: <span class="ident">GuildUnavailable</span>,
+        <span class="ident">_incomplete</span>: <span class="ident">UnavailableGuild</span>,
         <span class="ident">_full</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Guild</span><span class="op">&gt;</span>,
     ) {
     }
@@ -672,9 +633,9 @@
     <span class="doccomment">/// If the flag is false, the bot was removed from the guild, either by being</span>
     <span class="doccomment">/// kicked or banned. If the flag is true, the guild went offline.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [`unavailable`]: GuildUnavailable::unavailable</span>
+    <span class="doccomment">/// [`unavailable`]: UnavailableGuild::unavailable</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>))]</span>
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">guild_delete</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_ctx</span>: <span class="ident">Context</span>, <span class="ident">_incomplete</span>: <span class="ident">GuildUnavailable</span>) {}
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">guild_delete</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_ctx</span>: <span class="ident">Context</span>, <span class="ident">_incomplete</span>: <span class="ident">UnavailableGuild</span>) {}
 
     <span class="comment">// the emojis were updated.</span>
 
@@ -700,7 +661,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// Note: This event will not trigger unless the &quot;guild members&quot; privileged intent</span>
     <span class="doccomment">/// is enabled on the bot application page.</span>
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">guild_member_addition</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_ctx</span>: <span class="ident">Context</span>, <span class="ident">_guild_id</span>: <span class="ident">GuildId</span>, <span class="ident">_new_member</span>: <span class="ident">Member</span>) {}
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">guild_member_addition</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_ctx</span>: <span class="ident">Context</span>, <span class="ident">_new_member</span>: <span class="ident">Member</span>) {}
 
     <span class="doccomment">/// Dispatched when a user&#39;s membership ends by leaving, getting kicked, or being banned.</span>
     <span class="doccomment">///</span>
@@ -759,7 +720,7 @@
     <span class="doccomment">/// Dispatched when a role is created.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// Provides the guild&#39;s id and the new role&#39;s data.</span>
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">guild_role_create</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_ctx</span>: <span class="ident">Context</span>, <span class="ident">_guild_id</span>: <span class="ident">GuildId</span>, <span class="ident">_new</span>: <span class="ident">Role</span>) {}
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">guild_role_create</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_ctx</span>: <span class="ident">Context</span>, <span class="ident">_new</span>: <span class="ident">Role</span>) {}
 
     <span class="doccomment">/// Dispatched when a role is deleted.</span>
     <span class="doccomment">///</span>
@@ -788,7 +749,6 @@
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">guild_role_update</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">_ctx</span>: <span class="ident">Context</span>,
-        <span class="ident">_guild_id</span>: <span class="ident">GuildId</span>,
         <span class="ident">_old_data_if_available</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Role</span><span class="op">&gt;</span>,
         <span class="ident">_new</span>: <span class="ident">Role</span>,
     ) {
@@ -798,7 +758,18 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// Provides the guild&#39;s id and the role&#39;s new data.</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>))]</span>
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">guild_role_update</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_ctx</span>: <span class="ident">Context</span>, <span class="ident">_guild_id</span>: <span class="ident">GuildId</span>, <span class="ident">_new_data</span>: <span class="ident">Role</span>) {}
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">guild_role_update</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_ctx</span>: <span class="ident">Context</span>, <span class="ident">_new_data</span>: <span class="ident">Role</span>) {}
+
+    <span class="doccomment">/// Dispatched when the stickers are updated.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// Provides the guild&#39;s id and the new state of the stickers in the guild.</span>
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">guild_stickers_update</span>(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        <span class="ident">_ctx</span>: <span class="ident">Context</span>,
+        <span class="ident">_guild_id</span>: <span class="ident">GuildId</span>,
+        <span class="ident">_current_state</span>: <span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">StickerId</span>, <span class="ident">Sticker</span><span class="op">&gt;</span>,
+    ) {
+    }
 
     <span class="doccomment">/// Dispatched when a guild became unavailable.</span>
     <span class="doccomment">///</span>
@@ -913,7 +884,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// Note: This event will not trigger unless the &quot;guild presences&quot; privileged intent</span>
     <span class="doccomment">/// is enabled on the bot application page.</span>
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">presence_update</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_ctx</span>: <span class="ident">Context</span>, <span class="ident">_new_data</span>: <span class="ident">PresenceUpdateEvent</span>) {}
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">presence_update</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_ctx</span>: <span class="ident">Context</span>, <span class="ident">_new_data</span>: <span class="ident">Presence</span>) {}
 
     <span class="doccomment">/// Dispatched upon startup.</span>
     <span class="doccomment">///</span>
@@ -958,21 +929,14 @@
     <span class="doccomment">/// Provides the guild&#39;s id (if available) and</span>
     <span class="doccomment">/// the old and the new state of the guild&#39;s voice channels.</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">voice_state_update</span>(
-        <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">_ctx</span>: <span class="ident">Context</span>,
-        <span class="kw">_</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">GuildId</span><span class="op">&gt;</span>,
-        <span class="ident">_old</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">VoiceState</span><span class="op">&gt;</span>,
-        <span class="ident">_new</span>: <span class="ident">VoiceState</span>,
-    ) {
-    }
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">voice_state_update</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_ctx</span>: <span class="ident">Context</span>, <span class="ident">_old</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">VoiceState</span><span class="op">&gt;</span>, <span class="ident">_new</span>: <span class="ident">VoiceState</span>) {}
 
     <span class="doccomment">/// Dispatched when a user joins, leaves or moves to a voice channel.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// Provides the guild&#39;s id (if available) and</span>
     <span class="doccomment">/// the new state of the guild&#39;s voice channels.</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>))]</span>
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">voice_state_update</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_ctx</span>: <span class="ident">Context</span>, <span class="kw">_</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">GuildId</span><span class="op">&gt;</span>, <span class="kw">_</span>: <span class="ident">VoiceState</span>) {}
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">voice_state_update</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_ctx</span>: <span class="ident">Context</span>, <span class="kw">_</span>: <span class="ident">VoiceState</span>) {}
 
     <span class="doccomment">/// Dispatched when a guild&#39;s webhook is updated.</span>
     <span class="doccomment">///</span>
@@ -988,67 +952,27 @@
     <span class="doccomment">/// Dispatched when an interaction is created (e.g a slash command was used or a button was clicked).</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// Provides the created interaction.</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">interaction_create</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_ctx</span>: <span class="ident">Context</span>, <span class="ident">_interaction</span>: <span class="ident">Interaction</span>) {}
 
     <span class="doccomment">/// Dispatched when a guild integration is created.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// Provides the created integration.</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">integration_create</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_ctx</span>: <span class="ident">Context</span>, <span class="ident">_integration</span>: <span class="ident">Integration</span>) {}
 
     <span class="doccomment">/// Dispatched when a guild integration is updated.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// Provides the updated integration.</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">integration_update</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_ctx</span>: <span class="ident">Context</span>, <span class="ident">_integration</span>: <span class="ident">Integration</span>) {}
 
     <span class="doccomment">/// Dispatched when a guild integration is deleted.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// Provides the integration&#39;s id, the id of the guild it belongs to, and its associated application id</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">integration_delete</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">_ctx</span>: <span class="ident">Context</span>,
         <span class="ident">_integration_id</span>: <span class="ident">IntegrationId</span>,
         <span class="ident">_guild_id</span>: <span class="ident">GuildId</span>,
         <span class="ident">_application_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ApplicationId</span><span class="op">&gt;</span>,
-    ) {
-    }
-
-    <span class="doccomment">/// Dispatched when an application command is created.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Provides the created application command.</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
-    <span class="attribute">#[<span class="ident">deprecated</span>(<span class="ident">since</span> <span class="op">=</span> <span class="string">&quot;0.10.10&quot;</span>, <span class="ident">note</span> <span class="op">=</span> <span class="string">&quot;bots do no receive this event&quot;</span>)]</span>
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">application_command_create</span>(
-        <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">_ctx</span>: <span class="ident">Context</span>,
-        <span class="ident">_application_command</span>: <span class="ident">ApplicationCommand</span>,
-    ) {
-    }
-
-    <span class="doccomment">/// Dispatched when an application command is updated.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Provides the updated application command.</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
-    <span class="attribute">#[<span class="ident">deprecated</span>(<span class="ident">since</span> <span class="op">=</span> <span class="string">&quot;0.10.10&quot;</span>, <span class="ident">note</span> <span class="op">=</span> <span class="string">&quot;bots do no receive this event&quot;</span>)]</span>
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">application_command_update</span>(
-        <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">_ctx</span>: <span class="ident">Context</span>,
-        <span class="ident">_application_command</span>: <span class="ident">ApplicationCommand</span>,
-    ) {
-    }
-
-    <span class="doccomment">/// Dispatched when an application command is deleted.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Provides the deleted application command.</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
-    <span class="attribute">#[<span class="ident">deprecated</span>(<span class="ident">since</span> <span class="op">=</span> <span class="string">&quot;0.10.10&quot;</span>, <span class="ident">note</span> <span class="op">=</span> <span class="string">&quot;bots do no receive this event&quot;</span>)]</span>
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">application_command_delete</span>(
-        <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">_ctx</span>: <span class="ident">Context</span>,
-        <span class="ident">_application_command</span>: <span class="ident">ApplicationCommand</span>,
     ) {
     }
 
@@ -1100,7 +1024,7 @@
     <span class="doccomment">/// Provides the added/removed members, the approximate member count of members in the thread,</span>
     <span class="doccomment">/// the thread Id and its guild Id.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [`GatewayIntents::GUILDS`]: crate::client::bridge::gateway::GatewayIntents::GUILDS</span>
+    <span class="doccomment">/// [`GatewayIntents::GUILDS`]: crate::model::gateway::GatewayIntents::GUILDS</span>
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">thread_members_update</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">_ctx</span>: <span class="ident">Context</span>,
@@ -1116,5 +1040,5 @@
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">raw_event</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_ctx</span>: <span class="ident">Context</span>, <span class="ident">_ev</span>: <span class="ident">Event</span>) {}
 }
 </code></pre></div>
-</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.62.0-nightly (ec77f2524 2022-04-17)" ></div>
+</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.61.0-nightly (3c17c84a3 2022-03-21)" ></div>
 </body></html>

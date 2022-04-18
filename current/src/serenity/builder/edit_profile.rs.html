@@ -104,9 +104,11 @@
 <span id="99">99</span>
 <span id="100">100</span>
 <span id="101">101</span>
+<span id="102">102</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::collections::HashMap</span>;
 
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::internal::prelude</span>::<span class="kw-2">*</span>;
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::json::NULL</span>;
 
 <span class="doccomment">/// A builder to edit the current user&#39;s settings, to be used in conjunction</span>
 <span class="doccomment">/// with [`CurrentUser::edit`].</span>
@@ -143,7 +145,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// let base64 = utils::read_image(&quot;./my_image.jpg&quot;).expect(&quot;Failed to read image&quot;);</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// let mut user = context.cache.current_user().await;</span>
+    <span class="doccomment">/// let mut user = context.cache.current_user();</span>
     <span class="doccomment">/// let _ = user.edit(&amp;context, |p| p.avatar(Some(&amp;base64))).await;</span>
     <span class="doccomment">/// #     }</span>
     <span class="doccomment">/// # }</span>
@@ -152,7 +154,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// [`utils::read_image`]: crate::utils::read_image</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">avatar</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">avatar</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
-        <span class="kw">let</span> <span class="ident">avatar</span> <span class="op">=</span> <span class="ident">avatar</span>.<span class="ident">map_or</span>(<span class="ident">Value::Null</span>, <span class="op">|</span><span class="ident">x</span><span class="op">|</span> <span class="ident">Value::String</span>(<span class="ident">x</span>.<span class="ident">to_string</span>()));
+        <span class="kw">let</span> <span class="ident">avatar</span> <span class="op">=</span> <span class="ident">avatar</span>.<span class="ident">map_or</span>(<span class="ident">NULL</span>, <span class="op">|</span><span class="ident">x</span><span class="op">|</span> <span class="ident">Value::from</span>(<span class="ident">x</span>.<span class="ident">to_string</span>()));
 
         <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;avatar&quot;</span>, <span class="ident">avatar</span>);
         <span class="self">self</span>
@@ -169,7 +171,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// [provided]: Self::password</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">email</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">email</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;email&quot;</span>, <span class="ident">Value::String</span>(<span class="ident">email</span>.<span class="ident">to_string</span>()));
+        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;email&quot;</span>, <span class="ident">Value::from</span>(<span class="ident">email</span>.<span class="ident">to_string</span>()));
         <span class="self">self</span>
     }
 
@@ -180,7 +182,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// [provided]: Self::password</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new_password</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">new_password</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;new_password&quot;</span>, <span class="ident">Value::String</span>(<span class="ident">new_password</span>.<span class="ident">to_string</span>()));
+        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;new_password&quot;</span>, <span class="ident">Value::from</span>(<span class="ident">new_password</span>.<span class="ident">to_string</span>()));
         <span class="self">self</span>
     }
 
@@ -190,7 +192,7 @@
     <span class="doccomment">/// [modifying the password]: Self::new_password</span>
     <span class="doccomment">/// [modifying the associated email address]: Self::email</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">password</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">password</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;password&quot;</span>, <span class="ident">Value::String</span>(<span class="ident">password</span>.<span class="ident">to_string</span>()));
+        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;password&quot;</span>, <span class="ident">Value::from</span>(<span class="ident">password</span>.<span class="ident">to_string</span>()));
         <span class="self">self</span>
     }
 
@@ -201,10 +203,10 @@
     <span class="doccomment">/// If there are no available discriminators with the requested username,</span>
     <span class="doccomment">/// an error will occur.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">username</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">ToString</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">username</span>: <span class="ident">S</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;username&quot;</span>, <span class="ident">Value::String</span>(<span class="ident">username</span>.<span class="ident">to_string</span>()));
+        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;username&quot;</span>, <span class="ident">Value::from</span>(<span class="ident">username</span>.<span class="ident">to_string</span>()));
         <span class="self">self</span>
     }
 }
 </code></pre></div>
-</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.62.0-nightly (ec77f2524 2022-04-17)" ></div>
+</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.61.0-nightly (3c17c84a3 2022-03-21)" ></div>
 </body></html>

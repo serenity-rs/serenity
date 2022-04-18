@@ -219,12 +219,16 @@
 <span id="214">214</span>
 <span id="215">215</span>
 <span id="216">216</span>
+<span id="217">217</span>
+<span id="218">218</span>
+<span id="219">219</span>
+<span id="220">220</span>
+<span id="221">221</span>
+<span id="222">222</span>
 </pre><pre class="rust"><code><span class="doccomment">//! Error enum definition wrapping potential model implementation errors.</span>
 
-<span class="kw">use</span> <span class="ident">std</span>::{
-    <span class="ident">error::Error</span> <span class="kw">as</span> <span class="ident">StdError</span>,
-    <span class="ident">fmt</span>::{<span class="ident">Display</span>, <span class="ident">Formatter</span>, <span class="prelude-ty">Result</span> <span class="kw">as</span> <span class="ident">FmtResult</span>},
-};
+<span class="kw">use</span> <span class="ident">std::error::Error</span> <span class="kw">as</span> <span class="ident">StdError</span>;
+<span class="kw">use</span> <span class="ident">std::fmt</span>;
 
 <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::Permissions</span>;
 
@@ -270,7 +274,8 @@
 <span class="doccomment">///     }</span>
 <span class="doccomment">/// }</span>
 <span class="doccomment">/// let token = std::env::var(&quot;DISCORD_BOT_TOKEN&quot;)?;</span>
-<span class="doccomment">/// let mut client = Client::builder(&amp;token).event_handler(Handler).await?;</span>
+<span class="doccomment">/// let mut client =</span>
+<span class="doccomment">///     Client::builder(&amp;token, GatewayIntents::default()).event_handler(Handler).await?;</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// client.start().await?;</span>
 <span class="doccomment">/// #     Ok(())</span>
@@ -385,8 +390,13 @@
     <span class="ident">NotAuthor</span>,
     <span class="doccomment">/// Indicates that the webhook token is missing.</span>
     <span class="ident">NoTokenSet</span>,
-    <span class="doccomment">/// Indicates that the component type cannot be used in this context.</span>
-    <span class="ident">InvalidComponentType</span>,
+    <span class="doccomment">/// When attempting to delete a built in nitro sticker instead of a guild</span>
+    <span class="doccomment">/// sticker.</span>
+    <span class="ident">DeleteNitroSticker</span>,
+    <span class="doccomment">/// Indicates that the sticker file is missing.</span>
+    <span class="ident">NoStickerFileSet</span>,
+    <span class="doccomment">/// When attempting to send a message with over 3 stickers.</span>
+    <span class="ident">StickerAmount</span>,
 }
 
 <span class="kw">impl</span> <span class="ident">Error</span> {
@@ -404,8 +414,8 @@
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Display</span> <span class="kw">for</span> <span class="ident">Error</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">FmtResult</span> {
+<span class="kw">impl</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">Error</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
         <span class="kw">match</span> <span class="self">self</span> {
             <span class="ident">Error::BulkDeleteAmount</span> =&gt; <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;Too few/many messages to bulk delete.&quot;</span>),
             <span class="ident">Error::DeleteMessageDaysAmount</span>(<span class="kw">_</span>) =&gt; <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;Invalid delete message days.&quot;</span>),
@@ -417,7 +427,6 @@
             <span class="ident">Error::ChannelNotFound</span> =&gt; <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;Channel not found in the cache.&quot;</span>),
             <span class="ident">Error::Hierarchy</span> =&gt; <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;Role hierarchy prevents this action.&quot;</span>),
             <span class="ident">Error::InvalidChannelType</span> =&gt; <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;The channel cannot perform the action.&quot;</span>),
-            <span class="ident">Error::InvalidComponentType</span> =&gt; <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;The component cannot perform this action.&quot;</span>),
             <span class="ident">Error::InvalidPermissions</span>(<span class="kw">_</span>) =&gt; <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;Invalid permissions.&quot;</span>),
             <span class="ident">Error::InvalidUser</span> =&gt; <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;The current user cannot perform the action.&quot;</span>),
             <span class="ident">Error::ItemMissing</span> =&gt; <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;The required item is missing from the cache.&quot;</span>),
@@ -430,11 +439,14 @@
             <span class="ident">Error::NameTooLong</span> =&gt; <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;Name is over the character limit.&quot;</span>),
             <span class="ident">Error::NotAuthor</span> =&gt; <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;The bot is not author of this message.&quot;</span>),
             <span class="ident">Error::NoTokenSet</span> =&gt; <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;Token is not set.&quot;</span>),
+            <span class="ident">Error::DeleteNitroSticker</span> =&gt; <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;Cannot delete an official sticker.&quot;</span>),
+            <span class="ident">Error::NoStickerFileSet</span> =&gt; <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;Sticker file is not set.&quot;</span>),
+            <span class="ident">Error::StickerAmount</span> =&gt; <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;Too many stickers in a message.&quot;</span>),
         }
     }
 }
 
 <span class="kw">impl</span> <span class="ident">StdError</span> <span class="kw">for</span> <span class="ident">Error</span> {}
 </code></pre></div>
-</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.62.0-nightly (ec77f2524 2022-04-17)" ></div>
+</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.61.0-nightly (3c17c84a3 2022-03-21)" ></div>
 </body></html>

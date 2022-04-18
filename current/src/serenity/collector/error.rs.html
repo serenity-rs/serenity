@@ -46,14 +46,8 @@
 <span id="41">41</span>
 <span id="42">42</span>
 <span id="43">43</span>
-<span id="44">44</span>
-<span id="45">45</span>
-<span id="46">46</span>
-<span id="47">47</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std</span>::{
-    <span class="ident">error::Error</span> <span class="kw">as</span> <span class="ident">StdError</span>,
-    <span class="ident">fmt</span>::{<span class="ident">Display</span>, <span class="ident">Formatter</span>, <span class="prelude-ty">Result</span> <span class="kw">as</span> <span class="ident">FmtResult</span>},
-};
+</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::error::Error</span> <span class="kw">as</span> <span class="ident">StdError</span>;
+<span class="kw">use</span> <span class="ident">std::fmt</span>;
 
 <span class="doccomment">/// An error that occurred while working with a collector.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>)]</span>
@@ -71,22 +65,20 @@
     <span class="doccomment">/// # use serenity::{prelude::*, collector::{CollectorError, EventCollectorBuilder}, model::prelude::*};</span>
     <span class="doccomment">/// # let (sender, _) = futures::channel::mpsc::unbounded();</span>
     <span class="doccomment">/// # let ctx = serenity::client::bridge::gateway::ShardMessenger::new(sender);</span>
-    <span class="doccomment">/// # tokio_test::block_on(async move {</span>
     <span class="doccomment">/// assert!(matches!(</span>
     <span class="doccomment">///     EventCollectorBuilder::new(&amp;ctx)</span>
     <span class="doccomment">///         .add_event_type(EventType::GuildCreate)</span>
     <span class="doccomment">///         .add_user_id(UserId::default())</span>
-    <span class="doccomment">///         .await,</span>
+    <span class="doccomment">///         .build(),</span>
     <span class="doccomment">///     Err(SerenityError::Collector(CollectorError::InvalidEventIdFilters)),</span>
     <span class="doccomment">/// ));</span>
-    <span class="doccomment">/// # });</span>
     <span class="doccomment">/// ```</span>
     <span class="doccomment">/// [EventCollectorBuilder]: crate::collector::EventCollectorBuilder</span>
     <span class="ident">InvalidEventIdFilters</span>,
 }
 
-<span class="kw">impl</span> <span class="ident">Display</span> <span class="kw">for</span> <span class="ident">Error</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">FmtResult</span> {
+<span class="kw">impl</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">Error</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
         <span class="kw">match</span> <span class="self">self</span> {
             <span class="ident">Error::NoEventTypes</span> =&gt; <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;No event types provided&quot;</span>),
             <span class="ident">Error::InvalidEventIdFilters</span> =&gt; {
@@ -98,5 +90,5 @@
 
 <span class="kw">impl</span> <span class="ident">StdError</span> <span class="kw">for</span> <span class="ident">Error</span> {}
 </code></pre></div>
-</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.62.0-nightly (ec77f2524 2022-04-17)" ></div>
+</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.61.0-nightly (3c17c84a3 2022-03-21)" ></div>
 </body></html>

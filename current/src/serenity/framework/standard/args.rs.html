@@ -990,8 +990,9 @@
 <span id="985">985</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::borrow::Cow</span>;
 <span class="kw">use</span> <span class="ident">std::error::Error</span> <span class="kw">as</span> <span class="ident">StdError</span>;
+<span class="kw">use</span> <span class="ident">std::fmt</span>;
 <span class="kw">use</span> <span class="ident">std::marker::PhantomData</span>;
-<span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">fmt</span>, <span class="ident">str::FromStr</span>};
+<span class="kw">use</span> <span class="ident">std::str::FromStr</span>;
 
 <span class="kw">use</span> <span class="ident">uwl::Stream</span>;
 
@@ -1072,6 +1073,7 @@
 }
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">PartialEq</span>)]</span>
+<span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::enum_variant_names</span>)]</span>
 <span class="kw">enum</span> <span class="ident">TokenKind</span> {
     <span class="ident">Argument</span>,
     <span class="ident">QuotedArgument</span>,
@@ -1338,7 +1340,7 @@
                 <span class="ident">Delimiter::Single</span>(<span class="ident">c</span>) =&gt; <span class="ident">message</span>.<span class="ident">contains</span>(<span class="kw-2">*</span><span class="ident">c</span>),
                 <span class="ident">Delimiter::Multiple</span>(<span class="ident">s</span>) =&gt; <span class="ident">message</span>.<span class="ident">contains</span>(<span class="ident">s</span>),
             })
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">delim</span><span class="op">|</span> <span class="ident">delim</span>.<span class="ident">to_str</span>())
+            .<span class="ident">map</span>(<span class="ident">Delimiter::to_str</span>)
             .<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>();
 
         <span class="kw">let</span> <span class="ident">args</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">delims</span>.<span class="ident">is_empty</span>() <span class="op">&amp;&amp;</span> <span class="op">!</span><span class="ident">message</span>.<span class="ident">is_empty</span>() {
@@ -1768,12 +1770,11 @@
         <span class="kw">let</span> <span class="ident">before</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">offset</span>;
         <span class="self">self</span>.<span class="ident">restore</span>();
 
-        <span class="kw">let</span> <span class="ident">pos</span> <span class="op">=</span> <span class="kw">match</span> <span class="self">self</span>.<span class="ident">iter</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>().<span class="ident">quoted</span>().<span class="ident">position</span>(<span class="op">|</span><span class="ident">res</span><span class="op">|</span> <span class="ident">res</span>.<span class="ident">is_ok</span>()) {
-            <span class="prelude-val">Some</span>(<span class="ident">p</span>) =&gt; <span class="ident">p</span>,
-            <span class="prelude-val">None</span> =&gt; {
-                <span class="self">self</span>.<span class="ident">offset</span> <span class="op">=</span> <span class="ident">before</span>;
-                <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::Eos</span>);
-            },
+        <span class="kw">let</span> <span class="ident">pos</span> <span class="op">=</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">p</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">iter</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>().<span class="ident">quoted</span>().<span class="ident">position</span>(<span class="op">|</span><span class="ident">res</span><span class="op">|</span> <span class="ident">res</span>.<span class="ident">is_ok</span>()) {
+            <span class="ident">p</span>
+        } <span class="kw">else</span> {
+            <span class="self">self</span>.<span class="ident">offset</span> <span class="op">=</span> <span class="ident">before</span>;
+            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::Eos</span>);
         };
 
         <span class="self">self</span>.<span class="ident">offset</span> <span class="op">=</span> <span class="ident">pos</span>;
@@ -1816,12 +1817,11 @@
         <span class="kw">let</span> <span class="ident">before</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">offset</span>;
         <span class="self">self</span>.<span class="ident">restore</span>();
 
-        <span class="kw">let</span> <span class="ident">pos</span> <span class="op">=</span> <span class="kw">match</span> <span class="self">self</span>.<span class="ident">iter</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>().<span class="ident">quoted</span>().<span class="ident">position</span>(<span class="op">|</span><span class="ident">res</span><span class="op">|</span> <span class="ident">res</span>.<span class="ident">is_ok</span>()) {
-            <span class="prelude-val">Some</span>(<span class="ident">p</span>) =&gt; <span class="ident">p</span>,
-            <span class="prelude-val">None</span> =&gt; {
-                <span class="self">self</span>.<span class="ident">offset</span> <span class="op">=</span> <span class="ident">before</span>;
-                <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::Eos</span>);
-            },
+        <span class="kw">let</span> <span class="ident">pos</span> <span class="op">=</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">p</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">iter</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>().<span class="ident">quoted</span>().<span class="ident">position</span>(<span class="op">|</span><span class="ident">res</span><span class="op">|</span> <span class="ident">res</span>.<span class="ident">is_ok</span>()) {
+            <span class="ident">p</span>
+        } <span class="kw">else</span> {
+            <span class="self">self</span>.<span class="ident">offset</span> <span class="op">=</span> <span class="ident">before</span>;
+            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::Eos</span>);
         };
 
         <span class="self">self</span>.<span class="ident">offset</span> <span class="op">=</span> <span class="ident">pos</span>;
@@ -1974,5 +1974,5 @@
     }
 }
 </code></pre></div>
-</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.62.0-nightly (ec77f2524 2022-04-17)" ></div>
+</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.61.0-nightly (3c17c84a3 2022-03-21)" ></div>
 </body></html>

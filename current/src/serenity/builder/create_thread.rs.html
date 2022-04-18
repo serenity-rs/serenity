@@ -58,12 +58,9 @@
 <span id="53">53</span>
 <span id="54">54</span>
 <span id="55">55</span>
-<span id="56">56</span>
-<span id="57">57</span>
-<span id="58">58</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::collections::HashMap</span>;
 
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::internal::prelude</span>::<span class="kw-2">*</span>;
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::json</span>::{<span class="ident">from_number</span>, <span class="ident">Value</span>};
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::channel::ChannelType</span>;
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Default</span>)]</span>
@@ -74,7 +71,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// **Note**: Must be between 2 and 100 characters long.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">name</span><span class="op">&lt;</span><span class="ident">D</span>: <span class="ident">ToString</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">name</span>: <span class="ident">D</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;name&quot;</span>, <span class="ident">Value::String</span>(<span class="ident">name</span>.<span class="ident">to_string</span>()));
+        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;name&quot;</span>, <span class="ident">Value::from</span>(<span class="ident">name</span>.<span class="ident">to_string</span>()));
 
         <span class="self">self</span>
     }
@@ -83,7 +80,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// **Note**: Can only be set to 60, 1440, 4320, 10080 currently.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">auto_archive_duration</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">duration</span>: <span class="ident">u16</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;auto_archive_duration&quot;</span>, <span class="ident">Value::Number</span>(<span class="ident">Number::from</span>(<span class="ident">duration</span>)));
+        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;auto_archive_duration&quot;</span>, <span class="ident">from_number</span>(<span class="ident">duration</span>));
 
         <span class="self">self</span>
     }
@@ -99,7 +96,7 @@
     <span class="doccomment">/// [`MANAGE_CHANNELS`]: crate::model::permissions::Permissions::MANAGE_CHANNELS</span>
     <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">alias</span> <span class="op">=</span> <span class="string">&quot;slowmode&quot;</span>)]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">rate_limit_per_user</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">seconds</span>: <span class="ident">u64</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;rate_limit_per_user&quot;</span>, <span class="ident">Value::Number</span>(<span class="ident">Number::from</span>(<span class="ident">seconds</span>)));
+        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;rate_limit_per_user&quot;</span>, <span class="ident">from_number</span>(<span class="ident">seconds</span>));
 
         <span class="self">self</span>
     }
@@ -110,15 +107,12 @@
     <span class="doccomment">/// when thread documentation was first published. This is a bit of a weird default though,</span>
     <span class="doccomment">/// and thus is highly likely to change in the future, so it is recommended to always</span>
     <span class="doccomment">/// explicitly setting it to avoid any breaking change.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`ChannelType::PublicThread`]: crate::model::channel::ChannelType::PublicThread</span>
-    <span class="doccomment">/// [`ChannelType::PrivateThread`]: crate::model::channel::ChannelType::PrivateThread</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">kind</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">kind</span>: <span class="ident">ChannelType</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;type&quot;</span>, <span class="ident">Value::Number</span>(<span class="ident">Number::from</span>(<span class="ident">kind</span> <span class="kw">as</span> <span class="ident">u8</span>)));
+        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;type&quot;</span>, <span class="ident">from_number</span>(<span class="ident">kind</span> <span class="kw">as</span> <span class="ident">u8</span>));
 
         <span class="self">self</span>
     }
 }
 </code></pre></div>
-</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.62.0-nightly (ec77f2524 2022-04-17)" ></div>
+</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.61.0-nightly (3c17c84a3 2022-03-21)" ></div>
 </body></html>

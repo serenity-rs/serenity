@@ -520,8 +520,8 @@
 <span id="515">515</span>
 <span id="516">516</span>
 <span id="517">517</span>
-<span id="518">518</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::collections::HashMap</span>;
+<span class="kw">use</span> <span class="ident">std::fmt</span>;
 <span class="kw">use</span> <span class="ident">std::time</span>::{<span class="ident">Duration</span>, <span class="ident">Instant</span>};
 
 <span class="kw">use</span> <span class="ident">futures::future::BoxFuture</span>;
@@ -594,7 +594,7 @@
             <span class="comment">// category.</span>
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
             <span class="ident"><span class="self">Self</span>::Category</span>(<span class="ident">counter</span>) =&gt; {
-                <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">category_id</span>) <span class="op">=</span> <span class="ident">msg</span>.<span class="ident">category_id</span>(<span class="ident">ctx</span>).<span class="kw">await</span> {
+                <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">category_id</span>) <span class="op">=</span> <span class="ident">msg</span>.<span class="ident">category_id</span>(<span class="ident">ctx</span>) {
                     <span class="ident">counter</span>.<span class="ident">take</span>(<span class="ident">ctx</span>, <span class="ident">msg</span>, <span class="ident">category_id</span>.<span class="number">0</span>).<span class="kw">await</span>
                 } <span class="kw">else</span> {
                     <span class="prelude-val">None</span>
@@ -610,7 +610,7 @@
             <span class="ident"><span class="self">Self</span>::User</span>(<span class="ident">counter</span>) =&gt; <span class="ident">counter</span>.<span class="ident">give</span>(<span class="ident">ctx</span>, <span class="ident">msg</span>, <span class="ident">msg</span>.<span class="ident">author</span>.<span class="ident">id</span>.<span class="number">0</span>).<span class="kw">await</span>,
             <span class="ident"><span class="self">Self</span>::Guild</span>(<span class="ident">counter</span>) =&gt; {
                 <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">guild_id</span>) <span class="op">=</span> <span class="ident">msg</span>.<span class="ident">guild_id</span> {
-                    <span class="ident">counter</span>.<span class="ident">give</span>(<span class="ident">ctx</span>, <span class="ident">msg</span>, <span class="ident">guild_id</span>.<span class="number">0</span>).<span class="kw">await</span>
+                    <span class="ident">counter</span>.<span class="ident">give</span>(<span class="ident">ctx</span>, <span class="ident">msg</span>, <span class="ident">guild_id</span>.<span class="number">0</span>).<span class="kw">await</span>;
                 }
             },
             <span class="ident"><span class="self">Self</span>::Channel</span>(<span class="ident">counter</span>) =&gt; <span class="ident">counter</span>.<span class="ident">give</span>(<span class="ident">ctx</span>, <span class="ident">msg</span>, <span class="ident">msg</span>.<span class="ident">channel_id</span>.<span class="number">0</span>).<span class="kw">await</span>,
@@ -618,8 +618,8 @@
             <span class="comment">// category.</span>
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
             <span class="ident"><span class="self">Self</span>::Category</span>(<span class="ident">counter</span>) =&gt; {
-                <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">category_id</span>) <span class="op">=</span> <span class="ident">msg</span>.<span class="ident">category_id</span>(<span class="ident">ctx</span>).<span class="kw">await</span> {
-                    <span class="ident">counter</span>.<span class="ident">give</span>(<span class="ident">ctx</span>, <span class="ident">msg</span>, <span class="ident">category_id</span>.<span class="number">0</span>).<span class="kw">await</span>
+                <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">category_id</span>) <span class="op">=</span> <span class="ident">msg</span>.<span class="ident">category_id</span>(<span class="ident">ctx</span>) {
+                    <span class="ident">counter</span>.<span class="ident">give</span>(<span class="ident">ctx</span>, <span class="ident">msg</span>, <span class="ident">category_id</span>.<span class="number">0</span>).<span class="kw">await</span>;
                 }
             },
         }
@@ -753,10 +753,9 @@
                         <span class="ident">action</span>,
                         <span class="ident">is_first_try</span>: <span class="ident">was_first_try</span>,
                     });
-                } <span class="kw">else</span> {
-                    <span class="ident">ticket_owner</span>.<span class="ident">tickets</span> <span class="op">=</span> <span class="number">0</span>;
-                    <span class="ident">ticket_owner</span>.<span class="ident">set_time</span> <span class="op">=</span> <span class="ident">now</span>;
                 }
+                <span class="ident">ticket_owner</span>.<span class="ident">tickets</span> <span class="op">=</span> <span class="number">0</span>;
+                <span class="ident">ticket_owner</span>.<span class="ident">set_time</span> <span class="op">=</span> <span class="ident">now</span>;
             }
         }
 
@@ -799,12 +798,11 @@
                 <span class="ident">action</span>,
                 <span class="ident">is_first_try</span>: <span class="ident">was_first_try</span>,
             });
-        } <span class="kw">else</span> {
-            <span class="ident">ticket_owner</span>.<span class="ident">awaiting</span> <span class="op">=</span> <span class="ident">ticket_owner</span>.<span class="ident">awaiting</span>.<span class="ident">saturating_sub</span>(<span class="number">1</span>);
-            <span class="ident">ticket_owner</span>.<span class="ident">tickets</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
-            <span class="ident">ticket_owner</span>.<span class="ident">is_first_try</span> <span class="op">=</span> <span class="bool-val">true</span>;
-            <span class="ident">ticket_owner</span>.<span class="ident">last_time</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">now</span>);
         }
+        <span class="ident">ticket_owner</span>.<span class="ident">awaiting</span> <span class="op">=</span> <span class="ident">ticket_owner</span>.<span class="ident">awaiting</span>.<span class="ident">saturating_sub</span>(<span class="number">1</span>);
+        <span class="ident">ticket_owner</span>.<span class="ident">tickets</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
+        <span class="ident">ticket_owner</span>.<span class="ident">is_first_try</span> <span class="op">=</span> <span class="bool-val">true</span>;
+        <span class="ident">ticket_owner</span>.<span class="ident">last_time</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">now</span>);
 
         <span class="prelude-val">None</span>
     }
@@ -845,8 +843,8 @@
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">RevertBucket</span>;
 
-<span class="kw">impl</span> <span class="ident">std::fmt::Display</span> <span class="kw">for</span> <span class="ident">RevertBucket</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">std::fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">std::fmt::Result</span> {
+<span class="kw">impl</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">RevertBucket</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
         <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;RevertBucket&quot;</span>)
     }
 }
@@ -1040,5 +1038,5 @@
     }
 }
 </code></pre></div>
-</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.62.0-nightly (ec77f2524 2022-04-17)" ></div>
+</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.61.0-nightly (3c17c84a3 2022-03-21)" ></div>
 </body></html>

@@ -298,14 +298,25 @@
 <span id="293">293</span>
 <span id="294">294</span>
 <span id="295">295</span>
+<span id="296">296</span>
+<span id="297">297</span>
+<span id="298">298</span>
+<span id="299">299</span>
+<span id="300">300</span>
+<span id="301">301</span>
+<span id="302">302</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">async_tungstenite::tungstenite::Message</span>;
 <span class="kw">use</span> <span class="ident">futures::channel::mpsc</span>::{<span class="ident">TrySendError</span>, <span class="ident">UnboundedSender</span> <span class="kw">as</span> <span class="ident">Sender</span>};
 
 <span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">ChunkGuildFilter</span>, <span class="ident">ShardClientMessage</span>, <span class="ident">ShardRunnerMessage</span>};
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;collector&quot;</span>))]</span>
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::collector</span>::{<span class="ident">ComponentInteractionFilter</span>, <span class="ident">ModalInteractionFilter</span>};
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;collector&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::collector</span>::{<span class="ident">EventFilter</span>, <span class="ident">MessageFilter</span>, <span class="ident">ReactionFilter</span>};
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::collector</span>::{
+    <span class="ident">ComponentInteractionFilter</span>,
+    <span class="ident">EventFilter</span>,
+    <span class="ident">MessageFilter</span>,
+    <span class="ident">ModalInteractionFilter</span>,
+    <span class="ident">ReactionFilter</span>,
+};
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::gateway::InterMessage</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::prelude</span>::<span class="kw-2">*</span>;
 
@@ -354,7 +365,8 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// ```rust,no_run</span>
     <span class="doccomment">/// # use tokio::sync::Mutex;</span>
-    <span class="doccomment">/// # use serenity::client::bridge::gateway::{GatewayIntents, ChunkGuildFilter};</span>
+    <span class="doccomment">/// # use serenity::model::gateway::GatewayIntents;</span>
+    <span class="doccomment">/// # use serenity::client::bridge::gateway::ChunkGuildFilter;</span>
     <span class="doccomment">/// # use serenity::gateway::Shard;</span>
     <span class="doccomment">/// # use std::sync::Arc;</span>
     <span class="doccomment">/// #</span>
@@ -376,7 +388,8 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// ```rust,no_run</span>
     <span class="doccomment">/// # use tokio::sync::Mutex;</span>
-    <span class="doccomment">/// # use serenity::client::bridge::gateway::{GatewayIntents, ChunkGuildFilter};</span>
+    <span class="doccomment">/// # use serenity::model::gateway::GatewayIntents;</span>
+    <span class="doccomment">/// # use serenity::client::bridge::gateway::ChunkGuildFilter;</span>
     <span class="doccomment">/// # use serenity::gateway::Shard;</span>
     <span class="doccomment">/// # use std::sync::Arc;</span>
     <span class="doccomment">/// #</span>
@@ -424,7 +437,7 @@
     <span class="doccomment">/// ```rust,no_run</span>
     <span class="doccomment">/// # use tokio::sync::Mutex;</span>
     <span class="doccomment">/// # use serenity::gateway::Shard;</span>
-    <span class="doccomment">/// # use serenity::client::bridge::gateway::GatewayIntents;</span>
+    <span class="doccomment">/// # use serenity::model::gateway::GatewayIntents;</span>
     <span class="doccomment">/// # use std::sync::Arc;</span>
     <span class="doccomment">/// #</span>
     <span class="doccomment">/// # async fn run() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {</span>
@@ -494,7 +507,7 @@
     <span class="doccomment">/// ```rust,no_run</span>
     <span class="doccomment">/// # use tokio::sync::Mutex;</span>
     <span class="doccomment">/// # use serenity::gateway::Shard;</span>
-    <span class="doccomment">/// # use serenity::client::bridge::gateway::GatewayIntents;</span>
+    <span class="doccomment">/// # use serenity::model::gateway::GatewayIntents;</span>
     <span class="doccomment">/// # use std::sync::Arc;</span>
     <span class="doccomment">/// #</span>
     <span class="doccomment">/// # async fn run() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {</span>
@@ -542,6 +555,7 @@
     }
 
     <span class="doccomment">/// Sends a message to the shard.</span>
+    <span class="doccomment">///</span>
     <span class="doccomment">/// # Errors</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// Returns a [`TrySendError`] if the shard&#39;s receiver was closed.</span>
@@ -574,14 +588,14 @@
     }
 
     <span class="doccomment">/// Sets a new filter for a component interaction collector.</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;collector&quot;</span>))]</span>
+    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;collector&quot;</span>)]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_component_interaction_filter</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">collector</span>: <span class="ident">ComponentInteractionFilter</span>) {
         <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::let_underscore_must_use</span>)]</span>
         <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">send_to_shard</span>(<span class="ident">ShardRunnerMessage::SetComponentInteractionFilter</span>(<span class="ident">collector</span>));
     }
 
     <span class="doccomment">/// Sets a new filter for a modal interaction collector.</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;collector&quot;</span>))]</span>
+    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;collector&quot;</span>)]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_modal_interaction_filter</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">collector</span>: <span class="ident">ModalInteractionFilter</span>) {
         <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::let_underscore_must_use</span>)]</span>
         <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">send_to_shard</span>(<span class="ident">ShardRunnerMessage::SetModalInteractionFilter</span>(<span class="ident">collector</span>));
@@ -594,5 +608,5 @@
     }
 }
 </code></pre></div>
-</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.62.0-nightly (ec77f2524 2022-04-17)" ></div>
+</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.61.0-nightly (3c17c84a3 2022-03-21)" ></div>
 </body></html>

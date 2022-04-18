@@ -140,13 +140,14 @@
 <span id="135">135</span>
 <span id="136">136</span>
 <span id="137">137</span>
+<span id="138">138</span>
 </pre><pre class="rust"><code><span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
 <span class="kw">use</span> <span class="ident">reqwest::Client</span> <span class="kw">as</span> <span class="ident">ReqwestClient</span>;
 
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::internal::is_false</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::internal::prelude</span>::<span class="kw-2">*</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::id::AttachmentId</span>;
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::utils::is_false</span>;
 
 <span class="doccomment">/// A file uploaded with a message. Not to be confused with [`Embed`]s.</span>
 <span class="doccomment">///</span>
@@ -253,7 +254,8 @@
     <span class="doccomment">///     }</span>
     <span class="doccomment">/// }</span>
     <span class="doccomment">/// let token = std::env::var(&quot;DISCORD_TOKEN&quot;)?;</span>
-    <span class="doccomment">/// let mut client = Client::builder(&amp;token).event_handler(Handler).await?;</span>
+    <span class="doccomment">/// let mut client =</span>
+    <span class="doccomment">///     Client::builder(&amp;token, GatewayIntents::default()).event_handler(Handler).await?;</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// client.start().await?;</span>
     <span class="doccomment">/// #     Ok(())</span>
@@ -278,5 +280,5 @@
     }
 }
 </code></pre></div>
-</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.62.0-nightly (ec77f2524 2022-04-17)" ></div>
+</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.61.0-nightly (3c17c84a3 2022-03-21)" ></div>
 </body></html>

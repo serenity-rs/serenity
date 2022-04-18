@@ -292,11 +292,122 @@
 <span id="287">287</span>
 <span id="288">288</span>
 <span id="289">289</span>
+<span id="290">290</span>
+<span id="291">291</span>
+<span id="292">292</span>
+<span id="293">293</span>
+<span id="294">294</span>
+<span id="295">295</span>
+<span id="296">296</span>
+<span id="297">297</span>
+<span id="298">298</span>
+<span id="299">299</span>
+<span id="300">300</span>
+<span id="301">301</span>
+<span id="302">302</span>
+<span id="303">303</span>
+<span id="304">304</span>
+<span id="305">305</span>
+<span id="306">306</span>
+<span id="307">307</span>
+<span id="308">308</span>
+<span id="309">309</span>
+<span id="310">310</span>
+<span id="311">311</span>
+<span id="312">312</span>
+<span id="313">313</span>
+<span id="314">314</span>
+<span id="315">315</span>
+<span id="316">316</span>
+<span id="317">317</span>
+<span id="318">318</span>
+<span id="319">319</span>
+<span id="320">320</span>
+<span id="321">321</span>
+<span id="322">322</span>
+<span id="323">323</span>
+<span id="324">324</span>
+<span id="325">325</span>
+<span id="326">326</span>
+<span id="327">327</span>
+<span id="328">328</span>
+<span id="329">329</span>
+<span id="330">330</span>
+<span id="331">331</span>
+<span id="332">332</span>
+<span id="333">333</span>
+<span id="334">334</span>
+<span id="335">335</span>
+<span id="336">336</span>
+<span id="337">337</span>
+<span id="338">338</span>
+<span id="339">339</span>
+<span id="340">340</span>
+<span id="341">341</span>
+<span id="342">342</span>
+<span id="343">343</span>
+<span id="344">344</span>
+<span id="345">345</span>
+<span id="346">346</span>
+<span id="347">347</span>
+<span id="348">348</span>
+<span id="349">349</span>
+<span id="350">350</span>
+<span id="351">351</span>
+<span id="352">352</span>
+<span id="353">353</span>
+<span id="354">354</span>
+<span id="355">355</span>
+<span id="356">356</span>
+<span id="357">357</span>
+<span id="358">358</span>
+<span id="359">359</span>
+<span id="360">360</span>
+<span id="361">361</span>
+<span id="362">362</span>
+<span id="363">363</span>
+<span id="364">364</span>
+<span id="365">365</span>
+<span id="366">366</span>
+<span id="367">367</span>
+<span id="368">368</span>
+<span id="369">369</span>
+<span id="370">370</span>
+<span id="371">371</span>
+<span id="372">372</span>
+<span id="373">373</span>
+<span id="374">374</span>
+<span id="375">375</span>
+<span id="376">376</span>
+<span id="377">377</span>
+<span id="378">378</span>
+<span id="379">379</span>
+<span id="380">380</span>
+<span id="381">381</span>
+<span id="382">382</span>
+<span id="383">383</span>
+<span id="384">384</span>
+<span id="385">385</span>
+<span id="386">386</span>
+<span id="387">387</span>
+<span id="388">388</span>
+<span id="389">389</span>
+<span id="390">390</span>
+<span id="391">391</span>
+<span id="392">392</span>
+<span id="393">393</span>
+<span id="394">394</span>
+<span id="395">395</span>
+<span id="396">396</span>
+<span id="397">397</span>
+<span id="398">398</span>
+<span id="399">399</span>
+<span id="400">400</span>
+<span id="401">401</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::cmp::Ordering</span>;
-
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;utils&quot;</span>))]</span>
-<span class="kw">use</span> <span class="ident">async_trait::async_trait</span>;
-<span class="kw">use</span> <span class="ident">serde::de</span>::{<span class="ident">Deserialize</span>, <span class="ident">Deserializer</span>, <span class="ident">Error</span> <span class="kw">as</span> <span class="ident">DeError</span>};
+<span class="kw">use</span> <span class="ident">std::error::Error</span> <span class="kw">as</span> <span class="ident">StdError</span>;
+<span class="kw">use</span> <span class="ident">std::fmt</span>;
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::builder::EditRole</span>;
@@ -308,9 +419,8 @@
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::http::Http</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>))]</span>
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::internal::prelude</span>::<span class="kw-2">*</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;utils&quot;</span>))]</span>
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::misc::RoleParseError</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::prelude</span>::<span class="kw-2">*</span>;
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::utils::is_false</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;utils&quot;</span>))]</span>
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::utils::parse_role</span>;
 
@@ -378,6 +488,50 @@
     <span class="kw">pub</span> <span class="ident">unicode_emoji</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
 }
 
+<span class="doccomment">/// Helper for deserialization without a `GuildId` but then later updated to the correct `GuildId`.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// The only difference to `Role` is `#[serde(default)]` on `guild_id`.</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Deserialize</span>)]</span>
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">InterimRole</span> {
+    <span class="kw">pub</span> <span class="ident">id</span>: <span class="ident">RoleId</span>,
+    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">default</span>)]</span>
+    <span class="kw">pub</span> <span class="ident">guild_id</span>: <span class="ident">GuildId</span>,
+    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;utils&quot;</span>)]</span>
+    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename</span> <span class="op">=</span> <span class="string">&quot;color&quot;</span>)]</span>
+    <span class="kw">pub</span> <span class="ident">colour</span>: <span class="ident">Colour</span>,
+    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;utils&quot;</span>))]</span>
+    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename</span> <span class="op">=</span> <span class="string">&quot;color&quot;</span>)]</span>
+    <span class="kw">pub</span> <span class="ident">colour</span>: <span class="ident">u32</span>,
+    <span class="kw">pub</span> <span class="ident">hoist</span>: <span class="ident">bool</span>,
+    <span class="kw">pub</span> <span class="ident">managed</span>: <span class="ident">bool</span>,
+    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">default</span>)]</span>
+    <span class="kw">pub</span> <span class="ident">mentionable</span>: <span class="ident">bool</span>,
+    <span class="kw">pub</span> <span class="ident">name</span>: <span class="ident">String</span>,
+    <span class="kw">pub</span> <span class="ident">permissions</span>: <span class="ident">Permissions</span>,
+    <span class="kw">pub</span> <span class="ident">position</span>: <span class="ident">i64</span>,
+    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">default</span>)]</span>
+    <span class="kw">pub</span> <span class="ident">tags</span>: <span class="ident">RoleTags</span>,
+}
+
+<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">InterimRole</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Role</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">r</span>: <span class="ident">InterimRole</span>) -&gt; <span class="self">Self</span> {
+        <span class="self">Self</span> {
+            <span class="ident">id</span>: <span class="ident">r</span>.<span class="ident">id</span>,
+            <span class="ident">guild_id</span>: <span class="ident">r</span>.<span class="ident">guild_id</span>,
+            <span class="ident">colour</span>: <span class="ident">r</span>.<span class="ident">colour</span>,
+            <span class="ident">hoist</span>: <span class="ident">r</span>.<span class="ident">hoist</span>,
+            <span class="ident">managed</span>: <span class="ident">r</span>.<span class="ident">managed</span>,
+            <span class="ident">mentionable</span>: <span class="ident">r</span>.<span class="ident">mentionable</span>,
+            <span class="ident">name</span>: <span class="ident">r</span>.<span class="ident">name</span>,
+            <span class="ident">permissions</span>: <span class="ident">r</span>.<span class="ident">permissions</span>,
+            <span class="ident">position</span>: <span class="ident">r</span>.<span class="ident">position</span>,
+            <span class="ident">tags</span>: <span class="ident">r</span>.<span class="ident">tags</span>,
+            <span class="ident">icon</span>: <span class="prelude-val">None</span>,
+            <span class="ident">unicode_emoji</span>: <span class="prelude-val">None</span>,
+        }
+    }
+}
+
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
 <span class="kw">impl</span> <span class="ident">Role</span> {
     <span class="doccomment">/// Deletes the role.</span>
@@ -407,14 +561,9 @@
     <span class="doccomment">/// # use serenity::model::id::RoleId;</span>
     <span class="doccomment">/// # let role = RoleId(7).to_role_cached(&amp;cache).unwrap();</span>
     <span class="doccomment">/// // assuming a `role` has already been bound</span>
-    <span class="comment">//</span>
-    <span class="doccomment">/// role.edit(|mut r| {</span>
-    <span class="doccomment">///     r.hoist(true);</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">///     r</span>
-    <span class="doccomment">/// });</span>
+    <span class="doccomment">/// role.edit(|r| r.hoist(true));</span>
     <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// </span>
+    <span class="doccomment">///</span>
     <span class="doccomment">/// # Errors</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// Returns [`Error::Http`] if the current user does not</span>
@@ -451,11 +600,11 @@
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Display</span> <span class="kw">for</span> <span class="ident">Role</span> {
+<span class="kw">impl</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">Role</span> {
     <span class="doccomment">/// Format a mention for the role, pinging its members.</span>
     <span class="comment">// This is in the format of: `&lt;@&amp;ROLE_ID&gt;`.</span>
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">FmtResult</span> {
-        <span class="ident">Display::fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">mention</span>(), <span class="ident">f</span>)
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
+        <span class="ident">fmt::Display::fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">mention</span>(), <span class="ident">f</span>)
     }
 }
 
@@ -487,8 +636,10 @@
 <span class="kw">impl</span> <span class="ident">RoleId</span> {
     <span class="doccomment">/// Tries to find the [`Role`] by its Id in the cache.</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">to_role_cached</span>(<span class="self">self</span>, <span class="ident">cache</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Cache</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Role</span><span class="op">&gt;</span> {
-        <span class="kw">for</span> <span class="ident">guild</span> <span class="kw">in</span> <span class="ident">cache</span>.<span class="ident">as_ref</span>().<span class="ident">guilds</span>.<span class="ident">read</span>().<span class="kw">await</span>.<span class="ident">values</span>() {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">to_role_cached</span>(<span class="self">self</span>, <span class="ident">cache</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Cache</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Role</span><span class="op">&gt;</span> {
+        <span class="kw">for</span> <span class="ident">guild_entry</span> <span class="kw">in</span> <span class="ident">cache</span>.<span class="ident">as_ref</span>().<span class="ident">guilds</span>.<span class="ident">iter</span>() {
+            <span class="kw">let</span> <span class="ident">guild</span> <span class="op">=</span> <span class="ident">guild_entry</span>.<span class="ident">value</span>();
+
             <span class="kw">if</span> <span class="op">!</span><span class="ident">guild</span>.<span class="ident">roles</span>.<span class="ident">contains_key</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) {
                 <span class="kw">continue</span>;
             }
@@ -517,16 +668,35 @@
 }
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;utils&quot;</span>))]</span>
-<span class="attribute">#[<span class="ident">async_trait</span>]</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
+<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">RoleParseError</span> {
+    <span class="ident">NotPresentInCache</span>,
+    <span class="ident">InvalidRole</span>,
+}
+
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;utils&quot;</span>))]</span>
+<span class="kw">impl</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">RoleParseError</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
+        <span class="kw">match</span> <span class="self">self</span> {
+            <span class="ident">RoleParseError::NotPresentInCache</span> =&gt; <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;not present in cache&quot;</span>),
+            <span class="ident">RoleParseError::InvalidRole</span> =&gt; <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;invalid role&quot;</span>),
+        }
+    }
+}
+
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;utils&quot;</span>))]</span>
+<span class="kw">impl</span> <span class="ident">StdError</span> <span class="kw">for</span> <span class="ident">RoleParseError</span> {}
+
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;utils&quot;</span>))]</span>
 <span class="kw">impl</span> <span class="ident">FromStrAndCache</span> <span class="kw">for</span> <span class="ident">Role</span> {
     <span class="kw">type</span> <span class="prelude-val">Err</span> <span class="op">=</span> <span class="ident">RoleParseError</span>;
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">from_str</span><span class="op">&lt;</span><span class="ident">CRL</span><span class="op">&gt;</span>(<span class="ident">cache</span>: <span class="ident">CRL</span>, <span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">StdResult</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident"><span class="self">Self</span>::Err</span><span class="op">&gt;</span>
+    <span class="kw">fn</span> <span class="ident">from_str</span><span class="op">&lt;</span><span class="ident">CRL</span><span class="op">&gt;</span>(<span class="ident">cache</span>: <span class="ident">CRL</span>, <span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">StdResult</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident"><span class="self">Self</span>::Err</span><span class="op">&gt;</span>
     <span class="kw">where</span>
         <span class="ident">CRL</span>: <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Cache</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span>,
     {
         <span class="kw">match</span> <span class="ident">parse_role</span>(<span class="ident">s</span>) {
-            <span class="prelude-val">Some</span>(<span class="ident">x</span>) =&gt; <span class="kw">match</span> <span class="ident">RoleId</span>(<span class="ident">x</span>).<span class="ident">to_role_cached</span>(<span class="kw-2">&amp;</span><span class="ident">cache</span>).<span class="kw">await</span> {
+            <span class="prelude-val">Some</span>(<span class="ident">x</span>) =&gt; <span class="kw">match</span> <span class="ident">RoleId</span>(<span class="ident">x</span>).<span class="ident">to_role_cached</span>(<span class="kw-2">&amp;</span><span class="ident">cache</span>) {
                 <span class="prelude-val">Some</span>(<span class="ident">role</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">role</span>),
                 <span class="prelude-val">None</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">RoleParseError::NotPresentInCache</span>),
             },
@@ -536,7 +706,8 @@
 }
 
 <span class="doccomment">/// The tags of a [`Role`].</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Default</span>, <span class="ident">Serialize</span>)]</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Default</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
+<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">test</span>, <span class="ident">derive</span>(<span class="ident">PartialEq</span>))]</span>
 <span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">RoleTags</span> {
     <span class="doccomment">/// The Id of the bot the [`Role`] belongs to.</span>
@@ -544,43 +715,96 @@
     <span class="doccomment">/// The Id of the integration the [`Role`] belongs to.</span>
     <span class="kw">pub</span> <span class="ident">integration_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">IntegrationId</span><span class="op">&gt;</span>,
     <span class="doccomment">/// Whether this is the guild&#39;s premium subscriber role.</span>
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">default</span>)]</span>
+    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">default</span>, <span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;is_false&quot;</span>, <span class="ident">with</span> <span class="op">=</span> <span class="string">&quot;premium_subscriber&quot;</span>)]</span>
     <span class="kw">pub</span> <span class="ident">premium_subscriber</span>: <span class="ident">bool</span>,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="ident">Deserialize</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">RoleTags</span> {
-    <span class="kw">fn</span> <span class="ident">deserialize</span><span class="op">&lt;</span><span class="ident">D</span>: <span class="ident">Deserializer</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">deserializer</span>: <span class="ident">D</span>) -&gt; <span class="ident">StdResult</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">D::Error</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">map</span> <span class="op">=</span> <span class="ident">JsonMap::deserialize</span>(<span class="ident">deserializer</span>)<span class="question-mark">?</span>;
+<span class="doccomment">/// A premium subscriber role is reported with the field present and the value `null`.</span>
+<span class="kw">mod</span> <span class="ident">premium_subscriber</span> {
+    <span class="kw">use</span> <span class="ident">std::fmt</span>;
 
-        <span class="kw">let</span> <span class="ident">bot_id</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">map</span>.<span class="ident">contains_key</span>(<span class="string">&quot;bot_id&quot;</span>) {
-            <span class="bool-val">true</span> =&gt; <span class="prelude-val">Some</span>(
-                <span class="ident">map</span>.<span class="ident">remove</span>(<span class="string">&quot;bot_id&quot;</span>)
-                    .<span class="ident">ok_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">DeError::custom</span>(<span class="string">&quot;expected bot_id&quot;</span>))
-                    .<span class="ident">and_then</span>(<span class="ident">UserId::deserialize</span>)
-                    .<span class="ident">map_err</span>(<span class="ident">DeError::custom</span>)<span class="question-mark">?</span>,
-            ),
-            <span class="bool-val">false</span> =&gt; <span class="prelude-val">None</span>,
+    <span class="kw">use</span> <span class="ident">serde::de</span>::{<span class="ident">Error</span>, <span class="ident">Visitor</span>};
+    <span class="kw">use</span> <span class="ident">serde</span>::{<span class="ident">Deserializer</span>, <span class="ident">Serializer</span>};
+
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">deserialize</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span>, <span class="ident">D</span>: <span class="ident">Deserializer</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">deserializer</span>: <span class="ident">D</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">bool</span>, <span class="ident">D::Error</span><span class="op">&gt;</span> {
+        <span class="ident">deserializer</span>.<span class="ident">deserialize_option</span>(<span class="ident">NullValueVisitor</span>)
+    }
+
+    <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::trivially_copy_pass_by_ref</span>)]</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">serialize</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">Serializer</span><span class="op">&gt;</span>(<span class="kw">_</span>: <span class="kw-2">&amp;</span><span class="ident">bool</span>, <span class="ident">serializer</span>: <span class="ident">S</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">S::Ok</span>, <span class="ident">S::Error</span><span class="op">&gt;</span> {
+        <span class="ident">serializer</span>.<span class="ident">serialize_none</span>()
+    }
+
+    <span class="kw">struct</span> <span class="ident">NullValueVisitor</span>;
+
+    <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="ident">Visitor</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">NullValueVisitor</span> {
+        <span class="kw">type</span> <span class="ident">Value</span> <span class="op">=</span> <span class="ident">bool</span>;
+
+        <span class="kw">fn</span> <span class="ident">expecting</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
+            <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;null value&quot;</span>)
+        }
+
+        <span class="kw">fn</span> <span class="ident">visit_none</span><span class="op">&lt;</span><span class="ident">E</span>: <span class="ident">Error</span><span class="op">&gt;</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Value</span>, <span class="ident">E</span><span class="op">&gt;</span> {
+            <span class="prelude-val">Ok</span>(<span class="bool-val">true</span>)
+        }
+
+        <span class="doccomment">/// Called by the `simd_json` crate</span>
+        <span class="kw">fn</span> <span class="ident">visit_unit</span><span class="op">&lt;</span><span class="ident">E</span>: <span class="ident">Error</span><span class="op">&gt;</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Value</span>, <span class="ident">E</span><span class="op">&gt;</span> {
+            <span class="prelude-val">Ok</span>(<span class="bool-val">true</span>)
+        }
+    }
+}
+
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
+<span class="kw">mod</span> <span class="ident">tests</span> {
+    <span class="kw">use</span> <span class="ident">serde_test</span>::{<span class="ident">assert_tokens</span>, <span class="ident">Token</span>};
+
+    <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::RoleTags</span>;
+
+    <span class="attribute">#[<span class="ident">test</span>]</span>
+    <span class="kw">fn</span> <span class="ident">premium_subscriber_role_serde</span>() {
+        <span class="kw">let</span> <span class="ident">value</span> <span class="op">=</span> <span class="ident">RoleTags</span> {
+            <span class="ident">bot_id</span>: <span class="prelude-val">None</span>,
+            <span class="ident">integration_id</span>: <span class="prelude-val">None</span>,
+            <span class="ident">premium_subscriber</span>: <span class="bool-val">true</span>,
         };
 
-        <span class="kw">let</span> <span class="ident">integration_id</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">map</span>.<span class="ident">contains_key</span>(<span class="string">&quot;integration_id&quot;</span>) {
-            <span class="bool-val">true</span> =&gt; <span class="prelude-val">Some</span>(
-                <span class="ident">map</span>.<span class="ident">remove</span>(<span class="string">&quot;integration_id&quot;</span>)
-                    .<span class="ident">ok_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">DeError::custom</span>(<span class="string">&quot;expected integration_id&quot;</span>))
-                    .<span class="ident">and_then</span>(<span class="ident">IntegrationId::deserialize</span>)
-                    .<span class="ident">map_err</span>(<span class="ident">DeError::custom</span>)<span class="question-mark">?</span>,
-            ),
-            <span class="bool-val">false</span> =&gt; <span class="prelude-val">None</span>,
+        <span class="ident">assert_tokens</span>(<span class="kw-2">&amp;</span><span class="ident">value</span>, <span class="kw-2">&amp;</span>[
+            <span class="ident">Token::Struct</span> {
+                <span class="ident">name</span>: <span class="string">&quot;RoleTags&quot;</span>,
+                <span class="ident">len</span>: <span class="number">3</span>,
+            },
+            <span class="ident">Token::Str</span>(<span class="string">&quot;bot_id&quot;</span>),
+            <span class="ident">Token::None</span>,
+            <span class="ident">Token::Str</span>(<span class="string">&quot;integration_id&quot;</span>),
+            <span class="ident">Token::None</span>,
+            <span class="ident">Token::Str</span>(<span class="string">&quot;premium_subscriber&quot;</span>),
+            <span class="ident">Token::None</span>,
+            <span class="ident">Token::StructEnd</span>,
+        ]);
+    }
+
+    <span class="attribute">#[<span class="ident">test</span>]</span>
+    <span class="kw">fn</span> <span class="ident">non_premium_subscriber_role_serde</span>() {
+        <span class="kw">let</span> <span class="ident">value</span> <span class="op">=</span> <span class="ident">RoleTags</span> {
+            <span class="ident">bot_id</span>: <span class="prelude-val">None</span>,
+            <span class="ident">integration_id</span>: <span class="prelude-val">None</span>,
+            <span class="ident">premium_subscriber</span>: <span class="bool-val">false</span>,
         };
 
-        <span class="kw">let</span> <span class="ident">premium_subscriber</span> <span class="op">=</span> <span class="ident">map</span>.<span class="ident">contains_key</span>(<span class="string">&quot;premium_subscriber&quot;</span>);
-
-        <span class="prelude-val">Ok</span>(<span class="self">Self</span> {
-            <span class="ident">bot_id</span>,
-            <span class="ident">integration_id</span>,
-            <span class="ident">premium_subscriber</span>,
-        })
+        <span class="ident">assert_tokens</span>(<span class="kw-2">&amp;</span><span class="ident">value</span>, <span class="kw-2">&amp;</span>[
+            <span class="ident">Token::Struct</span> {
+                <span class="ident">name</span>: <span class="string">&quot;RoleTags&quot;</span>,
+                <span class="ident">len</span>: <span class="number">2</span>,
+            },
+            <span class="ident">Token::Str</span>(<span class="string">&quot;bot_id&quot;</span>),
+            <span class="ident">Token::None</span>,
+            <span class="ident">Token::Str</span>(<span class="string">&quot;integration_id&quot;</span>),
+            <span class="ident">Token::None</span>,
+            <span class="ident">Token::StructEnd</span>,
+        ]);
     }
 }
 </code></pre></div>
-</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.62.0-nightly (ec77f2524 2022-04-17)" ></div>
+</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.61.0-nightly (3c17c84a3 2022-03-21)" ></div>
 </body></html>

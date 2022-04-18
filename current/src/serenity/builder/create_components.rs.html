@@ -429,12 +429,37 @@
 <span id="424">424</span>
 <span id="425">425</span>
 <span id="426">426</span>
+<span id="427">427</span>
+<span id="428">428</span>
+<span id="429">429</span>
+<span id="430">430</span>
+<span id="431">431</span>
+<span id="432">432</span>
+<span id="433">433</span>
+<span id="434">434</span>
+<span id="435">435</span>
+<span id="436">436</span>
+<span id="437">437</span>
+<span id="438">438</span>
+<span id="439">439</span>
+<span id="440">440</span>
+<span id="441">441</span>
+<span id="442">442</span>
+<span id="443">443</span>
+<span id="444">444</span>
+<span id="445">445</span>
+<span id="446">446</span>
+<span id="447">447</span>
+<span id="448">448</span>
+<span id="449">449</span>
+<span id="450">450</span>
+<span id="451">451</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::collections::HashMap</span>;
 
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::internal::prelude</span>::<span class="kw-2">*</span>;
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::json</span>::{<span class="self">self</span>, <span class="ident">from_number</span>, <span class="ident">Value</span>};
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::channel::ReactionType</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::interactions::message_component</span>::{<span class="ident">ButtonStyle</span>, <span class="ident">InputTextStyle</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::utils</span>;
 
 <span class="doccomment">/// A builder for creating several [`ActionRow`]s.</span>
 <span class="doccomment">///</span>
@@ -473,7 +498,7 @@
 
     <span class="doccomment">/// Sets all the action rows.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_action_rows</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">rows</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">CreateActionRow</span><span class="op">&gt;</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
-        <span class="kw">let</span> <span class="ident">new_rows</span> <span class="op">=</span> <span class="ident">rows</span>.<span class="ident">into_iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="kw-2">mut</span> <span class="ident">f</span><span class="op">|</span> <span class="ident">f</span>.<span class="ident">build</span>()).<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Value</span><span class="op">&gt;</span><span class="op">&gt;</span>();
+        <span class="kw">let</span> <span class="ident">new_rows</span> <span class="op">=</span> <span class="ident">rows</span>.<span class="ident">into_iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="kw-2">mut</span> <span class="ident">f</span><span class="op">|</span> <span class="ident">f</span>.<span class="ident">build</span>());
 
         <span class="kw">for</span> <span class="ident">row</span> <span class="kw">in</span> <span class="ident">new_rows</span> {
             <span class="self">self</span>.<span class="number">0</span>.<span class="ident">push</span>(<span class="ident">row</span>);
@@ -505,7 +530,8 @@
 
     <span class="doccomment">/// Adds a button.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">add_button</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">button</span>: <span class="ident">CreateButton</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
-        <span class="kw">let</span> <span class="ident">components</span> <span class="op">=</span> <span class="self">self</span>.<span class="number">0</span>.<span class="ident">entry</span>(<span class="string">&quot;components&quot;</span>).<span class="ident">or_insert_with</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">Value::Array</span>(<span class="ident">Vec::new</span>()));
+        <span class="kw">let</span> <span class="ident">components</span> <span class="op">=</span>
+            <span class="self">self</span>.<span class="number">0</span>.<span class="ident">entry</span>(<span class="string">&quot;components&quot;</span>).<span class="ident">or_insert_with</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">Value::from</span>(<span class="ident">Vec</span>::<span class="op">&lt;</span><span class="ident">Value</span><span class="op">&gt;</span><span class="ident">::new</span>()));
         <span class="kw">let</span> <span class="ident">components_array</span> <span class="op">=</span> <span class="ident">components</span>.<span class="ident">as_array_mut</span>().<span class="ident">expect</span>(<span class="string">&quot;Must be an array&quot;</span>);
 
         <span class="ident">components_array</span>.<span class="ident">push</span>(<span class="ident">button</span>.<span class="ident">build</span>());
@@ -528,7 +554,8 @@
 
     <span class="doccomment">/// Adds a select menu.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">add_select_menu</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">menu</span>: <span class="ident">CreateSelectMenu</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
-        <span class="kw">let</span> <span class="ident">components</span> <span class="op">=</span> <span class="self">self</span>.<span class="number">0</span>.<span class="ident">entry</span>(<span class="string">&quot;components&quot;</span>).<span class="ident">or_insert_with</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">Value::Array</span>(<span class="ident">Vec::new</span>()));
+        <span class="kw">let</span> <span class="ident">components</span> <span class="op">=</span>
+            <span class="self">self</span>.<span class="number">0</span>.<span class="ident">entry</span>(<span class="string">&quot;components&quot;</span>).<span class="ident">or_insert_with</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">Value::from</span>(<span class="ident">Vec</span>::<span class="op">&lt;</span><span class="ident">Value</span><span class="op">&gt;</span><span class="ident">::new</span>()));
         <span class="kw">let</span> <span class="ident">components_array</span> <span class="op">=</span> <span class="ident">components</span>.<span class="ident">as_array_mut</span>().<span class="ident">expect</span>(<span class="string">&quot;Must be an array&quot;</span>);
 
         <span class="ident">components_array</span>.<span class="ident">push</span>(<span class="ident">menu</span>.<span class="ident">build</span>());
@@ -551,7 +578,8 @@
 
     <span class="doccomment">/// Adds an input text.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">add_input_text</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">input_text</span>: <span class="ident">CreateInputText</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
-        <span class="kw">let</span> <span class="ident">components</span> <span class="op">=</span> <span class="self">self</span>.<span class="number">0</span>.<span class="ident">entry</span>(<span class="string">&quot;components&quot;</span>).<span class="ident">or_insert_with</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">Value::Array</span>(<span class="ident">Vec::new</span>()));
+        <span class="kw">let</span> <span class="ident">components</span> <span class="op">=</span>
+            <span class="self">self</span>.<span class="number">0</span>.<span class="ident">entry</span>(<span class="string">&quot;components&quot;</span>).<span class="ident">or_insert_with</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">Value::from</span>(<span class="ident">Vec</span>::<span class="op">&lt;</span><span class="ident">Value</span><span class="op">&gt;</span><span class="ident">::new</span>()));
         <span class="kw">let</span> <span class="ident">components_array</span> <span class="op">=</span> <span class="ident">components</span>.<span class="ident">as_array_mut</span>().<span class="ident">expect</span>(<span class="string">&quot;Must be an array&quot;</span>);
 
         <span class="ident">components_array</span>.<span class="ident">push</span>(<span class="ident">input_text</span>.<span class="ident">build</span>());
@@ -560,79 +588,92 @@
     }
 
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">build</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">Value</span> {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;type&quot;</span>, <span class="ident">Value::Number</span>(<span class="ident">serde_json::Number::from</span>(<span class="number">1_u8</span>)));
+        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;type&quot;</span>, <span class="ident">from_number</span>(<span class="number">1_u8</span>));
 
-        <span class="ident">utils::hashmap_to_json_map</span>(<span class="self">self</span>.<span class="number">0</span>.<span class="ident">clone</span>()).<span class="ident">into</span>()
+        <span class="ident">json::hashmap_to_json_map</span>(<span class="self">self</span>.<span class="number">0</span>.<span class="ident">clone</span>()).<span class="ident">into</span>()
     }
 }
 
 <span class="doccomment">/// A builder for creating a [`Button`].</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// [`Button`]: crate::model::interactions::message_component::Button</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Default</span>)]</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">CreateButton</span>(<span class="kw">pub</span> <span class="ident">HashMap</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>, <span class="ident">Value</span><span class="op">&gt;</span>);
+
+<span class="kw">impl</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">CreateButton</span> {
+    <span class="doccomment">/// Creates a primary button.</span>
+    <span class="kw">fn</span> <span class="ident">default</span>() -&gt; <span class="self">Self</span> {
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">btn</span> <span class="op">=</span> <span class="self">Self</span>(<span class="ident">HashMap::new</span>());
+        <span class="ident">btn</span>.<span class="ident">style</span>(<span class="ident">ButtonStyle::Primary</span>);
+        <span class="ident">btn</span>
+    }
+}
 
 <span class="kw">impl</span> <span class="ident">CreateButton</span> {
     <span class="doccomment">/// Sets the style of the button.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">style</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">kind</span>: <span class="ident">ButtonStyle</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;style&quot;</span>, <span class="ident">Value::Number</span>(<span class="ident">serde_json::Number::from</span>(<span class="ident">kind</span> <span class="kw">as</span> <span class="ident">u8</span>)));
+        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;style&quot;</span>, <span class="ident">from_number</span>(<span class="ident">kind</span> <span class="kw">as</span> <span class="ident">u8</span>));
         <span class="self">self</span>
     }
 
     <span class="doccomment">/// The label of the button.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">label</span><span class="op">&lt;</span><span class="ident">D</span>: <span class="ident">ToString</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">label</span>: <span class="ident">D</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;label&quot;</span>, <span class="ident">Value::String</span>(<span class="ident">label</span>.<span class="ident">to_string</span>()));
+        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;label&quot;</span>, <span class="ident">Value::from</span>(<span class="ident">label</span>.<span class="ident">to_string</span>()));
         <span class="self">self</span>
     }
 
     <span class="doccomment">/// Sets the custom id of the button, a developer-defined identifier.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">custom_id</span><span class="op">&lt;</span><span class="ident">D</span>: <span class="ident">ToString</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">id</span>: <span class="ident">D</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;custom_id&quot;</span>, <span class="ident">Value::String</span>(<span class="ident">id</span>.<span class="ident">to_string</span>()));
+        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;custom_id&quot;</span>, <span class="ident">Value::from</span>(<span class="ident">id</span>.<span class="ident">to_string</span>()));
         <span class="self">self</span>
     }
 
     <span class="doccomment">/// The url for url style button.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">url</span><span class="op">&lt;</span><span class="ident">D</span>: <span class="ident">ToString</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">url</span>: <span class="ident">D</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;url&quot;</span>, <span class="ident">Value::String</span>(<span class="ident">url</span>.<span class="ident">to_string</span>()));
+        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;url&quot;</span>, <span class="ident">Value::from</span>(<span class="ident">url</span>.<span class="ident">to_string</span>()));
         <span class="self">self</span>
     }
 
     <span class="doccomment">/// Sets emoji of the button.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">emoji</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">emoji</span>: <span class="ident">ReactionType</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">emoji</span><span class="op">&lt;</span><span class="ident">R</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">ReactionType</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">emoji</span>: <span class="ident">R</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
+        <span class="self">self</span>.<span class="ident">_emoji</span>(<span class="ident">emoji</span>.<span class="ident">into</span>())
+    }
+
+    <span class="kw">fn</span> <span class="ident">_emoji</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">emoji</span>: <span class="ident">ReactionType</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">map</span> <span class="op">=</span> <span class="ident">JsonMap::new</span>();
 
         <span class="kw">match</span> <span class="ident">emoji</span> {
             <span class="ident">ReactionType::Unicode</span>(<span class="ident">u</span>) =&gt; {
-                <span class="ident">map</span>.<span class="ident">insert</span>(<span class="string">&quot;name&quot;</span>.<span class="ident">to_string</span>(), <span class="ident">Value::String</span>(<span class="ident">u</span>));
+                <span class="ident">map</span>.<span class="ident">insert</span>(<span class="string">&quot;name&quot;</span>.<span class="ident">to_string</span>(), <span class="ident">Value::from</span>(<span class="ident">u</span>));
             },
             <span class="ident">ReactionType::Custom</span> {
                 <span class="ident">animated</span>,
                 <span class="ident">id</span>,
                 <span class="ident">name</span>,
             } =&gt; {
-                <span class="ident">map</span>.<span class="ident">insert</span>(<span class="string">&quot;animated&quot;</span>.<span class="ident">to_string</span>(), <span class="ident">Value::Bool</span>(<span class="ident">animated</span>));
-                <span class="ident">map</span>.<span class="ident">insert</span>(<span class="string">&quot;id&quot;</span>.<span class="ident">to_string</span>(), <span class="ident">Value::String</span>(<span class="ident">id</span>.<span class="ident">to_string</span>()));
+                <span class="ident">map</span>.<span class="ident">insert</span>(<span class="string">&quot;animated&quot;</span>.<span class="ident">to_string</span>(), <span class="ident">Value::from</span>(<span class="ident">animated</span>));
+                <span class="ident">map</span>.<span class="ident">insert</span>(<span class="string">&quot;id&quot;</span>.<span class="ident">to_string</span>(), <span class="ident">Value::from</span>(<span class="ident">id</span>.<span class="ident">to_string</span>()));
 
                 <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">name</span>) <span class="op">=</span> <span class="ident">name</span> {
-                    <span class="ident">map</span>.<span class="ident">insert</span>(<span class="string">&quot;name&quot;</span>.<span class="ident">to_string</span>(), <span class="ident">Value::String</span>(<span class="ident">name</span>));
+                    <span class="ident">map</span>.<span class="ident">insert</span>(<span class="string">&quot;name&quot;</span>.<span class="ident">to_string</span>(), <span class="ident">Value::from</span>(<span class="ident">name</span>));
                 }
             },
         };
 
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;emoji&quot;</span>, <span class="ident">Value::Object</span>(<span class="ident">map</span>));
+        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;emoji&quot;</span>, <span class="ident">Value::from</span>(<span class="ident">map</span>));
         <span class="self">self</span>
     }
 
     <span class="doccomment">/// Sets the disabled state for the button.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">disabled</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">disabled</span>: <span class="ident">bool</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;disabled&quot;</span>, <span class="ident">Value::Bool</span>(<span class="ident">disabled</span>));
+        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;disabled&quot;</span>, <span class="ident">Value::from</span>(<span class="ident">disabled</span>));
         <span class="self">self</span>
     }
 
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">build</span>(<span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="ident">Value</span> {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;type&quot;</span>, <span class="ident">Value::Number</span>(<span class="ident">serde_json::Number::from</span>(<span class="number">2_u8</span>)));
+        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;type&quot;</span>, <span class="ident">from_number</span>(<span class="number">2_u8</span>));
 
-        <span class="ident">utils::hashmap_to_json_map</span>(<span class="self">self</span>.<span class="number">0</span>.<span class="ident">clone</span>()).<span class="ident">into</span>()
+        <span class="ident">json::hashmap_to_json_map</span>(<span class="self">self</span>.<span class="number">0</span>.<span class="ident">clone</span>()).<span class="ident">into</span>()
     }
 }
 
@@ -645,31 +686,31 @@
 <span class="kw">impl</span> <span class="ident">CreateSelectMenu</span> {
     <span class="doccomment">/// The placeholder of the select menu.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">placeholder</span><span class="op">&lt;</span><span class="ident">D</span>: <span class="ident">ToString</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">label</span>: <span class="ident">D</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;placeholder&quot;</span>, <span class="ident">Value::String</span>(<span class="ident">label</span>.<span class="ident">to_string</span>()));
+        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;placeholder&quot;</span>, <span class="ident">Value::from</span>(<span class="ident">label</span>.<span class="ident">to_string</span>()));
         <span class="self">self</span>
     }
 
     <span class="doccomment">/// Sets the custom id of the select menu, a developer-defined identifier.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">custom_id</span><span class="op">&lt;</span><span class="ident">D</span>: <span class="ident">ToString</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">id</span>: <span class="ident">D</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;custom_id&quot;</span>, <span class="ident">Value::String</span>(<span class="ident">id</span>.<span class="ident">to_string</span>()));
+        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;custom_id&quot;</span>, <span class="ident">Value::from</span>(<span class="ident">id</span>.<span class="ident">to_string</span>()));
         <span class="self">self</span>
     }
 
     <span class="doccomment">/// Sets the minimum values for the user to select.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">min_values</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">min</span>: <span class="ident">u64</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;min_values&quot;</span>, <span class="ident">Value::Number</span>(<span class="ident">Number::from</span>(<span class="ident">min</span>)));
+        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;min_values&quot;</span>, <span class="ident">from_number</span>(<span class="ident">min</span>));
         <span class="self">self</span>
     }
 
     <span class="doccomment">/// Sets the maximum values for the user to select.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">max_values</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">max</span>: <span class="ident">u64</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;max_values&quot;</span>, <span class="ident">Value::Number</span>(<span class="ident">Number::from</span>(<span class="ident">max</span>)));
+        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;max_values&quot;</span>, <span class="ident">from_number</span>(<span class="ident">max</span>));
         <span class="self">self</span>
     }
 
     <span class="doccomment">/// Sets the disabled state for the button.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">disabled</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">disabled</span>: <span class="ident">bool</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;disabled&quot;</span>, <span class="ident">Value::Bool</span>(<span class="ident">disabled</span>));
+        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;disabled&quot;</span>, <span class="ident">Value::from</span>(<span class="ident">disabled</span>));
         <span class="self">self</span>
     }
 
@@ -680,15 +721,15 @@
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">data</span> <span class="op">=</span> <span class="ident">CreateSelectMenuOptions::default</span>();
         <span class="ident">f</span>(<span class="kw-2">&amp;mut</span> <span class="ident">data</span>);
 
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;options&quot;</span>, <span class="ident">Value::Array</span>(<span class="ident">data</span>.<span class="number">0</span>));
+        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;options&quot;</span>, <span class="ident">Value::from</span>(<span class="ident">data</span>.<span class="number">0</span>));
 
         <span class="self">self</span>
     }
 
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">build</span>(<span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="ident">Value</span> {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;type&quot;</span>, <span class="ident">Value::Number</span>(<span class="ident">serde_json::Number::from</span>(<span class="number">3_u8</span>)));
+        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;type&quot;</span>, <span class="ident">from_number</span>(<span class="number">3_u8</span>));
 
-        <span class="ident">utils::hashmap_to_json_map</span>(<span class="self">self</span>.<span class="number">0</span>.<span class="ident">clone</span>()).<span class="ident">into</span>()
+        <span class="ident">json::hashmap_to_json_map</span>(<span class="self">self</span>.<span class="number">0</span>.<span class="ident">clone</span>()).<span class="ident">into</span>()
     }
 }
 
@@ -714,7 +755,7 @@
 
     <span class="doccomment">/// Adds an option.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">add_option</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">option</span>: <span class="ident">CreateSelectMenuOption</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
-        <span class="kw">let</span> <span class="ident">data</span> <span class="op">=</span> <span class="ident">utils::hashmap_to_json_map</span>(<span class="ident">option</span>.<span class="number">0</span>);
+        <span class="kw">let</span> <span class="ident">data</span> <span class="op">=</span> <span class="ident">json::hashmap_to_json_map</span>(<span class="ident">option</span>.<span class="number">0</span>);
 
         <span class="self">self</span>.<span class="number">0</span>.<span class="ident">push</span>(<span class="ident">data</span>.<span class="ident">into</span>());
 
@@ -723,10 +764,8 @@
 
     <span class="doccomment">/// Sets all the options.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_options</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">options</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">CreateSelectMenuOption</span><span class="op">&gt;</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
-        <span class="kw">let</span> <span class="ident">new_options</span> <span class="op">=</span> <span class="ident">options</span>
-            .<span class="ident">into_iter</span>()
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">option</span><span class="op">|</span> <span class="ident">utils::hashmap_to_json_map</span>(<span class="ident">option</span>.<span class="number">0</span>).<span class="ident">into</span>())
-            .<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Value</span><span class="op">&gt;</span><span class="op">&gt;</span>();
+        <span class="kw">let</span> <span class="ident">new_options</span> <span class="op">=</span>
+            <span class="ident">options</span>.<span class="ident">into_iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">option</span><span class="op">|</span> <span class="ident">json::hashmap_to_json_map</span>(<span class="ident">option</span>.<span class="number">0</span>).<span class="ident">into</span>());
 
         <span class="kw">for</span> <span class="ident">option</span> <span class="kw">in</span> <span class="ident">new_options</span> {
             <span class="self">self</span>.<span class="number">0</span>.<span class="ident">push</span>(<span class="ident">option</span>);
@@ -743,53 +782,64 @@
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">CreateSelectMenuOption</span>(<span class="kw">pub</span> <span class="ident">HashMap</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>, <span class="ident">Value</span><span class="op">&gt;</span>);
 
 <span class="kw">impl</span> <span class="ident">CreateSelectMenuOption</span> {
+    <span class="doccomment">/// Creates an option.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span><span class="op">&lt;</span><span class="ident">L</span>: <span class="ident">ToString</span>, <span class="ident">V</span>: <span class="ident">ToString</span><span class="op">&gt;</span>(<span class="ident">label</span>: <span class="ident">L</span>, <span class="ident">value</span>: <span class="ident">V</span>) -&gt; <span class="self">Self</span> {
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">opt</span> <span class="op">=</span> <span class="ident"><span class="self">Self</span>::default</span>();
+        <span class="ident">opt</span>.<span class="ident">label</span>(<span class="ident">label</span>).<span class="ident">value</span>(<span class="ident">value</span>);
+        <span class="ident">opt</span>
+    }
+
     <span class="doccomment">/// Sets the label of this option.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">label</span><span class="op">&lt;</span><span class="ident">D</span>: <span class="ident">ToString</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">label</span>: <span class="ident">D</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;label&quot;</span>, <span class="ident">Value::String</span>(<span class="ident">label</span>.<span class="ident">to_string</span>()));
+        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;label&quot;</span>, <span class="ident">Value::from</span>(<span class="ident">label</span>.<span class="ident">to_string</span>()));
         <span class="self">self</span>
     }
 
     <span class="doccomment">/// Sets the value of this option.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">value</span><span class="op">&lt;</span><span class="ident">D</span>: <span class="ident">ToString</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">value</span>: <span class="ident">D</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;value&quot;</span>, <span class="ident">Value::String</span>(<span class="ident">value</span>.<span class="ident">to_string</span>()));
+        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;value&quot;</span>, <span class="ident">Value::from</span>(<span class="ident">value</span>.<span class="ident">to_string</span>()));
         <span class="self">self</span>
     }
 
     <span class="doccomment">/// Sets the description shown on this option.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">description</span><span class="op">&lt;</span><span class="ident">D</span>: <span class="ident">ToString</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">description</span>: <span class="ident">D</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;description&quot;</span>, <span class="ident">Value::String</span>(<span class="ident">description</span>.<span class="ident">to_string</span>()));
+        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;description&quot;</span>, <span class="ident">Value::from</span>(<span class="ident">description</span>.<span class="ident">to_string</span>()));
         <span class="self">self</span>
     }
 
     <span class="doccomment">/// Sets emoji of the option.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">emoji</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">emoji</span>: <span class="ident">ReactionType</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">emoji</span><span class="op">&lt;</span><span class="ident">R</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">ReactionType</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">emoji</span>: <span class="ident">R</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
+        <span class="self">self</span>.<span class="ident">_emoji</span>(<span class="ident">emoji</span>.<span class="ident">into</span>())
+    }
+
+    <span class="kw">fn</span> <span class="ident">_emoji</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">emoji</span>: <span class="ident">ReactionType</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">map</span> <span class="op">=</span> <span class="ident">JsonMap::new</span>();
 
         <span class="kw">match</span> <span class="ident">emoji</span> {
             <span class="ident">ReactionType::Unicode</span>(<span class="ident">u</span>) =&gt; {
-                <span class="ident">map</span>.<span class="ident">insert</span>(<span class="string">&quot;name&quot;</span>.<span class="ident">to_string</span>(), <span class="ident">Value::String</span>(<span class="ident">u</span>));
+                <span class="ident">map</span>.<span class="ident">insert</span>(<span class="string">&quot;name&quot;</span>.<span class="ident">to_string</span>(), <span class="ident">Value::from</span>(<span class="ident">u</span>));
             },
             <span class="ident">ReactionType::Custom</span> {
                 <span class="ident">animated</span>,
                 <span class="ident">id</span>,
                 <span class="ident">name</span>,
             } =&gt; {
-                <span class="ident">map</span>.<span class="ident">insert</span>(<span class="string">&quot;animated&quot;</span>.<span class="ident">to_string</span>(), <span class="ident">Value::Bool</span>(<span class="ident">animated</span>));
-                <span class="ident">map</span>.<span class="ident">insert</span>(<span class="string">&quot;id&quot;</span>.<span class="ident">to_string</span>(), <span class="ident">Value::String</span>(<span class="ident">id</span>.<span class="ident">to_string</span>()));
+                <span class="ident">map</span>.<span class="ident">insert</span>(<span class="string">&quot;animated&quot;</span>.<span class="ident">to_string</span>(), <span class="ident">Value::from</span>(<span class="ident">animated</span>));
+                <span class="ident">map</span>.<span class="ident">insert</span>(<span class="string">&quot;id&quot;</span>.<span class="ident">to_string</span>(), <span class="ident">Value::from</span>(<span class="ident">id</span>.<span class="ident">to_string</span>()));
 
                 <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">name</span>) <span class="op">=</span> <span class="ident">name</span> {
-                    <span class="ident">map</span>.<span class="ident">insert</span>(<span class="string">&quot;name&quot;</span>.<span class="ident">to_string</span>(), <span class="ident">Value::String</span>(<span class="ident">name</span>));
+                    <span class="ident">map</span>.<span class="ident">insert</span>(<span class="string">&quot;name&quot;</span>.<span class="ident">to_string</span>(), <span class="ident">Value::from</span>(<span class="ident">name</span>));
                 }
             },
         };
 
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;emoji&quot;</span>, <span class="ident">Value::Object</span>(<span class="ident">map</span>));
+        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;emoji&quot;</span>, <span class="ident">Value::from</span>(<span class="ident">map</span>));
         <span class="self">self</span>
     }
 
     <span class="doccomment">/// Sets this option as selected by default.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">default_selection</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">disabled</span>: <span class="ident">bool</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;default&quot;</span>, <span class="ident">Value::Bool</span>(<span class="ident">disabled</span>));
+        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;default&quot;</span>, <span class="ident">Value::from</span>(<span class="ident">disabled</span>));
         <span class="self">self</span>
     }
 }
@@ -803,58 +853,58 @@
 <span class="kw">impl</span> <span class="ident">CreateInputText</span> {
     <span class="doccomment">/// Sets the custom id of the input text, a developer-defined identifier.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">custom_id</span><span class="op">&lt;</span><span class="ident">D</span>: <span class="ident">ToString</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">id</span>: <span class="ident">D</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;custom_id&quot;</span>, <span class="ident">Value::String</span>(<span class="ident">id</span>.<span class="ident">to_string</span>()));
+        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;custom_id&quot;</span>, <span class="ident">Value::from</span>(<span class="ident">id</span>.<span class="ident">to_string</span>()));
         <span class="self">self</span>
     }
 
     <span class="doccomment">/// Sets the style of this input text</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">style</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">kind</span>: <span class="ident">InputTextStyle</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;style&quot;</span>, <span class="ident">Value::Number</span>(<span class="ident">serde_json::Number::from</span>(<span class="ident">kind</span> <span class="kw">as</span> <span class="ident">u8</span>)));
+        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;style&quot;</span>, <span class="ident">from_number</span>(<span class="ident">kind</span> <span class="kw">as</span> <span class="ident">u8</span>));
         <span class="self">self</span>
     }
 
     <span class="doccomment">/// Sets the label of this input text.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">label</span><span class="op">&lt;</span><span class="ident">D</span>: <span class="ident">ToString</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">label</span>: <span class="ident">D</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;label&quot;</span>, <span class="ident">Value::String</span>(<span class="ident">label</span>.<span class="ident">to_string</span>()));
+        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;label&quot;</span>, <span class="ident">Value::from</span>(<span class="ident">label</span>.<span class="ident">to_string</span>()));
         <span class="self">self</span>
     }
 
     <span class="doccomment">/// Sets the placeholder of this input text.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">placeholder</span><span class="op">&lt;</span><span class="ident">D</span>: <span class="ident">ToString</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">label</span>: <span class="ident">D</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;placeholder&quot;</span>, <span class="ident">Value::String</span>(<span class="ident">label</span>.<span class="ident">to_string</span>()));
+        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;placeholder&quot;</span>, <span class="ident">Value::from</span>(<span class="ident">label</span>.<span class="ident">to_string</span>()));
         <span class="self">self</span>
     }
 
     <span class="doccomment">/// Sets the minimum length required for the input text</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">min_length</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">min</span>: <span class="ident">u64</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;min_length&quot;</span>, <span class="ident">Value::Number</span>(<span class="ident">Number::from</span>(<span class="ident">min</span>)));
+        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;min_length&quot;</span>, <span class="ident">from_number</span>(<span class="ident">min</span>));
         <span class="self">self</span>
     }
 
     <span class="doccomment">/// Sets the maximum length required for the input text</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">max_length</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">max</span>: <span class="ident">u64</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;max_length&quot;</span>, <span class="ident">Value::Number</span>(<span class="ident">Number::from</span>(<span class="ident">max</span>)));
+        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;max_length&quot;</span>, <span class="ident">from_number</span>(<span class="ident">max</span>));
         <span class="self">self</span>
     }
 
     <span class="doccomment">/// Sets the value of this input text.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">value</span><span class="op">&lt;</span><span class="ident">D</span>: <span class="ident">ToString</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">value</span>: <span class="ident">D</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;value&quot;</span>, <span class="ident">Value::String</span>(<span class="ident">value</span>.<span class="ident">to_string</span>()));
+        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;value&quot;</span>, <span class="ident">Value::from</span>(<span class="ident">value</span>.<span class="ident">to_string</span>()));
         <span class="self">self</span>
     }
 
     <span class="doccomment">/// Sets if the input text is required</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">required</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">required</span>: <span class="ident">bool</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;required&quot;</span>, <span class="ident">Value::Bool</span>(<span class="ident">required</span>));
+        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;required&quot;</span>, <span class="ident">Value::from</span>(<span class="ident">required</span>));
         <span class="self">self</span>
     }
 
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">build</span>(<span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="ident">Value</span> {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;type&quot;</span>, <span class="ident">Value::Number</span>(<span class="ident">serde_json::Number::from</span>(<span class="number">4_u8</span>)));
+        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;type&quot;</span>, <span class="ident">from_number</span>(<span class="number">4_u8</span>));
 
-        <span class="ident">utils::hashmap_to_json_map</span>(<span class="self">self</span>.<span class="number">0</span>.<span class="ident">clone</span>()).<span class="ident">into</span>()
+        <span class="ident">json::hashmap_to_json_map</span>(<span class="self">self</span>.<span class="number">0</span>.<span class="ident">clone</span>()).<span class="ident">into</span>()
     }
 }
 </code></pre></div>
-</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.62.0-nightly (ec77f2524 2022-04-17)" ></div>
+</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.61.0-nightly (3c17c84a3 2022-03-21)" ></div>
 </body></html>

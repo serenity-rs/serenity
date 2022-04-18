@@ -35,28 +35,8 @@
 <span id="30">30</span>
 <span id="31">31</span>
 <span id="32">32</span>
-<span id="33">33</span>
-<span id="34">34</span>
-<span id="35">35</span>
-<span id="36">36</span>
-<span id="37">37</span>
-<span id="38">38</span>
-<span id="39">39</span>
-<span id="40">40</span>
-<span id="41">41</span>
-<span id="42">42</span>
-<span id="43">43</span>
-<span id="44">44</span>
-<span id="45">45</span>
-<span id="46">46</span>
-<span id="47">47</span>
-<span id="48">48</span>
-<span id="49">49</span>
-<span id="50">50</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std</span>::{
-    <span class="ident">error::Error</span> <span class="kw">as</span> <span class="ident">StdError</span>,
-    <span class="ident">fmt</span>::{<span class="ident">Display</span>, <span class="ident">Formatter</span>, <span class="prelude-ty">Result</span> <span class="kw">as</span> <span class="ident">FmtResult</span>},
-};
+</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::error::Error</span> <span class="kw">as</span> <span class="ident">StdError</span>;
+<span class="kw">use</span> <span class="ident">std::fmt</span>;
 
 <span class="doccomment">/// An error returned from the [`Client`].</span>
 <span class="doccomment">///</span>
@@ -64,18 +44,11 @@
 <span class="doccomment">/// variant.</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// [`Client`]: super::Client</span>
-<span class="doccomment">/// [`Error`]: crate::Error</span>
 <span class="doccomment">/// [`Error::Client`]: crate::Error::Client</span>
-<span class="doccomment">/// [`GuildId::ban`]: crate::model::id::GuildId::ban</span>
 <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::enum_variant_names</span>)]</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>, <span class="ident">PartialEq</span>)]</span>
 <span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">Error</span> {
-    <span class="doccomment">/// When the token provided is invalid. This is returned when validating a</span>
-    <span class="doccomment">/// token through the [`validate_token`] function.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`validate_token`]: super::validate_token</span>
-    <span class="ident">InvalidToken</span>,
     <span class="doccomment">/// When a shard has completely failed to reboot after resume and/or</span>
     <span class="doccomment">/// reconnect attempts.</span>
     <span class="ident">ShardBootFailure</span>,
@@ -84,25 +57,16 @@
     <span class="ident">Shutdown</span>,
 }
 
-<span class="kw">impl</span> <span class="ident">Display</span> <span class="kw">for</span> <span class="ident">Error</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">FmtResult</span> {
+<span class="kw">impl</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">Error</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">Error::InvalidToken</span> =&gt; <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;The provided token was invalid&quot;</span>),
             <span class="ident">Error::ShardBootFailure</span> =&gt; <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;Failed to (re-)boot a shard&quot;</span>),
             <span class="ident">Error::Shutdown</span> =&gt; <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;The clients shards shutdown&quot;</span>),
         }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">StdError</span> <span class="kw">for</span> <span class="ident">Error</span> {
-    <span class="kw">fn</span> <span class="ident">description</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">str</span> {
-        <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
-            <span class="ident">Error::InvalidToken</span> =&gt; <span class="string">&quot;The provided token was invalid&quot;</span>,
-            <span class="ident">Error::ShardBootFailure</span> =&gt; <span class="string">&quot;Failed to (re-)boot a shard&quot;</span>,
-            <span class="ident">Error::Shutdown</span> =&gt; <span class="string">&quot;The clients shards shutdown&quot;</span>,
-        }
-    }
-}
+<span class="kw">impl</span> <span class="ident">StdError</span> <span class="kw">for</span> <span class="ident">Error</span> {}
 </code></pre></div>
-</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.62.0-nightly (ec77f2524 2022-04-17)" ></div>
+</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.61.0-nightly (3c17c84a3 2022-03-21)" ></div>
 </body></html>

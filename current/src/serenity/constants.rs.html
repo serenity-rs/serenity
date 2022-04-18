@@ -150,30 +150,6 @@
 <span id="145">145</span>
 <span id="146">146</span>
 <span id="147">147</span>
-<span id="148">148</span>
-<span id="149">149</span>
-<span id="150">150</span>
-<span id="151">151</span>
-<span id="152">152</span>
-<span id="153">153</span>
-<span id="154">154</span>
-<span id="155">155</span>
-<span id="156">156</span>
-<span id="157">157</span>
-<span id="158">158</span>
-<span id="159">159</span>
-<span id="160">160</span>
-<span id="161">161</span>
-<span id="162">162</span>
-<span id="163">163</span>
-<span id="164">164</span>
-<span id="165">165</span>
-<span id="166">166</span>
-<span id="167">167</span>
-<span id="168">168</span>
-<span id="169">169</span>
-<span id="170">170</span>
-<span id="171">171</span>
 </pre><pre class="rust"><code><span class="doccomment">//! A set of constants used by the library.</span>
 
 <span class="doccomment">/// The maximum length of the textual size of an embed.</span>
@@ -182,9 +158,12 @@
 <span class="doccomment">/// The maximum number of embeds in a message.</span>
 <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">EMBED_MAX_COUNT</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">10</span>;
 
-<span class="doccomment">/// The gateway version used by the library. The gateway URI is retrieved via</span>
+<span class="doccomment">/// The maximum number of stickers in a message.</span>
+<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">STICKER_MAX_COUNT</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">3</span>;
+
+<span class="doccomment">/// The gateway version used by the library. The gateway URL is retrieved via</span>
 <span class="doccomment">/// the REST API.</span>
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">GATEWAY_VERSION</span>: <span class="ident">u8</span> <span class="op">=</span> <span class="number">9</span>;
+<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">GATEWAY_VERSION</span>: <span class="ident">u8</span> <span class="op">=</span> <span class="number">10</span>;
 
 <span class="doccomment">/// The large threshold to send on identify.</span>
 <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">LARGE_THRESHOLD</span>: <span class="ident">u8</span> <span class="op">=</span> <span class="number">250</span>;
@@ -205,47 +184,20 @@
 );
 
 <span class="doccomment">/// List of messages Discord shows on member join.</span>
-<span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::non_ascii_literal</span>)]</span> <span class="comment">// allow for discord join messages</span>
 <span class="kw">pub</span> <span class="kw">static</span> <span class="ident">JOIN_MESSAGES</span>: <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span><span class="ident">str</span>] <span class="op">=</span> <span class="kw-2">&amp;</span>[
-    <span class="string">&quot;$user just joined the server - glhf!&quot;</span>,
-    <span class="string">&quot;$user just joined. Everyone, look busy!&quot;</span>,
-    <span class="string">&quot;$user just joined. Can I get a heal?&quot;</span>,
-    <span class="string">&quot;$user joined your party.&quot;</span>,
-    <span class="string">&quot;$user joined. You must construct additional pylons.&quot;</span>,
-    <span class="string">&quot;Ermagherd. $user is here.&quot;</span>,
-    <span class="string">&quot;Welcome, $user. Stay awhile and listen.&quot;</span>,
-    <span class="string">&quot;Welcome, $user. We were expecting you ( ͡° ͜ʖ ͡°)&quot;</span>,
+    <span class="string">&quot;$user joined the party.&quot;</span>,
+    <span class="string">&quot;$user is here.&quot;</span>,
     <span class="string">&quot;Welcome, $user. We hope you brought pizza.&quot;</span>,
-    <span class="string">&quot;Welcome $user. Leave your weapons by the door.&quot;</span>,
     <span class="string">&quot;A wild $user appeared.&quot;</span>,
-    <span class="string">&quot;Swoooosh. $user just landed.&quot;</span>,
-    <span class="string">&quot;Brace yourselves. $user just joined the server.&quot;</span>,
-    <span class="string">&quot;$user just joined... or did they?&quot;</span>,
-    <span class="string">&quot;$user just arrived. Seems OP - please nerf.&quot;</span>,
+    <span class="string">&quot;$user just landed.&quot;</span>,
     <span class="string">&quot;$user just slid into the server.&quot;</span>,
-    <span class="string">&quot;A $user has spawned in the server.&quot;</span>,
-    <span class="string">&quot;Big $user showed up!&quot;</span>,
-    <span class="string">&quot;Where’s $user? In the server!&quot;</span>,
-    <span class="string">&quot;$user hopped into the server. Kangaroo!!&quot;</span>,
-    <span class="string">&quot;$user just showed up. Hold my beer.&quot;</span>,
-    <span class="string">&quot;Challenger approaching - $user has appeared!&quot;</span>,
-    <span class="string">&quot;It&#39;s a bird! It&#39;s a plane! Nevermind, it&#39;s just $user.&quot;</span>,
-    <span class="string">r&quot;It&#39;s $user! Praise the sun! \[T]/&quot;</span>,
-    <span class="string">&quot;Never gonna give $user up. Never gonna let $user down.&quot;</span>,
-    <span class="string">&quot;$user has joined the battle bus.&quot;</span>,
-    <span class="string">&quot;Cheers, love! $user&#39;s here!&quot;</span>,
-    <span class="string">&quot;Hey! Listen! $user has joined!&quot;</span>,
-    <span class="string">&quot;We&#39;ve been expecting you $user&quot;</span>,
-    <span class="string">&quot;It&#39;s dangerous to go alone, take $user!&quot;</span>,
-    <span class="string">&quot;$user has joined the server! It&#39;s super effective!&quot;</span>,
-    <span class="string">&quot;Cheers, love! $user is here!&quot;</span>,
-    <span class="string">&quot;$user is here, as the prophecy foretold.&quot;</span>,
-    <span class="string">&quot;$user has arrived. Party&#39;s over.&quot;</span>,
-    <span class="string">&quot;Ready player $user&quot;</span>,
-    <span class="string">&quot;$user is here to kick butt and chew bubblegum. And $user is all out of gum.&quot;</span>,
-    <span class="string">&quot;Hello. Is it $user you&#39;re looking for?&quot;</span>,
-    <span class="string">&quot;$user has joined. Stay a while and listen!&quot;</span>,
-    <span class="string">&quot;Roses are red, violets are blue, $user joined this server with you&quot;</span>,
+    <span class="string">&quot;$user just showed up!&quot;</span>,
+    <span class="string">&quot;Welcome $user. Say hi!&quot;</span>,
+    <span class="string">&quot;$user hopped into the server.&quot;</span>,
+    <span class="string">&quot;Everyone welcome $user!&quot;</span>,
+    <span class="string">&quot;Glad you&#39;re here, $user.&quot;</span>,
+    <span class="string">&quot;Good to see you, $user.&quot;</span>,
+    <span class="string">&quot;Yay you made it, $user!&quot;</span>,
 ];
 
 <span class="doccomment">/// Enum to map gateway opcodes.</span>
@@ -346,5 +298,5 @@
     <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">DISALLOWED_GATEWAY_INTENTS</span>: <span class="ident">u16</span> <span class="op">=</span> <span class="number">4014</span>;
 }
 </code></pre></div>
-</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.62.0-nightly (ec77f2524 2022-04-17)" ></div>
+</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.61.0-nightly (3c17c84a3 2022-03-21)" ></div>
 </body></html>

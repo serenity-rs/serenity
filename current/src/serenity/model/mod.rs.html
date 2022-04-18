@@ -62,7 +62,6 @@
 <span id="57">57</span>
 <span id="58">58</span>
 <span id="59">59</span>
-<span id="60">60</span>
 </pre><pre class="rust"><code><span class="doccomment">//! Mappings of objects received from the API, with optional helper methods for</span>
 <span class="doccomment">//! ease of use.</span>
 <span class="doccomment">//!</span>
@@ -95,34 +94,33 @@
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">gateway</span>;
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">guild</span>;
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">id</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">interactions</span>;
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">invite</span>;
+<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">mention</span>;
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">misc</span>;
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">oauth2</span>;
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">permissions</span>;
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">prelude</span>;
+<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">sticker</span>;
+<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">timestamp</span>;
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">user</span>;
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">voice</span>;
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">webhook</span>;
 
-<span class="kw">use</span> <span class="ident">std</span>::{
-    <span class="ident">collections::HashMap</span>,
-    <span class="ident">fmt</span>::{<span class="ident">Display</span>, <span class="ident">Formatter</span>, <span class="prelude-ty">Result</span> <span class="kw">as</span> <span class="ident">FmtResult</span>},
-    <span class="ident">result::Result</span> <span class="kw">as</span> <span class="ident">StdResult</span>,
-};
+<span class="kw">use</span> <span class="ident">std::collections::HashMap</span>;
+<span class="kw">use</span> <span class="ident">std::result::Result</span> <span class="kw">as</span> <span class="ident">StdResult</span>;
 
 <span class="kw">use</span> <span class="ident">serde::de::Visitor</span>;
 <span class="kw">use</span> <span class="ident">serde</span>::{<span class="ident">Deserialize</span>, <span class="ident">Deserializer</span>};
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;voice-model&quot;</span>)]</span>
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">serenity_voice_model</span> <span class="kw">as</span> <span class="ident">voice_gateway</span>;
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">timestamp::Timestamp</span>;
 
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="self">self</span>::error::Error</span> <span class="kw">as</span> <span class="ident">ModelError</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="self">self</span>::permissions::Permissions</span>;
-<span class="kw">use</span> <span class="ident"><span class="self">self</span>::utils</span>::<span class="kw-2">*</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::internal::prelude</span>::<span class="kw-2">*</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;utils&quot;</span>)]</span>
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::utils::Colour</span>;
 </code></pre></div>
-</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.62.0-nightly (ec77f2524 2022-04-17)" ></div>
+</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.61.0-nightly (3c17c84a3 2022-03-21)" ></div>
 </body></html>

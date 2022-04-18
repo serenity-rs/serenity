@@ -467,6 +467,12 @@
 <span id="462">462</span>
 <span id="463">463</span>
 <span id="464">464</span>
+<span id="465">465</span>
+<span id="466">466</span>
+<span id="467">467</span>
+<span id="468">468</span>
+<span id="469">469</span>
+<span id="470">470</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::sync::Arc</span>;
 
 <span class="kw">use</span> <span class="ident">futures::channel::mpsc::UnboundedSender</span> <span class="kw">as</span> <span class="ident">Sender</span>;
@@ -477,10 +483,8 @@
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::cache::Cache</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;gateway&quot;</span>)]</span>
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::client::bridge::gateway::ShardMessenger</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;collector&quot;</span>))]</span>
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::collector::ComponentInteractionFilter</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;collector&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::collector</span>::{<span class="ident">MessageFilter</span>, <span class="ident">ReactionFilter</span>};
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::collector</span>::{<span class="ident">ComponentInteractionFilter</span>, <span class="ident">MessageFilter</span>, <span class="ident">ReactionFilter</span>};
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;gateway&quot;</span>)]</span>
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::gateway::InterMessage</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::http::Http</span>;
@@ -583,7 +587,8 @@
     <span class="doccomment">/// }</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// # async fn run() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {</span>
-    <span class="doccomment">/// let mut client = Client::builder(&quot;token&quot;).event_handler(Handler).await?;</span>
+    <span class="doccomment">/// let mut client =</span>
+    <span class="doccomment">///     Client::builder(&quot;token&quot;, GatewayIntents::default()).event_handler(Handler).await?;</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// client.start().await?;</span>
     <span class="doccomment">/// #     Ok(())</span>
@@ -620,7 +625,8 @@
     <span class="doccomment">/// }</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// # async fn run() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {</span>
-    <span class="doccomment">/// let mut client = Client::builder(&quot;token&quot;).event_handler(Handler).await?;</span>
+    <span class="doccomment">/// let mut client =</span>
+    <span class="doccomment">///     Client::builder(&quot;token&quot;, GatewayIntents::default()).event_handler(Handler).await?;</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// client.start().await?;</span>
     <span class="doccomment">/// #     Ok(())</span>
@@ -657,7 +663,8 @@
     <span class="doccomment">/// }</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// # async fn run() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {</span>
-    <span class="doccomment">/// let mut client = Client::builder(&quot;token&quot;).event_handler(Handler).await?;</span>
+    <span class="doccomment">/// let mut client =</span>
+    <span class="doccomment">///     Client::builder(&quot;token&quot;, GatewayIntents::default()).event_handler(Handler).await?;</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// client.start().await?;</span>
     <span class="doccomment">/// #     Ok(())</span>
@@ -693,7 +700,8 @@
     <span class="doccomment">/// }</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// # async fn run() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {</span>
-    <span class="doccomment">/// let mut client = Client::builder(&quot;token&quot;).event_handler(Handler).await?;</span>
+    <span class="doccomment">/// let mut client =</span>
+    <span class="doccomment">///     Client::builder(&quot;token&quot;, GatewayIntents::default()).event_handler(Handler).await?;</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// client.start().await?;</span>
     <span class="doccomment">/// #     Ok(())</span>
@@ -731,7 +739,8 @@
     <span class="doccomment">/// }</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// # async fn run() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {</span>
-    <span class="doccomment">/// let mut client = Client::builder(&quot;token&quot;).event_handler(Handler).await?;</span>
+    <span class="doccomment">/// let mut client =</span>
+    <span class="doccomment">///     Client::builder(&quot;token&quot;, GatewayIntents::default()).event_handler(Handler).await?;</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// client.start().await?;</span>
     <span class="doccomment">/// #     Ok(())</span>
@@ -773,7 +782,8 @@
     <span class="doccomment">/// }</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// # async fn run() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {</span>
-    <span class="doccomment">/// let mut client = Client::builder(&quot;token&quot;).event_handler(Handler).await?;</span>
+    <span class="doccomment">/// let mut client =</span>
+    <span class="doccomment">///     Client::builder(&quot;token&quot;, GatewayIntents::default()).event_handler(Handler).await?;</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// client.start().await?;</span>
     <span class="doccomment">/// #     Ok(())</span>
@@ -809,7 +819,8 @@
     <span class="doccomment">/// }</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// # async fn run() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {</span>
-    <span class="doccomment">/// let mut client = Client::builder(&quot;token&quot;).event_handler(Handler).await?;</span>
+    <span class="doccomment">/// let mut client =</span>
+    <span class="doccomment">///     Client::builder(&quot;token&quot;, GatewayIntents::default()).event_handler(Handler).await?;</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// client.start().await?;</span>
     <span class="doccomment">/// #     Ok(())</span>
@@ -839,7 +850,8 @@
     <span class="doccomment">/// }</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// # async fn run() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {</span>
-    <span class="doccomment">/// let mut client = Client::builder(&quot;token&quot;).event_handler(Handler).await?;</span>
+    <span class="doccomment">/// let mut client =</span>
+    <span class="doccomment">///     Client::builder(&quot;token&quot;, GatewayIntents::default()).event_handler(Handler).await?;</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// client.start().await?;</span>
     <span class="doccomment">/// #     Ok(())</span>
@@ -873,7 +885,7 @@
     <span class="doccomment">/// Sets a new `filter` for the shard to check if an interaction event shall be</span>
     <span class="doccomment">/// sent back to `filter`&#39;s paired receiver.</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;collector&quot;</span>))]</span>
+    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;collector&quot;</span>)]</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">set_component_interaction_filter</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">filter</span>: <span class="ident">ComponentInteractionFilter</span>) {
         <span class="self">self</span>.<span class="ident">shard</span>.<span class="ident">set_component_interaction_filter</span>(<span class="ident">filter</span>);
     }
@@ -932,5 +944,5 @@
     }
 }
 </code></pre></div>
-</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.62.0-nightly (ec77f2524 2022-04-17)" ></div>
+</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.61.0-nightly (3c17c84a3 2022-03-21)" ></div>
 </body></html>

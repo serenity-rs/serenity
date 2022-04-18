@@ -1,0 +1,1 @@
+initSidebarItems({"enum":[["StickerFormatType","Differentiates between sticker formats."],["StickerType","Differentiates between sticker types."]],"mod":[["sticker_id",""],["sticker_item",""],["sticker_pack",""]],"struct":[["Sticker","A sticker sent with a message."]]});

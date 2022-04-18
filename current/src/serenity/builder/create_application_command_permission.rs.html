@@ -212,20 +212,17 @@
 <span id="207">207</span>
 <span id="208">208</span>
 <span id="209">209</span>
-<span id="210">210</span>
-<span id="211">211</span>
-<span id="212">212</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::collections::HashMap</span>;
 
-<span class="kw">use</span> <span class="ident">serde_json::Value</span>;
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;simd-json&quot;</span>)]</span>
+<span class="kw">use</span> <span class="ident">simd_json::Mutable</span>;
 
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::json</span>::{<span class="self">self</span>, <span class="ident">from_number</span>, <span class="ident">Value</span>};
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::interactions::application_command::ApplicationCommandPermissionType</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::utils</span>;
 
 <span class="doccomment">/// A builder for creating several [`ApplicationCommandPermission`].</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// [`ApplicationCommandPermission`]: crate::model::interactions::application_command::ApplicationCommandPermission</span>
-<span class="doccomment">/// [`kind`]: Self::kind</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Default</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">CreateApplicationCommandsPermissions</span>(<span class="kw">pub</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Value</span><span class="op">&gt;</span>);
 
@@ -250,7 +247,7 @@
         <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
         <span class="ident">application_command</span>: <span class="ident">CreateApplicationCommandPermissions</span>,
     ) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
-        <span class="kw">let</span> <span class="ident">new_data</span> <span class="op">=</span> <span class="ident">Value::Object</span>(<span class="ident">utils::hashmap_to_json_map</span>(<span class="ident">application_command</span>.<span class="number">0</span>));
+        <span class="kw">let</span> <span class="ident">new_data</span> <span class="op">=</span> <span class="ident">Value::from</span>(<span class="ident">json::hashmap_to_json_map</span>(<span class="ident">application_command</span>.<span class="number">0</span>));
 
         <span class="self">self</span>.<span class="number">0</span>.<span class="ident">push</span>(<span class="ident">new_data</span>);
 
@@ -262,10 +259,8 @@
         <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
         <span class="ident">application_commands</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">CreateApplicationCommandPermissions</span><span class="op">&gt;</span>,
     ) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
-        <span class="kw">let</span> <span class="ident">new_application_commands</span> <span class="op">=</span> <span class="ident">application_commands</span>
-            .<span class="ident">into_iter</span>()
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="ident">Value::Object</span>(<span class="ident">utils::hashmap_to_json_map</span>(<span class="ident">f</span>.<span class="number">0</span>)))
-            .<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Value</span><span class="op">&gt;</span><span class="op">&gt;</span>();
+        <span class="kw">let</span> <span class="ident">new_application_commands</span> <span class="op">=</span>
+            <span class="ident">application_commands</span>.<span class="ident">into_iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="ident">Value::from</span>(<span class="ident">json::hashmap_to_json_map</span>(<span class="ident">f</span>.<span class="number">0</span>)));
 
         <span class="kw">for</span> <span class="ident">application_command</span> <span class="kw">in</span> <span class="ident">new_application_commands</span> {
             <span class="self">self</span>.<span class="number">0</span>.<span class="ident">push</span>(<span class="ident">application_command</span>);
@@ -277,7 +272,6 @@
 <span class="doccomment">/// A builder for creating an [`ApplicationCommandPermission`].</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// [`ApplicationCommandPermission`]: crate::model::interactions::application_command::ApplicationCommandPermission</span>
-<span class="doccomment">/// [`kind`]: Self::kind</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Default</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">CreateApplicationCommandPermissions</span>(<span class="kw">pub</span> <span class="ident">HashMap</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>, <span class="ident">Value</span><span class="op">&gt;</span>);
 
@@ -286,7 +280,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// [`CommandId`]: crate::model::id::CommandId</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">id</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">application_command_id</span>: <span class="ident">u64</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;id&quot;</span>, <span class="ident">Value::String</span>(<span class="ident">application_command_id</span>.<span class="ident">to_string</span>()));
+        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;id&quot;</span>, <span class="ident">Value::from</span>(<span class="ident">application_command_id</span>.<span class="ident">to_string</span>()));
         <span class="self">self</span>
     }
 
@@ -310,12 +304,13 @@
         <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
         <span class="ident">permission</span>: <span class="ident">CreateApplicationCommandPermissionData</span>,
     ) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
-        <span class="kw">let</span> <span class="ident">new_data</span> <span class="op">=</span> <span class="ident">utils::hashmap_to_json_map</span>(<span class="ident">permission</span>.<span class="number">0</span>);
-        <span class="kw">let</span> <span class="ident">permissions</span> <span class="op">=</span> <span class="self">self</span>.<span class="number">0</span>.<span class="ident">entry</span>(<span class="string">&quot;permissions&quot;</span>).<span class="ident">or_insert_with</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">Value::Array</span>(<span class="ident">Vec::new</span>()));
+        <span class="kw">let</span> <span class="ident">new_data</span> <span class="op">=</span> <span class="ident">json::hashmap_to_json_map</span>(<span class="ident">permission</span>.<span class="number">0</span>);
+        <span class="kw">let</span> <span class="ident">permissions</span> <span class="op">=</span>
+            <span class="self">self</span>.<span class="number">0</span>.<span class="ident">entry</span>(<span class="string">&quot;permissions&quot;</span>).<span class="ident">or_insert_with</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">Value::from</span>(<span class="ident">Vec</span>::<span class="op">&lt;</span><span class="ident">Value</span><span class="op">&gt;</span><span class="ident">::new</span>()));
 
         <span class="kw">let</span> <span class="ident">permissions_array</span> <span class="op">=</span> <span class="ident">permissions</span>.<span class="ident">as_array_mut</span>().<span class="ident">expect</span>(<span class="string">&quot;Must be an array&quot;</span>);
 
-        <span class="ident">permissions_array</span>.<span class="ident">push</span>(<span class="ident">Value::Object</span>(<span class="ident">new_data</span>));
+        <span class="ident">permissions_array</span>.<span class="ident">push</span>(<span class="ident">Value::from</span>(<span class="ident">new_data</span>));
 
         <span class="self">self</span>
     }
@@ -327,10 +322,10 @@
     ) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
         <span class="kw">let</span> <span class="ident">new_permissions</span> <span class="op">=</span> <span class="ident">permissions</span>
             .<span class="ident">into_iter</span>()
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="ident">Value::Object</span>(<span class="ident">utils::hashmap_to_json_map</span>(<span class="ident">f</span>.<span class="number">0</span>)))
+            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="ident">Value::from</span>(<span class="ident">json::hashmap_to_json_map</span>(<span class="ident">f</span>.<span class="number">0</span>)))
             .<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Value</span><span class="op">&gt;</span><span class="op">&gt;</span>();
 
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;permissions&quot;</span>, <span class="ident">Value::Array</span>(<span class="ident">new_permissions</span>));
+        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;permissions&quot;</span>, <span class="ident">Value::from</span>(<span class="ident">new_permissions</span>));
 
         <span class="self">self</span>
     }
@@ -339,7 +334,6 @@
 <span class="doccomment">/// A builder for creating several [`ApplicationCommandPermissionData`].</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// [`ApplicationCommandPermissionData`]: crate::model::interactions::application_command::ApplicationCommandPermissionData</span>
-<span class="doccomment">/// [`kind`]: Self::kind</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Default</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">CreateApplicationCommandPermissionsData</span>(<span class="kw">pub</span> <span class="ident">HashMap</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>, <span class="ident">Value</span><span class="op">&gt;</span>);
 
@@ -364,12 +358,13 @@
         <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
         <span class="ident">permission</span>: <span class="ident">CreateApplicationCommandPermissionData</span>,
     ) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
-        <span class="kw">let</span> <span class="ident">new_data</span> <span class="op">=</span> <span class="ident">utils::hashmap_to_json_map</span>(<span class="ident">permission</span>.<span class="number">0</span>);
-        <span class="kw">let</span> <span class="ident">permissions</span> <span class="op">=</span> <span class="self">self</span>.<span class="number">0</span>.<span class="ident">entry</span>(<span class="string">&quot;permissions&quot;</span>).<span class="ident">or_insert_with</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">Value::Array</span>(<span class="ident">Vec::new</span>()));
+        <span class="kw">let</span> <span class="ident">new_data</span> <span class="op">=</span> <span class="ident">json::hashmap_to_json_map</span>(<span class="ident">permission</span>.<span class="number">0</span>);
+        <span class="kw">let</span> <span class="ident">permissions</span> <span class="op">=</span>
+            <span class="self">self</span>.<span class="number">0</span>.<span class="ident">entry</span>(<span class="string">&quot;permissions&quot;</span>).<span class="ident">or_insert_with</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">Value::from</span>(<span class="ident">Vec</span>::<span class="op">&lt;</span><span class="ident">Value</span><span class="op">&gt;</span><span class="ident">::new</span>()));
 
         <span class="kw">let</span> <span class="ident">permissions_array</span> <span class="op">=</span> <span class="ident">permissions</span>.<span class="ident">as_array_mut</span>().<span class="ident">expect</span>(<span class="string">&quot;Must be an array&quot;</span>);
 
-        <span class="ident">permissions_array</span>.<span class="ident">push</span>(<span class="ident">Value::Object</span>(<span class="ident">new_data</span>));
+        <span class="ident">permissions_array</span>.<span class="ident">push</span>(<span class="ident">Value::from</span>(<span class="ident">new_data</span>));
 
         <span class="self">self</span>
     }
@@ -381,10 +376,10 @@
     ) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
         <span class="kw">let</span> <span class="ident">new_permissions</span> <span class="op">=</span> <span class="ident">permissions</span>
             .<span class="ident">into_iter</span>()
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="ident">Value::Object</span>(<span class="ident">utils::hashmap_to_json_map</span>(<span class="ident">f</span>.<span class="number">0</span>)))
+            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="ident">Value::from</span>(<span class="ident">json::hashmap_to_json_map</span>(<span class="ident">f</span>.<span class="number">0</span>)))
             .<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Value</span><span class="op">&gt;</span><span class="op">&gt;</span>();
 
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;permissions&quot;</span>, <span class="ident">Value::Array</span>(<span class="ident">new_permissions</span>));
+        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;permissions&quot;</span>, <span class="ident">Value::from</span>(<span class="ident">new_permissions</span>));
 
         <span class="self">self</span>
     }
@@ -395,7 +390,6 @@
 <span class="doccomment">/// All fields are required.</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// [`ApplicationCommandPermissionData`]: crate::model::interactions::application_command::ApplicationCommandPermissionData</span>
-<span class="doccomment">/// [`kind`]: Self::kind</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Default</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">CreateApplicationCommandPermissionData</span>(<span class="kw">pub</span> <span class="ident">HashMap</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>, <span class="ident">Value</span><span class="op">&gt;</span>);
 
@@ -404,7 +398,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// [`ApplicationCommandPermissionData`]: crate::model::interactions::application_command::ApplicationCommandPermissionData</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">kind</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">kind</span>: <span class="ident">ApplicationCommandPermissionType</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;type&quot;</span>, <span class="ident">Value::Number</span>(<span class="ident">serde_json::Number::from</span>(<span class="ident">kind</span> <span class="kw">as</span> <span class="ident">u8</span>)));
+        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;type&quot;</span>, <span class="ident">from_number</span>(<span class="ident">kind</span> <span class="kw">as</span> <span class="ident">u8</span>));
         <span class="self">self</span>
     }
 
@@ -412,7 +406,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// [`ApplicationCommandPermissionData`]: crate::model::interactions::application_command::ApplicationCommandPermissionData</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">id</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">id</span>: <span class="ident">u64</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;id&quot;</span>, <span class="ident">Value::String</span>(<span class="ident">id</span>.<span class="ident">to_string</span>()));
+        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;id&quot;</span>, <span class="ident">Value::from</span>(<span class="ident">id</span>.<span class="ident">to_string</span>()));
         <span class="self">self</span>
     }
 
@@ -423,10 +417,10 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// [`ApplicationCommandPermissionData`]: crate::model::interactions::application_command::ApplicationCommandPermissionData</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">permission</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">permission</span>: <span class="ident">bool</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;permission&quot;</span>, <span class="ident">Value::Bool</span>(<span class="ident">permission</span>));
+        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;permission&quot;</span>, <span class="ident">Value::from</span>(<span class="ident">permission</span>));
         <span class="self">self</span>
     }
 }
 </code></pre></div>
-</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.62.0-nightly (ec77f2524 2022-04-17)" ></div>
+</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.61.0-nightly (3c17c84a3 2022-03-21)" ></div>
 </body></html>

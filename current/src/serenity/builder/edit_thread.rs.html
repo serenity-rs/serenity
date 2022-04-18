@@ -56,7 +56,7 @@
 <span id="51">51</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::collections::HashMap</span>;
 
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::internal::prelude</span>::<span class="kw-2">*</span>;
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::json</span>::{<span class="ident">from_number</span>, <span class="ident">Value</span>};
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Default</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">EditThread</span>(<span class="kw">pub</span> <span class="ident">HashMap</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>, <span class="ident">Value</span><span class="op">&gt;</span>);
@@ -66,7 +66,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// **Note**: Must be between 2 and 100 characters long.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">name</span><span class="op">&lt;</span><span class="ident">D</span>: <span class="ident">ToString</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">name</span>: <span class="ident">D</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;name&quot;</span>, <span class="ident">Value::String</span>(<span class="ident">name</span>.<span class="ident">to_string</span>()));
+        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;name&quot;</span>, <span class="ident">Value::from</span>(<span class="ident">name</span>.<span class="ident">to_string</span>()));
 
         <span class="self">self</span>
     }
@@ -75,7 +75,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// **Note**: Can only be set to 60, 1440, 4320, 10080 currently.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">auto_archive_duration</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">duration</span>: <span class="ident">u16</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;auto_archive_duration&quot;</span>, <span class="ident">Value::Number</span>(<span class="ident">Number::from</span>(<span class="ident">duration</span>)));
+        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;auto_archive_duration&quot;</span>, <span class="ident">from_number</span>(<span class="ident">duration</span>));
 
         <span class="self">self</span>
     }
@@ -84,14 +84,14 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// **Note**: A thread that is `locked` can only be unarchived if the user has the `MANAGE_THREADS` permission.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">archived</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">archived</span>: <span class="ident">bool</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;archived&quot;</span>, <span class="ident">Value::Bool</span>(<span class="ident">archived</span>));
+        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;archived&quot;</span>, <span class="ident">Value::from</span>(<span class="ident">archived</span>));
 
         <span class="self">self</span>
     }
 
     <span class="doccomment">/// The lock status of the thread.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">locked</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">lock</span>: <span class="ident">bool</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;locked&quot;</span>, <span class="ident">Value::Bool</span>(<span class="ident">lock</span>));
+        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;locked&quot;</span>, <span class="ident">Value::from</span>(<span class="ident">lock</span>));
 
         <span class="self">self</span>
     }
@@ -100,11 +100,11 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// **Note**: Only available on private threads.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">invitable</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">invitable</span>: <span class="ident">bool</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;invitable&quot;</span>, <span class="ident">Value::Bool</span>(<span class="ident">invitable</span>));
+        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;invitable&quot;</span>, <span class="ident">Value::from</span>(<span class="ident">invitable</span>));
 
         <span class="self">self</span>
     }
 }
 </code></pre></div>
-</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.62.0-nightly (ec77f2524 2022-04-17)" ></div>
+</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.61.0-nightly (3c17c84a3 2022-03-21)" ></div>
 </body></html>

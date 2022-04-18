@@ -4,7 +4,7 @@
     </nav>
     <nav class="sidebar"><a class="sidebar-logo" href="../../../serenity/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div>
         </a><h2 class="location"><a href="#">Module ratelimiting</a></h2><div class="sidebar-elems"><section><div class="block"><ul><li><a href="#structs">Structs</a></li></ul></div></section><div id="sidebar-vars" data-name="ratelimiting" data-ty="mod" data-relpath="./"></div><script defer src="./sidebar-items.js"></script></div></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../serenity/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><div class="theme-picker hidden"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="22" height="22" alt="Pick another theme!" src="../../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></form></nav></div><section id="main-content" class="content"><div class="main-heading">
-    <h1 class="fqn"><span class="in-band">Module <a href="../../index.html">serenity</a>::<wbr><a href="../index.html">http</a>::<wbr><a class="mod" href="#">ratelimiting</a><button id="copy-path" onclick="copy_path(this)" title="Copy item path to clipboard"><img src="../../../clipboard.svg" width="19" height="18" alt="Copy item path"></button></span></h1><span class="out-of-band"><a class="srclink" href="../../../src/serenity/http/ratelimiting.rs.html#1-473">source</a> · <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">[<span class="inner">&#x2212;</span>]</a></span></div><span class="item-info"><div class="stab portability">Available on <strong>crate feature <code>http</code></strong> only.</div></span><details class="rustdoc-toggle top-doc" open><summary class="hideme"><span>Expand description</span></summary><div class="docblock"><p>Routes are used for ratelimiting. These are to differentiate between the
+    <h1 class="fqn"><span class="in-band">Module <a href="../../index.html">serenity</a>::<wbr><a href="../index.html">http</a>::<wbr><a class="mod" href="#">ratelimiting</a><button id="copy-path" onclick="copy_path(this)" title="Copy item path to clipboard"><img src="../../../clipboard.svg" width="19" height="18" alt="Copy item path"></button></span></h1><span class="out-of-band"><a class="srclink" href="../../../src/serenity/http/ratelimiting.rs.html#1-464">source</a> · <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">[<span class="inner">&#x2212;</span>]</a></span></div><div class="item-info"><div class="stab portability">This is supported on <strong>crate feature <code>http</code></strong> only.</div></div><details class="rustdoc-toggle top-doc" open><summary class="hideme"><span>Expand description</span></summary><div class="docblock"><p>Routes are used for ratelimiting. These are to differentiate between the
 different <em>types</em> of routes - such as getting the current user’s channels -
 for the most part, with the exception being major parameters.</p>
 <p><a href="https://discord.com/developers/docs/topics/rate-limits#rate-limits">Taken from</a> the Discord docs, major parameters are:</p>
@@ -15,23 +15,23 @@ For example, <code>/channels/:channel_id</code> and
 account when generating rate limits since it’s the major parameter. The
 only current major parameters are <code>channel_id</code>, <code>guild_id</code> and <code>webhook_id</code>.</p>
 </blockquote>
-<p>This results in the two URIs of <code>GET /channels/4/messages/7</code> and
+<p>This results in the two URLs of <code>GET /channels/4/messages/7</code> and
 <code>GET /channels/5/messages/8</code> being rate limited <em>separately</em>. However, the
-two URIs of <code>GET /channels/10/messages/11</code> and
+two URLs of <code>GET /channels/10/messages/11</code> and
 <code>GET /channels/10/messages/12</code> will count towards the “same ratelimit”, as
-the major parameter - <code>10</code> is equivalent in both URIs’ format.</p>
+the major parameter - <code>10</code> is equivalent in both URLs’ format.</p>
 <h2 id="examples"><a href="#examples">Examples</a></h2>
-<p>First: taking the first two URIs - <code>GET /channels/4/messages/7</code> and
+<p>First: taking the first two URLs - <code>GET /channels/4/messages/7</code> and
 <code>GET /channels/5/messages/8</code> - and assuming both buckets have a <code>limit</code> of
-<code>10</code>, requesting the first URI will result in the response containing a
+<code>10</code>, requesting the first URL will result in the response containing a
 <code>remaining</code> of <code>9</code>. Immediately after - prior to buckets resetting -
-performing a request to the <em>second</em> URI will also contain a <code>remaining</code> of
+performing a request to the <em>second</em> URL will also contain a <code>remaining</code> of
 <code>9</code> in the response, as the major parameter - <code>channel_id</code> - is different
 in the two requests (<code>4</code> and <code>5</code>).</p>
-<p>Second: take for example the last two URIs. Assuming the bucket’s <code>limit</code> is
-<code>10</code>, requesting the first URI will return a <code>remaining</code> of <code>9</code> in the
+<p>Second: take for example the last two URLs. Assuming the bucket’s <code>limit</code> is
+<code>10</code>, requesting the first URL will return a <code>remaining</code> of <code>9</code> in the
 response. Immediately after - prior to buckets resetting - performing a
-request to the <em>second</em> URI will return a <code>remaining</code> of <code>8</code> in the
+request to the <em>second</em> URL will return a <code>remaining</code> of <code>8</code> in the
 response, as the major parameter - <code>channel_id</code> - is equivalent for the two
 requests (<code>10</code>).</p>
 <p>Major parameters are why some variants (i.e. all of the channel/guild
@@ -43,5 +43,5 @@ differentiating between different ratelimits.</p>
 <a href="../routing/enum.Route.html" title="Route"><code>Route</code></a>, which is stored in <a href="../client/struct.Http.html"><code>Http</code></a>.</p>
 </div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.RatelimitedRequest.html" title="serenity::http::ratelimiting::RatelimitedRequest struct">RatelimitedRequest</a></div><div class="item-right docblock-short"><p>Information about a request for the ratelimiter to perform.</p>
 </div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.Ratelimiter.html" title="serenity::http::ratelimiting::Ratelimiter struct">Ratelimiter</a></div><div class="item-right docblock-short"><p>Ratelimiter for requests to the Discord API.</p>
-</div></div></div></section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.62.0-nightly (ec77f2524 2022-04-17)" ></div>
+</div></div></div></section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.61.0-nightly (3c17c84a3 2022-03-21)" ></div>
 </body></html>

@@ -171,15 +171,13 @@
 <span id="166">166</span>
 <span id="167">167</span>
 <span id="168">168</span>
-<span id="169">169</span>
-<span id="170">170</span>
 </pre><pre class="rust"><code><span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::builder::EditChannel</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::http</span>::{<span class="ident">CacheHttp</span>, <span class="ident">Http</span>};
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::json</span>::{<span class="self">self</span>, <span class="ident">from_number</span>};
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::prelude</span>::<span class="kw-2">*</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;utils&quot;</span>))]</span>
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::utils</span> <span class="kw">as</span> <span class="ident">serenity_utils</span>;
 
 <span class="doccomment">/// A category of [`GuildChannel`]s.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
@@ -190,8 +188,7 @@
     <span class="doccomment">/// Guild Id this category belongs to.</span>
     <span class="kw">pub</span> <span class="ident">guild_id</span>: <span class="ident">GuildId</span>,
     <span class="doccomment">/// If this category belongs to another category.</span>
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename</span> <span class="op">=</span> <span class="string">&quot;parent_id&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">category_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ChannelId</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">parent_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ChannelId</span><span class="op">&gt;</span>,
     <span class="doccomment">/// The position of this category.</span>
     <span class="kw">pub</span> <span class="ident">position</span>: <span class="ident">i64</span>,
     <span class="doccomment">/// Indicator of the type of channel this is.</span>
@@ -281,7 +278,7 @@
     <span class="doccomment">/// # async fn run() {</span>
     <span class="doccomment">/// #     use serenity::http::Http;</span>
     <span class="doccomment">/// #     use serenity::model::id::ChannelId;</span>
-    <span class="doccomment">/// #     let http = Http::default();</span>
+    <span class="doccomment">/// #     let http = Http::new(&quot;token&quot;);</span>
     <span class="doccomment">/// #     let category = ChannelId(1234);</span>
     <span class="doccomment">/// category.edit(&amp;http, |c| c.name(&quot;test&quot;).bitrate(86400)).await;</span>
     <span class="doccomment">/// # }</span>
@@ -294,24 +291,23 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// [Manage Channels]: Permissions::MANAGE_CHANNELS</span>
     <span class="doccomment">/// [Manage Roles]: Permissions::MANAGE_ROLES</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;utils&quot;</span>)]</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">edit</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">cache_http</span>: <span class="kw">impl</span> <span class="ident">CacheHttp</span>, <span class="ident">f</span>: <span class="ident">F</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span>
     <span class="kw">where</span>
         <span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="kw-2">&amp;mut</span> <span class="ident">EditChannel</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="ident">EditChannel</span>,
     {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">map</span> <span class="op">=</span> <span class="ident">HashMap::new</span>();
-        <span class="ident">map</span>.<span class="ident">insert</span>(<span class="string">&quot;name&quot;</span>, <span class="ident">Value::String</span>(<span class="self">self</span>.<span class="ident">name</span>.<span class="ident">clone</span>()));
-        <span class="ident">map</span>.<span class="ident">insert</span>(<span class="string">&quot;position&quot;</span>, <span class="ident">Value::Number</span>(<span class="ident">Number::from</span>(<span class="self">self</span>.<span class="ident">position</span>)));
+        <span class="ident">map</span>.<span class="ident">insert</span>(<span class="string">&quot;name&quot;</span>, <span class="ident">Value::from</span>(<span class="self">self</span>.<span class="ident">name</span>.<span class="ident">clone</span>()));
+        <span class="ident">map</span>.<span class="ident">insert</span>(<span class="string">&quot;position&quot;</span>, <span class="ident">from_number</span>(<span class="self">self</span>.<span class="ident">position</span>));
 
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">edit_channel</span> <span class="op">=</span> <span class="ident">EditChannel::default</span>();
         <span class="ident">f</span>(<span class="kw-2">&amp;mut</span> <span class="ident">edit_channel</span>);
-        <span class="kw">let</span> <span class="ident">map</span> <span class="op">=</span> <span class="ident">serenity_utils::hashmap_to_json_map</span>(<span class="ident">edit_channel</span>.<span class="number">0</span>);
+        <span class="kw">let</span> <span class="ident">map</span> <span class="op">=</span> <span class="ident">json::hashmap_to_json_map</span>(<span class="ident">edit_channel</span>.<span class="number">0</span>);
 
-        <span class="ident">cache_http</span>.<span class="ident">http</span>().<span class="ident">edit_channel</span>(<span class="self">self</span>.<span class="ident">id</span>.<span class="number">0</span>, <span class="kw-2">&amp;</span><span class="ident">map</span>).<span class="kw">await</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">channel</span><span class="op">|</span> {
+        <span class="ident">cache_http</span>.<span class="ident">http</span>().<span class="ident">edit_channel</span>(<span class="self">self</span>.<span class="ident">id</span>.<span class="number">0</span>, <span class="kw-2">&amp;</span><span class="ident">map</span>, <span class="prelude-val">None</span>).<span class="kw">await</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">channel</span><span class="op">|</span> {
             <span class="kw">let</span> <span class="ident">GuildChannel</span> {
                 <span class="ident">id</span>,
                 <span class="ident">guild_id</span>,
-                <span class="ident">category_id</span>,
+                <span class="ident">parent_id</span>,
                 <span class="ident">position</span>,
                 <span class="ident">kind</span>,
                 <span class="ident">name</span>,
@@ -323,7 +319,7 @@
             <span class="kw-2">*</span><span class="self">self</span> <span class="op">=</span> <span class="ident">ChannelCategory</span> {
                 <span class="ident">id</span>,
                 <span class="ident">guild_id</span>,
-                <span class="ident">category_id</span>,
+                <span class="ident">parent_id</span>,
                 <span class="ident">position</span>,
                 <span class="ident">kind</span>,
                 <span class="ident">name</span>,
@@ -344,5 +340,5 @@
     }
 }
 </code></pre></div>
-</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.62.0-nightly (ec77f2524 2022-04-17)" ></div>
+</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.61.0-nightly (3c17c84a3 2022-03-21)" ></div>
 </body></html>

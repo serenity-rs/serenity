@@ -155,27 +155,46 @@
 <span id="150">150</span>
 <span id="151">151</span>
 <span id="152">152</span>
+<span id="153">153</span>
+<span id="154">154</span>
+<span id="155">155</span>
+<span id="156">156</span>
+<span id="157">157</span>
+<span id="158">158</span>
+<span id="159">159</span>
+<span id="160">160</span>
+<span id="161">161</span>
+<span id="162">162</span>
+<span id="163">163</span>
+<span id="164">164</span>
+<span id="165">165</span>
+<span id="166">166</span>
+<span id="167">167</span>
+<span id="168">168</span>
+<span id="169">169</span>
+<span id="170">170</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::borrow::Cow</span>;
 
-<span class="kw">use</span> <span class="ident">reqwest</span>::{
-    <span class="ident">header</span>::{
-        <span class="ident">HeaderMap</span> <span class="kw">as</span> <span class="ident">Headers</span>,
-        <span class="ident">HeaderValue</span>,
-        <span class="ident">AUTHORIZATION</span>,
-        <span class="ident">CONTENT_LENGTH</span>,
-        <span class="ident">CONTENT_TYPE</span>,
-        <span class="ident">USER_AGENT</span>,
-    },
-    <span class="ident">Url</span>,
+<span class="kw">use</span> <span class="ident">reqwest::header</span>::{
+    <span class="ident">HeaderMap</span> <span class="kw">as</span> <span class="ident">Headers</span>,
+    <span class="ident">HeaderValue</span>,
+    <span class="ident">AUTHORIZATION</span>,
+    <span class="ident">CONTENT_LENGTH</span>,
+    <span class="ident">CONTENT_TYPE</span>,
+    <span class="ident">USER_AGENT</span>,
 };
-<span class="kw">use</span> <span class="ident">reqwest</span>::{<span class="ident">Client</span>, <span class="ident">RequestBuilder</span> <span class="kw">as</span> <span class="ident">ReqwestRequestBuilder</span>};
+<span class="kw">use</span> <span class="ident">reqwest</span>::{<span class="ident">Client</span>, <span class="ident">RequestBuilder</span> <span class="kw">as</span> <span class="ident">ReqwestRequestBuilder</span>, <span class="ident">Url</span>};
 <span class="kw">use</span> <span class="ident">tracing::instrument</span>;
 
-<span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">routing::RouteInfo</span>, <span class="ident">HttpError</span>};
+<span class="kw">use</span> <span class="ident"><span class="kw">super</span>::multipart::Multipart</span>;
+<span class="kw">use</span> <span class="ident"><span class="kw">super</span>::routing::RouteInfo</span>;
+<span class="kw">use</span> <span class="ident"><span class="kw">super</span>::HttpError</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::constants</span>;
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::internal::prelude</span>::<span class="kw-2">*</span>;
 
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">RequestBuilder</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
     <span class="ident">body</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">u8</span>]<span class="op">&gt;</span>,
+    <span class="ident">multipart</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Multipart</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>,
     <span class="ident">headers</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Headers</span><span class="op">&gt;</span>,
     <span class="ident">route</span>: <span class="ident">RouteInfo</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
 }
@@ -184,6 +203,7 @@
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">route_info</span>: <span class="ident">RouteInfo</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
         <span class="self">Self</span> {
             <span class="ident">body</span>: <span class="prelude-val">None</span>,
+            <span class="ident">multipart</span>: <span class="prelude-val">None</span>,
             <span class="ident">headers</span>: <span class="prelude-val">None</span>,
             <span class="ident">route</span>: <span class="ident">route_info</span>,
         }
@@ -195,6 +215,12 @@
 
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">body</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">body</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">u8</span>]<span class="op">&gt;</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">body</span> <span class="op">=</span> <span class="ident">body</span>;
+
+        <span class="self">self</span>
+    }
+
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">multipart</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">multipart</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Multipart</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
+        <span class="self">self</span>.<span class="ident">multipart</span> <span class="op">=</span> <span class="ident">multipart</span>;
 
         <span class="self">self</span>
     }
@@ -215,6 +241,7 @@
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Request</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
     <span class="kw">pub</span>(<span class="kw">super</span>) <span class="ident">body</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">u8</span>]<span class="op">&gt;</span>,
+    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="ident">multipart</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Multipart</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>,
     <span class="kw">pub</span>(<span class="kw">super</span>) <span class="ident">headers</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Headers</span><span class="op">&gt;</span>,
     <span class="kw">pub</span>(<span class="kw">super</span>) <span class="ident">route</span>: <span class="ident">RouteInfo</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
 }
@@ -223,26 +250,29 @@
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">builder</span>: <span class="ident">RequestBuilder</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
         <span class="kw">let</span> <span class="ident">RequestBuilder</span> {
             <span class="ident">body</span>,
+            <span class="ident">multipart</span>,
             <span class="ident">headers</span>,
             <span class="ident">route</span>,
         } <span class="op">=</span> <span class="ident">builder</span>;
 
         <span class="self">Self</span> {
             <span class="ident">body</span>,
+            <span class="ident">multipart</span>,
             <span class="ident">headers</span>,
             <span class="ident">route</span>,
         }
     }
 
     <span class="attribute">#[<span class="ident">instrument</span>(<span class="ident">skip</span>(<span class="ident">token</span>))]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">build</span>(
-        <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="self">self</span>,
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">build</span>(
+        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
         <span class="ident">client</span>: <span class="kw-2">&amp;</span><span class="ident">Client</span>,
         <span class="ident">token</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
         <span class="ident">proxy</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">Url</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">ReqwestRequestBuilder</span>, <span class="ident">HttpError</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">ReqwestRequestBuilder</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">Request</span> {
             <span class="ident">body</span>,
+            <span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">multipart</span>,
             <span class="ident">headers</span>: <span class="kw-2">ref</span> <span class="ident">request_headers</span>,
             <span class="ident">route</span>: <span class="kw-2">ref</span> <span class="ident">route_info</span>,
         } <span class="op">=</span> <span class="kw-2">*</span><span class="self">self</span>;
@@ -253,7 +283,8 @@
             <span class="ident">path</span> <span class="op">=</span> <span class="ident">Cow::Owned</span>(<span class="ident">path</span>.<span class="ident">to_mut</span>().<span class="ident">replace</span>(<span class="string">&quot;https://discord.com/&quot;</span>, <span class="ident">proxy</span>.<span class="ident">as_str</span>()));
         }
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">builder</span> <span class="op">=</span> <span class="ident">client</span>.<span class="ident">request</span>(<span class="ident">method</span>.<span class="ident">reqwest_method</span>(), <span class="ident">Url::parse</span>(<span class="kw-2">&amp;</span><span class="ident">path</span>)<span class="question-mark">?</span>);
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">builder</span> <span class="op">=</span>
+            <span class="ident">client</span>.<span class="ident">request</span>(<span class="ident">method</span>.<span class="ident">reqwest_method</span>(), <span class="ident">Url::parse</span>(<span class="kw-2">&amp;</span><span class="ident">path</span>).<span class="ident">map_err</span>(<span class="ident">HttpError::Url</span>)<span class="question-mark">?</span>);
 
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">bytes</span>) <span class="op">=</span> <span class="ident">body</span> {
             <span class="ident">builder</span> <span class="op">=</span> <span class="ident">builder</span>.<span class="ident">body</span>(<span class="ident">Vec::from</span>(<span class="ident">bytes</span>));
@@ -270,11 +301,16 @@
             <span class="ident">headers</span>.<span class="ident">insert</span>(<span class="ident">CONTENT_TYPE</span>, <span class="ident">HeaderValue::from_static</span>(<span class="string">&quot;application/json&quot;</span>));
         }
 
-        <span class="ident">headers</span>.<span class="ident">insert</span>(
-            <span class="ident">CONTENT_LENGTH</span>,
-            <span class="ident">HeaderValue::from_str</span>(<span class="kw-2">&amp;</span><span class="ident">body</span>.<span class="ident">unwrap_or</span>(<span class="kw-2">&amp;</span><span class="ident">Vec::new</span>()).<span class="ident">len</span>().<span class="ident">to_string</span>())
-                .<span class="ident">map_err</span>(<span class="ident">HttpError::InvalidHeader</span>)<span class="question-mark">?</span>,
-        );
+        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">multipart</span>) <span class="op">=</span> <span class="ident">multipart</span> {
+            <span class="comment">// Setting multipart adds the content-length header</span>
+            <span class="ident">builder</span> <span class="op">=</span> <span class="ident">builder</span>.<span class="ident">multipart</span>(<span class="ident">multipart</span>.<span class="ident">build_form</span>(<span class="ident">client</span>).<span class="kw">await</span><span class="question-mark">?</span>);
+        } <span class="kw">else</span> {
+            <span class="ident">headers</span>.<span class="ident">insert</span>(
+                <span class="ident">CONTENT_LENGTH</span>,
+                <span class="ident">HeaderValue::from_str</span>(<span class="kw-2">&amp;</span><span class="ident">body</span>.<span class="ident">unwrap_or</span>(<span class="kw-2">&amp;</span><span class="ident">Vec::new</span>()).<span class="ident">len</span>().<span class="ident">to_string</span>())
+                    .<span class="ident">map_err</span>(<span class="ident">HttpError::InvalidHeader</span>)<span class="question-mark">?</span>,
+            );
+        }
 
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">request_headers</span>) <span class="op">=</span> <span class="ident">request_headers</span> {
             <span class="ident">headers</span>.<span class="ident">extend</span>(<span class="ident">request_headers</span>.<span class="ident">clone</span>());
@@ -308,5 +344,5 @@
     }
 }
 </code></pre></div>
-</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.62.0-nightly (ec77f2524 2022-04-17)" ></div>
+</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.61.0-nightly (3c17c84a3 2022-03-21)" ></div>
 </body></html>

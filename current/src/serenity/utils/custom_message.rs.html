@@ -281,13 +281,9 @@
 <span id="276">276</span>
 <span id="277">277</span>
 <span id="278">278</span>
-<span id="279">279</span>
-<span id="280">280</span>
-<span id="281">281</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">chrono</span>::{<span class="ident">DateTime</span>, <span class="ident">Utc</span>};
-<span class="kw">use</span> <span class="ident">serde_json::Value</span>;
-
+</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::json::NULL</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::prelude</span>::<span class="kw-2">*</span>;
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::Timestamp</span>;
 
 <span class="doccomment">/// A builder for constructing a personal [`Message`] instance.</span>
 <span class="doccomment">/// This can be useful for emitting a manual [`dispatch`] to the framework,</span>
@@ -365,8 +361,8 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// If not used, the default value is [`None`] (not all messages are edited).</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">edited_timestamp</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">timestamp</span>: <span class="ident">DateTime</span><span class="op">&lt;</span><span class="ident">Utc</span><span class="op">&gt;</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">msg</span>.<span class="ident">edited_timestamp</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">timestamp</span>);
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">edited_timestamp</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Timestamp</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">timestamp</span>: <span class="ident">T</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
+        <span class="self">self</span>.<span class="ident">msg</span>.<span class="ident">edited_timestamp</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">timestamp</span>.<span class="ident">into</span>());
 
         <span class="self">self</span>
     }
@@ -479,8 +475,8 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// If not used, the default value is the current local time.</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">timestamp</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">timestamp</span>: <span class="ident">DateTime</span><span class="op">&lt;</span><span class="ident">Utc</span><span class="op">&gt;</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">msg</span>.<span class="ident">timestamp</span> <span class="op">=</span> <span class="ident">timestamp</span>;
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">timestamp</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Timestamp</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">timestamp</span>: <span class="ident">T</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
+        <span class="self">self</span>.<span class="ident">msg</span>.<span class="ident">timestamp</span> <span class="op">=</span> <span class="ident">timestamp</span>.<span class="ident">into</span>();
 
         <span class="self">self</span>
     }
@@ -547,24 +543,22 @@
         <span class="ident">mention_roles</span>: <span class="ident">Vec::new</span>(),
         <span class="ident">mention_channels</span>: <span class="ident">Vec::new</span>(),
         <span class="ident">mentions</span>: <span class="ident">Vec::new</span>(),
-        <span class="ident">nonce</span>: <span class="ident">Value::Null</span>,
+        <span class="ident">nonce</span>: <span class="ident">NULL</span>,
         <span class="ident">pinned</span>: <span class="bool-val">false</span>,
         <span class="ident">reactions</span>: <span class="ident">Vec::new</span>(),
         <span class="ident">tts</span>: <span class="bool-val">false</span>,
         <span class="ident">webhook_id</span>: <span class="prelude-val">None</span>,
-        <span class="ident">timestamp</span>: <span class="ident">Utc::now</span>(),
+        <span class="ident">timestamp</span>: <span class="ident">Timestamp::now</span>(),
         <span class="ident">activity</span>: <span class="prelude-val">None</span>,
         <span class="ident">application</span>: <span class="prelude-val">None</span>,
         <span class="ident">message_reference</span>: <span class="prelude-val">None</span>,
         <span class="ident">flags</span>: <span class="prelude-val">None</span>,
-        <span class="ident">stickers</span>: <span class="ident">Vec::new</span>(),
+        <span class="ident">sticker_items</span>: <span class="ident">Vec::new</span>(),
         <span class="ident">referenced_message</span>: <span class="prelude-val">None</span>,
-        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
         <span class="ident">interaction</span>: <span class="prelude-val">None</span>,
-        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
         <span class="ident">components</span>: <span class="macro">vec!</span>[],
     }
 }
 </code></pre></div>
-</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.62.0-nightly (ec77f2524 2022-04-17)" ></div>
+</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.61.0-nightly (3c17c84a3 2022-03-21)" ></div>
 </body></html>

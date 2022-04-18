@@ -280,13 +280,21 @@
 <span id="275">275</span>
 <span id="276">276</span>
 <span id="277">277</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">collections::HashSet</span>, <span class="ident">error::Error</span> <span class="kw">as</span> <span class="ident">StdError</span>, <span class="ident">fmt</span>};
+<span id="278">278</span>
+<span id="279">279</span>
+<span id="280">280</span>
+<span id="281">281</span>
+</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::collections::HashSet</span>;
+<span class="kw">use</span> <span class="ident">std::error::Error</span> <span class="kw">as</span> <span class="ident">StdError</span>;
+<span class="kw">use</span> <span class="ident">std::fmt</span>;
 
 <span class="kw">use</span> <span class="ident">futures::future::BoxFuture</span>;
 
 <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::Args</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::client::Context</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model</span>::{<span class="ident">channel::Message</span>, <span class="ident">id::UserId</span>, <span class="ident">permissions::Permissions</span>};
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::channel::Message</span>;
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::id::UserId</span>;
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::permissions::Permissions</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::utils::Colour</span>;
 
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">buckets</span>;
@@ -558,5 +566,5 @@
     }
 }
 </code></pre></div>
-</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.62.0-nightly (ec77f2524 2022-04-17)" ></div>
+</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.61.0-nightly (3c17c84a3 2022-03-21)" ></div>
 </body></html>

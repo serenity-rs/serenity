@@ -359,7 +359,7 @@
     }
 }
 
-<span class="kw">fn</span> <span class="ident">to_ident</span>(<span class="ident">p</span>: <span class="ident">Path</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Ident</span><span class="op">&gt;</span> {
+<span class="kw">fn</span> <span class="ident">to_ident</span>(<span class="ident">p</span>: <span class="kw-2">&amp;</span><span class="ident">Path</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Ident</span><span class="op">&gt;</span> {
     <span class="kw">if</span> <span class="ident">p</span>.<span class="ident">segments</span>.<span class="ident">is_empty</span>() {
         <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::new</span>(<span class="ident">p</span>.<span class="ident">span</span>(), <span class="string">&quot;cannot convert an empty path to an identifier&quot;</span>));
     }
@@ -400,12 +400,12 @@
 
     <span class="kw">match</span> <span class="ident">meta</span> {
         <span class="ident">Meta::Path</span>(<span class="ident">path</span>) =&gt; {
-            <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="ident">to_ident</span>(<span class="ident">path</span>)<span class="question-mark">?</span>;
+            <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="ident">to_ident</span>(<span class="kw-2">&amp;</span><span class="ident">path</span>)<span class="question-mark">?</span>;
 
             <span class="prelude-val">Ok</span>(<span class="ident">Values::new</span>(<span class="ident">name</span>, <span class="ident">ValueKind::Name</span>, <span class="ident">Vec::new</span>(), <span class="ident">attr</span>.<span class="ident">span</span>()))
         },
         <span class="ident">Meta::List</span>(<span class="ident">meta</span>) =&gt; {
-            <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="ident">to_ident</span>(<span class="ident">meta</span>.<span class="ident">path</span>)<span class="question-mark">?</span>;
+            <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="ident">to_ident</span>(<span class="kw-2">&amp;</span><span class="ident">meta</span>.<span class="ident">path</span>)<span class="question-mark">?</span>;
             <span class="kw">let</span> <span class="ident">nested</span> <span class="op">=</span> <span class="ident">meta</span>.<span class="ident">nested</span>;
 
             <span class="kw">if</span> <span class="ident">nested</span>.<span class="ident">is_empty</span>() {
@@ -419,8 +419,8 @@
                     <span class="ident">NestedMeta::Lit</span>(<span class="ident">l</span>) =&gt; <span class="ident">lits</span>.<span class="ident">push</span>(<span class="ident">l</span>),
                     <span class="ident">NestedMeta::Meta</span>(<span class="ident">m</span>) =&gt; <span class="kw">match</span> <span class="ident">m</span> {
                         <span class="ident">Meta::Path</span>(<span class="ident">path</span>) =&gt; {
-                            <span class="kw">let</span> <span class="ident">i</span> <span class="op">=</span> <span class="ident">to_ident</span>(<span class="ident">path</span>)<span class="question-mark">?</span>;
-                            <span class="ident">lits</span>.<span class="ident">push</span>(<span class="ident">Lit::Str</span>(<span class="ident">LitStr::new</span>(<span class="kw-2">&amp;</span><span class="ident">i</span>.<span class="ident">to_string</span>(), <span class="ident">i</span>.<span class="ident">span</span>())))
+                            <span class="kw">let</span> <span class="ident">i</span> <span class="op">=</span> <span class="ident">to_ident</span>(<span class="kw-2">&amp;</span><span class="ident">path</span>)<span class="question-mark">?</span>;
+                            <span class="ident">lits</span>.<span class="ident">push</span>(<span class="ident">Lit::Str</span>(<span class="ident">LitStr::new</span>(<span class="kw-2">&amp;</span><span class="ident">i</span>.<span class="ident">to_string</span>(), <span class="ident">i</span>.<span class="ident">span</span>())));
                         }
                         <span class="ident">Meta::List</span>(<span class="kw">_</span>) <span class="op">|</span> <span class="ident">Meta::NameValue</span>(<span class="kw">_</span>) =&gt; {
                             <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::new</span>(<span class="ident">attr</span>.<span class="ident">span</span>(), <span class="string">&quot;cannot nest a list; only accept literals and identifiers at this level&quot;</span>))
@@ -434,7 +434,7 @@
             <span class="prelude-val">Ok</span>(<span class="ident">Values::new</span>(<span class="ident">name</span>, <span class="ident">kind</span>, <span class="ident">lits</span>, <span class="ident">attr</span>.<span class="ident">span</span>()))
         },
         <span class="ident">Meta::NameValue</span>(<span class="ident">meta</span>) =&gt; {
-            <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="ident">to_ident</span>(<span class="ident">meta</span>.<span class="ident">path</span>)<span class="question-mark">?</span>;
+            <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="ident">to_ident</span>(<span class="kw-2">&amp;</span><span class="ident">meta</span>.<span class="ident">path</span>)<span class="question-mark">?</span>;
             <span class="kw">let</span> <span class="ident">lit</span> <span class="op">=</span> <span class="ident">meta</span>.<span class="ident">lit</span>;
 
             <span class="prelude-val">Ok</span>(<span class="ident">Values::new</span>(<span class="ident">name</span>, <span class="ident">ValueKind::Equals</span>, <span class="macro">vec!</span>[<span class="ident">lit</span>], <span class="ident">attr</span>.<span class="ident">span</span>()))
@@ -518,7 +518,7 @@
     <span class="kw">fn</span> <span class="ident">parse</span>(<span class="ident">values</span>: <span class="ident">Values</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
         <span class="ident">validate</span>(<span class="kw-2">&amp;</span><span class="ident">values</span>, <span class="kw-2">&amp;</span>[<span class="ident">ValueKind::Name</span>, <span class="ident">ValueKind::SingleList</span>])<span class="question-mark">?</span>;
 
-        <span class="prelude-val">Ok</span>(<span class="ident">values</span>.<span class="ident">literals</span>.<span class="ident">get</span>(<span class="number">0</span>).<span class="ident">map_or</span>(<span class="bool-val">true</span>, <span class="op">|</span><span class="ident">l</span><span class="op">|</span> <span class="ident">l</span>.<span class="ident">to_bool</span>()))
+        <span class="prelude-val">Ok</span>(<span class="ident">values</span>.<span class="ident">literals</span>.<span class="ident">get</span>(<span class="number">0</span>).<span class="ident">map_or</span>(<span class="bool-val">true</span>, <span class="ident">LitExt::to_bool</span>))
     }
 }
 
@@ -536,7 +536,7 @@
     <span class="kw">fn</span> <span class="ident">parse</span>(<span class="ident">values</span>: <span class="ident">Values</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
         <span class="ident">validate</span>(<span class="kw-2">&amp;</span><span class="ident">values</span>, <span class="kw-2">&amp;</span>[<span class="ident">ValueKind::List</span>])<span class="question-mark">?</span>;
 
-        <span class="prelude-val">Ok</span>(<span class="ident">values</span>.<span class="ident">literals</span>.<span class="ident">into_iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">l</span><span class="op">|</span> <span class="ident">l</span>.<span class="ident">to_ident</span>()).<span class="ident">collect</span>())
+        <span class="prelude-val">Ok</span>(<span class="ident">values</span>.<span class="ident">literals</span>.<span class="ident">iter</span>().<span class="ident">map</span>(<span class="ident">LitExt::to_ident</span>).<span class="ident">collect</span>())
     }
 }
 
@@ -544,7 +544,7 @@
     <span class="kw">fn</span> <span class="ident">parse</span>(<span class="ident">values</span>: <span class="ident">Values</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
         <span class="ident">validate</span>(<span class="kw-2">&amp;</span><span class="ident">values</span>, <span class="kw-2">&amp;</span>[<span class="ident">ValueKind::Name</span>, <span class="ident">ValueKind::Equals</span>, <span class="ident">ValueKind::SingleList</span>])<span class="question-mark">?</span>;
 
-        <span class="prelude-val">Ok</span>(<span class="ident">values</span>.<span class="ident">literals</span>.<span class="ident">get</span>(<span class="number">0</span>).<span class="ident">map</span>(<span class="op">|</span><span class="ident">l</span><span class="op">|</span> <span class="ident">l</span>.<span class="ident">to_str</span>()))
+        <span class="prelude-val">Ok</span>(<span class="ident">values</span>.<span class="ident">literals</span>.<span class="ident">get</span>(<span class="number">0</span>).<span class="ident">map</span>(<span class="ident">LitExt::to_str</span>))
     }
 }
 
@@ -644,5 +644,5 @@
 
 <span class="macro">attr_option_num!</span>(<span class="ident">u16</span>, <span class="ident">u32</span>, <span class="ident">usize</span>);
 </code></pre></div>
-</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="command_attr" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.62.0-nightly (ec77f2524 2022-04-17)" ></div>
+</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="command_attr" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.61.0-nightly (3c17c84a3 2022-03-21)" ></div>
 </body></html>

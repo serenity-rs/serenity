@@ -180,15 +180,15 @@
 <span class="kw">use</span> <span class="ident">std::time::SystemTime</span>;
 
 <span class="kw">use</span> <span class="ident">async_trait::async_trait</span>;
-<span class="kw">use</span> <span class="ident">serde_json::json</span>;
-<span class="kw">use</span> <span class="ident">tracing::instrument</span>;
-<span class="kw">use</span> <span class="ident">tracing</span>::{<span class="ident">debug</span>, <span class="ident">trace</span>};
+<span class="kw">use</span> <span class="ident">tracing</span>::{<span class="ident">debug</span>, <span class="ident">instrument</span>, <span class="ident">trace</span>};
 
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::client::bridge::gateway</span>::{<span class="ident">ChunkGuildFilter</span>, <span class="ident">GatewayIntents</span>};
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::client::bridge::gateway::ChunkGuildFilter</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::constants</span>::{<span class="self">self</span>, <span class="ident">OpCode</span>};
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::gateway</span>::{<span class="ident">CurrentPresence</span>, <span class="ident">WsStream</span>};
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::internal::prelude</span>::<span class="kw-2">*</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::internal::ws_impl::SenderExt</span>;
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::json::json</span>;
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::gateway::GatewayIntents</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::id::GuildId</span>;
 
 <span class="attribute">#[<span class="ident">async_trait</span>]</span>
@@ -253,7 +253,7 @@
             <span class="ident">ChunkGuildFilter::Query</span>(<span class="ident">query</span>) =&gt; <span class="ident">payload</span>[<span class="string">&quot;d&quot;</span>][<span class="string">&quot;query&quot;</span>] <span class="op">=</span> <span class="macro">json!</span>(<span class="ident">query</span>),
             <span class="ident">ChunkGuildFilter::UserIds</span>(<span class="ident">user_ids</span>) =&gt; {
                 <span class="kw">let</span> <span class="ident">ids</span> <span class="op">=</span> <span class="ident">user_ids</span>.<span class="ident">iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">x</span><span class="op">|</span> <span class="ident">x</span>.<span class="number">0</span>).<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span><span class="op">&gt;</span>();
-                <span class="ident">payload</span>[<span class="string">&quot;d&quot;</span>][<span class="string">&quot;user_ids&quot;</span>] <span class="op">=</span> <span class="macro">json!</span>(<span class="ident">ids</span>)
+                <span class="ident">payload</span>[<span class="string">&quot;d&quot;</span>][<span class="string">&quot;user_ids&quot;</span>] <span class="op">=</span> <span class="macro">json!</span>(<span class="ident">ids</span>);
             },
         };
 
@@ -350,5 +350,5 @@
     }
 }
 </code></pre></div>
-</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.62.0-nightly (ec77f2524 2022-04-17)" ></div>
+</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.61.0-nightly (3c17c84a3 2022-03-21)" ></div>
 </body></html>

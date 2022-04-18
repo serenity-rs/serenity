@@ -611,19 +611,14 @@
 <span id="606">606</span>
 <span id="607">607</span>
 <span id="608">608</span>
-<span id="609">609</span>
-<span id="610">610</span>
-<span id="611">611</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::collections::HashSet</span>;
 
 <span class="kw">use</span> <span class="ident">futures::future::BoxFuture</span>;
 
 <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::Delimiter</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::client::Context</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model</span>::{
-    <span class="ident">channel::Message</span>,
-    <span class="ident">id</span>::{<span class="ident">ChannelId</span>, <span class="ident">GuildId</span>, <span class="ident">UserId</span>},
-};
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::channel::Message</span>;
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::id</span>::{<span class="ident">ChannelId</span>, <span class="ident">GuildId</span>, <span class="ident">UserId</span>};
 
 <span class="kw">type</span> <span class="ident">DynamicPrefixHook</span> <span class="op">=</span>
     <span class="kw">for</span><span class="op">&lt;</span><span class="lifetime">&#39;fut</span><span class="op">&gt;</span> <span class="kw">fn</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;fut</span> <span class="ident">Context</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;fut</span> <span class="ident">Message</span>) -&gt; <span class="ident">BoxFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;fut</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span><span class="op">&gt;</span>;
@@ -694,7 +689,7 @@
 <span class="doccomment">/// Responding to mentions and setting a command prefix of `&quot;~&quot;`:</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// ```rust,no_run</span>
-<span class="doccomment">/// # use serenity::prelude::EventHandler;</span>
+<span class="doccomment">/// # use serenity::prelude::*;</span>
 <span class="doccomment">/// struct Handler;</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// impl EventHandler for Handler {}</span>
@@ -708,7 +703,10 @@
 <span class="doccomment">/// let framework =</span>
 <span class="doccomment">///     StandardFramework::new().configure(|c| c.on_mention(Some(UserId(5))).prefix(&quot;~&quot;));</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// let mut client = Client::builder(&amp;token).event_handler(Handler).framework(framework).await?;</span>
+<span class="doccomment">/// let mut client = Client::builder(&amp;token, GatewayIntents::default())</span>
+<span class="doccomment">///     .event_handler(Handler)</span>
+<span class="doccomment">///     .framework(framework)</span>
+<span class="doccomment">///     .await?;</span>
 <span class="doccomment">/// #     Ok(())</span>
 <span class="doccomment">/// # }</span>
 <span class="doccomment">/// ```</span>
@@ -949,16 +947,12 @@
     <span class="doccomment">/// use serenity::framework::StandardFramework;</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// let framework = StandardFramework::new().configure(|c| {</span>
-    <span class="doccomment">///     c</span>
-    <span class="doccomment">///        .dynamic_prefix(|_, msg| Box::pin(async move {</span>
-    <span class="doccomment">///             Some(if msg.channel_id.0 % 5 == 0 {</span>
-    <span class="doccomment">///                 &quot;!&quot;</span>
-    <span class="doccomment">///             } else {</span>
-    <span class="doccomment">///                 &quot;*&quot;</span>
-    <span class="doccomment">///             }.to_string())</span>
-    <span class="doccomment">///         }))</span>
-    <span class="doccomment">///         // This disables the default prefix &quot;~&quot;</span>
-    <span class="doccomment">///         .prefix(&quot;&quot;)</span>
+    <span class="doccomment">///     c.dynamic_prefix(|_, msg| {</span>
+    <span class="doccomment">///         Box::pin(</span>
+    <span class="doccomment">///             async move { Some(if msg.channel_id.0 % 5 == 0 { &quot;!&quot; } else { &quot;*&quot; }.to_string()) },</span>
+    <span class="doccomment">///         )</span>
+    <span class="doccomment">///     })</span>
+    <span class="doccomment">///     .prefix(&quot;&quot;) // This disables the default prefix &quot;~&quot;</span>
     <span class="doccomment">/// });</span>
     <span class="doccomment">/// ```</span>
     <span class="doccomment">///</span>
@@ -1162,7 +1156,7 @@
         <span class="ident">It</span>: <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">T</span><span class="op">&gt;</span>,
     {
         <span class="self">self</span>.<span class="ident">delimiters</span>.<span class="ident">clear</span>();
-        <span class="self">self</span>.<span class="ident">delimiters</span>.<span class="ident">extend</span>(<span class="ident">delimiters</span>.<span class="ident">into_iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">s</span><span class="op">|</span> <span class="ident">s</span>.<span class="ident">into</span>()));
+        <span class="self">self</span>.<span class="ident">delimiters</span>.<span class="ident">extend</span>(<span class="ident">delimiters</span>.<span class="ident">into_iter</span>().<span class="ident">map</span>(<span class="ident">Into::into</span>));
 
         <span class="self">self</span>
     }
@@ -1226,5 +1220,5 @@
     }
 }
 </code></pre></div>
-</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.62.0-nightly (ec77f2524 2022-04-17)" ></div>
+</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.61.0-nightly (3c17c84a3 2022-03-21)" ></div>
 </body></html>

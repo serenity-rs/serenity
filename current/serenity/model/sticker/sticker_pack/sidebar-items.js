@@ -1,0 +1,1 @@
+initSidebarItems({"struct":[["StickerPack","A sticker sent with a message."]]});

@@ -367,10 +367,9 @@
 <span id="362">362</span>
 <span id="363">363</span>
 <span id="364">364</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std</span>::{
-    <span class="ident">collections</span>::{<span class="ident">HashMap</span>, <span class="ident">VecDeque</span>},
-    <span class="ident">sync::Arc</span>,
-};
+<span id="365">365</span>
+</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::collections</span>::{<span class="ident">HashMap</span>, <span class="ident">VecDeque</span>};
+<span class="kw">use</span> <span class="ident">std::sync::Arc</span>;
 
 <span class="kw">use</span> <span class="ident">futures::channel::mpsc</span>::{<span class="self">self</span>, <span class="ident">UnboundedReceiver</span> <span class="kw">as</span> <span class="ident">Receiver</span>, <span class="ident">UnboundedSender</span> <span class="kw">as</span> <span class="ident">Sender</span>};
 <span class="kw">use</span> <span class="ident">futures::StreamExt</span>;
@@ -380,7 +379,6 @@
 <span class="kw">use</span> <span class="ident">typemap_rev::TypeMap</span>;
 
 <span class="kw">use</span> <span class="kw">super</span>::{
-    <span class="ident">GatewayIntents</span>,
     <span class="ident">ShardId</span>,
     <span class="ident">ShardManagerMessage</span>,
     <span class="ident">ShardManagerMonitor</span>,
@@ -395,6 +393,7 @@
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::framework::Framework</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::internal::prelude</span>::<span class="kw-2">*</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::internal::tokio::spawn_named</span>;
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::gateway::GatewayIntents</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::CacheAndHttp</span>;
 
 <span class="doccomment">/// A manager for handling the status of shards by starting them, restarting</span>
@@ -422,10 +421,11 @@
 <span class="doccomment">/// use std::env;</span>
 <span class="doccomment">/// use std::sync::Arc;</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// use serenity::client::bridge::gateway::{GatewayIntents, ShardManager, ShardManagerOptions};</span>
+<span class="doccomment">/// use serenity::client::bridge::gateway::{ShardManager, ShardManagerOptions};</span>
 <span class="doccomment">/// use serenity::client::{EventHandler, RawEventHandler};</span>
 <span class="doccomment">/// use serenity::framework::{Framework, StandardFramework};</span>
 <span class="doccomment">/// use serenity::http::Http;</span>
+<span class="doccomment">/// use serenity::model::gateway::GatewayIntents;</span>
 <span class="doccomment">/// use serenity::prelude::*;</span>
 <span class="doccomment">/// use serenity::CacheAndHttp;</span>
 <span class="doccomment">/// use tokio::sync::{Mutex, RwLock};</span>
@@ -435,13 +435,13 @@
 <span class="doccomment">/// impl EventHandler for Handler {}</span>
 <span class="doccomment">/// impl RawEventHandler for Handler {}</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// # let cache_and_http = Arc::new(CacheAndHttp::default());</span>
+<span class="doccomment">/// # let cache_and_http: Arc&lt;CacheAndHttp&gt; = unimplemented!();</span>
 <span class="doccomment">/// # let http = &amp;cache_and_http.http;</span>
 <span class="doccomment">/// let gateway_url = Arc::new(Mutex::new(http.get_gateway().await?.url));</span>
 <span class="doccomment">/// let data = Arc::new(RwLock::new(TypeMap::new()));</span>
 <span class="doccomment">/// let event_handler = Arc::new(Handler) as Arc&lt;dyn EventHandler&gt;;</span>
 <span class="doccomment">/// let framework =</span>
-<span class="doccomment">///     Arc::new(Box::new(StandardFramework::new()) as Box&lt;dyn Framework + &#39;static + Send + Sync&gt;);</span>
+<span class="doccomment">///     Arc::new(StandardFramework::new()) as Arc&lt;dyn Framework + Send + Sync + &#39;static&gt;;</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// ShardManager::new(ShardManagerOptions {</span>
 <span class="doccomment">///     data: &amp;data,</span>
@@ -496,8 +496,8 @@
 
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">shard_queuer</span> <span class="op">=</span> <span class="ident">ShardQueuer</span> {
             <span class="ident">data</span>: <span class="ident">Arc::clone</span>(<span class="ident">opt</span>.<span class="ident">data</span>),
-            <span class="ident">event_handler</span>: <span class="ident">opt</span>.<span class="ident">event_handler</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">h</span><span class="op">|</span> <span class="ident">Arc::clone</span>(<span class="ident">h</span>)),
-            <span class="ident">raw_event_handler</span>: <span class="ident">opt</span>.<span class="ident">raw_event_handler</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">rh</span><span class="op">|</span> <span class="ident">Arc::clone</span>(<span class="ident">rh</span>)),
+            <span class="ident">event_handler</span>: <span class="ident">opt</span>.<span class="ident">event_handler</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="ident">Arc::clone</span>),
+            <span class="ident">raw_event_handler</span>: <span class="ident">opt</span>.<span class="ident">raw_event_handler</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="ident">Arc::clone</span>),
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;framework&quot;</span>)]</span>
             <span class="ident">framework</span>: <span class="ident">Arc::clone</span>(<span class="ident">opt</span>.<span class="ident">framework</span>),
             <span class="ident">last_start</span>: <span class="prelude-val">None</span>,
@@ -591,7 +591,7 @@
     <span class="doccomment">/// use std::env;</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// use serenity::client::bridge::gateway::ShardId;</span>
-    <span class="doccomment">/// use serenity::client::{Client, EventHandler};</span>
+    <span class="doccomment">/// use serenity::prelude::*;</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// struct Handler;</span>
     <span class="doccomment">///</span>
@@ -599,7 +599,8 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// # async fn run() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {</span>
     <span class="doccomment">/// let token = std::env::var(&quot;DISCORD_TOKEN&quot;)?;</span>
-    <span class="doccomment">/// let mut client = Client::builder(&amp;token).event_handler(Handler).await?;</span>
+    <span class="doccomment">/// let mut client =</span>
+    <span class="doccomment">///     Client::builder(&amp;token, GatewayIntents::default()).event_handler(Handler).await?;</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// // restart shard ID 7</span>
     <span class="doccomment">/// client.shard_manager.lock().await.restart(ShardId(7)).await;</span>
@@ -624,7 +625,7 @@
     <span class="doccomment">/// [`ShardRunner`]: super::ShardRunner</span>
     <span class="attribute">#[<span class="ident">instrument</span>(<span class="ident">skip</span>(<span class="self">self</span>))]</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">shards_instantiated</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ShardId</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">runners</span>.<span class="ident">lock</span>().<span class="kw">await</span>.<span class="ident">keys</span>().<span class="ident">cloned</span>().<span class="ident">collect</span>()
+        <span class="self">self</span>.<span class="ident">runners</span>.<span class="ident">lock</span>().<span class="kw">await</span>.<span class="ident">keys</span>().<span class="ident">copied</span>().<span class="ident">collect</span>()
     }
 
     <span class="doccomment">/// Attempts to shut down the shard runner by Id.</span>
@@ -640,11 +641,12 @@
     <span class="attribute">#[<span class="ident">instrument</span>(<span class="ident">skip</span>(<span class="self">self</span>))]</span>
     <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::let_underscore_must_use</span>)]</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">shutdown</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">shard_id</span>: <span class="ident">ShardId</span>, <span class="ident">code</span>: <span class="ident">u16</span>) {
+        <span class="kw">const</span> <span class="ident">TIMEOUT</span>: <span class="ident">tokio::time::Duration</span> <span class="op">=</span> <span class="ident">tokio::time::Duration::from_secs</span>(<span class="number">5</span>);
+
         <span class="macro">info!</span>(<span class="string">&quot;Shutting down shard {}&quot;</span>, <span class="ident">shard_id</span>);
 
         <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">shard_queuer</span>.<span class="ident">unbounded_send</span>(<span class="ident">ShardQueuerMessage::ShutdownShard</span>(<span class="ident">shard_id</span>, <span class="ident">code</span>));
 
-        <span class="kw">const</span> <span class="ident">TIMEOUT</span>: <span class="ident">tokio::time::Duration</span> <span class="op">=</span> <span class="ident">tokio::time::Duration::from_secs</span>(<span class="number">5</span>);
         <span class="kw">match</span> <span class="ident">timeout</span>(<span class="ident">TIMEOUT</span>, <span class="self">self</span>.<span class="ident">shard_shutdown</span>.<span class="ident">next</span>()).<span class="kw">await</span> {
             <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">shutdown_shard_id</span>)) =&gt; {
                 <span class="kw">if</span> <span class="ident">shutdown_shard_id</span> <span class="op">!</span><span class="op">=</span> <span class="ident">shard_id</span> {
@@ -656,7 +658,7 @@
             },
             <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>) =&gt; (),
             <span class="prelude-val">Err</span>(<span class="ident">why</span>) =&gt; {
-                <span class="macro">warn!</span>(<span class="string">&quot;Failed to cleanly shutdown shard {}, reached timeout: {:?}&quot;</span>, <span class="ident">shard_id</span>, <span class="ident">why</span>,)
+                <span class="macro">warn!</span>(<span class="string">&quot;Failed to cleanly shutdown shard {}, reached timeout: {:?}&quot;</span>, <span class="ident">shard_id</span>, <span class="ident">why</span>);
             },
         }
 
@@ -678,7 +680,7 @@
                 <span class="kw">return</span>;
             }
 
-            <span class="ident">runners</span>.<span class="ident">keys</span>().<span class="ident">cloned</span>().<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>()
+            <span class="ident">runners</span>.<span class="ident">keys</span>().<span class="ident">copied</span>().<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>()
         };
 
         <span class="macro">info!</span>(<span class="string">&quot;Shutting down all shards&quot;</span>);
@@ -721,7 +723,7 @@
     <span class="kw">pub</span> <span class="ident">event_handler</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">EventHandler</span><span class="op">&gt;</span><span class="op">&gt;</span>,
     <span class="kw">pub</span> <span class="ident">raw_event_handler</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">RawEventHandler</span><span class="op">&gt;</span><span class="op">&gt;</span>,
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;framework&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">framework</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">Framework</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">framework</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">Arc</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">Framework</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span><span class="op">&gt;</span>,
     <span class="kw">pub</span> <span class="ident">shard_index</span>: <span class="ident">u64</span>,
     <span class="kw">pub</span> <span class="ident">shard_init</span>: <span class="ident">u64</span>,
     <span class="kw">pub</span> <span class="ident">shard_total</span>: <span class="ident">u64</span>,
@@ -732,5 +734,5 @@
     <span class="kw">pub</span> <span class="ident">intents</span>: <span class="ident">GatewayIntents</span>,
 }
 </code></pre></div>
-</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.62.0-nightly (ec77f2524 2022-04-17)" ></div>
+</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.61.0-nightly (3c17c84a3 2022-03-21)" ></div>
 </body></html>

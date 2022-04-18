@@ -2652,10 +2652,17 @@
 <span id="2647">2647</span>
 <span id="2648">2648</span>
 <span id="2649">2649</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std</span>::{
-    <span class="ident">borrow::Cow</span>,
-    <span class="ident">fmt</span>::{<span class="ident">Display</span>, <span class="ident">Write</span>},
-};
+<span id="2650">2650</span>
+<span id="2651">2651</span>
+<span id="2652">2652</span>
+<span id="2653">2653</span>
+<span id="2654">2654</span>
+<span id="2655">2655</span>
+<span id="2656">2656</span>
+<span id="2657">2657</span>
+<span id="2658">2658</span>
+</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::borrow::Cow</span>;
+<span class="kw">use</span> <span class="ident">std::fmt</span>::{<span class="ident">Display</span>, <span class="ident">Write</span>};
 
 <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::LightMethod</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::constants</span>;
@@ -2791,12 +2798,6 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// [`ChannelId`]: crate::model::id::ChannelId</span>
     <span class="ident">ChannelsIdThreadMembers</span>(<span class="ident">u64</span>),
-    <span class="doccomment">/// Route for the `/channels/:channel_id/threads/active` path.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The data is the relevant [`ChannelId`].</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`ChannelId`]: crate::model::id::ChannelId</span>
-    <span class="ident">ChannelsIdActiveThreads</span>(<span class="ident">u64</span>),
     <span class="doccomment">/// Route for the `/channels/:channel_id/threads/archived/public` path.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// The data is the relevant [`ChannelId`].</span>
@@ -2959,6 +2960,18 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// [`GuildId`]: crate::model::id::GuildId</span>
     <span class="ident">GuildsIdRolesId</span>(<span class="ident">u64</span>),
+    <span class="doccomment">/// Route for the `/guilds/:guild_id/stickers` path.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// The data is the relevant [`GuildId`].</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// [`GuildId`]: crate::model::id::GuildId</span>
+    <span class="ident">GuildsIdStickers</span>(<span class="ident">u64</span>),
+    <span class="doccomment">/// Route for the `/guilds/:guild_id/stickers/:sticker_id` path.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// The data is the relevant [`GuildId`].</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// [`GuildId`]: crate::model::id::GuildId</span>
+    <span class="ident">GuildsIdStickersId</span>(<span class="ident">u64</span>),
     <span class="doccomment">/// Route for the `/guilds/:guild_id/vanity-url` path.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// The data is the relevant [`GuildId`].</span>
@@ -2997,6 +3010,10 @@
     <span class="ident">GuildsIdThreadsActive</span>,
     <span class="doccomment">/// Route for the `/invites/:code` path.</span>
     <span class="ident">InvitesCode</span>,
+    <span class="doccomment">/// Route for the `/sticker-packs` path.</span>
+    <span class="ident">StickerPacks</span>,
+    <span class="doccomment">/// Route for the `/stickers/:sticker_id` path.</span>
+    <span class="ident">StickersId</span>,
     <span class="doccomment">/// Route for the `/users/:user_id` path.</span>
     <span class="ident">UsersId</span>,
     <span class="doccomment">/// Route for the `/users/@me` path.</span>
@@ -3024,56 +3041,48 @@
     <span class="doccomment">/// The data is the relevant [`ApplicationId`].</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// [`ApplicationId`]: crate::model::id::ApplicationId</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
     <span class="ident">WebhooksApplicationId</span>(<span class="ident">u64</span>),
     <span class="doccomment">/// Route for the `/interactions/:interaction_id` path.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// The data is the relevant [`InteractionId`].</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// [`InteractionId`]: crate::model::id::InteractionId</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
     <span class="ident">InteractionsId</span>(<span class="ident">u64</span>),
     <span class="doccomment">/// Route for the `/applications/:application_id` path.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// The data is the relevant [`ApplicationId`].</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// [`ApplicationId`]: crate::model::id::ApplicationId</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
     <span class="ident">ApplicationsIdCommands</span>(<span class="ident">u64</span>),
     <span class="doccomment">/// Route for the `/applications/:application_id/commands/:command_id` path.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// The data is the relevant [`ApplicationId`].</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// [`ApplicationId`]: crate::model::id::ApplicationId</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
     <span class="ident">ApplicationsIdCommandsId</span>(<span class="ident">u64</span>),
     <span class="doccomment">/// Route for the `/applications/:application_id/guilds/:guild_id` path.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// The data is the relevant [`ApplicationId`].</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// [`ApplicationId`]: crate::model::id::ApplicationId</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
     <span class="ident">ApplicationsIdGuildsIdCommands</span>(<span class="ident">u64</span>),
     <span class="doccomment">/// Route for the `/applications/:application_id/guilds/:guild_id/commands/permissions` path.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// The data is the relevant [`ApplicationId`].</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// [`ApplicationId`]: crate::model::id::ApplicationId</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
     <span class="ident">ApplicationsIdGuildsIdCommandsPermissions</span>(<span class="ident">u64</span>),
     <span class="doccomment">/// Route for the `/applications/:application_id/guilds/:guild_id/commands/:command_id/permissions` path.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// The data is the relevant [`ApplicationId`].</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// [`ApplicationId`]: crate::model::id::ApplicationId</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
     <span class="ident">ApplicationsIdGuildsIdCommandIdPermissions</span>(<span class="ident">u64</span>),
     <span class="doccomment">/// Route for the `/applications/:application_id/guilds/:guild_id` path.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// The data is the relevant [`ApplicationId`].</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// [`ApplicationId`]: crate::model::id::ApplicationId</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
     <span class="ident">ApplicationsIdGuildsIdCommandsId</span>(<span class="ident">u64</span>),
     <span class="doccomment">/// Route for the `/stage-instances` path.</span>
     <span class="doccomment">///</span>
@@ -3097,19 +3106,19 @@
 
 <span class="kw">impl</span> <span class="ident">Route</span> {
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">channel</span>(<span class="ident">channel_id</span>: <span class="ident">u64</span>) -&gt; <span class="ident">String</span> {
-        <span class="macro">format!</span>(<span class="macro">api!</span>(<span class="string">&quot;/channels/{}&quot;</span>), <span class="ident">channel_id</span>)
+        <span class="macro">api!</span>(<span class="string">&quot;/channels/{}&quot;</span>, <span class="ident">channel_id</span>)
     }
 
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">channel_invites</span>(<span class="ident">channel_id</span>: <span class="ident">u64</span>) -&gt; <span class="ident">String</span> {
-        <span class="macro">format!</span>(<span class="macro">api!</span>(<span class="string">&quot;/channels/{}/invites&quot;</span>), <span class="ident">channel_id</span>)
+        <span class="macro">api!</span>(<span class="string">&quot;/channels/{}/invites&quot;</span>, <span class="ident">channel_id</span>)
     }
 
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">channel_message</span>(<span class="ident">channel_id</span>: <span class="ident">u64</span>, <span class="ident">message_id</span>: <span class="ident">u64</span>) -&gt; <span class="ident">String</span> {
-        <span class="macro">format!</span>(<span class="macro">api!</span>(<span class="string">&quot;/channels/{}/messages/{}&quot;</span>), <span class="ident">channel_id</span>, <span class="ident">message_id</span>)
+        <span class="macro">api!</span>(<span class="string">&quot;/channels/{}/messages/{}&quot;</span>, <span class="ident">channel_id</span>, <span class="ident">message_id</span>)
     }
 
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">channel_message_crosspost</span>(<span class="ident">channel_id</span>: <span class="ident">u64</span>, <span class="ident">message_id</span>: <span class="ident">u64</span>) -&gt; <span class="ident">String</span> {
-        <span class="macro">format!</span>(<span class="macro">api!</span>(<span class="string">&quot;/channels/{}/messages/{}/crosspost&quot;</span>), <span class="ident">channel_id</span>, <span class="ident">message_id</span>)
+        <span class="macro">api!</span>(<span class="string">&quot;/channels/{}/messages/{}/crosspost&quot;</span>, <span class="ident">channel_id</span>, <span class="ident">message_id</span>)
     }
 
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">channel_message_reaction</span><span class="op">&lt;</span><span class="ident">D</span>, <span class="ident">T</span><span class="op">&gt;</span>(
@@ -3122,9 +3131,12 @@
         <span class="ident">D</span>: <span class="ident">Display</span>,
         <span class="ident">T</span>: <span class="ident">Display</span>,
     {
-        <span class="macro">format!</span>(
-            <span class="macro">api!</span>(<span class="string">&quot;/channels/{}/messages/{}/reactions/{}/{}&quot;</span>),
-            <span class="ident">channel_id</span>, <span class="ident">message_id</span>, <span class="ident">reaction_type</span>, <span class="ident">user_id</span>,
+        <span class="macro">api!</span>(
+            <span class="string">&quot;/channels/{}/messages/{}/reactions/{}/{}&quot;</span>,
+            <span class="ident">channel_id</span>,
+            <span class="ident">message_id</span>,
+            <span class="ident">reaction_type</span>,
+            <span class="ident">user_id</span>,
         )
     }
 
@@ -3136,10 +3148,7 @@
     <span class="kw">where</span>
         <span class="ident">T</span>: <span class="ident">Display</span>,
     {
-        <span class="macro">format!</span>(
-            <span class="macro">api!</span>(<span class="string">&quot;/channels/{}/messages/{}/reactions/{}&quot;</span>),
-            <span class="ident">channel_id</span>, <span class="ident">message_id</span>, <span class="ident">reaction_type</span>,
-        )
+        <span class="macro">api!</span>(<span class="string">&quot;/channels/{}/messages/{}/reactions/{}&quot;</span>, <span class="ident">channel_id</span>, <span class="ident">message_id</span>, <span class="ident">reaction_type</span>)
     }
 
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">channel_message_reactions</span>(<span class="ident">channel_id</span>: <span class="ident">u64</span>, <span class="ident">message_id</span>: <span class="ident">u64</span>) -&gt; <span class="ident">String</span> {
@@ -3154,68 +3163,67 @@
         <span class="ident">limit</span>: <span class="ident">u8</span>,
         <span class="ident">after</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span>,
     ) -&gt; <span class="ident">String</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">uri</span> <span class="op">=</span> <span class="macro">format!</span>(
-            <span class="macro">api!</span>(<span class="string">&quot;/channels/{}/messages/{}/reactions/{}?limit={}&quot;</span>),
-            <span class="ident">channel_id</span>, <span class="ident">message_id</span>, <span class="ident">reaction</span>, <span class="ident">limit</span>,
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">url</span> <span class="op">=</span> <span class="macro">api!</span>(
+            <span class="string">&quot;/channels/{}/messages/{}/reactions/{}?limit={}&quot;</span>,
+            <span class="ident">channel_id</span>,
+            <span class="ident">message_id</span>,
+            <span class="ident">reaction</span>,
+            <span class="ident">limit</span>,
         );
 
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">after</span>) <span class="op">=</span> <span class="ident">after</span> {
-            <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="macro">write!</span>(<span class="ident">uri</span>, <span class="string">&quot;&amp;after={}&quot;</span>, <span class="ident">after</span>);
+            <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="macro">write!</span>(<span class="ident">url</span>, <span class="string">&quot;&amp;after={}&quot;</span>, <span class="ident">after</span>);
         }
 
-        <span class="ident">uri</span>
+        <span class="ident">url</span>
     }
 
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">channel_messages</span>(<span class="ident">channel_id</span>: <span class="ident">u64</span>, <span class="ident">query</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span>) -&gt; <span class="ident">String</span> {
-        <span class="macro">format!</span>(<span class="macro">api!</span>(<span class="string">&quot;/channels/{}/messages{}&quot;</span>), <span class="ident">channel_id</span>, <span class="ident">query</span>.<span class="ident">unwrap_or</span>(<span class="string">&quot;&quot;</span>),)
+        <span class="macro">api!</span>(<span class="string">&quot;/channels/{}/messages{}&quot;</span>, <span class="ident">channel_id</span>, <span class="ident">query</span>.<span class="ident">unwrap_or</span>(<span class="string">&quot;&quot;</span>))
     }
 
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">channel_messages_bulk_delete</span>(<span class="ident">channel_id</span>: <span class="ident">u64</span>) -&gt; <span class="ident">String</span> {
-        <span class="macro">format!</span>(<span class="macro">api!</span>(<span class="string">&quot;/channels/{}/messages/bulk-delete&quot;</span>), <span class="ident">channel_id</span>)
+        <span class="macro">api!</span>(<span class="string">&quot;/channels/{}/messages/bulk-delete&quot;</span>, <span class="ident">channel_id</span>)
     }
 
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">channel_permission</span>(<span class="ident">channel_id</span>: <span class="ident">u64</span>, <span class="ident">target_id</span>: <span class="ident">u64</span>) -&gt; <span class="ident">String</span> {
-        <span class="macro">format!</span>(<span class="macro">api!</span>(<span class="string">&quot;/channels/{}/permissions/{}&quot;</span>), <span class="ident">channel_id</span>, <span class="ident">target_id</span>)
+        <span class="macro">api!</span>(<span class="string">&quot;/channels/{}/permissions/{}&quot;</span>, <span class="ident">channel_id</span>, <span class="ident">target_id</span>)
     }
 
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">channel_pin</span>(<span class="ident">channel_id</span>: <span class="ident">u64</span>, <span class="ident">message_id</span>: <span class="ident">u64</span>) -&gt; <span class="ident">String</span> {
-        <span class="macro">format!</span>(<span class="macro">api!</span>(<span class="string">&quot;/channels/{}/pins/{}&quot;</span>), <span class="ident">channel_id</span>, <span class="ident">message_id</span>)
+        <span class="macro">api!</span>(<span class="string">&quot;/channels/{}/pins/{}&quot;</span>, <span class="ident">channel_id</span>, <span class="ident">message_id</span>)
     }
 
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">channel_pins</span>(<span class="ident">channel_id</span>: <span class="ident">u64</span>) -&gt; <span class="ident">String</span> {
-        <span class="macro">format!</span>(<span class="macro">api!</span>(<span class="string">&quot;/channels/{}/pins&quot;</span>), <span class="ident">channel_id</span>)
+        <span class="macro">api!</span>(<span class="string">&quot;/channels/{}/pins&quot;</span>, <span class="ident">channel_id</span>)
     }
 
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">channel_typing</span>(<span class="ident">channel_id</span>: <span class="ident">u64</span>) -&gt; <span class="ident">String</span> {
-        <span class="macro">format!</span>(<span class="macro">api!</span>(<span class="string">&quot;/channels/{}/typing&quot;</span>), <span class="ident">channel_id</span>)
+        <span class="macro">api!</span>(<span class="string">&quot;/channels/{}/typing&quot;</span>, <span class="ident">channel_id</span>)
     }
 
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">channel_webhooks</span>(<span class="ident">channel_id</span>: <span class="ident">u64</span>) -&gt; <span class="ident">String</span> {
-        <span class="macro">format!</span>(<span class="macro">api!</span>(<span class="string">&quot;/channels/{}/webhooks&quot;</span>), <span class="ident">channel_id</span>)
+        <span class="macro">api!</span>(<span class="string">&quot;/channels/{}/webhooks&quot;</span>, <span class="ident">channel_id</span>)
     }
 
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">channel_public_threads</span>(<span class="ident">channel_id</span>: <span class="ident">u64</span>, <span class="ident">message_id</span>: <span class="ident">u64</span>) -&gt; <span class="ident">String</span> {
-        <span class="macro">format!</span>(<span class="macro">api!</span>(<span class="string">&quot;/channels/{}/messages/{}/threads&quot;</span>), <span class="ident">channel_id</span>, <span class="ident">message_id</span>)
+        <span class="macro">api!</span>(<span class="string">&quot;/channels/{}/messages/{}/threads&quot;</span>, <span class="ident">channel_id</span>, <span class="ident">message_id</span>)
     }
 
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">channel_private_threads</span>(<span class="ident">channel_id</span>: <span class="ident">u64</span>) -&gt; <span class="ident">String</span> {
-        <span class="macro">format!</span>(<span class="macro">api!</span>(<span class="string">&quot;/channels/{}/threads&quot;</span>), <span class="ident">channel_id</span>)
+        <span class="macro">api!</span>(<span class="string">&quot;/channels/{}/threads&quot;</span>, <span class="ident">channel_id</span>)
     }
 
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">channel_thread_member</span>(<span class="ident">channel_id</span>: <span class="ident">u64</span>, <span class="ident">user_id</span>: <span class="ident">u64</span>) -&gt; <span class="ident">String</span> {
-        <span class="macro">format!</span>(<span class="macro">api!</span>(<span class="string">&quot;/channels/{}/thread-members/{}&quot;</span>), <span class="ident">channel_id</span>, <span class="ident">user_id</span>)
+        <span class="macro">api!</span>(<span class="string">&quot;/channels/{}/thread-members/{}&quot;</span>, <span class="ident">channel_id</span>, <span class="ident">user_id</span>)
     }
 
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">channel_thread_member_me</span>(<span class="ident">channel_id</span>: <span class="ident">u64</span>) -&gt; <span class="ident">String</span> {
-        <span class="macro">format!</span>(<span class="macro">api!</span>(<span class="string">&quot;/channels/{}/thread-members/@me&quot;</span>), <span class="ident">channel_id</span>)
+        <span class="macro">api!</span>(<span class="string">&quot;/channels/{}/thread-members/@me&quot;</span>, <span class="ident">channel_id</span>)
     }
 
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">channel_thread_members</span>(<span class="ident">channel_id</span>: <span class="ident">u64</span>) -&gt; <span class="ident">String</span> {
-        <span class="macro">format!</span>(<span class="macro">api!</span>(<span class="string">&quot;/channels/{}/thread-members&quot;</span>), <span class="ident">channel_id</span>)
-    }
-
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">channel_active_threads</span>(<span class="ident">channel_id</span>: <span class="ident">u64</span>) -&gt; <span class="ident">String</span> {
-        <span class="macro">format!</span>(<span class="macro">api!</span>(<span class="string">&quot;/channels/{}/threads/active&quot;</span>), <span class="ident">channel_id</span>)
+        <span class="macro">api!</span>(<span class="string">&quot;/channels/{}/thread-members&quot;</span>, <span class="ident">channel_id</span>)
     }
 
     <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::let_underscore_must_use</span>)]</span>
@@ -3224,7 +3232,7 @@
         <span class="ident">before</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span>,
         <span class="ident">limit</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span>,
     ) -&gt; <span class="ident">String</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">s</span> <span class="op">=</span> <span class="macro">format!</span>(<span class="macro">api!</span>(<span class="string">&quot;/channels/{}/threads/archived/public&quot;</span>), <span class="ident">channel_id</span>);
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">s</span> <span class="op">=</span> <span class="macro">api!</span>(<span class="string">&quot;/channels/{}/threads/archived/public&quot;</span>, <span class="ident">channel_id</span>);
 
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">id</span>) <span class="op">=</span> <span class="ident">before</span> {
             <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="macro">write!</span>(<span class="ident">s</span>, <span class="string">&quot;&amp;before={}&quot;</span>, <span class="ident">id</span>);
@@ -3243,7 +3251,7 @@
         <span class="ident">before</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span>,
         <span class="ident">limit</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span>,
     ) -&gt; <span class="ident">String</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">s</span> <span class="op">=</span> <span class="macro">format!</span>(<span class="macro">api!</span>(<span class="string">&quot;/channels/{}/threads/archived/private&quot;</span>), <span class="ident">channel_id</span>);
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">s</span> <span class="op">=</span> <span class="macro">api!</span>(<span class="string">&quot;/channels/{}/threads/archived/private&quot;</span>, <span class="ident">channel_id</span>);
 
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">id</span>) <span class="op">=</span> <span class="ident">before</span> {
             <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="macro">write!</span>(<span class="ident">s</span>, <span class="string">&quot;&amp;before={}&quot;</span>, <span class="ident">id</span>);
@@ -3262,7 +3270,7 @@
         <span class="ident">before</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span>,
         <span class="ident">limit</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span>,
     ) -&gt; <span class="ident">String</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">s</span> <span class="op">=</span> <span class="macro">format!</span>(<span class="macro">api!</span>(<span class="string">&quot;/channels/{}/users/@me/threads/archived/private&quot;</span>), <span class="ident">channel_id</span>);
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">s</span> <span class="op">=</span> <span class="macro">api!</span>(<span class="string">&quot;/channels/{}/users/@me/threads/archived/private&quot;</span>, <span class="ident">channel_id</span>);
 
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">id</span>) <span class="op">=</span> <span class="ident">before</span> {
             <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="macro">write!</span>(<span class="ident">s</span>, <span class="string">&quot;&amp;before={}&quot;</span>, <span class="ident">id</span>);
@@ -3284,11 +3292,11 @@
     }
 
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">guild</span>(<span class="ident">guild_id</span>: <span class="ident">u64</span>) -&gt; <span class="ident">String</span> {
-        <span class="macro">format!</span>(<span class="macro">api!</span>(<span class="string">&quot;/guilds/{}&quot;</span>), <span class="ident">guild_id</span>)
+        <span class="macro">api!</span>(<span class="string">&quot;/guilds/{}&quot;</span>, <span class="ident">guild_id</span>)
     }
 
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">guild_with_counts</span>(<span class="ident">guild_id</span>: <span class="ident">u64</span>) -&gt; <span class="ident">String</span> {
-        <span class="macro">format!</span>(<span class="macro">api!</span>(<span class="string">&quot;/guilds/{}?with_counts=true&quot;</span>), <span class="ident">guild_id</span>)
+        <span class="macro">api!</span>(<span class="string">&quot;/guilds/{}?with_counts=true&quot;</span>, <span class="ident">guild_id</span>)
     }
 
     <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::let_underscore_must_use</span>)]</span>
@@ -3299,7 +3307,7 @@
         <span class="ident">before</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span>,
         <span class="ident">limit</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>,
     ) -&gt; <span class="ident">String</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">s</span> <span class="op">=</span> <span class="macro">format!</span>(<span class="macro">api!</span>(<span class="string">&quot;/guilds/{}/audit-logs?&quot;</span>), <span class="ident">guild_id</span>,);
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">s</span> <span class="op">=</span> <span class="macro">api!</span>(<span class="string">&quot;/guilds/{}/audit-logs?&quot;</span>, <span class="ident">guild_id</span>);
 
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">action_type</span>) <span class="op">=</span> <span class="ident">action_type</span> {
             <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="macro">write!</span>(<span class="ident">s</span>, <span class="string">&quot;&amp;action_type={}&quot;</span>, <span class="ident">action_type</span>);
@@ -3321,80 +3329,72 @@
     }
 
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">guild_ban</span>(<span class="ident">guild_id</span>: <span class="ident">u64</span>, <span class="ident">user_id</span>: <span class="ident">u64</span>) -&gt; <span class="ident">String</span> {
-        <span class="macro">format!</span>(<span class="macro">api!</span>(<span class="string">&quot;/guilds/{}/bans/{}&quot;</span>), <span class="ident">guild_id</span>, <span class="ident">user_id</span>)
+        <span class="macro">api!</span>(<span class="string">&quot;/guilds/{}/bans/{}&quot;</span>, <span class="ident">guild_id</span>, <span class="ident">user_id</span>)
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">guild_ban_optioned</span>(
-        <span class="ident">guild_id</span>: <span class="ident">u64</span>,
-        <span class="ident">user_id</span>: <span class="ident">u64</span>,
-        <span class="ident">delete_message_days</span>: <span class="ident">u8</span>,
-        <span class="ident">reason</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
-    ) -&gt; <span class="ident">String</span> {
-        <span class="macro">format!</span>(
-            <span class="macro">api!</span>(<span class="string">&quot;/guilds/{}/bans/{}?delete_message_days={}&amp;reason={}&quot;</span>),
-            <span class="ident">guild_id</span>, <span class="ident">user_id</span>, <span class="ident">delete_message_days</span>, <span class="ident">reason</span>,
-        )
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">guild_ban_optioned</span>(<span class="ident">guild_id</span>: <span class="ident">u64</span>, <span class="ident">user_id</span>: <span class="ident">u64</span>, <span class="ident">delete_message_days</span>: <span class="ident">u8</span>) -&gt; <span class="ident">String</span> {
+        <span class="macro">api!</span>(<span class="string">&quot;/guilds/{}/bans/{}?delete_message_days={}&quot;</span>, <span class="ident">guild_id</span>, <span class="ident">user_id</span>, <span class="ident">delete_message_days</span>)
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">guild_kick_optioned</span>(<span class="ident">guild_id</span>: <span class="ident">u64</span>, <span class="ident">user_id</span>: <span class="ident">u64</span>, <span class="ident">reason</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">String</span> {
-        <span class="macro">format!</span>(<span class="macro">api!</span>(<span class="string">&quot;/guilds/{}/members/{}?reason={}&quot;</span>), <span class="ident">guild_id</span>, <span class="ident">user_id</span>, <span class="ident">reason</span>,)
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">guild_kick_optioned</span>(<span class="ident">guild_id</span>: <span class="ident">u64</span>, <span class="ident">user_id</span>: <span class="ident">u64</span>) -&gt; <span class="ident">String</span> {
+        <span class="macro">api!</span>(<span class="string">&quot;/guilds/{}/members/{}&quot;</span>, <span class="ident">guild_id</span>, <span class="ident">user_id</span>)
     }
 
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">guild_bans</span>(<span class="ident">guild_id</span>: <span class="ident">u64</span>) -&gt; <span class="ident">String</span> {
-        <span class="macro">format!</span>(<span class="macro">api!</span>(<span class="string">&quot;/guilds/{}/bans&quot;</span>), <span class="ident">guild_id</span>)
+        <span class="macro">api!</span>(<span class="string">&quot;/guilds/{}/bans&quot;</span>, <span class="ident">guild_id</span>)
     }
 
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">guild_channels</span>(<span class="ident">guild_id</span>: <span class="ident">u64</span>) -&gt; <span class="ident">String</span> {
-        <span class="macro">format!</span>(<span class="macro">api!</span>(<span class="string">&quot;/guilds/{}/channels&quot;</span>), <span class="ident">guild_id</span>)
+        <span class="macro">api!</span>(<span class="string">&quot;/guilds/{}/channels&quot;</span>, <span class="ident">guild_id</span>)
     }
 
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">guild_widget</span>(<span class="ident">guild_id</span>: <span class="ident">u64</span>) -&gt; <span class="ident">String</span> {
-        <span class="macro">format!</span>(<span class="macro">api!</span>(<span class="string">&quot;/guilds/{}/widget&quot;</span>), <span class="ident">guild_id</span>)
+        <span class="macro">api!</span>(<span class="string">&quot;/guilds/{}/widget&quot;</span>, <span class="ident">guild_id</span>)
     }
 
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">guild_preview</span>(<span class="ident">guild_id</span>: <span class="ident">u64</span>) -&gt; <span class="ident">String</span> {
-        <span class="macro">format!</span>(<span class="macro">api!</span>(<span class="string">&quot;/guilds/{}/preview&quot;</span>), <span class="ident">guild_id</span>)
+        <span class="macro">api!</span>(<span class="string">&quot;/guilds/{}/preview&quot;</span>, <span class="ident">guild_id</span>)
     }
 
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">guild_emojis</span>(<span class="ident">guild_id</span>: <span class="ident">u64</span>) -&gt; <span class="ident">String</span> {
-        <span class="macro">format!</span>(<span class="macro">api!</span>(<span class="string">&quot;/guilds/{}/emojis&quot;</span>), <span class="ident">guild_id</span>)
+        <span class="macro">api!</span>(<span class="string">&quot;/guilds/{}/emojis&quot;</span>, <span class="ident">guild_id</span>)
     }
 
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">guild_emoji</span>(<span class="ident">guild_id</span>: <span class="ident">u64</span>, <span class="ident">emoji_id</span>: <span class="ident">u64</span>) -&gt; <span class="ident">String</span> {
-        <span class="macro">format!</span>(<span class="macro">api!</span>(<span class="string">&quot;/guilds/{}/emojis/{}&quot;</span>), <span class="ident">guild_id</span>, <span class="ident">emoji_id</span>)
+        <span class="macro">api!</span>(<span class="string">&quot;/guilds/{}/emojis/{}&quot;</span>, <span class="ident">guild_id</span>, <span class="ident">emoji_id</span>)
     }
 
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">guild_integration</span>(<span class="ident">guild_id</span>: <span class="ident">u64</span>, <span class="ident">integration_id</span>: <span class="ident">u64</span>) -&gt; <span class="ident">String</span> {
-        <span class="macro">format!</span>(<span class="macro">api!</span>(<span class="string">&quot;/guilds/{}/integrations/{}&quot;</span>), <span class="ident">guild_id</span>, <span class="ident">integration_id</span>)
+        <span class="macro">api!</span>(<span class="string">&quot;/guilds/{}/integrations/{}&quot;</span>, <span class="ident">guild_id</span>, <span class="ident">integration_id</span>)
     }
 
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">guild_integration_sync</span>(<span class="ident">guild_id</span>: <span class="ident">u64</span>, <span class="ident">integration_id</span>: <span class="ident">u64</span>) -&gt; <span class="ident">String</span> {
-        <span class="macro">format!</span>(<span class="macro">api!</span>(<span class="string">&quot;/guilds/{}/integrations/{}/sync&quot;</span>), <span class="ident">guild_id</span>, <span class="ident">integration_id</span>,)
+        <span class="macro">api!</span>(<span class="string">&quot;/guilds/{}/integrations/{}/sync&quot;</span>, <span class="ident">guild_id</span>, <span class="ident">integration_id</span>)
     }
 
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">guild_integrations</span>(<span class="ident">guild_id</span>: <span class="ident">u64</span>) -&gt; <span class="ident">String</span> {
-        <span class="macro">format!</span>(<span class="macro">api!</span>(<span class="string">&quot;/guilds/{}/integrations&quot;</span>), <span class="ident">guild_id</span>)
+        <span class="macro">api!</span>(<span class="string">&quot;/guilds/{}/integrations&quot;</span>, <span class="ident">guild_id</span>)
     }
 
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">guild_invites</span>(<span class="ident">guild_id</span>: <span class="ident">u64</span>) -&gt; <span class="ident">String</span> {
-        <span class="macro">format!</span>(<span class="macro">api!</span>(<span class="string">&quot;/guilds/{}/invites&quot;</span>), <span class="ident">guild_id</span>)
+        <span class="macro">api!</span>(<span class="string">&quot;/guilds/{}/invites&quot;</span>, <span class="ident">guild_id</span>)
     }
 
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">guild_member</span>(<span class="ident">guild_id</span>: <span class="ident">u64</span>, <span class="ident">user_id</span>: <span class="ident">u64</span>) -&gt; <span class="ident">String</span> {
-        <span class="macro">format!</span>(<span class="macro">api!</span>(<span class="string">&quot;/guilds/{}/members/{}&quot;</span>), <span class="ident">guild_id</span>, <span class="ident">user_id</span>)
+        <span class="macro">api!</span>(<span class="string">&quot;/guilds/{}/members/{}&quot;</span>, <span class="ident">guild_id</span>, <span class="ident">user_id</span>)
     }
 
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">guild_member_role</span>(<span class="ident">guild_id</span>: <span class="ident">u64</span>, <span class="ident">user_id</span>: <span class="ident">u64</span>, <span class="ident">role_id</span>: <span class="ident">u64</span>) -&gt; <span class="ident">String</span> {
-        <span class="macro">format!</span>(<span class="macro">api!</span>(<span class="string">&quot;/guilds/{}/members/{}/roles/{}&quot;</span>), <span class="ident">guild_id</span>, <span class="ident">user_id</span>, <span class="ident">role_id</span>,)
+        <span class="macro">api!</span>(<span class="string">&quot;/guilds/{}/members/{}/roles/{}&quot;</span>, <span class="ident">guild_id</span>, <span class="ident">user_id</span>, <span class="ident">role_id</span>)
     }
 
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">guild_members</span>(<span class="ident">guild_id</span>: <span class="ident">u64</span>) -&gt; <span class="ident">String</span> {
-        <span class="macro">format!</span>(<span class="macro">api!</span>(<span class="string">&quot;/guilds/{}/members&quot;</span>), <span class="ident">guild_id</span>)
+        <span class="macro">api!</span>(<span class="string">&quot;/guilds/{}/members&quot;</span>, <span class="ident">guild_id</span>)
     }
 
     <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::let_underscore_must_use</span>)]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">guild_members_search</span>(<span class="ident">guild_id</span>: <span class="ident">u64</span>, <span class="ident">query</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">limit</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span>) -&gt; <span class="ident">String</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">s</span> <span class="op">=</span> <span class="macro">format!</span>(<span class="macro">api!</span>(<span class="string">&quot;/guilds/{}/members/search?&quot;</span>), <span class="ident">guild_id</span>);
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">s</span> <span class="op">=</span> <span class="macro">api!</span>(<span class="string">&quot;/guilds/{}/members/search?&quot;</span>, <span class="ident">guild_id</span>);
 
         <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="macro">write!</span>(<span class="ident">s</span>, <span class="string">&quot;&amp;query={}&quot;</span>, <span class="ident">query</span>);
 
@@ -3405,7 +3405,7 @@
 
     <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::let_underscore_must_use</span>)]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">guild_members_optioned</span>(<span class="ident">guild_id</span>: <span class="ident">u64</span>, <span class="ident">after</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span>, <span class="ident">limit</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span>) -&gt; <span class="ident">String</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">s</span> <span class="op">=</span> <span class="macro">format!</span>(<span class="macro">api!</span>(<span class="string">&quot;/guilds/{}/members?&quot;</span>), <span class="ident">guild_id</span>);
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">s</span> <span class="op">=</span> <span class="macro">api!</span>(<span class="string">&quot;/guilds/{}/members?&quot;</span>, <span class="ident">guild_id</span>);
 
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">after</span>) <span class="op">=</span> <span class="ident">after</span> {
             <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="macro">write!</span>(<span class="ident">s</span>, <span class="string">&quot;&amp;after={}&quot;</span>, <span class="ident">after</span>);
@@ -3419,51 +3419,59 @@
     }
 
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">guild_member_me</span>(<span class="ident">guild_id</span>: <span class="ident">u64</span>) -&gt; <span class="ident">String</span> {
-        <span class="macro">format!</span>(<span class="macro">api!</span>(<span class="string">&quot;/guilds/{}/members/@me&quot;</span>), <span class="ident">guild_id</span>)
+        <span class="macro">api!</span>(<span class="string">&quot;/guilds/{}/members/@me&quot;</span>, <span class="ident">guild_id</span>)
     }
 
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">guild_nickname</span>(<span class="ident">guild_id</span>: <span class="ident">u64</span>) -&gt; <span class="ident">String</span> {
-        <span class="macro">format!</span>(<span class="macro">api!</span>(<span class="string">&quot;/guilds/{}/members/@me/nick&quot;</span>), <span class="ident">guild_id</span>)
+        <span class="macro">api!</span>(<span class="string">&quot;/guilds/{}/members/@me/nick&quot;</span>, <span class="ident">guild_id</span>)
     }
 
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">guild_prune</span>(<span class="ident">guild_id</span>: <span class="ident">u64</span>, <span class="ident">days</span>: <span class="ident">u64</span>) -&gt; <span class="ident">String</span> {
-        <span class="macro">format!</span>(<span class="macro">api!</span>(<span class="string">&quot;/guilds/{}/prune?days={}&quot;</span>), <span class="ident">guild_id</span>, <span class="ident">days</span>)
+        <span class="macro">api!</span>(<span class="string">&quot;/guilds/{}/prune?days={}&quot;</span>, <span class="ident">guild_id</span>, <span class="ident">days</span>)
     }
 
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">guild_regions</span>(<span class="ident">guild_id</span>: <span class="ident">u64</span>) -&gt; <span class="ident">String</span> {
-        <span class="macro">format!</span>(<span class="macro">api!</span>(<span class="string">&quot;/guilds/{}/regions&quot;</span>), <span class="ident">guild_id</span>)
+        <span class="macro">api!</span>(<span class="string">&quot;/guilds/{}/regions&quot;</span>, <span class="ident">guild_id</span>)
     }
 
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">guild_role</span>(<span class="ident">guild_id</span>: <span class="ident">u64</span>, <span class="ident">role_id</span>: <span class="ident">u64</span>) -&gt; <span class="ident">String</span> {
-        <span class="macro">format!</span>(<span class="macro">api!</span>(<span class="string">&quot;/guilds/{}/roles/{}&quot;</span>), <span class="ident">guild_id</span>, <span class="ident">role_id</span>)
+        <span class="macro">api!</span>(<span class="string">&quot;/guilds/{}/roles/{}&quot;</span>, <span class="ident">guild_id</span>, <span class="ident">role_id</span>)
     }
 
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">guild_roles</span>(<span class="ident">guild_id</span>: <span class="ident">u64</span>) -&gt; <span class="ident">String</span> {
-        <span class="macro">format!</span>(<span class="macro">api!</span>(<span class="string">&quot;/guilds/{}/roles&quot;</span>), <span class="ident">guild_id</span>)
+        <span class="macro">api!</span>(<span class="string">&quot;/guilds/{}/roles&quot;</span>, <span class="ident">guild_id</span>)
+    }
+
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">guild_sticker</span>(<span class="ident">guild_id</span>: <span class="ident">u64</span>, <span class="ident">sticker_id</span>: <span class="ident">u64</span>) -&gt; <span class="ident">String</span> {
+        <span class="macro">api!</span>(<span class="string">&quot;/guilds/{}/stickers/{}&quot;</span>, <span class="ident">guild_id</span>, <span class="ident">sticker_id</span>)
+    }
+
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">guild_stickers</span>(<span class="ident">guild_id</span>: <span class="ident">u64</span>) -&gt; <span class="ident">String</span> {
+        <span class="macro">api!</span>(<span class="string">&quot;/guilds/{}/stickers&quot;</span>, <span class="ident">guild_id</span>)
     }
 
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">guild_vanity_url</span>(<span class="ident">guild_id</span>: <span class="ident">u64</span>) -&gt; <span class="ident">String</span> {
-        <span class="macro">format!</span>(<span class="macro">api!</span>(<span class="string">&quot;/guilds/{}/vanity-url&quot;</span>), <span class="ident">guild_id</span>)
+        <span class="macro">api!</span>(<span class="string">&quot;/guilds/{}/vanity-url&quot;</span>, <span class="ident">guild_id</span>)
     }
 
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">guild_voice_states</span>(<span class="ident">guild_id</span>: <span class="ident">u64</span>, <span class="ident">user_id</span>: <span class="ident">u64</span>) -&gt; <span class="ident">String</span> {
-        <span class="macro">format!</span>(<span class="macro">api!</span>(<span class="string">&quot;/guilds/{}/voice-states/{}&quot;</span>), <span class="ident">guild_id</span>, <span class="ident">user_id</span>)
+        <span class="macro">api!</span>(<span class="string">&quot;/guilds/{}/voice-states/{}&quot;</span>, <span class="ident">guild_id</span>, <span class="ident">user_id</span>)
     }
 
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">guild_voice_states_me</span>(<span class="ident">guild_id</span>: <span class="ident">u64</span>) -&gt; <span class="ident">String</span> {
-        <span class="macro">format!</span>(<span class="macro">api!</span>(<span class="string">&quot;/guilds/{}/voice-states/@me&quot;</span>), <span class="ident">guild_id</span>)
+        <span class="macro">api!</span>(<span class="string">&quot;/guilds/{}/voice-states/@me&quot;</span>, <span class="ident">guild_id</span>)
     }
 
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">guild_webhooks</span>(<span class="ident">guild_id</span>: <span class="ident">u64</span>) -&gt; <span class="ident">String</span> {
-        <span class="macro">format!</span>(<span class="macro">api!</span>(<span class="string">&quot;/guilds/{}/webhooks&quot;</span>), <span class="ident">guild_id</span>)
+        <span class="macro">api!</span>(<span class="string">&quot;/guilds/{}/webhooks&quot;</span>, <span class="ident">guild_id</span>)
     }
 
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">guild_welcome_screen</span>(<span class="ident">guild_id</span>: <span class="ident">u64</span>) -&gt; <span class="ident">String</span> {
-        <span class="macro">format!</span>(<span class="macro">api!</span>(<span class="string">&quot;/guilds/{}/welcome-screen&quot;</span>), <span class="ident">guild_id</span>)
+        <span class="macro">api!</span>(<span class="string">&quot;/guilds/{}/welcome-screen&quot;</span>, <span class="ident">guild_id</span>)
     }
 
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">guild_threads_active</span>(<span class="ident">guild_id</span>: <span class="ident">u64</span>) -&gt; <span class="ident">String</span> {
-        <span class="macro">format!</span>(<span class="macro">api!</span>(<span class="string">&quot;/guilds/{}/threads/active&quot;</span>), <span class="ident">guild_id</span>)
+        <span class="macro">api!</span>(<span class="string">&quot;/guilds/{}/threads/active&quot;</span>, <span class="ident">guild_id</span>)
     }
 
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">guilds</span>() -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> {
@@ -3471,11 +3479,25 @@
     }
 
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">invite</span>(<span class="ident">code</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">String</span> {
-        <span class="macro">format!</span>(<span class="macro">api!</span>(<span class="string">&quot;/invites/{}&quot;</span>), <span class="ident">code</span>)
+        <span class="macro">api!</span>(<span class="string">&quot;/invites/{}&quot;</span>, <span class="ident">code</span>)
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">invite_optioned</span>(<span class="ident">code</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">stats</span>: <span class="ident">bool</span>) -&gt; <span class="ident">String</span> {
-        <span class="macro">format!</span>(<span class="macro">api!</span>(<span class="string">&quot;/invites/{}?with_counts={}&quot;</span>), <span class="ident">code</span>, <span class="ident">stats</span>)
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">invite_optioned</span>(
+        <span class="ident">code</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
+        <span class="ident">member_counts</span>: <span class="ident">bool</span>,
+        <span class="ident">expiration</span>: <span class="ident">bool</span>,
+        <span class="ident">event_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span>,
+    ) -&gt; <span class="ident">String</span> {
+        <span class="macro">api!</span>(
+            <span class="string">&quot;/invites/{}?with_counts={}&amp;with_expiration={}{}&quot;</span>,
+            <span class="ident">code</span>,
+            <span class="ident">member_counts</span>,
+            <span class="ident">expiration</span>,
+            <span class="kw">match</span> <span class="ident">event_id</span> {
+                <span class="prelude-val">Some</span>(<span class="ident">id</span>) =&gt; <span class="macro">format!</span>(<span class="string">&quot;&amp;event_id={}&quot;</span>, <span class="ident">id</span>),
+                <span class="prelude-val">None</span> =&gt; <span class="string">&quot;&quot;</span>.<span class="ident">to_string</span>(),
+            }
+        )
     }
 
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">oauth2_application_current</span>() -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> {
@@ -3498,8 +3520,16 @@
         <span class="macro">status!</span>(<span class="string">&quot;/scheduled-maintenances/upcoming.json&quot;</span>)
     }
 
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">sticker</span>(<span class="ident">sticker_id</span>: <span class="ident">u64</span>) -&gt; <span class="ident">String</span> {
+        <span class="macro">api!</span>(<span class="string">&quot;/stickers/{}&quot;</span>, <span class="ident">sticker_id</span>)
+    }
+
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">sticker_packs</span>() -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> {
+        <span class="macro">api!</span>(<span class="string">&quot;/sticker-packs&quot;</span>)
+    }
+
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">user</span><span class="op">&lt;</span><span class="ident">D</span>: <span class="ident">Display</span><span class="op">&gt;</span>(<span class="ident">target</span>: <span class="ident">D</span>) -&gt; <span class="ident">String</span> {
-        <span class="macro">format!</span>(<span class="macro">api!</span>(<span class="string">&quot;/users/{}&quot;</span>), <span class="ident">target</span>)
+        <span class="macro">api!</span>(<span class="string">&quot;/users/{}&quot;</span>, <span class="ident">target</span>)
     }
 
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">user_me_connections</span>() -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> {
@@ -3507,15 +3537,15 @@
     }
 
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">user_dm_channels</span><span class="op">&lt;</span><span class="ident">D</span>: <span class="ident">Display</span><span class="op">&gt;</span>(<span class="ident">target</span>: <span class="ident">D</span>) -&gt; <span class="ident">String</span> {
-        <span class="macro">format!</span>(<span class="macro">api!</span>(<span class="string">&quot;/users/{}/channels&quot;</span>), <span class="ident">target</span>)
+        <span class="macro">api!</span>(<span class="string">&quot;/users/{}/channels&quot;</span>, <span class="ident">target</span>)
     }
 
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">user_guild</span><span class="op">&lt;</span><span class="ident">D</span>: <span class="ident">Display</span><span class="op">&gt;</span>(<span class="ident">target</span>: <span class="ident">D</span>, <span class="ident">guild_id</span>: <span class="ident">u64</span>) -&gt; <span class="ident">String</span> {
-        <span class="macro">format!</span>(<span class="macro">api!</span>(<span class="string">&quot;/users/{}/guilds/{}&quot;</span>), <span class="ident">target</span>, <span class="ident">guild_id</span>)
+        <span class="macro">api!</span>(<span class="string">&quot;/users/{}/guilds/{}&quot;</span>, <span class="ident">target</span>, <span class="ident">guild_id</span>)
     }
 
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">user_guilds</span><span class="op">&lt;</span><span class="ident">D</span>: <span class="ident">Display</span><span class="op">&gt;</span>(<span class="ident">target</span>: <span class="ident">D</span>) -&gt; <span class="ident">String</span> {
-        <span class="macro">format!</span>(<span class="macro">api!</span>(<span class="string">&quot;/users/{}/guilds&quot;</span>), <span class="ident">target</span>)
+        <span class="macro">api!</span>(<span class="string">&quot;/users/{}/guilds&quot;</span>, <span class="ident">target</span>)
     }
 
     <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::let_underscore_must_use</span>)]</span>
@@ -3523,9 +3553,14 @@
         <span class="ident">target</span>: <span class="ident">D</span>,
         <span class="ident">after</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span>,
         <span class="ident">before</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span>,
-        <span class="ident">limit</span>: <span class="ident">u64</span>,
+        <span class="ident">limit</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span>,
     ) -&gt; <span class="ident">String</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">s</span> <span class="op">=</span> <span class="macro">format!</span>(<span class="macro">api!</span>(<span class="string">&quot;/users/{}/guilds?limit={}&amp;&quot;</span>), <span class="ident">target</span>, <span class="ident">limit</span>);
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">s</span> <span class="op">=</span> <span class="macro">api!</span>(<span class="string">&quot;/users/{}/guilds?&quot;</span>, <span class="ident">target</span>);
+
+        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">limit</span>) <span class="op">=</span> <span class="ident">limit</span> {
+            <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::let_underscore_must_use</span>)]</span>
+            <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="macro">write!</span>(<span class="ident">s</span>, <span class="string">&quot;&amp;limit={}&quot;</span>, <span class="ident">limit</span>);
+        }
 
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">after</span>) <span class="op">=</span> <span class="ident">after</span> {
             <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="macro">write!</span>(<span class="ident">s</span>, <span class="string">&quot;&amp;after={}&quot;</span>, <span class="ident">after</span>);
@@ -3545,107 +3580,96 @@
     }
 
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">webhook</span>(<span class="ident">webhook_id</span>: <span class="ident">u64</span>) -&gt; <span class="ident">String</span> {
-        <span class="macro">format!</span>(<span class="macro">api!</span>(<span class="string">&quot;/webhooks/{}&quot;</span>), <span class="ident">webhook_id</span>)
+        <span class="macro">api!</span>(<span class="string">&quot;/webhooks/{}&quot;</span>, <span class="ident">webhook_id</span>)
     }
 
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">webhook_with_token</span><span class="op">&lt;</span><span class="ident">D</span><span class="op">&gt;</span>(<span class="ident">webhook_id</span>: <span class="ident">u64</span>, <span class="ident">token</span>: <span class="ident">D</span>) -&gt; <span class="ident">String</span>
     <span class="kw">where</span>
         <span class="ident">D</span>: <span class="ident">Display</span>,
     {
-        <span class="macro">format!</span>(<span class="macro">api!</span>(<span class="string">&quot;/webhooks/{}/{}&quot;</span>), <span class="ident">webhook_id</span>, <span class="ident">token</span>)
+        <span class="macro">api!</span>(<span class="string">&quot;/webhooks/{}/{}&quot;</span>, <span class="ident">webhook_id</span>, <span class="ident">token</span>)
     }
 
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">webhook_with_token_optioned</span><span class="op">&lt;</span><span class="ident">D</span><span class="op">&gt;</span>(<span class="ident">webhook_id</span>: <span class="ident">u64</span>, <span class="ident">token</span>: <span class="ident">D</span>, <span class="ident">wait</span>: <span class="ident">bool</span>) -&gt; <span class="ident">String</span>
     <span class="kw">where</span>
         <span class="ident">D</span>: <span class="ident">Display</span>,
     {
-        <span class="macro">format!</span>(<span class="macro">api!</span>(<span class="string">&quot;/webhooks/{}/{}?wait={}&quot;</span>), <span class="ident">webhook_id</span>, <span class="ident">token</span>, <span class="ident">wait</span>)
+        <span class="macro">api!</span>(<span class="string">&quot;/webhooks/{}/{}?wait={}&quot;</span>, <span class="ident">webhook_id</span>, <span class="ident">token</span>, <span class="ident">wait</span>)
     }
 
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">webhook_message</span><span class="op">&lt;</span><span class="ident">D</span><span class="op">&gt;</span>(<span class="ident">webhook_id</span>: <span class="ident">u64</span>, <span class="ident">token</span>: <span class="ident">D</span>, <span class="ident">message_id</span>: <span class="ident">u64</span>) -&gt; <span class="ident">String</span>
     <span class="kw">where</span>
         <span class="ident">D</span>: <span class="ident">Display</span>,
     {
-        <span class="macro">format!</span>(<span class="macro">api!</span>(<span class="string">&quot;/webhooks/{}/{}/messages/{}&quot;</span>), <span class="ident">webhook_id</span>, <span class="ident">token</span>, <span class="ident">message_id</span>)
+        <span class="macro">api!</span>(<span class="string">&quot;/webhooks/{}/{}/messages/{}&quot;</span>, <span class="ident">webhook_id</span>, <span class="ident">token</span>, <span class="ident">message_id</span>)
     }
 
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">webhook_original_interaction_response</span><span class="op">&lt;</span><span class="ident">D</span>: <span class="ident">Display</span><span class="op">&gt;</span>(
         <span class="ident">application_id</span>: <span class="ident">u64</span>,
         <span class="ident">token</span>: <span class="ident">D</span>,
     ) -&gt; <span class="ident">String</span> {
-        <span class="macro">format!</span>(<span class="macro">api!</span>(<span class="string">&quot;/webhooks/{}/{}/messages/@original&quot;</span>), <span class="ident">application_id</span>, <span class="ident">token</span>)
+        <span class="macro">api!</span>(<span class="string">&quot;/webhooks/{}/{}/messages/@original&quot;</span>, <span class="ident">application_id</span>, <span class="ident">token</span>)
     }
 
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">webhook_followup_message</span><span class="op">&lt;</span><span class="ident">D</span>: <span class="ident">Display</span><span class="op">&gt;</span>(
         <span class="ident">application_id</span>: <span class="ident">u64</span>,
         <span class="ident">token</span>: <span class="ident">D</span>,
         <span class="ident">message_id</span>: <span class="ident">u64</span>,
     ) -&gt; <span class="ident">String</span> {
-        <span class="macro">format!</span>(<span class="macro">api!</span>(<span class="string">&quot;/webhooks/{}/{}/messages/{}&quot;</span>), <span class="ident">application_id</span>, <span class="ident">token</span>, <span class="ident">message_id</span>)
+        <span class="macro">api!</span>(<span class="string">&quot;/webhooks/{}/{}/messages/{}&quot;</span>, <span class="ident">application_id</span>, <span class="ident">token</span>, <span class="ident">message_id</span>)
     }
 
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">webhook_followup_messages</span><span class="op">&lt;</span><span class="ident">D</span>: <span class="ident">Display</span><span class="op">&gt;</span>(<span class="ident">application_id</span>: <span class="ident">u64</span>, <span class="ident">token</span>: <span class="ident">D</span>) -&gt; <span class="ident">String</span> {
-        <span class="macro">format!</span>(<span class="macro">api!</span>(<span class="string">&quot;/webhooks/{}/{}&quot;</span>), <span class="ident">application_id</span>, <span class="ident">token</span>)
+        <span class="macro">api!</span>(<span class="string">&quot;/webhooks/{}/{}&quot;</span>, <span class="ident">application_id</span>, <span class="ident">token</span>)
     }
 
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">interaction_response</span><span class="op">&lt;</span><span class="ident">D</span>: <span class="ident">Display</span><span class="op">&gt;</span>(<span class="ident">application_id</span>: <span class="ident">u64</span>, <span class="ident">token</span>: <span class="ident">D</span>) -&gt; <span class="ident">String</span> {
-        <span class="macro">format!</span>(<span class="macro">api!</span>(<span class="string">&quot;/interactions/{}/{}/callback&quot;</span>), <span class="ident">application_id</span>, <span class="ident">token</span>)
+        <span class="macro">api!</span>(<span class="string">&quot;/interactions/{}/{}/callback&quot;</span>, <span class="ident">application_id</span>, <span class="ident">token</span>)
     }
 
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">application_command</span>(<span class="ident">application_id</span>: <span class="ident">u64</span>, <span class="ident">command_id</span>: <span class="ident">u64</span>) -&gt; <span class="ident">String</span> {
-        <span class="macro">format!</span>(<span class="macro">api!</span>(<span class="string">&quot;/applications/{}/commands/{}&quot;</span>), <span class="ident">application_id</span>, <span class="ident">command_id</span>)
+        <span class="macro">api!</span>(<span class="string">&quot;/applications/{}/commands/{}&quot;</span>, <span class="ident">application_id</span>, <span class="ident">command_id</span>)
     }
 
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">application_commands</span>(<span class="ident">application_id</span>: <span class="ident">u64</span>) -&gt; <span class="ident">String</span> {
-        <span class="macro">format!</span>(<span class="macro">api!</span>(<span class="string">&quot;/applications/{}/commands&quot;</span>), <span class="ident">application_id</span>)
+        <span class="macro">api!</span>(<span class="string">&quot;/applications/{}/commands&quot;</span>, <span class="ident">application_id</span>)
     }
 
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">application_guild_command</span>(
         <span class="ident">application_id</span>: <span class="ident">u64</span>,
         <span class="ident">guild_id</span>: <span class="ident">u64</span>,
         <span class="ident">command_id</span>: <span class="ident">u64</span>,
     ) -&gt; <span class="ident">String</span> {
-        <span class="macro">format!</span>(
-            <span class="macro">api!</span>(<span class="string">&quot;/applications/{}/guilds/{}/commands/{}&quot;</span>),
-            <span class="ident">application_id</span>, <span class="ident">guild_id</span>, <span class="ident">command_id</span>
-        )
+        <span class="macro">api!</span>(<span class="string">&quot;/applications/{}/guilds/{}/commands/{}&quot;</span>, <span class="ident">application_id</span>, <span class="ident">guild_id</span>, <span class="ident">command_id</span>)
     }
 
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">application_guild_command_permissions</span>(
         <span class="ident">application_id</span>: <span class="ident">u64</span>,
         <span class="ident">guild_id</span>: <span class="ident">u64</span>,
         <span class="ident">command_id</span>: <span class="ident">u64</span>,
     ) -&gt; <span class="ident">String</span> {
-        <span class="macro">format!</span>(
-            <span class="macro">api!</span>(<span class="string">&quot;/applications/{}/guilds/{}/commands/{}/permissions&quot;</span>),
-            <span class="ident">application_id</span>, <span class="ident">guild_id</span>, <span class="ident">command_id</span>
+        <span class="macro">api!</span>(
+            <span class="string">&quot;/applications/{}/guilds/{}/commands/{}/permissions&quot;</span>,
+            <span class="ident">application_id</span>,
+            <span class="ident">guild_id</span>,
+            <span class="ident">command_id</span>,
         )
     }
 
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">application_guild_commands</span>(<span class="ident">application_id</span>: <span class="ident">u64</span>, <span class="ident">guild_id</span>: <span class="ident">u64</span>) -&gt; <span class="ident">String</span> {
-        <span class="macro">format!</span>(<span class="macro">api!</span>(<span class="string">&quot;/applications/{}/guilds/{}/commands&quot;</span>), <span class="ident">application_id</span>, <span class="ident">guild_id</span>)
+        <span class="macro">api!</span>(<span class="string">&quot;/applications/{}/guilds/{}/commands&quot;</span>, <span class="ident">application_id</span>, <span class="ident">guild_id</span>)
     }
 
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">application_guild_commands_permissions</span>(<span class="ident">application_id</span>: <span class="ident">u64</span>, <span class="ident">guild_id</span>: <span class="ident">u64</span>) -&gt; <span class="ident">String</span> {
-        <span class="macro">format!</span>(<span class="macro">api!</span>(<span class="string">&quot;/applications/{}/guilds/{}/commands/permissions&quot;</span>), <span class="ident">application_id</span>, <span class="ident">guild_id</span>)
+        <span class="macro">api!</span>(<span class="string">&quot;/applications/{}/guilds/{}/commands/permissions&quot;</span>, <span class="ident">application_id</span>, <span class="ident">guild_id</span>)
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">stage_instances</span>() -&gt; <span class="ident">String</span> {
-        <span class="macro">api!</span>(<span class="string">&quot;/stage-instances&quot;</span>).<span class="ident">to_string</span>()
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">stage_instances</span>() -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> {
+        <span class="macro">api!</span>(<span class="string">&quot;/stage-instances&quot;</span>)
     }
 
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">stage_instance</span>(<span class="ident">channel_id</span>: <span class="ident">u64</span>) -&gt; <span class="ident">String</span> {
-        <span class="macro">format!</span>(<span class="macro">api!</span>(<span class="string">&quot;/stage-instances/{}&quot;</span>), <span class="ident">channel_id</span>)
+        <span class="macro">api!</span>(<span class="string">&quot;/stage-instances/{}&quot;</span>, <span class="ident">channel_id</span>)
     }
 }
 
@@ -3665,7 +3689,6 @@
         <span class="ident">guild_id</span>: <span class="ident">u64</span>,
         <span class="ident">user_id</span>: <span class="ident">u64</span>,
         <span class="ident">delete_message_days</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>,
-        <span class="ident">reason</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span><span class="op">&gt;</span>,
     },
     <span class="ident">BroadcastTyping</span> {
         <span class="ident">channel_id</span>: <span class="ident">u64</span>,
@@ -3684,26 +3707,21 @@
     <span class="ident">CreateEmoji</span> {
         <span class="ident">guild_id</span>: <span class="ident">u64</span>,
     },
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
     <span class="ident">CreateFollowupMessage</span> {
         <span class="ident">application_id</span>: <span class="ident">u64</span>,
         <span class="ident">interaction_token</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>,
     },
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
     <span class="ident">CreateGlobalApplicationCommand</span> {
         <span class="ident">application_id</span>: <span class="ident">u64</span>,
     },
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
     <span class="ident">CreateGlobalApplicationCommands</span> {
         <span class="ident">application_id</span>: <span class="ident">u64</span>,
     },
     <span class="ident">CreateGuild</span>,
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
     <span class="ident">CreateGuildApplicationCommand</span> {
         <span class="ident">application_id</span>: <span class="ident">u64</span>,
         <span class="ident">guild_id</span>: <span class="ident">u64</span>,
     },
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
     <span class="ident">CreateGuildApplicationCommands</span> {
         <span class="ident">application_id</span>: <span class="ident">u64</span>,
         <span class="ident">guild_id</span>: <span class="ident">u64</span>,
@@ -3712,7 +3730,6 @@
         <span class="ident">guild_id</span>: <span class="ident">u64</span>,
         <span class="ident">integration_id</span>: <span class="ident">u64</span>,
     },
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
     <span class="ident">CreateInteractionResponse</span> {
         <span class="ident">interaction_id</span>: <span class="ident">u64</span>,
         <span class="ident">interaction_token</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>,
@@ -3736,6 +3753,9 @@
     <span class="ident">CreateRole</span> {
         <span class="ident">guild_id</span>: <span class="ident">u64</span>,
     },
+    <span class="ident">CreateSticker</span> {
+        <span class="ident">guild_id</span>: <span class="ident">u64</span>,
+    },
     <span class="ident">CreateWebhook</span> {
         <span class="ident">channel_id</span>: <span class="ident">u64</span>,
     },
@@ -3749,13 +3769,11 @@
         <span class="ident">guild_id</span>: <span class="ident">u64</span>,
         <span class="ident">emoji_id</span>: <span class="ident">u64</span>,
     },
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
     <span class="ident">DeleteFollowupMessage</span> {
         <span class="ident">application_id</span>: <span class="ident">u64</span>,
         <span class="ident">interaction_token</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>,
         <span class="ident">message_id</span>: <span class="ident">u64</span>,
     },
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
     <span class="ident">DeleteGlobalApplicationCommand</span> {
         <span class="ident">application_id</span>: <span class="ident">u64</span>,
         <span class="ident">command_id</span>: <span class="ident">u64</span>,
@@ -3763,7 +3781,6 @@
     <span class="ident">DeleteGuild</span> {
         <span class="ident">guild_id</span>: <span class="ident">u64</span>,
     },
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
     <span class="ident">DeleteGuildApplicationCommand</span> {
         <span class="ident">application_id</span>: <span class="ident">u64</span>,
         <span class="ident">guild_id</span>: <span class="ident">u64</span>,
@@ -3792,7 +3809,6 @@
         <span class="ident">message_id</span>: <span class="ident">u64</span>,
         <span class="ident">reaction</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>,
     },
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
     <span class="ident">DeleteOriginalInteractionResponse</span> {
         <span class="ident">application_id</span>: <span class="ident">u64</span>,
         <span class="ident">interaction_token</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>,
@@ -3810,6 +3826,10 @@
     <span class="ident">DeleteRole</span> {
         <span class="ident">guild_id</span>: <span class="ident">u64</span>,
         <span class="ident">role_id</span>: <span class="ident">u64</span>,
+    },
+    <span class="ident">DeleteSticker</span> {
+        <span class="ident">guild_id</span>: <span class="ident">u64</span>,
+        <span class="ident">sticker_id</span>: <span class="ident">u64</span>,
     },
     <span class="ident">DeleteWebhook</span> {
         <span class="ident">webhook_id</span>: <span class="ident">u64</span>,
@@ -3833,13 +3853,11 @@
         <span class="ident">guild_id</span>: <span class="ident">u64</span>,
         <span class="ident">emoji_id</span>: <span class="ident">u64</span>,
     },
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
     <span class="ident">EditFollowupMessage</span> {
         <span class="ident">application_id</span>: <span class="ident">u64</span>,
         <span class="ident">interaction_token</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>,
         <span class="ident">message_id</span>: <span class="ident">u64</span>,
     },
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
     <span class="ident">EditGlobalApplicationCommand</span> {
         <span class="ident">application_id</span>: <span class="ident">u64</span>,
         <span class="ident">command_id</span>: <span class="ident">u64</span>,
@@ -3847,19 +3865,16 @@
     <span class="ident">EditGuild</span> {
         <span class="ident">guild_id</span>: <span class="ident">u64</span>,
     },
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
     <span class="ident">EditGuildApplicationCommand</span> {
         <span class="ident">application_id</span>: <span class="ident">u64</span>,
         <span class="ident">guild_id</span>: <span class="ident">u64</span>,
         <span class="ident">command_id</span>: <span class="ident">u64</span>,
     },
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
     <span class="ident">EditGuildApplicationCommandPermission</span> {
         <span class="ident">application_id</span>: <span class="ident">u64</span>,
         <span class="ident">guild_id</span>: <span class="ident">u64</span>,
         <span class="ident">command_id</span>: <span class="ident">u64</span>,
     },
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
     <span class="ident">EditGuildApplicationCommandsPermissions</span> {
         <span class="ident">application_id</span>: <span class="ident">u64</span>,
         <span class="ident">guild_id</span>: <span class="ident">u64</span>,
@@ -3891,12 +3906,10 @@
     <span class="ident">EditNickname</span> {
         <span class="ident">guild_id</span>: <span class="ident">u64</span>,
     },
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
     <span class="ident">GetOriginalInteractionResponse</span> {
         <span class="ident">application_id</span>: <span class="ident">u64</span>,
         <span class="ident">interaction_token</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>,
     },
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
     <span class="ident">EditOriginalInteractionResponse</span> {
         <span class="ident">application_id</span>: <span class="ident">u64</span>,
         <span class="ident">interaction_token</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>,
@@ -3908,6 +3921,10 @@
     },
     <span class="ident">EditRolePosition</span> {
         <span class="ident">guild_id</span>: <span class="ident">u64</span>,
+    },
+    <span class="ident">EditSticker</span> {
+        <span class="ident">guild_id</span>: <span class="ident">u64</span>,
+        <span class="ident">sticker_id</span>: <span class="ident">u64</span>,
     },
     <span class="ident">EditThread</span> {
         <span class="ident">channel_id</span>: <span class="ident">u64</span>,
@@ -3980,9 +3997,6 @@
     <span class="ident">GetChannelThreadMembers</span> {
         <span class="ident">channel_id</span>: <span class="ident">u64</span>,
     },
-    <span class="ident">GetChannelActiveThreads</span> {
-        <span class="ident">channel_id</span>: <span class="ident">u64</span>,
-    },
     <span class="ident">GetChannelArchivedPublicThreads</span> {
         <span class="ident">channel_id</span>: <span class="ident">u64</span>,
         <span class="ident">before</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span>,
@@ -4007,18 +4021,15 @@
         <span class="ident">guild_id</span>: <span class="ident">u64</span>,
         <span class="ident">emoji_id</span>: <span class="ident">u64</span>,
     },
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
     <span class="ident">GetFollowupMessage</span> {
         <span class="ident">application_id</span>: <span class="ident">u64</span>,
         <span class="ident">interaction_token</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>,
         <span class="ident">message_id</span>: <span class="ident">u64</span>,
     },
     <span class="ident">GetGateway</span>,
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
     <span class="ident">GetGlobalApplicationCommands</span> {
         <span class="ident">application_id</span>: <span class="ident">u64</span>,
     },
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
     <span class="ident">GetGlobalApplicationCommand</span> {
         <span class="ident">application_id</span>: <span class="ident">u64</span>,
         <span class="ident">command_id</span>: <span class="ident">u64</span>,
@@ -4029,23 +4040,19 @@
     <span class="ident">GetGuildWithCounts</span> {
         <span class="ident">guild_id</span>: <span class="ident">u64</span>,
     },
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
     <span class="ident">GetGuildApplicationCommands</span> {
         <span class="ident">application_id</span>: <span class="ident">u64</span>,
         <span class="ident">guild_id</span>: <span class="ident">u64</span>,
     },
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
     <span class="ident">GetGuildApplicationCommand</span> {
         <span class="ident">application_id</span>: <span class="ident">u64</span>,
         <span class="ident">guild_id</span>: <span class="ident">u64</span>,
         <span class="ident">command_id</span>: <span class="ident">u64</span>,
     },
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
     <span class="ident">GetGuildApplicationCommandsPermissions</span> {
         <span class="ident">application_id</span>: <span class="ident">u64</span>,
         <span class="ident">guild_id</span>: <span class="ident">u64</span>,
     },
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
     <span class="ident">GetGuildApplicationCommandPermissions</span> {
         <span class="ident">application_id</span>: <span class="ident">u64</span>,
         <span class="ident">guild_id</span>: <span class="ident">u64</span>,
@@ -4084,6 +4091,9 @@
     <span class="ident">GetGuildRoles</span> {
         <span class="ident">guild_id</span>: <span class="ident">u64</span>,
     },
+    <span class="ident">GetGuildStickers</span> {
+        <span class="ident">guild_id</span>: <span class="ident">u64</span>,
+    },
     <span class="ident">GetGuildVanityUrl</span> {
         <span class="ident">guild_id</span>: <span class="ident">u64</span>,
     },
@@ -4093,11 +4103,13 @@
     <span class="ident">GetGuilds</span> {
         <span class="ident">after</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span>,
         <span class="ident">before</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span>,
-        <span class="ident">limit</span>: <span class="ident">u64</span>,
+        <span class="ident">limit</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span>,
     },
     <span class="ident">GetInvite</span> {
         <span class="ident">code</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>,
-        <span class="ident">stats</span>: <span class="ident">bool</span>,
+        <span class="ident">member_counts</span>: <span class="ident">bool</span>,
+        <span class="ident">expiration</span>: <span class="ident">bool</span>,
+        <span class="ident">event_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span>,
     },
     <span class="ident">GetMember</span> {
         <span class="ident">guild_id</span>: <span class="ident">u64</span>,
@@ -4120,6 +4132,14 @@
         <span class="ident">limit</span>: <span class="ident">u8</span>,
         <span class="ident">message_id</span>: <span class="ident">u64</span>,
         <span class="ident">reaction</span>: <span class="ident">String</span>,
+    },
+    <span class="ident">GetSticker</span> {
+        <span class="ident">sticker_id</span>: <span class="ident">u64</span>,
+    },
+    <span class="ident">GetStickerPacks</span>,
+    <span class="ident">GetGuildSticker</span> {
+        <span class="ident">guild_id</span>: <span class="ident">u64</span>,
+        <span class="ident">sticker_id</span>: <span class="ident">u64</span>,
     },
     <span class="ident">GetUnresolvedIncidents</span>,
     <span class="ident">GetUpcomingMaintenances</span>,
@@ -4144,7 +4164,6 @@
     <span class="ident">KickMember</span> {
         <span class="ident">guild_id</span>: <span class="ident">u64</span>,
         <span class="ident">user_id</span>: <span class="ident">u64</span>,
-        <span class="ident">reason</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>,
     },
     <span class="ident">LeaveGroup</span> {
         <span class="ident">group_id</span>: <span class="ident">u64</span>,
@@ -4210,7 +4229,6 @@
             <span class="ident">RouteInfo::GuildBanUser</span> {
                 <span class="ident">guild_id</span>,
                 <span class="ident">delete_message_days</span>,
-                <span class="ident">reason</span>,
                 <span class="ident">user_id</span>,
             } =&gt; (
                 <span class="comment">// TODO</span>
@@ -4220,7 +4238,6 @@
                     <span class="ident">guild_id</span>,
                     <span class="ident">user_id</span>,
                     <span class="ident">delete_message_days</span>.<span class="ident">unwrap_or</span>(<span class="number">0</span>),
-                    <span class="ident">reason</span>.<span class="ident">unwrap_or</span>(<span class="string">&quot;&quot;</span>),
                 )),
             ),
             <span class="ident">RouteInfo::BroadcastTyping</span> {
@@ -4262,7 +4279,6 @@
                 <span class="ident">Route::GuildsIdEmojis</span>(<span class="ident">guild_id</span>),
                 <span class="ident">Cow::from</span>(<span class="ident">Route::guild_emojis</span>(<span class="ident">guild_id</span>)),
             ),
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
             <span class="ident">RouteInfo::CreateFollowupMessage</span> {
                 <span class="ident">application_id</span>,
                 <span class="ident">interaction_token</span>,
@@ -4271,7 +4287,6 @@
                 <span class="ident">Route::WebhooksId</span>(<span class="ident">application_id</span>),
                 <span class="ident">Cow::from</span>(<span class="ident">Route::webhook_followup_messages</span>(<span class="ident">application_id</span>, <span class="ident">interaction_token</span>)),
             ),
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
             <span class="ident">RouteInfo::CreateGlobalApplicationCommand</span> {
                 <span class="ident">application_id</span>,
             } =&gt; (
@@ -4279,7 +4294,6 @@
                 <span class="ident">Route::ApplicationsIdCommands</span>(<span class="ident">application_id</span>),
                 <span class="ident">Cow::from</span>(<span class="ident">Route::application_commands</span>(<span class="ident">application_id</span>)),
             ),
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
             <span class="ident">RouteInfo::CreateGlobalApplicationCommands</span> {
                 <span class="ident">application_id</span>,
             } =&gt; (
@@ -4290,7 +4304,6 @@
             <span class="ident">RouteInfo::CreateGuild</span> =&gt; {
                 (<span class="ident">LightMethod::Post</span>, <span class="ident">Route::Guilds</span>, <span class="ident">Cow::from</span>(<span class="ident">Route::guilds</span>()))
             },
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
             <span class="ident">RouteInfo::CreateGuildApplicationCommand</span> {
                 <span class="ident">application_id</span>,
                 <span class="ident">guild_id</span>,
@@ -4299,7 +4312,6 @@
                 <span class="ident">Route::ApplicationsIdGuildsIdCommands</span>(<span class="ident">application_id</span>),
                 <span class="ident">Cow::from</span>(<span class="ident">Route::application_guild_commands</span>(<span class="ident">application_id</span>, <span class="ident">guild_id</span>)),
             ),
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
             <span class="ident">RouteInfo::CreateGuildApplicationCommands</span> {
                 <span class="ident">application_id</span>,
                 <span class="ident">guild_id</span>,
@@ -4316,7 +4328,6 @@
                 <span class="ident">Route::GuildsIdIntegrationsId</span>(<span class="ident">guild_id</span>),
                 <span class="ident">Cow::from</span>(<span class="ident">Route::guild_integration</span>(<span class="ident">guild_id</span>, <span class="ident">integration_id</span>)),
             ),
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
             <span class="ident">RouteInfo::CreateInteractionResponse</span> {
                 <span class="ident">interaction_id</span>,
                 <span class="ident">interaction_token</span>,
@@ -4368,6 +4379,13 @@
                 <span class="ident">Route::GuildsIdRoles</span>(<span class="ident">guild_id</span>),
                 <span class="ident">Cow::from</span>(<span class="ident">Route::guild_roles</span>(<span class="ident">guild_id</span>)),
             ),
+            <span class="ident">RouteInfo::CreateSticker</span> {
+                <span class="ident">guild_id</span>,
+            } =&gt; (
+                <span class="ident">LightMethod::Post</span>,
+                <span class="ident">Route::GuildsIdStickers</span>(<span class="ident">guild_id</span>),
+                <span class="ident">Cow::from</span>(<span class="ident">Route::guild_stickers</span>(<span class="ident">guild_id</span>)),
+            ),
             <span class="ident">RouteInfo::CrosspostMessage</span> {
                 <span class="ident">channel_id</span>,
                 <span class="ident">message_id</span>,
@@ -4405,7 +4423,6 @@
                 <span class="ident">Route::GuildsIdEmojisId</span>(<span class="ident">guild_id</span>),
                 <span class="ident">Cow::from</span>(<span class="ident">Route::guild_emoji</span>(<span class="ident">guild_id</span>, <span class="ident">emoji_id</span>)),
             ),
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
             <span class="ident">RouteInfo::DeleteFollowupMessage</span> {
                 <span class="ident">application_id</span>,
                 <span class="ident">interaction_token</span>,
@@ -4419,7 +4436,6 @@
                     <span class="ident">message_id</span>,
                 )),
             ),
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
             <span class="ident">RouteInfo::DeleteGlobalApplicationCommand</span> {
                 <span class="ident">application_id</span>,
                 <span class="ident">command_id</span>,
@@ -4433,7 +4449,6 @@
             } =&gt; {
                 (<span class="ident">LightMethod::Delete</span>, <span class="ident">Route::GuildsId</span>(<span class="ident">guild_id</span>), <span class="ident">Cow::from</span>(<span class="ident">Route::guild</span>(<span class="ident">guild_id</span>)))
             },
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
             <span class="ident">RouteInfo::DeleteGuildApplicationCommand</span> {
                 <span class="ident">application_id</span>,
                 <span class="ident">guild_id</span>,
@@ -4486,7 +4501,6 @@
                 <span class="ident">Route::ChannelsIdMessagesBulkDelete</span>(<span class="ident">channel_id</span>),
                 <span class="ident">Cow::from</span>(<span class="ident">Route::channel_messages_bulk_delete</span>(<span class="ident">channel_id</span>)),
             ),
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
             <span class="ident">RouteInfo::DeleteOriginalInteractionResponse</span> {
                 <span class="ident">application_id</span>,
                 <span class="ident">interaction_token</span>,
@@ -4524,6 +4538,14 @@
                 <span class="ident">Route::GuildsIdRolesId</span>(<span class="ident">guild_id</span>),
                 <span class="ident">Cow::from</span>(<span class="ident">Route::guild_role</span>(<span class="ident">guild_id</span>, <span class="ident">role_id</span>)),
             ),
+            <span class="ident">RouteInfo::DeleteSticker</span> {
+                <span class="ident">guild_id</span>,
+                <span class="ident">sticker_id</span>,
+            } =&gt; (
+                <span class="ident">LightMethod::Delete</span>,
+                <span class="ident">Route::GuildsIdStickersId</span>(<span class="ident">guild_id</span>),
+                <span class="ident">Cow::from</span>(<span class="ident">Route::guild_sticker</span>(<span class="ident">guild_id</span>, <span class="ident">sticker_id</span>)),
+            ),
             <span class="ident">RouteInfo::DeleteWebhook</span> {
                 <span class="ident">webhook_id</span>,
             } =&gt; (
@@ -4550,6 +4572,9 @@
             ),
             <span class="ident">RouteInfo::EditChannel</span> {
                 <span class="ident">channel_id</span>,
+            }
+            <span class="op">|</span> <span class="ident">RouteInfo::EditThread</span> {
+                <span class="ident">channel_id</span>,
             } =&gt; (
                 <span class="ident">LightMethod::Patch</span>,
                 <span class="ident">Route::ChannelsId</span>(<span class="ident">channel_id</span>),
@@ -4570,7 +4595,6 @@
                 <span class="ident">Route::GuildsIdEmojisId</span>(<span class="ident">guild_id</span>),
                 <span class="ident">Cow::from</span>(<span class="ident">Route::guild_emoji</span>(<span class="ident">guild_id</span>, <span class="ident">emoji_id</span>)),
             ),
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
             <span class="ident">RouteInfo::EditFollowupMessage</span> {
                 <span class="ident">application_id</span>,
                 <span class="ident">interaction_token</span>,
@@ -4584,7 +4608,6 @@
                     <span class="ident">message_id</span>,
                 )),
             ),
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
             <span class="ident">RouteInfo::EditGlobalApplicationCommand</span> {
                 <span class="ident">application_id</span>,
                 <span class="ident">command_id</span>,
@@ -4596,7 +4619,6 @@
             <span class="ident">RouteInfo::EditGuild</span> {
                 <span class="ident">guild_id</span>,
             } =&gt; (<span class="ident">LightMethod::Patch</span>, <span class="ident">Route::GuildsId</span>(<span class="ident">guild_id</span>), <span class="ident">Cow::from</span>(<span class="ident">Route::guild</span>(<span class="ident">guild_id</span>))),
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
             <span class="ident">RouteInfo::EditGuildApplicationCommand</span> {
                 <span class="ident">application_id</span>,
                 <span class="ident">guild_id</span>,
@@ -4606,7 +4628,6 @@
                 <span class="ident">Route::ApplicationsIdGuildsIdCommandsId</span>(<span class="ident">application_id</span>),
                 <span class="ident">Cow::from</span>(<span class="ident">Route::application_guild_command</span>(<span class="ident">application_id</span>, <span class="ident">guild_id</span>, <span class="ident">command_id</span>)),
             ),
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
             <span class="ident">RouteInfo::EditGuildApplicationCommandPermission</span> {
                 <span class="ident">application_id</span>,
                 <span class="ident">guild_id</span>,
@@ -4620,7 +4641,6 @@
                     <span class="ident">command_id</span>,
                 )),
             ),
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
             <span class="ident">RouteInfo::EditGuildApplicationCommandsPermissions</span> {
                 <span class="ident">application_id</span>,
                 <span class="ident">guild_id</span>,
@@ -4680,7 +4700,6 @@
                 <span class="ident">Route::GuildsIdMembersMeNick</span>(<span class="ident">guild_id</span>),
                 <span class="ident">Cow::from</span>(<span class="ident">Route::guild_nickname</span>(<span class="ident">guild_id</span>)),
             ),
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
             <span class="ident">RouteInfo::GetOriginalInteractionResponse</span> {
                 <span class="ident">application_id</span>,
                 <span class="ident">interaction_token</span>,
@@ -4692,7 +4711,6 @@
                     <span class="ident">interaction_token</span>,
                 )),
             ),
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
             <span class="ident">RouteInfo::EditOriginalInteractionResponse</span> {
                 <span class="ident">application_id</span>,
                 <span class="ident">interaction_token</span>,
@@ -4722,12 +4740,13 @@
                 <span class="ident">Route::GuildsIdRolesId</span>(<span class="ident">guild_id</span>),
                 <span class="ident">Cow::from</span>(<span class="ident">Route::guild_roles</span>(<span class="ident">guild_id</span>)),
             ),
-            <span class="ident">RouteInfo::EditThread</span> {
-                <span class="ident">channel_id</span>,
+            <span class="ident">RouteInfo::EditSticker</span> {
+                <span class="ident">guild_id</span>,
+                <span class="ident">sticker_id</span>,
             } =&gt; (
                 <span class="ident">LightMethod::Patch</span>,
-                <span class="ident">Route::ChannelsId</span>(<span class="ident">channel_id</span>),
-                <span class="ident">Cow::from</span>(<span class="ident">Route::channel</span>(<span class="ident">channel_id</span>)),
+                <span class="ident">Route::GuildsIdStickersId</span>(<span class="ident">guild_id</span>),
+                <span class="ident">Cow::from</span>(<span class="ident">Route::guild_sticker</span>(<span class="ident">guild_id</span>, <span class="ident">sticker_id</span>)),
             ),
             <span class="ident">RouteInfo::EditVoiceState</span> {
                 <span class="ident">guild_id</span>,
@@ -4786,9 +4805,6 @@
                 <span class="ident">Route::WebhooksId</span>(<span class="ident">webhook_id</span>),
                 <span class="ident">Cow::from</span>(<span class="ident">Route::webhook_with_token_optioned</span>(<span class="ident">webhook_id</span>, <span class="ident">token</span>, <span class="ident">wait</span>)),
             ),
-            <span class="ident">RouteInfo::GetActiveMaintenance</span> =&gt; {
-                (<span class="ident">LightMethod::Get</span>, <span class="ident">Route::None</span>, <span class="ident">Cow::from</span>(<span class="ident">Route::status_maintenances_active</span>()))
-            },
             <span class="ident">RouteInfo::GetAuditLogs</span> {
                 <span class="ident">action_type</span>,
                 <span class="ident">before</span>,
@@ -4852,13 +4868,6 @@
                 <span class="ident">Route::ChannelsIdThreadMembers</span>(<span class="ident">channel_id</span>),
                 <span class="ident">Cow::from</span>(<span class="ident">Route::channel_thread_members</span>(<span class="ident">channel_id</span>)),
             ),
-            <span class="ident">RouteInfo::GetChannelActiveThreads</span> {
-                <span class="ident">channel_id</span>,
-            } =&gt; (
-                <span class="ident">LightMethod::Get</span>,
-                <span class="ident">Route::ChannelsIdActiveThreads</span>(<span class="ident">channel_id</span>),
-                <span class="ident">Cow::from</span>(<span class="ident">Route::channel_active_threads</span>(<span class="ident">channel_id</span>)),
-            ),
             <span class="ident">RouteInfo::GetChannelArchivedPublicThreads</span> {
                 <span class="ident">channel_id</span>,
                 <span class="ident">before</span>,
@@ -4886,7 +4895,6 @@
                 <span class="ident">Route::ChannelsIdMeJoindedArchivedPrivateThreads</span>(<span class="ident">channel_id</span>),
                 <span class="ident">Cow::from</span>(<span class="ident">Route::channel_joined_private_threads</span>(<span class="ident">channel_id</span>, <span class="ident">before</span>, <span class="ident">limit</span>)),
             ),
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
             <span class="ident">RouteInfo::GetFollowupMessage</span> {
                 <span class="ident">application_id</span>,
                 <span class="ident">interaction_token</span>,
@@ -4961,7 +4969,6 @@
             <span class="ident">RouteInfo::GetGateway</span> =&gt; {
                 (<span class="ident">LightMethod::Get</span>, <span class="ident">Route::Gateway</span>, <span class="ident">Cow::from</span>(<span class="ident">Route::gateway</span>()))
             },
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
             <span class="ident">RouteInfo::GetGlobalApplicationCommands</span> {
                 <span class="ident">application_id</span>,
             } =&gt; (
@@ -4969,7 +4976,6 @@
                 <span class="ident">Route::ApplicationsIdCommands</span>(<span class="ident">application_id</span>),
                 <span class="ident">Cow::from</span>(<span class="ident">Route::application_commands</span>(<span class="ident">application_id</span>)),
             ),
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
             <span class="ident">RouteInfo::GetGlobalApplicationCommand</span> {
                 <span class="ident">application_id</span>,
                 <span class="ident">command_id</span>,
@@ -4988,7 +4994,6 @@
                 <span class="ident">Route::GuildsId</span>(<span class="ident">guild_id</span>),
                 <span class="ident">Cow::from</span>(<span class="ident">Route::guild_with_counts</span>(<span class="ident">guild_id</span>)),
             ),
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
             <span class="ident">RouteInfo::GetGuildApplicationCommands</span> {
                 <span class="ident">application_id</span>,
                 <span class="ident">guild_id</span>,
@@ -4997,7 +5002,6 @@
                 <span class="ident">Route::ApplicationsIdGuildsIdCommands</span>(<span class="ident">application_id</span>),
                 <span class="ident">Cow::from</span>(<span class="ident">Route::application_guild_commands</span>(<span class="ident">application_id</span>, <span class="ident">guild_id</span>)),
             ),
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
             <span class="ident">RouteInfo::GetGuildApplicationCommand</span> {
                 <span class="ident">application_id</span>,
                 <span class="ident">guild_id</span>,
@@ -5007,7 +5011,6 @@
                 <span class="ident">Route::ApplicationsIdGuildsIdCommandsId</span>(<span class="ident">application_id</span>),
                 <span class="ident">Cow::from</span>(<span class="ident">Route::application_guild_command</span>(<span class="ident">application_id</span>, <span class="ident">guild_id</span>, <span class="ident">command_id</span>)),
             ),
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
             <span class="ident">RouteInfo::GetGuildApplicationCommandsPermissions</span> {
                 <span class="ident">application_id</span>,
                 <span class="ident">guild_id</span>,
@@ -5016,7 +5019,6 @@
                 <span class="ident">Route::ApplicationsIdGuildsIdCommandsPermissions</span>(<span class="ident">application_id</span>),
                 <span class="ident">Cow::from</span>(<span class="ident">Route::application_guild_commands_permissions</span>(<span class="ident">application_id</span>, <span class="ident">guild_id</span>)),
             ),
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
             <span class="ident">RouteInfo::GetGuildApplicationCommandPermissions</span> {
                 <span class="ident">application_id</span>,
                 <span class="ident">guild_id</span>,
@@ -5096,6 +5098,21 @@
                 <span class="ident">Route::GuildsIdRoles</span>(<span class="ident">guild_id</span>),
                 <span class="ident">Cow::from</span>(<span class="ident">Route::guild_roles</span>(<span class="ident">guild_id</span>)),
             ),
+            <span class="ident">RouteInfo::GetGuildSticker</span> {
+                <span class="ident">guild_id</span>,
+                <span class="ident">sticker_id</span>,
+            } =&gt; (
+                <span class="ident">LightMethod::Get</span>,
+                <span class="ident">Route::GuildsIdStickersId</span>(<span class="ident">guild_id</span>),
+                <span class="ident">Cow::from</span>(<span class="ident">Route::guild_sticker</span>(<span class="ident">guild_id</span>, <span class="ident">sticker_id</span>)),
+            ),
+            <span class="ident">RouteInfo::GetGuildStickers</span> {
+                <span class="ident">guild_id</span>,
+            } =&gt; (
+                <span class="ident">LightMethod::Get</span>,
+                <span class="ident">Route::GuildsIdStickers</span>(<span class="ident">guild_id</span>),
+                <span class="ident">Cow::from</span>(<span class="ident">Route::guild_stickers</span>(<span class="ident">guild_id</span>)),
+            ),
             <span class="ident">RouteInfo::GetGuildVanityUrl</span> {
                 <span class="ident">guild_id</span>,
             } =&gt; (
@@ -5121,11 +5138,13 @@
             ),
             <span class="ident">RouteInfo::GetInvite</span> {
                 <span class="ident">code</span>,
-                <span class="ident">stats</span>,
+                <span class="ident">member_counts</span>,
+                <span class="ident">expiration</span>,
+                <span class="ident">event_id</span>,
             } =&gt; (
                 <span class="ident">LightMethod::Get</span>,
                 <span class="ident">Route::InvitesCode</span>,
-                <span class="ident">Cow::from</span>(<span class="ident">Route::invite_optioned</span>(<span class="ident">code</span>, <span class="ident">stats</span>)),
+                <span class="ident">Cow::from</span>(<span class="ident">Route::invite_optioned</span>(<span class="ident">code</span>, <span class="ident">member_counts</span>, <span class="ident">expiration</span>, <span class="ident">event_id</span>)),
             ),
             <span class="ident">RouteInfo::GetMember</span> {
                 <span class="ident">guild_id</span>,
@@ -5171,11 +5190,11 @@
                     <span class="ident">channel_id</span>, <span class="ident">message_id</span>, <span class="ident">reaction</span>, <span class="ident">limit</span>, <span class="ident">after</span>,
                 )),
             ),
-            <span class="ident">RouteInfo::GetUnresolvedIncidents</span> =&gt; {
-                (<span class="ident">LightMethod::Get</span>, <span class="ident">Route::None</span>, <span class="ident">Cow::from</span>(<span class="ident">Route::status_incidents_unresolved</span>()))
-            },
-            <span class="ident">RouteInfo::GetUpcomingMaintenances</span> =&gt; {
-                (<span class="ident">LightMethod::Get</span>, <span class="ident">Route::None</span>, <span class="ident">Cow::from</span>(<span class="ident">Route::status_maintenances_upcoming</span>()))
+            <span class="ident">RouteInfo::GetSticker</span> {
+                <span class="ident">sticker_id</span>,
+            } =&gt; (<span class="ident">LightMethod::Get</span>, <span class="ident">Route::StickersId</span>, <span class="ident">Cow::from</span>(<span class="ident">Route::sticker</span>(<span class="ident">sticker_id</span>))),
+            <span class="ident">RouteInfo::GetStickerPacks</span> =&gt; {
+                (<span class="ident">LightMethod::Get</span>, <span class="ident">Route::StickerPacks</span>, <span class="ident">Cow::from</span>(<span class="ident">Route::sticker_packs</span>()))
             },
             <span class="ident">RouteInfo::GetUser</span> {
                 <span class="ident">user_id</span>,
@@ -5211,11 +5230,10 @@
             <span class="ident">RouteInfo::KickMember</span> {
                 <span class="ident">guild_id</span>,
                 <span class="ident">user_id</span>,
-                <span class="ident">reason</span>,
             } =&gt; (
                 <span class="ident">LightMethod::Delete</span>,
                 <span class="ident">Route::GuildsIdMembersId</span>(<span class="ident">guild_id</span>),
-                <span class="ident">Cow::from</span>(<span class="ident">Route::guild_kick_optioned</span>(<span class="ident">guild_id</span>, <span class="ident">user_id</span>, <span class="ident">reason</span>)),
+                <span class="ident">Cow::from</span>(<span class="ident">Route::guild_kick_optioned</span>(<span class="ident">guild_id</span>, <span class="ident">user_id</span>)),
             ),
             <span class="ident">RouteInfo::LeaveGroup</span> {
                 <span class="ident">group_id</span>,
@@ -5281,13 +5299,13 @@
                 <span class="ident">Route::GuildsIdIntegrationsId</span>(<span class="ident">guild_id</span>),
                 <span class="ident">Cow::from</span>(<span class="ident">Route::guild_integration_sync</span>(<span class="ident">guild_id</span>, <span class="ident">integration_id</span>)),
             ),
-            <span class="ident">RouteInfo::StatusIncidentsUnresolved</span> =&gt; {
+            <span class="ident">RouteInfo::GetUnresolvedIncidents</span> <span class="op">|</span> <span class="ident">RouteInfo::StatusIncidentsUnresolved</span> =&gt; {
                 (<span class="ident">LightMethod::Get</span>, <span class="ident">Route::None</span>, <span class="ident">Cow::from</span>(<span class="ident">Route::status_incidents_unresolved</span>()))
             },
-            <span class="ident">RouteInfo::StatusMaintenancesActive</span> =&gt; {
+            <span class="ident">RouteInfo::GetActiveMaintenance</span> <span class="op">|</span> <span class="ident">RouteInfo::StatusMaintenancesActive</span> =&gt; {
                 (<span class="ident">LightMethod::Get</span>, <span class="ident">Route::None</span>, <span class="ident">Cow::from</span>(<span class="ident">Route::status_maintenances_active</span>()))
             },
-            <span class="ident">RouteInfo::StatusMaintenancesUpcoming</span> =&gt; {
+            <span class="ident">RouteInfo::GetUpcomingMaintenances</span> <span class="op">|</span> <span class="ident">RouteInfo::StatusMaintenancesUpcoming</span> =&gt; {
                 (<span class="ident">LightMethod::Get</span>, <span class="ident">Route::None</span>, <span class="ident">Cow::from</span>(<span class="ident">Route::status_maintenances_upcoming</span>()))
             },
             <span class="ident">RouteInfo::UnpinMessage</span> {
@@ -5302,5 +5320,5 @@
     }
 }
 </code></pre></div>
-</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.62.0-nightly (ec77f2524 2022-04-17)" ></div>
+</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.61.0-nightly (3c17c84a3 2022-03-21)" ></div>
 </body></html>

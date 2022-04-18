@@ -274,28 +274,77 @@
 <span id="269">269</span>
 <span id="270">270</span>
 <span id="271">271</span>
+<span id="272">272</span>
+<span id="273">273</span>
+<span id="274">274</span>
+<span id="275">275</span>
+<span id="276">276</span>
+<span id="277">277</span>
+<span id="278">278</span>
+<span id="279">279</span>
+<span id="280">280</span>
+<span id="281">281</span>
+<span id="282">282</span>
+<span id="283">283</span>
+<span id="284">284</span>
+<span id="285">285</span>
+<span id="286">286</span>
+<span id="287">287</span>
+<span id="288">288</span>
+<span id="289">289</span>
+<span id="290">290</span>
+<span id="291">291</span>
+<span id="292">292</span>
+<span id="293">293</span>
+<span id="294">294</span>
+<span id="295">295</span>
+<span id="296">296</span>
+<span id="297">297</span>
+<span id="298">298</span>
+<span id="299">299</span>
+<span id="300">300</span>
+<span id="301">301</span>
+<span id="302">302</span>
+<span id="303">303</span>
+<span id="304">304</span>
+<span id="305">305</span>
+<span id="306">306</span>
+<span id="307">307</span>
+<span id="308">308</span>
+<span id="309">309</span>
+<span id="310">310</span>
+<span id="311">311</span>
+<span id="312">312</span>
+<span id="313">313</span>
+<span id="314">314</span>
+<span id="315">315</span>
+<span id="316">316</span>
+<span id="317">317</span>
+<span id="318">318</span>
+<span id="319">319</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::collections::HashMap</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http&quot;</span>))]</span>
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>))]</span>
 <span class="kw">use</span> <span class="ident">std::marker::PhantomData</span>;
 
-<span class="kw">use</span> <span class="ident"><span class="kw">super</span>::CreateAllowedMentions</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">super</span>::CreateEmbed</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
+<span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">CreateAllowedMentions</span>, <span class="ident">CreateEmbed</span>};
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::builder::CreateComponents</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::http::AttachmentType</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::internal::prelude</span>::<span class="kw-2">*</span>;
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::json</span>::{<span class="self">self</span>, <span class="ident">from_number</span>, <span class="ident">to_value</span>};
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::channel::AttachmentType</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::channel</span>::{<span class="ident">MessageFlags</span>, <span class="ident">MessageReference</span>, <span class="ident">ReactionType</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::utils</span>;
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::id::StickerId</span>;
 
 <span class="doccomment">/// A builder to specify the contents of an [`Http::send_message`] request,</span>
 <span class="doccomment">/// primarily meant for use through [`ChannelId::send_message`].</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// There are two situations where different field requirements are present:</span>
+<span class="doccomment">/// There are three situations where different field requirements are present:</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// 1. When sending an [`Self::embed`], no other field is required;</span>
-<span class="doccomment">/// 2. Otherwise, [`Self::content`] is the only required field that is required to be</span>
-<span class="doccomment">/// set.</span>
+<span class="doccomment">/// 1. When sending a message without embeds or stickers, [`Self::content`] is</span>
+<span class="doccomment">///    the only required field that is required to be set.</span>
+<span class="doccomment">/// 2. When sending an [`Self::embed`], no other field is required.</span>
+<span class="doccomment">/// 3. When sending stickers with [`Self::sticker_id`] or other sticker methods,</span>
+<span class="doccomment">///    no other field is required.</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// Note that if you only need to send the content of a message, without</span>
 <span class="doccomment">/// specifying other fields, then [`ChannelId::say`] may be a more preferable</span>
@@ -310,22 +359,14 @@
 <span class="doccomment">/// # use serenity::http::Http;</span>
 <span class="doccomment">/// # use std::sync::Arc;</span>
 <span class="doccomment">/// #</span>
-<span class="doccomment">/// # let http = Arc::new(Http::default());</span>
+<span class="doccomment">/// # let http = Arc::new(Http::new(&quot;token&quot;));</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// let channel_id = ChannelId(7);</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// let _ = channel_id.send_message(&amp;http, |m| {</span>
-<span class="doccomment">///     m.content(&quot;test&quot;);</span>
-<span class="doccomment">///     m.tts(true);</span>
-<span class="doccomment">///</span>
-<span class="doccomment">///     m.embed(|mut e| {</span>
-<span class="doccomment">///         e.title(&quot;This is an embed&quot;);</span>
-<span class="doccomment">///         e.description(&quot;With a description&quot;);</span>
-<span class="doccomment">///</span>
-<span class="doccomment">///         e</span>
-<span class="doccomment">///     });</span>
-<span class="doccomment">///</span>
-<span class="doccomment">///     m</span>
+<span class="doccomment">///     m.content(&quot;test&quot;)</span>
+<span class="doccomment">///         .tts(true)</span>
+<span class="doccomment">///         .embed(|e| e.title(&quot;This is an embed&quot;).description(&quot;With a description&quot;))</span>
 <span class="doccomment">/// });</span>
 <span class="doccomment">/// ```</span>
 <span class="doccomment">///</span>
@@ -336,8 +377,8 @@
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">CreateMessage</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(
     <span class="kw">pub</span> <span class="ident">HashMap</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>, <span class="ident">Value</span><span class="op">&gt;</span>,
     <span class="kw">pub</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ReactionType</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http&quot;</span>)]</span> <span class="kw">pub</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">AttachmentType</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http&quot;</span>))]</span> <span class="ident">PhantomData</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> ()<span class="op">&gt;</span>,
+    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span> <span class="kw">pub</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">AttachmentType</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>))]</span> <span class="ident">PhantomData</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> ()<span class="op">&gt;</span>,
 );
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">CreateMessage</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
@@ -350,15 +391,15 @@
     }
 
     <span class="kw">fn</span> <span class="ident">_content</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">content</span>: <span class="ident">String</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;content&quot;</span>, <span class="ident">Value::String</span>(<span class="ident">content</span>));
+        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;content&quot;</span>, <span class="ident">Value::from</span>(<span class="ident">content</span>));
         <span class="self">self</span>
     }
 
     <span class="kw">fn</span> <span class="ident">_add_embed</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">embed</span>: <span class="ident">CreateEmbed</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
-        <span class="kw">let</span> <span class="ident">map</span> <span class="op">=</span> <span class="ident">utils::hashmap_to_json_map</span>(<span class="ident">embed</span>.<span class="number">0</span>);
-        <span class="kw">let</span> <span class="ident">embed</span> <span class="op">=</span> <span class="ident">Value::Object</span>(<span class="ident">map</span>);
+        <span class="kw">let</span> <span class="ident">map</span> <span class="op">=</span> <span class="ident">json::hashmap_to_json_map</span>(<span class="ident">embed</span>.<span class="number">0</span>);
+        <span class="kw">let</span> <span class="ident">embed</span> <span class="op">=</span> <span class="ident">Value::from</span>(<span class="ident">map</span>);
 
-        <span class="kw">let</span> <span class="ident">embeds</span> <span class="op">=</span> <span class="self">self</span>.<span class="number">0</span>.<span class="ident">entry</span>(<span class="string">&quot;embeds&quot;</span>).<span class="ident">or_insert_with</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">Value::Array</span>(<span class="ident">Vec::new</span>()));
+        <span class="kw">let</span> <span class="ident">embeds</span> <span class="op">=</span> <span class="self">self</span>.<span class="number">0</span>.<span class="ident">entry</span>(<span class="string">&quot;embeds&quot;</span>).<span class="ident">or_insert_with</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">Value::from</span>(<span class="ident">Vec</span>::<span class="op">&lt;</span><span class="ident">Value</span><span class="op">&gt;</span><span class="ident">::new</span>()));
         <span class="kw">let</span> <span class="ident">embeds_array</span> <span class="op">=</span> <span class="ident">embeds</span>.<span class="ident">as_array_mut</span>().<span class="ident">expect</span>(<span class="string">&quot;Embeds must be an array&quot;</span>);
 
         <span class="ident">embeds_array</span>.<span class="ident">push</span>(<span class="ident">embed</span>);
@@ -403,7 +444,7 @@
     {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">embed</span> <span class="op">=</span> <span class="ident">CreateEmbed::default</span>();
         <span class="ident">f</span>(<span class="kw-2">&amp;mut</span> <span class="ident">embed</span>);
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;embeds&quot;</span>, <span class="ident">Value::Array</span>(<span class="ident">Vec::new</span>()));
+        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;embeds&quot;</span>, <span class="ident">Value::from</span>(<span class="ident">Vec</span>::<span class="op">&lt;</span><span class="ident">Value</span><span class="op">&gt;</span><span class="ident">::new</span>()));
         <span class="self">self</span>.<span class="ident">_add_embed</span>(<span class="ident">embed</span>)
     }
 
@@ -414,7 +455,7 @@
     <span class="doccomment">/// **Note**: This will replace all existing embeds.</span>
     <span class="doccomment">/// Use [`Self::add_embed()`] to add an additional embed.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_embed</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">embed</span>: <span class="ident">CreateEmbed</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;embeds&quot;</span>, <span class="ident">Value::Array</span>(<span class="ident">Vec::new</span>()));
+        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;embeds&quot;</span>, <span class="ident">Value::from</span>(<span class="ident">Vec</span>::<span class="op">&lt;</span><span class="ident">Value</span><span class="op">&gt;</span><span class="ident">::new</span>()));
         <span class="self">self</span>.<span class="ident">_add_embed</span>(<span class="ident">embed</span>)
     }
 
@@ -423,7 +464,7 @@
     <span class="doccomment">/// **Note**: This will replace all existing embeds. Use [`Self::add_embeds()`] to keep existing</span>
     <span class="doccomment">/// embeds.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_embeds</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">embeds</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">CreateEmbed</span><span class="op">&gt;</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;embeds&quot;</span>, <span class="ident">Value::Array</span>(<span class="ident">Vec::new</span>()));
+        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;embeds&quot;</span>, <span class="ident">Value::from</span>(<span class="ident">Vec</span>::<span class="op">&lt;</span><span class="ident">Value</span><span class="op">&gt;</span><span class="ident">::new</span>()));
         <span class="kw">for</span> <span class="ident">embed</span> <span class="kw">in</span> <span class="ident">embeds</span> {
             <span class="self">self</span>.<span class="ident">_add_embed</span>(<span class="ident">embed</span>);
         }
@@ -437,7 +478,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// Defaults to `false`.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">tts</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">tts</span>: <span class="ident">bool</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;tts&quot;</span>, <span class="ident">Value::Bool</span>(<span class="ident">tts</span>));
+        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;tts&quot;</span>, <span class="ident">Value::from</span>(<span class="ident">tts</span>));
         <span class="self">self</span>
     }
 
@@ -456,19 +497,19 @@
     }
 
     <span class="doccomment">/// Appends a file to the message.</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http&quot;</span>)]</span>
+    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">add_file</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">AttachmentType</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">file</span>: <span class="ident">T</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
         <span class="self">self</span>.<span class="number">2</span>.<span class="ident">push</span>(<span class="ident">file</span>.<span class="ident">into</span>());
         <span class="self">self</span>
     }
 
     <span class="doccomment">/// Appends a list of files to the message.</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http&quot;</span>)]</span>
+    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">add_files</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">AttachmentType</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>, <span class="ident">It</span>: <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span>(
         <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
         <span class="ident">files</span>: <span class="ident">It</span>,
     ) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="number">2</span>.<span class="ident">extend</span>(<span class="ident">files</span>.<span class="ident">into_iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="ident">f</span>.<span class="ident">into</span>()));
+        <span class="self">self</span>.<span class="number">2</span>.<span class="ident">extend</span>(<span class="ident">files</span>.<span class="ident">into_iter</span>().<span class="ident">map</span>(<span class="ident">Into::into</span>));
         <span class="self">self</span>
     }
 
@@ -476,12 +517,12 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// Calling this multiple times will overwrite the file list.</span>
     <span class="doccomment">/// To append files, call [`Self::add_file`] or [`Self::add_files`] instead.</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http&quot;</span>)]</span>
+    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">files</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">AttachmentType</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>, <span class="ident">It</span>: <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span>(
         <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
         <span class="ident">files</span>: <span class="ident">It</span>,
     ) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="number">2</span> <span class="op">=</span> <span class="ident">files</span>.<span class="ident">into_iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="ident">f</span>.<span class="ident">into</span>()).<span class="ident">collect</span>();
+        <span class="self">self</span>.<span class="number">2</span> <span class="op">=</span> <span class="ident">files</span>.<span class="ident">into_iter</span>().<span class="ident">map</span>(<span class="ident">Into::into</span>).<span class="ident">collect</span>();
         <span class="self">self</span>
     }
 
@@ -492,8 +533,8 @@
     {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">allowed_mentions</span> <span class="op">=</span> <span class="ident">CreateAllowedMentions::default</span>();
         <span class="ident">f</span>(<span class="kw-2">&amp;mut</span> <span class="ident">allowed_mentions</span>);
-        <span class="kw">let</span> <span class="ident">map</span> <span class="op">=</span> <span class="ident">utils::hashmap_to_json_map</span>(<span class="ident">allowed_mentions</span>.<span class="number">0</span>);
-        <span class="kw">let</span> <span class="ident">allowed_mentions</span> <span class="op">=</span> <span class="ident">Value::Object</span>(<span class="ident">map</span>);
+        <span class="kw">let</span> <span class="ident">map</span> <span class="op">=</span> <span class="ident">json::hashmap_to_json_map</span>(<span class="ident">allowed_mentions</span>.<span class="number">0</span>);
+        <span class="kw">let</span> <span class="ident">allowed_mentions</span> <span class="op">=</span> <span class="ident">Value::from</span>(<span class="ident">map</span>);
 
         <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;allowed_mentions&quot;</span>, <span class="ident">allowed_mentions</span>);
         <span class="self">self</span>
@@ -502,12 +543,11 @@
     <span class="doccomment">/// Set the reference message this message is a reply to.</span>
     <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::unwrap_used</span>)]</span> <span class="comment">// allowing unwrap here because serializing MessageReference should never error</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">reference_message</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">reference</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">MessageReference</span><span class="op">&gt;</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;message_reference&quot;</span>, <span class="ident">serde_json::to_value</span>(<span class="ident">reference</span>.<span class="ident">into</span>()).<span class="ident">unwrap</span>());
+        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;message_reference&quot;</span>, <span class="ident">to_value</span>(<span class="ident">reference</span>.<span class="ident">into</span>()).<span class="ident">unwrap</span>());
         <span class="self">self</span>
     }
 
     <span class="doccomment">/// Creates components for this message.</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">components</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">f</span>: <span class="ident">F</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span>
     <span class="kw">where</span>
         <span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="kw-2">&amp;mut</span> <span class="ident">CreateComponents</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="ident">CreateComponents</span>,
@@ -515,21 +555,77 @@
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">components</span> <span class="op">=</span> <span class="ident">CreateComponents::default</span>();
         <span class="ident">f</span>(<span class="kw-2">&amp;mut</span> <span class="ident">components</span>);
 
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;components&quot;</span>, <span class="ident">Value::Array</span>(<span class="ident">components</span>.<span class="number">0</span>));
+        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;components&quot;</span>, <span class="ident">Value::from</span>(<span class="ident">components</span>.<span class="number">0</span>));
         <span class="self">self</span>
     }
 
     <span class="doccomment">/// Sets the components of this message.</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_components</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">components</span>: <span class="ident">CreateComponents</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;components&quot;</span>, <span class="ident">Value::Array</span>(<span class="ident">components</span>.<span class="number">0</span>));
+        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;components&quot;</span>, <span class="ident">Value::from</span>(<span class="ident">components</span>.<span class="number">0</span>));
         <span class="self">self</span>
     }
 
     <span class="doccomment">/// Sets the flags for the message.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">flags</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">flags</span>: <span class="ident">MessageFlags</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;flags&quot;</span>, <span class="ident">Value::Number</span>(<span class="ident">serde_json::Number::from</span>(<span class="ident">flags</span>.<span class="ident">bits</span>)));
+        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;flags&quot;</span>, <span class="ident">from_number</span>(<span class="ident">flags</span>.<span class="ident">bits</span>()));
         <span class="self">self</span>
+    }
+
+    <span class="doccomment">/// Sets a single sticker ID to include in the message.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// **Note**: This will replace all existing stickers. Use</span>
+    <span class="doccomment">/// [`Self::add_sticker_id()`] to add an additional sticker.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">sticker_id</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">sticker_id</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">StickerId</span><span class="op">&gt;</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
+        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;sticker_ids&quot;</span>, <span class="ident">Value::from</span>(<span class="ident">Vec</span>::<span class="op">&lt;</span><span class="ident">Value</span><span class="op">&gt;</span><span class="ident">::new</span>()));
+        <span class="self">self</span>.<span class="ident">add_sticker_id</span>(<span class="ident">sticker_id</span>)
+    }
+
+    <span class="doccomment">/// Add a sticker ID for the message.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// **Note**: There can be a maximum of 3 stickers in a message.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// **Note**: This will keep all existing stickers. Use</span>
+    <span class="doccomment">/// [`Self::set_sticker_ids()`] to replace existing stickers.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">add_sticker_id</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">sticker_id</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">StickerId</span><span class="op">&gt;</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
+        <span class="kw">let</span> <span class="ident">sticker_ids</span> <span class="op">=</span>
+            <span class="self">self</span>.<span class="number">0</span>.<span class="ident">entry</span>(<span class="string">&quot;sticker_ids&quot;</span>).<span class="ident">or_insert_with</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">Value::from</span>(<span class="ident">Vec</span>::<span class="op">&lt;</span><span class="ident">Value</span><span class="op">&gt;</span><span class="ident">::new</span>()));
+        <span class="kw">let</span> <span class="ident">sticker_ids_array</span> <span class="op">=</span> <span class="ident">sticker_ids</span>.<span class="ident">as_array_mut</span>().<span class="ident">expect</span>(<span class="string">&quot;Sticker_ids must be an array&quot;</span>);
+
+        <span class="ident">sticker_ids_array</span>.<span class="ident">push</span>(<span class="ident">Value::from</span>(<span class="ident">sticker_id</span>.<span class="ident">into</span>().<span class="number">0</span>));
+
+        <span class="self">self</span>
+    }
+
+    <span class="doccomment">/// Add multiple sticker IDs for the message.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// **Note**: There can be a maximum of 3 stickers in a message.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// **Note**: This will keep all existing stickers. Use</span>
+    <span class="doccomment">/// [`Self::set_sticker_ids()`] to replace existing stickers.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">add_sticker_ids</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">StickerId</span><span class="op">&gt;</span>, <span class="ident">It</span>: <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span>(
+        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
+        <span class="ident">sticker_ids</span>: <span class="ident">It</span>,
+    ) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
+        <span class="kw">for</span> <span class="ident">sticker_id</span> <span class="kw">in</span> <span class="ident">sticker_ids</span> {
+            <span class="self">self</span>.<span class="ident">add_sticker_id</span>(<span class="ident">sticker_id</span>);
+        }
+
+        <span class="self">self</span>
+    }
+
+    <span class="doccomment">/// Sets a list of sticker IDs to include in the message.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// **Note**: There can be a maximum of 3 stickers in a message.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// **Note**: This will replace all existing stickers. Use</span>
+    <span class="doccomment">/// [`Self::add_sticker_id()`] or [`Self::add_sticker_ids()`] to keep</span>
+    <span class="doccomment">/// existing stickers.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_sticker_ids</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">StickerId</span><span class="op">&gt;</span>, <span class="ident">It</span>: <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span>(
+        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
+        <span class="ident">sticker_ids</span>: <span class="ident">It</span>,
+    ) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
+        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;sticker_ids&quot;</span>, <span class="ident">Value::from</span>(<span class="ident">Vec</span>::<span class="op">&lt;</span><span class="ident">Value</span><span class="op">&gt;</span><span class="ident">::new</span>()));
+        <span class="self">self</span>.<span class="ident">add_sticker_ids</span>(<span class="ident">sticker_ids</span>)
     }
 }
 
@@ -540,11 +636,11 @@
     <span class="doccomment">/// [`Message`]: crate::model::channel::Message</span>
     <span class="kw">fn</span> <span class="ident">default</span>() -&gt; <span class="ident">CreateMessage</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">map</span> <span class="op">=</span> <span class="ident">HashMap::new</span>();
-        <span class="ident">map</span>.<span class="ident">insert</span>(<span class="string">&quot;tts&quot;</span>, <span class="ident">Value::Bool</span>(<span class="bool-val">false</span>));
+        <span class="ident">map</span>.<span class="ident">insert</span>(<span class="string">&quot;tts&quot;</span>, <span class="ident">Value::from</span>(<span class="bool-val">false</span>));
 
-        <span class="ident">CreateMessage</span>(<span class="ident">map</span>, <span class="prelude-val">None</span>, <span class="ident">Default::default</span>())
+        <span class="ident">CreateMessage</span>(<span class="ident">map</span>, <span class="prelude-val">None</span>, <span class="ident">Vec::default</span>())
     }
 }
 </code></pre></div>
-</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.62.0-nightly (ec77f2524 2022-04-17)" ></div>
+</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.61.0-nightly (3c17c84a3 2022-03-21)" ></div>
 </body></html>

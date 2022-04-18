@@ -53,14 +53,6 @@
 <span id="48">48</span>
 <span id="49">49</span>
 <span id="50">50</span>
-<span id="51">51</span>
-<span id="52">52</span>
-<span id="53">53</span>
-<span id="54">54</span>
-<span id="55">55</span>
-<span id="56">56</span>
-<span id="57">57</span>
-<span id="58">58</span>
 </pre><pre class="rust"><code><span class="doccomment">/// Settings for the cache.</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// # Examples</span>
@@ -73,21 +65,13 @@
 <span class="doccomment">/// let mut settings = CacheSettings::new();</span>
 <span class="doccomment">/// settings.max_messages(10);</span>
 <span class="doccomment">/// ```</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>)]</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Default</span>)]</span>
 <span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Settings</span> {
     <span class="doccomment">/// The maximum number of messages to store in a channel&#39;s message cache.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// Defaults to 0.</span>
     <span class="kw">pub</span> <span class="ident">max_messages</span>: <span class="ident">usize</span>,
-}
-
-<span class="kw">impl</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">Settings</span> {
-    <span class="kw">fn</span> <span class="ident">default</span>() -&gt; <span class="self">Self</span> {
-        <span class="ident">Settings</span> {
-            <span class="ident">max_messages</span>: <span class="ident">usize::default</span>(),
-        }
-    }
 }
 
 <span class="kw">impl</span> <span class="ident">Settings</span> {
@@ -120,5 +104,5 @@
     }
 }
 </code></pre></div>
-</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.62.0-nightly (ec77f2524 2022-04-17)" ></div>
+</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.61.0-nightly (3c17c84a3 2022-03-21)" ></div>
 </body></html>

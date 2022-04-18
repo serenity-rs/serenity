@@ -96,14 +96,6 @@
 <span id="91">91</span>
 <span id="92">92</span>
 <span id="93">93</span>
-<span id="94">94</span>
-<span id="95">95</span>
-<span id="96">96</span>
-<span id="97">97</span>
-<span id="98">98</span>
-<span id="99">99</span>
-<span id="100">100</span>
-<span id="101">101</span>
 </pre><pre class="rust"><code><span class="doccomment">//! A set of builders used to make using methods on certain structs simpler to</span>
 <span class="doccomment">//! use.</span>
 <span class="doccomment">//!</span>
@@ -114,97 +106,89 @@
 <span class="kw">mod</span> <span class="ident">create_channel</span>;
 <span class="kw">mod</span> <span class="ident">create_embed</span>;
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
 <span class="kw">mod</span> <span class="ident">create_application_command</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
 <span class="kw">mod</span> <span class="ident">create_application_command_permission</span>;
 
 <span class="kw">mod</span> <span class="ident">add_member</span>;
 <span class="kw">mod</span> <span class="ident">bot_auth_parameters</span>;
 <span class="kw">mod</span> <span class="ident">create_allowed_mentions</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
 <span class="kw">mod</span> <span class="ident">create_components</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
 <span class="kw">mod</span> <span class="ident">create_interaction_response</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
 <span class="kw">mod</span> <span class="ident">create_interaction_response_followup</span>;
 <span class="kw">mod</span> <span class="ident">create_invite</span>;
 <span class="kw">mod</span> <span class="ident">create_message</span>;
 <span class="kw">mod</span> <span class="ident">create_stage_instance</span>;
+<span class="kw">mod</span> <span class="ident">create_sticker</span>;
 <span class="kw">mod</span> <span class="ident">create_thread</span>;
 <span class="kw">mod</span> <span class="ident">edit_channel</span>;
 <span class="kw">mod</span> <span class="ident">edit_guild</span>;
 <span class="kw">mod</span> <span class="ident">edit_guild_welcome_screen</span>;
 <span class="kw">mod</span> <span class="ident">edit_guild_widget</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
 <span class="kw">mod</span> <span class="ident">edit_interaction_response</span>;
 <span class="kw">mod</span> <span class="ident">edit_member</span>;
 <span class="kw">mod</span> <span class="ident">edit_message</span>;
 <span class="kw">mod</span> <span class="ident">edit_profile</span>;
 <span class="kw">mod</span> <span class="ident">edit_role</span>;
 <span class="kw">mod</span> <span class="ident">edit_stage_instance</span>;
+<span class="kw">mod</span> <span class="ident">edit_sticker</span>;
 <span class="kw">mod</span> <span class="ident">edit_thread</span>;
 <span class="kw">mod</span> <span class="ident">edit_voice_state</span>;
 <span class="kw">mod</span> <span class="ident">edit_webhook_message</span>;
 <span class="kw">mod</span> <span class="ident">execute_webhook</span>;
 <span class="kw">mod</span> <span class="ident">get_messages</span>;
 
-<span class="kw">pub</span> <span class="kw">use</span> <span class="self">self</span>::{
-    <span class="ident">add_member::AddMember</span>,
-    <span class="ident">bot_auth_parameters::CreateBotAuthParameters</span>,
-    <span class="ident">create_allowed_mentions::CreateAllowedMentions</span>,
-    <span class="ident">create_allowed_mentions::ParseValue</span>,
-    <span class="ident">create_channel::CreateChannel</span>,
-    <span class="ident">create_embed</span>::{<span class="ident">CreateEmbed</span>, <span class="ident">CreateEmbedAuthor</span>, <span class="ident">CreateEmbedFooter</span>, <span class="ident">Timestamp</span>},
-    <span class="ident">create_invite::CreateInvite</span>,
-    <span class="ident">create_message::CreateMessage</span>,
-    <span class="ident">create_stage_instance::CreateStageInstance</span>,
-    <span class="ident">create_thread::CreateThread</span>,
-    <span class="ident">edit_channel::EditChannel</span>,
-    <span class="ident">edit_guild::EditGuild</span>,
-    <span class="ident">edit_guild_welcome_screen::EditGuildWelcomeScreen</span>,
-    <span class="ident">edit_guild_widget::EditGuildWidget</span>,
-    <span class="ident">edit_member::EditMember</span>,
-    <span class="ident">edit_message::EditMessage</span>,
-    <span class="ident">edit_profile::EditProfile</span>,
-    <span class="ident">edit_role::EditRole</span>,
-    <span class="ident">edit_stage_instance::EditStageInstance</span>,
-    <span class="ident">edit_thread::EditThread</span>,
-    <span class="ident">edit_voice_state::EditVoiceState</span>,
-    <span class="ident">edit_webhook_message::EditWebhookMessage</span>,
-    <span class="ident">execute_webhook::ExecuteWebhook</span>,
-    <span class="ident">get_messages::GetMessages</span>,
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="self">self</span>::add_member::AddMember</span>;
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="self">self</span>::bot_auth_parameters::CreateBotAuthParameters</span>;
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="self">self</span>::create_allowed_mentions</span>::{<span class="ident">CreateAllowedMentions</span>, <span class="ident">ParseValue</span>};
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="self">self</span>::create_application_command</span>::{
+    <span class="ident">CreateApplicationCommand</span>,
+    <span class="ident">CreateApplicationCommandOption</span>,
+    <span class="ident">CreateApplicationCommands</span>,
 };
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">use</span> <span class="self">self</span>::{
-    <span class="ident">create_application_command</span>::{
-        <span class="ident">CreateApplicationCommand</span>,
-        <span class="ident">CreateApplicationCommandOption</span>,
-        <span class="ident">CreateApplicationCommands</span>,
-    },
-    <span class="ident">create_application_command_permission</span>::{
-        <span class="ident">CreateApplicationCommandPermissionData</span>,
-        <span class="ident">CreateApplicationCommandPermissions</span>,
-        <span class="ident">CreateApplicationCommandPermissionsData</span>,
-        <span class="ident">CreateApplicationCommandsPermissions</span>,
-    },
-    <span class="ident">create_components</span>::{
-        <span class="ident">CreateActionRow</span>,
-        <span class="ident">CreateButton</span>,
-        <span class="ident">CreateComponents</span>,
-        <span class="ident">CreateInputText</span>,
-        <span class="ident">CreateSelectMenu</span>,
-        <span class="ident">CreateSelectMenuOption</span>,
-        <span class="ident">CreateSelectMenuOptions</span>,
-    },
-    <span class="ident">create_interaction_response</span>::{
-        <span class="ident">CreateAutocompleteResponse</span>,
-        <span class="ident">CreateInteractionResponse</span>,
-        <span class="ident">CreateInteractionResponseData</span>,
-    },
-    <span class="ident">create_interaction_response_followup::CreateInteractionResponseFollowup</span>,
-    <span class="ident">edit_interaction_response::EditInteractionResponse</span>,
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="self">self</span>::create_application_command_permission</span>::{
+    <span class="ident">CreateApplicationCommandPermissionData</span>,
+    <span class="ident">CreateApplicationCommandPermissions</span>,
+    <span class="ident">CreateApplicationCommandPermissionsData</span>,
+    <span class="ident">CreateApplicationCommandsPermissions</span>,
 };
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="self">self</span>::create_channel::CreateChannel</span>;
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="self">self</span>::create_components</span>::{
+    <span class="ident">CreateActionRow</span>,
+    <span class="ident">CreateButton</span>,
+    <span class="ident">CreateComponents</span>,
+    <span class="ident">CreateInputText</span>,
+    <span class="ident">CreateSelectMenu</span>,
+    <span class="ident">CreateSelectMenuOption</span>,
+    <span class="ident">CreateSelectMenuOptions</span>,
+};
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="self">self</span>::create_embed</span>::{<span class="ident">CreateEmbed</span>, <span class="ident">CreateEmbedAuthor</span>, <span class="ident">CreateEmbedFooter</span>};
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="self">self</span>::create_interaction_response</span>::{
+    <span class="ident">CreateAutocompleteResponse</span>,
+    <span class="ident">CreateInteractionResponse</span>,
+    <span class="ident">CreateInteractionResponseData</span>,
+};
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="self">self</span>::create_interaction_response_followup::CreateInteractionResponseFollowup</span>;
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="self">self</span>::create_invite::CreateInvite</span>;
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="self">self</span>::create_message::CreateMessage</span>;
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="self">self</span>::create_stage_instance::CreateStageInstance</span>;
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="self">self</span>::create_sticker::CreateSticker</span>;
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="self">self</span>::create_thread::CreateThread</span>;
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="self">self</span>::edit_channel::EditChannel</span>;
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="self">self</span>::edit_guild::EditGuild</span>;
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="self">self</span>::edit_guild_welcome_screen::EditGuildWelcomeScreen</span>;
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="self">self</span>::edit_guild_widget::EditGuildWidget</span>;
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="self">self</span>::edit_interaction_response::EditInteractionResponse</span>;
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="self">self</span>::edit_member::EditMember</span>;
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="self">self</span>::edit_message::EditMessage</span>;
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="self">self</span>::edit_profile::EditProfile</span>;
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="self">self</span>::edit_role::EditRole</span>;
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="self">self</span>::edit_stage_instance::EditStageInstance</span>;
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="self">self</span>::edit_sticker::EditSticker</span>;
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="self">self</span>::edit_thread::EditThread</span>;
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="self">self</span>::edit_voice_state::EditVoiceState</span>;
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="self">self</span>::edit_webhook_message::EditWebhookMessage</span>;
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="self">self</span>::execute_webhook::ExecuteWebhook</span>;
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="self">self</span>::get_messages::GetMessages</span>;
 </code></pre></div>
-</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.62.0-nightly (ec77f2524 2022-04-17)" ></div>
+</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.61.0-nightly (3c17c84a3 2022-03-21)" ></div>
 </body></html>

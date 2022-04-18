@@ -1,0 +1,1 @@
+initSidebarItems({"fn":[["parse","Verifies that the token adheres to the Discord token format and extracts the bot user ID and the token generation unix timestamp."],["validate","Validates that a token is likely in a valid format."]],"struct":[["InvalidToken","Error that can be return by [`validate`]."]]});

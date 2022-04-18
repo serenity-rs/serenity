@@ -280,14 +280,55 @@
 <span id="275">275</span>
 <span id="276">276</span>
 <span id="277">277</span>
+<span id="278">278</span>
+<span id="279">279</span>
+<span id="280">280</span>
+<span id="281">281</span>
+<span id="282">282</span>
+<span id="283">283</span>
+<span id="284">284</span>
+<span id="285">285</span>
+<span id="286">286</span>
+<span id="287">287</span>
+<span id="288">288</span>
+<span id="289">289</span>
+<span id="290">290</span>
+<span id="291">291</span>
+<span id="292">292</span>
+<span id="293">293</span>
+<span id="294">294</span>
+<span id="295">295</span>
+<span id="296">296</span>
+<span id="297">297</span>
+<span id="298">298</span>
+<span id="299">299</span>
+<span id="300">300</span>
+<span id="301">301</span>
+<span id="302">302</span>
+<span id="303">303</span>
+<span id="304">304</span>
+<span id="305">305</span>
+<span id="306">306</span>
+<span id="307">307</span>
+<span id="308">308</span>
+<span id="309">309</span>
+<span id="310">310</span>
+<span id="311">311</span>
+<span id="312">312</span>
+<span id="313">313</span>
+<span id="314">314</span>
+<span id="315">315</span>
+<span id="316">316</span>
+<span id="317">317</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::collections::HashMap</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http&quot;</span>))]</span>
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>))]</span>
 <span class="kw">use</span> <span class="ident">std::marker::PhantomData</span>;
 
-<span class="kw">use</span> <span class="ident">serde_json::Value</span>;
-
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::http::AttachmentType</span>;
+<span class="kw">use</span> <span class="ident"><span class="kw">super</span>::CreateAllowedMentions</span>;
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::builder::CreateComponents</span>;
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::json</span>::{<span class="self">self</span>, <span class="ident">from_number</span>, <span class="ident">Value</span>};
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::channel::AttachmentType</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::channel::MessageFlags</span>;
 
 <span class="doccomment">/// A builder to create the inner content of a [`Webhook`]&#39;s execution.</span>
@@ -309,10 +350,9 @@
 <span class="doccomment">/// use serenity::utils::Colour;</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// # async fn run() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {</span>
-<span class="doccomment">/// # let http = Http::default();</span>
-<span class="doccomment">/// let id = 245037420704169985;</span>
-<span class="doccomment">/// let token = &quot;ig5AO-wdVWpCBtUUMxmgsWryqgsW3DChbKYOINftJ4DCrUbnkedoYZD0VOH1QLr-S3sV&quot;;</span>
-<span class="doccomment">/// let webhook = http.get_webhook_with_token(id, token).await?;</span>
+<span class="doccomment">/// # let http = Http::new(&quot;token&quot;);</span>
+<span class="doccomment">/// let url = &quot;https://discord.com/api/webhooks/245037420704169985/ig5AO-wdVWpCBtUUMxmgsWryqgsW3DChbKYOINftJ4DCrUbnkedoYZD0VOH1QLr-S3sV&quot;;</span>
+<span class="doccomment">/// let webhook = http.get_webhook_from_url(url).await?;</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// let website = Embed::fake(|e| {</span>
 <span class="doccomment">///     e.title(&quot;The Rust Language Website&quot;)</span>
@@ -343,8 +383,8 @@
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ExecuteWebhook</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(
     <span class="kw">pub</span> <span class="ident">HashMap</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>, <span class="ident">Value</span><span class="op">&gt;</span>,
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http&quot;</span>)]</span> <span class="kw">pub</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">AttachmentType</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http&quot;</span>))]</span> <span class="ident">PhantomData</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> ()<span class="op">&gt;</span>,
+    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span> <span class="kw">pub</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">AttachmentType</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>))]</span> <span class="ident">PhantomData</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> ()<span class="op">&gt;</span>,
 );
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">ExecuteWebhook</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
@@ -358,7 +398,7 @@
     <span class="doccomment">/// # use serenity::http::Http;</span>
     <span class="doccomment">/// #</span>
     <span class="doccomment">/// # async fn run() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {</span>
-    <span class="doccomment">/// # let http = Http::default();</span>
+    <span class="doccomment">/// # let http = Http::new(&quot;token&quot;);</span>
     <span class="doccomment">/// # let webhook = http.get_webhook_with_token(0, &quot;&quot;).await?;</span>
     <span class="doccomment">/// #</span>
     <span class="doccomment">/// let avatar_url = &quot;https://i.imgur.com/KTs6whd.jpg&quot;;</span>
@@ -368,7 +408,7 @@
     <span class="doccomment">/// # }</span>
     <span class="doccomment">/// ```</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">avatar_url</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">ToString</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">avatar_url</span>: <span class="ident">S</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;avatar_url&quot;</span>, <span class="ident">Value::String</span>(<span class="ident">avatar_url</span>.<span class="ident">to_string</span>()));
+        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;avatar_url&quot;</span>, <span class="ident">Value::from</span>(<span class="ident">avatar_url</span>.<span class="ident">to_string</span>()));
         <span class="self">self</span>
     }
 
@@ -385,7 +425,7 @@
     <span class="doccomment">/// # use serenity::http::Http;</span>
     <span class="doccomment">/// #</span>
     <span class="doccomment">/// # async fn run() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {</span>
-    <span class="doccomment">/// # let http = Http::default();</span>
+    <span class="doccomment">/// # let http = Http::new(&quot;token&quot;);</span>
     <span class="doccomment">/// # let webhook = http.get_webhook_with_token(0, &quot;&quot;).await?;</span>
     <span class="doccomment">/// #</span>
     <span class="doccomment">/// let execution = webhook.execute(&amp;http, false, |w| w.content(&quot;foo&quot;)).await;</span>
@@ -397,24 +437,24 @@
     <span class="doccomment">/// # }</span>
     <span class="doccomment">/// ```</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">content</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">ToString</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">content</span>: <span class="ident">S</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;content&quot;</span>, <span class="ident">Value::String</span>(<span class="ident">content</span>.<span class="ident">to_string</span>()));
+        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;content&quot;</span>, <span class="ident">Value::from</span>(<span class="ident">content</span>.<span class="ident">to_string</span>()));
         <span class="self">self</span>
     }
 
     <span class="doccomment">/// Appends a file to the webhook message.</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http&quot;</span>)]</span>
+    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">add_file</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">AttachmentType</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">file</span>: <span class="ident">T</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
         <span class="self">self</span>.<span class="number">1</span>.<span class="ident">push</span>(<span class="ident">file</span>.<span class="ident">into</span>());
         <span class="self">self</span>
     }
 
     <span class="doccomment">/// Appends a list of files to the webhook message.</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http&quot;</span>)]</span>
+    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">add_files</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">AttachmentType</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>, <span class="ident">It</span>: <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span>(
         <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
         <span class="ident">files</span>: <span class="ident">It</span>,
     ) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="number">1</span>.<span class="ident">extend</span>(<span class="ident">files</span>.<span class="ident">into_iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="ident">f</span>.<span class="ident">into</span>()));
+        <span class="self">self</span>.<span class="number">1</span>.<span class="ident">extend</span>(<span class="ident">files</span>.<span class="ident">into_iter</span>().<span class="ident">map</span>(<span class="ident">Into::into</span>));
         <span class="self">self</span>
     }
 
@@ -422,12 +462,52 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// Calling this multiple times will overwrite the file list.</span>
     <span class="doccomment">/// To append files, call [`Self::add_file`] or [`Self::add_files`] instead.</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http&quot;</span>)]</span>
+    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">files</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">AttachmentType</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>, <span class="ident">It</span>: <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span>(
         <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
         <span class="ident">files</span>: <span class="ident">It</span>,
     ) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="number">1</span> <span class="op">=</span> <span class="ident">files</span>.<span class="ident">into_iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="ident">f</span>.<span class="ident">into</span>()).<span class="ident">collect</span>();
+        <span class="self">self</span>.<span class="number">1</span> <span class="op">=</span> <span class="ident">files</span>.<span class="ident">into_iter</span>().<span class="ident">map</span>(<span class="ident">Into::into</span>).<span class="ident">collect</span>();
+        <span class="self">self</span>
+    }
+
+    <span class="doccomment">/// Set the allowed mentions for the message.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">allowed_mentions</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">f</span>: <span class="ident">F</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span>
+    <span class="kw">where</span>
+        <span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="kw-2">&amp;mut</span> <span class="ident">CreateAllowedMentions</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="ident">CreateAllowedMentions</span>,
+    {
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">allowed_mentions</span> <span class="op">=</span> <span class="ident">CreateAllowedMentions::default</span>();
+        <span class="ident">f</span>(<span class="kw-2">&amp;mut</span> <span class="ident">allowed_mentions</span>);
+        <span class="kw">let</span> <span class="ident">map</span> <span class="op">=</span> <span class="ident">json::hashmap_to_json_map</span>(<span class="ident">allowed_mentions</span>.<span class="number">0</span>);
+        <span class="kw">let</span> <span class="ident">allowed_mentions</span> <span class="op">=</span> <span class="ident">Value::from</span>(<span class="ident">map</span>);
+
+        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;allowed_mentions&quot;</span>, <span class="ident">allowed_mentions</span>);
+        <span class="self">self</span>
+    }
+
+    <span class="doccomment">/// Creates components for this message. Requires an application-owned webhook, meaning either</span>
+    <span class="doccomment">/// the webhook&#39;s `kind` field is set to [`WebhookType::Application`], or it was created by an</span>
+    <span class="doccomment">/// application (and has kind [`WebhookType::Incoming`]).</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// [`WebhookType::Application`]: crate::model::webhook::WebhookType</span>
+    <span class="doccomment">/// [`WebhookType::Incoming`]: crate::model::webhook::WebhookType</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">components</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">f</span>: <span class="ident">F</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span>
+    <span class="kw">where</span>
+        <span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="kw-2">&amp;mut</span> <span class="ident">CreateComponents</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="ident">CreateComponents</span>,
+    {
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">components</span> <span class="op">=</span> <span class="ident">CreateComponents::default</span>();
+        <span class="ident">f</span>(<span class="kw-2">&amp;mut</span> <span class="ident">components</span>);
+
+        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;components&quot;</span>, <span class="ident">Value::from</span>(<span class="ident">components</span>.<span class="number">0</span>));
+        <span class="self">self</span>
+    }
+
+    <span class="doccomment">/// Sets the components of this message. Requires an application-owned webhook. See</span>
+    <span class="doccomment">/// [`components`] for details.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// [`components`]: crate::builder::ExecuteWebhook::components</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_components</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">components</span>: <span class="ident">CreateComponents</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
+        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;components&quot;</span>, <span class="ident">Value::Array</span>(<span class="ident">components</span>.<span class="number">0</span>));
         <span class="self">self</span>
     }
 
@@ -445,7 +525,7 @@
     <span class="doccomment">/// [`Webhook::execute`]: crate::model::webhook::Webhook::execute</span>
     <span class="doccomment">/// [struct-level documentation]: #examples</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">embeds</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">embeds</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Value</span><span class="op">&gt;</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;embeds&quot;</span>, <span class="ident">Value::Array</span>(<span class="ident">embeds</span>));
+        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;embeds&quot;</span>, <span class="ident">Value::from</span>(<span class="ident">embeds</span>));
         <span class="self">self</span>
     }
 
@@ -459,7 +539,7 @@
     <span class="doccomment">/// # use serenity::http::Http;</span>
     <span class="doccomment">/// #</span>
     <span class="doccomment">/// # async fn run() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {</span>
-    <span class="doccomment">/// # let http = Http::default();</span>
+    <span class="doccomment">/// # let http = Http::new(&quot;token&quot;);</span>
     <span class="doccomment">/// # let webhook = http.get_webhook_with_token(0, &quot;&quot;).await?;</span>
     <span class="doccomment">/// #</span>
     <span class="doccomment">/// let execution = webhook.execute(&amp;http, false, |w| w.content(&quot;hello&quot;).tts(true)).await;</span>
@@ -471,7 +551,7 @@
     <span class="doccomment">/// # }</span>
     <span class="doccomment">/// ```</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">tts</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">tts</span>: <span class="ident">bool</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;tts&quot;</span>, <span class="ident">Value::Bool</span>(<span class="ident">tts</span>));
+        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;tts&quot;</span>, <span class="ident">Value::from</span>(<span class="ident">tts</span>));
         <span class="self">self</span>
     }
 
@@ -485,7 +565,7 @@
     <span class="doccomment">/// # use serenity::http::Http;</span>
     <span class="doccomment">/// #</span>
     <span class="doccomment">/// # async fn run() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {</span>
-    <span class="doccomment">/// # let http = Http::default();</span>
+    <span class="doccomment">/// # let http = Http::new(&quot;token&quot;);</span>
     <span class="doccomment">/// # let webhook = http.get_webhook_with_token(0, &quot;&quot;).await?;</span>
     <span class="doccomment">/// #</span>
     <span class="doccomment">/// let execution = webhook.execute(&amp;http, false, |w| w.content(&quot;hello&quot;).username(&quot;hakase&quot;)).await;</span>
@@ -497,7 +577,7 @@
     <span class="doccomment">/// # }</span>
     <span class="doccomment">/// ```</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">username</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">ToString</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">username</span>: <span class="ident">S</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;username&quot;</span>, <span class="ident">Value::String</span>(<span class="ident">username</span>.<span class="ident">to_string</span>()));
+        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;username&quot;</span>, <span class="ident">Value::from</span>(<span class="ident">username</span>.<span class="ident">to_string</span>()));
         <span class="self">self</span>
     }
 
@@ -512,7 +592,7 @@
     <span class="doccomment">/// # use serenity::model::channel::MessageFlags;</span>
     <span class="doccomment">/// #</span>
     <span class="doccomment">/// # async fn run() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {</span>
-    <span class="doccomment">/// # let http = Http::default();</span>
+    <span class="doccomment">/// # let http = Http::new(&quot;token&quot;);</span>
     <span class="doccomment">/// # let webhook = http.get_webhook_with_token(0, &quot;&quot;).await?;</span>
     <span class="doccomment">/// #</span>
     <span class="doccomment">/// let execution = webhook</span>
@@ -529,7 +609,7 @@
     <span class="doccomment">/// # }</span>
     <span class="doccomment">/// ```</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">flags</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">flags</span>: <span class="ident">MessageFlags</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;flags&quot;</span>, <span class="ident">Value::Number</span>(<span class="ident">serde_json::Number::from</span>(<span class="ident">flags</span>.<span class="ident">bits</span>)));
+        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;flags&quot;</span>, <span class="ident">from_number</span>(<span class="ident">flags</span>.<span class="ident">bits</span>()));
         <span class="self">self</span>
     }
 }
@@ -552,11 +632,11 @@
     <span class="doccomment">/// [`Webhook`]: crate::model::webhook::Webhook</span>
     <span class="kw">fn</span> <span class="ident">default</span>() -&gt; <span class="ident">ExecuteWebhook</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">map</span> <span class="op">=</span> <span class="ident">HashMap::new</span>();
-        <span class="ident">map</span>.<span class="ident">insert</span>(<span class="string">&quot;tts&quot;</span>, <span class="ident">Value::Bool</span>(<span class="bool-val">false</span>));
+        <span class="ident">map</span>.<span class="ident">insert</span>(<span class="string">&quot;tts&quot;</span>, <span class="ident">Value::from</span>(<span class="bool-val">false</span>));
 
-        <span class="ident">ExecuteWebhook</span>(<span class="ident">map</span>, <span class="ident">Default::default</span>())
+        <span class="ident">ExecuteWebhook</span>(<span class="ident">map</span>, <span class="ident">Vec::default</span>())
     }
 }
 </code></pre></div>
-</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.62.0-nightly (ec77f2524 2022-04-17)" ></div>
+</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.61.0-nightly (3c17c84a3 2022-03-21)" ></div>
 </body></html>

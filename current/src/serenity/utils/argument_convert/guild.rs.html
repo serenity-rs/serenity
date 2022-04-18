@@ -48,8 +48,28 @@
 <span id="43">43</span>
 <span id="44">44</span>
 <span id="45">45</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">super</span>::ArgumentConvert</span>;
-<span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">model::prelude</span>::<span class="kw-2">*</span>, <span class="ident">prelude</span>::<span class="kw-2">*</span>};
+<span id="46">46</span>
+<span id="47">47</span>
+<span id="48">48</span>
+<span id="49">49</span>
+<span id="50">50</span>
+<span id="51">51</span>
+<span id="52">52</span>
+<span id="53">53</span>
+<span id="54">54</span>
+<span id="55">55</span>
+<span id="56">56</span>
+<span id="57">57</span>
+<span id="58">58</span>
+<span id="59">59</span>
+</pre><pre class="rust"><code><span class="comment">// From HTTP you can only get PartialGuild; for Guild you need gateway and cache</span>
+<span class="attribute">#![<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
+
+<span class="kw">use</span> <span class="ident">std::fmt</span>;
+
+<span class="kw">use</span> <span class="ident"><span class="kw">super</span>::ArgumentConvert</span>;
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::prelude</span>::<span class="kw-2">*</span>;
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::prelude</span>::<span class="kw-2">*</span>;
 
 <span class="doccomment">/// Error that can be returned from [`Guild::convert`].</span>
 <span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
@@ -62,8 +82,8 @@
 
 <span class="kw">impl</span> <span class="ident">std::error::Error</span> <span class="kw">for</span> <span class="ident">GuildParseError</span> {}
 
-<span class="kw">impl</span> <span class="ident">std::fmt::Display</span> <span class="kw">for</span> <span class="ident">GuildParseError</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">std::fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">std::fmt::Result</span> {
+<span class="kw">impl</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">GuildParseError</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
         <span class="kw">match</span> <span class="self">self</span> {
             <span class="ident"><span class="self">Self</span>::NotFoundOrMalformed</span> =&gt; <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;Guild not found or unknown format&quot;</span>),
         }
@@ -73,7 +93,6 @@
 <span class="doccomment">/// Look up a Guild, either by ID or by a string case-insensitively.</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// Requires the cache feature to be enabled.</span>
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
 <span class="attribute">#[<span class="ident">async_trait::async_trait</span>]</span>
 <span class="kw">impl</span> <span class="ident">ArgumentConvert</span> <span class="kw">for</span> <span class="ident">Guild</span> {
     <span class="kw">type</span> <span class="prelude-val">Err</span> <span class="op">=</span> <span class="ident">GuildParseError</span>;
@@ -84,15 +103,24 @@
         <span class="ident">_channel_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ChannelId</span><span class="op">&gt;</span>,
         <span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
     ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident"><span class="self">Self</span>::Err</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">guilds</span> <span class="op">=</span> <span class="ident">ctx</span>.<span class="ident">cache</span>.<span class="ident">guilds</span>.<span class="ident">read</span>().<span class="kw">await</span>;
+        <span class="kw">let</span> <span class="ident">guilds</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">ctx</span>.<span class="ident">cache</span>.<span class="ident">guilds</span>;
 
-        <span class="kw">let</span> <span class="ident">lookup_by_id</span> <span class="op">=</span> <span class="op">|</span><span class="op">|</span> <span class="ident">guilds</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="ident">GuildId</span>(<span class="ident">s</span>.<span class="ident">parse</span>().<span class="ident">ok</span>()<span class="question-mark">?</span>));
+        <span class="kw">let</span> <span class="ident">lookup_by_id</span> <span class="op">=</span> <span class="op">|</span><span class="op">|</span> <span class="ident">guilds</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="ident">GuildId</span>(<span class="ident">s</span>.<span class="ident">parse</span>().<span class="ident">ok</span>()<span class="question-mark">?</span>)).<span class="ident">map</span>(<span class="op">|</span><span class="ident">g</span><span class="op">|</span> <span class="ident">g</span>.<span class="ident">clone</span>());
 
-        <span class="kw">let</span> <span class="ident">lookup_by_name</span> <span class="op">=</span> <span class="op">|</span><span class="op">|</span> <span class="ident">guilds</span>.<span class="ident">values</span>().<span class="ident">find</span>(<span class="op">|</span><span class="ident">guild</span><span class="op">|</span> <span class="ident">guild</span>.<span class="ident">name</span>.<span class="ident">eq_ignore_ascii_case</span>(<span class="ident">s</span>));
+        <span class="kw">let</span> <span class="ident">lookup_by_name</span> <span class="op">=</span> <span class="op">|</span><span class="op">|</span> {
+            <span class="ident">guilds</span>.<span class="ident">iter</span>().<span class="ident">find_map</span>(<span class="op">|</span><span class="ident">m</span><span class="op">|</span> {
+                <span class="kw">let</span> <span class="ident">guild</span> <span class="op">=</span> <span class="ident">m</span>.<span class="ident">value</span>();
+                <span class="kw">if</span> <span class="ident">guild</span>.<span class="ident">name</span>.<span class="ident">eq_ignore_ascii_case</span>(<span class="ident">s</span>) {
+                    <span class="prelude-val">Some</span>(<span class="ident">guild</span>.<span class="ident">clone</span>())
+                } <span class="kw">else</span> {
+                    <span class="prelude-val">None</span>
+                }
+            })
+        };
 
-        <span class="ident">lookup_by_id</span>().<span class="ident">or_else</span>(<span class="ident">lookup_by_name</span>).<span class="ident">cloned</span>().<span class="ident">ok_or</span>(<span class="ident">GuildParseError::NotFoundOrMalformed</span>)
+        <span class="ident">lookup_by_id</span>().<span class="ident">or_else</span>(<span class="ident">lookup_by_name</span>).<span class="ident">ok_or</span>(<span class="ident">GuildParseError::NotFoundOrMalformed</span>)
     }
 }
 </code></pre></div>
-</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.62.0-nightly (ec77f2524 2022-04-17)" ></div>
+</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.61.0-nightly (3c17c84a3 2022-03-21)" ></div>
 </body></html>

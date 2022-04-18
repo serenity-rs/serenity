@@ -742,14 +742,110 @@
 <span id="737">737</span>
 <span id="738">738</span>
 <span id="739">739</span>
+<span id="740">740</span>
+<span id="741">741</span>
+<span id="742">742</span>
+<span id="743">743</span>
+<span id="744">744</span>
+<span id="745">745</span>
+<span id="746">746</span>
+<span id="747">747</span>
+<span id="748">748</span>
+<span id="749">749</span>
+<span id="750">750</span>
+<span id="751">751</span>
+<span id="752">752</span>
+<span id="753">753</span>
+<span id="754">754</span>
+<span id="755">755</span>
+<span id="756">756</span>
+<span id="757">757</span>
+<span id="758">758</span>
+<span id="759">759</span>
+<span id="760">760</span>
+<span id="761">761</span>
+<span id="762">762</span>
+<span id="763">763</span>
+<span id="764">764</span>
+<span id="765">765</span>
+<span id="766">766</span>
+<span id="767">767</span>
+<span id="768">768</span>
+<span id="769">769</span>
+<span id="770">770</span>
+<span id="771">771</span>
+<span id="772">772</span>
+<span id="773">773</span>
+<span id="774">774</span>
+<span id="775">775</span>
+<span id="776">776</span>
+<span id="777">777</span>
+<span id="778">778</span>
+<span id="779">779</span>
+<span id="780">780</span>
+<span id="781">781</span>
+<span id="782">782</span>
+<span id="783">783</span>
+<span id="784">784</span>
+<span id="785">785</span>
+<span id="786">786</span>
+<span id="787">787</span>
+<span id="788">788</span>
+<span id="789">789</span>
+<span id="790">790</span>
+<span id="791">791</span>
+<span id="792">792</span>
+<span id="793">793</span>
+<span id="794">794</span>
+<span id="795">795</span>
+<span id="796">796</span>
+<span id="797">797</span>
+<span id="798">798</span>
+<span id="799">799</span>
+<span id="800">800</span>
+<span id="801">801</span>
+<span id="802">802</span>
+<span id="803">803</span>
+<span id="804">804</span>
+<span id="805">805</span>
+<span id="806">806</span>
+<span id="807">807</span>
+<span id="808">808</span>
+<span id="809">809</span>
+<span id="810">810</span>
+<span id="811">811</span>
+<span id="812">812</span>
+<span id="813">813</span>
+<span id="814">814</span>
+<span id="815">815</span>
+<span id="816">816</span>
+<span id="817">817</span>
+<span id="818">818</span>
+<span id="819">819</span>
+<span id="820">820</span>
+<span id="821">821</span>
+<span id="822">822</span>
+<span id="823">823</span>
+<span id="824">824</span>
+<span id="825">825</span>
+<span id="826">826</span>
+<span id="827">827</span>
+<span id="828">828</span>
+<span id="829">829</span>
+<span id="830">830</span>
+<span id="831">831</span>
+<span id="832">832</span>
+<span id="833">833</span>
+<span id="834">834</span>
+<span id="835">835</span>
+<span id="836">836</span>
+<span id="837">837</span>
+<span id="838">838</span>
+<span id="839">839</span>
+<span id="840">840</span>
 </pre><pre class="rust"><code><span class="doccomment">//! Models pertaining to the gateway.</span>
 
-<span class="comment">// TODO: Remove after `GuildStatus` was replaced</span>
-<span class="attribute">#![<span class="ident">allow</span>(<span class="ident">deprecated</span>)]</span>
-
-<span class="kw">use</span> <span class="ident">bitflags::bitflags</span>;
-<span class="kw">use</span> <span class="ident">serde::de::Error</span> <span class="kw">as</span> <span class="ident">DeError</span>;
-<span class="kw">use</span> <span class="ident">serde::ser</span>::{<span class="ident">Serialize</span>, <span class="ident">SerializeStruct</span>, <span class="ident">Serializer</span>};
+<span class="kw">use</span> <span class="ident">url::Url</span>;
 
 <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::prelude</span>::<span class="kw-2">*</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::utils</span>::<span class="kw-2">*</span>;
@@ -774,7 +870,7 @@
 }
 
 <span class="doccomment">/// Representation of an activity that a [`User`] is performing.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Serialize</span>)]</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
 <span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Activity</span> {
     <span class="doccomment">/// The ID of the application for the activity.</span>
@@ -788,7 +884,7 @@
     <span class="doccomment">/// Whether or not the activity is an instanced game session.</span>
     <span class="kw">pub</span> <span class="ident">instance</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span>,
     <span class="doccomment">/// The type of activity being performed</span>
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">default</span> <span class="op">=</span> <span class="string">&quot;ActivityType::default&quot;</span>, <span class="ident">rename</span> <span class="op">=</span> <span class="string">&quot;type&quot;</span>)]</span>
+    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">default</span>, <span class="ident">rename</span> <span class="op">=</span> <span class="string">&quot;type&quot;</span>)]</span>
     <span class="kw">pub</span> <span class="ident">kind</span>: <span class="ident">ActivityType</span>,
     <span class="doccomment">/// The name of the activity.</span>
     <span class="kw">pub</span> <span class="ident">name</span>: <span class="ident">String</span>,
@@ -812,16 +908,40 @@
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
     <span class="kw">pub</span> <span class="ident">session_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
     <span class="doccomment">/// The Stream URL if [`Self::kind`] is [`ActivityType::Streaming`].</span>
-    <span class="kw">pub</span> <span class="ident">url</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">url</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Url</span><span class="op">&gt;</span>,
     <span class="doccomment">/// The buttons of this activity.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// **Note**: There can only be up to 2 buttons.</span>
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">default</span>)]</span>
+    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">default</span>, <span class="ident">deserialize_with</span> <span class="op">=</span> <span class="string">&quot;deserialize_buttons&quot;</span>)]</span>
     <span class="kw">pub</span> <span class="ident">buttons</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ActivityButton</span><span class="op">&gt;</span>,
 }
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
 <span class="kw">impl</span> <span class="ident">Activity</span> {
+    <span class="doccomment">/// Common constructor for the different `ActivityType`s.</span>
+    <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">name</span>: <span class="ident">String</span>, <span class="ident">kind</span>: <span class="ident">ActivityType</span>) -&gt; <span class="self">Self</span> {
+        <span class="self">Self</span> {
+            <span class="ident">application_id</span>: <span class="prelude-val">None</span>,
+            <span class="ident">assets</span>: <span class="prelude-val">None</span>,
+            <span class="ident">details</span>: <span class="prelude-val">None</span>,
+            <span class="ident">flags</span>: <span class="prelude-val">None</span>,
+            <span class="ident">instance</span>: <span class="prelude-val">None</span>,
+            <span class="ident">kind</span>,
+            <span class="ident">name</span>,
+            <span class="ident">party</span>: <span class="prelude-val">None</span>,
+            <span class="ident">secrets</span>: <span class="prelude-val">None</span>,
+            <span class="ident">state</span>: <span class="prelude-val">None</span>,
+            <span class="ident">emoji</span>: <span class="prelude-val">None</span>,
+            <span class="ident">timestamps</span>: <span class="prelude-val">None</span>,
+            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
+            <span class="ident">sync_id</span>: <span class="prelude-val">None</span>,
+            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
+            <span class="ident">session_id</span>: <span class="prelude-val">None</span>,
+            <span class="ident">url</span>: <span class="prelude-val">None</span>,
+            <span class="ident">buttons</span>: <span class="macro">vec!</span>[],
+        }
+    }
+
     <span class="doccomment">/// Creates a [`Activity`] struct that appears as a `Playing &lt;name&gt;` status.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// **Note**: Maximum `name` length is 128.</span>
@@ -851,26 +971,7 @@
     <span class="kw">where</span>
         <span class="ident">N</span>: <span class="ident">ToString</span>,
     {
-        <span class="ident">Activity</span> {
-            <span class="ident">application_id</span>: <span class="prelude-val">None</span>,
-            <span class="ident">assets</span>: <span class="prelude-val">None</span>,
-            <span class="ident">details</span>: <span class="prelude-val">None</span>,
-            <span class="ident">flags</span>: <span class="prelude-val">None</span>,
-            <span class="ident">instance</span>: <span class="prelude-val">None</span>,
-            <span class="ident">kind</span>: <span class="ident">ActivityType::Playing</span>,
-            <span class="ident">name</span>: <span class="ident">name</span>.<span class="ident">to_string</span>(),
-            <span class="ident">party</span>: <span class="prelude-val">None</span>,
-            <span class="ident">secrets</span>: <span class="prelude-val">None</span>,
-            <span class="ident">state</span>: <span class="prelude-val">None</span>,
-            <span class="ident">emoji</span>: <span class="prelude-val">None</span>,
-            <span class="ident">timestamps</span>: <span class="prelude-val">None</span>,
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
-            <span class="ident">sync_id</span>: <span class="prelude-val">None</span>,
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
-            <span class="ident">session_id</span>: <span class="prelude-val">None</span>,
-            <span class="ident">url</span>: <span class="prelude-val">None</span>,
-            <span class="ident">buttons</span>: <span class="macro">vec!</span>[],
-        }
+        <span class="ident">Activity::new</span>(<span class="ident">name</span>.<span class="ident">to_string</span>(), <span class="ident">ActivityType::Playing</span>)
     }
 
     <span class="doccomment">/// Creates an [`Activity`] struct that appears as a `Streaming &lt;name&gt;`</span>
@@ -904,27 +1005,11 @@
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">streaming</span><span class="op">&lt;</span><span class="ident">N</span>, <span class="ident">U</span><span class="op">&gt;</span>(<span class="ident">name</span>: <span class="ident">N</span>, <span class="ident">url</span>: <span class="ident">U</span>) -&gt; <span class="ident">Activity</span>
     <span class="kw">where</span>
         <span class="ident">N</span>: <span class="ident">ToString</span>,
-        <span class="ident">U</span>: <span class="ident">ToString</span>,
+        <span class="ident">U</span>: <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span>,
     {
         <span class="ident">Activity</span> {
-            <span class="ident">application_id</span>: <span class="prelude-val">None</span>,
-            <span class="ident">assets</span>: <span class="prelude-val">None</span>,
-            <span class="ident">details</span>: <span class="prelude-val">None</span>,
-            <span class="ident">flags</span>: <span class="prelude-val">None</span>,
-            <span class="ident">instance</span>: <span class="prelude-val">None</span>,
-            <span class="ident">kind</span>: <span class="ident">ActivityType::Streaming</span>,
-            <span class="ident">name</span>: <span class="ident">name</span>.<span class="ident">to_string</span>(),
-            <span class="ident">party</span>: <span class="prelude-val">None</span>,
-            <span class="ident">secrets</span>: <span class="prelude-val">None</span>,
-            <span class="ident">state</span>: <span class="prelude-val">None</span>,
-            <span class="ident">emoji</span>: <span class="prelude-val">None</span>,
-            <span class="ident">timestamps</span>: <span class="prelude-val">None</span>,
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
-            <span class="ident">sync_id</span>: <span class="prelude-val">None</span>,
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
-            <span class="ident">session_id</span>: <span class="prelude-val">None</span>,
-            <span class="ident">url</span>: <span class="prelude-val">Some</span>(<span class="ident">url</span>.<span class="ident">to_string</span>()),
-            <span class="ident">buttons</span>: <span class="macro">vec!</span>[],
+            <span class="ident">url</span>: <span class="prelude-val">Some</span>(<span class="ident">Url::parse</span>(<span class="ident">url</span>.<span class="ident">as_ref</span>()).<span class="ident">expect</span>(<span class="string">&quot;Failed to parse url&quot;</span>)),
+            ..<span class="ident">Activity::new</span>(<span class="ident">name</span>.<span class="ident">to_string</span>(), <span class="ident">ActivityType::Streaming</span>)
         }
     }
 
@@ -957,26 +1042,7 @@
     <span class="kw">where</span>
         <span class="ident">N</span>: <span class="ident">ToString</span>,
     {
-        <span class="ident">Activity</span> {
-            <span class="ident">application_id</span>: <span class="prelude-val">None</span>,
-            <span class="ident">assets</span>: <span class="prelude-val">None</span>,
-            <span class="ident">details</span>: <span class="prelude-val">None</span>,
-            <span class="ident">flags</span>: <span class="prelude-val">None</span>,
-            <span class="ident">instance</span>: <span class="prelude-val">None</span>,
-            <span class="ident">kind</span>: <span class="ident">ActivityType::Listening</span>,
-            <span class="ident">name</span>: <span class="ident">name</span>.<span class="ident">to_string</span>(),
-            <span class="ident">party</span>: <span class="prelude-val">None</span>,
-            <span class="ident">secrets</span>: <span class="prelude-val">None</span>,
-            <span class="ident">state</span>: <span class="prelude-val">None</span>,
-            <span class="ident">emoji</span>: <span class="prelude-val">None</span>,
-            <span class="ident">timestamps</span>: <span class="prelude-val">None</span>,
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
-            <span class="ident">sync_id</span>: <span class="prelude-val">None</span>,
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
-            <span class="ident">session_id</span>: <span class="prelude-val">None</span>,
-            <span class="ident">url</span>: <span class="prelude-val">None</span>,
-            <span class="ident">buttons</span>: <span class="macro">vec!</span>[],
-        }
+        <span class="ident">Activity::new</span>(<span class="ident">name</span>.<span class="ident">to_string</span>(), <span class="ident">ActivityType::Listening</span>)
     }
 
     <span class="doccomment">/// Creates a [`Activity`] struct that appears as a `Watching &lt;name&gt;` status.</span>
@@ -1008,26 +1074,7 @@
     <span class="kw">where</span>
         <span class="ident">N</span>: <span class="ident">ToString</span>,
     {
-        <span class="ident">Activity</span> {
-            <span class="ident">application_id</span>: <span class="prelude-val">None</span>,
-            <span class="ident">assets</span>: <span class="prelude-val">None</span>,
-            <span class="ident">details</span>: <span class="prelude-val">None</span>,
-            <span class="ident">flags</span>: <span class="prelude-val">None</span>,
-            <span class="ident">instance</span>: <span class="prelude-val">None</span>,
-            <span class="ident">kind</span>: <span class="ident">ActivityType::Watching</span>,
-            <span class="ident">name</span>: <span class="ident">name</span>.<span class="ident">to_string</span>(),
-            <span class="ident">party</span>: <span class="prelude-val">None</span>,
-            <span class="ident">secrets</span>: <span class="prelude-val">None</span>,
-            <span class="ident">state</span>: <span class="prelude-val">None</span>,
-            <span class="ident">emoji</span>: <span class="prelude-val">None</span>,
-            <span class="ident">timestamps</span>: <span class="prelude-val">None</span>,
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
-            <span class="ident">sync_id</span>: <span class="prelude-val">None</span>,
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
-            <span class="ident">session_id</span>: <span class="prelude-val">None</span>,
-            <span class="ident">url</span>: <span class="prelude-val">None</span>,
-            <span class="ident">buttons</span>: <span class="macro">vec!</span>[],
-        }
+        <span class="ident">Activity::new</span>(<span class="ident">name</span>.<span class="ident">to_string</span>(), <span class="ident">ActivityType::Watching</span>)
     }
 
     <span class="doccomment">/// Creates a [`Activity`] struct that appears as a `Competing in &lt;name&gt;` status.</span>
@@ -1059,138 +1106,7 @@
     <span class="kw">where</span>
         <span class="ident">N</span>: <span class="ident">ToString</span>,
     {
-        <span class="ident">Activity</span> {
-            <span class="ident">application_id</span>: <span class="prelude-val">None</span>,
-            <span class="ident">assets</span>: <span class="prelude-val">None</span>,
-            <span class="ident">details</span>: <span class="prelude-val">None</span>,
-            <span class="ident">flags</span>: <span class="prelude-val">None</span>,
-            <span class="ident">instance</span>: <span class="prelude-val">None</span>,
-            <span class="ident">kind</span>: <span class="ident">ActivityType::Competing</span>,
-            <span class="ident">name</span>: <span class="ident">name</span>.<span class="ident">to_string</span>(),
-            <span class="ident">party</span>: <span class="prelude-val">None</span>,
-            <span class="ident">secrets</span>: <span class="prelude-val">None</span>,
-            <span class="ident">state</span>: <span class="prelude-val">None</span>,
-            <span class="ident">emoji</span>: <span class="prelude-val">None</span>,
-            <span class="ident">timestamps</span>: <span class="prelude-val">None</span>,
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
-            <span class="ident">sync_id</span>: <span class="prelude-val">None</span>,
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
-            <span class="ident">session_id</span>: <span class="prelude-val">None</span>,
-            <span class="ident">url</span>: <span class="prelude-val">None</span>,
-            <span class="ident">buttons</span>: <span class="macro">vec!</span>[],
-        }
-    }
-}
-
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="ident">Deserialize</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Activity</span> {
-    <span class="kw">fn</span> <span class="ident">deserialize</span><span class="op">&lt;</span><span class="ident">D</span>: <span class="ident">Deserializer</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">deserializer</span>: <span class="ident">D</span>) -&gt; <span class="ident">StdResult</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">D::Error</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">map</span> <span class="op">=</span> <span class="ident">JsonMap::deserialize</span>(<span class="ident">deserializer</span>)<span class="question-mark">?</span>;
-
-        <span class="kw">let</span> <span class="ident">application_id</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">map</span>.<span class="ident">remove</span>(<span class="string">&quot;application_id&quot;</span>) {
-            <span class="prelude-val">Some</span>(<span class="ident">v</span>) =&gt; <span class="ident">serde_json::from_value</span>::<span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">v</span>).<span class="ident">map_err</span>(<span class="ident">DeError::custom</span>)<span class="question-mark">?</span>,
-            <span class="prelude-val">None</span> =&gt; <span class="prelude-val">None</span>,
-        };
-
-        <span class="kw">let</span> <span class="ident">assets</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">map</span>.<span class="ident">remove</span>(<span class="string">&quot;assets&quot;</span>) {
-            <span class="prelude-val">Some</span>(<span class="ident">v</span>) =&gt; <span class="ident">serde_json::from_value</span>::<span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">v</span>).<span class="ident">map_err</span>(<span class="ident">DeError::custom</span>)<span class="question-mark">?</span>,
-            <span class="prelude-val">None</span> =&gt; <span class="prelude-val">None</span>,
-        };
-
-        <span class="kw">let</span> <span class="ident">details</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">map</span>.<span class="ident">remove</span>(<span class="string">&quot;details&quot;</span>) {
-            <span class="prelude-val">Some</span>(<span class="ident">v</span>) =&gt; <span class="ident">serde_json::from_value</span>::<span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">v</span>).<span class="ident">map_err</span>(<span class="ident">DeError::custom</span>)<span class="question-mark">?</span>,
-            <span class="prelude-val">None</span> =&gt; <span class="prelude-val">None</span>,
-        };
-
-        <span class="kw">let</span> <span class="ident">flags</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">map</span>.<span class="ident">remove</span>(<span class="string">&quot;flags&quot;</span>) {
-            <span class="prelude-val">Some</span>(<span class="ident">v</span>) =&gt; <span class="ident">serde_json::from_value</span>::<span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">v</span>)
-                .<span class="ident">map_err</span>(<span class="ident">DeError::custom</span>)<span class="question-mark">?</span>
-                .<span class="ident">map</span>(<span class="ident">ActivityFlags::from_bits_truncate</span>),
-            <span class="prelude-val">None</span> =&gt; <span class="prelude-val">None</span>,
-        };
-
-        <span class="kw">let</span> <span class="ident">instance</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">map</span>.<span class="ident">remove</span>(<span class="string">&quot;instance&quot;</span>) {
-            <span class="prelude-val">Some</span>(<span class="ident">v</span>) =&gt; <span class="ident">serde_json::from_value</span>::<span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">v</span>).<span class="ident">map_err</span>(<span class="ident">DeError::custom</span>)<span class="question-mark">?</span>,
-            <span class="prelude-val">None</span> =&gt; <span class="prelude-val">None</span>,
-        };
-
-        <span class="kw">let</span> <span class="ident">kind</span> <span class="op">=</span> <span class="ident">map</span>
-            .<span class="ident">remove</span>(<span class="string">&quot;type&quot;</span>)
-            .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">v</span><span class="op">|</span> <span class="ident">ActivityType::deserialize</span>(<span class="ident">v</span>).<span class="ident">ok</span>())
-            .<span class="ident">unwrap_or</span>(<span class="ident">ActivityType::Playing</span>);
-
-        <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="ident">map</span>
-            .<span class="ident">remove</span>(<span class="string">&quot;name&quot;</span>)
-            .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">v</span><span class="op">|</span> <span class="ident">String::deserialize</span>(<span class="ident">v</span>).<span class="ident">ok</span>())
-            .<span class="ident">unwrap_or_else</span>(<span class="ident">String::new</span>);
-
-        <span class="kw">let</span> <span class="ident">party</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">map</span>.<span class="ident">remove</span>(<span class="string">&quot;party&quot;</span>) {
-            <span class="prelude-val">Some</span>(<span class="ident">v</span>) =&gt; <span class="ident">serde_json::from_value</span>::<span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">v</span>).<span class="ident">map_err</span>(<span class="ident">DeError::custom</span>)<span class="question-mark">?</span>,
-            <span class="prelude-val">None</span> =&gt; <span class="prelude-val">None</span>,
-        };
-
-        <span class="kw">let</span> <span class="ident">secrets</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">map</span>.<span class="ident">remove</span>(<span class="string">&quot;secrets&quot;</span>) {
-            <span class="prelude-val">Some</span>(<span class="ident">v</span>) =&gt; <span class="ident">serde_json::from_value</span>::<span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">v</span>).<span class="ident">map_err</span>(<span class="ident">DeError::custom</span>)<span class="question-mark">?</span>,
-            <span class="prelude-val">None</span> =&gt; <span class="prelude-val">None</span>,
-        };
-
-        <span class="kw">let</span> <span class="ident">state</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">map</span>.<span class="ident">remove</span>(<span class="string">&quot;state&quot;</span>) {
-            <span class="prelude-val">Some</span>(<span class="ident">v</span>) =&gt; <span class="ident">serde_json::from_value</span>::<span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">v</span>).<span class="ident">map_err</span>(<span class="ident">DeError::custom</span>)<span class="question-mark">?</span>,
-            <span class="prelude-val">None</span> =&gt; <span class="prelude-val">None</span>,
-        };
-
-        <span class="kw">let</span> <span class="ident">emoji</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">map</span>.<span class="ident">remove</span>(<span class="string">&quot;emoji&quot;</span>) {
-            <span class="prelude-val">Some</span>(<span class="ident">v</span>) =&gt; <span class="ident">serde_json::from_value</span>::<span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">v</span>).<span class="ident">map_err</span>(<span class="ident">DeError::custom</span>)<span class="question-mark">?</span>,
-            <span class="prelude-val">None</span> =&gt; <span class="prelude-val">None</span>,
-        };
-
-        <span class="kw">let</span> <span class="ident">timestamps</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">map</span>.<span class="ident">remove</span>(<span class="string">&quot;timestamps&quot;</span>) {
-            <span class="prelude-val">Some</span>(<span class="ident">v</span>) =&gt; <span class="ident">serde_json::from_value</span>::<span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">v</span>).<span class="ident">map_err</span>(<span class="ident">DeError::custom</span>)<span class="question-mark">?</span>,
-            <span class="prelude-val">None</span> =&gt; <span class="prelude-val">None</span>,
-        };
-
-        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
-        <span class="kw">let</span> <span class="ident">sync_id</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">map</span>.<span class="ident">remove</span>(<span class="string">&quot;sync_id&quot;</span>) {
-            <span class="prelude-val">Some</span>(<span class="ident">v</span>) =&gt; <span class="ident">serde_json::from_value</span>::<span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">v</span>).<span class="ident">map_err</span>(<span class="ident">DeError::custom</span>)<span class="question-mark">?</span>,
-            <span class="prelude-val">None</span> =&gt; <span class="prelude-val">None</span>,
-        };
-
-        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
-        <span class="kw">let</span> <span class="ident">session_id</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">map</span>.<span class="ident">remove</span>(<span class="string">&quot;session_id&quot;</span>) {
-            <span class="prelude-val">Some</span>(<span class="ident">v</span>) =&gt; <span class="ident">serde_json::from_value</span>::<span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">v</span>).<span class="ident">map_err</span>(<span class="ident">DeError::custom</span>)<span class="question-mark">?</span>,
-            <span class="prelude-val">None</span> =&gt; <span class="prelude-val">None</span>,
-        };
-
-        <span class="kw">let</span> <span class="ident">url</span> <span class="op">=</span> <span class="ident">map</span>.<span class="ident">remove</span>(<span class="string">&quot;url&quot;</span>).<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">v</span><span class="op">|</span> <span class="ident">serde_json::from_value</span>::<span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>(<span class="ident">v</span>).<span class="ident">ok</span>());
-
-        <span class="kw">let</span> <span class="ident">buttons</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">map</span>.<span class="ident">contains_key</span>(<span class="string">&quot;buttons&quot;</span>) {
-            <span class="bool-val">true</span> =&gt; <span class="ident">map</span>
-                .<span class="ident">remove</span>(<span class="string">&quot;buttons&quot;</span>)
-                .<span class="ident">ok_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">DeError::custom</span>(<span class="string">&quot;expected buttons&quot;</span>))
-                .<span class="ident">and_then</span>(<span class="ident">deserialize_buttons</span>)
-                .<span class="ident">map_err</span>(<span class="ident">DeError::custom</span>)<span class="question-mark">?</span>,
-            <span class="bool-val">false</span> =&gt; <span class="macro">vec!</span>[],
-        };
-
-        <span class="prelude-val">Ok</span>(<span class="ident">Activity</span> {
-            <span class="ident">application_id</span>,
-            <span class="ident">assets</span>,
-            <span class="ident">details</span>,
-            <span class="ident">flags</span>,
-            <span class="ident">instance</span>,
-            <span class="ident">kind</span>,
-            <span class="ident">name</span>,
-            <span class="ident">party</span>,
-            <span class="ident">secrets</span>,
-            <span class="ident">state</span>,
-            <span class="ident">emoji</span>,
-            <span class="ident">timestamps</span>,
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
-            <span class="ident">sync_id</span>,
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
-            <span class="ident">session_id</span>,
-            <span class="ident">url</span>,
-            <span class="ident">buttons</span>,
-        })
+        <span class="ident">Activity::new</span>(<span class="ident">name</span>.<span class="ident">to_string</span>(), <span class="ident">ActivityType::Competing</span>)
     }
 }
 
@@ -1222,7 +1138,7 @@
 
 <span class="macro">bitflags!</span> {
     <span class="doccomment">/// A set of flags defining what is in an activity&#39;s payload.</span>
-    <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
+    <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Default</span>)]</span>
     <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ActivityFlags</span>: <span class="ident">u64</span> {
         <span class="doccomment">/// Whether the activity is an instance activity.</span>
         <span class="kw">const</span> <span class="ident">INSTANCE</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">0</span>;
@@ -1331,107 +1247,90 @@
     <span class="kw">pub</span> <span class="ident">web</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">OnlineStatus</span><span class="op">&gt;</span>,
 }
 
+<span class="doccomment">/// Information about the user of a [`Presence`] event.</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Default</span>, <span class="ident">Debug</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
+<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
+<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">default</span>)]</span>
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">PresenceUser</span> {
+    <span class="kw">pub</span> <span class="ident">id</span>: <span class="ident">UserId</span>,
+    <span class="kw">pub</span> <span class="ident">avatar</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">bot</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span>,
+    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">with</span> <span class="op">=</span> <span class="string">&quot;discriminator::option&quot;</span>)]</span>
+    <span class="kw">pub</span> <span class="ident">discriminator</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u16</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">email</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">mfa_enabled</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span>,
+    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename</span> <span class="op">=</span> <span class="string">&quot;username&quot;</span>)]</span>
+    <span class="kw">pub</span> <span class="ident">name</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">verified</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">public_flags</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">UserPublicFlags</span><span class="op">&gt;</span>,
+}
+
+<span class="kw">impl</span> <span class="ident">PresenceUser</span> {
+    <span class="doccomment">/// Attempts to convert this [`PresenceUser`] instance into a [`User`].</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// If one of [`User`]&#39;s required fields is None in `self`, None is returned.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">into_user</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">User</span><span class="op">&gt;</span> {
+        <span class="prelude-val">Some</span>(<span class="ident">User</span> {
+            <span class="ident">avatar</span>: <span class="self">self</span>.<span class="ident">avatar</span>,
+            <span class="ident">bot</span>: <span class="self">self</span>.<span class="ident">bot</span><span class="question-mark">?</span>,
+            <span class="ident">discriminator</span>: <span class="self">self</span>.<span class="ident">discriminator</span><span class="question-mark">?</span>,
+            <span class="ident">id</span>: <span class="self">self</span>.<span class="ident">id</span>,
+            <span class="ident">name</span>: <span class="self">self</span>.<span class="ident">name</span><span class="question-mark">?</span>,
+            <span class="ident">public_flags</span>: <span class="self">self</span>.<span class="ident">public_flags</span>,
+            <span class="ident">banner</span>: <span class="prelude-val">None</span>,
+            <span class="ident">accent_colour</span>: <span class="prelude-val">None</span>,
+        })
+    }
+
+    <span class="doccomment">/// Attempts to convert this [`PresenceUser`] instance into a [`User`].</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// Will clone individual fields if needed.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// If one of [`User`]&#39;s required fields is None in `self`, None is returned.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">to_user</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">User</span><span class="op">&gt;</span> {
+        <span class="prelude-val">Some</span>(<span class="ident">User</span> {
+            <span class="ident">avatar</span>: <span class="self">self</span>.<span class="ident">avatar</span>.<span class="ident">clone</span>(),
+            <span class="ident">bot</span>: <span class="self">self</span>.<span class="ident">bot</span><span class="question-mark">?</span>,
+            <span class="ident">discriminator</span>: <span class="self">self</span>.<span class="ident">discriminator</span><span class="question-mark">?</span>,
+            <span class="ident">id</span>: <span class="self">self</span>.<span class="ident">id</span>,
+            <span class="ident">name</span>: <span class="self">self</span>.<span class="ident">name</span>.<span class="ident">clone</span>()<span class="question-mark">?</span>,
+            <span class="ident">public_flags</span>: <span class="self">self</span>.<span class="ident">public_flags</span>,
+            <span class="ident">banner</span>: <span class="prelude-val">None</span>,
+            <span class="ident">accent_colour</span>: <span class="prelude-val">None</span>,
+        })
+    }
+
+    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span> <span class="comment">// method is only used with the cache feature enabled</span>
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">update_with_user</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">user</span>: <span class="ident">User</span>) {
+        <span class="self">self</span>.<span class="ident">id</span> <span class="op">=</span> <span class="ident">user</span>.<span class="ident">id</span>;
+        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">avatar</span>) <span class="op">=</span> <span class="ident">user</span>.<span class="ident">avatar</span> {
+            <span class="self">self</span>.<span class="ident">avatar</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">avatar</span>);
+        }
+        <span class="self">self</span>.<span class="ident">bot</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">user</span>.<span class="ident">bot</span>);
+        <span class="self">self</span>.<span class="ident">discriminator</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">user</span>.<span class="ident">discriminator</span>);
+        <span class="self">self</span>.<span class="ident">name</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">user</span>.<span class="ident">name</span>);
+        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">public_flags</span>) <span class="op">=</span> <span class="ident">user</span>.<span class="ident">public_flags</span> {
+            <span class="self">self</span>.<span class="ident">public_flags</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">public_flags</span>);
+        }
+    }
+}
+
 <span class="doccomment">/// Information detailing the current online status of a [`User`].</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>)]</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
 <span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Presence</span> {
     <span class="doccomment">/// [`User`]&#39;s current activities.</span>
+    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">default</span>)]</span>
     <span class="kw">pub</span> <span class="ident">activities</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Activity</span><span class="op">&gt;</span>,
     <span class="doccomment">/// The devices a user are currently active on, if available.</span>
+    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">default</span>)]</span>
     <span class="kw">pub</span> <span class="ident">client_status</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ClientStatus</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// The date of the last presence update.</span>
-    <span class="kw">pub</span> <span class="ident">last_modified</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// The `GuildId` the presence update is coming from.</span>
+    <span class="kw">pub</span> <span class="ident">guild_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">GuildId</span><span class="op">&gt;</span>,
     <span class="doccomment">/// The user&#39;s online status.</span>
     <span class="kw">pub</span> <span class="ident">status</span>: <span class="ident">OnlineStatus</span>,
-    <span class="doccomment">/// The Id of the [`User`]. Can be used to calculate the user&#39;s creation</span>
-    <span class="doccomment">/// date.</span>
-    <span class="kw">pub</span> <span class="ident">user_id</span>: <span class="ident">UserId</span>,
-    <span class="doccomment">/// The associated user instance.</span>
-    <span class="kw">pub</span> <span class="ident">user</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">User</span><span class="op">&gt;</span>,
-}
-
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="ident">Deserialize</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Presence</span> {
-    <span class="kw">fn</span> <span class="ident">deserialize</span><span class="op">&lt;</span><span class="ident">D</span>: <span class="ident">Deserializer</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">deserializer</span>: <span class="ident">D</span>) -&gt; <span class="ident">StdResult</span><span class="op">&lt;</span><span class="ident">Presence</span>, <span class="ident">D::Error</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">map</span> <span class="op">=</span> <span class="ident">JsonMap::deserialize</span>(<span class="ident">deserializer</span>)<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">user_map</span> <span class="op">=</span> <span class="ident">map</span>
-            .<span class="ident">remove</span>(<span class="string">&quot;user&quot;</span>)
-            .<span class="ident">ok_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">DeError::custom</span>(<span class="string">&quot;expected presence user&quot;</span>))
-            .<span class="ident">and_then</span>(<span class="ident">JsonMap::deserialize</span>)
-            .<span class="ident">map_err</span>(<span class="ident">DeError::custom</span>)<span class="question-mark">?</span>;
-
-        <span class="kw">let</span> (<span class="ident">user_id</span>, <span class="ident">user</span>) <span class="op">=</span> <span class="kw">if</span> <span class="ident">user_map</span>.<span class="ident">len</span>() <span class="op">&gt;</span> <span class="number">1</span> {
-            <span class="kw">let</span> <span class="ident">user</span> <span class="op">=</span> <span class="ident">User::deserialize</span>(<span class="ident">Value::Object</span>(<span class="ident">user_map</span>)).<span class="ident">map_err</span>(<span class="ident">DeError::custom</span>)<span class="question-mark">?</span>;
-
-            (<span class="ident">user</span>.<span class="ident">id</span>, <span class="prelude-val">Some</span>(<span class="ident">user</span>))
-        } <span class="kw">else</span> {
-            <span class="kw">let</span> <span class="ident">user_id</span> <span class="op">=</span> <span class="ident">user_map</span>
-                .<span class="ident">remove</span>(<span class="string">&quot;id&quot;</span>)
-                .<span class="ident">ok_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">DeError::custom</span>(<span class="string">&quot;Missing presence user id&quot;</span>))
-                .<span class="ident">and_then</span>(<span class="ident">UserId::deserialize</span>)
-                .<span class="ident">map_err</span>(<span class="ident">DeError::custom</span>)<span class="question-mark">?</span>;
-
-            (<span class="ident">user_id</span>, <span class="prelude-val">None</span>)
-        };
-
-        <span class="kw">let</span> <span class="ident">activities</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">map</span>.<span class="ident">remove</span>(<span class="string">&quot;activities&quot;</span>) {
-            <span class="prelude-val">Some</span>(<span class="ident">v</span>) =&gt; <span class="ident">serde_json::from_value</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Activity</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">v</span>).<span class="ident">map_err</span>(<span class="ident">DeError::custom</span>)<span class="question-mark">?</span>,
-            <span class="prelude-val">None</span> =&gt; <span class="ident">Vec::new</span>(),
-        };
-
-        <span class="kw">let</span> <span class="ident">client_status</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">map</span>.<span class="ident">remove</span>(<span class="string">&quot;client_status&quot;</span>) {
-            <span class="prelude-val">Some</span>(<span class="ident">v</span>) =&gt; {
-                <span class="ident">serde_json::from_value</span>::<span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ClientStatus</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">v</span>).<span class="ident">map_err</span>(<span class="ident">DeError::custom</span>)<span class="question-mark">?</span>
-            },
-            <span class="prelude-val">None</span> =&gt; <span class="prelude-val">None</span>,
-        };
-
-        <span class="kw">let</span> <span class="ident">last_modified</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">map</span>.<span class="ident">remove</span>(<span class="string">&quot;last_modified&quot;</span>) {
-            <span class="prelude-val">Some</span>(<span class="ident">v</span>) =&gt; <span class="ident">serde_json::from_value</span>::<span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">v</span>).<span class="ident">map_err</span>(<span class="ident">DeError::custom</span>)<span class="question-mark">?</span>,
-            <span class="prelude-val">None</span> =&gt; <span class="prelude-val">None</span>,
-        };
-
-        <span class="kw">let</span> <span class="ident">status</span> <span class="op">=</span> <span class="ident">map</span>
-            .<span class="ident">remove</span>(<span class="string">&quot;status&quot;</span>)
-            .<span class="ident">ok_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">DeError::custom</span>(<span class="string">&quot;expected presence status&quot;</span>))
-            .<span class="ident">and_then</span>(<span class="ident">OnlineStatus::deserialize</span>)
-            .<span class="ident">map_err</span>(<span class="ident">DeError::custom</span>)<span class="question-mark">?</span>;
-
-        <span class="prelude-val">Ok</span>(<span class="ident">Presence</span> {
-            <span class="ident">activities</span>,
-            <span class="ident">client_status</span>,
-            <span class="ident">last_modified</span>,
-            <span class="ident">status</span>,
-            <span class="ident">user_id</span>,
-            <span class="ident">user</span>,
-        })
-    }
-}
-
-<span class="kw">impl</span> <span class="ident">Serialize</span> <span class="kw">for</span> <span class="ident">Presence</span> {
-    <span class="kw">fn</span> <span class="ident">serialize</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">serializer</span>: <span class="ident">S</span>) -&gt; <span class="ident">StdResult</span><span class="op">&lt;</span><span class="ident">S::Ok</span>, <span class="ident">S::Error</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">S</span>: <span class="ident">Serializer</span>,
-    {
-        <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Serialize</span>)]</span>
-        <span class="kw">struct</span> <span class="ident">UserId</span> {
-            <span class="ident">id</span>: <span class="ident">u64</span>,
-        }
-
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">state</span> <span class="op">=</span> <span class="ident">serializer</span>.<span class="ident">serialize_struct</span>(<span class="string">&quot;Presence&quot;</span>, <span class="number">3</span>)<span class="question-mark">?</span>;
-        <span class="ident">state</span>.<span class="ident">serialize_field</span>(<span class="string">&quot;client_status&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">client_status</span>)<span class="question-mark">?</span>;
-        <span class="ident">state</span>.<span class="ident">serialize_field</span>(<span class="string">&quot;last_modified&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">last_modified</span>)<span class="question-mark">?</span>;
-        <span class="ident">state</span>.<span class="ident">serialize_field</span>(<span class="string">&quot;status&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">status</span>)<span class="question-mark">?</span>;
-
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">user</span>) <span class="op">=</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">user</span> {
-            <span class="ident">state</span>.<span class="ident">serialize_field</span>(<span class="string">&quot;user&quot;</span>, <span class="kw-2">&amp;</span><span class="ident">user</span>)<span class="question-mark">?</span>;
-        } <span class="kw">else</span> {
-            <span class="ident">state</span>.<span class="ident">serialize_field</span>(<span class="string">&quot;user&quot;</span>, <span class="kw-2">&amp;</span><span class="ident">UserId</span> {
-                <span class="ident">id</span>: <span class="self">self</span>.<span class="ident">user_id</span>.<span class="number">0</span>,
-            })<span class="question-mark">?</span>;
-        }
-
-        <span class="ident">state</span>.<span class="ident">end</span>()
-    }
+    <span class="doccomment">/// Data about the associated user.</span>
+    <span class="kw">pub</span> <span class="ident">user</span>: <span class="ident">PresenceUser</span>,
 }
 
 <span class="doccomment">/// An initial set of information given after IDENTIFYing to the gateway.</span>
@@ -1439,18 +1338,10 @@
 <span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Ready</span> {
     <span class="kw">pub</span> <span class="ident">application</span>: <span class="ident">PartialCurrentApplicationInfo</span>,
-    <span class="kw">pub</span> <span class="ident">guilds</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">GuildStatus</span><span class="op">&gt;</span>,
-    <span class="attribute">#[<span class="ident">serde</span>(
-        <span class="ident">default</span>,
-        <span class="ident">serialize_with</span> <span class="op">=</span> <span class="string">&quot;serialize_presences&quot;</span>,
-        <span class="ident">deserialize_with</span> <span class="op">=</span> <span class="string">&quot;deserialize_presences&quot;</span>
-    )]</span>
+    <span class="kw">pub</span> <span class="ident">guilds</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">UnavailableGuild</span><span class="op">&gt;</span>,
+    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">default</span>, <span class="ident">with</span> <span class="op">=</span> <span class="string">&quot;presences&quot;</span>)]</span>
     <span class="kw">pub</span> <span class="ident">presences</span>: <span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">UserId</span>, <span class="ident">Presence</span><span class="op">&gt;</span>,
-    <span class="attribute">#[<span class="ident">serde</span>(
-        <span class="ident">default</span>,
-        <span class="ident">serialize_with</span> <span class="op">=</span> <span class="string">&quot;serialize_private_channels&quot;</span>,
-        <span class="ident">deserialize_with</span> <span class="op">=</span> <span class="string">&quot;deserialize_private_channels&quot;</span>
-    )]</span>
+    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">default</span>, <span class="ident">with</span> <span class="op">=</span> <span class="string">&quot;private_channels&quot;</span>)]</span>
     <span class="kw">pub</span> <span class="ident">private_channels</span>: <span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">ChannelId</span>, <span class="ident">Channel</span><span class="op">&gt;</span>,
     <span class="kw">pub</span> <span class="ident">session_id</span>: <span class="ident">String</span>,
     <span class="kw">pub</span> <span class="ident">shard</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span>[<span class="ident">u64</span>; <span class="number">2</span>]<span class="op">&gt;</span>,
@@ -1481,6 +1372,317 @@
     <span class="kw">pub</span> <span class="ident">end</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span>,
     <span class="kw">pub</span> <span class="ident">start</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span>,
 }
+
+<span class="macro">bitflags!</span> {
+    <span class="doccomment">/// [Gateway Intents] will limit the events your bot will receive via the gateway.</span>
+    <span class="doccomment">/// By default, all intents except [Privileged Intents] are selected.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # What are Intents</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// A [gateway intent] sets the types of gateway events</span>
+    <span class="doccomment">/// (e.g. member joins, guild integrations, guild emoji updates, ...) the</span>
+    <span class="doccomment">/// bot shall receive. Carefully picking the needed intents greatly helps</span>
+    <span class="doccomment">/// the bot to scale, as less intents will result in less events to be</span>
+    <span class="doccomment">/// received via the network from Discord and less processing needed for</span>
+    <span class="doccomment">/// handling the data.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Privileged Intents</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// The intents [`GatewayIntents::GUILD_PRESENCES`], [`GatewayIntents::GUILD_MEMBERS`]</span>
+    <span class="doccomment">/// and [`GatewayIntents::MESSAGE_CONTENT`] are [Privileged Intents]. They need to be enabled in</span>
+    <span class="doccomment">/// the *developer portal*.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// **Note**:</span>
+    <span class="doccomment">/// Once the bot is in 100 guilds or more, [the bot must be verified] in</span>
+    <span class="doccomment">/// order to use privileged intents.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// [gateway intent]: https://discord.com/developers/docs/topics/gateway#privileged-intents</span>
+    <span class="doccomment">/// [Privileged Intents]: https://discord.com/developers/docs/topics/gateway#privileged-intents</span>
+    <span class="doccomment">/// [the bot must be verified]: https://support.discord.com/hc/en-us/articles/360040720412-Bot-Verification-and-Data-Whitelisting</span>
+    <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Default</span>)]</span>
+    <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">GatewayIntents</span>: <span class="ident">u64</span> {
+        <span class="doccomment">/// Enables following gateway events:</span>
+        <span class="doccomment">///</span>
+        <span class="doccomment">/// - GUILD_CREATE</span>
+        <span class="doccomment">/// - GUILD_DELETE</span>
+        <span class="doccomment">/// - GUILD_ROLE_CREATE</span>
+        <span class="doccomment">/// - GUILD_ROLE_UPDATE</span>
+        <span class="doccomment">/// - GUILD_ROLE_DELETE</span>
+        <span class="doccomment">/// - CHANNEL_CREATE</span>
+        <span class="doccomment">/// - CHANNEL_UPDATE</span>
+        <span class="doccomment">/// - CHANNEL_DELETE</span>
+        <span class="doccomment">/// - CHANNEL_PINS_UPDATE</span>
+        <span class="doccomment">/// - THREAD_CREATE</span>
+        <span class="doccomment">/// - THREAD_UPDATE</span>
+        <span class="doccomment">/// - THREAD_DELETE</span>
+        <span class="doccomment">/// - THREAD_LIST_SYNC</span>
+        <span class="doccomment">/// - THREAD_MEMBER_UPDATE</span>
+        <span class="doccomment">/// - THREAD_MEMBERS_UPDATE</span>
+        <span class="doccomment">/// - STAGE_INSTANCE_CREATE</span>
+        <span class="doccomment">/// - STAGE_INSTANCE_UPDATE</span>
+        <span class="doccomment">/// - STAGE_INSTANCE_DELETE</span>
+        <span class="kw">const</span> <span class="ident">GUILDS</span> <span class="op">=</span> <span class="number">1</span>;
+        <span class="doccomment">/// Enables following gateway events:</span>
+        <span class="doccomment">///</span>
+        <span class="doccomment">/// - GUILD_MEMBER_ADD</span>
+        <span class="doccomment">/// - GUILD_MEMBER_UPDATE</span>
+        <span class="doccomment">/// - GUILD_MEMBER_REMOVE</span>
+        <span class="doccomment">/// - THREAD_MEMBERS_UPDATE</span>
+        <span class="doccomment">///</span>
+        <span class="doccomment">/// **Info**:</span>
+        <span class="doccomment">/// This intent is *privileged*.</span>
+        <span class="doccomment">/// In order to use it, you must head to your application in the</span>
+        <span class="doccomment">/// Developer Portal and enable the toggle for *Privileged Intents*.</span>
+        <span class="doccomment">///</span>
+        <span class="doccomment">/// This intent is also necessary to even receive the events in contains.</span>
+        <span class="kw">const</span> <span class="ident">GUILD_MEMBERS</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">1</span>;
+        <span class="doccomment">/// Enables following gateway events:</span>
+        <span class="doccomment">///</span>
+        <span class="doccomment">/// - GUILD_BAN_ADD</span>
+        <span class="doccomment">/// - GUILD_BAN_REMOVE</span>
+        <span class="kw">const</span> <span class="ident">GUILD_BANS</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">2</span>;
+        <span class="doccomment">/// Enables following gateway event:</span>
+        <span class="doccomment">///</span>
+        <span class="doccomment">/// - GUILD_EMOJIS_UPDATE</span>
+        <span class="doccomment">/// - GUILD_STICKERS_UPDATE</span>
+        <span class="kw">const</span> <span class="ident">GUILD_EMOJIS_AND_STICKERS</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">3</span>;
+        <span class="doccomment">/// Enables following gateway event:</span>
+        <span class="doccomment">///</span>
+        <span class="doccomment">/// - GUILD_INTEGRATIONS_UPDATE</span>
+        <span class="doccomment">/// - INTEGRATION_CREATE</span>
+        <span class="doccomment">/// - INTEGRATION_UPDATE</span>
+        <span class="doccomment">/// - INTEGRATION_DELETE</span>
+        <span class="kw">const</span> <span class="ident">GUILD_INTEGRATIONS</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">4</span>;
+        <span class="doccomment">/// Enables following gateway event:</span>
+        <span class="doccomment">///</span>
+        <span class="doccomment">/// - WEBHOOKS_UPDATE</span>
+        <span class="kw">const</span> <span class="ident">GUILD_WEBHOOKS</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">5</span>;
+        <span class="doccomment">/// Enables following gateway events:</span>
+        <span class="doccomment">///</span>
+        <span class="doccomment">/// - INVITE_CREATE</span>
+        <span class="doccomment">/// - INVITE_DELETE</span>
+        <span class="kw">const</span> <span class="ident">GUILD_INVITES</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">6</span>;
+        <span class="doccomment">/// Enables following gateway event:</span>
+        <span class="doccomment">///</span>
+        <span class="doccomment">/// - VOICE_STATE_UPDATE</span>
+        <span class="kw">const</span> <span class="ident">GUILD_VOICE_STATES</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">7</span>;
+        <span class="doccomment">/// Enables following gateway event:</span>
+        <span class="doccomment">///</span>
+        <span class="doccomment">/// - PRESENCE_UPDATE</span>
+        <span class="doccomment">///</span>
+        <span class="doccomment">/// **Info**:</span>
+        <span class="doccomment">/// This intent is *privileged*.</span>
+        <span class="doccomment">/// In order to use it, you must head to your application in the</span>
+        <span class="doccomment">/// Developer Portal and enable the toggle for *Privileged Intents*.</span>
+        <span class="doccomment">///</span>
+        <span class="doccomment">/// This intent is also necessary to even receive the events in contains.</span>
+        <span class="kw">const</span> <span class="ident">GUILD_PRESENCES</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">8</span>;
+        <span class="doccomment">/// Enables following gateway events:</span>
+        <span class="doccomment">///</span>
+        <span class="doccomment">/// - MESSAGE_CREATE</span>
+        <span class="doccomment">/// - MESSAGE_UPDATE</span>
+        <span class="doccomment">/// - MESSAGE_DELETE</span>
+        <span class="doccomment">/// - MESSAGE_DELETE_BULK</span>
+        <span class="kw">const</span> <span class="ident">GUILD_MESSAGES</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">9</span>;
+        <span class="doccomment">/// Enables following gateway events:</span>
+        <span class="doccomment">///</span>
+        <span class="doccomment">/// - MESSAGE_REACTION_ADD</span>
+        <span class="doccomment">/// - MESSAGE_REACTION_REMOVE</span>
+        <span class="doccomment">/// - MESSAGE_REACTION_REMOVE_ALL</span>
+        <span class="doccomment">/// - MESSAGE_REACTION_REMOVE_EMOJI</span>
+        <span class="kw">const</span> <span class="ident">GUILD_MESSAGE_REACTIONS</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">10</span>;
+        <span class="doccomment">/// Enable following gateway event:</span>
+        <span class="doccomment">///</span>
+        <span class="doccomment">/// - TYPING_START</span>
+        <span class="kw">const</span> <span class="ident">GUILD_MESSAGE_TYPING</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">11</span>;
+        <span class="doccomment">/// Enable following gateway events:</span>
+        <span class="doccomment">///</span>
+        <span class="doccomment">/// - MESSAGE_CREATE</span>
+        <span class="doccomment">/// - MESSAGE_UPDATE</span>
+        <span class="doccomment">/// - MESSAGE_DELETE</span>
+        <span class="doccomment">/// - CHANNEL_PINS_UPDATE</span>
+        <span class="kw">const</span> <span class="ident">DIRECT_MESSAGES</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">12</span>;
+        <span class="doccomment">/// Enable following gateway events:</span>
+        <span class="doccomment">///</span>
+        <span class="doccomment">/// - MESSAGE_REACTION_ADD</span>
+        <span class="doccomment">/// - MESSAGE_REACTION_REMOVE</span>
+        <span class="doccomment">/// - MESSAGE_REACTION_REMOVE_ALL</span>
+        <span class="doccomment">/// - MESSAGE_REACTION_REMOVE_EMOJI</span>
+        <span class="kw">const</span> <span class="ident">DIRECT_MESSAGE_REACTIONS</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">13</span>;
+        <span class="doccomment">/// Enable following gateway event:</span>
+        <span class="doccomment">///</span>
+        <span class="doccomment">/// - TYPING_START</span>
+        <span class="kw">const</span> <span class="ident">DIRECT_MESSAGE_TYPING</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">14</span>;
+        <span class="doccomment">/// Enable message content in following gateway events:</span>
+        <span class="doccomment">///</span>
+        <span class="doccomment">/// - MESSAGE_CREATE</span>
+        <span class="doccomment">///</span>
+        <span class="doccomment">/// **Info**:</span>
+        <span class="doccomment">/// This intent is *privileged*.</span>
+        <span class="doccomment">/// In order to use it, you must head to your application in the</span>
+        <span class="doccomment">/// Developer Portal and enable the toggle for *Privileged Intents*.</span>
+        <span class="kw">const</span> <span class="ident">MESSAGE_CONTENT</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">15</span>;
+        <span class="doccomment">/// Enable following gateway events:</span>
+        <span class="doccomment">///</span>
+        <span class="doccomment">/// - GUILD_SCHEDULED_EVENT_CREATE</span>
+        <span class="doccomment">/// - GUILD_SCHEDULED_EVENT_UPDATE</span>
+        <span class="doccomment">/// - GUILD_SCHEDULED_EVENT_DELETE</span>
+        <span class="doccomment">/// - GUILD_SCHEDULED_EVENT_USER_ADD</span>
+        <span class="doccomment">/// - GUILD_SCHEDULED_EVENT_USER_REMOVE</span>
+        <span class="kw">const</span> <span class="ident">GUILD_SCHEDULED_EVENTS</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">16</span>;
+    }
+}
+
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
+<span class="kw">impl</span> <span class="ident">GatewayIntents</span> {
+    <span class="doccomment">/// Gets all of the intents that aren&#39;t considered privileged by Discord.</span>
+    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">non_privileged</span>() -&gt; <span class="ident">GatewayIntents</span> {
+        <span class="comment">// bitflags don&#39;t support const evaluation. Workaround.</span>
+        <span class="comment">// See: https://github.com/bitflags/bitflags/issues/180</span>
+        <span class="ident"><span class="self">Self</span>::privileged</span>().<span class="ident">complement</span>()
+    }
+
+    <span class="doccomment">/// Gets all of the intents that are considered privileged by Discord.</span>
+    <span class="doccomment">/// Use of these intents will require explicitly whitelisting the bot.</span>
+    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">privileged</span>() -&gt; <span class="ident">GatewayIntents</span> {
+        <span class="comment">// bitflags don&#39;t support const evaluation. Workaround.</span>
+        <span class="comment">// See: https://github.com/bitflags/bitflags/issues/180</span>
+        <span class="ident"><span class="self">Self</span>::GUILD_MEMBERS</span>.<span class="ident">union</span>(<span class="ident"><span class="self">Self</span>::GUILD_PRESENCES</span>).<span class="ident">union</span>(<span class="ident"><span class="self">Self</span>::MESSAGE_CONTENT</span>)
+    }
+
+    <span class="doccomment">/// Checks if any of the included intents are privileged.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_privileged</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
+        <span class="self">self</span>.<span class="ident">intersects</span>(<span class="ident"><span class="self">Self</span>::privileged</span>())
+    }
+
+    <span class="doccomment">/// Shorthand for checking that the set of intents contains the</span>
+    <span class="doccomment">/// [GUILDS] intent.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// [GUILDS]: Self::GUILDS</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">guilds</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
+        <span class="self">self</span>.<span class="ident">contains</span>(<span class="ident"><span class="self">Self</span>::GUILDS</span>)
+    }
+
+    <span class="doccomment">/// Shorthand for checking that the set of intents contains the</span>
+    <span class="doccomment">/// [GUILD_MEMBERS] intent.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// [GUILD_MEMBERS]: Self::GUILD_MEMBERS</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">guild_members</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
+        <span class="self">self</span>.<span class="ident">contains</span>(<span class="ident"><span class="self">Self</span>::GUILD_MEMBERS</span>)
+    }
+
+    <span class="doccomment">/// Shorthand for checking that the set of intents contains the</span>
+    <span class="doccomment">/// [GUILD_BANS] intent.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// [GUILD_BANS]: Self::GUILD_BANS</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">guild_bans</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
+        <span class="self">self</span>.<span class="ident">contains</span>(<span class="ident"><span class="self">Self</span>::GUILD_BANS</span>)
+    }
+
+    <span class="doccomment">/// Shorthand for checking that the set of intents contains the</span>
+    <span class="doccomment">/// [GUILD_EMOJIS_AND_STICKERS] intent.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// [GUILD_EMOJIS_AND_STICKERS]: Self::GUILD_EMOJIS_AND_STICKERS</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">guild_emojis_and_stickers</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
+        <span class="self">self</span>.<span class="ident">contains</span>(<span class="ident"><span class="self">Self</span>::GUILD_EMOJIS_AND_STICKERS</span>)
+    }
+
+    <span class="doccomment">/// Shorthand for checking that the set of intents contains the</span>
+    <span class="doccomment">/// [GUILD_INTEGRATIONS] intent.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// [GUILD_INTEGRATIONS]: Self::GUILD_INTEGRATIONS</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">guild_integrations</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
+        <span class="self">self</span>.<span class="ident">contains</span>(<span class="ident"><span class="self">Self</span>::GUILD_INTEGRATIONS</span>)
+    }
+
+    <span class="doccomment">/// Shorthand for checking that the set of intents contains the</span>
+    <span class="doccomment">/// [GUILD_WEBHOOKS] intent.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// [GUILD_WEBHOOKS]: Self::GUILD_WEBHOOKS</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">guild_webhooks</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
+        <span class="self">self</span>.<span class="ident">contains</span>(<span class="ident"><span class="self">Self</span>::GUILD_WEBHOOKS</span>)
+    }
+
+    <span class="doccomment">/// Shorthand for checking that the set of intents contains the</span>
+    <span class="doccomment">/// [GUILD_INVITES] intent.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// [GUILD_INVITES]: Self::GUILD_INVITES</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">guild_invites</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
+        <span class="self">self</span>.<span class="ident">contains</span>(<span class="ident"><span class="self">Self</span>::GUILD_INVITES</span>)
+    }
+
+    <span class="doccomment">/// Shorthand for checking that the set of intents contains the</span>
+    <span class="doccomment">/// [GUILD_VOICE_STATES] intent.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// [GUILD_VOICE_STATES]: Self::GUILD_VOICE_STATES</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">guild_voice_states</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
+        <span class="self">self</span>.<span class="ident">contains</span>(<span class="ident"><span class="self">Self</span>::GUILD_VOICE_STATES</span>)
+    }
+
+    <span class="doccomment">/// Shorthand for checking that the set of intents contains the</span>
+    <span class="doccomment">/// [GUILD_PRESENCES] intent.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// [GUILD_PRESENCES]: Self::GUILD_PRESENCES</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">guild_presences</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
+        <span class="self">self</span>.<span class="ident">contains</span>(<span class="ident"><span class="self">Self</span>::GUILD_PRESENCES</span>)
+    }
+
+    <span class="doccomment">/// Shorthand for checking that the set of intents contains the</span>
+    <span class="doccomment">/// [GUILD_MESSAGE_REACTIONS] intent.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// [GUILD_MESSAGE_REACTIONS]: Self::GUILD_MESSAGE_REACTIONS</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">guild_message_reactions</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
+        <span class="self">self</span>.<span class="ident">contains</span>(<span class="ident"><span class="self">Self</span>::GUILD_MESSAGE_REACTIONS</span>)
+    }
+
+    <span class="doccomment">/// Shorthand for checking that the set of intents contains the</span>
+    <span class="doccomment">/// [GUILD_MESSAGE_TYPING] intent.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// [GUILD_MESSAGE_TYPING]: Self::GUILD_MESSAGE_TYPING</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">guild_message_typing</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
+        <span class="self">self</span>.<span class="ident">contains</span>(<span class="ident"><span class="self">Self</span>::GUILD_MESSAGE_TYPING</span>)
+    }
+
+    <span class="doccomment">/// Shorthand for checking that the set of intents contains the</span>
+    <span class="doccomment">/// [DIRECT_MESSAGES] intent.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// [DIRECT_MESSAGES]: Self::DIRECT_MESSAGES</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">direct_messages</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
+        <span class="self">self</span>.<span class="ident">contains</span>(<span class="ident"><span class="self">Self</span>::DIRECT_MESSAGES</span>)
+    }
+
+    <span class="doccomment">/// Shorthand for checking that the set of intents contains the</span>
+    <span class="doccomment">/// [DIRECT_MESSAGE_REACTIONS] intent.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// [DIRECT_MESSAGE_REACTIONS]: Self::DIRECT_MESSAGE_REACTIONS</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">direct_message_reactions</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
+        <span class="self">self</span>.<span class="ident">contains</span>(<span class="ident"><span class="self">Self</span>::DIRECT_MESSAGE_REACTIONS</span>)
+    }
+
+    <span class="doccomment">/// Shorthand for checking that the set of intents contains the</span>
+    <span class="doccomment">/// [DIRECT_MESSAGE_TYPING] intent.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// [DIRECT_MESSAGE_TYPING]: Self::DIRECT_MESSAGE_TYPING</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">direct_message_typing</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
+        <span class="self">self</span>.<span class="ident">contains</span>(<span class="ident"><span class="self">Self</span>::DIRECT_MESSAGE_TYPING</span>)
+    }
+
+    <span class="doccomment">/// Shorthand for checking that the set of intents contains the</span>
+    <span class="doccomment">/// [MESSAGE_CONTENT] intent.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// [MESSAGE_CONTENT]: Self::MESSAGE_CONTENT</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">message_content</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
+        <span class="self">self</span>.<span class="ident">contains</span>(<span class="ident"><span class="self">Self</span>::MESSAGE_CONTENT</span>)
+    }
+
+    <span class="doccomment">/// Shorthand for checking that the set of intents contains the</span>
+    <span class="doccomment">/// [GUILD_SCHEDULED_EVENTS] intent.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// [GUILD_SCHEDULED_EVENTS]: Self::GUILD_SCHEDULED_EVENTS</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">guild_scheduled_events</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
+        <span class="self">self</span>.<span class="ident">contains</span>(<span class="ident"><span class="self">Self</span>::GUILD_SCHEDULED_EVENTS</span>)
+    }
+}
 </code></pre></div>
-</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.62.0-nightly (ec77f2524 2022-04-17)" ></div>
+</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.61.0-nightly (3c17c84a3 2022-03-21)" ></div>
 </body></html>

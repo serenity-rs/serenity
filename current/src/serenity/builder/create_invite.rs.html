@@ -251,25 +251,9 @@
 <span id="246">246</span>
 <span id="247">247</span>
 <span id="248">248</span>
-<span id="249">249</span>
-<span id="250">250</span>
-<span id="251">251</span>
-<span id="252">252</span>
-<span id="253">253</span>
-<span id="254">254</span>
-<span id="255">255</span>
-<span id="256">256</span>
-<span id="257">257</span>
-<span id="258">258</span>
-<span id="259">259</span>
-<span id="260">260</span>
-<span id="261">261</span>
-<span id="262">262</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::collections::HashMap</span>;
 
-<span class="kw">use</span> <span class="ident">serde_json::Value</span>;
-
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::internal::prelude</span>::<span class="kw-2">*</span>;
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::json</span>::{<span class="ident">from_number</span>, <span class="ident">Value</span>, <span class="ident">NULL</span>};
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::id</span>::{<span class="ident">ApplicationId</span>, <span class="ident">UserId</span>};
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::invite::InviteTargetType</span>;
 
@@ -295,7 +279,7 @@
 <span class="doccomment">/// impl EventHandler for Handler {</span>
 <span class="doccomment">///     async fn message(&amp;self, context: Context, msg: Message) {</span>
 <span class="doccomment">///         if msg.content == &quot;!createinvite&quot; {</span>
-<span class="doccomment">///             let channel = match context.cache.guild_channel(msg.channel_id).await {</span>
+<span class="doccomment">///             let channel = match context.cache.guild_channel(msg.channel_id) {</span>
 <span class="doccomment">///                 Some(channel) =&gt; channel,</span>
 <span class="doccomment">///                 None =&gt; {</span>
 <span class="doccomment">///                     let _ = msg.channel_id.say(&amp;context, &quot;Error creating invite&quot;).await;</span>
@@ -326,7 +310,8 @@
 <span class="doccomment">///     }</span>
 <span class="doccomment">/// }</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// let mut client = Client::builder(&quot;token&quot;).event_handler(Handler).await?;</span>
+<span class="doccomment">/// let mut client =</span>
+<span class="doccomment">///     Client::builder(&quot;token&quot;, GatewayIntents::default()).event_handler(Handler).await?;</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// client.start().await?;</span>
 <span class="doccomment">/// #     Ok(())</span>
@@ -359,17 +344,14 @@
     <span class="doccomment">/// # #[cfg(all(feature = &quot;cache&quot;, feature = &quot;client&quot;, feature = &quot;framework&quot;, feature = &quot;http&quot;))]</span>
     <span class="doccomment">/// # #[command]</span>
     <span class="doccomment">/// # async fn example(context: &amp;Context) -&gt; CommandResult {</span>
-    <span class="doccomment">/// #     let channel = context.cache.guild_channel(81384788765712384).await.unwrap();</span>
+    <span class="doccomment">/// #     let channel = context.cache.guild_channel(81384788765712384).unwrap();</span>
     <span class="doccomment">/// #</span>
-    <span class="doccomment">/// let invite = channel.create_invite(context, |i| {</span>
-    <span class="doccomment">///     i.max_age(3600)</span>
-    <span class="doccomment">/// })</span>
-    <span class="doccomment">/// .await?;</span>
+    <span class="doccomment">/// let invite = channel.create_invite(context, |i| i.max_age(3600)).await?;</span>
     <span class="doccomment">/// #     Ok(())</span>
     <span class="doccomment">/// # }</span>
     <span class="doccomment">/// ```</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">max_age</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">max_age</span>: <span class="ident">u64</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;max_age&quot;</span>, <span class="ident">Value::Number</span>(<span class="ident">Number::from</span>(<span class="ident">max_age</span>)));
+        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;max_age&quot;</span>, <span class="ident">from_number</span>(<span class="ident">max_age</span>));
         <span class="self">self</span>
     }
 
@@ -393,17 +375,14 @@
     <span class="doccomment">/// # #[cfg(all(feature = &quot;cache&quot;, feature = &quot;client&quot;, feature = &quot;framework&quot;, feature = &quot;http&quot;))]</span>
     <span class="doccomment">/// # #[command]</span>
     <span class="doccomment">/// # async fn example(context: &amp;Context) -&gt; CommandResult {</span>
-    <span class="doccomment">/// #     let channel = context.cache.guild_channel(81384788765712384).await.unwrap();</span>
+    <span class="doccomment">/// #     let channel = context.cache.guild_channel(81384788765712384).unwrap();</span>
     <span class="doccomment">/// #</span>
-    <span class="doccomment">/// let invite = channel.create_invite(context, |i| {</span>
-    <span class="doccomment">///     i.max_uses(5)</span>
-    <span class="doccomment">/// })</span>
-    <span class="doccomment">/// .await?;</span>
+    <span class="doccomment">/// let invite = channel.create_invite(context, |i| i.max_uses(5)).await?;</span>
     <span class="doccomment">/// #     Ok(())</span>
     <span class="doccomment">/// # }</span>
     <span class="doccomment">/// ```</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">max_uses</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">max_uses</span>: <span class="ident">u64</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;max_uses&quot;</span>, <span class="ident">Value::Number</span>(<span class="ident">Number::from</span>(<span class="ident">max_uses</span>)));
+        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;max_uses&quot;</span>, <span class="ident">from_number</span>(<span class="ident">max_uses</span>));
         <span class="self">self</span>
     }
 
@@ -425,19 +404,16 @@
     <span class="doccomment">/// # #[cfg(all(feature = &quot;cache&quot;, feature = &quot;client&quot;, feature = &quot;framework&quot;, feature = &quot;http&quot;))]</span>
     <span class="doccomment">/// # #[command]</span>
     <span class="doccomment">/// # async fn example(context: &amp;Context) -&gt; CommandResult {</span>
-    <span class="doccomment">/// #     let channel = context.cache.guild_channel(81384788765712384).await.unwrap();</span>
+    <span class="doccomment">/// #     let channel = context.cache.guild_channel(81384788765712384).unwrap();</span>
     <span class="doccomment">/// #</span>
-    <span class="doccomment">/// let invite = channel.create_invite(context, |i| {</span>
-    <span class="doccomment">///     i.temporary(true)</span>
-    <span class="doccomment">/// })</span>
-    <span class="doccomment">/// .await?;</span>
+    <span class="doccomment">/// let invite = channel.create_invite(context, |i| i.temporary(true)).await?;</span>
     <span class="doccomment">/// #     Ok(())</span>
     <span class="doccomment">/// # }</span>
     <span class="doccomment">/// #</span>
     <span class="doccomment">/// # fn main() {}</span>
     <span class="doccomment">/// ```</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">temporary</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">temporary</span>: <span class="ident">bool</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;temporary&quot;</span>, <span class="ident">Value::Bool</span>(<span class="ident">temporary</span>));
+        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;temporary&quot;</span>, <span class="ident">Value::from</span>(<span class="ident">temporary</span>));
         <span class="self">self</span>
     }
 
@@ -459,23 +435,20 @@
     <span class="doccomment">/// # #[cfg(all(feature = &quot;cache&quot;, feature = &quot;client&quot;, feature = &quot;framework&quot;, feature = &quot;http&quot;))]</span>
     <span class="doccomment">/// # #[command]</span>
     <span class="doccomment">/// # async fn example(context: &amp;Context) -&gt; CommandResult {</span>
-    <span class="doccomment">/// #     let channel = context.cache.guild_channel(81384788765712384).await.unwrap();</span>
+    <span class="doccomment">/// #     let channel = context.cache.guild_channel(81384788765712384).unwrap();</span>
     <span class="doccomment">/// #</span>
-    <span class="doccomment">/// let invite = channel.create_invite(context, |i| {</span>
-    <span class="doccomment">///     i.unique(true)</span>
-    <span class="doccomment">/// })</span>
-    <span class="doccomment">/// .await?;</span>
+    <span class="doccomment">/// let invite = channel.create_invite(context, |i| i.unique(true)).await?;</span>
     <span class="doccomment">/// #     Ok(())</span>
     <span class="doccomment">/// # }</span>
     <span class="doccomment">/// ```</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">unique</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">unique</span>: <span class="ident">bool</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;unique&quot;</span>, <span class="ident">Value::Bool</span>(<span class="ident">unique</span>));
+        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;unique&quot;</span>, <span class="ident">Value::from</span>(<span class="ident">unique</span>));
         <span class="self">self</span>
     }
 
     <span class="doccomment">/// The type of target for this voice channel invite.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">target_type</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">target_type</span>: <span class="ident">InviteTargetType</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;target_type&quot;</span>, <span class="ident">Value::Number</span>(<span class="ident">Number::from</span>(<span class="ident">target_type</span> <span class="kw">as</span> <span class="ident">u8</span>)));
+        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;target_type&quot;</span>, <span class="ident">from_number</span>(<span class="ident">target_type</span> <span class="kw">as</span> <span class="ident">u8</span>));
         <span class="self">self</span>
     }
 
@@ -483,7 +456,7 @@
     <span class="doccomment">/// `Stream`</span>
     <span class="doccomment">/// The user must be streaming in the channel.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">target_user_id</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">target_user_id</span>: <span class="ident">UserId</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;target_user_id&quot;</span>, <span class="ident">Value::Number</span>(<span class="ident">Number::from</span>(<span class="ident">target_user_id</span>.<span class="number">0</span>)));
+        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;target_user_id&quot;</span>, <span class="ident">from_number</span>(<span class="ident">target_user_id</span>.<span class="number">0</span>));
         <span class="self">self</span>
     }
 
@@ -502,8 +475,7 @@
     <span class="doccomment">/// poker: `755827207812677713`</span>
     <span class="doccomment">/// chess: `832012774040141894`</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">target_application_id</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">target_application_id</span>: <span class="ident">ApplicationId</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="number">0</span>
-            .<span class="ident">insert</span>(<span class="string">&quot;target_application_id&quot;</span>, <span class="ident">Value::Number</span>(<span class="ident">Number::from</span>(<span class="ident">target_application_id</span>.<span class="number">0</span>)));
+        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;target_application_id&quot;</span>, <span class="ident">from_number</span>(<span class="ident">target_application_id</span>.<span class="number">0</span>));
         <span class="self">self</span>
     }
 }
@@ -522,11 +494,11 @@
     <span class="doccomment">/// ```</span>
     <span class="kw">fn</span> <span class="ident">default</span>() -&gt; <span class="ident">CreateInvite</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">map</span> <span class="op">=</span> <span class="ident">HashMap::new</span>();
-        <span class="ident">map</span>.<span class="ident">insert</span>(<span class="string">&quot;validate&quot;</span>, <span class="ident">Value::Null</span>);
+        <span class="ident">map</span>.<span class="ident">insert</span>(<span class="string">&quot;validate&quot;</span>, <span class="ident">NULL</span>);
 
         <span class="ident">CreateInvite</span>(<span class="ident">map</span>)
     }
 }
 </code></pre></div>
-</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.62.0-nightly (ec77f2524 2022-04-17)" ></div>
+</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.61.0-nightly (3c17c84a3 2022-03-21)" ></div>
 </body></html>
