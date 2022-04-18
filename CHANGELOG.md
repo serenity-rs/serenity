@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 This project mostly adheres to [Semantic Versioning][semver].
 
+## [0.11.1] - 2021-04-18
+
+This is a light release to fix compilation on https://docs.rs.
+
+Thanks to the following for their contributions:
+
+- [@acdenisSK]
+
+### Changed
+
+- [misc] Manually specify list of features for docs.rs to build ([@acdenisSK]) [c:9f11a3f]
+
 ## [0.11.0] - 2021-04-18
 
 Thanks to the following for their contributions:
@@ -4697,6 +4709,7 @@ Initial commit.
 
 <!-- COMPARISONS -->
 
+[0.11.1]: https://github.com/serenity-rs/serenity/compare/v0.11.0...v0.11.1
 [0.11.0]: https://github.com/serenity-rs/serenity/compare/v0.10.10...v0.11.0
 [0.10.10]: https://github.com/serenity-rs/serenity/compare/v0.10.9...v0.10.10
 [0.10.9]: https://github.com/serenity-rs/serenity/compare/v0.10.8...v0.10.9
@@ -4995,6 +5008,8 @@ Initial commit.
 
 
 <!-- COMMITS -->
+
+[c:9f11a3f]: https://github.com/serenity-rs/serenity/commit/9f11a3f2e9908ae33b3ab0dbd38ccf7fb96370ba
 
 [c:440f0fa]: https://github.com/serenity-rs/serenity/commit/440f0fa5204b00ea3200ee3577d1c051862a6041
 [c:4dbf3d0]: https://github.com/serenity-rs/serenity/commit/4dbf3d06beaec57e1d235f0469907a5a61a02b04
