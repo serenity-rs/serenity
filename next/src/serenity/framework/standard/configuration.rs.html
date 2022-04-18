@@ -608,6 +608,9 @@
 <span id="603">603</span>
 <span id="604">604</span>
 <span id="605">605</span>
+<span id="606">606</span>
+<span id="607">607</span>
+<span id="608">608</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::collections::HashSet</span>;
 
 <span class="kw">use</span> <span class="ident">futures::future::BoxFuture</span>;
@@ -686,7 +689,7 @@
 <span class="doccomment">/// Responding to mentions and setting a command prefix of `&quot;~&quot;`:</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// ```rust,no_run</span>
-<span class="doccomment">/// # use serenity::prelude::EventHandler;</span>
+<span class="doccomment">/// # use serenity::prelude::*;</span>
 <span class="doccomment">/// struct Handler;</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// impl EventHandler for Handler {}</span>
@@ -700,7 +703,10 @@
 <span class="doccomment">/// let framework =</span>
 <span class="doccomment">///     StandardFramework::new().configure(|c| c.on_mention(Some(UserId(5))).prefix(&quot;~&quot;));</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// let mut client = Client::builder(&amp;token).event_handler(Handler).framework(framework).await?;</span>
+<span class="doccomment">/// let mut client = Client::builder(&amp;token, GatewayIntents::default())</span>
+<span class="doccomment">///     .event_handler(Handler)</span>
+<span class="doccomment">///     .framework(framework)</span>
+<span class="doccomment">///     .await?;</span>
 <span class="doccomment">/// #     Ok(())</span>
 <span class="doccomment">/// # }</span>
 <span class="doccomment">/// ```</span>

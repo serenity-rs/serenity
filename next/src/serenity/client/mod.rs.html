@@ -971,6 +971,15 @@
 <span id="966">966</span>
 <span id="967">967</span>
 <span id="968">968</span>
+<span id="969">969</span>
+<span id="970">970</span>
+<span id="971">971</span>
+<span id="972">972</span>
+<span id="973">973</span>
+<span id="974">974</span>
+<span id="975">975</span>
+<span id="976">976</span>
+<span id="977">977</span>
 </pre><pre class="rust"><code><span class="doccomment">//! The Client contains information about a single bot&#39;s token, as well</span>
 <span class="doccomment">//! as event handlers. Dispatching events to configured handlers and starting</span>
 <span class="doccomment">//! the shards&#39; connections are handled directly via the client. In addition,</span>
@@ -1057,12 +1066,12 @@
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;gateway&quot;</span>)]</span>
 <span class="kw">impl</span> <span class="ident">ClientBuilder</span> {
-    <span class="kw">fn</span> <span class="ident">_new</span>(<span class="ident">http</span>: <span class="ident">Http</span>) -&gt; <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">_new</span>(<span class="ident">http</span>: <span class="ident">Http</span>, <span class="ident">intents</span>: <span class="ident">GatewayIntents</span>) -&gt; <span class="self">Self</span> {
         <span class="self">Self</span> {
             <span class="ident">data</span>: <span class="prelude-val">Some</span>(<span class="ident">TypeMap::new</span>()),
             <span class="ident">http</span>: <span class="prelude-val">Some</span>(<span class="ident">http</span>),
             <span class="ident">fut</span>: <span class="prelude-val">None</span>,
-            <span class="ident">intents</span>: <span class="ident">GatewayIntents::non_privileged</span>(),
+            <span class="ident">intents</span>,
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
             <span class="ident">cache_settings</span>: <span class="prelude-val">Some</span>(<span class="ident">CacheSettings::new</span>()),
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;framework&quot;</span>)]</span>
@@ -1081,8 +1090,8 @@
     <span class="doccomment">/// If you have enabled the `framework`-feature (on by default), you must specify</span>
     <span class="doccomment">/// a framework via the [`Self::framework`] or [`Self::framework_arc`] method,</span>
     <span class="doccomment">/// otherwise awaiting the builder will cause a panic.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">token</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident"><span class="self">Self</span>::_new</span>(<span class="ident">Http::new</span>(<span class="ident">token</span>.<span class="ident">as_ref</span>()))
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">token</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span>, <span class="ident">intents</span>: <span class="ident">GatewayIntents</span>) -&gt; <span class="self">Self</span> {
+        <span class="ident"><span class="self">Self</span>::_new</span>(<span class="ident">Http::new</span>(<span class="ident">token</span>.<span class="ident">as_ref</span>()), <span class="ident">intents</span>)
     }
 
     <span class="doccomment">/// Construct a new builder with a [`Http`] instance to calls methods on</span>
@@ -1092,8 +1101,8 @@
     <span class="doccomment">/// If you have enabled the `framework`-feature (on by default), you must specify</span>
     <span class="doccomment">/// a framework via the [`Self::framework`] or [`Self::framework_arc`] method,</span>
     <span class="doccomment">/// otherwise awaiting the builder will cause a panic.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new_with_http</span>(<span class="ident">http</span>: <span class="ident">Http</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident"><span class="self">Self</span>::_new</span>(<span class="ident">http</span>)
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new_with_http</span>(<span class="ident">http</span>: <span class="ident">Http</span>, <span class="ident">intents</span>: <span class="ident">GatewayIntents</span>) -&gt; <span class="self">Self</span> {
+        <span class="ident"><span class="self">Self</span>::_new</span>(<span class="ident">http</span>, <span class="ident">intents</span>)
     }
 
     <span class="doccomment">/// Sets a token for the bot. If the token is not prefixed &quot;Bot &quot;,</span>
@@ -1420,7 +1429,8 @@
 <span class="doccomment">/// }</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// # async fn run() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {</span>
-<span class="doccomment">/// let mut client = Client::builder(&quot;my token here&quot;).event_handler(Handler).await?;</span>
+<span class="doccomment">/// let mut client =</span>
+<span class="doccomment">///     Client::builder(&quot;my token here&quot;, GatewayIntents::default()).event_handler(Handler).await?;</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// client.start().await?;</span>
 <span class="doccomment">/// #   Ok(())</span>
@@ -1506,7 +1516,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// # async fn run() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {</span>
     <span class="doccomment">/// let token = std::env::var(&quot;DISCORD_TOKEN&quot;)?;</span>
-    <span class="doccomment">/// let mut client = Client::builder(&amp;token).event_handler(Handler).await?;</span>
+    <span class="doccomment">/// let mut client = Client::builder(&amp;token, GatewayIntents::default()).event_handler(Handler).await?;</span>
     <span class="doccomment">/// {</span>
     <span class="doccomment">///     let mut data = client.data.write().await;</span>
     <span class="doccomment">///     data.insert::&lt;MessageEventCounter&gt;(HashMap::default());</span>
@@ -1543,7 +1553,7 @@
     <span class="doccomment">/// 5 seconds:</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// ```rust,no_run</span>
-    <span class="doccomment">/// # use serenity::client::{Client, EventHandler};</span>
+    <span class="doccomment">/// # use serenity::prelude::*;</span>
     <span class="doccomment">/// # use std::time::Duration;</span>
     <span class="doccomment">/// #</span>
     <span class="doccomment">/// # async fn run() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {</span>
@@ -1552,7 +1562,8 @@
     <span class="doccomment">/// impl EventHandler for Handler {}</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// let token = std::env::var(&quot;DISCORD_TOKEN&quot;)?;</span>
-    <span class="doccomment">/// let mut client = Client::builder(&amp;token).event_handler(Handler).await?;</span>
+    <span class="doccomment">/// let mut client =</span>
+    <span class="doccomment">///     Client::builder(&amp;token, GatewayIntents::default()).event_handler(Handler).await?;</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// let shard_manager = client.shard_manager.clone();</span>
     <span class="doccomment">///</span>
@@ -1575,14 +1586,15 @@
     <span class="doccomment">/// # async fn run() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {</span>
     <span class="doccomment">/// use std::time::Duration;</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// use serenity::client::{Client, EventHandler};</span>
+    <span class="doccomment">/// use serenity::prelude::*;</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// struct Handler;</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// impl EventHandler for Handler {}</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// let token = std::env::var(&quot;DISCORD_TOKEN&quot;)?;</span>
-    <span class="doccomment">/// let mut client = Client::builder(&amp;token).event_handler(Handler).await?;</span>
+    <span class="doccomment">/// let mut client =</span>
+    <span class="doccomment">///     Client::builder(&amp;token, GatewayIntents::default()).event_handler(Handler).await?;</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// // Create a clone of the `Arc` containing the shard manager.</span>
     <span class="doccomment">/// let shard_manager = client.shard_manager.clone();</span>
@@ -1622,8 +1634,8 @@
 }
 
 <span class="kw">impl</span> <span class="ident">Client</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">builder</span>(<span class="ident">token</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span>) -&gt; <span class="ident">ClientBuilder</span> {
-        <span class="ident">ClientBuilder::new</span>(<span class="ident">token</span>)
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">builder</span>(<span class="ident">token</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span>, <span class="ident">intents</span>: <span class="ident">GatewayIntents</span>) -&gt; <span class="ident">ClientBuilder</span> {
+        <span class="ident">ClientBuilder::new</span>(<span class="ident">token</span>, <span class="ident">intents</span>)
     }
 
     <span class="doccomment">/// Establish the connection and start listening for events.</span>
@@ -1644,7 +1656,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// ```rust,no_run</span>
     <span class="doccomment">/// # use std::error::Error;</span>
-    <span class="doccomment">/// # use serenity::prelude::EventHandler;</span>
+    <span class="doccomment">/// # use serenity::prelude::*;</span>
     <span class="doccomment">/// use serenity::Client;</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// struct Handler;</span>
@@ -1653,7 +1665,8 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// # async fn run() -&gt; Result&lt;(), Box&lt;dyn Error&gt;&gt; {</span>
     <span class="doccomment">/// let token = std::env::var(&quot;DISCORD_TOKEN&quot;)?;</span>
-    <span class="doccomment">/// let mut client = Client::builder(&amp;token).event_handler(Handler).await?;</span>
+    <span class="doccomment">/// let mut client =</span>
+    <span class="doccomment">///     Client::builder(&amp;token, GatewayIntents::default()).event_handler(Handler).await?;</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// if let Err(why) = client.start().await {</span>
     <span class="doccomment">///     println!(&quot;Err with client: {:?}&quot;, why);</span>
@@ -1686,7 +1699,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// ```rust,no_run</span>
     <span class="doccomment">/// # use std::error::Error;</span>
-    <span class="doccomment">/// # use serenity::prelude::EventHandler;</span>
+    <span class="doccomment">/// # use serenity::prelude::*;</span>
     <span class="doccomment">/// use serenity::Client;</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// struct Handler;</span>
@@ -1695,7 +1708,8 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// # async fn run() -&gt; Result&lt;(), Box&lt;dyn Error&gt;&gt; {</span>
     <span class="doccomment">/// let token = std::env::var(&quot;DISCORD_TOKEN&quot;)?;</span>
-    <span class="doccomment">/// let mut client = Client::builder(&amp;token).event_handler(Handler).await?;</span>
+    <span class="doccomment">/// let mut client =</span>
+    <span class="doccomment">///     Client::builder(&amp;token, GatewayIntents::default()).event_handler(Handler).await?;</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// if let Err(why) = client.start_autosharded().await {</span>
     <span class="doccomment">///     println!(&quot;Err with client: {:?}&quot;, why);</span>
@@ -1739,7 +1753,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// ```rust,no_run</span>
     <span class="doccomment">/// # use std::error::Error;</span>
-    <span class="doccomment">/// # use serenity::prelude::EventHandler;</span>
+    <span class="doccomment">/// # use serenity::prelude::*;</span>
     <span class="doccomment">/// use serenity::Client;</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// struct Handler;</span>
@@ -1748,7 +1762,8 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// # async fn run() -&gt; Result&lt;(), Box&lt;dyn Error&gt;&gt; {</span>
     <span class="doccomment">/// let token = std::env::var(&quot;DISCORD_TOKEN&quot;)?;</span>
-    <span class="doccomment">/// let mut client = Client::builder(&amp;token).event_handler(Handler).await?;</span>
+    <span class="doccomment">/// let mut client =</span>
+    <span class="doccomment">///     Client::builder(&amp;token, GatewayIntents::default()).event_handler(Handler).await?;</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// if let Err(why) = client.start_shard(3, 5).await {</span>
     <span class="doccomment">///     println!(&quot;Err with client: {:?}&quot;, why);</span>
@@ -1762,7 +1777,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// ```rust,no_run</span>
     <span class="doccomment">/// # use std::error::Error;</span>
-    <span class="doccomment">/// # use serenity::prelude::EventHandler;</span>
+    <span class="doccomment">/// # use serenity::prelude::*;</span>
     <span class="doccomment">/// use serenity::Client;</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// struct Handler;</span>
@@ -1771,7 +1786,8 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// # async fn run() -&gt; Result&lt;(), Box&lt;dyn Error&gt;&gt; {</span>
     <span class="doccomment">/// let token = std::env::var(&quot;DISCORD_TOKEN&quot;)?;</span>
-    <span class="doccomment">/// let mut client = Client::builder(&amp;token).event_handler(Handler).await?;</span>
+    <span class="doccomment">/// let mut client =</span>
+    <span class="doccomment">///     Client::builder(&amp;token, GatewayIntents::default()).event_handler(Handler).await?;</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// if let Err(why) = client.start_shard(0, 1).await {</span>
     <span class="doccomment">///     println!(&quot;Err with client: {:?}&quot;, why);</span>
@@ -1809,7 +1825,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// ```rust,no_run</span>
     <span class="doccomment">/// # use std::error::Error;</span>
-    <span class="doccomment">/// # use serenity::prelude::EventHandler;</span>
+    <span class="doccomment">/// # use serenity::prelude::*;</span>
     <span class="doccomment">/// use serenity::Client;</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// struct Handler;</span>
@@ -1818,7 +1834,8 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// # async fn run() -&gt; Result&lt;(), Box&lt;dyn Error&gt;&gt; {</span>
     <span class="doccomment">/// let token = std::env::var(&quot;DISCORD_TOKEN&quot;)?;</span>
-    <span class="doccomment">/// let mut client = Client::builder(&amp;token).event_handler(Handler).await?;</span>
+    <span class="doccomment">/// let mut client =</span>
+    <span class="doccomment">///     Client::builder(&amp;token, GatewayIntents::default()).event_handler(Handler).await?;</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// if let Err(why) = client.start_shards(8).await {</span>
     <span class="doccomment">///     println!(&quot;Err with client: {:?}&quot;, why);</span>
@@ -1857,7 +1874,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// ```rust,no_run</span>
     <span class="doccomment">/// # use std::error::Error;</span>
-    <span class="doccomment">/// # use serenity::prelude::EventHandler;</span>
+    <span class="doccomment">/// # use serenity::prelude::*;</span>
     <span class="doccomment">/// use serenity::Client;</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// struct Handler;</span>
@@ -1866,7 +1883,8 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// # async fn run() -&gt; Result&lt;(), Box&lt;dyn Error&gt;&gt; {</span>
     <span class="doccomment">/// let token = std::env::var(&quot;DISCORD_TOKEN&quot;)?;</span>
-    <span class="doccomment">/// let mut client = Client::builder(&amp;token).event_handler(Handler).await?;</span>
+    <span class="doccomment">/// let mut client =</span>
+    <span class="doccomment">///     Client::builder(&amp;token, GatewayIntents::default()).event_handler(Handler).await?;</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// if let Err(why) = client.start_shard_range([4, 7], 10).await {</span>
     <span class="doccomment">///     println!(&quot;Err with client: {:?}&quot;, why);</span>

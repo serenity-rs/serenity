@@ -897,6 +897,9 @@
 <span id="892">892</span>
 <span id="893">893</span>
 <span id="894">894</span>
+<span id="895">895</span>
+<span id="896">896</span>
+<span id="897">897</span>
 </pre><pre class="rust"><code><span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">help_commands</span>;
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">macros</span> {
     <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">command_attr</span>::{<span class="ident">check</span>, <span class="ident">command</span>, <span class="ident">group</span>, <span class="ident">help</span>, <span class="ident">hook</span>};
@@ -1037,7 +1040,7 @@
     <span class="doccomment">/// Configuring the framework for a [`Client`], [allowing whitespace between prefixes], and setting the [`prefix`] to `&quot;~&quot;`:</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// ```rust,no_run</span>
-    <span class="doccomment">/// # use serenity::prelude::EventHandler;</span>
+    <span class="doccomment">/// # use serenity::prelude::*;</span>
     <span class="doccomment">/// # struct Handler;</span>
     <span class="doccomment">/// # impl EventHandler for Handler {}</span>
     <span class="doccomment">/// use serenity::framework::StandardFramework;</span>
@@ -1047,7 +1050,10 @@
     <span class="doccomment">/// let token = std::env::var(&quot;DISCORD_TOKEN&quot;)?;</span>
     <span class="doccomment">/// let framework = StandardFramework::new().configure(|c| c.with_whitespace(true).prefix(&quot;~&quot;));</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// let mut client = Client::builder(&amp;token).event_handler(Handler).framework(framework).await?;</span>
+    <span class="doccomment">/// let mut client = Client::builder(&amp;token, GatewayIntents::default())</span>
+    <span class="doccomment">///     .event_handler(Handler)</span>
+    <span class="doccomment">///     .framework(framework)</span>
+    <span class="doccomment">///     .await?;</span>
     <span class="doccomment">/// #     Ok(())</span>
     <span class="doccomment">/// # }</span>
     <span class="doccomment">/// ```</span>

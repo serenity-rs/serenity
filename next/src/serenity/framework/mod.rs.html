@@ -126,6 +126,9 @@
 <span id="121">121</span>
 <span id="122">122</span>
 <span id="123">123</span>
+<span id="124">124</span>
+<span id="125">125</span>
+<span id="126">126</span>
 </pre><pre class="rust"><code><span class="doccomment">//! The framework is a customizable method of separating commands.</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! This is used in combination with [`ClientBuilder::framework`].</span>
@@ -160,10 +163,10 @@
 <span class="doccomment">//! ping and about command:</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! ```rust,no_run</span>
-<span class="doccomment">//! use serenity::client::{Client, Context, EventHandler};</span>
 <span class="doccomment">//! use serenity::framework::standard::macros::{command, group};</span>
 <span class="doccomment">//! use serenity::framework::standard::{CommandResult, StandardFramework};</span>
 <span class="doccomment">//! use serenity::model::channel::Message;</span>
+<span class="doccomment">//! use serenity::prelude::*;</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! #[command]</span>
 <span class="doccomment">//! async fn about(ctx: &amp;Context, msg: &amp;Message) -&gt; CommandResult {</span>
@@ -198,7 +201,10 @@
 <span class="doccomment">//!     // all-uppercased version of the `name` with a `_GROUP` suffix appended at the end.</span>
 <span class="doccomment">//!     .group(&amp;GENERAL_GROUP);</span>
 <span class="doccomment">//!</span>
-<span class="doccomment">//! let mut client = Client::builder(&amp;token).event_handler(Handler).framework(framework).await?;</span>
+<span class="doccomment">//! let mut client = Client::builder(&amp;token, GatewayIntents::default())</span>
+<span class="doccomment">//!     .event_handler(Handler)</span>
+<span class="doccomment">//!     .framework(framework)</span>
+<span class="doccomment">//!     .await?;</span>
 <span class="doccomment">//! #     Ok(())</span>
 <span class="doccomment">//! # }</span>
 <span class="doccomment">//! ```</span>
