@@ -15,3 +15,6 @@ dae2cb77b407044f44a7a2790d93efba3891854e
 
 # Format the repository and add a workflow for formatting and linting (#1174)
 9bbb25aac4d651804286f333eb503a72d41e473b
+
+# Format imports with module granularity (#1846)
+4c97810b6d25617fa0a0a4b4769deb751a17d373
