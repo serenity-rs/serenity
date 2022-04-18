@@ -4,13 +4,14 @@ use std::time::Duration;
 use std::{env, fmt};
 
 use dotenv::dotenv;
+use serenity::async_trait;
 use serenity::builder::{CreateActionRow, CreateButton, CreateSelectMenu, CreateSelectMenuOption};
 use serenity::client::{Context, EventHandler};
 use serenity::futures::StreamExt;
 use serenity::model::channel::Message;
 use serenity::model::interactions::message_component::ButtonStyle;
 use serenity::model::interactions::InteractionResponseType;
-use serenity::{async_trait, Client};
+use serenity::prelude::*;
 
 #[derive(Debug)]
 enum Animal {
@@ -235,16 +236,12 @@ async fn main() {
     // Configure the client with your Discord bot token in the environment.
     let token = env::var("DISCORD_TOKEN").expect("Expected a token in the environment");
 
-    // The Application Id is usually the Bot User Id. It is needed for components
-    let application_id: u64 = env::var("APPLICATION_ID")
-        .expect("Expected an application id in the environment")
-        .parse()
-        .expect("application id is not a valid id");
-
     // Build our client.
-    let mut client = Client::builder(token)
+    let intents = GatewayIntents::GUILD_MESSAGES
+        | GatewayIntents::DIRECT_MESSAGES
+        | GatewayIntents::MESSAGE_CONTENT;
+    let mut client = Client::builder(token, intents)
         .event_handler(Handler)
-        .application_id(application_id)
         .await
         .expect("Error creating client");
 

@@ -138,7 +138,7 @@ impl StandardFramework {
     /// Configuring the framework for a [`Client`], [allowing whitespace between prefixes], and setting the [`prefix`] to `"~"`:
     ///
     /// ```rust,no_run
-    /// # use serenity::prelude::EventHandler;
+    /// # use serenity::prelude::*;
     /// # struct Handler;
     /// # impl EventHandler for Handler {}
     /// use serenity::framework::StandardFramework;
@@ -148,7 +148,10 @@ impl StandardFramework {
     /// let token = std::env::var("DISCORD_TOKEN")?;
     /// let framework = StandardFramework::new().configure(|c| c.with_whitespace(true).prefix("~"));
     ///
-    /// let mut client = Client::builder(&token).event_handler(Handler).framework(framework).await?;
+    /// let mut client = Client::builder(&token, GatewayIntents::default())
+    ///     .event_handler(Handler)
+    ///     .framework(framework)
+    ///     .await?;
     /// #     Ok(())
     /// # }
     /// ```

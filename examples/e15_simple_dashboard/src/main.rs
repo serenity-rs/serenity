@@ -415,7 +415,10 @@ async fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
         command_usage_values: Mutex::new(command_usage_values),
     });
 
-    let mut client = Client::builder(token)
+    let intents = GatewayIntents::GUILD_MESSAGES
+        | GatewayIntents::DIRECT_MESSAGES
+        | GatewayIntents::MESSAGE_CONTENT;
+    let mut client = Client::builder(token, intents)
         .event_handler(Handler)
         .framework(framework)
         .type_map_insert::<RillRateComponents>(components)
