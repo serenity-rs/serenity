@@ -59,7 +59,8 @@
     clippy::non_ascii_literal,
     clippy::missing_errors_doc,
     clippy::let_underscore_must_use,
-    clippy::unused_async
+    clippy::unused_async,
+    unused
 )]
 #![cfg_attr(test, allow(clippy::unwrap_used))]
 #![type_length_limit = "3294819"] // needed so ShardRunner::run compiles with instrument.
