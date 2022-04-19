@@ -329,42 +329,6 @@
 <span id="324">324</span>
 <span id="325">325</span>
 <span id="326">326</span>
-<span id="327">327</span>
-<span id="328">328</span>
-<span id="329">329</span>
-<span id="330">330</span>
-<span id="331">331</span>
-<span id="332">332</span>
-<span id="333">333</span>
-<span id="334">334</span>
-<span id="335">335</span>
-<span id="336">336</span>
-<span id="337">337</span>
-<span id="338">338</span>
-<span id="339">339</span>
-<span id="340">340</span>
-<span id="341">341</span>
-<span id="342">342</span>
-<span id="343">343</span>
-<span id="344">344</span>
-<span id="345">345</span>
-<span id="346">346</span>
-<span id="347">347</span>
-<span id="348">348</span>
-<span id="349">349</span>
-<span id="350">350</span>
-<span id="351">351</span>
-<span id="352">352</span>
-<span id="353">353</span>
-<span id="354">354</span>
-<span id="355">355</span>
-<span id="356">356</span>
-<span id="357">357</span>
-<span id="358">358</span>
-<span id="359">359</span>
-<span id="360">360</span>
-<span id="361">361</span>
-<span id="362">362</span>
 </pre><pre class="rust"><code><span class="doccomment">//! Audit log types for administrative actions within guilds.</span>
 
 <span class="kw">use</span> <span class="ident">std::collections::HashMap</span>;
@@ -455,9 +419,6 @@
     }
 }
 
-<span class="attribute">#[<span class="ident">deprecated</span>(<span class="ident">note</span> <span class="op">=</span> <span class="string">&quot;use `ChannelAction`&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">ActionChannel</span> <span class="op">=</span> <span class="ident">ChannelAction</span>;
-
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">Debug</span>)]</span>
 <span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
 <span class="attribute">#[<span class="ident">repr</span>(<span class="ident">u8</span>)]</span>
@@ -467,9 +428,6 @@
     <span class="ident">Delete</span> <span class="op">=</span> <span class="number">12</span>,
 }
 
-<span class="attribute">#[<span class="ident">deprecated</span>(<span class="ident">note</span> <span class="op">=</span> <span class="string">&quot;use `ChannelOverwriteAction`&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">ActionChannelOverwrite</span> <span class="op">=</span> <span class="ident">ChannelOverwriteAction</span>;
-
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">Debug</span>)]</span>
 <span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
 <span class="attribute">#[<span class="ident">repr</span>(<span class="ident">u8</span>)]</span>
@@ -478,9 +436,6 @@
     <span class="ident">Update</span> <span class="op">=</span> <span class="number">14</span>,
     <span class="ident">Delete</span> <span class="op">=</span> <span class="number">15</span>,
 }
-
-<span class="attribute">#[<span class="ident">deprecated</span>(<span class="ident">note</span> <span class="op">=</span> <span class="string">&quot;use `MemberAction`&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">ActionMember</span> <span class="op">=</span> <span class="ident">MemberAction</span>;
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">Debug</span>)]</span>
 <span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
@@ -497,9 +452,6 @@
     <span class="ident">BotAdd</span> <span class="op">=</span> <span class="number">28</span>,
 }
 
-<span class="attribute">#[<span class="ident">deprecated</span>(<span class="ident">note</span> <span class="op">=</span> <span class="string">&quot;use `RoleAction`&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">ActionRole</span> <span class="op">=</span> <span class="ident">RoleAction</span>;
-
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">Debug</span>)]</span>
 <span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
 <span class="attribute">#[<span class="ident">repr</span>(<span class="ident">u8</span>)]</span>
@@ -508,9 +460,6 @@
     <span class="ident">Update</span> <span class="op">=</span> <span class="number">31</span>,
     <span class="ident">Delete</span> <span class="op">=</span> <span class="number">32</span>,
 }
-
-<span class="attribute">#[<span class="ident">deprecated</span>(<span class="ident">note</span> <span class="op">=</span> <span class="string">&quot;use `InviteAction`&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">ActionInvite</span> <span class="op">=</span> <span class="ident">InviteAction</span>;
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">Debug</span>)]</span>
 <span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
@@ -521,9 +470,6 @@
     <span class="ident">Delete</span> <span class="op">=</span> <span class="number">42</span>,
 }
 
-<span class="attribute">#[<span class="ident">deprecated</span>(<span class="ident">note</span> <span class="op">=</span> <span class="string">&quot;use `WebhookAction`&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">ActionWebhook</span> <span class="op">=</span> <span class="ident">WebhookAction</span>;
-
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">Debug</span>)]</span>
 <span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
 <span class="attribute">#[<span class="ident">repr</span>(<span class="ident">u8</span>)]</span>
@@ -533,9 +479,6 @@
     <span class="ident">Delete</span> <span class="op">=</span> <span class="number">52</span>,
 }
 
-<span class="attribute">#[<span class="ident">deprecated</span>(<span class="ident">note</span> <span class="op">=</span> <span class="string">&quot;use `EmojiAction`&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">ActionEmoji</span> <span class="op">=</span> <span class="ident">EmojiAction</span>;
-
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">Debug</span>)]</span>
 <span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
 <span class="attribute">#[<span class="ident">repr</span>(<span class="ident">u8</span>)]</span>
@@ -544,9 +487,6 @@
     <span class="ident">Update</span> <span class="op">=</span> <span class="number">61</span>,
     <span class="ident">Delete</span> <span class="op">=</span> <span class="number">62</span>,
 }
-
-<span class="attribute">#[<span class="ident">deprecated</span>(<span class="ident">note</span> <span class="op">=</span> <span class="string">&quot;use `MessageAction`&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">ActionMessage</span> <span class="op">=</span> <span class="ident">MessageAction</span>;
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">Debug</span>)]</span>
 <span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
@@ -558,9 +498,6 @@
     <span class="ident">Unpin</span> <span class="op">=</span> <span class="number">75</span>,
 }
 
-<span class="attribute">#[<span class="ident">deprecated</span>(<span class="ident">note</span> <span class="op">=</span> <span class="string">&quot;use `IntegrationAction`&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">ActionIntegration</span> <span class="op">=</span> <span class="ident">IntegrationAction</span>;
-
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">Debug</span>)]</span>
 <span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
 <span class="attribute">#[<span class="ident">repr</span>(<span class="ident">u8</span>)]</span>
@@ -569,9 +506,6 @@
     <span class="ident">Update</span> <span class="op">=</span> <span class="number">81</span>,
     <span class="ident">Delete</span> <span class="op">=</span> <span class="number">82</span>,
 }
-
-<span class="attribute">#[<span class="ident">deprecated</span>(<span class="ident">note</span> <span class="op">=</span> <span class="string">&quot;use `StageInstanceAction`&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">ActionStageInstance</span> <span class="op">=</span> <span class="ident">StageInstanceAction</span>;
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">Debug</span>)]</span>
 <span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
@@ -582,9 +516,6 @@
     <span class="ident">Delete</span> <span class="op">=</span> <span class="number">85</span>,
 }
 
-<span class="attribute">#[<span class="ident">deprecated</span>(<span class="ident">note</span> <span class="op">=</span> <span class="string">&quot;use `StickerAction`&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">ActionSticker</span> <span class="op">=</span> <span class="ident">StickerAction</span>;
-
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">Debug</span>)]</span>
 <span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
 <span class="attribute">#[<span class="ident">repr</span>(<span class="ident">u8</span>)]</span>
@@ -593,9 +524,6 @@
     <span class="ident">Update</span> <span class="op">=</span> <span class="number">91</span>,
     <span class="ident">Delete</span> <span class="op">=</span> <span class="number">92</span>,
 }
-
-<span class="attribute">#[<span class="ident">deprecated</span>(<span class="ident">note</span> <span class="op">=</span> <span class="string">&quot;use `ThreadAction`&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">ActionThread</span> <span class="op">=</span> <span class="ident">ThreadAction</span>;
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">Debug</span>)]</span>
 <span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>

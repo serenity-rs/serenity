@@ -3131,9 +3131,6 @@
 <span id="3126">3126</span>
 <span id="3127">3127</span>
 <span id="3128">3128</span>
-<span id="3129">3129</span>
-<span id="3130">3130</span>
-<span id="3131">3131</span>
 </pre><pre class="rust"><code><span class="doccomment">//! Models relating to guilds and types that it owns.</span>
 
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">audit_log</span>;
@@ -3158,9 +3155,6 @@
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>))]</span>
 <span class="kw">use</span> <span class="ident">tracing::warn</span>;
 
-<span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
-<span class="attribute">#[<span class="ident">deprecated</span>(<span class="ident">note</span> <span class="op">=</span> <span class="string">&quot;import the types from the `audit_log` module&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="self">self</span>::audit_log</span>::<span class="kw-2">*</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="self">self</span>::emoji</span>::<span class="kw-2">*</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="self">self</span>::guild_id</span>::<span class="kw-2">*</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="self">self</span>::guild_preview</span>::<span class="kw-2">*</span>;
