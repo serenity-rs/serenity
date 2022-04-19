@@ -88,9 +88,6 @@ impl Serialize for Action {
     }
 }
 
-#[deprecated(note = "use `ChannelAction`")]
-pub type ActionChannel = ChannelAction;
-
 #[derive(Copy, Clone, Debug)]
 #[non_exhaustive]
 #[repr(u8)]
@@ -100,9 +97,6 @@ pub enum ChannelAction {
     Delete = 12,
 }
 
-#[deprecated(note = "use `ChannelOverwriteAction`")]
-pub type ActionChannelOverwrite = ChannelOverwriteAction;
-
 #[derive(Copy, Clone, Debug)]
 #[non_exhaustive]
 #[repr(u8)]
@@ -111,9 +105,6 @@ pub enum ChannelOverwriteAction {
     Update = 14,
     Delete = 15,
 }
-
-#[deprecated(note = "use `MemberAction`")]
-pub type ActionMember = MemberAction;
 
 #[derive(Copy, Clone, Debug)]
 #[non_exhaustive]
@@ -130,9 +121,6 @@ pub enum MemberAction {
     BotAdd = 28,
 }
 
-#[deprecated(note = "use `RoleAction`")]
-pub type ActionRole = RoleAction;
-
 #[derive(Copy, Clone, Debug)]
 #[non_exhaustive]
 #[repr(u8)]
@@ -141,9 +129,6 @@ pub enum RoleAction {
     Update = 31,
     Delete = 32,
 }
-
-#[deprecated(note = "use `InviteAction`")]
-pub type ActionInvite = InviteAction;
 
 #[derive(Copy, Clone, Debug)]
 #[non_exhaustive]
@@ -154,9 +139,6 @@ pub enum InviteAction {
     Delete = 42,
 }
 
-#[deprecated(note = "use `WebhookAction`")]
-pub type ActionWebhook = WebhookAction;
-
 #[derive(Copy, Clone, Debug)]
 #[non_exhaustive]
 #[repr(u8)]
@@ -166,9 +148,6 @@ pub enum WebhookAction {
     Delete = 52,
 }
 
-#[deprecated(note = "use `EmojiAction`")]
-pub type ActionEmoji = EmojiAction;
-
 #[derive(Copy, Clone, Debug)]
 #[non_exhaustive]
 #[repr(u8)]
@@ -177,9 +156,6 @@ pub enum EmojiAction {
     Update = 61,
     Delete = 62,
 }
-
-#[deprecated(note = "use `MessageAction`")]
-pub type ActionMessage = MessageAction;
 
 #[derive(Copy, Clone, Debug)]
 #[non_exhaustive]
@@ -191,9 +167,6 @@ pub enum MessageAction {
     Unpin = 75,
 }
 
-#[deprecated(note = "use `IntegrationAction`")]
-pub type ActionIntegration = IntegrationAction;
-
 #[derive(Copy, Clone, Debug)]
 #[non_exhaustive]
 #[repr(u8)]
@@ -202,9 +175,6 @@ pub enum IntegrationAction {
     Update = 81,
     Delete = 82,
 }
-
-#[deprecated(note = "use `StageInstanceAction`")]
-pub type ActionStageInstance = StageInstanceAction;
 
 #[derive(Copy, Clone, Debug)]
 #[non_exhaustive]
@@ -215,9 +185,6 @@ pub enum StageInstanceAction {
     Delete = 85,
 }
 
-#[deprecated(note = "use `StickerAction`")]
-pub type ActionSticker = StickerAction;
-
 #[derive(Copy, Clone, Debug)]
 #[non_exhaustive]
 #[repr(u8)]
@@ -226,9 +193,6 @@ pub enum StickerAction {
     Update = 91,
     Delete = 92,
 }
-
-#[deprecated(note = "use `ThreadAction`")]
-pub type ActionThread = ThreadAction;
 
 #[derive(Copy, Clone, Debug)]
 #[non_exhaustive]
