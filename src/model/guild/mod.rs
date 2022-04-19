@@ -21,9 +21,6 @@ use tracing::error;
 #[cfg(all(feature = "model", feature = "cache"))]
 use tracing::warn;
 
-#[doc(hidden)]
-#[deprecated(note = "import the types from the `audit_log` module")]
-pub use self::audit_log::*;
 pub use self::emoji::*;
 pub use self::guild_id::*;
 pub use self::guild_preview::*;
