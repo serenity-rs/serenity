@@ -2,6 +2,7 @@
 
 #[cfg(all(feature = "model", feature = "utils"))]
 use std::error::Error as StdError;
+#[cfg(all(feature = "model", feature = "utils"))]
 use std::fmt;
 #[cfg(all(feature = "model", feature = "utils"))]
 use std::result::Result as StdResult;
