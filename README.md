@@ -202,11 +202,11 @@ If you use the `native_tls_backend` and you are not developing on macOS or Windo
 [`EventHandler::message`]: https://docs.rs/serenity/*/serenity/client/trait.EventHandler.html#method.message
 [`Context`]: https://docs.rs/serenity/*/serenity/client/struct.Context.html
 [`Event`]: https://docs.rs/serenity/*/serenity/model/event/enum.Event.html
-[`Event::MessageCreate`]: https://docs.rs/serenity/*/serenity/model/event/enum.Event.html#variant.MessageCreatef
+[`Event::MessageCreate`]: https://docs.rs/serenity/*/serenity/model/event/enum.Event.html#variant.MessageCreate
 [`Shard`]: https://docs.rs/serenity/*/serenity/gateway/struct.Shard.html
 [`examples`]: https://github.com/serenity-rs/serenity/blob/current/examples
 [`rest`]: https://docs.rs/serenity/*/serenity/client/rest/index.html
-[`validate_token`]: https://docs.rs/serenity/*/serenity/client/fn.validate_token.html
+[`validate_token`]: https://docs.rs/serenity/*/serenity/utils/fn.validate_token.html
 [cache docs]: https://docs.rs/serenity/*/serenity/cache/index.html
 [ci]: https://github.com/serenity-rs/serenity/actions
 [ci-badge]: https://img.shields.io/github/workflow/status/serenity-rs/serenity/CI?style=flat-square
