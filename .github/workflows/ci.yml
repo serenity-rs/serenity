@@ -204,8 +204,6 @@ jobs:
         uses: Swatinem/rust-cache@v1
 
       - name: Build docs
-        env:
-          RUSTDOCFLAGS: -D rustdoc::broken_intra_doc_links -D rustdoc::private_intra_doc_links
         run: |
           cargo doc --no-deps --features collector,voice,unstable_discord_api
           cargo doc --no-deps -p command_attr
