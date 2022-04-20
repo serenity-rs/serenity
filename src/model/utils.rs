@@ -12,6 +12,7 @@ use super::prelude::*;
 use crate::cache::Cache;
 #[cfg(feature = "cache")]
 use crate::internal::prelude::*;
+use crate::model::application::command::CommandOptionType;
 use crate::model::interactions::application_command::*;
 
 pub fn default_true() -> bool {
@@ -89,13 +90,13 @@ pub fn deserialize_options_with_resolved<'de, D: Deserializer<'de>>(
 
 fn try_resolve(
     value: &Value,
-    kind: ApplicationCommandOptionType,
+    kind: CommandOptionType,
     resolved: &ApplicationCommandInteractionDataResolved,
 ) -> Option<ApplicationCommandInteractionDataOptionValue> {
     let string = value.as_str();
 
     match kind {
-        ApplicationCommandOptionType::User => {
+        CommandOptionType::User => {
             let id = &UserId(string?.parse().ok()?);
 
             let user = resolved.users.get(id)?.clone();
@@ -103,21 +104,21 @@ fn try_resolve(
 
             Some(ApplicationCommandInteractionDataOptionValue::User(user, member))
         },
-        ApplicationCommandOptionType::Role => {
+        CommandOptionType::Role => {
             let id = &RoleId(string?.parse().ok()?);
 
             let role = resolved.roles.get(id)?.clone();
 
             Some(ApplicationCommandInteractionDataOptionValue::Role(role))
         },
-        ApplicationCommandOptionType::Channel => {
+        CommandOptionType::Channel => {
             let id = &ChannelId(string?.parse().ok()?);
 
             let channel = resolved.channels.get(id)?.clone();
 
             Some(ApplicationCommandInteractionDataOptionValue::Channel(channel))
         },
-        ApplicationCommandOptionType::Mentionable => {
+        CommandOptionType::Mentionable => {
             let id: u64 = string?.parse().ok()?;
 
             if let Some(user) = resolved.users.get(&UserId(id)) {
@@ -131,19 +132,19 @@ fn try_resolve(
                 Some(ApplicationCommandInteractionDataOptionValue::Role(role))
             }
         },
-        ApplicationCommandOptionType::String => {
+        CommandOptionType::String => {
             Some(ApplicationCommandInteractionDataOptionValue::String(string?.to_owned()))
         },
-        ApplicationCommandOptionType::Integer => {
+        CommandOptionType::Integer => {
             Some(ApplicationCommandInteractionDataOptionValue::Integer(value.as_i64()?))
         },
-        ApplicationCommandOptionType::Boolean => {
+        CommandOptionType::Boolean => {
             Some(ApplicationCommandInteractionDataOptionValue::Boolean(value.as_bool()?))
         },
-        ApplicationCommandOptionType::Number => {
+        CommandOptionType::Number => {
             Some(ApplicationCommandInteractionDataOptionValue::Number(value.as_f64()?))
         },
-        ApplicationCommandOptionType::Attachment => {
+        CommandOptionType::Attachment => {
             let id = &AttachmentId(string?.parse().ok()?);
 
             let attachment = resolved.attachments.get(id)?.clone();

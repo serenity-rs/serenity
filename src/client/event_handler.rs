@@ -5,7 +5,7 @@ use async_trait::async_trait;
 use super::context::Context;
 use crate::client::bridge::gateway::event::*;
 use crate::json::Value;
-use crate::model::interactions::application_command::ApplicationCommandPermission;
+use crate::model::application::command::CommandPermission;
 use crate::model::interactions::Interaction;
 use crate::model::prelude::*;
 
@@ -18,7 +18,7 @@ pub trait EventHandler: Send + Sync {
     async fn application_command_permissions_update(
         &self,
         _ctx: Context,
-        _permission: ApplicationCommandPermission,
+        _permission: CommandPermission,
     ) {
     }
 

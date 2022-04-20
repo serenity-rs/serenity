@@ -1,13 +1,10 @@
 use std::env;
 
 use serenity::async_trait;
+use serenity::model::application::command::{Command, CommandOptionType};
 use serenity::model::gateway::Ready;
 use serenity::model::id::GuildId;
-use serenity::model::interactions::application_command::{
-    ApplicationCommand,
-    ApplicationCommandInteractionDataOptionValue,
-    ApplicationCommandOptionType,
-};
+use serenity::model::interactions::application_command::ApplicationCommandInteractionDataOptionValue;
 use serenity::model::interactions::{Interaction, InteractionResponseType};
 use serenity::prelude::*;
 
@@ -94,7 +91,7 @@ impl EventHandler for Handler {
                         option
                             .name("id")
                             .description("The user to lookup")
-                            .kind(ApplicationCommandOptionType::User)
+                            .kind(CommandOptionType::User)
                             .required(true)
                     })
                 })
@@ -106,14 +103,14 @@ impl EventHandler for Handler {
                             option
                                 .name("user")
                                 .description("The user to welcome")
-                                .kind(ApplicationCommandOptionType::User)
+                                .kind(CommandOptionType::User)
                                 .required(true)
                         })
                         .create_option(|option| {
                             option
                                 .name("message")
                                 .description("The message to send")
-                                .kind(ApplicationCommandOptionType::String)
+                                .kind(CommandOptionType::String)
                                 .required(true)
                                 .add_string_choice(
                                     "Welcome to our cool server! Ask me if you need help",
@@ -138,7 +135,7 @@ impl EventHandler for Handler {
                             option
                                 .name("int")
                                 .description("An integer from 5 to 10")
-                                .kind(ApplicationCommandOptionType::Integer)
+                                .kind(CommandOptionType::Integer)
                                 .min_int_value(5)
                                 .max_int_value(10)
                                 .required(true)
@@ -147,7 +144,7 @@ impl EventHandler for Handler {
                             option
                                 .name("number")
                                 .description("A float from -3.3 to 234.5")
-                                .kind(ApplicationCommandOptionType::Number)
+                                .kind(CommandOptionType::Number)
                                 .min_number_value(-3.3)
                                 .max_number_value(234.5)
                                 .required(true)
@@ -161,7 +158,7 @@ impl EventHandler for Handler {
                             option
                                 .name("attachment")
                                 .description("A file")
-                                .kind(ApplicationCommandOptionType::Attachment)
+                                .kind(CommandOptionType::Attachment)
                                 .required(true)
                         })
                 })
@@ -170,11 +167,10 @@ impl EventHandler for Handler {
 
         println!("I now have the following guild slash commands: {:#?}", commands);
 
-        let guild_command =
-            ApplicationCommand::create_global_application_command(&ctx.http, |command| {
-                command.name("wonderful_command").description("An amazing command")
-            })
-            .await;
+        let guild_command = Command::create_global_application_command(&ctx.http, |command| {
+            command.name("wonderful_command").description("An amazing command")
+        })
+        .await;
 
         println!("I created the following global slash command: {:#?}", guild_command);
     }

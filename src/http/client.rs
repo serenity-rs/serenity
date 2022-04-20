@@ -20,10 +20,7 @@ use super::typing::Typing;
 use super::{AttachmentType, GuildPagination, HttpError, UserPagination};
 use crate::internal::prelude::*;
 use crate::json::prelude::*;
-use crate::model::interactions::application_command::{
-    ApplicationCommand,
-    ApplicationCommandPermission,
-};
+use crate::model::application::command::{Command, CommandPermission};
 use crate::model::prelude::*;
 use crate::{constants, utils};
 
@@ -528,10 +525,7 @@ impl Http {
     /// application will overwrite the old command.
     ///
     /// [docs]: https://discord.com/developers/docs/interactions/slash-commands#create-global-application-command
-    pub async fn create_global_application_command(
-        &self,
-        map: &Value,
-    ) -> Result<ApplicationCommand> {
+    pub async fn create_global_application_command(&self, map: &Value) -> Result<Command> {
         self.fire(Request {
             body: Some(map.to_string().as_bytes()),
             multipart: None,
@@ -544,10 +538,7 @@ impl Http {
     }
 
     /// Creates new global application commands.
-    pub async fn create_global_application_commands(
-        &self,
-        map: &Value,
-    ) -> Result<Vec<ApplicationCommand>> {
+    pub async fn create_global_application_commands(&self, map: &Value) -> Result<Vec<Command>> {
         self.fire(Request {
             body: Some(map.to_string().as_bytes()),
             multipart: None,
@@ -564,7 +555,7 @@ impl Http {
         &self,
         guild_id: u64,
         map: &Value,
-    ) -> Result<Vec<ApplicationCommand>> {
+    ) -> Result<Vec<Command>> {
         self.fire(Request {
             body: Some(map.to_string().as_bytes()),
             multipart: None,
@@ -631,7 +622,7 @@ impl Http {
         &self,
         guild_id: u64,
         map: &Value,
-    ) -> Result<ApplicationCommand> {
+    ) -> Result<Command> {
         self.fire(Request {
             body: Some(map.to_string().as_bytes()),
             multipart: None,
@@ -1478,7 +1469,7 @@ impl Http {
         &self,
         command_id: u64,
         map: &Value,
-    ) -> Result<ApplicationCommand> {
+    ) -> Result<Command> {
         self.fire(Request {
             body: Some(map.to_string().as_bytes()),
             multipart: None,
@@ -1523,7 +1514,7 @@ impl Http {
         guild_id: u64,
         command_id: u64,
         map: &Value,
-    ) -> Result<ApplicationCommand> {
+    ) -> Result<Command> {
         self.fire(Request {
             body: Some(map.to_string().as_bytes()),
             multipart: None,
@@ -1549,7 +1540,7 @@ impl Http {
         guild_id: u64,
         command_id: u64,
         map: &Value,
-    ) -> Result<ApplicationCommandPermission> {
+    ) -> Result<CommandPermission> {
         self.fire(Request {
             body: Some(map.to_string().as_bytes()),
             multipart: None,
@@ -1574,7 +1565,7 @@ impl Http {
         &self,
         guild_id: u64,
         map: &Value,
-    ) -> Result<Vec<ApplicationCommandPermission>> {
+    ) -> Result<Vec<CommandPermission>> {
         self.fire(Request {
             body: Some(map.to_string().as_bytes()),
             multipart: None,
@@ -2689,7 +2680,7 @@ impl Http {
     }
 
     /// Fetches all of the global commands for your application.
-    pub async fn get_global_application_commands(&self) -> Result<Vec<ApplicationCommand>> {
+    pub async fn get_global_application_commands(&self) -> Result<Vec<Command>> {
         self.fire(Request {
             body: None,
             multipart: None,
@@ -2702,10 +2693,7 @@ impl Http {
     }
 
     /// Fetches a global commands for your application by its Id.
-    pub async fn get_global_application_command(
-        &self,
-        command_id: u64,
-    ) -> Result<ApplicationCommand> {
+    pub async fn get_global_application_command(&self, command_id: u64) -> Result<Command> {
         self.fire(Request {
             body: None,
             multipart: None,
@@ -2745,10 +2733,7 @@ impl Http {
     }
 
     /// Fetches all of the guild commands for your application for a specific guild.
-    pub async fn get_guild_application_commands(
-        &self,
-        guild_id: u64,
-    ) -> Result<Vec<ApplicationCommand>> {
+    pub async fn get_guild_application_commands(&self, guild_id: u64) -> Result<Vec<Command>> {
         self.fire(Request {
             body: None,
             multipart: None,
@@ -2766,7 +2751,7 @@ impl Http {
         &self,
         guild_id: u64,
         command_id: u64,
-    ) -> Result<ApplicationCommand> {
+    ) -> Result<Command> {
         self.fire(Request {
             body: None,
             multipart: None,
@@ -2784,7 +2769,7 @@ impl Http {
     pub async fn get_guild_application_commands_permissions(
         &self,
         guild_id: u64,
-    ) -> Result<Vec<ApplicationCommandPermission>> {
+    ) -> Result<Vec<CommandPermission>> {
         self.fire(Request {
             body: None,
             multipart: None,
@@ -2802,7 +2787,7 @@ impl Http {
         &self,
         guild_id: u64,
         command_id: u64,
-    ) -> Result<ApplicationCommandPermission> {
+    ) -> Result<CommandPermission> {
         self.fire(Request {
             body: None,
             multipart: None,
