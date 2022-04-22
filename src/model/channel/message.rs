@@ -23,7 +23,7 @@ use crate::http::{CacheHttp, Http};
 #[cfg(feature = "model")]
 use crate::json;
 use crate::json::prelude::*;
-use crate::model::interactions::message_component::ActionRow;
+use crate::model::application::component::ActionRow;
 use crate::model::interactions::MessageInteraction;
 use crate::model::prelude::*;
 #[cfg(feature = "model")]

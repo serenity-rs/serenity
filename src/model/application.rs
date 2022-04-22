@@ -1,6 +1,7 @@
 //! Models about OAuth2 applications.
 
 pub mod command;
+pub mod component;
 pub mod oauth;
 
 use super::id::{snowflake, ApplicationId, UserId};

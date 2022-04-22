@@ -2,8 +2,8 @@ use std::collections::HashMap;
 
 use crate::internal::prelude::*;
 use crate::json::{self, from_number, Value};
+use crate::model::application::component::{ButtonStyle, InputTextStyle};
 use crate::model::channel::ReactionType;
-use crate::model::interactions::message_component::{ButtonStyle, InputTextStyle};
 
 /// A builder for creating several [`ActionRow`]s.
 ///
