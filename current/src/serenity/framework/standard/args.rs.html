@@ -993,7 +993,6 @@
 <span id="988">988</span>
 <span id="989">989</span>
 <span id="990">990</span>
-<span id="991">991</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::borrow::Cow</span>;
 <span class="kw">use</span> <span class="ident">std::error::Error</span> <span class="kw">as</span> <span class="ident">StdError</span>;
 <span class="kw">use</span> <span class="ident">std::fmt</span>;
@@ -1358,8 +1357,7 @@
             } <span class="kw">else</span> {
                 <span class="comment">// If there are no delimiters, then the only possible argument is the whole</span>
                 <span class="comment">// message.</span>
-                <span class="kw">let</span> <span class="ident">start</span> <span class="op">=</span> <span class="ident">message</span>.<span class="ident">find</span>(<span class="ident">msg</span>).<span class="ident">unwrap_or</span>(<span class="number">0</span>);
-                <span class="macro">vec!</span>[<span class="ident">Token::new</span>(<span class="ident">kind</span>, <span class="ident">start</span>, <span class="ident">start</span> <span class="op">+</span> <span class="ident">msg</span>.<span class="ident">len</span>())]
+                <span class="macro">vec!</span>[<span class="ident">Token::new</span>(<span class="ident">kind</span>, <span class="number">0</span>, <span class="ident">message</span>.<span class="ident">len</span>())]
             }
         } <span class="kw">else</span> {
             <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">args</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
