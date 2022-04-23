@@ -1806,3 +1806,52 @@ impl<'de> Deserialize<'de> for PartialGuild {
         })
     }
 }
+
+impl From<Guild> for PartialGuild {
+    /// Converts this [`Guild`] instance into a [`PartialGuild`]
+    ///
+    /// [`PartialGuild`] is not a strict subset and contains some data specific to the current user
+    /// that [`Guild`] does not contain. Therefore, this method needs access to cache and HTTP to
+    /// generate the missing data
+    fn from(guild: Guild) -> Self {
+        Self {
+            application_id: guild.application_id,
+            id: guild.id,
+            afk_channel_id: guild.afk_channel_id,
+            afk_timeout: guild.afk_timeout,
+            default_message_notifications: guild.default_message_notifications,
+            widget_enabled: guild.widget_enabled,
+            widget_channel_id: guild.widget_channel_id,
+            emojis: guild.emojis,
+            features: guild.features,
+            icon: guild.icon,
+            mfa_level: guild.mfa_level,
+            name: guild.name,
+            owner_id: guild.owner_id,
+            // Not very good, but PartialGuild deserialization uses .unwrap_or_default() too
+            owner: Default::default(),
+            roles: guild.roles,
+            splash: guild.splash,
+            discovery_splash: guild.discovery_splash,
+            system_channel_id: guild.system_channel_id,
+            system_channel_flags: guild.system_channel_flags,
+            rules_channel_id: guild.rules_channel_id,
+            public_updates_channel_id: guild.public_updates_channel_id,
+            verification_level: guild.verification_level,
+            description: guild.description,
+            premium_tier: guild.premium_tier,
+            premium_subscription_count: guild.premium_subscription_count,
+            banner: guild.banner,
+            vanity_url_code: guild.vanity_url_code,
+            welcome_screen: guild.welcome_screen,
+            approximate_member_count: guild.approximate_member_count,
+            approximate_presence_count: guild.approximate_presence_count,
+            nsfw_level: guild.nsfw_level,
+            max_video_channel_users: guild.max_video_channel_users,
+            max_presences: guild.max_presences,
+            max_members: guild.max_members,
+            permissions: None,
+            stickers: guild.stickers,
+        }
+    }
+}
