@@ -16,7 +16,7 @@ use tokio::time::{sleep, Sleep};
 
 use crate::client::bridge::gateway::ShardMessenger;
 use crate::collector::LazyArc;
-use crate::model::interactions::modal::ModalSubmitInteraction;
+use crate::model::application::interaction::modal::ModalSubmitInteraction;
 
 macro_rules! impl_modal_interaction_collector {
     ($($name:ident;)*) => {

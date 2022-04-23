@@ -1,24 +1,33 @@
-use serde::de::Error as DeError;
+use serde::de::{Deserialize, Deserializer, Error as DeError};
 use serde::Serialize;
 
-use super::prelude::*;
-#[cfg(feature = "http")]
+#[cfg(feature = "model")]
 use crate::builder::{
     CreateInteractionResponse,
     CreateInteractionResponseFollowup,
     EditInteractionResponse,
 };
-#[cfg(feature = "http")]
+#[cfg(feature = "model")]
 use crate::http::Http;
-#[cfg(feature = "http")]
+use crate::internal::prelude::*;
+#[cfg(feature = "model")]
 use crate::json;
 use crate::json::prelude::*;
-use crate::model::interactions::InteractionType;
+use crate::model::application::component::ActionRow;
+#[cfg(feature = "http")]
+use crate::model::application::interaction::InteractionResponseType;
+use crate::model::application::interaction::InteractionType;
+use crate::model::channel::Message;
+use crate::model::guild::Member;
+#[cfg(feature = "http")]
+use crate::model::id::MessageId;
+use crate::model::id::{ApplicationId, ChannelId, GuildId, InteractionId};
+use crate::model::user::User;
 
-/// An interaction triggered by a message component.
+/// An interaction triggered by a modal submit.
 #[derive(Clone, Debug, Serialize)]
 #[non_exhaustive]
-pub struct MessageComponentInteraction {
+pub struct ModalSubmitInteraction {
     /// Id of the interaction.
     pub id: InteractionId,
     /// Id of the application this interaction is for.
@@ -27,10 +36,12 @@ pub struct MessageComponentInteraction {
     #[serde(rename = "type")]
     pub kind: InteractionType,
     /// The data of the interaction which was triggered.
-    pub data: MessageComponentInteractionData,
-    /// The message this interaction was triggered by, if
-    /// it is a component.
-    pub message: Message,
+    pub data: ModalSubmitInteractionData,
+    /// The message this interaction was triggered by
+    /// **Note**: Does not exist if the modal interaction originates from
+    /// an application command interaction
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub message: Option<Message>,
     /// The guild Id this interaction was sent from, if there is one.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub guild_id: Option<GuildId>,
@@ -53,8 +64,8 @@ pub struct MessageComponentInteraction {
     pub locale: String,
 }
 
-#[cfg(feature = "http")]
-impl MessageComponentInteraction {
+#[cfg(feature = "model")]
+impl ModalSubmitInteraction {
     /// Gets the interaction response.
     ///
     /// # Errors
@@ -119,7 +130,7 @@ impl MessageComponentInteraction {
     ///
     /// Refer to Discord's docs for Edit Webhook Message for field information.
     ///
-    /// **Note**:   Message contents must be under 2000 unicode code points, does not work on ephemeral messages.
+    /// **Note**:   Message contents must be under 2000 unicode code points.
     ///
     /// [`UserId`]: crate::model::id::UserId
     ///
@@ -245,21 +256,6 @@ impl MessageComponentInteraction {
     ) -> Result<()> {
         http.as_ref().delete_followup_message(&self.token, message_id.into().into()).await
     }
-
-    /// Gets a followup message.
-    ///
-    /// # Errors
-    ///
-    /// May return [`Error::Http`] if the API returns an error.
-    /// Such as if the response was deleted.
-    pub async fn get_followup_message<M: Into<MessageId>>(
-        &self,
-        http: impl AsRef<Http>,
-        message_id: M,
-    ) -> Result<Message> {
-        http.as_ref().get_followup_message(&self.token, message_id.into().into()).await
-    }
-
     /// Helper function to defer an interaction
     ///
     /// # Errors
@@ -280,7 +276,7 @@ impl MessageComponentInteraction {
     }
 }
 
-impl<'de> Deserialize<'de> for MessageComponentInteraction {
+impl<'de> Deserialize<'de> for ModalSubmitInteraction {
     fn deserialize<D: Deserializer<'de>>(deserializer: D) -> StdResult<Self, D::Error> {
         let mut map = JsonMap::deserialize(deserializer)?;
 
@@ -301,7 +297,7 @@ impl<'de> Deserialize<'de> for MessageComponentInteraction {
                                     .expect("couldn't deserialize message component")
                                     .insert(
                                         "guild_id".to_string(),
-                                        Value::from(guild_id.to_string()),
+                                        Value::String(guild_id.to_string()),
                                     );
                             }
                         }
@@ -317,7 +313,7 @@ impl<'de> Deserialize<'de> for MessageComponentInteraction {
                                     )
                                     .insert(
                                         "guild_id".to_string(),
-                                        Value::from(guild_id.to_string()),
+                                        Value::String(guild_id.to_string()),
                                     );
                             }
                         }
@@ -347,7 +343,7 @@ impl<'de> Deserialize<'de> for MessageComponentInteraction {
         let data = map
             .remove("data")
             .ok_or_else(|| DeError::custom("expected data"))
-            .and_then(MessageComponentInteractionData::deserialize)
+            .and_then(ModalSubmitInteractionData::deserialize)
             .map_err(DeError::custom)?;
 
         let guild_id = map
@@ -372,11 +368,8 @@ impl<'de> Deserialize<'de> for MessageComponentInteraction {
             .or_else(|| member.as_ref().map(|m| m.user.clone()))
             .ok_or_else(|| DeError::custom("expected user or member"))?;
 
-        let message = map
-            .remove("message")
-            .ok_or_else(|| DeError::custom("expected message"))
-            .and_then(Message::deserialize)
-            .map_err(DeError::custom)?;
+        let message =
+            map.remove("message").map(Message::deserialize).transpose().map_err(DeError::custom)?;
 
         let token = map
             .remove("token")
@@ -420,53 +413,12 @@ impl<'de> Deserialize<'de> for MessageComponentInteraction {
     }
 }
 
-/// A message component interaction data, provided by [`MessageComponentInteraction::data`]
+/// A modal submit interaction data, provided by [`ModalSubmitInteraction::data`]
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
-pub struct MessageComponentInteractionData {
-    /// The custom id of the component.
+pub struct ModalSubmitInteractionData {
+    /// The custom id of the modal
     pub custom_id: String,
-    /// The type of the component.
-    pub component_type: ComponentType,
-    /// The given values of the [`SelectMenu`]s
-    #[serde(default)]
-    pub values: Vec<String>,
+    /// The components.
+    pub components: Vec<ActionRow>,
 }
-
-use crate::model::application::component;
-
-/// The type of a component
-#[deprecated(note = "use `model::application::component::ComponentType`")]
-pub type ComponentType = component::ComponentType;
-
-/// An action row.
-#[deprecated(note = "use `model::application::component::ActionRow`")]
-pub type ActionRow = component::ActionRow;
-
-// A component which can be inside of an [`ActionRow`].
-#[deprecated(note = "use `model::application::component::ActionRowComponent`")]
-pub type ActionRowComponent = component::ActionRowComponent;
-
-/// A button component.
-#[deprecated(note = "use `model::application::component::Button`")]
-pub type Button = component::Button;
-
-/// The style of a button.
-#[deprecated(note = "use `model::application::component::ButtonStyle`")]
-pub type ButtonStyle = component::ButtonStyle;
-
-/// A select menu component.
-#[deprecated(note = "use `model::application::component::SelectMenu`")]
-pub type SelectMenu = component::SelectMenu;
-
-/// A select menu component options.
-#[deprecated(note = "use `model::application::component::SelectMenuOption`")]
-pub type SelectMenuOption = component::SelectMenuOption;
-
-/// An input text component for modal interactions
-#[deprecated(note = "use `model::application::component::InputText`")]
-pub type InputText = component::InputText;
-
-/// The style of the input text
-#[deprecated(note = "use `model::application::component::InputTextStyle`")]
-pub type InputTextStyle = component::InputTextStyle;

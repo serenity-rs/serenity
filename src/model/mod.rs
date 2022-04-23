@@ -30,6 +30,7 @@ pub mod event;
 pub mod gateway;
 pub mod guild;
 pub mod id;
+#[deprecated(note = "use `model::application::interaction`")]
 pub mod interactions;
 pub mod invite;
 pub mod mention;

@@ -3,7 +3,6 @@ use std::collections::HashMap;
 use serde::de::Error as DeError;
 use serde::{Deserialize, Deserializer};
 
-use super::prelude::*;
 #[cfg(feature = "http")]
 use crate::builder::{
     CreateInteractionResponse,
@@ -12,24 +11,29 @@ use crate::builder::{
 };
 #[cfg(feature = "http")]
 use crate::http::Http;
-use crate::internal::prelude::StdResult;
+use crate::internal::prelude::*;
 #[cfg(feature = "http")]
 use crate::json;
 use crate::json::prelude::*;
 use crate::model::application::command::{CommandOptionType, CommandType};
-use crate::model::channel::{Attachment, PartialChannel};
+#[cfg(feature = "http")]
+use crate::model::application::interaction::InteractionResponseType;
+use crate::model::application::interaction::InteractionType;
+use crate::model::channel::{Attachment, Message, PartialChannel};
 use crate::model::guild::{Member, PartialMember, Role};
 use crate::model::id::{
     ApplicationId,
+    AttachmentId,
     ChannelId,
     CommandId,
     GuildId,
     InteractionId,
+    MessageId,
     RoleId,
+    TargetId,
     UserId,
 };
-use crate::model::interactions::InteractionType;
-use crate::model::prelude::User;
+use crate::model::user::User;
 use crate::model::utils::deserialize_options_with_resolved;
 
 /// An interaction when a user invokes a slash command.
@@ -44,7 +48,7 @@ pub struct ApplicationCommandInteraction {
     #[serde(rename = "type")]
     pub kind: InteractionType,
     /// The data of the interaction which was triggered.
-    pub data: ApplicationCommandInteractionData,
+    pub data: CommandData,
     /// The guild Id this interaction was sent from, if there is one.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub guild_id: Option<GuildId>,
@@ -383,7 +387,7 @@ impl<'de> Deserialize<'de> for ApplicationCommandInteraction {
         let data = map
             .remove("data")
             .ok_or_else(|| DeError::custom("expected data"))
-            .and_then(ApplicationCommandInteractionData::deserialize)
+            .and_then(CommandData::deserialize)
             .map_err(DeError::custom)?;
 
         let guild_id = map
@@ -452,7 +456,7 @@ impl<'de> Deserialize<'de> for ApplicationCommandInteraction {
 /// The command data payload.
 #[derive(Clone, Debug, Serialize)]
 #[non_exhaustive]
-pub struct ApplicationCommandInteractionData {
+pub struct CommandData {
     /// The Id of the invoked command.
     pub id: CommandId,
     /// The name of the invoked command.
@@ -462,10 +466,10 @@ pub struct ApplicationCommandInteractionData {
     pub kind: CommandType,
     /// The parameters and the given values.
     #[serde(default)]
-    pub options: Vec<ApplicationCommandInteractionDataOption>,
+    pub options: Vec<CommandDataOption>,
     /// The converted objects from the given options.
     #[serde(default)]
-    pub resolved: ApplicationCommandInteractionDataResolved,
+    pub resolved: CommandDataResolved,
     /// The Id of the guild the command is registered to.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub guild_id: Option<GuildId>,
@@ -480,7 +484,7 @@ pub struct ApplicationCommandInteractionData {
     pub target_id: Option<TargetId>,
 }
 
-impl ApplicationCommandInteractionData {
+impl CommandData {
     /// The target resolved data of [`target_id`]
     ///
     /// [`target_id`]: Self::target_id
@@ -506,7 +510,7 @@ impl ApplicationCommandInteractionData {
     }
 }
 
-impl<'de> Deserialize<'de> for ApplicationCommandInteractionData {
+impl<'de> Deserialize<'de> for CommandData {
     fn deserialize<D: Deserializer<'de>>(deserializer: D) -> StdResult<Self, D::Error> {
         let mut map = JsonMap::deserialize(deserializer)?;
 
@@ -524,7 +528,7 @@ impl<'de> Deserialize<'de> for ApplicationCommandInteractionData {
 
         let resolved = map
             .remove("resolved")
-            .map(ApplicationCommandInteractionDataResolved::deserialize)
+            .map(CommandDataResolved::deserialize)
             .transpose()
             .map_err(DeError::custom)?
             .unwrap_or_default();
@@ -564,7 +568,7 @@ impl<'de> Deserialize<'de> for ApplicationCommandInteractionData {
     }
 }
 
-/// The resolved value of a [`ApplicationCommandInteractionData::target_id`].
+/// The resolved value of a [`CommandData::target_id`].
 #[derive(Clone, Debug, Serialize, Deserialize)]
 #[non_exhaustive]
 #[repr(u8)]
@@ -574,10 +578,10 @@ pub enum ResolvedTarget {
 }
 
 /// The resolved data of a command data interaction payload.
-/// It contains the objects of [`ApplicationCommandInteractionDataOption`]s.
+/// It contains the objects of [`CommandDataOption`]s.
 #[derive(Clone, Debug, Default, Deserialize, Serialize)]
 #[non_exhaustive]
-pub struct ApplicationCommandInteractionDataResolved {
+pub struct CommandDataResolved {
     /// The resolved users.
     #[serde(default, skip_serializing_if = "HashMap::is_empty")]
     pub users: HashMap<UserId, User>,
@@ -603,10 +607,10 @@ pub struct ApplicationCommandInteractionDataResolved {
 /// All options have names and an option can either be a parameter and input `value` or it can denote a sub-command or group, in which case it will contain a
 /// top-level key and another vector of `options`.
 ///
-/// Their resolved objects can be found on [`ApplicationCommandInteractionData::resolved`].
+/// Their resolved objects can be found on [`CommandData::resolved`].
 #[derive(Clone, Debug, Serialize)]
 #[non_exhaustive]
-pub struct ApplicationCommandInteractionDataOption {
+pub struct CommandDataOption {
     /// The name of the parameter.
     pub name: String,
     /// The given value.
@@ -619,17 +623,17 @@ pub struct ApplicationCommandInteractionDataOption {
     /// **Note**: It is only present if the option is
     /// a group or a subcommand.
     #[serde(default)]
-    pub options: Vec<ApplicationCommandInteractionDataOption>,
+    pub options: Vec<CommandDataOption>,
     /// The resolved object of the given `value`, if there is one.
     #[serde(default)]
-    pub resolved: Option<ApplicationCommandInteractionDataOptionValue>,
+    pub resolved: Option<CommandDataOptionValue>,
     /// For `Autocomplete` Interactions this will be `true` if
     /// this option is currently focused by the user.
     #[serde(default)]
     pub focused: bool,
 }
 
-impl<'de> Deserialize<'de> for ApplicationCommandInteractionDataOption {
+impl<'de> Deserialize<'de> for CommandDataOption {
     fn deserialize<D: Deserializer<'de>>(deserializer: D) -> StdResult<Self, D::Error> {
         let mut map = JsonMap::deserialize(deserializer)?;
 
@@ -670,11 +674,11 @@ impl<'de> Deserialize<'de> for ApplicationCommandInteractionDataOption {
     }
 }
 
-/// The resolved value of an [`ApplicationCommandInteractionDataOption`].
+/// The resolved value of an [`CommandDataOption`].
 #[derive(Clone, Debug, Serialize, Deserialize)]
 #[non_exhaustive]
 #[repr(u8)]
-pub enum ApplicationCommandInteractionDataOptionValue {
+pub enum CommandDataOptionValue {
     String(String),
     Integer(i64),
     Boolean(bool),
@@ -734,37 +738,3 @@ impl From<TargetId> for UserId {
         Self(id.0)
     }
 }
-
-use crate::model::application::command;
-
-/// The base command model that belongs to an application.
-#[deprecated(note = "use `model::application::command::Command`")]
-pub type ApplicationCommand = command::Command;
-
-/// The type of an application command.
-#[deprecated(note = "use `model::application::command::CommandType`")]
-pub type ApplicationCommandType = command::CommandType;
-
-/// The parameters for an [`ApplicationCommand`].
-#[deprecated(note = "use `model::application::command::CommandOption`")]
-pub type ApplicationCommandOption = command::CommandOption;
-
-/// The type of an [`ApplicationCommandOption`].
-#[deprecated(note = "use `model::application::command::CommandOptionType`")]
-pub type ApplicationCommandOptionType = command::CommandOptionType;
-
-/// The only valid values a user can pick in an [`ApplicationCommandOption`].
-#[deprecated(note = "use `model::application::command::CommandOptionChoice`")]
-pub type ApplicationCommandOptionChoice = command::CommandOptionChoice;
-
-/// An [`ApplicationCommand`] permission.
-#[deprecated(note = "use `model::application::command::CommandPermission`")]
-pub type ApplicationCommandPermission = command::CommandPermission;
-
-/// The [`ApplicationCommandPermission`] data.
-#[deprecated(note = "use `model::application::command::CommandPermissionData`")]
-pub type ApplicationCommandPermissionData = command::CommandPermissionData;
-
-/// The type of an [`ApplicationCommandPermissionData`].
-#[deprecated(note = "use `model::application::command::CommandPermissionType`")]
-pub type ApplicationCommandPermissionType = command::CommandPermissionType;

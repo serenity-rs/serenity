@@ -32,9 +32,9 @@ use crate::framework::Framework;
 use crate::gateway::{GatewayError, InterMessage, ReconnectType, Shard, ShardAction};
 use crate::internal::prelude::*;
 use crate::internal::ws_impl::{ReceiverExt, SenderExt};
-use crate::model::event::{Event, GatewayEvent};
 #[cfg(feature = "collector")]
-use crate::model::interactions::Interaction;
+use crate::model::application::interaction::Interaction;
+use crate::model::event::{Event, GatewayEvent};
 use crate::CacheAndHttp;
 
 /// A runner for managing a [`Shard`] and its respective WebSocket client.

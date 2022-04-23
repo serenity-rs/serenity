@@ -12,7 +12,7 @@ use crate::constants::OpCode;
 use crate::internal::prelude::*;
 use crate::json::prelude::*;
 use crate::model::application::command::CommandPermission;
-use crate::model::interactions::Interaction;
+use crate::model::application::interaction::Interaction;
 
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[serde(transparent)]

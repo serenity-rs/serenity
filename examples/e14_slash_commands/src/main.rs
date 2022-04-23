@@ -2,10 +2,10 @@ use std::env;
 
 use serenity::async_trait;
 use serenity::model::application::command::{Command, CommandOptionType};
+use serenity::model::application::interaction::application_command::CommandDataOptionValue;
+use serenity::model::application::interaction::{Interaction, InteractionResponseType};
 use serenity::model::gateway::Ready;
 use serenity::model::id::GuildId;
-use serenity::model::interactions::application_command::ApplicationCommandInteractionDataOptionValue;
-use serenity::model::interactions::{Interaction, InteractionResponseType};
 use serenity::prelude::*;
 
 struct Handler;
@@ -26,9 +26,7 @@ impl EventHandler for Handler {
                         .as_ref()
                         .expect("Expected user object");
 
-                    if let ApplicationCommandInteractionDataOptionValue::User(user, _member) =
-                        options
-                    {
+                    if let CommandDataOptionValue::User(user, _member) = options {
                         format!("{}'s id is {}", user.tag(), user.id)
                     } else {
                         "Please provide a valid user".to_string()
@@ -44,9 +42,7 @@ impl EventHandler for Handler {
                         .as_ref()
                         .expect("Expected attachment object");
 
-                    if let ApplicationCommandInteractionDataOptionValue::Attachment(attachment) =
-                        options
-                    {
+                    if let CommandDataOptionValue::Attachment(attachment) = options {
                         format!(
                             "Attachment name: {}, attachment size: {}",
                             attachment.filename, attachment.size

@@ -18,6 +18,7 @@ pub use super::gateway::*;
 pub use super::guild::audit_log::*;
 pub use super::guild::*;
 pub use super::id::*;
+#[allow(deprecated)]
 pub use super::interactions::*;
 pub use super::invite::*;
 pub use super::mention::*;

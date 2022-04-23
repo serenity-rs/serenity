@@ -13,7 +13,11 @@ use crate::cache::Cache;
 #[cfg(feature = "cache")]
 use crate::internal::prelude::*;
 use crate::model::application::command::CommandOptionType;
-use crate::model::interactions::application_command::*;
+use crate::model::application::interaction::application_command::{
+    CommandDataOption,
+    CommandDataOptionValue,
+    CommandDataResolved,
+};
 
 pub fn default_true() -> bool {
     true
@@ -77,8 +81,8 @@ pub fn deserialize_members<'de, D: Deserializer<'de>>(
 
 pub fn deserialize_options_with_resolved<'de, D: Deserializer<'de>>(
     deserializer: D,
-    resolved: &ApplicationCommandInteractionDataResolved,
-) -> StdResult<Vec<ApplicationCommandInteractionDataOption>, D::Error> {
+    resolved: &CommandDataResolved,
+) -> StdResult<Vec<CommandDataOption>, D::Error> {
     let mut options = Vec::deserialize(deserializer)?;
 
     for option in &mut options {
@@ -91,8 +95,8 @@ pub fn deserialize_options_with_resolved<'de, D: Deserializer<'de>>(
 fn try_resolve(
     value: &Value,
     kind: CommandOptionType,
-    resolved: &ApplicationCommandInteractionDataResolved,
-) -> Option<ApplicationCommandInteractionDataOptionValue> {
+    resolved: &CommandDataResolved,
+) -> Option<CommandDataOptionValue> {
     let string = value.as_str();
 
     match kind {
@@ -102,21 +106,21 @@ fn try_resolve(
             let user = resolved.users.get(id)?.clone();
             let member = resolved.members.get(id).cloned();
 
-            Some(ApplicationCommandInteractionDataOptionValue::User(user, member))
+            Some(CommandDataOptionValue::User(user, member))
         },
         CommandOptionType::Role => {
             let id = &RoleId(string?.parse().ok()?);
 
             let role = resolved.roles.get(id)?.clone();
 
-            Some(ApplicationCommandInteractionDataOptionValue::Role(role))
+            Some(CommandDataOptionValue::Role(role))
         },
         CommandOptionType::Channel => {
             let id = &ChannelId(string?.parse().ok()?);
 
             let channel = resolved.channels.get(id)?.clone();
 
-            Some(ApplicationCommandInteractionDataOptionValue::Channel(channel))
+            Some(CommandDataOptionValue::Channel(channel))
         },
         CommandOptionType::Mentionable => {
             let id: u64 = string?.parse().ok()?;
@@ -125,40 +129,29 @@ fn try_resolve(
                 let user = user.clone();
                 let member = resolved.members.get(&UserId(id)).cloned();
 
-                Some(ApplicationCommandInteractionDataOptionValue::User(user, member))
+                Some(CommandDataOptionValue::User(user, member))
             } else {
                 let role = resolved.roles.get(&RoleId(id))?.clone();
 
-                Some(ApplicationCommandInteractionDataOptionValue::Role(role))
+                Some(CommandDataOptionValue::Role(role))
             }
         },
-        CommandOptionType::String => {
-            Some(ApplicationCommandInteractionDataOptionValue::String(string?.to_owned()))
-        },
-        CommandOptionType::Integer => {
-            Some(ApplicationCommandInteractionDataOptionValue::Integer(value.as_i64()?))
-        },
-        CommandOptionType::Boolean => {
-            Some(ApplicationCommandInteractionDataOptionValue::Boolean(value.as_bool()?))
-        },
-        CommandOptionType::Number => {
-            Some(ApplicationCommandInteractionDataOptionValue::Number(value.as_f64()?))
-        },
+        CommandOptionType::String => Some(CommandDataOptionValue::String(string?.to_owned())),
+        CommandOptionType::Integer => Some(CommandDataOptionValue::Integer(value.as_i64()?)),
+        CommandOptionType::Boolean => Some(CommandDataOptionValue::Boolean(value.as_bool()?)),
+        CommandOptionType::Number => Some(CommandDataOptionValue::Number(value.as_f64()?)),
         CommandOptionType::Attachment => {
             let id = &AttachmentId(string?.parse().ok()?);
 
             let attachment = resolved.attachments.get(id)?.clone();
 
-            Some(ApplicationCommandInteractionDataOptionValue::Attachment(attachment))
+            Some(CommandDataOptionValue::Attachment(attachment))
         },
         _ => None,
     }
 }
 
-fn loop_resolved(
-    options: &mut ApplicationCommandInteractionDataOption,
-    resolved: &ApplicationCommandInteractionDataResolved,
-) {
+fn loop_resolved(options: &mut CommandDataOption, resolved: &CommandDataResolved) {
     if let Some(ref value) = options.value {
         options.resolved = try_resolve(value, options.kind, resolved);
     }
