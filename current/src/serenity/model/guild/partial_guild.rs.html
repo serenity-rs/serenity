@@ -1811,6 +1811,55 @@
 <span id="1806">1806</span>
 <span id="1807">1807</span>
 <span id="1808">1808</span>
+<span id="1809">1809</span>
+<span id="1810">1810</span>
+<span id="1811">1811</span>
+<span id="1812">1812</span>
+<span id="1813">1813</span>
+<span id="1814">1814</span>
+<span id="1815">1815</span>
+<span id="1816">1816</span>
+<span id="1817">1817</span>
+<span id="1818">1818</span>
+<span id="1819">1819</span>
+<span id="1820">1820</span>
+<span id="1821">1821</span>
+<span id="1822">1822</span>
+<span id="1823">1823</span>
+<span id="1824">1824</span>
+<span id="1825">1825</span>
+<span id="1826">1826</span>
+<span id="1827">1827</span>
+<span id="1828">1828</span>
+<span id="1829">1829</span>
+<span id="1830">1830</span>
+<span id="1831">1831</span>
+<span id="1832">1832</span>
+<span id="1833">1833</span>
+<span id="1834">1834</span>
+<span id="1835">1835</span>
+<span id="1836">1836</span>
+<span id="1837">1837</span>
+<span id="1838">1838</span>
+<span id="1839">1839</span>
+<span id="1840">1840</span>
+<span id="1841">1841</span>
+<span id="1842">1842</span>
+<span id="1843">1843</span>
+<span id="1844">1844</span>
+<span id="1845">1845</span>
+<span id="1846">1846</span>
+<span id="1847">1847</span>
+<span id="1848">1848</span>
+<span id="1849">1849</span>
+<span id="1850">1850</span>
+<span id="1851">1851</span>
+<span id="1852">1852</span>
+<span id="1853">1853</span>
+<span id="1854">1854</span>
+<span id="1855">1855</span>
+<span id="1856">1856</span>
+<span id="1857">1857</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">serde::de::Error</span> <span class="kw">as</span> <span class="ident">DeError</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;simd-json&quot;</span>)]</span>
 <span class="kw">use</span> <span class="ident">simd_json::StaticNode</span>;
@@ -3617,6 +3666,55 @@
             <span class="ident">permissions</span>,
             <span class="ident">stickers</span>,
         })
+    }
+}
+
+<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">Guild</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">PartialGuild</span> {
+    <span class="doccomment">/// Converts this [`Guild`] instance into a [`PartialGuild`]</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// [`PartialGuild`] is not a strict subset and contains some data specific to the current user</span>
+    <span class="doccomment">/// that [`Guild`] does not contain. Therefore, this method needs access to cache and HTTP to</span>
+    <span class="doccomment">/// generate the missing data</span>
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">guild</span>: <span class="ident">Guild</span>) -&gt; <span class="self">Self</span> {
+        <span class="self">Self</span> {
+            <span class="ident">application_id</span>: <span class="ident">guild</span>.<span class="ident">application_id</span>,
+            <span class="ident">id</span>: <span class="ident">guild</span>.<span class="ident">id</span>,
+            <span class="ident">afk_channel_id</span>: <span class="ident">guild</span>.<span class="ident">afk_channel_id</span>,
+            <span class="ident">afk_timeout</span>: <span class="ident">guild</span>.<span class="ident">afk_timeout</span>,
+            <span class="ident">default_message_notifications</span>: <span class="ident">guild</span>.<span class="ident">default_message_notifications</span>,
+            <span class="ident">widget_enabled</span>: <span class="ident">guild</span>.<span class="ident">widget_enabled</span>,
+            <span class="ident">widget_channel_id</span>: <span class="ident">guild</span>.<span class="ident">widget_channel_id</span>,
+            <span class="ident">emojis</span>: <span class="ident">guild</span>.<span class="ident">emojis</span>,
+            <span class="ident">features</span>: <span class="ident">guild</span>.<span class="ident">features</span>,
+            <span class="ident">icon</span>: <span class="ident">guild</span>.<span class="ident">icon</span>,
+            <span class="ident">mfa_level</span>: <span class="ident">guild</span>.<span class="ident">mfa_level</span>,
+            <span class="ident">name</span>: <span class="ident">guild</span>.<span class="ident">name</span>,
+            <span class="ident">owner_id</span>: <span class="ident">guild</span>.<span class="ident">owner_id</span>,
+            <span class="comment">// Not very good, but PartialGuild deserialization uses .unwrap_or_default() too</span>
+            <span class="ident">owner</span>: <span class="ident">Default::default</span>(),
+            <span class="ident">roles</span>: <span class="ident">guild</span>.<span class="ident">roles</span>,
+            <span class="ident">splash</span>: <span class="ident">guild</span>.<span class="ident">splash</span>,
+            <span class="ident">discovery_splash</span>: <span class="ident">guild</span>.<span class="ident">discovery_splash</span>,
+            <span class="ident">system_channel_id</span>: <span class="ident">guild</span>.<span class="ident">system_channel_id</span>,
+            <span class="ident">system_channel_flags</span>: <span class="ident">guild</span>.<span class="ident">system_channel_flags</span>,
+            <span class="ident">rules_channel_id</span>: <span class="ident">guild</span>.<span class="ident">rules_channel_id</span>,
+            <span class="ident">public_updates_channel_id</span>: <span class="ident">guild</span>.<span class="ident">public_updates_channel_id</span>,
+            <span class="ident">verification_level</span>: <span class="ident">guild</span>.<span class="ident">verification_level</span>,
+            <span class="ident">description</span>: <span class="ident">guild</span>.<span class="ident">description</span>,
+            <span class="ident">premium_tier</span>: <span class="ident">guild</span>.<span class="ident">premium_tier</span>,
+            <span class="ident">premium_subscription_count</span>: <span class="ident">guild</span>.<span class="ident">premium_subscription_count</span>,
+            <span class="ident">banner</span>: <span class="ident">guild</span>.<span class="ident">banner</span>,
+            <span class="ident">vanity_url_code</span>: <span class="ident">guild</span>.<span class="ident">vanity_url_code</span>,
+            <span class="ident">welcome_screen</span>: <span class="ident">guild</span>.<span class="ident">welcome_screen</span>,
+            <span class="ident">approximate_member_count</span>: <span class="ident">guild</span>.<span class="ident">approximate_member_count</span>,
+            <span class="ident">approximate_presence_count</span>: <span class="ident">guild</span>.<span class="ident">approximate_presence_count</span>,
+            <span class="ident">nsfw_level</span>: <span class="ident">guild</span>.<span class="ident">nsfw_level</span>,
+            <span class="ident">max_video_channel_users</span>: <span class="ident">guild</span>.<span class="ident">max_video_channel_users</span>,
+            <span class="ident">max_presences</span>: <span class="ident">guild</span>.<span class="ident">max_presences</span>,
+            <span class="ident">max_members</span>: <span class="ident">guild</span>.<span class="ident">max_members</span>,
+            <span class="ident">permissions</span>: <span class="prelude-val">None</span>,
+            <span class="ident">stickers</span>: <span class="ident">guild</span>.<span class="ident">stickers</span>,
+        }
     }
 }
 </code></pre></div>
