@@ -362,8 +362,7 @@ impl Args {
             } else {
                 // If there are no delimiters, then the only possible argument is the whole
                 // message.
-                let start = message.find(msg).unwrap_or(0);
-                vec![Token::new(kind, start, start + msg.len())]
+                vec![Token::new(kind, 0, message.len())]
             }
         } else {
             let mut args = Vec::new();
