@@ -1,11 +1,6 @@
 use std::collections::HashMap;
 
 #[cfg(feature = "model")]
-use bytes::buf::Buf;
-#[cfg(feature = "model")]
-use tokio::{fs::File, io::AsyncReadExt};
-
-#[cfg(feature = "model")]
 use crate::http::Http;
 use crate::internal::prelude::*;
 use crate::json::from_number;
@@ -142,39 +137,10 @@ impl EditRole {
         http: impl AsRef<Http>,
         icon: impl Into<AttachmentType<'a>>,
     ) -> Result<&mut Self> {
-        let icon = match icon.into() {
-            AttachmentType::Bytes {
-                data,
-                filename: _,
-            } => "data:image/png;base64,".to_string() + &base64::encode(&data),
-            AttachmentType::File {
-                file,
-                filename: _,
-            } => {
-                let mut buf = Vec::new();
-                file.try_clone().await?.read_to_end(&mut buf).await?;
-
-                "data:image/png;base64,".to_string() + &base64::encode(&buf)
-            },
-            AttachmentType::Path(path) => {
-                let mut file = File::open(path).await?;
-                let mut buf = vec![];
-                file.read_to_end(&mut buf).await?;
-
-                "data:image/png;base64,".to_string() + &base64::encode(&buf)
-            },
-            AttachmentType::Image(url) => {
-                let response = http.as_ref().client.get(url).send().await?;
-                let mut bytes = response.bytes().await?;
-                let mut picture: Vec<u8> = vec![0; bytes.len()];
-                bytes.copy_to_slice(&mut picture[..]);
-
-                "data:image/png;base64,".to_string() + &base64::encode(&picture)
-            },
-        };
-
+        let icon_data = icon.into().data(&http.as_ref().client).await?;
+        let icon_string = format!("data:image/png;base64,{}", base64::encode(icon_data));
         self.0.remove("unicode_emoji");
-        self.0.insert("icon", Value::String(icon));
+        self.0.insert("icon", Value::from(icon_string));
 
         Ok(self)
     }
