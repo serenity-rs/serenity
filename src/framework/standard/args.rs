@@ -353,12 +353,18 @@ impl Args {
             .map(Delimiter::to_str)
             .collect::<Vec<_>>();
 
-        let args = if delims.is_empty() && !message.is_empty() {
-            let kind =
-                if is_quoted(message) { TokenKind::QuotedArgument } else { TokenKind::Argument };
+        let args = if delims.is_empty() {
+            let msg = message.trim();
+            let kind = if is_quoted(msg) { TokenKind::QuotedArgument } else { TokenKind::Argument };
 
-            // If there are no delimiters, then the only possible argument is the whole message.
-            vec![Token::new(kind, 0, message.len())]
+            if msg.is_empty() {
+                Vec::new()
+            } else {
+                // If there are no delimiters, then the only possible argument is the whole
+                // message.
+                let start = message.find(msg).unwrap_or(0);
+                vec![Token::new(kind, start, start + msg.len())]
+            }
         } else {
             let mut args = Vec::new();
             let mut stream = Stream::new(message);
