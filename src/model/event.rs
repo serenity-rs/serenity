@@ -1355,25 +1355,17 @@ pub fn deserialize_event_with_type(kind: EventType, v: Value) -> Result<Event> {
             // GuildUnavailable isn't actually received from the gateway, so it
             // can be lumped in with GuildCreate's arm.
 
-            let mut map = JsonMap::deserialize(v)?;
-
-            if map.remove("unavailable").and_then(|v| v.as_bool()).unwrap_or(false) {
-                let guild_data = from_value(Value::from(map))?;
-
-                Event::GuildUnavailable(guild_data)
+            if v.get("unavailable").and_then(|v| v.as_bool()).unwrap_or(false) {
+                Event::GuildUnavailable(from_value(v)?)
             } else {
-                Event::GuildCreate(from_value(Value::from(map))?)
+                Event::GuildCreate(from_value(v)?)
             }
         },
         EventType::GuildDelete => {
-            let mut map = JsonMap::deserialize(v)?;
-
-            if map.remove("unavailable").and_then(|v| v.as_bool()).unwrap_or(false) {
-                let guild_data = from_value(Value::from(map))?;
-
-                Event::GuildUnavailable(guild_data)
+            if v.get("unavailable").and_then(|v| v.as_bool()).unwrap_or(false) {
+                Event::GuildUnavailable(from_value(v)?)
             } else {
-                Event::GuildDelete(from_value(Value::from(map))?)
+                Event::GuildDelete(from_value(v)?)
             }
         },
         EventType::GuildEmojisUpdate => Event::GuildEmojisUpdate(from_value(v)?),
