@@ -22,7 +22,7 @@ serde-value = "0.7"
 async-trait = "0.1.9"
 
 [dependencies.simd-json]
-version = "0.4"
+version = "0.4.14"
 optional = true
 
 [dependencies.tracing]
