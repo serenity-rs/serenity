@@ -203,6 +203,8 @@ bitflags! {
     /// The flags for an interaction response.
     #[derive(Default)]
     pub struct InteractionApplicationCommandCallbackDataFlags: u64 {
+        /// Do not include any embeds when serializing this message.
+        const SUPPRESS_EMBEDS = 1 << 2;
         /// Interaction message will only be visible to sender and will
         /// be quickly deleted.
         const EPHEMERAL = 1 << 6;
