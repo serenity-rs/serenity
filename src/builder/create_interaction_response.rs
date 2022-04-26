@@ -30,9 +30,9 @@ impl<'a> CreateInteractionResponse<'a> {
     /// Sets the `InteractionApplicationCommandCallbackData` for the message.
     pub fn interaction_response_data<F>(&mut self, f: F) -> &mut Self
     where
-        for<'b, 'c> F: FnOnce(
-            &'b mut CreateInteractionResponseData<'c>,
-        ) -> &'b mut CreateInteractionResponseData<'c>,
+        for<'b> F: FnOnce(
+            &'b mut CreateInteractionResponseData<'a>,
+        ) -> &'b mut CreateInteractionResponseData<'a>,
     {
         let mut data = CreateInteractionResponseData::default();
         f(&mut data);
