@@ -3,7 +3,7 @@
 use std::collections::HashMap;
 use std::mem::transmute;
 
-use serde::de::{self, Deserializer};
+use serde::de::Deserializer;
 use serde::ser::{Serialize, Serializer};
 
 mod change;
@@ -31,6 +31,7 @@ pub enum Action {
     StageInstance(StageInstanceAction),
     Sticker(StickerAction),
     Thread(ThreadAction),
+    Unknown(u8),
 }
 
 impl Action {
@@ -49,9 +50,12 @@ impl Action {
             Action::StageInstance(x) => x as u8,
             Action::Sticker(x) => x as u8,
             Action::Thread(x) => x as u8,
+            Action::Unknown(x) => x,
         }
     }
 
+    // TODO: Change function to `from_value(u8) -> Action` in the next version and return
+    // `Action::Unknown(u8)` for unknown values.
     pub fn from_value(value: u8) -> Option<Action> {
         let action = match value {
             1 => Action::GuildUpdate,
@@ -77,8 +81,7 @@ impl Action {
 impl<'de> Deserialize<'de> for Action {
     fn deserialize<D: Deserializer<'de>>(deserializer: D) -> StdResult<Self, D::Error> {
         let value = u8::deserialize(deserializer)?;
-        Action::from_value(value)
-            .ok_or_else(|| de::Error::custom(format!("Unexpected action number: {}", value)))
+        Ok(Action::from_value(value).unwrap_or(Action::Unknown(value)))
     }
 }
 
@@ -358,5 +361,27 @@ mod tests {
         assert_action!(Action::Thread(ThreadAction::Create), 110);
         assert_action!(Action::Thread(ThreadAction::Update), 111);
         assert_action!(Action::Thread(ThreadAction::Delete), 112);
+
+        // TODO: use `assert_action!` when `Action::from_value` returns `Action::Unknown`
+        assert_eq!(Action::Unknown(234).num(), 234);
+    }
+
+    #[test]
+    fn action_serde() {
+        use serde_json::json;
+
+        #[derive(Debug, Deserialize, Serialize)]
+        struct T {
+            action: Action,
+        }
+
+        let value = json!({
+            "action": 234,
+        });
+
+        let value = serde_json::from_value::<T>(value).unwrap();
+        assert_eq!(value.action.num(), 234);
+
+        assert!(matches!(value.action, Action::Unknown(234)));
     }
 }
