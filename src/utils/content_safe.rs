@@ -225,7 +225,7 @@ fn clean_mention(
         },
         Mention::Role(id) => id
             .to_role_cached(&cache)
-            .map_or_else(|| "@deleted-role".into(), |role| format!("@{}", role.name).into()),
+            .map_or(Cow::Borrowed("@deleted-role"), |role| format!("@{}", role.name).into()),
         Mention::User(id) => {
             if let Some(guild_id) = options.guild_reference {
                 if let Some(guild) = cache.guild(&guild_id) {
@@ -253,7 +253,7 @@ fn clean_mention(
                 .as_ref()
                 .map(get_username)
                 .or_else(|| users.iter().find(|u| u.id == id).map(get_username))
-                .unwrap_or_else(|| "@invalid-user".into())
+                .unwrap_or(Cow::Borrowed("@invalid-user"))
         },
         Mention::Emoji(_, _) => unreachable!(),
     }
