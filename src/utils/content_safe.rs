@@ -1,3 +1,5 @@
+use std::borrow::Cow;
+
 use crate::cache::Cache;
 use crate::model::channel::Channel;
 use crate::model::id::GuildId;
@@ -211,19 +213,19 @@ fn clean_mention(
     mention: Mention,
     options: &ContentSafeOptions,
     users: &[User],
-) -> String {
+) -> Cow<'static, str> {
     let cache = cache.as_ref();
     match mention {
         Mention::Channel(id) => {
             if let Some(Channel::Guild(channel)) = id.to_channel_cached(&cache) {
-                format!("#{}", channel.name)
+                format!("#{}", channel.name).into()
             } else {
-                "#deleted-channel".to_string()
+                "#deleted-channel".into()
             }
         },
         Mention::Role(id) => id
             .to_role_cached(&cache)
-            .map_or_else(|| "@deleted-role".to_string(), |role| format!("@{}", role.name)),
+            .map_or_else(|| "@deleted-role".into(), |role| format!("@{}", role.name).into()),
         Mention::User(id) => {
             if let Some(guild_id) = options.guild_reference {
                 if let Some(guild) = cache.guild(&guild_id) {
@@ -232,7 +234,8 @@ fn clean_mention(
                             format!("@{}", member.distinct())
                         } else {
                             format!("@{}", member.display_name())
-                        };
+                        }
+                        .into();
                     }
                 }
             }
@@ -243,13 +246,14 @@ fn clean_mention(
                 } else {
                     format!("@{}", user.name)
                 }
+                .into()
             };
             cache
                 .user(id)
                 .as_ref()
                 .map(get_username)
                 .or_else(|| users.iter().find(|u| u.id == id).map(get_username))
-                .unwrap_or_else(|| "@invalid-user".to_string())
+                .unwrap_or_else(|| "@invalid-user".into())
         },
         Mention::Emoji(_, _) => unreachable!(),
     }
