@@ -5,12 +5,23 @@ use async_trait::async_trait;
 use super::context::Context;
 use crate::client::bridge::gateway::event::*;
 use crate::json::Value;
+use crate::model::interactions::application_command::ApplicationCommandPermission;
 use crate::model::interactions::Interaction;
 use crate::model::prelude::*;
 
 /// The core trait for handling events by serenity.
 #[async_trait]
 pub trait EventHandler: Send + Sync {
+    /// Dispatched when the permissions of an application command was updated.
+    ///
+    /// Provides said permission's data.
+    async fn application_command_permissions_update(
+        &self,
+        _ctx: Context,
+        _permission: ApplicationCommandPermission,
+    ) {
+    }
+
     /// Dispatched when the cache has received and inserted all data from
     /// guilds.
     ///
