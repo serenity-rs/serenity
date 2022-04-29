@@ -9,6 +9,7 @@ use crate::model::interactions::application_command::{
     ApplicationCommandOptionType,
     ApplicationCommandType,
 };
+use crate::model::Permissions;
 
 /// A builder for creating a new [`ApplicationCommandOption`].
 ///
@@ -206,10 +207,25 @@ impl CreateApplicationCommand {
         self
     }
 
+    /// Specifies the default permissions required to execute the command.
+    pub fn default_member_permissions(&mut self, permissions: Permissions) -> &mut Self {
+        self.0.insert("default_member_permissions", Value::from(permissions.bits().to_string()));
+
+        self
+    }
+
+    /// Specifies if the command is available in DMs.
+    pub fn dm_permission(&mut self, enabled: bool) -> &mut Self {
+        self.0.insert("dm_permission", Value::from(enabled));
+
+        self
+    }
+
     /// Specifies if the command should not be usable by default
     ///
     /// **Note**: Setting it to false will disable it for anyone,
     /// including administrators and guild owners.
+    #[deprecated(note = "replaced by `default_member_permissions`")]
     pub fn default_permission(&mut self, default_permission: bool) -> &mut Self {
         self.0.insert("default_permission", Value::from(default_permission));
 
