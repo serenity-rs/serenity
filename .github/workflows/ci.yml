@@ -157,6 +157,10 @@ jobs:
       - name: Cache
         uses: Swatinem/rust-cache@v1
 
+      # dashmap 5.3+ MSRV is 1.59
+      - name: Pin dashmap to 5.2.0
+        run: cargo update -p dashmap --precise 5.2.0
+
       - name: Check
         run: cargo check --features collector,unstable_discord_api
 
