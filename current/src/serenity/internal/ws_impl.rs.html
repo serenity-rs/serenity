@@ -96,7 +96,21 @@
 <span id="91">91</span>
 <span id="92">92</span>
 <span id="93">93</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">async_trait::async_trait</span>;
+<span id="94">94</span>
+<span id="95">95</span>
+<span id="96">96</span>
+<span id="97">97</span>
+<span id="98">98</span>
+<span id="99">99</span>
+<span id="100">100</span>
+<span id="101">101</span>
+<span id="102">102</span>
+<span id="103">103</span>
+<span id="104">104</span>
+<span id="105">105</span>
+</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::io::Read</span>;
+
+<span class="kw">use</span> <span class="ident">async_trait::async_trait</span>;
 <span class="kw">use</span> <span class="ident">async_tungstenite::tungstenite::Message</span>;
 <span class="kw">use</span> <span class="ident">flate2::read::ZlibDecoder</span>;
 <span class="kw">use</span> <span class="ident">futures::stream::SplitSink</span>;
@@ -107,7 +121,7 @@
 
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::gateway</span>::{<span class="ident">GatewayError</span>, <span class="ident">WsStream</span>};
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::internal::prelude</span>::<span class="kw-2">*</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::json</span>::{<span class="ident">from_reader</span>, <span class="ident">from_str</span>, <span class="ident">to_string</span>};
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::json</span>::{<span class="ident">from_str</span>, <span class="ident">to_string</span>};
 
 <span class="attribute">#[<span class="ident">async_trait</span>]</span>
 <span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">ReceiverExt</span> {
@@ -155,9 +169,19 @@
 
 <span class="attribute">#[<span class="ident">inline</span>]</span>
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">convert_ws_message</span>(<span class="ident">message</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Message</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Value</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">const</span> <span class="ident">DECOMPRESSION_MULTIPLIER</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">3</span>;
+
     <span class="prelude-val">Ok</span>(<span class="kw">match</span> <span class="ident">message</span> {
         <span class="prelude-val">Some</span>(<span class="ident">Message::Binary</span>(<span class="ident">bytes</span>)) =&gt; {
-            <span class="ident">from_reader</span>(<span class="ident">ZlibDecoder::new</span>(<span class="kw-2">&amp;</span><span class="ident">bytes</span>[..])).<span class="ident">map</span>(<span class="prelude-val">Some</span>).<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">why</span><span class="op">|</span> {
+            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">decompressed</span> <span class="op">=</span> <span class="ident">String::with_capacity</span>(<span class="ident">bytes</span>.<span class="ident">len</span>() <span class="op">*</span> <span class="ident">DECOMPRESSION_MULTIPLIER</span>);
+
+            <span class="ident">ZlibDecoder::new</span>(<span class="kw-2">&amp;</span><span class="ident">bytes</span>[..]).<span class="ident">read_to_string</span>(<span class="kw-2">&amp;mut</span> <span class="ident">decompressed</span>).<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">why</span><span class="op">|</span> {
+                <span class="macro">warn!</span>(<span class="string">&quot;Err decompressing bytes: {:?}; bytes: {:?}&quot;</span>, <span class="ident">why</span>, <span class="ident">bytes</span>);
+
+                <span class="ident">why</span>
+            })<span class="question-mark">?</span>;
+
+            <span class="ident">from_str</span>(<span class="ident">decompressed</span>.<span class="ident">as_mut_str</span>()).<span class="ident">map</span>(<span class="prelude-val">Some</span>).<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">why</span><span class="op">|</span> {
                 <span class="macro">warn!</span>(<span class="string">&quot;Err deserializing bytes: {:?}; bytes: {:?}&quot;</span>, <span class="ident">why</span>, <span class="ident">bytes</span>);
 
                 <span class="ident">why</span>
