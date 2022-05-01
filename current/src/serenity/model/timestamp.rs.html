@@ -358,7 +358,7 @@
         <span class="doccomment">/// assert_eq!(timestamp.unix_timestamp(), 1462015105);</span>
         <span class="doccomment">/// assert_eq!(timestamp.to_string(), &quot;2016-04-30T11:18:25.796Z&quot;);</span>
         <span class="doccomment">/// ```</span>
-        <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
+        <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>, <span class="ident">Ord</span>, <span class="ident">PartialOrd</span>)]</span>
         <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">transparent</span>)]</span>
         <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Timestamp</span>(<span class="ident">DateTime</span><span class="op">&lt;</span><span class="ident">Utc</span><span class="op">&gt;</span>);
 
@@ -434,7 +434,7 @@
         <span class="doccomment">/// assert_eq!(timestamp.unix_timestamp(), 1462015105);</span>
         <span class="doccomment">/// assert_eq!(timestamp.to_string(), &quot;2016-04-30T11:18:25.796Z&quot;);</span>
         <span class="doccomment">/// ```</span>
-        <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
+        <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>, <span class="ident">Ord</span>, <span class="ident">PartialOrd</span>)]</span>
         <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">transparent</span>)]</span>
         <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Timestamp</span>(<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">with</span> <span class="op">=</span> <span class="string">&quot;rfc3339&quot;</span>)]</span> <span class="ident">OffsetDateTime</span>);
 
