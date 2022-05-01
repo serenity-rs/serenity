@@ -20,10 +20,7 @@ use crate::client::bridge::gateway::ChunkGuildFilter;
 use crate::constants::{self, close_codes};
 use crate::http::Http;
 use crate::internal::prelude::*;
-#[cfg(feature = "native_tls_backend")]
-use crate::internal::ws_impl::create_native_tls_client;
-#[cfg(all(feature = "rustls_backend", not(feature = "native_tls_backend")))]
-use crate::internal::ws_impl::create_rustls_client;
+use crate::internal::ws_impl::create_client;
 use crate::model::event::{Event, GatewayEvent};
 use crate::model::gateway::{Activity, GatewayIntents};
 use crate::model::id::GuildId;
@@ -813,24 +810,13 @@ impl Shard {
     }
 }
 
-#[cfg(all(feature = "rustls_backend", not(feature = "native_tls_backend")))]
 async fn connect(base_url: &str) -> Result<WsStream> {
-    let url = build_gateway_url(base_url)?;
+    let url =
+        Url::parse(&format!("{}?v={}", base_url, constants::GATEWAY_VERSION)).map_err(|why| {
+            warn!("Error building gateway URL with base `{}`: {:?}", base_url, why);
 
-    create_rustls_client(url).await
-}
+            Error::Gateway(GatewayError::BuildingUrl)
+        })?;
 
-#[cfg(feature = "native_tls_backend")]
-async fn connect(base_url: &str) -> Result<WsStream> {
-    let url = build_gateway_url(base_url)?;
-
-    create_native_tls_client(url).await
-}
-
-fn build_gateway_url(base: &str) -> Result<Url> {
-    Url::parse(&format!("{}?v={}", base, constants::GATEWAY_VERSION)).map_err(|why| {
-        warn!("Error building gateway URL with base `{}`: {:?}", base, why);
-
-        Error::Gateway(GatewayError::BuildingUrl)
-    })
+    create_client(url).await
 }
