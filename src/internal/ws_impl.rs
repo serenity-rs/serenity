@@ -1,3 +1,5 @@
+use std::io::Read;
+
 use async_trait::async_trait;
 use async_tungstenite::tungstenite::Message;
 use flate2::read::ZlibDecoder;
@@ -9,7 +11,7 @@ use url::Url;
 
 use crate::gateway::{GatewayError, WsStream};
 use crate::internal::prelude::*;
-use crate::json::{from_reader, from_str, to_string};
+use crate::json::{from_str, to_string};
 
 #[async_trait]
 pub trait ReceiverExt {
@@ -57,9 +59,19 @@ impl SenderExt for WsStream {
 
 #[inline]
 pub(crate) fn convert_ws_message(message: Option<Message>) -> Result<Option<Value>> {
+    const DECOMPRESSION_MULTIPLIER: usize = 3;
+
     Ok(match message {
         Some(Message::Binary(bytes)) => {
-            from_reader(ZlibDecoder::new(&bytes[..])).map(Some).map_err(|why| {
+            let mut decompressed = String::with_capacity(bytes.len() * DECOMPRESSION_MULTIPLIER);
+
+            ZlibDecoder::new(&bytes[..]).read_to_string(&mut decompressed).map_err(|why| {
+                warn!("Err decompressing bytes: {:?}; bytes: {:?}", why, bytes);
+
+                why
+            })?;
+
+            from_str(decompressed.as_mut_str()).map(Some).map_err(|why| {
                 warn!("Err deserializing bytes: {:?}; bytes: {:?}", why, bytes);
 
                 why

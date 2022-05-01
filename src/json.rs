@@ -93,24 +93,6 @@ where
     Ok(simd_json::from_str(s)?)
 }
 
-#[cfg(all(feature = "gateway", not(feature = "simd-json")))]
-pub(crate) fn from_reader<R, T>(r: R) -> Result<T>
-where
-    T: DeserializeOwned,
-    R: std::io::Read,
-{
-    Ok(serde_json::from_reader(r)?)
-}
-
-#[cfg(all(feature = "gateway", feature = "simd-json"))]
-pub(crate) fn from_reader<R, T>(r: R) -> Result<T>
-where
-    T: DeserializeOwned,
-    R: std::io::Read,
-{
-    Ok(simd_json::from_reader(r)?)
-}
-
 #[cfg(not(feature = "simd-json"))]
 pub(crate) fn from_value<T>(v: Value) -> Result<T>
 where
