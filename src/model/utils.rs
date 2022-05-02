@@ -98,22 +98,22 @@ fn try_resolve(
         ApplicationCommandOptionType::User => {
             let id = &UserId(string?.parse().ok()?);
 
-            let user = resolved.users.get(id)?.to_owned();
-            let member = resolved.members.get(id).map(ToOwned::to_owned);
+            let user = resolved.users.get(id)?.clone();
+            let member = resolved.members.get(id).cloned();
 
             Some(ApplicationCommandInteractionDataOptionValue::User(user, member))
         },
         ApplicationCommandOptionType::Role => {
             let id = &RoleId(string?.parse().ok()?);
 
-            let role = resolved.roles.get(id)?.to_owned();
+            let role = resolved.roles.get(id)?.clone();
 
             Some(ApplicationCommandInteractionDataOptionValue::Role(role))
         },
         ApplicationCommandOptionType::Channel => {
             let id = &ChannelId(string?.parse().ok()?);
 
-            let channel = resolved.channels.get(id)?.to_owned();
+            let channel = resolved.channels.get(id)?.clone();
 
             Some(ApplicationCommandInteractionDataOptionValue::Channel(channel))
         },
@@ -121,12 +121,12 @@ fn try_resolve(
             let id: u64 = string?.parse().ok()?;
 
             if let Some(user) = resolved.users.get(&UserId(id)) {
-                let user = user.to_owned();
-                let member = resolved.members.get(&UserId(id)).map(ToOwned::to_owned);
+                let user = user.clone();
+                let member = resolved.members.get(&UserId(id)).cloned();
 
                 Some(ApplicationCommandInteractionDataOptionValue::User(user, member))
             } else {
-                let role = resolved.roles.get(&RoleId(id))?.to_owned();
+                let role = resolved.roles.get(&RoleId(id))?.clone();
 
                 Some(ApplicationCommandInteractionDataOptionValue::Role(role))
             }
@@ -146,7 +146,7 @@ fn try_resolve(
         ApplicationCommandOptionType::Attachment => {
             let id = &AttachmentId(string?.parse().ok()?);
 
-            let attachment = resolved.attachments.get(id)?.to_owned();
+            let attachment = resolved.attachments.get(id)?.clone();
 
             Some(ApplicationCommandInteractionDataOptionValue::Attachment(attachment))
         },

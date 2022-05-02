@@ -31,7 +31,7 @@ fn loop_errors(value: &Value, errors: &mut Vec<DiscordJsonSingleError>, path: &[
                 .expect("expected _errors")
                 .as_array()
                 .expect("expected array")
-                .to_owned();
+                .clone();
             for error in found_errors {
                 let error_object = error.as_object().expect("expected object");
                 let mut object_path = path.to_owned();

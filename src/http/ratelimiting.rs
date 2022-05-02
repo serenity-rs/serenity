@@ -430,7 +430,7 @@ mod tests {
         let mut map = HeaderMap::with_capacity(pairs.len());
 
         for (name, val) in pairs {
-            map.insert(name, val.to_owned());
+            map.insert(name, val.clone());
         }
 
         map
