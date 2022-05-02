@@ -329,12 +329,37 @@
 <span id="324">324</span>
 <span id="325">325</span>
 <span id="326">326</span>
+<span id="327">327</span>
+<span id="328">328</span>
+<span id="329">329</span>
+<span id="330">330</span>
+<span id="331">331</span>
+<span id="332">332</span>
+<span id="333">333</span>
+<span id="334">334</span>
+<span id="335">335</span>
+<span id="336">336</span>
+<span id="337">337</span>
+<span id="338">338</span>
+<span id="339">339</span>
+<span id="340">340</span>
+<span id="341">341</span>
+<span id="342">342</span>
+<span id="343">343</span>
+<span id="344">344</span>
+<span id="345">345</span>
+<span id="346">346</span>
+<span id="347">347</span>
+<span id="348">348</span>
+<span id="349">349</span>
+<span id="350">350</span>
+<span id="351">351</span>
 </pre><pre class="rust"><code><span class="doccomment">//! Audit log types for administrative actions within guilds.</span>
 
 <span class="kw">use</span> <span class="ident">std::collections::HashMap</span>;
 <span class="kw">use</span> <span class="ident">std::mem::transmute</span>;
 
-<span class="kw">use</span> <span class="ident">serde::de</span>::{<span class="self">self</span>, <span class="ident">Deserializer</span>};
+<span class="kw">use</span> <span class="ident">serde::de::Deserializer</span>;
 <span class="kw">use</span> <span class="ident">serde::ser</span>::{<span class="ident">Serialize</span>, <span class="ident">Serializer</span>};
 
 <span class="kw">mod</span> <span class="ident">change</span>;
@@ -362,6 +387,7 @@
     <span class="ident">StageInstance</span>(<span class="ident">StageInstanceAction</span>),
     <span class="ident">Sticker</span>(<span class="ident">StickerAction</span>),
     <span class="ident">Thread</span>(<span class="ident">ThreadAction</span>),
+    <span class="ident">Unknown</span>(<span class="ident">u8</span>),
 }
 
 <span class="kw">impl</span> <span class="ident">Action</span> {
@@ -380,9 +406,12 @@
             <span class="ident">Action::StageInstance</span>(<span class="ident">x</span>) =&gt; <span class="ident">x</span> <span class="kw">as</span> <span class="ident">u8</span>,
             <span class="ident">Action::Sticker</span>(<span class="ident">x</span>) =&gt; <span class="ident">x</span> <span class="kw">as</span> <span class="ident">u8</span>,
             <span class="ident">Action::Thread</span>(<span class="ident">x</span>) =&gt; <span class="ident">x</span> <span class="kw">as</span> <span class="ident">u8</span>,
+            <span class="ident">Action::Unknown</span>(<span class="ident">x</span>) =&gt; <span class="ident">x</span>,
         }
     }
 
+    <span class="comment">// TODO: Change function to `from_value(u8) -&gt; Action` in the next version and return</span>
+    <span class="comment">// `Action::Unknown(u8)` for unknown values.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_value</span>(<span class="ident">value</span>: <span class="ident">u8</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Action</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">action</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">value</span> {
             <span class="number">1</span> =&gt; <span class="ident">Action::GuildUpdate</span>,
@@ -408,8 +437,7 @@
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="ident">Deserialize</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Action</span> {
     <span class="kw">fn</span> <span class="ident">deserialize</span><span class="op">&lt;</span><span class="ident">D</span>: <span class="ident">Deserializer</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">deserializer</span>: <span class="ident">D</span>) -&gt; <span class="ident">StdResult</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">D::Error</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">value</span> <span class="op">=</span> <span class="ident">u8::deserialize</span>(<span class="ident">deserializer</span>)<span class="question-mark">?</span>;
-        <span class="ident">Action::from_value</span>(<span class="ident">value</span>)
-            .<span class="ident">ok_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">de::Error::custom</span>(<span class="macro">format!</span>(<span class="string">&quot;Unexpected action number: {}&quot;</span>, <span class="ident">value</span>)))
+        <span class="prelude-val">Ok</span>(<span class="ident">Action::from_value</span>(<span class="ident">value</span>).<span class="ident">unwrap_or</span>(<span class="ident">Action::Unknown</span>(<span class="ident">value</span>)))
     }
 }
 
@@ -653,6 +681,28 @@
         <span class="macro">assert_action!</span>(<span class="ident">Action::Thread</span>(<span class="ident">ThreadAction::Create</span>), <span class="number">110</span>);
         <span class="macro">assert_action!</span>(<span class="ident">Action::Thread</span>(<span class="ident">ThreadAction::Update</span>), <span class="number">111</span>);
         <span class="macro">assert_action!</span>(<span class="ident">Action::Thread</span>(<span class="ident">ThreadAction::Delete</span>), <span class="number">112</span>);
+
+        <span class="comment">// TODO: use `assert_action!` when `Action::from_value` returns `Action::Unknown`</span>
+        <span class="macro">assert_eq!</span>(<span class="ident">Action::Unknown</span>(<span class="number">234</span>).<span class="ident">num</span>(), <span class="number">234</span>);
+    }
+
+    <span class="attribute">#[<span class="ident">test</span>]</span>
+    <span class="kw">fn</span> <span class="ident">action_serde</span>() {
+        <span class="kw">use</span> <span class="ident">serde_json::json</span>;
+
+        <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
+        <span class="kw">struct</span> <span class="ident">T</span> {
+            <span class="ident">action</span>: <span class="ident">Action</span>,
+        }
+
+        <span class="kw">let</span> <span class="ident">value</span> <span class="op">=</span> <span class="macro">json!</span>({
+            <span class="string">&quot;action&quot;</span>: <span class="number">234</span>,
+        });
+
+        <span class="kw">let</span> <span class="ident">value</span> <span class="op">=</span> <span class="ident">serde_json::from_value</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">value</span>).<span class="ident">unwrap</span>();
+        <span class="macro">assert_eq!</span>(<span class="ident">value</span>.<span class="ident">action</span>.<span class="ident">num</span>(), <span class="number">234</span>);
+
+        <span class="macro">assert!</span>(<span class="macro">matches!</span>(<span class="ident">value</span>.<span class="ident">action</span>, <span class="ident">Action::Unknown</span>(<span class="number">234</span>)));
     }
 }
 </code></pre></div>

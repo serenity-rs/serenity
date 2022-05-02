@@ -124,6 +124,8 @@
 <span id="119">119</span>
 <span id="120">120</span>
 <span id="121">121</span>
+<span id="122">122</span>
+<span id="123">123</span>
 </pre><pre class="rust"><code><span class="doccomment">//! Serenity is a Rust library for the Discord API.</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! View the [examples] on how to make and structure a bot.</span>
@@ -179,12 +181,14 @@
 <span class="attribute">#![<span class="ident">doc</span>(<span class="ident">html_root_url</span> <span class="op">=</span> <span class="string">&quot;https://docs.rs/serenity/*&quot;</span>)]</span>
 <span class="attribute">#![<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">feature</span>(<span class="ident">doc_auto_cfg</span>))]</span>
 <span class="attribute">#![<span class="ident">deny</span>(<span class="ident">rust_2018_idioms</span>)]</span>
+<span class="attribute">#![<span class="ident">deny</span>(<span class="ident">rustdoc::broken_intra_doc_links</span>, <span class="ident">rustdoc::private_intra_doc_links</span>)]</span>
 <span class="attribute">#![<span class="ident">deny</span>(
     <span class="ident">clippy::unwrap_used</span>,
     <span class="ident">clippy::non_ascii_literal</span>,
     <span class="ident">clippy::missing_errors_doc</span>,
     <span class="ident">clippy::let_underscore_must_use</span>,
-    <span class="ident">clippy::unused_async</span>
+    <span class="ident">clippy::unused_async</span>,
+    <span class="ident">unused</span>
 )]</span>
 <span class="attribute">#![<span class="ident">cfg_attr</span>(<span class="ident">test</span>, <span class="ident">allow</span>(<span class="ident">clippy::unwrap_used</span>))]</span>
 <span class="attribute">#![<span class="ident">type_length_limit</span> <span class="op">=</span> <span class="string">&quot;3294819&quot;</span>]</span> <span class="comment">// needed so ShardRunner::run compiles with instrument.</span>

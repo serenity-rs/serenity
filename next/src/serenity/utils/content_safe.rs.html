@@ -527,7 +527,13 @@
 <span id="522">522</span>
 <span id="523">523</span>
 <span id="524">524</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::cache::Cache</span>;
+<span id="525">525</span>
+<span id="526">526</span>
+<span id="527">527</span>
+<span id="528">528</span>
+</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::borrow::Cow</span>;
+
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::cache::Cache</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::channel::Channel</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::id::GuildId</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::mention::Mention</span>;
@@ -740,19 +746,19 @@
     <span class="ident">mention</span>: <span class="ident">Mention</span>,
     <span class="ident">options</span>: <span class="kw-2">&amp;</span><span class="ident">ContentSafeOptions</span>,
     <span class="ident">users</span>: <span class="kw-2">&amp;</span>[<span class="ident">User</span>],
-) -&gt; <span class="ident">String</span> {
+) -&gt; <span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span>, <span class="ident">str</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="ident">cache</span> <span class="op">=</span> <span class="ident">cache</span>.<span class="ident">as_ref</span>();
     <span class="kw">match</span> <span class="ident">mention</span> {
         <span class="ident">Mention::Channel</span>(<span class="ident">id</span>) =&gt; {
             <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">Channel::Guild</span>(<span class="ident">channel</span>)) <span class="op">=</span> <span class="ident">id</span>.<span class="ident">to_channel_cached</span>(<span class="kw-2">&amp;</span><span class="ident">cache</span>) {
-                <span class="macro">format!</span>(<span class="string">&quot;#{}&quot;</span>, <span class="ident">channel</span>.<span class="ident">name</span>)
+                <span class="macro">format!</span>(<span class="string">&quot;#{}&quot;</span>, <span class="ident">channel</span>.<span class="ident">name</span>).<span class="ident">into</span>()
             } <span class="kw">else</span> {
-                <span class="string">&quot;#deleted-channel&quot;</span>.<span class="ident">to_string</span>()
+                <span class="string">&quot;#deleted-channel&quot;</span>.<span class="ident">into</span>()
             }
         },
         <span class="ident">Mention::Role</span>(<span class="ident">id</span>) =&gt; <span class="ident">id</span>
             .<span class="ident">to_role_cached</span>(<span class="kw-2">&amp;</span><span class="ident">cache</span>)
-            .<span class="ident">map_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="string">&quot;@deleted-role&quot;</span>.<span class="ident">to_string</span>(), <span class="op">|</span><span class="ident">role</span><span class="op">|</span> <span class="macro">format!</span>(<span class="string">&quot;@{}&quot;</span>, <span class="ident">role</span>.<span class="ident">name</span>)),
+            .<span class="ident">map_or</span>(<span class="ident">Cow::Borrowed</span>(<span class="string">&quot;@deleted-role&quot;</span>), <span class="op">|</span><span class="ident">role</span><span class="op">|</span> <span class="macro">format!</span>(<span class="string">&quot;@{}&quot;</span>, <span class="ident">role</span>.<span class="ident">name</span>).<span class="ident">into</span>()),
         <span class="ident">Mention::User</span>(<span class="ident">id</span>) =&gt; {
             <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">guild_id</span>) <span class="op">=</span> <span class="ident">options</span>.<span class="ident">guild_reference</span> {
                 <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">guild</span>) <span class="op">=</span> <span class="ident">cache</span>.<span class="ident">guild</span>(<span class="kw-2">&amp;</span><span class="ident">guild_id</span>) {
@@ -761,7 +767,8 @@
                             <span class="macro">format!</span>(<span class="string">&quot;@{}&quot;</span>, <span class="ident">member</span>.<span class="ident">distinct</span>())
                         } <span class="kw">else</span> {
                             <span class="macro">format!</span>(<span class="string">&quot;@{}&quot;</span>, <span class="ident">member</span>.<span class="ident">display_name</span>())
-                        };
+                        }
+                        .<span class="ident">into</span>();
                     }
                 }
             }
@@ -772,13 +779,14 @@
                 } <span class="kw">else</span> {
                     <span class="macro">format!</span>(<span class="string">&quot;@{}&quot;</span>, <span class="ident">user</span>.<span class="ident">name</span>)
                 }
+                .<span class="ident">into</span>()
             };
             <span class="ident">cache</span>
                 .<span class="ident">user</span>(<span class="ident">id</span>)
                 .<span class="ident">as_ref</span>()
                 .<span class="ident">map</span>(<span class="ident">get_username</span>)
                 .<span class="ident">or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">users</span>.<span class="ident">iter</span>().<span class="ident">find</span>(<span class="op">|</span><span class="ident">u</span><span class="op">|</span> <span class="ident">u</span>.<span class="ident">id</span> <span class="op">==</span> <span class="ident">id</span>).<span class="ident">map</span>(<span class="ident">get_username</span>))
-                .<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="string">&quot;@invalid-user&quot;</span>.<span class="ident">to_string</span>())
+                .<span class="ident">unwrap_or</span>(<span class="ident">Cow::Borrowed</span>(<span class="string">&quot;@invalid-user&quot;</span>))
         },
         <span class="ident">Mention::Emoji</span>(<span class="kw">_</span>, <span class="kw">_</span>) =&gt; <span class="macro">unreachable!</span>(),
     }

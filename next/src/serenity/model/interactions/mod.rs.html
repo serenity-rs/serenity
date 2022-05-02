@@ -245,6 +245,8 @@
 <span id="240">240</span>
 <span id="241">241</span>
 <span id="242">242</span>
+<span id="243">243</span>
+<span id="244">244</span>
 </pre><pre class="rust"><code><span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">application_command</span>;
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">autocomplete</span>;
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">message_component</span>;
@@ -450,6 +452,8 @@
     <span class="doccomment">/// The flags for an interaction response.</span>
     <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Default</span>)]</span>
     <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">InteractionApplicationCommandCallbackDataFlags</span>: <span class="ident">u64</span> {
+        <span class="doccomment">/// Do not include any embeds when serializing this message.</span>
+        <span class="kw">const</span> <span class="ident">SUPPRESS_EMBEDS</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">2</span>;
         <span class="doccomment">/// Interaction message will only be visible to sender and will</span>
         <span class="doccomment">/// be quickly deleted.</span>
         <span class="kw">const</span> <span class="ident">EPHEMERAL</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">6</span>;

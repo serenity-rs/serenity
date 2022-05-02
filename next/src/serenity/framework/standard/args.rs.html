@@ -988,6 +988,11 @@
 <span id="983">983</span>
 <span id="984">984</span>
 <span id="985">985</span>
+<span id="986">986</span>
+<span id="987">987</span>
+<span id="988">988</span>
+<span id="989">989</span>
+<span id="990">990</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::borrow::Cow</span>;
 <span class="kw">use</span> <span class="ident">std::error::Error</span> <span class="kw">as</span> <span class="ident">StdError</span>;
 <span class="kw">use</span> <span class="ident">std::fmt</span>;
@@ -1343,12 +1348,17 @@
             .<span class="ident">map</span>(<span class="ident">Delimiter::to_str</span>)
             .<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>();
 
-        <span class="kw">let</span> <span class="ident">args</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">delims</span>.<span class="ident">is_empty</span>() <span class="op">&amp;&amp;</span> <span class="op">!</span><span class="ident">message</span>.<span class="ident">is_empty</span>() {
-            <span class="kw">let</span> <span class="ident">kind</span> <span class="op">=</span>
-                <span class="kw">if</span> <span class="ident">is_quoted</span>(<span class="ident">message</span>) { <span class="ident">TokenKind::QuotedArgument</span> } <span class="kw">else</span> { <span class="ident">TokenKind::Argument</span> };
+        <span class="kw">let</span> <span class="ident">args</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">delims</span>.<span class="ident">is_empty</span>() {
+            <span class="kw">let</span> <span class="ident">msg</span> <span class="op">=</span> <span class="ident">message</span>.<span class="ident">trim</span>();
+            <span class="kw">let</span> <span class="ident">kind</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">is_quoted</span>(<span class="ident">msg</span>) { <span class="ident">TokenKind::QuotedArgument</span> } <span class="kw">else</span> { <span class="ident">TokenKind::Argument</span> };
 
-            <span class="comment">// If there are no delimiters, then the only possible argument is the whole message.</span>
-            <span class="macro">vec!</span>[<span class="ident">Token::new</span>(<span class="ident">kind</span>, <span class="number">0</span>, <span class="ident">message</span>.<span class="ident">len</span>())]
+            <span class="kw">if</span> <span class="ident">msg</span>.<span class="ident">is_empty</span>() {
+                <span class="ident">Vec::new</span>()
+            } <span class="kw">else</span> {
+                <span class="comment">// If there are no delimiters, then the only possible argument is the whole</span>
+                <span class="comment">// message.</span>
+                <span class="macro">vec!</span>[<span class="ident">Token::new</span>(<span class="ident">kind</span>, <span class="number">0</span>, <span class="ident">message</span>.<span class="ident">len</span>())]
+            }
         } <span class="kw">else</span> {
             <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">args</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
             <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">stream</span> <span class="op">=</span> <span class="ident">Stream::new</span>(<span class="ident">message</span>);

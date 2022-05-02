@@ -1899,14 +1899,6 @@
 <span id="1894">1894</span>
 <span id="1895">1895</span>
 <span id="1896">1896</span>
-<span id="1897">1897</span>
-<span id="1898">1898</span>
-<span id="1899">1899</span>
-<span id="1900">1900</span>
-<span id="1901">1901</span>
-<span id="1902">1902</span>
-<span id="1903">1903</span>
-<span id="1904">1904</span>
 </pre><pre class="rust"><code><span class="doccomment">//! All the events this library handles.</span>
 
 <span class="kw">use</span> <span class="ident">std::collections::HashMap</span>;
@@ -3264,25 +3256,17 @@
             <span class="comment">// GuildUnavailable isn&#39;t actually received from the gateway, so it</span>
             <span class="comment">// can be lumped in with GuildCreate&#39;s arm.</span>
 
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">map</span> <span class="op">=</span> <span class="ident">JsonMap::deserialize</span>(<span class="ident">v</span>)<span class="question-mark">?</span>;
-
-            <span class="kw">if</span> <span class="ident">map</span>.<span class="ident">remove</span>(<span class="string">&quot;unavailable&quot;</span>).<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">v</span><span class="op">|</span> <span class="ident">v</span>.<span class="ident">as_bool</span>()).<span class="ident">unwrap_or</span>(<span class="bool-val">false</span>) {
-                <span class="kw">let</span> <span class="ident">guild_data</span> <span class="op">=</span> <span class="ident">from_value</span>(<span class="ident">Value::from</span>(<span class="ident">map</span>))<span class="question-mark">?</span>;
-
-                <span class="ident">Event::GuildUnavailable</span>(<span class="ident">guild_data</span>)
+            <span class="kw">if</span> <span class="ident">v</span>.<span class="ident">get</span>(<span class="string">&quot;unavailable&quot;</span>).<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">v</span><span class="op">|</span> <span class="ident">v</span>.<span class="ident">as_bool</span>()).<span class="ident">unwrap_or</span>(<span class="bool-val">false</span>) {
+                <span class="ident">Event::GuildUnavailable</span>(<span class="ident">from_value</span>(<span class="ident">v</span>)<span class="question-mark">?</span>)
             } <span class="kw">else</span> {
-                <span class="ident">Event::GuildCreate</span>(<span class="ident">from_value</span>(<span class="ident">Value::from</span>(<span class="ident">map</span>))<span class="question-mark">?</span>)
+                <span class="ident">Event::GuildCreate</span>(<span class="ident">from_value</span>(<span class="ident">v</span>)<span class="question-mark">?</span>)
             }
         },
         <span class="ident">EventType::GuildDelete</span> =&gt; {
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">map</span> <span class="op">=</span> <span class="ident">JsonMap::deserialize</span>(<span class="ident">v</span>)<span class="question-mark">?</span>;
-
-            <span class="kw">if</span> <span class="ident">map</span>.<span class="ident">remove</span>(<span class="string">&quot;unavailable&quot;</span>).<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">v</span><span class="op">|</span> <span class="ident">v</span>.<span class="ident">as_bool</span>()).<span class="ident">unwrap_or</span>(<span class="bool-val">false</span>) {
-                <span class="kw">let</span> <span class="ident">guild_data</span> <span class="op">=</span> <span class="ident">from_value</span>(<span class="ident">Value::from</span>(<span class="ident">map</span>))<span class="question-mark">?</span>;
-
-                <span class="ident">Event::GuildUnavailable</span>(<span class="ident">guild_data</span>)
+            <span class="kw">if</span> <span class="ident">v</span>.<span class="ident">get</span>(<span class="string">&quot;unavailable&quot;</span>).<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">v</span><span class="op">|</span> <span class="ident">v</span>.<span class="ident">as_bool</span>()).<span class="ident">unwrap_or</span>(<span class="bool-val">false</span>) {
+                <span class="ident">Event::GuildUnavailable</span>(<span class="ident">from_value</span>(<span class="ident">v</span>)<span class="question-mark">?</span>)
             } <span class="kw">else</span> {
-                <span class="ident">Event::GuildDelete</span>(<span class="ident">from_value</span>(<span class="ident">Value::from</span>(<span class="ident">map</span>))<span class="question-mark">?</span>)
+                <span class="ident">Event::GuildDelete</span>(<span class="ident">from_value</span>(<span class="ident">v</span>)<span class="question-mark">?</span>)
             }
         },
         <span class="ident">EventType::GuildEmojisUpdate</span> =&gt; <span class="ident">Event::GuildEmojisUpdate</span>(<span class="ident">from_value</span>(<span class="ident">v</span>)<span class="question-mark">?</span>),
