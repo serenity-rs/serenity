@@ -384,18 +384,22 @@ impl ShardRunner {
 
                     true
                 },
-                ShardClientMessage::Manager(ShardManagerMessage::ShardUpdate {
-                    ..
-                })
-                | ShardClientMessage::Manager(ShardManagerMessage::ShutdownInitiated)
-                | ShardClientMessage::Manager(ShardManagerMessage::ShutdownFinished(_)) => {
+                ShardClientMessage::Manager(
+                    ShardManagerMessage::ShardUpdate {
+                        ..
+                    }
+                    | ShardManagerMessage::ShutdownInitiated
+                    | ShardManagerMessage::ShutdownFinished(_),
+                ) => {
                     // nb: not sent here
 
                     true
                 },
-                ShardClientMessage::Manager(ShardManagerMessage::ShardDisallowedGatewayIntents)
-                | ShardClientMessage::Manager(ShardManagerMessage::ShardInvalidAuthentication)
-                | ShardClientMessage::Manager(ShardManagerMessage::ShardInvalidGatewayIntents) => {
+                ShardClientMessage::Manager(
+                    ShardManagerMessage::ShardDisallowedGatewayIntents
+                    | ShardManagerMessage::ShardInvalidAuthentication
+                    | ShardManagerMessage::ShardInvalidGatewayIntents,
+                ) => {
                     // These variants should never be received.
                     warn!("[ShardRunner {:?}] Received a ShardError?", self.shard.shard_info(),);
 
