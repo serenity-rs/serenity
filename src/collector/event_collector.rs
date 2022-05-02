@@ -147,6 +147,7 @@ struct FilterOptions {
 }
 
 /// Future building a stream of events.
+#[must_use = "Builders do nothing unless built"]
 pub struct EventCollectorBuilder {
     filter: Option<FilterOptions>,
     shard: Option<ShardMessenger>,
@@ -168,7 +169,6 @@ impl EventCollectorBuilder {
     /// The filter checks whether the event has the right related guild, channel, user, and message.
     /// Only events with types passed to [`Self::add_event_type`] as counted towards this limit.
     #[allow(clippy::unwrap_used)]
-    #[must_use]
     pub fn filter_limit(mut self, limit: u32) -> Self {
         self.filter.as_mut().unwrap().filter_limit = Some(limit);
 
@@ -180,7 +180,6 @@ impl EventCollectorBuilder {
     /// An event is considered *collected*, if the event
     /// passes all the requirements.
     #[allow(clippy::unwrap_used)]
-    #[must_use]
     pub fn collect_limit(mut self, limit: u32) -> Self {
         self.filter.as_mut().unwrap().collect_limit = Some(limit);
 
@@ -204,7 +203,6 @@ impl EventCollectorBuilder {
     /// Adds an [`EventType`] that this collector will collect.
     /// If an event does not have one of these types, it won't be received.
     #[allow(clippy::unwrap_used)]
-    #[must_use]
     pub fn add_event_type(mut self, event_type: EventType) -> Self {
         self.filter.as_mut().unwrap().event_types.push(event_type);
 
@@ -249,7 +247,6 @@ impl EventCollectorBuilder {
 
     /// Sets a `duration` for how long the collector shall receive
     /// events.
-    #[must_use]
     pub fn timeout(mut self, duration: Duration) -> Self {
         self.timeout = Some(Box::pin(sleep(duration)));
 

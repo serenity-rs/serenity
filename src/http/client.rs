@@ -81,6 +81,7 @@ impl HttpBuilder {
 
     /// Sets a token for the bot. If the token is not prefixed "Bot ", this
     /// method will automatically do so.
+    #[must_use]
     pub fn token(mut self, token: impl AsRef<str>) -> Self {
         self.token = parse_token(token);
 

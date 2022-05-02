@@ -26,7 +26,6 @@ macro_rules! impl_component_interaction_collector {
                 ///
                 /// The filter checks whether the message has been sent
                 /// in the right guild, channel, and by the right author.
-                #[must_use]
                 pub fn filter_limit(mut self, limit: u32) -> Self {
                     self.filter.as_mut().unwrap().filter_limit = Some(limit);
 
@@ -37,7 +36,6 @@ macro_rules! impl_component_interaction_collector {
                 ///
                 /// An interaction is considered *collected*, if the interaction
                 /// passes all the requirements.
-                #[must_use]
                 pub fn collect_limit(mut self, limit: u32) -> Self {
                     self.filter.as_mut().unwrap().collect_limit = Some(limit);
 
@@ -89,7 +87,6 @@ macro_rules! impl_component_interaction_collector {
 
                 /// Sets a `duration` for how long the collector shall receive
                 /// interactions.
-                #[must_use]
                 pub fn timeout(mut self, duration: Duration) -> Self {
                     self.timeout = Some(Box::pin(sleep(duration)));
 
@@ -198,6 +195,7 @@ impl_component_interaction_collector! {
     ComponentInteractionCollectorBuilder;
 }
 
+#[must_use = "Builders do nothing unless built"]
 pub struct ComponentInteractionCollectorBuilder {
     filter: Option<FilterOptions>,
     shard: Option<ShardMessenger>,
@@ -230,6 +228,7 @@ impl ComponentInteractionCollectorBuilder {
     }
 }
 
+#[must_use = "Builders do nothing unless awaited"]
 pub struct CollectComponentInteraction {
     filter: Option<FilterOptions>,
     shard: Option<ShardMessenger>,

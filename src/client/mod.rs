@@ -65,6 +65,7 @@ pub use crate::CacheAndHttp;
 
 /// A builder implementing [`Future`] building a [`Client`] to interact with Discord.
 #[cfg(feature = "gateway")]
+#[must_use = "Builders do nothing unless they are awaited"]
 pub struct ClientBuilder {
     // TODO: data, http and cache_settings are Options in order to take() them out in the Future impl.
     // This should be changed after the stabilization of std::future::IntoFuture.
