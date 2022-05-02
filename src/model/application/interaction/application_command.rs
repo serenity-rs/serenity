@@ -479,21 +479,21 @@ impl CommandData {
     ///
     /// [`target_id`]: Self::target_id
     #[must_use]
-    pub fn target(&self) -> Option<ResolvedTarget> {
+    pub fn target(&self) -> Option<ResolvedTarget<'_>> {
         match (self.kind, self.target_id) {
             (CommandType::User, Some(id)) => {
                 let user_id = id.to_user_id();
 
-                let user = self.resolved.users.get(&user_id).cloned()?;
-                let member = self.resolved.members.get(&user_id).cloned();
+                let user = self.resolved.users.get(&user_id)?;
+                let member = self.resolved.members.get(&user_id);
 
-                Some(ResolvedTarget::User(user, member.map(Box::new)))
+                Some(ResolvedTarget::User(user, member))
             },
             (CommandType::Message, Some(id)) => {
                 let message_id = id.to_message_id();
-                let message = self.resolved.messages.get(&message_id).cloned()?;
+                let message = self.resolved.messages.get(&message_id)?;
 
-                Some(ResolvedTarget::Message(Box::new(message)))
+                Some(ResolvedTarget::Message(message))
             },
             _ => None,
         }
@@ -559,12 +559,12 @@ impl<'de> Deserialize<'de> for CommandData {
 }
 
 /// The resolved value of a [`CommandData::target_id`].
-#[derive(Clone, Debug, Serialize, Deserialize)]
+#[derive(Clone, Debug)]
 #[non_exhaustive]
 #[repr(u8)]
-pub enum ResolvedTarget {
-    User(User, Option<Box<PartialMember>>),
-    Message(Box<Message>),
+pub enum ResolvedTarget<'a> {
+    User(&'a User, Option<&'a PartialMember>),
+    Message(&'a Message),
 }
 
 /// The resolved data of a command data interaction payload.
