@@ -1319,6 +1319,11 @@ mod test {
             #[serde(with = "discriminator")]
             discriminator: u16,
         }
+        #[derive(Debug, PartialEq, Deserialize, Serialize)]
+        struct UserOpt {
+            #[serde(with = "discriminator::option")]
+            discriminator: Option<u16>,
+        }
 
         let user = User {
             discriminator: 123,
@@ -1341,12 +1346,6 @@ mod test {
             Token::U16(123),
             Token::StructEnd,
         ]);
-
-        #[derive(Debug, PartialEq, Deserialize, Serialize)]
-        struct UserOpt {
-            #[serde(with = "discriminator::option")]
-            discriminator: Option<u16>,
-        }
 
         let user = UserOpt {
             discriminator: Some(123),

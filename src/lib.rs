@@ -59,6 +59,7 @@
     clippy::unnested_or_patterns,
     clippy::inconsistent_struct_constructor,
     clippy::semicolon_if_nothing_returned,
+    clippy::items_after_statements
 )]
 #![deny(rustdoc::broken_intra_doc_links, rustdoc::private_intra_doc_links)]
 #![deny(

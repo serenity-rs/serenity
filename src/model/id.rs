@@ -318,6 +318,17 @@ mod tests {
 
         use super::snowflake;
 
+        #[derive(Debug, PartialEq, Deserialize, Serialize)]
+        struct S {
+            #[serde(with = "snowflake")]
+            id: u64,
+        }
+
+        #[derive(Debug, PartialEq, Deserialize, Serialize)]
+        struct Opt {
+            id: Option<GuildId>,
+        }
+
         let id = GuildId(17_5928_8472_9911_7063);
         assert_tokens(&id, &[
             Token::NewtypeStruct {
@@ -332,12 +343,6 @@ mod tests {
             Token::U64(17_5928_8472_9911_7063),
         ]);
 
-        #[derive(Debug, PartialEq, Deserialize, Serialize)]
-        struct S {
-            #[serde(with = "snowflake")]
-            id: u64,
-        }
-
         let s = S {
             id: 17_5928_8472_9911_7063,
         };
@@ -350,11 +355,6 @@ mod tests {
             Token::Str("175928847299117063"),
             Token::StructEnd,
         ]);
-
-        #[derive(Debug, PartialEq, Deserialize, Serialize)]
-        struct Opt {
-            id: Option<GuildId>,
-        }
 
         let s = Opt {
             id: Some(GuildId(17_5928_8472_9911_7063)),
