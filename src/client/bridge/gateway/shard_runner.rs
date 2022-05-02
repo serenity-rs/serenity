@@ -673,12 +673,11 @@ impl ShardRunner {
 
     #[instrument(skip(self))]
     fn update_manager(&self) {
-        #[allow(clippy::let_underscore_must_use)]
-        let _ = self.manager_tx.unbounded_send(ShardManagerMessage::ShardUpdate {
+        drop(self.manager_tx.unbounded_send(ShardManagerMessage::ShardUpdate {
             id: ShardId(self.shard.shard_info()[0]),
             latency: self.shard.latency(),
             stage: self.shard.stage(),
-        });
+        }));
     }
 }
 

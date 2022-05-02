@@ -499,7 +499,6 @@ impl Route {
         api!("/channels/{}/messages/{}/reactions", channel_id, message_id)
     }
 
-    #[allow(clippy::let_underscore_must_use)]
     #[must_use]
     pub fn channel_message_reactions_list(
         channel_id: u64,
@@ -517,7 +516,7 @@ impl Route {
         );
 
         if let Some(after) = after {
-            let _ = write!(url, "&after={}", after);
+            url.push_str(&format!("&after={}", after));
         }
 
         url
@@ -583,7 +582,6 @@ impl Route {
         api!("/channels/{}/thread-members", channel_id)
     }
 
-    #[allow(clippy::let_underscore_must_use)]
     #[must_use]
     pub fn channel_archived_public_threads(
         channel_id: u64,
@@ -593,17 +591,16 @@ impl Route {
         let mut s = api!("/channels/{}/threads/archived/public", channel_id);
 
         if let Some(id) = before {
-            let _ = write!(s, "&before={}", id);
+            s.push_str(&format!("&before={}", id));
         }
 
         if let Some(limit) = limit {
-            let _ = write!(s, "&limit={}", limit);
+            s.push_str(&format!("&limit={}", limit));
         }
 
         s
     }
 
-    #[allow(clippy::let_underscore_must_use)]
     #[must_use]
     pub fn channel_archived_private_threads(
         channel_id: u64,
@@ -613,17 +610,16 @@ impl Route {
         let mut s = api!("/channels/{}/threads/archived/private", channel_id);
 
         if let Some(id) = before {
-            let _ = write!(s, "&before={}", id);
+            s.push_str(&format!("&before={}", id));
         }
 
         if let Some(limit) = limit {
-            let _ = write!(s, "&limit={}", limit);
+            s.push_str(&format!("&limit={}", limit));
         }
 
         s
     }
 
-    #[allow(clippy::let_underscore_must_use)]
     #[must_use]
     pub fn channel_joined_private_threads(
         channel_id: u64,
@@ -633,11 +629,11 @@ impl Route {
         let mut s = api!("/channels/{}/users/@me/threads/archived/private", channel_id);
 
         if let Some(id) = before {
-            let _ = write!(s, "&before={}", id);
+            s.push_str(&format!("&before={}", id));
         }
 
         if let Some(limit) = limit {
-            let _ = write!(s, "&limit={}", limit);
+            s.push_str(&format!("&limit={}", limit));
         }
 
         s

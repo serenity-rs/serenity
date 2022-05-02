@@ -978,7 +978,6 @@ fn flatten_group_to_string(
 /// buffer respecting the plain help format.
 /// If `nest_level` is `0`, this function will skip the group's name.
 #[cfg(all(feature = "cache", feature = "http"))]
-#[allow(clippy::let_underscore_must_use)]
 fn flatten_group_to_plain_string(
     group_text: &mut String,
     group: &GroupCommandsPair,
@@ -1261,7 +1260,6 @@ pub async fn with_embeds(
 
 /// Turns grouped commands into a [`String`] taking plain help format into account.
 #[cfg(all(feature = "cache", feature = "http"))]
-#[allow(clippy::let_underscore_must_use)]
 fn grouped_commands_to_plain_string(
     help_options: &HelpOptions,
     help_description: &str,
@@ -1269,10 +1267,11 @@ fn grouped_commands_to_plain_string(
 ) -> String {
     let mut result = "__**Commands**__\n".to_string();
 
-    let _ = writeln!(result, "{}", &help_description);
+    result.push_str(help_description);
+    result.push('\n');
 
     for group in groups {
-        let _ = write!(result, "\n**{}**", &group.name);
+        result.push_str(&format!("\n**{}**", &group.name));
 
         flatten_group_to_plain_string(&mut result, group, 0, help_options);
     }
@@ -1282,73 +1281,70 @@ fn grouped_commands_to_plain_string(
 
 /// Turns a single command into a [`String`] taking plain help format into account.
 #[cfg(all(feature = "cache", feature = "http"))]
-#[allow(clippy::let_underscore_must_use)]
 fn single_command_to_plain_string(help_options: &HelpOptions, command: &Command<'_>) -> String {
     let mut result = String::default();
 
-    let _ = writeln!(result, "__**{}**__", command.name);
+    result.push_str(&format!("__**{}**__\n", command.name));
 
     if !command.aliases.is_empty() {
-        let _ = writeln!(
-            result,
+        result.push_str(&format!(
             "**{}**: `{}`",
             help_options.aliases_label,
             command.aliases.join("`, `")
-        );
+        ));
     }
 
     if let Some(description) = command.description {
-        let _ = writeln!(result, "**{}**: {}", help_options.description_label, description);
+        result.push_str(&format!("**{}**: {}\n", help_options.description_label, description));
     };
 
     if let Some(usage) = command.usage {
         if let Some(first_prefix) = command.group_prefixes.get(0) {
-            let _ = writeln!(
-                result,
-                "**{}**: `{} {} {}`",
+            result.push_str(&format!(
+                "**{}**: `{} {} {}`\n",
                 help_options.usage_label, first_prefix, command.name, usage
-            );
+            ));
         } else {
-            let _ =
-                writeln!(result, "**{}**: `{} {}`", help_options.usage_label, command.name, usage);
+            result.push_str(&format!(
+                "**{}**: `{} {}`\n",
+                help_options.usage_label, command.name, usage
+            ));
         }
     }
 
     if !command.usage_sample.is_empty() {
         if let Some(first_prefix) = command.group_prefixes.get(0) {
             let format_example = |example| {
-                let _ = writeln!(
-                    result,
-                    "**{}**: `{} {} {}`",
+                result.push_str(&format!(
+                    "**{}**: `{} {} {}`\n",
                     help_options.usage_sample_label, first_prefix, command.name, example
-                );
+                ));
             };
             command.usage_sample.iter().for_each(format_example);
         } else {
             let format_example = |example| {
-                let _ = writeln!(
-                    result,
-                    "**{}**: `{} {}`",
+                result.push_str(&format!(
+                    "**{}**: `{} {}`\n",
                     help_options.usage_sample_label, command.name, example
-                );
+                ));
             };
             command.usage_sample.iter().for_each(format_example);
         }
     }
 
-    let _ = writeln!(result, "**{}**: {}", help_options.grouped_label, command.group_name);
+    result.push_str(&format!("**{}**: {}\n", help_options.grouped_label, command.group_name));
 
     if !help_options.available_text.is_empty() && !command.availability.is_empty() {
-        let _ = writeln!(result, "**{}**: {}", help_options.available_text, command.availability);
+        result
+            .push_str(&format!("**{}**: {}\n", help_options.available_text, command.availability));
     }
 
     if !command.sub_commands.is_empty() {
-        let _ = writeln!(
-            result,
-            "**{}**: `{}`",
+        result.push_str(&format!(
+            "**{}**: `{}`\n",
             help_options.sub_commands_label,
             command.sub_commands.join("`, `"),
-        );
+        ));
     }
 
     result
@@ -1395,7 +1391,6 @@ fn single_command_to_plain_string(help_options: &HelpOptions, command: &Command<
 ///
 /// Returns the same errors as [`ChannelId::send_message`].
 #[cfg(all(feature = "cache", feature = "http"))]
-#[allow(clippy::implicit_hasher)]
 pub async fn plain(
     ctx: &Context,
     msg: &Message,
