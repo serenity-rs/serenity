@@ -329,8 +329,7 @@ impl ShardManager {
 
         let msg = ShardQueuerMessage::Start(shard_info[0], shard_info[1]);
 
-        #[allow(clippy::let_underscore_must_use)]
-        let _ = self.shard_queuer.unbounded_send(msg);
+        drop(self.shard_queuer.unbounded_send(msg));
     }
 }
 

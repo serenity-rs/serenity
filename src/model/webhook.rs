@@ -1,8 +1,6 @@
 //! Webhook model and implementations.
 
 use std::fmt;
-#[cfg(feature = "model")]
-use std::mem;
 
 #[cfg(feature = "model")]
 use super::channel::Message;
@@ -434,15 +432,9 @@ impl Webhook {
     /// [`Error::Json`]: crate::error::Error::Json
     pub async fn refresh(&mut self, http: impl AsRef<Http>) -> Result<()> {
         let token = self.token.as_ref().ok_or(ModelError::NoTokenSet)?;
-        match http.as_ref().get_webhook_with_token(self.id.0, token).await {
-            Ok(replacement) => {
-                #[allow(clippy::let_underscore_must_use)]
-                let _ = mem::replace(self, replacement);
-
-                Ok(())
-            },
-            Err(why) => Err(why),
-        }
+        http.as_ref().get_webhook_with_token(self.id.0, token).await.map(|replacement| {
+            *self = replacement;
+        })
     }
 
     /// Returns the url of the webhook.

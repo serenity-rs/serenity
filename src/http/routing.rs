@@ -729,29 +729,25 @@ impl Route {
         api!("/guilds/{}/members", guild_id)
     }
 
-    #[allow(clippy::let_underscore_must_use)]
     pub fn guild_members_search(guild_id: u64, query: &str, limit: Option<u64>) -> String {
         let mut s = api!("/guilds/{}/members/search?", guild_id);
 
-        let _ = write!(s, "&query={}", query);
-
-        let _ = write!(s, "&limit={}", limit.unwrap_or(constants::MEMBER_FETCH_LIMIT));
-
+        s.push_str(&format!(
+            "&query={}&limit={}",
+            query,
+            limit.unwrap_or(constants::MEMBER_FETCH_LIMIT)
+        ));
         s
     }
 
-    #[allow(clippy::let_underscore_must_use)]
     pub fn guild_members_optioned(guild_id: u64, after: Option<u64>, limit: Option<u64>) -> String {
         let mut s = api!("/guilds/{}/members?", guild_id);
 
         if let Some(after) = after {
-            let _ = write!(s, "&after={}", after);
-            // should not error, ignoring
+            s.push_str(&format!("&after={}", after));
         }
 
-        let _ = write!(s, "&limit={}", limit.unwrap_or(constants::MEMBER_FETCH_LIMIT));
-        // should not error, ignoring
-
+        s.push_str(&format!("&limit={}", limit.unwrap_or(constants::MEMBER_FETCH_LIMIT)));
         s
     }
 
@@ -895,18 +891,15 @@ impl Route {
         let mut s = api!("/users/{}/guilds?", target);
 
         if let Some(limit) = limit {
-            #[allow(clippy::let_underscore_must_use)]
-            let _ = write!(s, "&limit={}", limit);
+            s.push_str(&format!("&limit={}", limit))
         }
 
         if let Some(after) = after {
-            let _ = write!(s, "&after={}", after);
-            // should not error, ignoring
+            s.push_str(&format!("&after={}", after))
         }
 
         if let Some(before) = before {
-            let _ = write!(s, "&before={}", before);
-            // should not error, ignoring
+            s.push_str(&format!("&before={}", before))
         }
 
         s

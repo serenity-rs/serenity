@@ -307,15 +307,15 @@ impl ShardRunner {
         }
 
         // Send a Close Frame to Discord, which allows a bot to "log off"
-        #[allow(clippy::let_underscore_must_use)]
-        let _ = self
-            .shard
-            .client
-            .close(Some(CloseFrame {
-                code: close_code.into(),
-                reason: Cow::from(""),
-            }))
-            .await;
+        drop(
+            self.shard
+                .client
+                .close(Some(CloseFrame {
+                    code: close_code.into(),
+                    reason: Cow::from(""),
+                }))
+                .await,
+        );
 
         // In return, we wait for either a Close Frame response, or an error, after which this WS is deemed
         // disconnected from Discord.
@@ -539,9 +539,7 @@ impl ShardRunner {
                         self.shard.shard_info(),
                     );
 
-                    #[allow(clippy::let_underscore_must_use)]
-                    let _ = self.request_restart().await;
-
+                    drop(self.request_restart().await);
                     return Ok(false);
                 },
                 Err(_) => break,

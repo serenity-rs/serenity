@@ -323,8 +323,7 @@ fn _read_image(path: &Path) -> Result<String> {
     let mut f = File::open(path)?;
 
     // errors here are intentionally ignored
-    #[allow(clippy::let_underscore_must_use)]
-    let _ = f.read_to_end(&mut v);
+    drop(f.read_to_end(&mut v));
 
     let b64 = base64::encode(&v);
     let ext = if path.extension() == Some(OsStr::new("png")) { "png" } else { "jpg" };

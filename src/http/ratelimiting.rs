@@ -156,7 +156,7 @@ impl Ratelimiter {
 
         loop {
             // This will block if another thread hit the global ratelimit.
-            let _ = self.global.lock().await;
+            drop(self.global.lock().await);
 
             // Destructure the tuple instead of retrieving the third value to
             // take advantage of the type system. If `RouteInfo::deconstruct`
@@ -203,7 +203,7 @@ impl Ratelimiter {
             }
 
             let redo = if response.headers().get("x-ratelimit-global").is_some() {
-                let _ = self.global.lock().await;
+                drop(self.global.lock().await);
 
                 Ok(
                     if let Some(retry_after) =

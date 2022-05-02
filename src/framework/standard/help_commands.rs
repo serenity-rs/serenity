@@ -986,30 +986,29 @@ fn flatten_group_to_plain_string(
     let repeated_indent_str = help_options.indention_prefix.repeat(nest_level);
 
     if nest_level > 0 {
-        let _ = write!(group_text, "\n{}**{}**", repeated_indent_str, group.name,);
+        group_text.push_str(&format!("\n{}**{}**", repeated_indent_str, group.name));
     }
 
     if group.prefixes.is_empty() {
-        let _ = write!(group_text, ": ");
+        group_text.push_str(": ");
     } else {
-        let _ = write!(
-            group_text,
+        group_text.push_str(&format!(
             " ({}: `{}`): ",
             help_options.group_prefix,
             group.prefixes.join("`, `"),
-        );
+        ));
     }
 
     let joined_commands = group.command_names.join(", ");
 
-    let _ = write!(group_text, "{}", joined_commands);
+    group_text.push_str(&joined_commands);
 
     for sub_group in &group.sub_groups {
         let mut sub_group_text = String::default();
 
         flatten_group_to_plain_string(&mut sub_group_text, sub_group, nest_level + 1, help_options);
 
-        let _ = write!(group_text, "{}", sub_group_text);
+        group_text.push_str(&sub_group_text);
     }
 }
 
