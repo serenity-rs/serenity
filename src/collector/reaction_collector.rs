@@ -127,8 +127,7 @@ impl ReactionAction {
     #[must_use]
     pub fn as_inner_ref(&self) -> &Arc<Reaction> {
         match self {
-            Self::Added(inner) => inner,
-            Self::Removed(inner) => inner,
+            Self::Added(inner) | Self::Removed(inner) => inner,
         }
     }
 

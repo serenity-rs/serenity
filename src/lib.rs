@@ -61,7 +61,8 @@
     clippy::semicolon_if_nothing_returned,
     clippy::items_after_statements,
     clippy::implicit_clone,
-    clippy::return_self_not_must_use
+    clippy::return_self_not_must_use,
+    clippy::match_same_arms,
 )]
 #![deny(rustdoc::broken_intra_doc_links, rustdoc::private_intra_doc_links)]
 #![deny(
