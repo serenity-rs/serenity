@@ -32,6 +32,7 @@ impl ShardMessenger {
     ///
     /// [`Client`]: crate::Client
     #[inline]
+    #[must_use]
     pub fn new(tx: Sender<InterMessage>) -> Self {
         Self {
             tx,

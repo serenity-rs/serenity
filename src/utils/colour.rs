@@ -87,6 +87,7 @@ impl Colour {
     /// assert_eq!(colour.tuple(), (100, 76, 67));
     /// ```
     #[inline]
+    #[must_use]
     pub const fn new(value: u32) -> Colour {
         Colour(value)
     }
@@ -120,6 +121,7 @@ impl Colour {
     // Clippy wants to use `u32::from` instead `as`-casts,
     // but this not doable as `u32::from` is not a const fn.
     #[allow(clippy::cast_lossless)]
+    #[must_use]
     pub const fn from_rgb(red: u8, green: u8, blue: u8) -> Colour {
         Colour((red as u32) << 16 | (green as u32) << 8 | blue as u32)
     }
@@ -133,6 +135,7 @@ impl Colour {
     ///
     /// assert_eq!(Colour::new(6573123).r(), 100);
     /// ```
+    #[must_use]
     pub const fn r(self) -> u8 {
         ((self.0 >> 16) & 255) as u8
     }
@@ -146,6 +149,7 @@ impl Colour {
     ///
     /// assert_eq!(Colour::new(6573123).g(), 76);
     /// ```
+    #[must_use]
     pub const fn g(self) -> u8 {
         ((self.0 >> 8) & 255) as u8
     }
@@ -159,6 +163,7 @@ impl Colour {
     ///
     /// assert_eq!(Colour::new(6573123).b(), 67);
     /// ```
+    #[must_use]
     pub const fn b(self) -> u8 {
         (self.0 & 255) as u8
     }
@@ -175,6 +180,7 @@ impl Colour {
     ///
     /// assert_eq!(Colour::new(6573123).tuple(), (100, 76, 67));
     /// ```
+    #[must_use]
     pub const fn tuple(self) -> (u8, u8, u8) {
         (self.r(), self.g(), self.b())
     }
@@ -191,6 +197,7 @@ impl Colour {
     ///
     /// assert_eq!(Colour::new(6573123).hex(), "644C43");
     /// ```
+    #[must_use]
     pub fn hex(self) -> String {
         format!("{:06X}", self.0)
     }

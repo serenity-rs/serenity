@@ -61,6 +61,7 @@ use crate::model::misc::EmojiIdentifier;
 /// ```
 ///
 /// [`RichInvite`]: crate::model::invite::RichInvite
+#[must_use]
 pub fn parse_invite(code: &str) -> &str {
     let code = code.trim_start_matches("http://").trim_start_matches("https://");
     let lower = code.to_lowercase();
@@ -84,6 +85,7 @@ pub fn parse_invite(code: &str) -> &str {
 /// assert_eq!(parse_user_tag("kangalioo#9108"), Some(("kangalioo", 9108)));
 /// assert_eq!(parse_user_tag("kangalioo#10108"), None);
 /// ```
+#[must_use]
 pub fn parse_user_tag(s: &str) -> Option<(&str, u16)> {
     let (name, discrim) = s.split_once('#')?;
     let discrim = discrim.parse().ok()?;
@@ -417,6 +419,7 @@ pub fn parse_quotes(s: impl AsRef<str>) -> Vec<String> {
 /// assert_eq!(id, 245037420704169985);
 /// assert_eq!(token, "ig5AO-wdVWpCBtUUMxmgsWryqgsW3DChbKYOINftJ4DCrUbnkedoYZD0VOH1QLr-S3sV");
 /// ```
+#[must_use]
 pub fn parse_webhook(url: &Url) -> Option<(u64, &str)> {
     let (webhook_id, token) = url.path().strip_prefix("/api/webhooks/")?.split_once('/')?;
     if !["http", "https"].contains(&url.scheme())

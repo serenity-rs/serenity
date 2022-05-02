@@ -490,6 +490,7 @@ impl Message {
 
     /// True if message was sent using direct messages.
     #[inline]
+    #[must_use]
     pub fn is_private(&self) -> bool {
         self.guild_id.is_none()
     }
@@ -527,6 +528,7 @@ impl Message {
     /// Returns [`None`] if the message is within the limit, otherwise returns
     /// [`Some`] with an inner value of how many unicode code points the message
     /// is over.
+    #[must_use]
     pub fn overflow_length(content: &str) -> Option<usize> {
         // Check if the content is over the maximum number of unicode code
         // points.
@@ -797,6 +799,7 @@ impl Message {
 
     /// Checks whether the message mentions passed [`User`].
     #[inline]
+    #[must_use]
     pub fn mentions_user(&self, user: &User) -> bool {
         self.mentions_user_id(user.id)
     }
@@ -859,6 +862,7 @@ impl Message {
     /// Returns a link referencing this message. When clicked, users will jump to the message.
     /// The link will be valid for messages in either private channels or guilds.
     #[inline]
+    #[must_use]
     pub fn link(&self) -> String {
         self.id.link(self.channel_id, self.guild_id)
     }
@@ -1256,6 +1260,7 @@ bitflags! {
 impl MessageId {
     /// Returns a link referencing this message. When clicked, users will jump to the message.
     /// The link will be valid for messages in either private channels or guilds.
+    #[must_use]
     pub fn link(&self, channel_id: ChannelId, guild_id: Option<GuildId>) -> String {
         if let Some(guild_id) = guild_id {
             format!("https://discord.com/channels/{}/{}/{}", guild_id, channel_id, self)

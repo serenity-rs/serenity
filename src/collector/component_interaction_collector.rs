@@ -26,6 +26,7 @@ macro_rules! impl_component_interaction_collector {
                 ///
                 /// The filter checks whether the message has been sent
                 /// in the right guild, channel, and by the right author.
+                #[must_use]
                 pub fn filter_limit(mut self, limit: u32) -> Self {
                     self.filter.as_mut().unwrap().filter_limit = Some(limit);
 
@@ -36,6 +37,7 @@ macro_rules! impl_component_interaction_collector {
                 ///
                 /// An interaction is considered *collected*, if the interaction
                 /// passes all the requirements.
+                #[must_use]
                 pub fn collect_limit(mut self, limit: u32) -> Self {
                     self.filter.as_mut().unwrap().collect_limit = Some(limit);
 
@@ -87,6 +89,7 @@ macro_rules! impl_component_interaction_collector {
 
                 /// Sets a `duration` for how long the collector shall receive
                 /// interactions.
+                #[must_use]
                 pub fn timeout(mut self, duration: Duration) -> Self {
                     self.timeout = Some(Box::pin(sleep(duration)));
 
@@ -212,6 +215,7 @@ impl ComponentInteractionCollectorBuilder {
 
     /// Use the given configuration to build the [`ComponentInteractionCollector`].
     #[allow(clippy::unwrap_used)]
+    #[must_use]
     pub fn build(self) -> ComponentInteractionCollector {
         let shard_messenger = self.shard.unwrap();
         let (filter, receiver) = ComponentInteractionFilter::new(self.filter.unwrap());

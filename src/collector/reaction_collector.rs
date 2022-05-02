@@ -27,6 +27,7 @@ macro_rules! impl_reaction_collector {
                 ///
                 /// The filter checks whether the message has been sent
                 /// in the right guild, channel, and by the right author.
+                #[must_use]
                 pub fn filter_limit(mut self, limit: u32) -> Self {
                     self.filter.as_mut().unwrap().filter_limit = Some(limit);
 
@@ -37,6 +38,7 @@ macro_rules! impl_reaction_collector {
                 ///
                 /// A reaction is considered *collected*, if the reaction
                 /// passes all the requirements.
+                #[must_use]
                 pub fn collect_limit(mut self, limit: u32) -> Self {
                     self.filter.as_mut().unwrap().collect_limit = Some(limit);
 
@@ -89,6 +91,7 @@ macro_rules! impl_reaction_collector {
                 /// If set to `true`, added reactions will be collected.
                 ///
                 /// Set to `true` by default.
+                #[must_use]
                 pub fn added(mut self, is_accepted: bool) -> Self {
                     self.filter.as_mut().unwrap().accept_added = is_accepted;
 
@@ -98,6 +101,7 @@ macro_rules! impl_reaction_collector {
                 /// If set to `true`, removed reactions will be collected.
                 ///
                 /// Set to `false` by default.
+                #[must_use]
                 pub fn removed(mut self, is_accepted: bool) -> Self {
                     self.filter.as_mut().unwrap().accept_removed = is_accepted;
 
@@ -106,6 +110,7 @@ macro_rules! impl_reaction_collector {
 
                 /// Sets a `duration` for how long the collector shall receive
                 /// reactions.
+                #[must_use]
                 pub fn timeout(mut self, duration: Duration) -> Self {
                     self.timeout = Some(Box::pin(sleep(duration)));
 
@@ -124,6 +129,7 @@ pub enum ReactionAction {
 }
 
 impl ReactionAction {
+    #[must_use]
     pub fn as_inner_ref(&self) -> &Arc<Reaction> {
         match self {
             Self::Added(inner) => inner,
@@ -131,10 +137,12 @@ impl ReactionAction {
         }
     }
 
+    #[must_use]
     pub fn is_added(&self) -> bool {
         matches!(self, Self::Added(_))
     }
 
+    #[must_use]
     pub fn is_removed(&self) -> bool {
         matches!(self, Self::Removed(_))
     }
@@ -306,6 +314,7 @@ impl ReactionCollectorBuilder {
 
     /// Use the given configuration to build the [`ReactionCollector`].
     #[allow(clippy::unwrap_used)]
+    #[must_use]
     pub fn build(self) -> ReactionCollector {
         let shard_messenger = self.shard.unwrap();
         let (filter, receiver) = ReactionFilter::new(self.filter.unwrap());

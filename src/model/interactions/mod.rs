@@ -27,6 +27,7 @@ pub enum Interaction {
 
 impl Interaction {
     /// Gets the interaction Id.
+    #[must_use]
     pub fn id(&self) -> InteractionId {
         match self {
             Interaction::Ping(i) => i.id,
@@ -38,6 +39,7 @@ impl Interaction {
     }
 
     /// Gets the interaction type
+    #[must_use]
     pub fn kind(&self) -> InteractionType {
         match self {
             Interaction::Ping(_) => InteractionType::Ping,
@@ -49,6 +51,7 @@ impl Interaction {
     }
 
     /// Gets the interaction application Id
+    #[must_use]
     pub fn application_id(&self) -> ApplicationId {
         match self {
             Interaction::Ping(i) => i.application_id,
@@ -60,6 +63,7 @@ impl Interaction {
     }
 
     /// Gets the interaction token.
+    #[must_use]
     pub fn token(&self) -> &str {
         match self {
             Interaction::Ping(ref i) => i.token.as_str(),
@@ -71,6 +75,7 @@ impl Interaction {
     }
 
     /// Gets the invoked guild locale.
+    #[must_use]
     pub fn guild_locale(&self) -> Option<&str> {
         match self {
             Interaction::Ping(i) => i.guild_locale.as_deref(),
@@ -82,6 +87,7 @@ impl Interaction {
     }
 
     /// Converts this to a [`PingInteraction`]
+    #[must_use]
     pub fn ping(self) -> Option<PingInteraction> {
         match self {
             Interaction::Ping(i) => Some(i),
@@ -90,6 +96,7 @@ impl Interaction {
     }
 
     /// Converts this to an [`ApplicationCommandInteraction`]
+    #[must_use]
     pub fn application_command(self) -> Option<ApplicationCommandInteraction> {
         match self {
             Interaction::ApplicationCommand(i) => Some(i),
@@ -98,6 +105,7 @@ impl Interaction {
     }
 
     /// Converts this to a [`MessageComponentInteraction`]
+    #[must_use]
     pub fn message_component(self) -> Option<MessageComponentInteraction> {
         match self {
             Interaction::MessageComponent(i) => Some(i),
@@ -106,6 +114,7 @@ impl Interaction {
     }
 
     /// Converts this to a [`AutocompleteInteraction`]
+    #[must_use]
     pub fn autocomplete(self) -> Option<AutocompleteInteraction> {
         match self {
             Interaction::Autocomplete(i) => Some(i),
@@ -114,6 +123,7 @@ impl Interaction {
     }
 
     /// Converts this to a [`ModalSubmitInteraction`]
+    #[must_use]
     pub fn modal_submit(self) -> Option<ModalSubmitInteraction> {
         match self {
             Interaction::ModalSubmit(i) => Some(i),

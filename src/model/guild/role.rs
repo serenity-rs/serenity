@@ -175,6 +175,7 @@ impl Role {
 
     /// Check that the role has the given permission.
     #[inline]
+    #[must_use]
     pub fn has_permission(&self, permission: Permissions) -> bool {
         self.permissions.contains(permission)
     }
@@ -185,6 +186,7 @@ impl Role {
     /// precisely equivalent to the given permissions. If you need only check
     /// that the role has at least the given permissions, pass `false`.
     #[inline]
+    #[must_use]
     pub fn has_permissions(&self, permissions: Permissions, precise: bool) -> bool {
         if precise {
             self.permissions == permissions

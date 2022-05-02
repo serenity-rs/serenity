@@ -1165,6 +1165,7 @@ macro_rules! define_event_related_id_methods {
         }
     ),+ $(,)?) => {
         /// User ID(s) related to this event.
+        #[must_use]
         pub fn user_id(&self) -> RelatedId<UserId> {
             use RelatedId::*;
             #[allow(unused_variables)]
@@ -1178,6 +1179,7 @@ macro_rules! define_event_related_id_methods {
         }
 
         /// Guild ID related to this event.
+        #[must_use]
         pub fn guild_id(&self) -> RelatedId<GuildId> {
             use RelatedId::*;
             #[allow(unused_variables)]
@@ -1191,6 +1193,7 @@ macro_rules! define_event_related_id_methods {
         }
 
         /// Channel ID(s) related to this event.
+        #[must_use]
         pub fn channel_id(&self) -> RelatedId<ChannelId> {
             use RelatedId::*;
             #[allow(unused_variables)]
@@ -1204,6 +1207,7 @@ macro_rules! define_event_related_id_methods {
         }
 
         /// Message ID(s) related to this event.
+        #[must_use]
         pub fn message_id(&self) -> RelatedId<MessageId> {
             use RelatedId::*;
             #[allow(unused_variables)]
@@ -1220,6 +1224,7 @@ macro_rules! define_event_related_id_methods {
 
 impl Event {
     /// Return the type of this event.
+    #[must_use]
     pub fn event_type(&self) -> EventType {
         match self {
             Self::ChannelCreate(_) => EventType::ChannelCreate,
@@ -1665,6 +1670,7 @@ macro_rules! define_related_ids_for_event_type {
             $variant:path, $_:pat => { $($input:tt)* }
         ),+ $(,)?
     ) => {
+        #[must_use]
         pub fn related_ids(&self) -> RelatedIdsForEventType {
             match self {
                 Self::Other(_) => Default::default(),
@@ -1757,6 +1763,7 @@ impl EventType {
     /// Return the event name of this event. Some events are synthetic, and we lack
     /// the information to recover the original event name for these events, in which
     /// case this method returns [`None`].
+    #[must_use]
     pub fn name(&self) -> Option<&str> {
         match self {
             Self::ChannelCreate => Some(Self::CHANNEL_CREATE),

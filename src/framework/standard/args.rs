@@ -343,6 +343,7 @@ impl Args {
     /// // We shall not see `the quick brown` again.
     /// assert_eq!(args.rest(), "fox jumps over the lazy");
     /// ```
+    #[must_use]
     pub fn new(message: &str, possible_delimiters: &[Delimiter]) -> Self {
         let delims = possible_delimiters
             .iter()
@@ -491,6 +492,7 @@ impl Args {
     /// assert_eq!(args.current(), None);
     /// ```
     #[inline]
+    #[must_use]
     pub fn current(&self) -> Option<&str> {
         if self.is_empty() {
             return None;
@@ -723,6 +725,7 @@ impl Args {
     /// assert_eq!(protagonists, "Harry, Hermione, Ronald");
     /// ```
     #[inline]
+    #[must_use]
     pub fn raw(&self) -> RawArguments<'_> {
         RawArguments {
             tokens: &self.args,
@@ -745,6 +748,7 @@ impl Args {
     /// assert_eq!(&*horror_movies, &["Saw", "The Mist", "A Quiet Place"]);
     /// ```
     #[inline]
+    #[must_use]
     pub fn raw_quoted(&self) -> RawArguments<'_> {
         let mut raw = self.raw();
         raw.quoted = true;
@@ -849,12 +853,14 @@ impl Args {
 
     /// Get the original, unmodified message passed to the command.
     #[inline]
+    #[must_use]
     pub fn message(&self) -> &str {
         &self.message
     }
 
     /// Starting from the offset, return the remainder of available arguments.
     #[inline]
+    #[must_use]
     pub fn rest(&self) -> &str {
         self.remains().unwrap_or_default()
     }
@@ -863,6 +869,7 @@ impl Args {
     ///
     /// Returns [`None`] if there are no remaining arguments.
     #[inline]
+    #[must_use]
     pub fn remains(&self) -> Option<&str> {
         if self.is_empty() {
             return None;
@@ -881,18 +888,21 @@ impl Args {
     /// The value returned is to be assumed to stay static.
     /// However, if [`Self::find`] was called previously, and was successful, then the value is subtracted by one.
     #[inline]
+    #[must_use]
     pub fn len(&self) -> usize {
         self.args.len()
     }
 
     /// Assert that there are no more arguments left.
     #[inline]
+    #[must_use]
     pub fn is_empty(&self) -> bool {
         self.offset >= self.len()
     }
 
     /// Return the amount of arguments still available.
     #[inline]
+    #[must_use]
     pub fn remaining(&self) -> usize {
         if self.is_empty() {
             return 0;

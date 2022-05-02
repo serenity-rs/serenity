@@ -157,11 +157,13 @@ impl ChannelCategory {
     }
 
     #[inline]
+    #[must_use]
     pub fn is_nsfw(&self) -> bool {
         self.kind == ChannelType::Text && self.nsfw
     }
 
     /// Returns the name of the category.
+    #[must_use]
     pub fn name(&self) -> &str {
         &self.name
     }

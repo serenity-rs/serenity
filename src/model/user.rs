@@ -215,6 +215,7 @@ impl CurrentUser {
     /// # }
     /// ```
     #[inline]
+    #[must_use]
     pub fn avatar_url(&self) -> Option<String> {
         avatar_url(self.id, self.avatar.as_ref())
     }
@@ -223,6 +224,7 @@ impl CurrentUser {
     ///
     /// This will produce a PNG URL.
     #[inline]
+    #[must_use]
     pub fn default_avatar_url(&self) -> String {
         default_avatar_url(self.discriminator)
     }
@@ -285,6 +287,7 @@ impl CurrentUser {
     /// This will call [`Self::avatar_url`] first, and if that returns [`None`], it
     /// then falls back to [`Self::default_avatar_url`].
     #[inline]
+    #[must_use]
     pub fn face(&self) -> String {
         self.avatar_url().unwrap_or_else(|| self.default_avatar_url())
     }
@@ -511,6 +514,7 @@ impl CurrentUser {
     /// # }
     /// ```
     #[inline]
+    #[must_use]
     pub fn static_avatar_url(&self) -> Option<String> {
         static_avatar_url(self.id, self.avatar.as_ref())
     }
@@ -532,6 +536,7 @@ impl CurrentUser {
     /// # }
     /// ```
     #[inline]
+    #[must_use]
     pub fn tag(&self) -> String {
         tag(&self.name, self.discriminator)
     }
@@ -600,6 +605,7 @@ pub enum OnlineStatus {
 }
 
 impl OnlineStatus {
+    #[must_use]
     pub fn name(&self) -> &str {
         match *self {
             OnlineStatus::DoNotDisturb => "dnd",
@@ -738,6 +744,7 @@ impl User {
     ///
     /// This will produce a WEBP image URL, or GIF if the user has a GIF avatar.
     #[inline]
+    #[must_use]
     pub fn avatar_url(&self) -> Option<String> {
         avatar_url(self.id, self.avatar.as_ref())
     }
@@ -749,6 +756,7 @@ impl User {
     /// **Note**: This will only be present if the user is fetched via Rest API,
     /// e.g. with [`Http::get_user`].
     #[inline]
+    #[must_use]
     pub fn banner_url(&self) -> Option<String> {
         banner_url(self.id, self.banner.as_ref())
     }
@@ -772,6 +780,7 @@ impl User {
 
     /// Retrieves the time that this user was created at.
     #[inline]
+    #[must_use]
     pub fn created_at(&self) -> Timestamp {
         self.id.created_at()
     }
@@ -780,6 +789,7 @@ impl User {
     ///
     /// This will produce a PNG URL.
     #[inline]
+    #[must_use]
     pub fn default_avatar_url(&self) -> String {
         default_avatar_url(self.discriminator)
     }
@@ -877,6 +887,7 @@ impl User {
     ///
     /// This will call [`Self::avatar_url`] first, and if that returns [`None`], it
     /// then falls back to [`Self::default_avatar_url`].
+    #[must_use]
     pub fn face(&self) -> String {
         self.avatar_url().unwrap_or_else(|| self.default_avatar_url())
     }
@@ -978,6 +989,7 @@ impl User {
     ///
     /// This will always produce a WEBP image URL.
     #[inline]
+    #[must_use]
     pub fn static_avatar_url(&self) -> Option<String> {
         static_avatar_url(self.id, self.avatar.as_ref())
     }
@@ -1022,6 +1034,7 @@ impl User {
     /// # }
     /// ```
     #[inline]
+    #[must_use]
     pub fn tag(&self) -> String {
         tag(&self.name, self.discriminator)
     }

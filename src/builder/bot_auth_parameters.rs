@@ -18,6 +18,7 @@ pub struct CreateBotAuthParameters {
 
 impl CreateBotAuthParameters {
     /// Builds the url with the provided data.
+    #[must_use]
     pub fn build(self) -> String {
         let mut valid_data = vec![];
         let bits = self.permissions.bits();

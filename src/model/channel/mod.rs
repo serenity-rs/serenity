@@ -84,6 +84,7 @@ impl Channel {
     /// }
     /// # }
     /// ```
+    #[must_use]
     pub fn guild(self) -> Option<GuildChannel> {
         match self {
             Channel::Guild(lock) => Some(lock),
@@ -115,6 +116,7 @@ impl Channel {
     /// }
     /// # }
     /// ```
+    #[must_use]
     pub fn private(self) -> Option<PrivateChannel> {
         match self {
             Channel::Private(lock) => Some(lock),
@@ -146,6 +148,7 @@ impl Channel {
     /// }
     /// # }
     /// ```
+    #[must_use]
     pub fn category(self) -> Option<ChannelCategory> {
         match self {
             Channel::Category(lock) => Some(lock),
@@ -181,6 +184,7 @@ impl Channel {
 
     /// Determines if the channel is NSFW.
     #[inline]
+    #[must_use]
     #[cfg(feature = "model")]
     pub fn is_nsfw(&self) -> bool {
         match self {
@@ -193,6 +197,7 @@ impl Channel {
     /// Retrieves the Id of the inner [`GuildChannel`], or
     /// [`PrivateChannel`].
     #[inline]
+    #[must_use]
     pub fn id(&self) -> ChannelId {
         match self {
             Channel::Guild(ch) => ch.id,
@@ -206,6 +211,7 @@ impl Channel {
     ///
     /// If other channel types are used it will return None.
     #[inline]
+    #[must_use]
     pub fn position(&self) -> Option<i64> {
         match self {
             Channel::Guild(channel) => Some(channel.position),
@@ -330,6 +336,7 @@ enum_number!(ChannelType {
 
 impl ChannelType {
     #[inline]
+    #[must_use]
     pub fn name(&self) -> &str {
         match *self {
             ChannelType::Private => "private",

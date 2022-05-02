@@ -80,6 +80,7 @@ impl<T: std::str::FromStr> ArgumentConvert for T {
 ///     None,
 /// );
 /// ```
+#[must_use]
 pub fn parse_message_id_pair(s: &str) -> Option<(ChannelId, MessageId)> {
     let mut parts = s.splitn(2, '-');
     let channel_id = ChannelId(parts.next()?.parse().ok()?);
@@ -108,6 +109,7 @@ pub fn parse_message_id_pair(s: &str) -> Option<(ChannelId, MessageId)> {
 /// );
 /// assert_eq!(parse_message_url("https://google.com"), None);
 /// ```
+#[must_use]
 pub fn parse_message_url(s: &str) -> Option<(GuildId, ChannelId, MessageId)> {
     let mut parts = s.strip_prefix("https://discord.com/channels/")?.splitn(3, '/');
     let guild_id = GuildId(parts.next()?.parse().ok()?);

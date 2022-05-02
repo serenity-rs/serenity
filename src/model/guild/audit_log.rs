@@ -35,6 +35,7 @@ pub enum Action {
 }
 
 impl Action {
+    #[must_use]
     pub fn num(self) -> u8 {
         match self {
             Action::GuildUpdate => 1,
@@ -56,6 +57,7 @@ impl Action {
 
     // TODO: Change function to `from_value(u8) -> Action` in the next version and return
     // `Action::Unknown(u8)` for unknown values.
+    #[must_use]
     pub fn from_value(value: u8) -> Option<Action> {
         let action = match value {
             1 => Action::GuildUpdate,

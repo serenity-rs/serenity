@@ -159,6 +159,7 @@ impl Emoji {
     /// # }
     /// ```
     #[cfg(feature = "cache")]
+    #[must_use]
     pub fn find_guild_id(&self, cache: impl AsRef<Cache>) -> Option<GuildId> {
         for guild_entry in cache.as_ref().guilds.iter() {
             let guild = guild_entry.value();
@@ -187,6 +188,7 @@ impl Emoji {
     /// # }
     /// ```
     #[inline]
+    #[must_use]
     pub fn url(&self) -> String {
         let extension = if self.animated { "gif" } else { "png" };
         cdn!("/emojis/{}.{}", self.id, extension)

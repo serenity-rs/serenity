@@ -125,6 +125,7 @@ pub struct StandardFramework {
 
 impl StandardFramework {
     #[inline]
+    #[must_use]
     pub fn new() -> Self {
         StandardFramework::default()
     }

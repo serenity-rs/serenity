@@ -144,18 +144,21 @@ pub enum RateLimitAction {
 impl RateLimitInfo {
     /// Gets the duration of the rate limit in seconds.
     #[inline]
+    #[must_use]
     pub fn as_secs(&self) -> u64 {
         self.rate_limit.as_secs()
     }
 
     /// Gets the duration of the rate limit in milliseconds.
     #[inline]
+    #[must_use]
     pub fn as_millis(&self) -> u128 {
         self.rate_limit.as_millis()
     }
 
     /// Gets the duration of the rate limit in microseconds.
     #[inline]
+    #[must_use]
     pub fn as_micros(&self) -> u128 {
         self.rate_limit.as_micros()
     }
@@ -381,6 +384,7 @@ impl Default for BucketBuilder {
 
 impl BucketBuilder {
     /// A bucket collecting tickets per command invocation.
+    #[must_use]
     pub fn new_global() -> Self {
         Self {
             limited_for: LimitedFor::Global,
@@ -389,6 +393,7 @@ impl BucketBuilder {
     }
 
     /// A bucket collecting tickets per user.
+    #[must_use]
     pub fn new_user() -> Self {
         Self {
             limited_for: LimitedFor::User,
@@ -397,6 +402,7 @@ impl BucketBuilder {
     }
 
     /// A bucket collecting tickets per guild.
+    #[must_use]
     pub fn new_guild() -> Self {
         Self {
             limited_for: LimitedFor::Guild,
@@ -405,6 +411,7 @@ impl BucketBuilder {
     }
 
     /// A bucket collecting tickets per channel.
+    #[must_use]
     pub fn new_channel() -> Self {
         Self {
             limited_for: LimitedFor::Channel,
@@ -417,6 +424,7 @@ impl BucketBuilder {
     /// This requires the cache, as messages do not contain their channel's
     /// category.
     #[cfg(feature = "cache")]
+    #[must_use]
     pub fn new_category() -> Self {
         Self {
             limited_for: LimitedFor::Category,

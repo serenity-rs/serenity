@@ -36,6 +36,7 @@ impl StickerItem {
     ///
     /// **Note**: This will only be `None` if the format_type is unknown.
     #[inline]
+    #[must_use]
     pub fn image_url(&self) -> Option<String> {
         sticker_url(self.id, self.format_type)
     }

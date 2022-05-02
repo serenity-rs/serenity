@@ -122,6 +122,7 @@ impl ConnectionStage {
     ///
     /// assert!(!ConnectionStage::Connected.is_connecting());
     /// ```
+    #[must_use]
     pub fn is_connecting(self) -> bool {
         use self::ConnectionStage::*;
 

@@ -201,6 +201,7 @@ pub struct Cache {
 impl Cache {
     /// Creates a new cache.
     #[inline]
+    #[must_use]
     pub fn new() -> Self {
         Self::default()
     }

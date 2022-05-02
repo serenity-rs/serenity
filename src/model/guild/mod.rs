@@ -301,6 +301,7 @@ impl Guild {
     ///
     /// **Note**: This is very costly if used in a server with lots of channels,
     /// members, or both.
+    #[must_use]
     pub fn default_channel_guaranteed(&self) -> Option<&GuildChannel> {
         for channel in self.channels.values() {
             if let Channel::Guild(channel) = channel {
@@ -432,6 +433,7 @@ impl Guild {
     }
 
     /// Returns the formatted URL of the guild's banner image, if one exists.
+    #[must_use]
     pub fn banner_url(&self) -> Option<String> {
         self.banner.as_ref().map(|banner| cdn!("/banners/{}/{}.webp?size=1024", self.id, banner))
     }
@@ -1379,6 +1381,7 @@ impl Guild {
     /// Returns the formatted URL of the guild's icon, if one exists.
     ///
     /// This will produce a WEBP image URL, or GIF if the guild has a GIF icon.
+    #[must_use]
     pub fn icon_url(&self) -> Option<String> {
         self.icon.as_ref().map(|icon| {
             let ext = if icon.starts_with("a_") { "gif" } else { "webp" };
@@ -1466,6 +1469,7 @@ impl Guild {
     /// Checks if the guild is 'large'. A guild is considered large if it has
     /// more than 250 members.
     #[inline]
+    #[must_use]
     pub fn is_large(&self) -> bool {
         self.members.len() > LARGE_THRESHOLD as usize
     }
@@ -1557,6 +1561,7 @@ impl Guild {
 
     /// Gets a list of all the members (satisfying the status provided to the function) in this
     /// guild.
+    #[must_use]
     pub fn members_with_status(&self, status: OnlineStatus) -> Vec<&Member> {
         let mut members = vec![];
 
@@ -1589,6 +1594,7 @@ impl Guild {
     /// **Note**: This will only search members that are cached. If you want to
     /// search all members in the guild via the Http API, use
     /// [`Self::search_members`].
+    #[must_use]
     pub fn member_named(&self, name: &str) -> Option<&Member> {
         let (username, discrim) = match crate::utils::parse_user_tag(name) {
             Some((username, discrim)) => (username, Some(discrim)),
@@ -2246,11 +2252,13 @@ impl Guild {
     /// ```
     #[cfg(all(feature = "utils", not(feature = "cache")))]
     #[inline]
+    #[must_use]
     pub fn shard_id(&self, shard_count: u64) -> u64 {
         self.id.shard_id(shard_count)
     }
 
     /// Returns the formatted URL of the guild's splash image, if one exists.
+    #[must_use]
     pub fn splash_url(&self) -> Option<String> {
         self.splash.as_ref().map(|splash| cdn!("/splashes/{}/{}.webp?size=4096", self.id, splash))
     }
@@ -2418,6 +2426,7 @@ impl Guild {
     /// #    Ok(())
     /// # }
     /// ```
+    #[must_use]
     pub fn role_by_name(&self, role_name: &str) -> Option<&Role> {
         self.roles.values().find(|role| role_name == role.name)
     }
@@ -2860,6 +2869,7 @@ impl GuildInfo {
     /// Returns the formatted URL of the guild's icon, if the guild has an icon.
     ///
     /// This will produce a WEBP image URL, or GIF if the guild has a GIF icon.
+    #[must_use]
     pub fn icon_url(&self) -> Option<String> {
         self.icon.as_ref().map(|icon| {
             let ext = if icon.starts_with("a_") { "gif" } else { "webp" };
@@ -2890,6 +2900,7 @@ impl From<u64> for GuildContainer {
 #[cfg(feature = "model")]
 impl InviteGuild {
     /// Returns the formatted URL of the guild's splash image, if one exists.
+    #[must_use]
     pub fn splash_url(&self) -> Option<String> {
         self.splash.as_ref().map(|splash| cdn!("/splashes/{}/{}.webp?size=4096", self.id, splash))
     }

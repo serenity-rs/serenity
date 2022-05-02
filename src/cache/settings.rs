@@ -22,6 +22,7 @@ pub struct Settings {
 impl Settings {
     /// Creates new settings to be used with a cache.
     #[inline]
+    #[must_use]
     pub fn new() -> Self {
         Self::default()
     }

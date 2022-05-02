@@ -144,11 +144,13 @@ pub struct Suggestions(pub Vec<SuggestedCommandName>);
 impl Suggestions {
     /// Immutably borrow inner [`Vec`].
     #[inline]
+    #[must_use]
     pub fn as_vec(&self) -> &Vec<SuggestedCommandName> {
         &self.0
     }
 
     /// Concats names of suggestions with a given `separator`.
+    #[must_use]
     pub fn join(&self, separator: &str) -> String {
         match self.as_vec().as_slice() {
             [] => String::new(),

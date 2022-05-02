@@ -214,6 +214,7 @@ impl CreateButton {
         self
     }
 
+    #[must_use]
     pub fn build(mut self) -> Value {
         self.0.insert("type", from_number(2_u8));
 
@@ -270,6 +271,7 @@ impl CreateSelectMenu {
         self
     }
 
+    #[must_use]
     pub fn build(mut self) -> Value {
         self.0.insert("type", from_number(3_u8));
 
@@ -443,6 +445,7 @@ impl CreateInputText {
         self
     }
 
+    #[must_use]
     pub fn build(mut self) -> Value {
         self.0.insert("type", from_number(4_u8));
 

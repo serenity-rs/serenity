@@ -474,6 +474,7 @@ impl ApplicationCommandInteractionData {
     /// The target resolved data of [`target_id`]
     ///
     /// [`target_id`]: Self::target_id
+    #[must_use]
     pub fn target(&self) -> Option<ResolvedTarget> {
         match (self.kind, self.target_id) {
             (ApplicationCommandType::User, Some(id)) => {
@@ -984,11 +985,13 @@ pub struct ApplicationCommandPermissionData {
 
 impl CommandPermissionId {
     /// Converts this [`CommandPermissionId`] to [`UserId`].
+    #[must_use]
     pub fn to_user_id(self) -> UserId {
         self.0.into()
     }
 
     /// Converts this [`CommandPermissionId`] to [`RoleId`].
+    #[must_use]
     pub fn to_role_id(self) -> RoleId {
         self.0.into()
     }
@@ -1032,11 +1035,13 @@ impl From<CommandPermissionId> for UserId {
 
 impl TargetId {
     /// Converts this [`CommandPermissionId`] to [`UserId`].
+    #[must_use]
     pub fn to_user_id(self) -> UserId {
         self.0.into()
     }
 
     /// Converts this [`CommandPermissionId`] to [`MessageId`].
+    #[must_use]
     pub fn to_message_id(self) -> MessageId {
         self.0.into()
     }

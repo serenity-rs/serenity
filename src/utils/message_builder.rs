@@ -50,6 +50,7 @@ impl MessageBuilder {
     /// // alternatively:
     /// let message = MessageBuilder::default();
     /// ```
+    #[must_use]
     pub fn new() -> MessageBuilder {
         MessageBuilder::default()
     }
@@ -1078,6 +1079,7 @@ impl Content {
     }
 
     #[allow(clippy::inherent_to_string)]
+    #[must_use]
     pub fn to_string(&self) -> String {
         trait UnwrapWith {
             fn unwrap_with(&self, n: usize) -> usize;

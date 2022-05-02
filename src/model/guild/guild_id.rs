@@ -1012,6 +1012,7 @@ impl GuildId {
 
     /// Returns the name of whatever guild this id holds.
     #[cfg(feature = "cache")]
+    #[must_use]
     pub fn name(self, cache: impl AsRef<Cache>) -> Option<String> {
         let guild = self.to_guild_cached(&cache)?;
         Some(guild.name)
@@ -1504,6 +1505,7 @@ impl GuildId {
     }
 
     /// Get the widget image URL.
+    #[must_use]
     pub fn widget_image_url(&self, style: GuildWidgetStyle) -> String {
         api!("/guilds/{}/widget.png?style={}", self.0, style)
     }

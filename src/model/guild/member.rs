@@ -283,6 +283,7 @@ impl Member {
 
     /// Returns the DiscordTag of a Member, taking possible nickname into account.
     #[inline]
+    #[must_use]
     pub fn distinct(&self) -> String {
         format!("{}#{:04}", self.display_name(), self.user.discriminator)
     }
@@ -615,6 +616,7 @@ impl Member {
     ///
     /// This will produce a WEBP image URL, or GIF if the member has a GIF avatar.
     #[inline]
+    #[must_use]
     pub fn avatar_url(&self) -> Option<String> {
         avatar_url(self.guild_id, self.user.id, self.avatar.as_ref())
     }
@@ -625,6 +627,7 @@ impl Member {
     /// This will call [`Self::avatar_url`] first, and if that returns [`None`],
     /// it then falls back to [`User::face()`].
     #[inline]
+    #[must_use]
     pub fn face(&self) -> String {
         self.avatar_url().unwrap_or_else(|| self.user.face())
     }

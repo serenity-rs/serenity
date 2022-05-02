@@ -48,6 +48,7 @@ pub struct EditRole(pub HashMap<&'static str, Value>);
 
 impl EditRole {
     /// Creates a new builder with the values of the given [`Role`].
+    #[must_use]
     pub fn new(role: &Role) -> Self {
         let mut map = HashMap::with_capacity(9);
 

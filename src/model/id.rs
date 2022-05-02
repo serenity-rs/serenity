@@ -9,18 +9,21 @@ macro_rules! id_u64 {
         $(
             impl $name {
                 /// Retrieves the time that the Id was created at.
+                #[must_use]
                 pub fn created_at(&self) -> Timestamp {
                     Timestamp::from_discord_id(self.0)
                 }
 
                 /// Immutably borrow inner Id.
                 #[inline]
+                #[must_use]
                 pub fn as_u64(&self) -> &u64 {
                     &self.0
                 }
 
                 /// Mutably borrow inner Id.
                 #[inline]
+                #[must_use]
                 pub fn as_mut_u64(&mut self) -> &mut u64 {
                     &mut self.0
                 }

@@ -43,6 +43,7 @@ enum_number!(WebhookType {
 
 impl WebhookType {
     #[inline]
+    #[must_use]
     pub fn name(&self) -> &str {
         match self {
             WebhookType::Incoming => "incoming",

@@ -65,6 +65,7 @@ pub trait CacheHttp: Send + Sync {
     fn http(&self) -> &Http;
 
     #[cfg(feature = "cache")]
+    #[must_use]
     fn cache(&self) -> Option<&Arc<Cache>> {
         None
     }
@@ -170,6 +171,7 @@ pub enum LightMethod {
 }
 
 impl LightMethod {
+    #[must_use]
     pub fn reqwest_method(self) -> Method {
         match self {
             LightMethod::Delete => Method::DELETE,

@@ -143,6 +143,7 @@ pub struct GuildChannel {
 impl GuildChannel {
     /// Whether or not this channel is text-based, meaning that
     /// it is possible to send messages.
+    #[must_use]
     pub fn is_text_based(&self) -> bool {
         matches!(self.kind, ChannelType::Text | ChannelType::News)
     }
@@ -635,6 +636,7 @@ impl GuildChannel {
     /// Only [text channels][`ChannelType::Text`] are taken into consideration
     /// as being NSFW. [voice channels][`ChannelType::Voice`] are never NSFW.
     #[inline]
+    #[must_use]
     pub fn is_nsfw(&self) -> bool {
         self.kind == ChannelType::Text && self.nsfw
     }
@@ -681,6 +683,7 @@ impl GuildChannel {
     }
 
     /// Returns the name of the guild channel.
+    #[must_use]
     pub fn name(&self) -> &str {
         &self.name
     }

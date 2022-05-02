@@ -442,22 +442,27 @@ pub enum Route {
 }
 
 impl Route {
+    #[must_use]
     pub fn channel(channel_id: u64) -> String {
         api!("/channels/{}", channel_id)
     }
 
+    #[must_use]
     pub fn channel_invites(channel_id: u64) -> String {
         api!("/channels/{}/invites", channel_id)
     }
 
+    #[must_use]
     pub fn channel_message(channel_id: u64, message_id: u64) -> String {
         api!("/channels/{}/messages/{}", channel_id, message_id)
     }
 
+    #[must_use]
     pub fn channel_message_crosspost(channel_id: u64, message_id: u64) -> String {
         api!("/channels/{}/messages/{}/crosspost", channel_id, message_id)
     }
 
+    #[must_use]
     pub fn channel_message_reaction<D, T>(
         channel_id: u64,
         message_id: u64,
@@ -477,6 +482,7 @@ impl Route {
         )
     }
 
+    #[must_use]
     pub fn channel_message_reaction_emoji<T>(
         channel_id: u64,
         message_id: u64,
@@ -488,11 +494,13 @@ impl Route {
         api!("/channels/{}/messages/{}/reactions/{}", channel_id, message_id, reaction_type)
     }
 
+    #[must_use]
     pub fn channel_message_reactions(channel_id: u64, message_id: u64) -> String {
         api!("/channels/{}/messages/{}/reactions", channel_id, message_id)
     }
 
     #[allow(clippy::let_underscore_must_use)]
+    #[must_use]
     pub fn channel_message_reactions_list(
         channel_id: u64,
         message_id: u64,
@@ -515,55 +523,68 @@ impl Route {
         url
     }
 
+    #[must_use]
     pub fn channel_messages(channel_id: u64, query: Option<&str>) -> String {
         api!("/channels/{}/messages{}", channel_id, query.unwrap_or(""))
     }
 
+    #[must_use]
     pub fn channel_messages_bulk_delete(channel_id: u64) -> String {
         api!("/channels/{}/messages/bulk-delete", channel_id)
     }
 
+    #[must_use]
     pub fn channel_permission(channel_id: u64, target_id: u64) -> String {
         api!("/channels/{}/permissions/{}", channel_id, target_id)
     }
 
+    #[must_use]
     pub fn channel_pin(channel_id: u64, message_id: u64) -> String {
         api!("/channels/{}/pins/{}", channel_id, message_id)
     }
 
+    #[must_use]
     pub fn channel_pins(channel_id: u64) -> String {
         api!("/channels/{}/pins", channel_id)
     }
 
+    #[must_use]
     pub fn channel_typing(channel_id: u64) -> String {
         api!("/channels/{}/typing", channel_id)
     }
 
+    #[must_use]
     pub fn channel_webhooks(channel_id: u64) -> String {
         api!("/channels/{}/webhooks", channel_id)
     }
 
+    #[must_use]
     pub fn channel_public_threads(channel_id: u64, message_id: u64) -> String {
         api!("/channels/{}/messages/{}/threads", channel_id, message_id)
     }
 
+    #[must_use]
     pub fn channel_private_threads(channel_id: u64) -> String {
         api!("/channels/{}/threads", channel_id)
     }
 
+    #[must_use]
     pub fn channel_thread_member(channel_id: u64, user_id: u64) -> String {
         api!("/channels/{}/thread-members/{}", channel_id, user_id)
     }
 
+    #[must_use]
     pub fn channel_thread_member_me(channel_id: u64) -> String {
         api!("/channels/{}/thread-members/@me", channel_id)
     }
 
+    #[must_use]
     pub fn channel_thread_members(channel_id: u64) -> String {
         api!("/channels/{}/thread-members", channel_id)
     }
 
     #[allow(clippy::let_underscore_must_use)]
+    #[must_use]
     pub fn channel_archived_public_threads(
         channel_id: u64,
         before: Option<u64>,
@@ -583,6 +604,7 @@ impl Route {
     }
 
     #[allow(clippy::let_underscore_must_use)]
+    #[must_use]
     pub fn channel_archived_private_threads(
         channel_id: u64,
         before: Option<u64>,
@@ -602,6 +624,7 @@ impl Route {
     }
 
     #[allow(clippy::let_underscore_must_use)]
+    #[must_use]
     pub fn channel_joined_private_threads(
         channel_id: u64,
         before: Option<u64>,
@@ -620,23 +643,28 @@ impl Route {
         s
     }
 
+    #[must_use]
     pub fn gateway() -> &'static str {
         api!("/gateway")
     }
 
+    #[must_use]
     pub fn gateway_bot() -> &'static str {
         api!("/gateway/bot")
     }
 
+    #[must_use]
     pub fn guild(guild_id: u64) -> String {
         api!("/guilds/{}", guild_id)
     }
 
+    #[must_use]
     pub fn guild_with_counts(guild_id: u64) -> String {
         api!("/guilds/{}?with_counts=true", guild_id)
     }
 
     #[allow(clippy::let_underscore_must_use)]
+    #[must_use]
     pub fn guild_audit_logs(
         guild_id: u64,
         action_type: Option<u8>,
@@ -665,70 +693,87 @@ impl Route {
         s
     }
 
+    #[must_use]
     pub fn guild_ban(guild_id: u64, user_id: u64) -> String {
         api!("/guilds/{}/bans/{}", guild_id, user_id)
     }
 
+    #[must_use]
     pub fn guild_ban_optioned(guild_id: u64, user_id: u64, delete_message_days: u8) -> String {
         api!("/guilds/{}/bans/{}?delete_message_days={}", guild_id, user_id, delete_message_days)
     }
 
+    #[must_use]
     pub fn guild_kick_optioned(guild_id: u64, user_id: u64) -> String {
         api!("/guilds/{}/members/{}", guild_id, user_id)
     }
 
+    #[must_use]
     pub fn guild_bans(guild_id: u64) -> String {
         api!("/guilds/{}/bans", guild_id)
     }
 
+    #[must_use]
     pub fn guild_channels(guild_id: u64) -> String {
         api!("/guilds/{}/channels", guild_id)
     }
 
+    #[must_use]
     pub fn guild_widget(guild_id: u64) -> String {
         api!("/guilds/{}/widget", guild_id)
     }
 
+    #[must_use]
     pub fn guild_preview(guild_id: u64) -> String {
         api!("/guilds/{}/preview", guild_id)
     }
 
+    #[must_use]
     pub fn guild_emojis(guild_id: u64) -> String {
         api!("/guilds/{}/emojis", guild_id)
     }
 
+    #[must_use]
     pub fn guild_emoji(guild_id: u64, emoji_id: u64) -> String {
         api!("/guilds/{}/emojis/{}", guild_id, emoji_id)
     }
 
+    #[must_use]
     pub fn guild_integration(guild_id: u64, integration_id: u64) -> String {
         api!("/guilds/{}/integrations/{}", guild_id, integration_id)
     }
 
+    #[must_use]
     pub fn guild_integration_sync(guild_id: u64, integration_id: u64) -> String {
         api!("/guilds/{}/integrations/{}/sync", guild_id, integration_id)
     }
 
+    #[must_use]
     pub fn guild_integrations(guild_id: u64) -> String {
         api!("/guilds/{}/integrations", guild_id)
     }
 
+    #[must_use]
     pub fn guild_invites(guild_id: u64) -> String {
         api!("/guilds/{}/invites", guild_id)
     }
 
+    #[must_use]
     pub fn guild_member(guild_id: u64, user_id: u64) -> String {
         api!("/guilds/{}/members/{}", guild_id, user_id)
     }
 
+    #[must_use]
     pub fn guild_member_role(guild_id: u64, user_id: u64, role_id: u64) -> String {
         api!("/guilds/{}/members/{}/roles/{}", guild_id, user_id, role_id)
     }
 
+    #[must_use]
     pub fn guild_members(guild_id: u64) -> String {
         api!("/guilds/{}/members", guild_id)
     }
 
+    #[must_use]
     pub fn guild_members_search(guild_id: u64, query: &str, limit: Option<u64>) -> String {
         let mut s = api!("/guilds/{}/members/search?", guild_id);
 
@@ -740,6 +785,7 @@ impl Route {
         s
     }
 
+    #[must_use]
     pub fn guild_members_optioned(guild_id: u64, after: Option<u64>, limit: Option<u64>) -> String {
         let mut s = api!("/guilds/{}/members?", guild_id);
 
@@ -751,70 +797,87 @@ impl Route {
         s
     }
 
+    #[must_use]
     pub fn guild_member_me(guild_id: u64) -> String {
         api!("/guilds/{}/members/@me", guild_id)
     }
 
+    #[must_use]
     pub fn guild_nickname(guild_id: u64) -> String {
         api!("/guilds/{}/members/@me/nick", guild_id)
     }
 
+    #[must_use]
     pub fn guild_prune(guild_id: u64, days: u64) -> String {
         api!("/guilds/{}/prune?days={}", guild_id, days)
     }
 
+    #[must_use]
     pub fn guild_regions(guild_id: u64) -> String {
         api!("/guilds/{}/regions", guild_id)
     }
 
+    #[must_use]
     pub fn guild_role(guild_id: u64, role_id: u64) -> String {
         api!("/guilds/{}/roles/{}", guild_id, role_id)
     }
 
+    #[must_use]
     pub fn guild_roles(guild_id: u64) -> String {
         api!("/guilds/{}/roles", guild_id)
     }
 
+    #[must_use]
     pub fn guild_sticker(guild_id: u64, sticker_id: u64) -> String {
         api!("/guilds/{}/stickers/{}", guild_id, sticker_id)
     }
 
+    #[must_use]
     pub fn guild_stickers(guild_id: u64) -> String {
         api!("/guilds/{}/stickers", guild_id)
     }
 
+    #[must_use]
     pub fn guild_vanity_url(guild_id: u64) -> String {
         api!("/guilds/{}/vanity-url", guild_id)
     }
 
+    #[must_use]
     pub fn guild_voice_states(guild_id: u64, user_id: u64) -> String {
         api!("/guilds/{}/voice-states/{}", guild_id, user_id)
     }
 
+    #[must_use]
     pub fn guild_voice_states_me(guild_id: u64) -> String {
         api!("/guilds/{}/voice-states/@me", guild_id)
     }
 
+    #[must_use]
     pub fn guild_webhooks(guild_id: u64) -> String {
         api!("/guilds/{}/webhooks", guild_id)
     }
 
+    #[must_use]
     pub fn guild_welcome_screen(guild_id: u64) -> String {
         api!("/guilds/{}/welcome-screen", guild_id)
     }
 
+    #[must_use]
     pub fn guild_threads_active(guild_id: u64) -> String {
         api!("/guilds/{}/threads/active", guild_id)
     }
 
+    #[must_use]
     pub fn guilds() -> &'static str {
         api!("/guilds")
     }
 
+    #[must_use]
     pub fn invite(code: &str) -> String {
         api!("/invites/{}", code)
     }
 
+    #[must_use]
     pub fn invite_optioned(
         code: &str,
         member_counts: bool,
@@ -833,55 +896,68 @@ impl Route {
         )
     }
 
+    #[must_use]
     pub fn oauth2_application_current() -> &'static str {
         api!("/oauth2/applications/@me")
     }
 
+    #[must_use]
     pub fn private_channel() -> &'static str {
         api!("/users/@me/channels")
     }
 
+    #[must_use]
     pub fn status_incidents_unresolved() -> &'static str {
         status!("/incidents/unresolved.json")
     }
 
+    #[must_use]
     pub fn status_maintenances_active() -> &'static str {
         status!("/scheduled-maintenances/active.json")
     }
 
+    #[must_use]
     pub fn status_maintenances_upcoming() -> &'static str {
         status!("/scheduled-maintenances/upcoming.json")
     }
 
+    #[must_use]
     pub fn sticker(sticker_id: u64) -> String {
         api!("/stickers/{}", sticker_id)
     }
 
+    #[must_use]
     pub fn sticker_packs() -> &'static str {
         api!("/sticker-packs")
     }
 
+    #[must_use]
     pub fn user<D: Display>(target: D) -> String {
         api!("/users/{}", target)
     }
 
+    #[must_use]
     pub fn user_me_connections() -> &'static str {
         api!("/users/@me/connections")
     }
 
+    #[must_use]
     pub fn user_dm_channels<D: Display>(target: D) -> String {
         api!("/users/{}/channels", target)
     }
 
+    #[must_use]
     pub fn user_guild<D: Display>(target: D, guild_id: u64) -> String {
         api!("/users/{}/guilds/{}", target, guild_id)
     }
 
+    #[must_use]
     pub fn user_guilds<D: Display>(target: D) -> String {
         api!("/users/{}/guilds", target)
     }
 
     #[allow(clippy::let_underscore_must_use)]
+    #[must_use]
     pub fn user_guilds_optioned<D: Display>(
         target: D,
         after: Option<u64>,
@@ -905,14 +981,17 @@ impl Route {
         s
     }
 
+    #[must_use]
     pub fn voice_regions() -> &'static str {
         api!("/voice/regions")
     }
 
+    #[must_use]
     pub fn webhook(webhook_id: u64) -> String {
         api!("/webhooks/{}", webhook_id)
     }
 
+    #[must_use]
     pub fn webhook_with_token<D>(webhook_id: u64, token: D) -> String
     where
         D: Display,
@@ -920,6 +999,7 @@ impl Route {
         api!("/webhooks/{}/{}", webhook_id, token)
     }
 
+    #[must_use]
     pub fn webhook_with_token_optioned<D>(webhook_id: u64, token: D, wait: bool) -> String
     where
         D: Display,
@@ -927,6 +1007,7 @@ impl Route {
         api!("/webhooks/{}/{}?wait={}", webhook_id, token, wait)
     }
 
+    #[must_use]
     pub fn webhook_message<D>(webhook_id: u64, token: D, message_id: u64) -> String
     where
         D: Display,
@@ -934,6 +1015,7 @@ impl Route {
         api!("/webhooks/{}/{}/messages/{}", webhook_id, token, message_id)
     }
 
+    #[must_use]
     pub fn webhook_original_interaction_response<D: Display>(
         application_id: u64,
         token: D,
@@ -941,6 +1023,7 @@ impl Route {
         api!("/webhooks/{}/{}/messages/@original", application_id, token)
     }
 
+    #[must_use]
     pub fn webhook_followup_message<D: Display>(
         application_id: u64,
         token: D,
@@ -949,22 +1032,27 @@ impl Route {
         api!("/webhooks/{}/{}/messages/{}", application_id, token, message_id)
     }
 
+    #[must_use]
     pub fn webhook_followup_messages<D: Display>(application_id: u64, token: D) -> String {
         api!("/webhooks/{}/{}", application_id, token)
     }
 
+    #[must_use]
     pub fn interaction_response<D: Display>(application_id: u64, token: D) -> String {
         api!("/interactions/{}/{}/callback", application_id, token)
     }
 
+    #[must_use]
     pub fn application_command(application_id: u64, command_id: u64) -> String {
         api!("/applications/{}/commands/{}", application_id, command_id)
     }
 
+    #[must_use]
     pub fn application_commands(application_id: u64) -> String {
         api!("/applications/{}/commands", application_id)
     }
 
+    #[must_use]
     pub fn application_guild_command(
         application_id: u64,
         guild_id: u64,
@@ -973,6 +1061,7 @@ impl Route {
         api!("/applications/{}/guilds/{}/commands/{}", application_id, guild_id, command_id)
     }
 
+    #[must_use]
     pub fn application_guild_command_permissions(
         application_id: u64,
         guild_id: u64,
@@ -986,18 +1075,22 @@ impl Route {
         )
     }
 
+    #[must_use]
     pub fn application_guild_commands(application_id: u64, guild_id: u64) -> String {
         api!("/applications/{}/guilds/{}/commands", application_id, guild_id)
     }
 
+    #[must_use]
     pub fn application_guild_commands_permissions(application_id: u64, guild_id: u64) -> String {
         api!("/applications/{}/guilds/{}/commands/permissions", application_id, guild_id)
     }
 
+    #[must_use]
     pub fn stage_instances() -> &'static str {
         api!("/stage-instances")
     }
 
+    #[must_use]
     pub fn stage_instance(channel_id: u64) -> String {
         api!("/stage-instances/{}", channel_id)
     }
@@ -1537,6 +1630,7 @@ pub enum RouteInfo<'a> {
 }
 
 impl<'a> RouteInfo<'a> {
+    #[must_use]
     pub fn deconstruct(&self) -> (LightMethod, Route, Cow<'_, str>) {
         match *self {
             RouteInfo::AddGuildMember {

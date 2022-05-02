@@ -17,6 +17,7 @@ impl CustomMessage {
     /// with dummy data. Use the methods to replace the individual bits
     /// of this message with valid data.
     #[inline]
+    #[must_use]
     pub fn new() -> Self {
         Self::default()
     }
@@ -25,6 +26,7 @@ impl CustomMessage {
     ///
     /// If not used, the default value is `MessageId(0)`.
     #[inline]
+    #[must_use]
     pub fn id(&mut self, id: MessageId) -> &mut Self {
         self.msg.id = id;
 
@@ -220,6 +222,7 @@ impl CustomMessage {
 
     /// Consume this builder and return the constructed message.
     #[inline]
+    #[must_use]
     pub fn build(self) -> Message {
         self.msg
     }
