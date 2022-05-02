@@ -1871,7 +1871,7 @@ impl Http {
 
     /// Edits a thread channel in the [`GuildChannel`] given its Id.
     pub async fn edit_thread(&self, channel_id: u64, map: &JsonMap) -> Result<GuildChannel> {
-        let body = serde_json::to_vec(map)?;
+        let body = to_vec(map)?;
 
         self.fire(Request {
             body: Some(&body),
@@ -2928,6 +2928,52 @@ impl Http {
         }
 
         from_value(value).map_err(From::from)
+    }
+
+    /// Gets a scheduled event by Id.
+    ///
+    /// **Note**: Requires the [Manage Events] permission.
+    ///
+    /// [Manage Events]: Permissions::MANAGE_EVENTS
+    pub async fn get_scheduled_event(
+        &self,
+        guild_id: u64,
+        event_id: u64,
+        with_user_count: bool,
+    ) -> Result<ScheduledEvent> {
+        self.fire(Request {
+            body: None,
+            multipart: None,
+            headers: None,
+            route: RouteInfo::GetScheduledEvent {
+                guild_id,
+                event_id,
+                with_user_count,
+            },
+        })
+        .await
+    }
+
+    /// Gets a list of all scheduled events for the coressponding guild.
+    ///
+    /// **Note**: Requires the [Manage Events] permission.
+    ///
+    /// [Manage Events]: Permissions::MANAGE_EVENTS
+    pub async fn get_scheduled_events(
+        &self,
+        guild_id: u64,
+        with_user_count: bool,
+    ) -> Result<Vec<ScheduledEvent>> {
+        self.fire(Request {
+            body: None,
+            multipart: None,
+            headers: None,
+            route: RouteInfo::GetScheduledEvents {
+                guild_id,
+                with_user_count,
+            },
+        })
+        .await
     }
 
     /// Retrieves a list of stickers in a [`Guild`].

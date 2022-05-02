@@ -1112,6 +1112,45 @@ impl GuildId {
         http.as_ref().search_guild_members(self.0, query, limit).await
     }
 
+    /// Fetches a specifified scheduled event in the guild, by Id. If `with_user_count` is set to
+    /// `true`, then the `user_count` field will be populated, indicating the number of users
+    /// interested in the event.
+    ///
+    /// **Note**: Requres the [Manage Events] permission.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`Error::Http`] if the current user lacks permission, or if the provided Id is
+    /// invalid.
+    ///
+    /// [Manage Events]: Permissions::MANAGE_EVENTS
+    pub async fn scheduled_event(
+        self,
+        http: impl AsRef<Http>,
+        event_id: impl Into<ScheduledEventId>,
+        with_user_count: bool,
+    ) -> Result<ScheduledEvent> {
+        http.as_ref().get_scheduled_event(self.0, event_id.into().0, with_user_count).await
+    }
+
+    /// Fetches a list of all scheduled events in the guild. If `with_user_count` is set to `true`,
+    /// then each event returned will have its `user_count` field populated.
+    ///
+    /// **Note**: Requres the [Manage Events] permission.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`Error::Http`] if the current user lacks permission.
+    ///
+    /// [Manage Events]: Permissions::MANAGE_EVENTS
+    pub async fn scheduled_events(
+        self,
+        http: impl AsRef<Http>,
+        with_user_count: bool,
+    ) -> Result<Vec<ScheduledEvent>> {
+        http.as_ref().get_scheduled_events(self.0, with_user_count).await
+    }
+
     /// Returns the Id of the shard associated with the guild.
     ///
     /// When the cache is enabled this will automatically retrieve the total

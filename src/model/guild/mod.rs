@@ -9,6 +9,7 @@ mod member;
 mod partial_guild;
 mod premium_tier;
 mod role;
+mod scheduled_event;
 mod system_channel;
 mod welcome_screen;
 
@@ -31,6 +32,7 @@ pub use self::member::*;
 pub use self::partial_guild::*;
 pub use self::premium_tier::*;
 pub use self::role::*;
+pub use self::scheduled_event::*;
 pub use self::system_channel::*;
 pub use self::welcome_screen::*;
 use super::utils::*;
@@ -2202,6 +2204,45 @@ impl Guild {
         limit: Option<u64>,
     ) -> Result<Vec<Member>> {
         self.id.search_members(http, query, limit).await
+    }
+
+    /// Fetches a specifified scheduled event in the guild, by Id. If `with_user_count` is set to
+    /// `true`, then the `user_count` field will be populated, indicating the number of users
+    /// interested in the event.
+    ///
+    /// **Note**: Requres the [Manage Events] permission.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`Error::Http`] if the current user lacks permission, or if the provided Id is
+    /// invalid.
+    ///
+    /// [Manage Events]: Permissions::MANAGE_EVENTS
+    pub async fn scheduled_event(
+        self,
+        http: impl AsRef<Http>,
+        event_id: impl Into<ScheduledEventId>,
+        with_user_count: bool,
+    ) -> Result<ScheduledEvent> {
+        self.id.scheduled_event(&http, event_id, with_user_count).await
+    }
+
+    /// Fetches a list of all scheduled events in the guild. If `with_user_count` is set to `true`,
+    /// then each event returned will have its `user_count` field populated.
+    ///
+    /// **Note**: Requres the [Manage Events] permission.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`Error::Http`] if the current user lacks permission.
+    ///
+    /// [Manage Events]: Permissions::MANAGE_EVENTS
+    pub async fn scheduled_events(
+        self,
+        http: impl AsRef<Http>,
+        with_user_count: bool,
+    ) -> Result<Vec<ScheduledEvent>> {
+        self.id.scheduled_events(&http, with_user_count).await
     }
 
     /// Returns the Id of the shard associated with the guild.
