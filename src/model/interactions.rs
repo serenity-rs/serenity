@@ -16,7 +16,7 @@ pub mod application_command {
     #[deprecated(
         note = "use `model::application::interaction::application_command::ResolvedTarget`"
     )]
-    pub type ResolvedTarget = application_command::ResolvedTarget;
+    pub type ResolvedTarget<'a> = application_command::ResolvedTarget<'a>;
 
     /// The resolved data of a command data interaction payload.
     /// It contains the objects of [`ApplicationCommandInteractionDataOption`]s.
