@@ -963,15 +963,15 @@ impl Route {
         let mut s = api!("/users/{}/guilds?", target);
 
         if let Some(limit) = limit {
-            s.push_str(&format!("&limit={}", limit))
+            s.push_str(&format!("&limit={}", limit));
         }
 
         if let Some(after) = after {
-            s.push_str(&format!("&after={}", after))
+            s.push_str(&format!("&after={}", after));
         }
 
         if let Some(before) = before {
-            s.push_str(&format!("&before={}", before))
+            s.push_str(&format!("&before={}", before));
         }
 
         s

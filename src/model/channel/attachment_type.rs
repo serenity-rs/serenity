@@ -139,6 +139,6 @@ mod test {
         assert!(matches!(
             AttachmentType::from("https://test.url/test.jpg"),
             AttachmentType::Image(_)
-        ))
+        ));
     }
 }

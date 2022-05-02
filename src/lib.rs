@@ -57,7 +57,8 @@
     clippy::let_underscore_drop,
     clippy::must_use_candidate,
     clippy::unnested_or_patterns,
-    clippy::inconsistent_struct_constructor
+    clippy::inconsistent_struct_constructor,
+    clippy::semicolon_if_nothing_returned,
 )]
 #![deny(rustdoc::broken_intra_doc_links, rustdoc::private_intra_doc_links)]
 #![deny(

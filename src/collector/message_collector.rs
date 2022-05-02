@@ -245,7 +245,7 @@ impl Future for CollectReply {
                 }
                 .next()
                 .await
-            }))
+            }));
         }
 
         self.fut.as_mut().unwrap().as_mut().poll(ctx)
