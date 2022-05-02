@@ -355,10 +355,13 @@ impl From<TriggerType> for u8 {
     }
 }
 
-/// Additional data used to determine whether a rule should be triggered.
+/// Individual change for trigger metadata within an audit log entry.
 ///
 /// Different fields are relevant based on the value of trigger_type.
-#[derive(Clone, Debug, Deserialize, Serialize)]
+/// See [`Change::TriggerMetadata`].
+///
+/// [`Change::TriggerMetadata`]: crate::model::guild::audit_log::Change::TriggerMetadata
+#[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
 pub struct TriggerMetadata {
     keyword_filter: Option<Vec<String>>,
     presets: Option<Vec<KeywordPresentType>>,
