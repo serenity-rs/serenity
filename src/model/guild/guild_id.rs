@@ -30,7 +30,7 @@ use crate::collector::{
     ReactionCollectorBuilder,
 };
 #[cfg(feature = "model")]
-use crate::http::{CacheHttp, Http};
+use crate::http::{CacheHttp, Http, UserPagination};
 #[cfg(feature = "model")]
 use crate::internal::prelude::*;
 #[cfg(feature = "model")]
@@ -1219,6 +1219,51 @@ impl GuildId {
         with_user_count: bool,
     ) -> Result<Vec<ScheduledEvent>> {
         http.as_ref().get_scheduled_events(self.0, with_user_count).await
+    }
+
+    /// Fetches a list of interested users for the specified event.
+    ///
+    /// If `limit` is left unset, by default at most 100 users are returned.
+    ///
+    /// **Note**: Requires the [Manage Events] permission.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`Error::Http`] if the current user lacks permission, or if the provided Id is
+    /// invalid.
+    ///
+    /// [Manage Events]: Permissions::MANAGE_EVENTS
+    pub async fn scheduled_event_users(
+        self,
+        http: impl AsRef<Http>,
+        event_id: impl Into<ScheduledEventId>,
+        limit: Option<u64>,
+    ) -> Result<Vec<ScheduledEventUser>> {
+        http.as_ref().get_scheduled_event_users(self.0, event_id.into().0, limit, None, None).await
+    }
+
+    /// Fetches a list of interested users for the specified event, with additional options and
+    /// filtering. See [`Http::get_scheduled_event_users`] for details.
+    ///
+    /// **Note**: Requires the [Manage Events] permission.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`Error::Http`] if the current user lacks permission, or if the provided Id is
+    /// invalid.
+    ///
+    /// [Manage Events]: Permissions::MANAGE_EVENTS
+    pub async fn scheduled_event_users_optioned(
+        self,
+        http: impl AsRef<Http>,
+        event_id: impl Into<ScheduledEventId>,
+        limit: Option<u64>,
+        target: Option<UserPagination>,
+        with_member: Option<bool>,
+    ) -> Result<Vec<ScheduledEventUser>> {
+        http.as_ref()
+            .get_scheduled_event_users(self.0, event_id.into().0, limit, target, with_member)
+            .await
     }
 
     /// Returns the Id of the shard associated with the guild.

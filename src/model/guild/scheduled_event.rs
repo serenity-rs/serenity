@@ -80,3 +80,11 @@ enum_number!(ScheduledEventType {
 pub struct ScheduledEventMetadata {
     pub location: String,
 }
+
+#[derive(Clone, Debug, Serialize, Deserialize)]
+pub struct ScheduledEventUser {
+    #[serde(rename = "guild_scheduled_event_id")]
+    pub event_id: ScheduledEventId,
+    pub user: User,
+    pub member: Option<Member>,
+}

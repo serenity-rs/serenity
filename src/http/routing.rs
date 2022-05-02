@@ -309,6 +309,12 @@ pub enum Route {
     ///
     /// [`GuildId`]: crate::model::id::GuildId
     GuildsIdScheduledEventsId(u64),
+    /// Route for the `/guilds/:guild_id/scheduled-events/:event_id/users` path.
+    ///
+    /// The data is the relevant [`GuildId`].
+    ///
+    /// [`GuildId`]: crate::model::id::GuildId
+    GuildsIdScheduledEventsIdUsers(u64),
     /// Route for the `/guilds/:guild_id/stickers` path.
     ///
     /// The data is the relevant [`GuildId`].
@@ -810,6 +816,36 @@ impl Route {
             #[allow(clippy::let_underscore_must_use)]
             let _ = write!(s, "?with_user_count={}", b);
         }
+        s
+    }
+
+    #[allow(clippy::let_underscore_must_use)]
+    pub fn guild_scheduled_event_users(
+        guild_id: u64,
+        event_id: u64,
+        after: Option<u64>,
+        before: Option<u64>,
+        limit: Option<u64>,
+        with_member: Option<bool>,
+    ) -> String {
+        let mut s = api!("/guilds/{}/scheduled-events/{}/users?", guild_id, event_id);
+
+        if let Some(limit) = limit {
+            let _ = write!(s, "&limit={}", limit);
+        }
+
+        if let Some(after) = after {
+            let _ = write!(s, "&after={}", after);
+        }
+
+        if let Some(before) = before {
+            let _ = write!(s, "&before={}", before);
+        }
+
+        if let Some(with_member) = with_member {
+            let _ = write!(s, "&with_member={}", with_member);
+        }
+
         s
     }
 
@@ -1481,6 +1517,14 @@ pub enum RouteInfo<'a> {
     GetScheduledEvents {
         guild_id: u64,
         with_user_count: bool,
+    },
+    GetScheduledEventUsers {
+        guild_id: u64,
+        event_id: u64,
+        after: Option<u64>,
+        before: Option<u64>,
+        limit: Option<u64>,
+        with_member: Option<bool>,
     },
     GetGuildStickers {
         guild_id: u64,
@@ -2620,6 +2664,25 @@ impl<'a> RouteInfo<'a> {
                 LightMethod::Get,
                 Route::GuildsIdScheduledEvents(guild_id),
                 Cow::from(Route::guild_scheduled_events(guild_id, Some(with_user_count))),
+            ),
+            RouteInfo::GetScheduledEventUsers {
+                guild_id,
+                event_id,
+                after,
+                before,
+                limit,
+                with_member,
+            } => (
+                LightMethod::Get,
+                Route::GuildsIdScheduledEventsIdUsers(guild_id),
+                Cow::from(Route::guild_scheduled_event_users(
+                    guild_id,
+                    event_id,
+                    after,
+                    before,
+                    limit,
+                    with_member,
+                )),
             ),
             RouteInfo::GetSticker {
                 sticker_id,

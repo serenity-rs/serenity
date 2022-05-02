@@ -17,7 +17,7 @@ use super::ratelimiting::{RatelimitedRequest, Ratelimiter};
 use super::request::Request;
 use super::routing::RouteInfo;
 use super::typing::Typing;
-use super::{AttachmentType, GuildPagination, HttpError};
+use super::{AttachmentType, GuildPagination, HttpError, UserPagination};
 use crate::internal::prelude::*;
 use crate::json::prelude::*;
 use crate::model::interactions::application_command::{
@@ -3040,6 +3040,53 @@ impl Http {
             route: RouteInfo::GetScheduledEvents {
                 guild_id,
                 with_user_count,
+            },
+        })
+        .await
+    }
+
+    /// Gets a list of all interested users for the corresponding scheduled event, with additional
+    /// options for filtering.
+    ///
+    /// If `limit` is left unset, by default at most 100 users are returned.
+    ///
+    /// If `target` is set, then users will be filtered by Id, such that their Id comes before or
+    /// after the provided [`UserId`] wrapped by the [`UserPagination`].
+    ///
+    /// If `with_member` is set to `Some(true)`, then the [`member`] field of the user struct will
+    /// be populated with [`Guild Member`] information, if the interested user is a member of the
+    /// guild the event takes place in.
+    ///
+    /// [`UserId`]: crate::model::id::UserId
+    /// [`member`]: ScheduledEventUser::member
+    /// [`Guild Member`]: crate::model::guild::Member
+    pub async fn get_scheduled_event_users(
+        &self,
+        guild_id: u64,
+        event_id: u64,
+        limit: Option<u64>,
+        target: Option<UserPagination>,
+        with_member: Option<bool>,
+    ) -> Result<Vec<ScheduledEventUser>> {
+        let (after, before) = match target {
+            None => (None, None),
+            Some(p) => match p {
+                UserPagination::After(id) => (Some(id.0), None),
+                UserPagination::Before(id) => (None, Some(id.0)),
+            },
+        };
+
+        self.fire(Request {
+            body: None,
+            multipart: None,
+            headers: None,
+            route: RouteInfo::GetScheduledEventUsers {
+                guild_id,
+                event_id,
+                after,
+                before,
+                limit,
+                with_member,
             },
         })
         .await
