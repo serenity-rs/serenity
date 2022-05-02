@@ -1608,21 +1608,21 @@
     <span class="doccomment">/// The target resolved data of [`target_id`]</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// [`target_id`]: Self::target_id</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">target</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ResolvedTarget</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">target</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ResolvedTarget</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">match</span> (<span class="self">self</span>.<span class="ident">kind</span>, <span class="self">self</span>.<span class="ident">target_id</span>) {
             (<span class="ident">ApplicationCommandType::User</span>, <span class="prelude-val">Some</span>(<span class="ident">id</span>)) =&gt; {
                 <span class="kw">let</span> <span class="ident">user_id</span> <span class="op">=</span> <span class="ident">id</span>.<span class="ident">to_user_id</span>();
 
-                <span class="kw">let</span> <span class="ident">user</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">resolved</span>.<span class="ident">users</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="ident">user_id</span>).<span class="ident">cloned</span>()<span class="question-mark">?</span>;
-                <span class="kw">let</span> <span class="ident">member</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">resolved</span>.<span class="ident">members</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="ident">user_id</span>).<span class="ident">cloned</span>();
+                <span class="kw">let</span> <span class="ident">user</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">resolved</span>.<span class="ident">users</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="ident">user_id</span>)<span class="question-mark">?</span>;
+                <span class="kw">let</span> <span class="ident">member</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">resolved</span>.<span class="ident">members</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="ident">user_id</span>);
 
-                <span class="prelude-val">Some</span>(<span class="ident">ResolvedTarget::User</span>(<span class="ident">user</span>, <span class="ident">member</span>.<span class="ident">map</span>(<span class="ident">Box::new</span>)))
+                <span class="prelude-val">Some</span>(<span class="ident">ResolvedTarget::User</span>(<span class="ident">user</span>, <span class="ident">member</span>))
             },
             (<span class="ident">ApplicationCommandType::Message</span>, <span class="prelude-val">Some</span>(<span class="ident">id</span>)) =&gt; {
                 <span class="kw">let</span> <span class="ident">message_id</span> <span class="op">=</span> <span class="ident">id</span>.<span class="ident">to_message_id</span>();
-                <span class="kw">let</span> <span class="ident">message</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">resolved</span>.<span class="ident">messages</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="ident">message_id</span>).<span class="ident">cloned</span>()<span class="question-mark">?</span>;
+                <span class="kw">let</span> <span class="ident">message</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">resolved</span>.<span class="ident">messages</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="ident">message_id</span>)<span class="question-mark">?</span>;
 
-                <span class="prelude-val">Some</span>(<span class="ident">ResolvedTarget::Message</span>(<span class="ident">Box::new</span>(<span class="ident">message</span>)))
+                <span class="prelude-val">Some</span>(<span class="ident">ResolvedTarget::Message</span>(<span class="ident">message</span>))
             },
             <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
         }
@@ -1688,12 +1688,12 @@
 }
 
 <span class="doccomment">/// The resolved value of a [`ApplicationCommandInteractionData::target_id`].</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Serialize</span>, <span class="ident">Deserialize</span>)]</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>)]</span>
 <span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
 <span class="attribute">#[<span class="ident">repr</span>(<span class="ident">u8</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">ResolvedTarget</span> {
-    <span class="ident">User</span>(<span class="ident">User</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="ident">PartialMember</span><span class="op">&gt;</span><span class="op">&gt;</span>),
-    <span class="ident">Message</span>(<span class="ident">Box</span><span class="op">&lt;</span><span class="ident">Message</span><span class="op">&gt;</span>),
+<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">ResolvedTarget</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
+    <span class="ident">User</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">User</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">PartialMember</span><span class="op">&gt;</span>),
+    <span class="ident">Message</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">Message</span>),
 }
 
 <span class="doccomment">/// The resolved data of a command data interaction payload.</span>
