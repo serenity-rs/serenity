@@ -826,6 +826,31 @@ impl Http {
         from_value(value).map_err(From::from)
     }
 
+    /// Creates a Guild Scheduled Event.
+    ///
+    /// Refer to Discord's docs for field information.
+    ///
+    /// **Note**: Requres the [Manage Events] permission.
+    ///
+    /// [Manage Events]: Permissions::MANAGE_EVENTS
+    pub async fn create_scheduled_event(
+        &self,
+        guild_id: u64,
+        map: &JsonMap,
+        audit_log_reason: Option<&str>,
+    ) -> Result<ScheduledEvent> {
+        let body = to_vec(map)?;
+        self.fire(Request {
+            body: Some(&body),
+            multipart: None,
+            headers: audit_log_reason.map(reason_into_header),
+            route: RouteInfo::CreateScheduledEvent {
+                guild_id,
+            },
+        })
+        .await
+    }
+
     /// Creates a sticker.
     ///
     /// **Note**: Requires the [Manage Emojis and Stickers] permission.
@@ -1190,6 +1215,25 @@ impl Http {
             route: RouteInfo::DeleteRole {
                 guild_id,
                 role_id,
+            },
+        })
+        .await
+    }
+
+    /// Deletes a [Scheduled Event] from a server.
+    ///
+    /// **Note**: Requires the [Manage Events] permission.
+    ///
+    /// [Scheduled Event]: crate::model::guild::ScheduledEvent
+    /// [Manage Events]: Permissions::MANAGE_EVENTS
+    pub async fn delete_scheduled_event(&self, guild_id: u64, event_id: u64) -> Result<()> {
+        self.wind(204, Request {
+            body: None,
+            multipart: None,
+            headers: None,
+            route: RouteInfo::DeleteScheduledEvent {
+                guild_id,
+                event_id,
             },
         })
         .await
@@ -1833,6 +1877,31 @@ impl Http {
         }
 
         from_value(value).map_err(From::from)
+    }
+
+    /// Modifies a scheduled event.
+    ///
+    /// **Note**: Requires the [Manage Events] permission.
+    ///
+    /// [Manage Events]: Permissions::MANAGE_EVENTS
+    pub async fn edit_scheduled_event(
+        &self,
+        guild_id: u64,
+        event_id: u64,
+        map: &JsonMap,
+        audit_log_reason: Option<&str>,
+    ) -> Result<ScheduledEvent> {
+        let body = to_vec(map)?;
+        self.fire(Request {
+            body: Some(&body),
+            multipart: None,
+            headers: audit_log_reason.map(reason_into_header),
+            route: RouteInfo::EditScheduledEvent {
+                guild_id,
+                event_id,
+            },
+        })
+        .await
     }
 
     /// Changes a sticker in a guild.

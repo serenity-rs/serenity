@@ -1124,6 +1124,9 @@ pub enum RouteInfo<'a> {
     CreateRole {
         guild_id: u64,
     },
+    CreateScheduledEvent {
+        guild_id: u64,
+    },
     CreateSticker {
         guild_id: u64,
     },
@@ -1197,6 +1200,10 @@ pub enum RouteInfo<'a> {
     DeleteRole {
         guild_id: u64,
         role_id: u64,
+    },
+    DeleteScheduledEvent {
+        guild_id: u64,
+        event_id: u64,
     },
     DeleteSticker {
         guild_id: u64,
@@ -1292,6 +1299,10 @@ pub enum RouteInfo<'a> {
     },
     EditRolePosition {
         guild_id: u64,
+    },
+    EditScheduledEvent {
+        guild_id: u64,
+        event_id: u64,
     },
     EditSticker {
         guild_id: u64,
@@ -1759,6 +1770,13 @@ impl<'a> RouteInfo<'a> {
                 Route::GuildsIdRoles(guild_id),
                 Cow::from(Route::guild_roles(guild_id)),
             ),
+            RouteInfo::CreateScheduledEvent {
+                guild_id,
+            } => (
+                LightMethod::Post,
+                Route::GuildsIdScheduledEvents(guild_id),
+                Cow::from(Route::guild_scheduled_events(guild_id, None)),
+            ),
             RouteInfo::CreateSticker {
                 guild_id,
             } => (
@@ -1918,6 +1936,14 @@ impl<'a> RouteInfo<'a> {
                 Route::GuildsIdRolesId(guild_id),
                 Cow::from(Route::guild_role(guild_id, role_id)),
             ),
+            RouteInfo::DeleteScheduledEvent {
+                guild_id,
+                event_id,
+            } => (
+                LightMethod::Delete,
+                Route::GuildsIdScheduledEventsId(guild_id),
+                Cow::from(Route::guild_scheduled_event(guild_id, event_id, None)),
+            ),
             RouteInfo::DeleteSticker {
                 guild_id,
                 sticker_id,
@@ -1959,6 +1985,14 @@ impl<'a> RouteInfo<'a> {
                 LightMethod::Patch,
                 Route::ChannelsId(channel_id),
                 Cow::from(Route::channel(channel_id)),
+            ),
+            RouteInfo::EditScheduledEvent {
+                guild_id,
+                event_id,
+            } => (
+                LightMethod::Patch,
+                Route::GuildsIdScheduledEventsId(guild_id),
+                Cow::from(Route::guild_scheduled_event(guild_id, event_id, None)),
             ),
             RouteInfo::EditStageInstance {
                 channel_id,

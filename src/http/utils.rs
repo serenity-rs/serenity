@@ -30,6 +30,15 @@ fn loop_errors(value: &Value, errors: &mut Vec<DiscordJsonSingleError>, path: &[
                 .as_array()
                 .expect("expected array")
                 .to_owned();
+
+            // FIXME: This is a workaround to a bug in the {Create,Edit}ScheduledEvent endpoints.
+            // Occasionally there will be an additional nested _errors field. See the relevant
+            // github issue: https://github.com/discord/discord-api-docs/issues/4811
+            let found_errors = match found_errors[0].get("_errors") {
+                Some(array) => array.as_array().expect("expected array").to_owned(),
+                None => found_errors,
+            };
+
             for error in found_errors {
                 let error_object = error.as_object().expect("expected object");
                 let mut object_path = path.to_owned();

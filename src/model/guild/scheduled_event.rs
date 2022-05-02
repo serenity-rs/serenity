@@ -33,7 +33,7 @@ pub struct ScheduledEvent {
     /// The type of the event, indicating if it will take place in a Stage Instance, a Voice
     /// Channel, or at some External location.
     #[serde(rename = "entity_type")]
-    pub kind: ScheduledEventKind,
+    pub kind: ScheduledEventType,
     /// Optional event location, only required for External events.
     #[serde(rename = "entity_metadata")]
     pub metadata: Option<ScheduledEventMetadata>,
@@ -63,14 +63,14 @@ enum_number!(ScheduledEventStatus {
 });
 
 #[derive(Copy, Clone, Debug)]
-pub enum ScheduledEventKind {
+pub enum ScheduledEventType {
     StageInstance = 1,
     Voice = 2,
     External = 3,
     Unknown = !0,
 }
 
-enum_number!(ScheduledEventKind {
+enum_number!(ScheduledEventType {
     StageInstance,
     Voice,
     External,

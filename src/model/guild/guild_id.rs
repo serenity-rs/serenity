@@ -16,6 +16,8 @@ use crate::builder::{
     EditRole,
     EditSticker,
 };
+#[cfg(feature = "model")]
+use crate::builder::{CreateScheduledEvent, EditScheduledEvent};
 #[cfg(all(feature = "cache", feature = "model"))]
 use crate::cache::Cache;
 #[cfg(feature = "collector")]
@@ -340,6 +342,31 @@ impl GuildId {
         Ok(role)
     }
 
+    /// Creates a new scheduled event in the guild with the data set, if any.
+    ///
+    /// **Note**: Requres the [Manage Events] permission.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`Error::Http`] if the current user lacks permission, or if invalid data is given.
+    ///
+    /// [Manage Events]: Permissions::MANAGE_EVENTS
+    pub async fn create_scheduled_event<F>(
+        &self,
+        http: impl AsRef<Http>,
+        f: F,
+    ) -> Result<ScheduledEvent>
+    where
+        F: FnOnce(&mut CreateScheduledEvent) -> &mut CreateScheduledEvent,
+    {
+        let mut builder = CreateScheduledEvent::default();
+        f(&mut builder);
+
+        let map = json::hashmap_to_json_map(builder.0);
+
+        http.as_ref().create_scheduled_event(self.0, &map, None).await
+    }
+
     /// Creates a new sticker in the guild with the data set, if any.
     ///
     /// **Note**: Requires the [Manage Emojis and Stickers] permission.
@@ -442,6 +469,24 @@ impl GuildId {
         role_id: impl Into<RoleId>,
     ) -> Result<()> {
         http.as_ref().delete_role(self.0, role_id.into().0).await
+    }
+
+    /// Deletes a specified scheduled event in the guild.
+    ///
+    /// **Note**: Requres the [Manage Events] permission.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`Error::Http`] if the current user lacks permission, or if invalid data is given.
+    ///
+    /// [Manage Events]: Permissions::MANAGE_EVENTS
+    #[inline]
+    pub async fn delete_scheduled_event(
+        self,
+        http: impl AsRef<Http>,
+        event_id: impl Into<ScheduledEventId>,
+    ) -> Result<()> {
+        http.as_ref().delete_scheduled_event(self.0, event_id.into().0).await
     }
 
     /// Deletes a [`Sticker`] by Id from the guild.
@@ -607,6 +652,31 @@ impl GuildId {
         let map = json::hashmap_to_json_map(edit_role.0);
 
         http.as_ref().edit_role(self.0, role_id.into().0, &map, None).await
+    }
+
+    /// Modifies a scheduled event in the guild with the data set, if any.
+    ///
+    /// **Note**: Requres the [Manage Events] permission.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`Error::Http`] if the current user lacks permission, or if invalid data is given.
+    ///
+    /// [Manage Events]: Permissions::MANAGE_EVENTS
+    pub async fn edit_scheduled_event<F>(
+        self,
+        http: impl AsRef<Http>,
+        event_id: impl Into<ScheduledEventId>,
+        f: F,
+    ) -> Result<ScheduledEvent>
+    where
+        F: FnOnce(&mut EditScheduledEvent) -> &mut EditScheduledEvent,
+    {
+        let mut edit_scheduled_event = EditScheduledEvent::default();
+        f(&mut edit_scheduled_event);
+        let map = json::hashmap_to_json_map(edit_scheduled_event.0);
+
+        http.as_ref().edit_scheduled_event(self.0, event_id.into().0, &map, None).await
     }
 
     /// Edits a [`Sticker`], optionally setting its fields.
