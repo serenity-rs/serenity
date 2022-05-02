@@ -220,9 +220,9 @@ impl<'de> Deserialize<'de> for GuildMembersChunkEvent {
 
                 Ok(GuildMembersChunkEvent {
                     guild_id,
+                    members,
                     chunk_index,
                     chunk_count,
-                    members,
                     nonce,
                 })
             }

@@ -53,7 +53,12 @@
 #![doc(html_root_url = "https://docs.rs/serenity/*")]
 #![cfg_attr(docsrs, feature(doc_auto_cfg))]
 #![deny(rust_2018_idioms)]
-#![warn(clippy::let_underscore_drop, clippy::must_use_candidate, clippy::unnested_or_patterns)]
+#![warn(
+    clippy::let_underscore_drop,
+    clippy::must_use_candidate,
+    clippy::unnested_or_patterns,
+    clippy::inconsistent_struct_constructor
+)]
 #![deny(rustdoc::broken_intra_doc_links, rustdoc::private_intra_doc_links)]
 #![deny(
     clippy::unwrap_used,

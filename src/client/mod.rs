@@ -396,12 +396,12 @@ impl Future for ClientBuilder {
                 };
 
                 Ok(Client {
-                    ws_url,
                     data,
                     shard_manager,
                     shard_manager_worker,
                     #[cfg(feature = "voice")]
                     voice_manager,
+                    ws_url,
                     cache_and_http,
                 })
             }));

@@ -543,8 +543,8 @@ impl<'de> Deserialize<'de> for ApplicationCommandInteractionData {
         };
 
         Ok(Self {
-            name,
             id,
+            name,
             kind,
             options,
             resolved,

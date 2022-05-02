@@ -150,9 +150,9 @@ impl EmbedField {
 
     fn _new(name: String, value: String, inline: bool) -> Self {
         Self {
-            inline,
             name,
             value,
+            inline,
         }
     }
 }
