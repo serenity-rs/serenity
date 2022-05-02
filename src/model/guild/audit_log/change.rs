@@ -6,6 +6,7 @@ use serde::ser::{Serialize, SerializeStruct, Serializer};
 
 use crate::json::Value;
 use crate::model::channel::PermissionOverwrite;
+use crate::model::guild::automod::{EventType, TriggerType};
 use crate::model::guild::{
     DefaultMessageNotificationLevel,
     ExplicitContentFilter,
@@ -34,6 +35,10 @@ pub enum EntityType {
 #[derive(Debug, PartialEq)]
 #[non_exhaustive]
 pub enum Change {
+    Actions {
+        old: Option<Value>,
+        new: Option<Value>,
+    },
     /// AFK channel was changed.
     AfkChannelId {
         old: Option<ChannelId>,
@@ -138,6 +143,10 @@ pub enum Change {
         old: Option<String>,
         new: Option<String>,
     },
+    Enabled {
+        old: Option<bool>,
+        new: Option<bool>,
+    },
     /// Integration emoticons was enabled/disabled.
     EnableEmoticons {
         old: Option<bool>,
@@ -147,6 +156,18 @@ pub enum Change {
     EntityType {
         old: Option<u64>,
         new: Option<u64>,
+    },
+    EventType {
+        old: Option<EventType>,
+        new: Option<EventType>,
+    },
+    ExemptChannels {
+        old: Option<Vec<ChannelId>>,
+        new: Option<Vec<ChannelId>>,
+    },
+    ExemptRoles {
+        old: Option<Vec<RoleId>>,
+        new: Option<Vec<RoleId>>,
     },
     /// Behavior of the expiration of an integration was changed.
     ExpireBehavior {
@@ -348,6 +369,14 @@ pub enum Change {
         old: Option<String>,
         new: Option<String>,
     },
+    TriggerMetadata {
+        old: Option<Value>,
+        new: Option<Value>,
+    },
+    TriggerType {
+        old: Option<TriggerType>,
+        new: Option<TriggerType>,
+    },
     /// Type of a created entity.
     Type {
         old: Option<EntityType>,
@@ -409,6 +438,7 @@ impl Change {
         }
 
         variant_keys! {
+            Actions: "actions",
             AfkChannelId: "afk_channel_id",
             AfkTimeout: "afk_timeout",
             Allow: "allow",
@@ -430,8 +460,12 @@ impl Change {
             Deny: "deny",
             Description: "description",
             DiscoverySplashHash: "discovery_splash_hash",
+            Enabled: "enabled",
             EnableEmoticons: "enable_emoticons",
             EntityType: "entity_type",
+            EventType: "event_type",
+            ExemptChannels: "exempt_channels",
+            ExemptRoles: "exempt_roles",
             ExpireBehavior: "expire_behavior",
             ExpireGracePeriod: "expire_grace_period",
             ExplicitContentFilter: "explicit_content_filter",
@@ -472,6 +506,8 @@ impl Change {
             Tags: "tags",
             Temporary: "temporary",
             Topic: "topic",
+            TriggerMetadata: "trigger_metadata",
+            TriggerType: "trigger_type",
             Type: "type",
             UnicodeEmoji: "unicode_emoji",
             UserLimit: "user_limit",
@@ -516,6 +552,7 @@ impl Serialize for Change {
         }
 
         serialize_variants! {
+            Actions: "actions",
             AfkChannelId: "afk_channel_id",
             AfkTimeout: "afk_timeout",
             Allow: "allow",
@@ -537,8 +574,12 @@ impl Serialize for Change {
             Deny: "deny",
             Description: "description",
             DiscoverySplashHash: "discovery_splash_hash",
+            Enabled: "enabled",
             EnableEmoticons: "enable_emoticons",
             EntityType: "entity_type",
+            EventType: "event_type",
+            ExemptChannels: "exempt_channels",
+            ExemptRoles: "exempt_roles",
             ExpireBehavior: "expire_behavior",
             ExpireGracePeriod: "expire_grace_period",
             ExplicitContentFilter: "explicit_content_filter",
@@ -579,6 +620,8 @@ impl Serialize for Change {
             Tags: "tags",
             Temporary: "temporary",
             Topic: "topic",
+            TriggerMetadata: "trigger_metadata",
+            TriggerType: "trigger_type",
             Type: "type",
             UnicodeEmoji: "unicode_emoji",
             UserLimit: "user_limit",
@@ -663,6 +706,7 @@ impl<'de> Visitor<'de> for ChangeVisitor {
         }
 
         let change = deserialize_variants! {
+            Actions: Value,
             AfkChannelId: ChannelId,
             AfkTimeout: u64,
             Allow: Permissions,
@@ -684,8 +728,12 @@ impl<'de> Visitor<'de> for ChangeVisitor {
             Deny: Permissions,
             Description: String,
             DiscoverySplashHash: String,
+            Enabled: bool,
             EnableEmoticons: bool,
             EntityType: u64,
+            EventType: EventType,
+            ExemptChannels: Vec<ChannelId>,
+            ExemptRoles: Vec<RoleId>,
             ExpireBehavior: u64,
             ExpireGracePeriod: u64,
             ExplicitContentFilter: ExplicitContentFilter,
@@ -726,6 +774,8 @@ impl<'de> Visitor<'de> for ChangeVisitor {
             Tags: String,
             Temporary: bool,
             Topic: String,
+            TriggerMetadata: Value,
+            TriggerType: TriggerType,
             Type: EntityType,
             UnicodeEmoji: String,
             UserLimit: u64,
@@ -750,6 +800,7 @@ enum MaybeUnknown<T> {
 #[derive(Deserialize)]
 #[serde(field_identifier, rename_all = "snake_case")]
 enum Key {
+    Actions,
     AfkChannelId,
     AfkTimeout,
     Allow,
@@ -772,8 +823,12 @@ enum Key {
     Deny,
     Description,
     DiscoverySplashHash,
+    Enabled,
     EnableEmoticons,
     EntityType,
+    EventType,
+    ExemptChannels,
+    ExemptRoles,
     ExpireBehavior,
     ExpireGracePeriod,
     ExplicitContentFilter,
@@ -812,6 +867,8 @@ enum Key {
     Tags,
     Temporary,
     Topic,
+    TriggerMetadata,
+    TriggerType,
     Type,
     UnicodeEmoji,
     UserLimit,
