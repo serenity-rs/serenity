@@ -1029,12 +1029,12 @@ impl From<CommandPermissionId> for UserId {
 }
 
 impl TargetId {
-    /// Converts this [`CommandPermissionId`] to [`UserId`].
+    /// Converts this [`TargetId`] to [`UserId`].
     pub fn to_user_id(self) -> UserId {
         self.0.into()
     }
 
-    /// Converts this [`CommandPermissionId`] to [`MessageId`].
+    /// Converts this [`TargetId`] to [`MessageId`].
     pub fn to_message_id(self) -> MessageId {
         self.0.into()
     }
