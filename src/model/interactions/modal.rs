@@ -15,7 +15,7 @@ use crate::builder::{
 use crate::http::Http;
 #[cfg(feature = "model")]
 use crate::json;
-use crate::json::from_number;
+use crate::json::{from_number, Value};
 use crate::model::interactions::InteractionType;
 
 /// An interaction triggered by a modal submit.
@@ -275,10 +275,10 @@ impl<'de> Deserialize<'de> for ModalSubmitInteraction {
         let mut map = JsonMap::deserialize(deserializer)?;
 
         let id =
-            map.get("guild_id").and_then(json::Value::as_str).and_then(|x| x.parse::<u64>().ok());
+            map.get("guild_id").and_then(Value::as_str).and_then(|x| x.parse::<u64>().ok());
 
         if let Some(guild_id) = id {
-            if let Some(member) = map.get_mut("member").and_then(json::Value::as_object_mut) {
+            if let Some(member) = map.get_mut("member").and_then(Value::as_object_mut) {
                 member.insert("guild_id".to_string(), from_number(guild_id));
             }
 
