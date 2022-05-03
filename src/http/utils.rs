@@ -1,6 +1,4 @@
 use serde::de::{Deserialize, Deserializer};
-#[cfg(feature = "simd-json")]
-use simd_json::ValueAccess;
 
 use crate::http::error::DiscordJsonSingleError;
 use crate::internal::prelude::*;

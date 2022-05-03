@@ -45,22 +45,6 @@ where
     map.into_iter().map(|(k, v)| (k.to_string(), v)).collect()
 }
 
-#[cfg(all(feature = "http", not(feature = "simd-json")))]
-pub(crate) fn to_vec<T>(v: &T) -> Result<Vec<u8>>
-where
-    T: Serialize,
-{
-    Ok(serde_json::to_vec(v)?)
-}
-
-#[cfg(all(feature = "http", feature = "simd-json"))]
-pub(crate) fn to_vec<T>(v: &T) -> Result<Vec<u8>>
-where
-    T: Serialize,
-{
-    Ok(simd_json::to_vec(v)?)
-}
-
 #[cfg(not(feature = "simd-json"))]
 pub(crate) fn to_string<T>(v: &T) -> Result<String>
 where
@@ -173,7 +157,7 @@ pub mod prelude {
         to_vec_pretty,
     };
     #[cfg(feature = "simd-json")]
-    pub use simd_json::{Builder, Mutable, Value as ValueTrait, ValueAccess};
+    pub use simd_json::{Builder, Mutable, StaticNode, Value as ValueTrait, ValueAccess};
 
     pub use super::*;
 }

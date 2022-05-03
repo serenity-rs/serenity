@@ -10,8 +10,6 @@ use percent_encoding::{utf8_percent_encode, NON_ALPHANUMERIC};
 use reqwest::header::{HeaderMap as Headers, HeaderValue, CONTENT_TYPE};
 use reqwest::{Client, ClientBuilder, Response as ReqwestResponse, StatusCode, Url};
 use serde::de::DeserializeOwned;
-#[cfg(feature = "simd-json")]
-use simd_json::ValueAccess;
 use tracing::{debug, instrument, trace};
 
 use super::multipart::Multipart;
@@ -21,7 +19,7 @@ use super::routing::RouteInfo;
 use super::typing::Typing;
 use super::{AttachmentType, GuildPagination, HttpError};
 use crate::internal::prelude::*;
-use crate::json::{from_number, from_value, json, to_value, to_vec};
+use crate::json::prelude::*;
 use crate::model::interactions::application_command::{
     ApplicationCommand,
     ApplicationCommandPermission,
@@ -267,7 +265,7 @@ impl Http {
         user_id: u64,
         map: &JsonMap,
     ) -> Result<Option<Member>> {
-        let body = serde_json::to_vec(map)?;
+        let body = to_vec(map)?;
 
         let response = self
             .request(Request {

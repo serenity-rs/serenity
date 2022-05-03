@@ -1,10 +1,8 @@
 use std::collections::HashMap;
 
 use serde::{Deserialize, Serialize};
-#[cfg(feature = "simd-json")]
-use simd_json::Mutable;
 
-use crate::json::{json, Value};
+use crate::json::prelude::*;
 use crate::model::id::{RoleId, UserId};
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
