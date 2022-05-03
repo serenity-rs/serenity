@@ -229,7 +229,7 @@ fn check_common_behaviour(
     cache: impl AsRef<Cache>,
     msg: &Message,
     options: &impl CommonOptions,
-    owners: &HashSet<UserId>,
+    owners: &HashSet<UserId, impl std::hash::BuildHasher + Send + Sync>,
     help_options: &HelpOptions,
 ) -> HelpBehaviour {
     if !options.help_available() {
@@ -272,7 +272,7 @@ async fn check_command_behaviour(
     msg: &Message,
     options: &CommandOptions,
     group_checks: &[&Check],
-    owners: &HashSet<UserId>,
+    owners: &HashSet<UserId, impl std::hash::BuildHasher + Send + Sync>,
     help_options: &HelpOptions,
 ) -> HelpBehaviour {
     let behaviour = check_common_behaviour(&ctx, msg, &options, owners, help_options);
@@ -309,7 +309,7 @@ fn nested_commands_search<'rec, 'a: 'rec>(
     name: &'rec mut String,
     help_options: &'a HelpOptions,
     similar_commands: &'rec mut Vec<SuggestedCommandName>,
-    owners: &'rec HashSet<UserId>,
+    owners: &'rec HashSet<UserId, impl std::hash::BuildHasher + Send + Sync>,
 ) -> BoxFuture<'rec, Option<&'a InternalCommand>> {
     async move {
         for command in commands {
@@ -448,7 +448,7 @@ fn nested_group_command_search<'rec, 'a: 'rec>(
     name: &'rec mut String,
     help_options: &'a HelpOptions,
     similar_commands: &'rec mut Vec<SuggestedCommandName>,
-    owners: &'rec HashSet<UserId>,
+    owners: &'rec HashSet<UserId, impl std::hash::BuildHasher + Send + Sync>,
 ) -> BoxFuture<'rec, Result<CustomisedHelpData<'a>, ()>> {
     async move {
         for group in groups {
@@ -574,7 +574,7 @@ async fn fetch_single_command<'a>(
     groups: &[&'static CommandGroup],
     name: &'a str,
     help_options: &'a HelpOptions,
-    owners: &HashSet<UserId>,
+    owners: &HashSet<UserId, impl std::hash::BuildHasher + Send + Sync>,
 ) -> Result<CustomisedHelpData<'a>, Vec<SuggestedCommandName>> {
     let mut similar_commands: Vec<SuggestedCommandName> = Vec::new();
     let mut name = name.to_string();
@@ -601,7 +601,7 @@ async fn fill_eligible_commands<'a>(
     ctx: &Context,
     msg: &Message,
     commands: &[&'static InternalCommand],
-    owners: &HashSet<UserId>,
+    owners: &HashSet<UserId, impl std::hash::BuildHasher + Send + Sync>,
     help_options: &'a HelpOptions,
     group: &'a CommandGroup,
     to_fill: &mut GroupCommandsPair,
@@ -658,7 +658,7 @@ fn fetch_all_eligible_commands_in_group<'rec, 'a: 'rec>(
     ctx: &'rec Context,
     msg: &'rec Message,
     commands: &'rec [&'static InternalCommand],
-    owners: &'rec HashSet<UserId>,
+    owners: &'rec HashSet<UserId, impl std::hash::BuildHasher + Send + Sync>,
     help_options: &'a HelpOptions,
     group: &'a CommandGroup,
     highest_formatter: HelpBehaviour,
@@ -713,7 +713,7 @@ async fn create_command_group_commands_pair_from_groups<'a>(
     ctx: &Context,
     msg: &Message,
     groups: &[&'static CommandGroup],
-    owners: &HashSet<UserId>,
+    owners: &HashSet<UserId, impl std::hash::BuildHasher + Send + Sync>,
     help_options: &'a HelpOptions,
 ) -> Vec<GroupCommandsPair> {
     let mut listed_groups: Vec<GroupCommandsPair> = Vec::default();
@@ -737,7 +737,7 @@ async fn create_single_group(
     ctx: &Context,
     msg: &Message,
     group: &CommandGroup,
-    owners: &HashSet<UserId>,
+    owners: &HashSet<UserId, impl std::hash::BuildHasher + Send + Sync>,
     help_options: &HelpOptions,
 ) -> GroupCommandsPair {
     let mut group_with_cmds = fetch_all_eligible_commands_in_group(
@@ -777,12 +777,11 @@ fn trim_prefixless_group(group_name: &str, searched_group: &mut String) -> bool 
 }
 
 #[cfg(feature = "cache")]
-#[allow(clippy::implicit_hasher)]
 pub fn searched_lowercase<'rec, 'a: 'rec>(
     ctx: &'rec Context,
     msg: &'rec Message,
     group: &'rec CommandGroup,
-    owners: &'rec HashSet<UserId>,
+    owners: &'rec HashSet<UserId, impl std::hash::BuildHasher + Send + Sync>,
     help_options: &'a HelpOptions,
     searched_named_lowercase: &'rec mut String,
 ) -> BoxFuture<'rec, Option<CustomisedHelpData<'a>>> {
@@ -841,13 +840,12 @@ pub fn searched_lowercase<'rec, 'a: 'rec>(
 /// taking [`HelpOptions`] into consideration when deciding on whether a command
 /// shall be picked and in what textual format.
 #[cfg(feature = "cache")]
-#[allow(clippy::implicit_hasher)]
 pub async fn create_customised_help_data<'a>(
     ctx: &Context,
     msg: &Message,
     args: &'a Args,
     groups: &[&'static CommandGroup],
-    owners: &HashSet<UserId>,
+    owners: &HashSet<UserId, impl std::hash::BuildHasher + Send + Sync>,
     help_options: &'a HelpOptions,
 ) -> CustomisedHelpData<'a> {
     if !args.is_empty() {
@@ -1190,14 +1188,13 @@ async fn send_error_embed(
 ///
 /// [`StandardFramework::help`]: crate::framework::standard::StandardFramework::help
 #[cfg(all(feature = "cache", feature = "http"))]
-#[allow(clippy::implicit_hasher)]
 pub async fn with_embeds(
     ctx: &Context,
     msg: &Message,
     args: Args,
     help_options: &HelpOptions,
     groups: &[&'static CommandGroup],
-    owners: HashSet<UserId>,
+    owners: HashSet<UserId, impl std::hash::BuildHasher + Send + Sync>,
 ) -> Result<Message, Error> {
     let formatted_help =
         create_customised_help_data(ctx, msg, &args, groups, &owners, help_options).await;
@@ -1397,7 +1394,7 @@ pub async fn plain(
     args: Args,
     help_options: &HelpOptions,
     groups: &[&'static CommandGroup],
-    owners: HashSet<UserId>,
+    owners: HashSet<UserId, impl std::hash::BuildHasher + Send + Sync>,
 ) -> Result<Message, Error> {
     let formatted_help =
         create_customised_help_data(ctx, msg, &args, groups, &owners, help_options).await;
