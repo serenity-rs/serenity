@@ -2169,12 +2169,12 @@
 }
 
 <span class="kw">impl</span> <span class="ident">TargetId</span> {
-    <span class="doccomment">/// Converts this [`CommandPermissionId`] to [`UserId`].</span>
+    <span class="doccomment">/// Converts this [`TargetId`] to [`UserId`].</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">to_user_id</span>(<span class="self">self</span>) -&gt; <span class="ident">UserId</span> {
         <span class="self">self</span>.<span class="number">0</span>.<span class="ident">into</span>()
     }
 
-    <span class="doccomment">/// Converts this [`CommandPermissionId`] to [`MessageId`].</span>
+    <span class="doccomment">/// Converts this [`TargetId`] to [`MessageId`].</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">to_message_id</span>(<span class="self">self</span>) -&gt; <span class="ident">MessageId</span> {
         <span class="self">self</span>.<span class="number">0</span>.<span class="ident">into</span>()
     }
