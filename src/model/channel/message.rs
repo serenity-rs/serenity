@@ -5,9 +5,6 @@ use std::fmt::Display;
 #[cfg(all(feature = "cache", feature = "model"))]
 use std::fmt::Write;
 
-#[cfg(feature = "simd-json")]
-use simd_json::ValueAccess;
-
 #[cfg(all(feature = "model", feature = "utils"))]
 use crate::builder::{CreateEmbed, EditMessage};
 #[cfg(all(feature = "cache", feature = "model"))]
@@ -27,7 +24,7 @@ use crate::collector::{
 use crate::http::{CacheHttp, Http};
 #[cfg(feature = "model")]
 use crate::json;
-use crate::json::Value;
+use crate::json::prelude::*;
 use crate::model::interactions::message_component::ActionRow;
 use crate::model::interactions::MessageInteraction;
 use crate::model::prelude::*;

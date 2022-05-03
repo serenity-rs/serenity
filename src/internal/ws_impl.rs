@@ -3,8 +3,7 @@ use std::io::Read;
 use async_trait::async_trait;
 use async_tungstenite::tungstenite::Message;
 use flate2::read::ZlibDecoder;
-use futures::stream::SplitSink;
-use futures::{SinkExt, StreamExt, TryStreamExt};
+use futures::{SinkExt, StreamExt};
 use tokio::time::timeout;
 use tracing::{instrument, warn};
 use url::Url;
@@ -16,7 +15,6 @@ use crate::json::{from_str, to_string};
 #[async_trait]
 pub trait ReceiverExt {
     async fn recv_json(&mut self) -> Result<Option<Value>>;
-    async fn try_recv_json(&mut self) -> Result<Option<Value>>;
 }
 
 #[async_trait]
@@ -36,17 +34,6 @@ impl ReceiverExt for WsStream {
         };
 
         convert_ws_message(ws_message)
-    }
-
-    async fn try_recv_json(&mut self) -> Result<Option<Value>> {
-        convert_ws_message(self.try_next().await.ok().flatten())
-    }
-}
-
-#[async_trait]
-impl SenderExt for SplitSink<WsStream, Message> {
-    async fn send_json(&mut self, value: &Value) -> Result<()> {
-        Ok(to_string(value).map(Message::Text).map_err(Error::from).map(|m| self.send(m))?.await?)
     }
 }
 

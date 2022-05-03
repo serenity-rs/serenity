@@ -1,11 +1,9 @@
 use std::collections::HashMap;
 
-#[cfg(feature = "simd-json")]
-use simd_json::Mutable;
-
 use super::{CreateAllowedMentions, CreateEmbed};
 use crate::builder::CreateComponents;
-use crate::json::{self, Value};
+use crate::json;
+use crate::json::prelude::*;
 
 #[derive(Clone, Debug, Default)]
 pub struct EditInteractionResponse(pub HashMap<&'static str, Value>);

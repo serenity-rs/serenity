@@ -1,9 +1,7 @@
 use std::collections::HashMap;
 
-#[cfg(feature = "simd-json")]
-use simd_json::Mutable;
-
-use crate::json::{self, from_number, json, ToNumber, Value};
+use crate::json;
+use crate::json::prelude::*;
 use crate::model::channel::ChannelType;
 use crate::model::interactions::application_command::{
     ApplicationCommandOptionType,

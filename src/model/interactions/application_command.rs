@@ -2,8 +2,6 @@ use std::collections::HashMap;
 
 use serde::de::Error as DeError;
 use serde::{Deserialize, Deserializer};
-#[cfg(feature = "simd-json")]
-use simd_json::ValueAccess;
 
 use super::prelude::*;
 #[cfg(feature = "http")]
@@ -20,7 +18,7 @@ use crate::http::Http;
 use crate::internal::prelude::StdResult;
 #[cfg(feature = "http")]
 use crate::json;
-use crate::json::{from_number, JsonMap, Value};
+use crate::json::prelude::*;
 use crate::model::channel::{Attachment, ChannelType, PartialChannel};
 use crate::model::guild::{Member, PartialMember, Role};
 use crate::model::id::{

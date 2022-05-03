@@ -1,7 +1,5 @@
 use serde::de::Error as DeError;
 use serde::{Serialize, Serializer};
-#[cfg(feature = "simd-json")]
-use simd_json::ValueAccess;
 
 use super::prelude::*;
 #[cfg(feature = "http")]
@@ -14,7 +12,7 @@ use crate::builder::{
 use crate::http::Http;
 #[cfg(feature = "http")]
 use crate::json;
-use crate::json::{from_number, from_value, Value};
+use crate::json::prelude::*;
 use crate::model::interactions::InteractionType;
 
 /// An interaction triggered by a message component.
