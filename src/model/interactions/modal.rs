@@ -1,7 +1,5 @@
 use serde::de::Error as DeError;
 use serde::Serialize;
-#[cfg(feature = "simdjson")]
-use simd_json::ValueAccess;
 
 use super::message_component::ActionRow;
 use super::prelude::*;
@@ -15,7 +13,7 @@ use crate::builder::{
 use crate::http::Http;
 #[cfg(feature = "model")]
 use crate::json;
-use crate::json::from_number;
+use crate::json::prelude::*;
 use crate::model::interactions::InteractionType;
 
 /// An interaction triggered by a modal submit.

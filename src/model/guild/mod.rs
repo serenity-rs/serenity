@@ -15,8 +15,6 @@ mod welcome_screen;
 #[cfg(feature = "model")]
 use futures::stream::StreamExt;
 use serde::de::Error as DeError;
-#[cfg(feature = "simd-json")]
-use simd_json::StaticNode;
 #[cfg(feature = "model")]
 use tracing::error;
 #[cfg(all(feature = "model", feature = "cache"))]
@@ -63,8 +61,6 @@ use crate::collector::{
 use crate::constants::LARGE_THRESHOLD;
 #[cfg(feature = "model")]
 use crate::http::{CacheHttp, Http};
-#[cfg(all(feature = "http", feature = "model"))]
-use crate::json::json;
 use crate::json::prelude::*;
 use crate::json::{from_number, from_value};
 use crate::model::prelude::*;

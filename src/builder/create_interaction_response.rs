@@ -1,11 +1,9 @@
 use std::collections::HashMap;
 
-#[cfg(feature = "simd-json")]
-use simd_json::{Mutable, ValueAccess};
-
 use super::{CreateAllowedMentions, CreateEmbed};
 use crate::builder::CreateComponents;
-use crate::json::{self, from_number, json, Value};
+use crate::json;
+use crate::json::prelude::*;
 use crate::model::channel::AttachmentType;
 use crate::model::interactions::{
     InteractionApplicationCommandCallbackDataFlags,
