@@ -1360,14 +1360,14 @@ pub fn deserialize_event_with_type(kind: EventType, v: Value) -> Result<Event> {
             // GuildUnavailable isn't actually received from the gateway, so it
             // can be lumped in with GuildCreate's arm.
 
-            if v.get("unavailable").and_then(|v| v.as_bool()).unwrap_or(false) {
+            if v.get("unavailable").and_then(Value::as_bool).unwrap_or(false) {
                 Event::GuildUnavailable(from_value(v)?)
             } else {
                 Event::GuildCreate(from_value(v)?)
             }
         },
         EventType::GuildDelete => {
-            if v.get("unavailable").and_then(|v| v.as_bool()).unwrap_or(false) {
+            if v.get("unavailable").and_then(Value::as_bool).unwrap_or(false) {
                 Event::GuildUnavailable(from_value(v)?)
             } else {
                 Event::GuildDelete(from_value(v)?)

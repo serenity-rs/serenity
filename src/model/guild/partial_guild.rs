@@ -1576,10 +1576,10 @@ impl<'de> Deserialize<'de> for PartialGuild {
     fn deserialize<D: Deserializer<'de>>(deserializer: D) -> StdResult<Self, D::Error> {
         let mut map = JsonMap::deserialize(deserializer)?;
 
-        let id = map.get("id").and_then(|x| x.as_str()).and_then(|x| x.parse::<u64>().ok());
+        let id = map.get("id").and_then(Value::as_str).and_then(|x| x.parse::<u64>().ok());
 
         if let Some(guild_id) = id {
-            if let Some(array) = map.get_mut("roles").and_then(|x| x.as_array_mut()) {
+            if let Some(array) = map.get_mut("roles").and_then(Value::as_array_mut) {
                 for value in array {
                     if let Some(role) = value.as_object_mut() {
                         role.insert("guild_id".to_string(), from_number(guild_id));
