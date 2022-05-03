@@ -3096,7 +3096,7 @@ mod test {
                 application_id: Some(ApplicationId(0)),
                 explicit_content_filter: ExplicitContentFilter::None,
                 system_channel_id: Some(ChannelId(0)),
-                system_channel_flags: Default::default(),
+                system_channel_flags: SystemChannelFlags::default(),
                 rules_channel_id: None,
                 premium_subscription_count: 12,
                 banner: None,

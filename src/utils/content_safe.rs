@@ -328,7 +328,7 @@ mod tests {
             splash: None,
             discovery_splash: None,
             system_channel_id: None,
-            system_channel_flags: Default::default(),
+            system_channel_flags: SystemChannelFlags::default(),
             rules_channel_id: None,
             public_updates_channel_id: None,
             verification_level: VerificationLevel::None,
