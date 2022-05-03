@@ -169,7 +169,6 @@ impl<T> Mentionable for T
 where
     T: Into<Mention> + Copy,
 {
-    #[inline(always)]
     fn mention(&self) -> Mention {
         (*self).into()
     }
