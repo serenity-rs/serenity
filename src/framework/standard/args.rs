@@ -24,11 +24,9 @@ impl<E> From<E> for Error<E> {
 
 impl<E: fmt::Display> fmt::Display for Error<E> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        use self::Error::*;
-
         match *self {
-            Eos => f.write_str(r#"ArgError("end of string")"#),
-            Parse(ref e) => write!(f, "ArgError(\"{}\")", e),
+            Self::Eos => f.write_str(r#"ArgError("end of string")"#),
+            Self::Parse(ref e) => write!(f, "ArgError(\"{}\")", e),
         }
     }
 }

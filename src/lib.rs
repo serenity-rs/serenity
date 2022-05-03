@@ -63,7 +63,8 @@
     clippy::implicit_clone,
     clippy::return_self_not_must_use,
     clippy::match_same_arms,
-    clippy::redundant_closure_for_method_calls
+    clippy::redundant_closure_for_method_calls,
+    clippy::enum_glob_use
 )]
 #![deny(rustdoc::broken_intra_doc_links, rustdoc::private_intra_doc_links)]
 #![deny(

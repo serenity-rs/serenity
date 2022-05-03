@@ -803,10 +803,9 @@ pub enum Event {
 
 #[cfg(feature = "model")]
 fn gid_from_channel(c: &Channel) -> RelatedId<GuildId> {
-    use RelatedId::*;
     match c {
-        Channel::Guild(g) => Some(g.guild_id),
-        _ => None,
+        Channel::Guild(g) => RelatedId::Some(g.guild_id),
+        _ => RelatedId::None,
     }
 }
 
