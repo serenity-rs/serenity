@@ -306,6 +306,22 @@
 <span id="301">301</span>
 <span id="302">302</span>
 <span id="303">303</span>
+<span id="304">304</span>
+<span id="305">305</span>
+<span id="306">306</span>
+<span id="307">307</span>
+<span id="308">308</span>
+<span id="309">309</span>
+<span id="310">310</span>
+<span id="311">311</span>
+<span id="312">312</span>
+<span id="313">313</span>
+<span id="314">314</span>
+<span id="315">315</span>
+<span id="316">316</span>
+<span id="317">317</span>
+<span id="318">318</span>
+<span id="319">319</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::collections::HashMap</span>;
 
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::json</span>;
@@ -315,6 +331,7 @@
     <span class="ident">ApplicationCommandOptionType</span>,
     <span class="ident">ApplicationCommandType</span>,
 };
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::Permissions</span>;
 
 <span class="doccomment">/// A builder for creating a new [`ApplicationCommandOption`].</span>
 <span class="doccomment">///</span>
@@ -512,10 +529,25 @@
         <span class="self">self</span>
     }
 
+    <span class="doccomment">/// Specifies the default permissions required to execute the command.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">default_member_permissions</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">permissions</span>: <span class="ident">Permissions</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
+        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;default_member_permissions&quot;</span>, <span class="ident">Value::from</span>(<span class="ident">permissions</span>.<span class="ident">bits</span>().<span class="ident">to_string</span>()));
+
+        <span class="self">self</span>
+    }
+
+    <span class="doccomment">/// Specifies if the command is available in DMs.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">dm_permission</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">enabled</span>: <span class="ident">bool</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
+        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;dm_permission&quot;</span>, <span class="ident">Value::from</span>(<span class="ident">enabled</span>));
+
+        <span class="self">self</span>
+    }
+
     <span class="doccomment">/// Specifies if the command should not be usable by default</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// **Note**: Setting it to false will disable it for anyone,</span>
     <span class="doccomment">/// including administrators and guild owners.</span>
+    <span class="attribute">#[<span class="ident">deprecated</span>(<span class="ident">note</span> <span class="op">=</span> <span class="string">&quot;replaced by `default_member_permissions`&quot;</span>)]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">default_permission</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">default_permission</span>: <span class="ident">bool</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
         <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;default_permission&quot;</span>, <span class="ident">Value::from</span>(<span class="ident">default_permission</span>));
 

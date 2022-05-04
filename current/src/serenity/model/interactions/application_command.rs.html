@@ -1138,6 +1138,15 @@
 <span id="1133">1133</span>
 <span id="1134">1134</span>
 <span id="1135">1135</span>
+<span id="1136">1136</span>
+<span id="1137">1137</span>
+<span id="1138">1138</span>
+<span id="1139">1139</span>
+<span id="1140">1140</span>
+<span id="1141">1141</span>
+<span id="1142">1142</span>
+<span id="1143">1143</span>
+<span id="1144">1144</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::collections::HashMap</span>;
 
 <span class="kw">use</span> <span class="ident">serde::de::Error</span> <span class="kw">as</span> <span class="ident">DeError</span>;
@@ -1838,9 +1847,16 @@
     <span class="doccomment">/// The parameters for the command.</span>
     <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">default</span>)]</span>
     <span class="kw">pub</span> <span class="ident">options</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ApplicationCommandOption</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// The default permissions required to execute the command.</span>
+    <span class="kw">pub</span> <span class="ident">default_member_permissions</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Permissions</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// Indicates whether the command is available in DMs with the app, only for globally-scoped commands.</span>
+    <span class="doccomment">/// By default, commands are visible.</span>
+    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">default</span>)]</span>
+    <span class="kw">pub</span> <span class="ident">dm_permission</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span>,
     <span class="doccomment">/// Whether the command is enabled by default when</span>
     <span class="doccomment">/// the application is added to a guild.</span>
     <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">default</span> <span class="op">=</span> <span class="string">&quot;self::default_permission_value&quot;</span>)]</span>
+    <span class="attribute">#[<span class="ident">deprecated</span>(<span class="ident">note</span> <span class="op">=</span> <span class="string">&quot;replaced by `default_member_permissions`&quot;</span>)]</span>
     <span class="kw">pub</span> <span class="ident">default_permission</span>: <span class="ident">bool</span>,
     <span class="doccomment">/// An autoincremented version identifier updated during substantial record changes.</span>
     <span class="kw">pub</span> <span class="ident">version</span>: <span class="ident">CommandVersionId</span>,
@@ -2256,12 +2272,14 @@
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">ApplicationCommandPermissionType</span> {
     <span class="ident">Role</span> <span class="op">=</span> <span class="number">1</span>,
     <span class="ident">User</span> <span class="op">=</span> <span class="number">2</span>,
+    <span class="ident">Channel</span> <span class="op">=</span> <span class="number">3</span>,
     <span class="ident">Unknown</span> <span class="op">=</span> <span class="op">!</span><span class="number">0</span>,
 }
 
 <span class="macro">enum_number!</span>(<span class="ident">ApplicationCommandPermissionType</span> {
     <span class="ident">Role</span>,
-    <span class="ident">User</span>
+    <span class="ident">User</span>,
+    <span class="ident">Channel</span>,
 });
 
 <span class="doccomment">/// The only valid values a user can pick in an [`ApplicationCommandOption`].</span>
