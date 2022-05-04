@@ -16,6 +16,8 @@ use crate::builder::{
     EditRole,
     EditSticker,
 };
+#[cfg(feature = "model")]
+use crate::builder::{CreateScheduledEvent, EditScheduledEvent};
 #[cfg(all(feature = "cache", feature = "model"))]
 use crate::cache::Cache;
 #[cfg(feature = "collector")]
@@ -28,7 +30,7 @@ use crate::collector::{
     ReactionCollectorBuilder,
 };
 #[cfg(feature = "model")]
-use crate::http::{CacheHttp, Http};
+use crate::http::{CacheHttp, Http, UserPagination};
 #[cfg(feature = "model")]
 use crate::internal::prelude::*;
 #[cfg(feature = "model")]
@@ -340,6 +342,31 @@ impl GuildId {
         Ok(role)
     }
 
+    /// Creates a new scheduled event in the guild with the data set, if any.
+    ///
+    /// **Note**: Requres the [Manage Events] permission.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`Error::Http`] if the current user lacks permission, or if invalid data is given.
+    ///
+    /// [Manage Events]: Permissions::MANAGE_EVENTS
+    pub async fn create_scheduled_event<F>(
+        &self,
+        http: impl AsRef<Http>,
+        f: F,
+    ) -> Result<ScheduledEvent>
+    where
+        F: FnOnce(&mut CreateScheduledEvent) -> &mut CreateScheduledEvent,
+    {
+        let mut builder = CreateScheduledEvent::default();
+        f(&mut builder);
+
+        let map = json::hashmap_to_json_map(builder.0);
+
+        http.as_ref().create_scheduled_event(self.0, &map, None).await
+    }
+
     /// Creates a new sticker in the guild with the data set, if any.
     ///
     /// **Note**: Requires the [Manage Emojis and Stickers] permission.
@@ -442,6 +469,24 @@ impl GuildId {
         role_id: impl Into<RoleId>,
     ) -> Result<()> {
         http.as_ref().delete_role(self.0, role_id.into().0).await
+    }
+
+    /// Deletes a specified scheduled event in the guild.
+    ///
+    /// **Note**: Requres the [Manage Events] permission.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`Error::Http`] if the current user lacks permission, or if invalid data is given.
+    ///
+    /// [Manage Events]: Permissions::MANAGE_EVENTS
+    #[inline]
+    pub async fn delete_scheduled_event(
+        self,
+        http: impl AsRef<Http>,
+        event_id: impl Into<ScheduledEventId>,
+    ) -> Result<()> {
+        http.as_ref().delete_scheduled_event(self.0, event_id.into().0).await
     }
 
     /// Deletes a [`Sticker`] by Id from the guild.
@@ -607,6 +652,31 @@ impl GuildId {
         let map = json::hashmap_to_json_map(edit_role.0);
 
         http.as_ref().edit_role(self.0, role_id.into().0, &map, None).await
+    }
+
+    /// Modifies a scheduled event in the guild with the data set, if any.
+    ///
+    /// **Note**: Requres the [Manage Events] permission.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`Error::Http`] if the current user lacks permission, or if invalid data is given.
+    ///
+    /// [Manage Events]: Permissions::MANAGE_EVENTS
+    pub async fn edit_scheduled_event<F>(
+        self,
+        http: impl AsRef<Http>,
+        event_id: impl Into<ScheduledEventId>,
+        f: F,
+    ) -> Result<ScheduledEvent>
+    where
+        F: FnOnce(&mut EditScheduledEvent) -> &mut EditScheduledEvent,
+    {
+        let mut edit_scheduled_event = EditScheduledEvent::default();
+        f(&mut edit_scheduled_event);
+        let map = json::hashmap_to_json_map(edit_scheduled_event.0);
+
+        http.as_ref().edit_scheduled_event(self.0, event_id.into().0, &map, None).await
     }
 
     /// Edits a [`Sticker`], optionally setting its fields.
@@ -1110,6 +1180,90 @@ impl GuildId {
         limit: Option<u64>,
     ) -> Result<Vec<Member>> {
         http.as_ref().search_guild_members(self.0, query, limit).await
+    }
+
+    /// Fetches a specifified scheduled event in the guild, by Id. If `with_user_count` is set to
+    /// `true`, then the `user_count` field will be populated, indicating the number of users
+    /// interested in the event.
+    ///
+    /// **Note**: Requres the [Manage Events] permission.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`Error::Http`] if the current user lacks permission, or if the provided Id is
+    /// invalid.
+    ///
+    /// [Manage Events]: Permissions::MANAGE_EVENTS
+    pub async fn scheduled_event(
+        self,
+        http: impl AsRef<Http>,
+        event_id: impl Into<ScheduledEventId>,
+        with_user_count: bool,
+    ) -> Result<ScheduledEvent> {
+        http.as_ref().get_scheduled_event(self.0, event_id.into().0, with_user_count).await
+    }
+
+    /// Fetches a list of all scheduled events in the guild. If `with_user_count` is set to `true`,
+    /// then each event returned will have its `user_count` field populated.
+    ///
+    /// **Note**: Requres the [Manage Events] permission.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`Error::Http`] if the current user lacks permission.
+    ///
+    /// [Manage Events]: Permissions::MANAGE_EVENTS
+    pub async fn scheduled_events(
+        self,
+        http: impl AsRef<Http>,
+        with_user_count: bool,
+    ) -> Result<Vec<ScheduledEvent>> {
+        http.as_ref().get_scheduled_events(self.0, with_user_count).await
+    }
+
+    /// Fetches a list of interested users for the specified event.
+    ///
+    /// If `limit` is left unset, by default at most 100 users are returned.
+    ///
+    /// **Note**: Requires the [Manage Events] permission.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`Error::Http`] if the current user lacks permission, or if the provided Id is
+    /// invalid.
+    ///
+    /// [Manage Events]: Permissions::MANAGE_EVENTS
+    pub async fn scheduled_event_users(
+        self,
+        http: impl AsRef<Http>,
+        event_id: impl Into<ScheduledEventId>,
+        limit: Option<u64>,
+    ) -> Result<Vec<ScheduledEventUser>> {
+        http.as_ref().get_scheduled_event_users(self.0, event_id.into().0, limit, None, None).await
+    }
+
+    /// Fetches a list of interested users for the specified event, with additional options and
+    /// filtering. See [`Http::get_scheduled_event_users`] for details.
+    ///
+    /// **Note**: Requires the [Manage Events] permission.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`Error::Http`] if the current user lacks permission, or if the provided Id is
+    /// invalid.
+    ///
+    /// [Manage Events]: Permissions::MANAGE_EVENTS
+    pub async fn scheduled_event_users_optioned(
+        self,
+        http: impl AsRef<Http>,
+        event_id: impl Into<ScheduledEventId>,
+        limit: Option<u64>,
+        target: Option<UserPagination>,
+        with_member: Option<bool>,
+    ) -> Result<Vec<ScheduledEventUser>> {
+        http.as_ref()
+            .get_scheduled_event_users(self.0, event_id.into().0, limit, target, with_member)
+            .await
     }
 
     /// Returns the Id of the shard associated with the guild.

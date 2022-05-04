@@ -335,6 +335,8 @@ bitflags::bitflags! {
         const USE_SLASH_COMMANDS = 1 << 31;
         /// Allows for requesting to speak in stage channels.
         const REQUEST_TO_SPEAK = 1 << 32;
+        /// Allows for creating, editing, and deleting scheduled events
+        const MANAGE_EVENTS = 1 << 33;
         /// Allows for deleting and archiving threads, and viewing all private threads.
         const MANAGE_THREADS = 1 << 34;
         /// Allows for creating threads.

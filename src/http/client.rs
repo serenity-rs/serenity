@@ -17,7 +17,7 @@ use super::ratelimiting::{RatelimitedRequest, Ratelimiter};
 use super::request::Request;
 use super::routing::RouteInfo;
 use super::typing::Typing;
-use super::{AttachmentType, GuildPagination, HttpError};
+use super::{AttachmentType, GuildPagination, HttpError, UserPagination};
 use crate::internal::prelude::*;
 use crate::json::prelude::*;
 use crate::model::interactions::application_command::{
@@ -826,6 +826,31 @@ impl Http {
         from_value(value).map_err(From::from)
     }
 
+    /// Creates a Guild Scheduled Event.
+    ///
+    /// Refer to Discord's docs for field information.
+    ///
+    /// **Note**: Requres the [Manage Events] permission.
+    ///
+    /// [Manage Events]: Permissions::MANAGE_EVENTS
+    pub async fn create_scheduled_event(
+        &self,
+        guild_id: u64,
+        map: &JsonMap,
+        audit_log_reason: Option<&str>,
+    ) -> Result<ScheduledEvent> {
+        let body = to_vec(map)?;
+        self.fire(Request {
+            body: Some(&body),
+            multipart: None,
+            headers: audit_log_reason.map(reason_into_header),
+            route: RouteInfo::CreateScheduledEvent {
+                guild_id,
+            },
+        })
+        .await
+    }
+
     /// Creates a sticker.
     ///
     /// **Note**: Requires the [Manage Emojis and Stickers] permission.
@@ -1190,6 +1215,25 @@ impl Http {
             route: RouteInfo::DeleteRole {
                 guild_id,
                 role_id,
+            },
+        })
+        .await
+    }
+
+    /// Deletes a [Scheduled Event] from a server.
+    ///
+    /// **Note**: Requires the [Manage Events] permission.
+    ///
+    /// [Scheduled Event]: crate::model::guild::ScheduledEvent
+    /// [Manage Events]: Permissions::MANAGE_EVENTS
+    pub async fn delete_scheduled_event(&self, guild_id: u64, event_id: u64) -> Result<()> {
+        self.wind(204, Request {
+            body: None,
+            multipart: None,
+            headers: None,
+            route: RouteInfo::DeleteScheduledEvent {
+                guild_id,
+                event_id,
             },
         })
         .await
@@ -1835,6 +1879,31 @@ impl Http {
         from_value(value).map_err(From::from)
     }
 
+    /// Modifies a scheduled event.
+    ///
+    /// **Note**: Requires the [Manage Events] permission.
+    ///
+    /// [Manage Events]: Permissions::MANAGE_EVENTS
+    pub async fn edit_scheduled_event(
+        &self,
+        guild_id: u64,
+        event_id: u64,
+        map: &JsonMap,
+        audit_log_reason: Option<&str>,
+    ) -> Result<ScheduledEvent> {
+        let body = to_vec(map)?;
+        self.fire(Request {
+            body: Some(&body),
+            multipart: None,
+            headers: audit_log_reason.map(reason_into_header),
+            route: RouteInfo::EditScheduledEvent {
+                guild_id,
+                event_id,
+            },
+        })
+        .await
+    }
+
     /// Changes a sticker in a guild.
     ///
     /// **Note**: Requires the [Manage Emojis and Stickers] permission.
@@ -1871,7 +1940,7 @@ impl Http {
 
     /// Edits a thread channel in the [`GuildChannel`] given its Id.
     pub async fn edit_thread(&self, channel_id: u64, map: &JsonMap) -> Result<GuildChannel> {
-        let body = serde_json::to_vec(map)?;
+        let body = to_vec(map)?;
 
         self.fire(Request {
             body: Some(&body),
@@ -2928,6 +2997,99 @@ impl Http {
         }
 
         from_value(value).map_err(From::from)
+    }
+
+    /// Gets a scheduled event by Id.
+    ///
+    /// **Note**: Requires the [Manage Events] permission.
+    ///
+    /// [Manage Events]: Permissions::MANAGE_EVENTS
+    pub async fn get_scheduled_event(
+        &self,
+        guild_id: u64,
+        event_id: u64,
+        with_user_count: bool,
+    ) -> Result<ScheduledEvent> {
+        self.fire(Request {
+            body: None,
+            multipart: None,
+            headers: None,
+            route: RouteInfo::GetScheduledEvent {
+                guild_id,
+                event_id,
+                with_user_count,
+            },
+        })
+        .await
+    }
+
+    /// Gets a list of all scheduled events for the coressponding guild.
+    ///
+    /// **Note**: Requires the [Manage Events] permission.
+    ///
+    /// [Manage Events]: Permissions::MANAGE_EVENTS
+    pub async fn get_scheduled_events(
+        &self,
+        guild_id: u64,
+        with_user_count: bool,
+    ) -> Result<Vec<ScheduledEvent>> {
+        self.fire(Request {
+            body: None,
+            multipart: None,
+            headers: None,
+            route: RouteInfo::GetScheduledEvents {
+                guild_id,
+                with_user_count,
+            },
+        })
+        .await
+    }
+
+    /// Gets a list of all interested users for the corresponding scheduled event, with additional
+    /// options for filtering.
+    ///
+    /// If `limit` is left unset, by default at most 100 users are returned.
+    ///
+    /// If `target` is set, then users will be filtered by Id, such that their Id comes before or
+    /// after the provided [`UserId`] wrapped by the [`UserPagination`].
+    ///
+    /// If `with_member` is set to `Some(true)`, then the [`member`] field of the user struct will
+    /// be populated with [`Guild Member`] information, if the interested user is a member of the
+    /// guild the event takes place in.
+    ///
+    /// [`UserId`]: crate::model::id::UserId
+    /// [`member`]: ScheduledEventUser::member
+    /// [`Guild Member`]: crate::model::guild::Member
+    pub async fn get_scheduled_event_users(
+        &self,
+        guild_id: u64,
+        event_id: u64,
+        limit: Option<u64>,
+        target: Option<UserPagination>,
+        with_member: Option<bool>,
+    ) -> Result<Vec<ScheduledEventUser>> {
+        let (after, before) = match target {
+            None => (None, None),
+            Some(p) => match p {
+                UserPagination::After(id) => (Some(id.0), None),
+                UserPagination::Before(id) => (None, Some(id.0)),
+            },
+        };
+
+        self.fire(Request {
+            body: None,
+            multipart: None,
+            headers: None,
+            route: RouteInfo::GetScheduledEventUsers {
+                guild_id,
+                event_id,
+                after,
+                before,
+                limit,
+                with_member,
+            },
+        })
+        .await
     }
 
     /// Retrieves a list of stickers in a [`Guild`].

@@ -122,6 +122,12 @@ pub struct MessageId(#[serde(with = "snowflake")] pub u64);
 )]
 pub struct RoleId(#[serde(with = "snowflake")] pub u64);
 
+/// An identifier for a Scheduled Event
+#[derive(
+    Copy, Clone, Default, Debug, Eq, Hash, PartialEq, PartialOrd, Ord, Deserialize, Serialize,
+)]
+pub struct ScheduledEventId(#[serde(with = "snowflake")] pub u64);
+
 /// An identifier for a User
 #[derive(
     Copy, Clone, Default, Debug, Eq, Hash, PartialEq, PartialOrd, Ord, Deserialize, Serialize,
@@ -218,6 +224,7 @@ id_u64! {
     IntegrationId;
     MessageId;
     RoleId;
+    ScheduledEventId;
     StickerId;
     StickerPackId;
     StickerPackBannerId;
