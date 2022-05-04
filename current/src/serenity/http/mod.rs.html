@@ -197,6 +197,17 @@
 <span id="192">192</span>
 <span id="193">193</span>
 <span id="194">194</span>
+<span id="195">195</span>
+<span id="196">196</span>
+<span id="197">197</span>
+<span id="198">198</span>
+<span id="199">199</span>
+<span id="200">200</span>
+<span id="201">201</span>
+<span id="202">202</span>
+<span id="203">203</span>
+<span id="204">204</span>
+<span id="205">205</span>
 </pre><pre class="rust"><code><span class="doccomment">//! The HTTP module which provides functions for performing requests to</span>
 <span class="doccomment">//! endpoints in Discord&#39;s API.</span>
 <span class="doccomment">//!</span>
@@ -390,6 +401,17 @@
     <span class="ident">After</span>(<span class="ident">GuildId</span>),
     <span class="doccomment">/// The Id to get the guilds before.</span>
     <span class="ident">Before</span>(<span class="ident">GuildId</span>),
+}
+
+<span class="doccomment">/// Representation of the method of a query to send for the [`get_scheduled_event_users`] function.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// [`get_scheduled_event_users`]: Http::get_scheduled_event_users</span>
+<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
+<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">UserPagination</span> {
+    <span class="doccomment">/// The Id to get the users after.</span>
+    <span class="ident">After</span>(<span class="ident">UserId</span>),
+    <span class="doccomment">/// The Id to get the users before.</span>
+    <span class="ident">Before</span>(<span class="ident">UserId</span>),
 }
 </code></pre></div>
 </section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.61.0-nightly (3c17c84a3 2022-03-21)" ></div>
