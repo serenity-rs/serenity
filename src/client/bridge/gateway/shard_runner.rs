@@ -5,7 +5,6 @@ use async_tungstenite::tungstenite::error::Error as TungsteniteError;
 use async_tungstenite::tungstenite::protocol::frame::CloseFrame;
 use async_tungstenite::tungstenite::{self};
 use futures::channel::mpsc::{self, UnboundedReceiver as Receiver, UnboundedSender as Sender};
-use futures::{SinkExt, StreamExt};
 use serde::Deserialize;
 use tokio::sync::RwLock;
 use tracing::{debug, error, info, instrument, trace, warn};
@@ -31,7 +30,6 @@ use crate::collector::{
 use crate::framework::Framework;
 use crate::gateway::{GatewayError, InterMessage, ReconnectType, Shard, ShardAction};
 use crate::internal::prelude::*;
-use crate::internal::ws_impl::{ReceiverExt, SenderExt};
 use crate::model::event::{Event, GatewayEvent};
 #[cfg(feature = "collector")]
 use crate::model::interactions::Interaction;

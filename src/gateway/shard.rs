@@ -7,20 +7,11 @@ use tokio::sync::Mutex;
 use tracing::{debug, error, info, instrument, trace, warn};
 use url::Url;
 
-use super::{
-    ConnectionStage,
-    CurrentPresence,
-    GatewayError,
-    ReconnectType,
-    ShardAction,
-    WebSocketGatewayClientExt,
-    WsStream,
-};
+use super::{ConnectionStage, CurrentPresence, GatewayError, ReconnectType, ShardAction, WsClient};
 use crate::client::bridge::gateway::ChunkGuildFilter;
 use crate::constants::{self, close_codes};
 use crate::http::Http;
 use crate::internal::prelude::*;
-use crate::internal::ws_impl::create_client;
 use crate::model::event::{Event, GatewayEvent};
 use crate::model::gateway::{Activity, GatewayIntents};
 use crate::model::id::GuildId;
@@ -59,7 +50,7 @@ use crate::model::user::OnlineStatus;
 /// [docs]: https://discord.com/developers/docs/topics/gateway#sharding
 /// [module docs]: crate::gateway#sharding
 pub struct Shard {
-    pub client: WsStream,
+    pub client: WsClient,
     current_presence: CurrentPresence,
     /// A tuple of:
     ///
@@ -749,7 +740,7 @@ impl Shard {
     /// This will set the stage of the shard before and after instantiation of
     /// the client.
     #[instrument(skip(self))]
-    pub async fn initialize(&mut self) -> Result<WsStream> {
+    pub async fn initialize(&mut self) -> Result<WsClient> {
         debug!("[Shard {:?}] Initializing.", self.shard_info);
 
         // We need to do two, sort of three things here:
@@ -810,7 +801,7 @@ impl Shard {
     }
 }
 
-async fn connect(base_url: &str) -> Result<WsStream> {
+async fn connect(base_url: &str) -> Result<WsClient> {
     let url =
         Url::parse(&format!("{}?v={}", base_url, constants::GATEWAY_VERSION)).map_err(|why| {
             warn!("Error building gateway URL with base `{}`: {:?}", base_url, why);
@@ -818,5 +809,5 @@ async fn connect(base_url: &str) -> Result<WsStream> {
             Error::Gateway(GatewayError::BuildingUrl)
         })?;
 
-    create_client(url).await
+    WsClient::connect(url).await
 }

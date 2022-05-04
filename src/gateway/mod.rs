@@ -48,13 +48,13 @@
 
 mod error;
 mod shard;
-mod ws_client_ext;
+mod ws;
 
 use std::fmt;
 
 pub use self::error::Error as GatewayError;
 pub use self::shard::Shard;
-pub use self::ws_client_ext::WebSocketGatewayClientExt;
+pub use self::ws::WsClient;
 #[cfg(feature = "client")]
 use crate::client::bridge::gateway::ShardClientMessage;
 use crate::json::Value;
@@ -62,11 +62,6 @@ use crate::model::gateway::Activity;
 use crate::model::user::OnlineStatus;
 
 pub type CurrentPresence = (Option<Activity>, OnlineStatus);
-
-use async_tungstenite::tokio::ConnectStream;
-use async_tungstenite::WebSocketStream;
-
-pub type WsStream = WebSocketStream<ConnectStream>;
 
 /// Indicates the current connection stage of a [`Shard`].
 ///
