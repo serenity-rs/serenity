@@ -1,9 +1,9 @@
 use std::borrow::Cow;
 use std::sync::Arc;
 
+use async_tungstenite::tungstenite;
 use async_tungstenite::tungstenite::error::Error as TungsteniteError;
 use async_tungstenite::tungstenite::protocol::frame::CloseFrame;
-use async_tungstenite::tungstenite::{self};
 use futures::channel::mpsc::{self, UnboundedReceiver as Receiver, UnboundedSender as Sender};
 use futures::{SinkExt, StreamExt};
 use serde::Deserialize;

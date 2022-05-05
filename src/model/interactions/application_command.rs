@@ -699,9 +699,16 @@ pub struct ApplicationCommand {
     /// The parameters for the command.
     #[serde(default)]
     pub options: Vec<ApplicationCommandOption>,
+    /// The default permissions required to execute the command.
+    pub default_member_permissions: Option<Permissions>,
+    /// Indicates whether the command is available in DMs with the app, only for globally-scoped commands.
+    /// By default, commands are visible.
+    #[serde(default)]
+    pub dm_permission: Option<bool>,
     /// Whether the command is enabled by default when
     /// the application is added to a guild.
     #[serde(default = "self::default_permission_value")]
+    #[deprecated(note = "replaced by `default_member_permissions`")]
     pub default_permission: bool,
     /// An autoincremented version identifier updated during substantial record changes.
     pub version: CommandVersionId,
@@ -1032,13 +1039,13 @@ impl From<CommandPermissionId> for UserId {
 }
 
 impl TargetId {
-    /// Converts this [`CommandPermissionId`] to [`UserId`].
+    /// Converts this [`TargetId`] to [`UserId`].
     #[must_use]
     pub fn to_user_id(self) -> UserId {
         self.0.into()
     }
 
-    /// Converts this [`CommandPermissionId`] to [`MessageId`].
+    /// Converts this [`TargetId`] to [`MessageId`].
     #[must_use]
     pub fn to_message_id(self) -> MessageId {
         self.0.into()
@@ -1121,12 +1128,14 @@ enum_number!(ApplicationCommandOptionType {
 pub enum ApplicationCommandPermissionType {
     Role = 1,
     User = 2,
+    Channel = 3,
     Unknown = !0,
 }
 
 enum_number!(ApplicationCommandPermissionType {
     Role,
-    User
+    User,
+    Channel,
 });
 
 /// The only valid values a user can pick in an [`ApplicationCommandOption`].

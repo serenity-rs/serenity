@@ -353,6 +353,18 @@ async fn handle_event(
                 event_handler.shard_stage_update(context, event).await;
             });
         },
+        DispatchEvent::Model(Event::ApplicationCommandPermissionsUpdate(event)) => {
+            let event_handler = Arc::clone(event_handler);
+
+            spawn_named(
+                "dispatch::event_handler::application_command_permissions_update",
+                async move {
+                    event_handler
+                        .application_command_permissions_update(context, event.permission)
+                        .await;
+                },
+            );
+        },
         DispatchEvent::Model(Event::ChannelCreate(mut event)) => {
             update(&cache_and_http, &mut event);
             match event.channel {

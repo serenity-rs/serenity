@@ -11,7 +11,15 @@ use super::utils::{emojis, roles, stickers};
 use crate::constants::OpCode;
 use crate::internal::prelude::*;
 use crate::json::prelude::*;
+use crate::model::interactions::application_command::ApplicationCommandPermission;
 use crate::model::interactions::Interaction;
+
+#[derive(Clone, Debug, Deserialize, Serialize)]
+#[serde(transparent)]
+#[non_exhaustive]
+pub struct ApplicationCommandPermissionsUpdateEvent {
+    pub permission: ApplicationCommandPermission,
+}
 
 /// Event data for the channel creation event.
 ///
@@ -669,6 +677,13 @@ impl<'de> Deserialize<'de> for GatewayEvent {
 #[non_exhaustive]
 #[serde(untagged)]
 pub enum Event {
+    /// The permissions of an [`ApplicationCommand`] was changed.
+    ///
+    /// Fires the [`EventHandler::application_command_permissions_update`] event.
+    ///
+    /// [`ApplicationCommand`]: crate::model::interactions::application_command::ApplicationCommand
+    /// [`EventHandler::application_command_permissions_update`]: crate::client::EventHandler::application_command_permissions_update
+    ApplicationCommandPermissionsUpdate(ApplicationCommandPermissionsUpdateEvent),
     /// A [`Channel`] was created.
     ///
     /// Fires the [`EventHandler::channel_create`] event.
@@ -812,6 +827,12 @@ fn gid_from_channel(c: &Channel) -> RelatedId<GuildId> {
 macro_rules! with_related_ids_for_event_types {
     ($macro:ident) => {
         $macro! {
+            Self::ApplicationCommandPermissionsUpdate, Self::ApplicationCommandPermissionsUpdate(e) => {
+                user_id: Never,
+                guild_id: Some(e.permission.guild_id),
+                channel_id: Never,
+                message_id: Never,
+            },
             Self::ChannelCreate, Self::ChannelCreate(e) => {
                 user_id: Never,
                 guild_id: gid_from_channel(&e.channel),
@@ -1226,6 +1247,9 @@ impl Event {
     #[must_use]
     pub fn event_type(&self) -> EventType {
         match self {
+            Self::ApplicationCommandPermissionsUpdate(_) => {
+                EventType::ApplicationCommandPermissionsUpdate
+            },
             Self::ChannelCreate(_) => EventType::ChannelCreate,
             Self::ChannelDelete(_) => EventType::ChannelDelete,
             Self::ChannelPinsUpdate(_) => EventType::ChannelPinsUpdate,
@@ -1349,6 +1373,9 @@ impl<T> TryFrom<RelatedId<T>> for Option<T> {
 /// Returns [`Error::Json`] if there is an error in deserializing the event data.
 pub fn deserialize_event_with_type(kind: EventType, v: Value) -> Result<Event> {
     Ok(match kind {
+        EventType::ApplicationCommandPermissionsUpdate => {
+            Event::ApplicationCommandPermissionsUpdate(from_value(v)?)
+        },
         EventType::ChannelCreate => Event::ChannelCreate(from_value(v)?),
         EventType::ChannelDelete => Event::ChannelDelete(from_value(v)?),
         EventType::ChannelPinsUpdate => Event::ChannelPinsUpdate(from_value(v)?),
@@ -1431,6 +1458,10 @@ pub fn deserialize_event_with_type(kind: EventType, v: Value) -> Result<Event> {
 #[derive(Clone, Debug, Eq, PartialEq, PartialOrd, Ord)]
 #[non_exhaustive]
 pub enum EventType {
+    /// Indicator that an application command permission update payload was received.
+    ///
+    /// This maps to [`ApplicationCommandPermissionsUpdateEvent`].
+    ApplicationCommandPermissionsUpdate,
     /// Indicator that a channel create payload was received.
     ///
     /// This maps to [`ChannelCreateEvent`].
@@ -1708,6 +1739,8 @@ macro_rules! define_related_ids_for_event_type {
 }
 
 impl EventType {
+    const APPLICATION_COMMAND_PERMISSIONS_UPDATE: &'static str =
+        "APPLICATION_COMMAND_PERMISSIONS_UPDATE";
     const CHANNEL_CREATE: &'static str = "CHANNEL_CREATE";
     const CHANNEL_DELETE: &'static str = "CHANNEL_DELETE";
     const CHANNEL_PINS_UPDATE: &'static str = "CHANNEL_PINS_UPDATE";
@@ -1765,6 +1798,9 @@ impl EventType {
     #[must_use]
     pub fn name(&self) -> Option<&str> {
         match self {
+            Self::ApplicationCommandPermissionsUpdate => {
+                Some(Self::APPLICATION_COMMAND_PERMISSIONS_UPDATE)
+            },
             Self::ChannelCreate => Some(Self::CHANNEL_CREATE),
             Self::ChannelDelete => Some(Self::CHANNEL_DELETE),
             Self::ChannelPinsUpdate => Some(Self::CHANNEL_PINS_UPDATE),
@@ -1845,6 +1881,9 @@ impl<'de> Deserialize<'de> for EventType {
                 E: DeError,
             {
                 Ok(match v {
+                    EventType::APPLICATION_COMMAND_PERMISSIONS_UPDATE => {
+                        EventType::ApplicationCommandPermissionsUpdate
+                    },
                     EventType::CHANNEL_CREATE => EventType::ChannelCreate,
                     EventType::CHANNEL_DELETE => EventType::ChannelDelete,
                     EventType::CHANNEL_PINS_UPDATE => EventType::ChannelPinsUpdate,
