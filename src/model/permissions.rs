@@ -85,6 +85,7 @@ macro_rules! generate_get_permission_names {
     {$ ($perm:ident: $name:expr),*} => {
         impl Permissions {
             /// Returns a list of names of all contained permissions.
+            #[must_use]
             pub fn get_permission_names(self) -> Vec<&'static str> {
                 let mut names = Vec::new();
 
@@ -406,6 +407,7 @@ impl Permissions {
     /// [Add Reactions] permission.
     ///
     /// [Add Reactions]: Self::ADD_REACTIONS
+    #[must_use]
     pub fn add_reactions(self) -> bool {
         self.contains(Self::ADD_REACTIONS)
     }
@@ -414,6 +416,7 @@ impl Permissions {
     /// [Administrator] permission.
     ///
     /// [Administrator]: Self::ADMINISTRATOR
+    #[must_use]
     pub fn administrator(self) -> bool {
         self.contains(Self::ADMINISTRATOR)
     }
@@ -422,6 +425,7 @@ impl Permissions {
     /// [Attach Files] permission.
     ///
     /// [Attach Files]: Self::ATTACH_FILES
+    #[must_use]
     pub fn attach_files(self) -> bool {
         self.contains(Self::ATTACH_FILES)
     }
@@ -430,6 +434,7 @@ impl Permissions {
     /// [Ban Members] permission.
     ///
     /// [Ban Members]: Self::BAN_MEMBERS
+    #[must_use]
     pub fn ban_members(self) -> bool {
         self.contains(Self::BAN_MEMBERS)
     }
@@ -438,6 +443,7 @@ impl Permissions {
     /// [Change Nickname] permission.
     ///
     /// [Change Nickname]: Self::CHANGE_NICKNAME
+    #[must_use]
     pub fn change_nickname(self) -> bool {
         self.contains(Self::CHANGE_NICKNAME)
     }
@@ -446,6 +452,7 @@ impl Permissions {
     /// [Connect] permission.
     ///
     /// [Connect]: Self::CONNECT
+    #[must_use]
     pub fn connect(self) -> bool {
         self.contains(Self::CONNECT)
     }
@@ -454,6 +461,7 @@ impl Permissions {
     /// [View Audit Log] permission.
     ///
     /// [View Audit Log]: Self::VIEW_AUDIT_LOG
+    #[must_use]
     pub fn view_audit_log(self) -> bool {
         self.contains(Self::VIEW_AUDIT_LOG)
     }
@@ -462,6 +470,7 @@ impl Permissions {
     /// [View Channel] permission.
     ///
     /// [View Channel]: Self::VIEW_CHANNEL
+    #[must_use]
     pub fn view_channel(self) -> bool {
         self.contains(Self::VIEW_CHANNEL)
     }
@@ -470,6 +479,7 @@ impl Permissions {
     /// [View Guild Insights] permission.
     ///
     /// [View Guild Insights]: Self::VIEW_GUILD_INSIGHTS
+    #[must_use]
     pub fn view_guild_insights(self) -> bool {
         self.contains(Self::VIEW_GUILD_INSIGHTS)
     }
@@ -478,6 +488,7 @@ impl Permissions {
     /// [Priority Speaker] permission.
     ///
     /// [Priority Speaker]: Self::PRIORITY_SPEAKER
+    #[must_use]
     pub fn priority_speaker(self) -> bool {
         self.contains(Self::PRIORITY_SPEAKER)
     }
@@ -486,6 +497,7 @@ impl Permissions {
     /// [Stream] permission.
     ///
     /// [Stream]: Self::STREAM
+    #[must_use]
     pub fn stream(self) -> bool {
         self.contains(Self::STREAM)
     }
@@ -494,6 +506,7 @@ impl Permissions {
     /// [Create Instant Invite] permission.
     ///
     /// [Create Instant Invite]: Self::CREATE_INSTANT_INVITE
+    #[must_use]
     pub fn create_instant_invite(self) -> bool {
         self.contains(Self::CREATE_INSTANT_INVITE)
     }
@@ -502,6 +515,7 @@ impl Permissions {
     /// [Create Private Threads] permission.
     ///
     /// [Create Private Threads]: Self::CREATE_PRIVATE_THREADS
+    #[must_use]
     pub fn create_private_threads(self) -> bool {
         self.contains(Self::CREATE_PRIVATE_THREADS)
     }
@@ -510,6 +524,7 @@ impl Permissions {
     /// [Create Public Threads] permission.
     ///
     /// [Create Public Threads]: Self::CREATE_PUBLIC_THREADS
+    #[must_use]
     pub fn create_public_threads(self) -> bool {
         self.contains(Self::CREATE_PUBLIC_THREADS)
     }
@@ -518,6 +533,7 @@ impl Permissions {
     /// [Deafen Members] permission.
     ///
     /// [Deafen Members]: Self::DEAFEN_MEMBERS
+    #[must_use]
     pub fn deafen_members(self) -> bool {
         self.contains(Self::DEAFEN_MEMBERS)
     }
@@ -526,6 +542,7 @@ impl Permissions {
     /// [Embed Links] permission.
     ///
     /// [Embed Links]: Self::EMBED_LINKS
+    #[must_use]
     pub fn embed_links(self) -> bool {
         self.contains(Self::EMBED_LINKS)
     }
@@ -534,6 +551,7 @@ impl Permissions {
     /// [Use External Emojis] permission.
     ///
     /// [Use External Emojis]: Self::USE_EXTERNAL_EMOJIS
+    #[must_use]
     pub fn external_emojis(self) -> bool {
         self.contains(Self::USE_EXTERNAL_EMOJIS)
     }
@@ -542,6 +560,7 @@ impl Permissions {
     /// [Kick Members] permission.
     ///
     /// [Kick Members]: Self::KICK_MEMBERS
+    #[must_use]
     pub fn kick_members(self) -> bool {
         self.contains(Self::KICK_MEMBERS)
     }
@@ -550,6 +569,7 @@ impl Permissions {
     /// [Manage Channels] permission.
     ///
     /// [Manage Channels]: Self::MANAGE_CHANNELS
+    #[must_use]
     pub fn manage_channels(self) -> bool {
         self.contains(Self::MANAGE_CHANNELS)
     }
@@ -558,6 +578,7 @@ impl Permissions {
     /// [Manage Emojis and Stickers] permission.
     ///
     /// [Manage Emojis and Stickers]: Self::MANAGE_EMOJIS_AND_STICKERS
+    #[must_use]
     pub fn manage_emojis_and_stickers(self) -> bool {
         self.contains(Self::MANAGE_EMOJIS_AND_STICKERS)
     }
@@ -566,6 +587,7 @@ impl Permissions {
     /// [Manage Guild] permission.
     ///
     /// [Manage Guild]: Self::MANAGE_GUILD
+    #[must_use]
     pub fn manage_guild(self) -> bool {
         self.contains(Self::MANAGE_GUILD)
     }
@@ -574,6 +596,7 @@ impl Permissions {
     /// [Manage Messages] permission.
     ///
     /// [Manage Messages]: Self::MANAGE_MESSAGES
+    #[must_use]
     pub fn manage_messages(self) -> bool {
         self.contains(Self::MANAGE_MESSAGES)
     }
@@ -582,6 +605,7 @@ impl Permissions {
     /// [Manage Nicknames] permission.
     ///
     /// [Manage Nicknames]: Self::MANAGE_NICKNAMES
+    #[must_use]
     pub fn manage_nicknames(self) -> bool {
         self.contains(Self::MANAGE_NICKNAMES)
     }
@@ -590,6 +614,7 @@ impl Permissions {
     /// [Manage Roles] permission.
     ///
     /// [Manage Roles]: Self::MANAGE_ROLES
+    #[must_use]
     pub fn manage_roles(self) -> bool {
         self.contains(Self::MANAGE_ROLES)
     }
@@ -598,6 +623,7 @@ impl Permissions {
     /// [Manage Threads] permission.
     ///
     /// [Manage Threads]: Self::MANAGE_THREADS
+    #[must_use]
     pub fn manage_threads(self) -> bool {
         self.contains(Self::MANAGE_THREADS)
     }
@@ -606,6 +632,7 @@ impl Permissions {
     /// [Manage Webhooks] permission.
     ///
     /// [Manage Webhooks]: Self::MANAGE_WEBHOOKS
+    #[must_use]
     pub fn manage_webhooks(self) -> bool {
         self.contains(Self::MANAGE_WEBHOOKS)
     }
@@ -614,6 +641,7 @@ impl Permissions {
     /// [Mention Everyone] permission.
     ///
     /// [Mention Everyone]: Self::MENTION_EVERYONE
+    #[must_use]
     pub fn mention_everyone(self) -> bool {
         self.contains(Self::MENTION_EVERYONE)
     }
@@ -622,6 +650,7 @@ impl Permissions {
     /// [Moderate Members] permission.
     ///
     /// [Moderate Members]: Self::MODERATE_MEMBERS
+    #[must_use]
     pub fn moderate_members(self) -> bool {
         self.contains(Self::MODERATE_MEMBERS)
     }
@@ -630,6 +659,7 @@ impl Permissions {
     /// [Move Members] permission.
     ///
     /// [Move Members]: Self::MOVE_MEMBERS
+    #[must_use]
     pub fn move_members(self) -> bool {
         self.contains(Self::MOVE_MEMBERS)
     }
@@ -638,6 +668,7 @@ impl Permissions {
     /// [Mute Members] permission.
     ///
     /// [Mute Members]: Self::MUTE_MEMBERS
+    #[must_use]
     pub fn mute_members(self) -> bool {
         self.contains(Self::MUTE_MEMBERS)
     }
@@ -646,6 +677,7 @@ impl Permissions {
     /// [Read Message History] permission.
     ///
     /// [Read Message History]: Self::READ_MESSAGE_HISTORY
+    #[must_use]
     pub fn read_message_history(self) -> bool {
         self.contains(Self::READ_MESSAGE_HISTORY)
     }
@@ -654,6 +686,7 @@ impl Permissions {
     /// [Send Messages] permission.
     ///
     /// [Send Messages]: Self::SEND_MESSAGES
+    #[must_use]
     pub fn send_messages(self) -> bool {
         self.contains(Self::SEND_MESSAGES)
     }
@@ -662,6 +695,7 @@ impl Permissions {
     /// [Send Messages in Threads] permission.
     ///
     /// [Send Messages in Threads]: Self::SEND_MESSAGES_IN_THREADS
+    #[must_use]
     pub fn send_messages_in_threads(self) -> bool {
         self.contains(Self::SEND_MESSAGES_IN_THREADS)
     }
@@ -670,6 +704,7 @@ impl Permissions {
     /// [Send TTS Messages] permission.
     ///
     /// [Send TTS Messages]: Self::SEND_TTS_MESSAGES
+    #[must_use]
     pub fn send_tts_messages(self) -> bool {
         self.contains(Self::SEND_TTS_MESSAGES)
     }
@@ -678,6 +713,7 @@ impl Permissions {
     /// [Speak] permission.
     ///
     /// [Speak]: Self::SPEAK
+    #[must_use]
     pub fn speak(self) -> bool {
         self.contains(Self::SPEAK)
     }
@@ -686,6 +722,7 @@ impl Permissions {
     /// [Request To Speak] permission.
     ///
     /// [Request To Speak]: Self::REQUEST_TO_SPEAK
+    #[must_use]
     pub fn request_to_speak(self) -> bool {
         self.contains(Self::REQUEST_TO_SPEAK)
     }
@@ -694,6 +731,7 @@ impl Permissions {
     /// [Use Embedded Activities] permission.
     ///
     /// [Use Embedded Activities]: Self::USE_EMBEDDED_ACTIVITIES
+    #[must_use]
     pub fn use_embedded_activities(self) -> bool {
         self.contains(Self::USE_EMBEDDED_ACTIVITIES)
     }
@@ -702,6 +740,7 @@ impl Permissions {
     /// [Use External Emojis] permission.
     ///
     /// [Use External Emojis]: Self::USE_EXTERNAL_EMOJIS
+    #[must_use]
     pub fn use_external_emojis(self) -> bool {
         self.contains(Self::USE_EXTERNAL_EMOJIS)
     }
@@ -710,6 +749,7 @@ impl Permissions {
     /// [Use External Stickers] permission.
     ///
     /// [Use External Stickers]: Self::USE_EXTERNAL_STICKERS
+    #[must_use]
     pub fn use_external_stickers(self) -> bool {
         self.contains(Self::USE_EXTERNAL_STICKERS)
     }
@@ -718,6 +758,7 @@ impl Permissions {
     /// [Use Slash Commands] permission.
     ///
     /// [Use Slash Commands]: Self::USE_SLASH_COMMANDS
+    #[must_use]
     pub fn use_slash_commands(self) -> bool {
         self.contains(Self::USE_SLASH_COMMANDS)
     }
@@ -726,6 +767,7 @@ impl Permissions {
     /// [Use VAD] permission.
     ///
     /// [Use VAD]: Self::USE_VAD
+    #[must_use]
     pub fn use_vad(self) -> bool {
         self.contains(Self::USE_VAD)
     }

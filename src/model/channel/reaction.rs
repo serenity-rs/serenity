@@ -427,6 +427,7 @@ impl ReactionType {
     /// **Note**: This is mainly for use internally. There is otherwise most
     /// likely little use for it.
     #[inline]
+    #[must_use]
     pub fn as_data(&self) -> String {
         match *self {
             ReactionType::Custom {
@@ -443,6 +444,7 @@ impl ReactionType {
     /// Helper function to allow testing equality of unicode emojis without
     /// having to perform any allocation.
     /// Will always return false if the reaction was not a unicode reaction.
+    #[must_use]
     pub fn unicode_eq(&self, other: &str) -> bool {
         if let ReactionType::Unicode(unicode) = &self {
             unicode == other
@@ -455,6 +457,7 @@ impl ReactionType {
     /// Helper function to allow comparing unicode emojis without having
     /// to perform any allocation.
     /// Will return None if the reaction was not a unicode reaction.
+    #[must_use]
     pub fn unicode_partial_cmp(&self, other: &str) -> Option<Ordering> {
         if let ReactionType::Unicode(unicode) = &self {
             Some(unicode.as_str().cmp(other))

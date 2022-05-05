@@ -198,6 +198,7 @@ impl_modal_interaction_collector! {
     ModalInteractionCollectorBuilder;
 }
 
+#[must_use = "Builders do nothing unless built"]
 pub struct ModalInteractionCollectorBuilder {
     filter: Option<FilterOptions>,
     shard: Option<ShardMessenger>,
@@ -215,6 +216,7 @@ impl ModalInteractionCollectorBuilder {
 
     /// Use the given configuration to build the [`ModalInteractionCollector`].
     #[allow(clippy::unwrap_used)]
+    #[must_use]
     pub fn build(self) -> ModalInteractionCollector {
         let shard_messenger = self.shard.unwrap();
         let (filter, receiver) = ModalInteractionFilter::new(self.filter.unwrap());
@@ -229,6 +231,7 @@ impl ModalInteractionCollectorBuilder {
     }
 }
 
+#[must_use = "builders do nothing unless awaited"]
 pub struct CollectModalInteraction {
     filter: Option<FilterOptions>,
     shard: Option<ShardMessenger>,
@@ -265,7 +268,7 @@ impl Future for CollectModalInteraction {
                 }
                 .next()
                 .await
-            }))
+            }));
         }
 
         self.fut.as_mut().unwrap().as_mut().poll(ctx)

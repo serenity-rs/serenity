@@ -61,9 +61,7 @@ impl ShardManagerMonitor {
             match value {
                 ShardManagerMessage::Restart(shard_id) => {
                     self.manager.lock().await.restart(shard_id).await;
-
-                    #[allow(clippy::let_underscore_must_use)]
-                    let _ = self.shutdown.unbounded_send(shard_id);
+                    drop(self.shutdown.unbounded_send(shard_id));
                 },
                 ShardManagerMessage::ShardUpdate {
                     id,
@@ -80,9 +78,7 @@ impl ShardManagerMonitor {
                 },
                 ShardManagerMessage::Shutdown(shard_id, code) => {
                     self.manager.lock().await.shutdown(shard_id, code).await;
-
-                    #[allow(clippy::let_underscore_must_use)]
-                    let _ = self.shutdown.unbounded_send(shard_id);
+                    drop(self.shutdown.unbounded_send(shard_id));
                 },
                 ShardManagerMessage::ShutdownAll => {
                     self.manager.lock().await.shutdown_all().await;

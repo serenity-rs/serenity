@@ -173,6 +173,7 @@ impl PrivateChannel {
     /// **Note**: This method is for consistency. This will always return
     /// `false`, due to DMs not being considered NSFW.
     #[inline]
+    #[must_use]
     pub fn is_nsfw(&self) -> bool {
         false
     }
@@ -208,6 +209,7 @@ impl PrivateChannel {
     }
 
     /// Returns "DM with $username#discriminator".
+    #[must_use]
     pub fn name(&self) -> String {
         format!("DM with {}", self.recipient.tag())
     }

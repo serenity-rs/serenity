@@ -272,10 +272,10 @@ impl<'de> Deserialize<'de> for ModalSubmitInteraction {
     fn deserialize<D: Deserializer<'de>>(deserializer: D) -> StdResult<Self, D::Error> {
         let mut map = JsonMap::deserialize(deserializer)?;
 
-        let id = map.get("guild_id").and_then(|x| x.as_str()).and_then(|x| x.parse::<u64>().ok());
+        let id = map.get("guild_id").and_then(Value::as_str).and_then(|x| x.parse::<u64>().ok());
 
         if let Some(guild_id) = id {
-            if let Some(member) = map.get_mut("member").and_then(|x| x.as_object_mut()) {
+            if let Some(member) = map.get_mut("member").and_then(Value::as_object_mut) {
                 member.insert("guild_id".to_string(), from_number(guild_id));
             }
 

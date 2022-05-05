@@ -269,13 +269,12 @@ impl ShardManager {
     /// know it should shut down. This _should never happen_. It may already be
     /// stopped.
     #[instrument(skip(self))]
-    #[allow(clippy::let_underscore_must_use)]
     pub async fn shutdown(&mut self, shard_id: ShardId, code: u16) {
         const TIMEOUT: tokio::time::Duration = tokio::time::Duration::from_secs(5);
 
         info!("Shutting down shard {}", shard_id);
 
-        let _ = self.shard_queuer.unbounded_send(ShardQueuerMessage::ShutdownShard(shard_id, code));
+        drop(self.shard_queuer.unbounded_send(ShardQueuerMessage::ShutdownShard(shard_id, code)));
 
         match timeout(TIMEOUT, self.shard_shutdown.next()).await {
             Ok(Some(shutdown_shard_id)) => {
@@ -301,7 +300,6 @@ impl ShardManager {
     /// If you only need to shutdown a select number of shards, prefer looping
     /// over the [`Self::shutdown`] method.
     #[instrument(skip(self))]
-    #[allow(clippy::let_underscore_must_use)]
     pub async fn shutdown_all(&mut self) {
         let keys = {
             let runners = self.runners.lock().await;
@@ -319,8 +317,8 @@ impl ShardManager {
             self.shutdown(shard_id, 1000).await;
         }
 
-        let _ = self.shard_queuer.unbounded_send(ShardQueuerMessage::Shutdown);
-        let _ = self.monitor_tx.unbounded_send(ShardManagerMessage::ShutdownInitiated);
+        drop(self.shard_queuer.unbounded_send(ShardQueuerMessage::Shutdown));
+        drop(self.monitor_tx.unbounded_send(ShardManagerMessage::ShutdownInitiated));
     }
 
     #[instrument(skip(self))]
@@ -329,8 +327,7 @@ impl ShardManager {
 
         let msg = ShardQueuerMessage::Start(shard_info[0], shard_info[1]);
 
-        #[allow(clippy::let_underscore_must_use)]
-        let _ = self.shard_queuer.unbounded_send(msg);
+        drop(self.shard_queuer.unbounded_send(msg));
     }
 }
 
@@ -341,10 +338,9 @@ impl Drop for ShardManager {
     /// [`ShardQueuer`] to shutdown.
     ///
     /// [`ShardRunner`]: super::ShardRunner
-    #[allow(clippy::let_underscore_must_use)]
     fn drop(&mut self) {
-        let _ = self.shard_queuer.unbounded_send(ShardQueuerMessage::Shutdown);
-        let _ = self.monitor_tx.unbounded_send(ShardManagerMessage::ShutdownInitiated);
+        drop(self.shard_queuer.unbounded_send(ShardQueuerMessage::Shutdown));
+        drop(self.monitor_tx.unbounded_send(ShardManagerMessage::ShutdownInitiated));
     }
 }
 

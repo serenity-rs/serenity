@@ -144,11 +144,13 @@ pub struct Suggestions(pub Vec<SuggestedCommandName>);
 impl Suggestions {
     /// Immutably borrow inner [`Vec`].
     #[inline]
+    #[must_use]
     pub fn as_vec(&self) -> &Vec<SuggestedCommandName> {
         &self.0
     }
 
     /// Concats names of suggestions with a given `separator`.
+    #[must_use]
     pub fn join(&self, separator: &str) -> String {
         match self.as_vec().as_slice() {
             [] => String::new(),
@@ -227,7 +229,7 @@ fn check_common_behaviour(
     cache: impl AsRef<Cache>,
     msg: &Message,
     options: &impl CommonOptions,
-    owners: &HashSet<UserId>,
+    owners: &HashSet<UserId, impl std::hash::BuildHasher + Send + Sync>,
     help_options: &HelpOptions,
 ) -> HelpBehaviour {
     if !options.help_available() {
@@ -270,7 +272,7 @@ async fn check_command_behaviour(
     msg: &Message,
     options: &CommandOptions,
     group_checks: &[&Check],
-    owners: &HashSet<UserId>,
+    owners: &HashSet<UserId, impl std::hash::BuildHasher + Send + Sync>,
     help_options: &HelpOptions,
 ) -> HelpBehaviour {
     let behaviour = check_common_behaviour(&ctx, msg, &options, owners, help_options);
@@ -307,7 +309,7 @@ fn nested_commands_search<'rec, 'a: 'rec>(
     name: &'rec mut String,
     help_options: &'a HelpOptions,
     similar_commands: &'rec mut Vec<SuggestedCommandName>,
-    owners: &'rec HashSet<UserId>,
+    owners: &'rec HashSet<UserId, impl std::hash::BuildHasher + Send + Sync>,
 ) -> BoxFuture<'rec, Option<&'a InternalCommand>> {
     async move {
         for command in commands {
@@ -446,7 +448,7 @@ fn nested_group_command_search<'rec, 'a: 'rec>(
     name: &'rec mut String,
     help_options: &'a HelpOptions,
     similar_commands: &'rec mut Vec<SuggestedCommandName>,
-    owners: &'rec HashSet<UserId>,
+    owners: &'rec HashSet<UserId, impl std::hash::BuildHasher + Send + Sync>,
 ) -> BoxFuture<'rec, Result<CustomisedHelpData<'a>, ()>> {
     async move {
         for group in groups {
@@ -572,7 +574,7 @@ async fn fetch_single_command<'a>(
     groups: &[&'static CommandGroup],
     name: &'a str,
     help_options: &'a HelpOptions,
-    owners: &HashSet<UserId>,
+    owners: &HashSet<UserId, impl std::hash::BuildHasher + Send + Sync>,
 ) -> Result<CustomisedHelpData<'a>, Vec<SuggestedCommandName>> {
     let mut similar_commands: Vec<SuggestedCommandName> = Vec::new();
     let mut name = name.to_string();
@@ -599,7 +601,7 @@ async fn fill_eligible_commands<'a>(
     ctx: &Context,
     msg: &Message,
     commands: &[&'static InternalCommand],
-    owners: &HashSet<UserId>,
+    owners: &HashSet<UserId, impl std::hash::BuildHasher + Send + Sync>,
     help_options: &'a HelpOptions,
     group: &'a CommandGroup,
     to_fill: &mut GroupCommandsPair,
@@ -656,7 +658,7 @@ fn fetch_all_eligible_commands_in_group<'rec, 'a: 'rec>(
     ctx: &'rec Context,
     msg: &'rec Message,
     commands: &'rec [&'static InternalCommand],
-    owners: &'rec HashSet<UserId>,
+    owners: &'rec HashSet<UserId, impl std::hash::BuildHasher + Send + Sync>,
     help_options: &'a HelpOptions,
     group: &'a CommandGroup,
     highest_formatter: HelpBehaviour,
@@ -711,7 +713,7 @@ async fn create_command_group_commands_pair_from_groups<'a>(
     ctx: &Context,
     msg: &Message,
     groups: &[&'static CommandGroup],
-    owners: &HashSet<UserId>,
+    owners: &HashSet<UserId, impl std::hash::BuildHasher + Send + Sync>,
     help_options: &'a HelpOptions,
 ) -> Vec<GroupCommandsPair> {
     let mut listed_groups: Vec<GroupCommandsPair> = Vec::default();
@@ -735,7 +737,7 @@ async fn create_single_group(
     ctx: &Context,
     msg: &Message,
     group: &CommandGroup,
-    owners: &HashSet<UserId>,
+    owners: &HashSet<UserId, impl std::hash::BuildHasher + Send + Sync>,
     help_options: &HelpOptions,
 ) -> GroupCommandsPair {
     let mut group_with_cmds = fetch_all_eligible_commands_in_group(
@@ -775,12 +777,11 @@ fn trim_prefixless_group(group_name: &str, searched_group: &mut String) -> bool 
 }
 
 #[cfg(feature = "cache")]
-#[allow(clippy::implicit_hasher)]
 pub fn searched_lowercase<'rec, 'a: 'rec>(
     ctx: &'rec Context,
     msg: &'rec Message,
     group: &'rec CommandGroup,
-    owners: &'rec HashSet<UserId>,
+    owners: &'rec HashSet<UserId, impl std::hash::BuildHasher + Send + Sync>,
     help_options: &'a HelpOptions,
     searched_named_lowercase: &'rec mut String,
 ) -> BoxFuture<'rec, Option<CustomisedHelpData<'a>>> {
@@ -839,13 +840,12 @@ pub fn searched_lowercase<'rec, 'a: 'rec>(
 /// taking [`HelpOptions`] into consideration when deciding on whether a command
 /// shall be picked and in what textual format.
 #[cfg(feature = "cache")]
-#[allow(clippy::implicit_hasher)]
 pub async fn create_customised_help_data<'a>(
     ctx: &Context,
     msg: &Message,
     args: &'a Args,
     groups: &[&'static CommandGroup],
-    owners: &HashSet<UserId>,
+    owners: &HashSet<UserId, impl std::hash::BuildHasher + Send + Sync>,
     help_options: &'a HelpOptions,
 ) -> CustomisedHelpData<'a> {
     if !args.is_empty() {
@@ -976,7 +976,6 @@ fn flatten_group_to_string(
 /// buffer respecting the plain help format.
 /// If `nest_level` is `0`, this function will skip the group's name.
 #[cfg(all(feature = "cache", feature = "http"))]
-#[allow(clippy::let_underscore_must_use)]
 fn flatten_group_to_plain_string(
     group_text: &mut String,
     group: &GroupCommandsPair,
@@ -986,30 +985,29 @@ fn flatten_group_to_plain_string(
     let repeated_indent_str = help_options.indention_prefix.repeat(nest_level);
 
     if nest_level > 0 {
-        let _ = write!(group_text, "\n{}**{}**", repeated_indent_str, group.name,);
+        group_text.push_str(&format!("\n{}**{}**", repeated_indent_str, group.name));
     }
 
     if group.prefixes.is_empty() {
-        let _ = write!(group_text, ": ");
+        group_text.push_str(": ");
     } else {
-        let _ = write!(
-            group_text,
+        group_text.push_str(&format!(
             " ({}: `{}`): ",
             help_options.group_prefix,
             group.prefixes.join("`, `"),
-        );
+        ));
     }
 
     let joined_commands = group.command_names.join(", ");
 
-    let _ = write!(group_text, "{}", joined_commands);
+    group_text.push_str(&joined_commands);
 
     for sub_group in &group.sub_groups {
         let mut sub_group_text = String::default();
 
         flatten_group_to_plain_string(&mut sub_group_text, sub_group, nest_level + 1, help_options);
 
-        let _ = write!(group_text, "{}", sub_group_text);
+        group_text.push_str(&sub_group_text);
     }
 }
 
@@ -1190,14 +1188,13 @@ async fn send_error_embed(
 ///
 /// [`StandardFramework::help`]: crate::framework::standard::StandardFramework::help
 #[cfg(all(feature = "cache", feature = "http"))]
-#[allow(clippy::implicit_hasher)]
 pub async fn with_embeds(
     ctx: &Context,
     msg: &Message,
     args: Args,
     help_options: &HelpOptions,
     groups: &[&'static CommandGroup],
-    owners: HashSet<UserId>,
+    owners: HashSet<UserId, impl std::hash::BuildHasher + Send + Sync>,
 ) -> Result<Message, Error> {
     let formatted_help =
         create_customised_help_data(ctx, msg, &args, groups, &owners, help_options).await;
@@ -1260,7 +1257,6 @@ pub async fn with_embeds(
 
 /// Turns grouped commands into a [`String`] taking plain help format into account.
 #[cfg(all(feature = "cache", feature = "http"))]
-#[allow(clippy::let_underscore_must_use)]
 fn grouped_commands_to_plain_string(
     help_options: &HelpOptions,
     help_description: &str,
@@ -1268,10 +1264,11 @@ fn grouped_commands_to_plain_string(
 ) -> String {
     let mut result = "__**Commands**__\n".to_string();
 
-    let _ = writeln!(result, "{}", &help_description);
+    result.push_str(help_description);
+    result.push('\n');
 
     for group in groups {
-        let _ = write!(result, "\n**{}**", &group.name);
+        result.push_str(&format!("\n**{}**", &group.name));
 
         flatten_group_to_plain_string(&mut result, group, 0, help_options);
     }
@@ -1281,73 +1278,70 @@ fn grouped_commands_to_plain_string(
 
 /// Turns a single command into a [`String`] taking plain help format into account.
 #[cfg(all(feature = "cache", feature = "http"))]
-#[allow(clippy::let_underscore_must_use)]
 fn single_command_to_plain_string(help_options: &HelpOptions, command: &Command<'_>) -> String {
     let mut result = String::default();
 
-    let _ = writeln!(result, "__**{}**__", command.name);
+    result.push_str(&format!("__**{}**__\n", command.name));
 
     if !command.aliases.is_empty() {
-        let _ = writeln!(
-            result,
+        result.push_str(&format!(
             "**{}**: `{}`",
             help_options.aliases_label,
             command.aliases.join("`, `")
-        );
+        ));
     }
 
     if let Some(description) = command.description {
-        let _ = writeln!(result, "**{}**: {}", help_options.description_label, description);
+        result.push_str(&format!("**{}**: {}\n", help_options.description_label, description));
     };
 
     if let Some(usage) = command.usage {
         if let Some(first_prefix) = command.group_prefixes.get(0) {
-            let _ = writeln!(
-                result,
-                "**{}**: `{} {} {}`",
+            result.push_str(&format!(
+                "**{}**: `{} {} {}`\n",
                 help_options.usage_label, first_prefix, command.name, usage
-            );
+            ));
         } else {
-            let _ =
-                writeln!(result, "**{}**: `{} {}`", help_options.usage_label, command.name, usage);
+            result.push_str(&format!(
+                "**{}**: `{} {}`\n",
+                help_options.usage_label, command.name, usage
+            ));
         }
     }
 
     if !command.usage_sample.is_empty() {
         if let Some(first_prefix) = command.group_prefixes.get(0) {
             let format_example = |example| {
-                let _ = writeln!(
-                    result,
-                    "**{}**: `{} {} {}`",
+                result.push_str(&format!(
+                    "**{}**: `{} {} {}`\n",
                     help_options.usage_sample_label, first_prefix, command.name, example
-                );
+                ));
             };
             command.usage_sample.iter().for_each(format_example);
         } else {
             let format_example = |example| {
-                let _ = writeln!(
-                    result,
-                    "**{}**: `{} {}`",
+                result.push_str(&format!(
+                    "**{}**: `{} {}`\n",
                     help_options.usage_sample_label, command.name, example
-                );
+                ));
             };
             command.usage_sample.iter().for_each(format_example);
         }
     }
 
-    let _ = writeln!(result, "**{}**: {}", help_options.grouped_label, command.group_name);
+    result.push_str(&format!("**{}**: {}\n", help_options.grouped_label, command.group_name));
 
     if !help_options.available_text.is_empty() && !command.availability.is_empty() {
-        let _ = writeln!(result, "**{}**: {}", help_options.available_text, command.availability);
+        result
+            .push_str(&format!("**{}**: {}\n", help_options.available_text, command.availability));
     }
 
     if !command.sub_commands.is_empty() {
-        let _ = writeln!(
-            result,
-            "**{}**: `{}`",
+        result.push_str(&format!(
+            "**{}**: `{}`\n",
             help_options.sub_commands_label,
             command.sub_commands.join("`, `"),
-        );
+        ));
     }
 
     result
@@ -1394,14 +1388,13 @@ fn single_command_to_plain_string(help_options: &HelpOptions, command: &Command<
 ///
 /// Returns the same errors as [`ChannelId::send_message`].
 #[cfg(all(feature = "cache", feature = "http"))]
-#[allow(clippy::implicit_hasher)]
 pub async fn plain(
     ctx: &Context,
     msg: &Message,
     args: Args,
     help_options: &HelpOptions,
     groups: &[&'static CommandGroup],
-    owners: HashSet<UserId>,
+    owners: HashSet<UserId, impl std::hash::BuildHasher + Send + Sync>,
 ) -> Result<Message, Error> {
     let formatted_help =
         create_customised_help_data(ctx, msg, &args, groups, &owners, help_options).await;

@@ -53,6 +53,26 @@
 #![doc(html_root_url = "https://docs.rs/serenity/*")]
 #![cfg_attr(docsrs, feature(doc_auto_cfg))]
 #![deny(rust_2018_idioms)]
+#![warn(clippy::pedantic)]
+#![allow(
+    // Allowed to avoid breaking changes.
+    clippy::module_name_repetitions,
+    clippy::needless_pass_by_value,
+    clippy::struct_excessive_bools,
+    clippy::ref_option_ref,
+    clippy::unused_self,
+    // Allowed as they are too pedantic 
+    clippy::cast_possible_truncation,
+    clippy::unreadable_literal,
+    clippy::cast_possible_wrap,
+    clippy::wildcard_imports,
+    clippy::cast_sign_loss,
+    clippy::too_many_lines,
+    clippy::doc_markdown,
+    clippy::cast_lossless,
+    // Covered by other lints
+    clippy::missing_panics_doc, // clippy::unwrap_used
+)]
 #![deny(rustdoc::broken_intra_doc_links, rustdoc::private_intra_doc_links)]
 #![deny(
     clippy::unwrap_used,

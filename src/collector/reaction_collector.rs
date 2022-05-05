@@ -124,17 +124,19 @@ pub enum ReactionAction {
 }
 
 impl ReactionAction {
+    #[must_use]
     pub fn as_inner_ref(&self) -> &Arc<Reaction> {
         match self {
-            Self::Added(inner) => inner,
-            Self::Removed(inner) => inner,
+            Self::Added(inner) | Self::Removed(inner) => inner,
         }
     }
 
+    #[must_use]
     pub fn is_added(&self) -> bool {
         matches!(self, Self::Added(_))
     }
 
+    #[must_use]
     pub fn is_removed(&self) -> bool {
         matches!(self, Self::Removed(_))
     }
@@ -289,6 +291,7 @@ impl_reaction_collector! {
     ReactionCollectorBuilder;
 }
 
+#[must_use = "builders do nothing until built"]
 pub struct ReactionCollectorBuilder {
     filter: Option<FilterOptions>,
     shard: Option<ShardMessenger>,
@@ -306,6 +309,7 @@ impl ReactionCollectorBuilder {
 
     /// Use the given configuration to build the [`ReactionCollector`].
     #[allow(clippy::unwrap_used)]
+    #[must_use]
     pub fn build(self) -> ReactionCollector {
         let shard_messenger = self.shard.unwrap();
         let (filter, receiver) = ReactionFilter::new(self.filter.unwrap());
@@ -320,6 +324,7 @@ impl ReactionCollectorBuilder {
     }
 }
 
+#[must_use = "builders do nothing unless awaited"]
 pub struct CollectReaction {
     filter: Option<FilterOptions>,
     shard: Option<ShardMessenger>,
@@ -356,7 +361,7 @@ impl Future for CollectReaction {
                 }
                 .next()
                 .await
-            }))
+            }));
         }
 
         self.fut.as_mut().unwrap().as_mut().poll(ctx)

@@ -70,6 +70,7 @@ pub struct EmojiIdentifier {
 #[cfg(all(feature = "model", feature = "utils"))]
 impl EmojiIdentifier {
     /// Generates a URL to the emoji's image.
+    #[must_use]
     pub fn url(&self) -> String {
         let ext = if self.animated { "gif" } else { "png" };
 

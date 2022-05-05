@@ -64,6 +64,7 @@ cfg_if::cfg_if! {
             }
 
             /// Create a new `Timestamp` with the current date and time in UTC.
+            #[must_use]
             pub fn now() -> Self {
                 Self(Utc::now())
             }
@@ -79,6 +80,7 @@ cfg_if::cfg_if! {
             }
 
             /// Returns the number of non-leap seconds since January 1, 1970 0:00:00 UTC
+            #[must_use]
             pub fn unix_timestamp(&self) -> i64 {
                 self.0.timestamp()
             }

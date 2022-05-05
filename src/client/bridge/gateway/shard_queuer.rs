@@ -203,8 +203,7 @@ impl ShardQueuer {
         };
 
         spawn_named("shard_queuer::stop", async move {
-            #[allow(clippy::let_underscore_must_use)]
-            let _ = runner.run().await;
+            drop(runner.run().await);
             debug!("[ShardRunner {:?}] Stopping", runner.shard.shard_info());
         });
 

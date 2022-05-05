@@ -397,6 +397,7 @@ pub enum Change {
 }
 
 impl Change {
+    #[must_use]
     pub fn key(&self) -> Cow<'_, str> {
         macro_rules! variant_keys {
             ($($Variant:ident: $key:literal,)*) => {

@@ -313,10 +313,10 @@ impl<'de> Deserialize<'de> for ApplicationCommandInteraction {
     fn deserialize<D: Deserializer<'de>>(deserializer: D) -> StdResult<Self, D::Error> {
         let mut map = JsonMap::deserialize(deserializer)?;
 
-        let id = map.get("guild_id").and_then(|x| x.as_str()).and_then(|x| x.parse::<u64>().ok());
+        let id = map.get("guild_id").and_then(Value::as_str).and_then(|x| x.parse::<u64>().ok());
 
         if let Some(guild_id) = id {
-            if let Some(member) = map.get_mut("member").and_then(|x| x.as_object_mut()) {
+            if let Some(member) = map.get_mut("member").and_then(Value::as_object_mut) {
                 member.insert("guild_id".to_string(), from_number(guild_id));
             }
 
@@ -472,6 +472,7 @@ impl ApplicationCommandInteractionData {
     /// The target resolved data of [`target_id`]
     ///
     /// [`target_id`]: Self::target_id
+    #[must_use]
     pub fn target(&self) -> Option<ResolvedTarget> {
         match (self.kind, self.target_id) {
             (ApplicationCommandType::User, Some(id)) => {
@@ -540,8 +541,8 @@ impl<'de> Deserialize<'de> for ApplicationCommandInteractionData {
         };
 
         Ok(Self {
-            name,
             id,
+            name,
             kind,
             options,
             resolved,
@@ -989,11 +990,13 @@ pub struct ApplicationCommandPermissionData {
 
 impl CommandPermissionId {
     /// Converts this [`CommandPermissionId`] to [`UserId`].
+    #[must_use]
     pub fn to_user_id(self) -> UserId {
         self.0.into()
     }
 
     /// Converts this [`CommandPermissionId`] to [`RoleId`].
+    #[must_use]
     pub fn to_role_id(self) -> RoleId {
         self.0.into()
     }
@@ -1037,11 +1040,13 @@ impl From<CommandPermissionId> for UserId {
 
 impl TargetId {
     /// Converts this [`TargetId`] to [`UserId`].
+    #[must_use]
     pub fn to_user_id(self) -> UserId {
         self.0.into()
     }
 
     /// Converts this [`TargetId`] to [`MessageId`].
+    #[must_use]
     pub fn to_message_id(self) -> MessageId {
         self.0.into()
     }

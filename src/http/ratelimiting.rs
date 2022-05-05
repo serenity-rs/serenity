@@ -139,6 +139,7 @@ impl Ratelimiter {
     /// #     Ok(())
     /// # }
     /// ```
+    #[must_use]
     pub fn routes(&self) -> Arc<RwLock<HashMap<Route, Arc<Mutex<Ratelimit>>>>> {
         Arc::clone(&self.routes)
     }
@@ -156,7 +157,7 @@ impl Ratelimiter {
 
         loop {
             // This will block if another thread hit the global ratelimit.
-            let _ = self.global.lock().await;
+            drop(self.global.lock().await);
 
             // Destructure the tuple instead of retrieving the third value to
             // take advantage of the type system. If `RouteInfo::deconstruct`
@@ -203,7 +204,7 @@ impl Ratelimiter {
             }
 
             let redo = if response.headers().get("x-ratelimit-global").is_some() {
-                let _ = self.global.lock().await;
+                drop(self.global.lock().await);
 
                 Ok(
                     if let Some(retry_after) =
@@ -327,24 +328,28 @@ impl Ratelimit {
 
     /// The total number of requests that can be made in a period of time.
     #[inline]
+    #[must_use]
     pub fn limit(&self) -> i64 {
         self.limit
     }
 
     /// The number of requests remaining in the period of time.
     #[inline]
+    #[must_use]
     pub fn remaining(&self) -> i64 {
         self.remaining
     }
 
     /// The absolute time in milliseconds when the interval resets.
     #[inline]
+    #[must_use]
     pub fn reset(&self) -> Option<SystemTime> {
         self.reset
     }
 
     /// The total time in milliseconds when the interval resets.
     #[inline]
+    #[must_use]
     pub fn reset_after(&self) -> Option<Duration> {
         self.reset_after
     }
@@ -425,7 +430,7 @@ mod tests {
         let mut map = HeaderMap::with_capacity(pairs.len());
 
         for (name, val) in pairs {
-            map.insert(name, val.to_owned());
+            map.insert(name, val.clone());
         }
 
         map

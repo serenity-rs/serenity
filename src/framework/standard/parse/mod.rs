@@ -497,7 +497,7 @@ pub async fn command(
         }
     }
 
-    let mut last = Err(ParseError::UnrecognisedCommand(None));
+    let mut last = Err::<Invoke, _>(ParseError::UnrecognisedCommand(None));
     let mut is_prefixless = false;
 
     for (group, map) in groups {

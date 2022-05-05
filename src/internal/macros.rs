@@ -46,6 +46,7 @@ macro_rules! enum_number {
     ($name:ident { $($(#[$attr:meta])? $variant:ident $(,)? )* }) => {
         impl $name {
             #[inline]
+            #[must_use]
             pub fn num(&self) -> u64 {
                 *self as u64
             }

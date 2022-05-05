@@ -125,6 +125,7 @@ pub struct StandardFramework {
 
 impl StandardFramework {
     #[inline]
+    #[must_use]
     pub fn new() -> Self {
         StandardFramework::default()
     }
@@ -159,6 +160,7 @@ impl StandardFramework {
     /// [`Client`]: crate::Client
     /// [`prefix`]: Configuration::prefix
     /// [allowing whitespace between prefixes]: Configuration::with_whitespace
+    #[must_use]
     pub fn configure<F>(mut self, f: F) -> Self
     where
         F: FnOnce(&mut Configuration) -> &mut Configuration,
@@ -362,6 +364,7 @@ impl StandardFramework {
     /// ```
     ///
     /// [`serenity::framework::standard::help_commands`]: crate::framework::standard::help_commands
+    #[must_use]
     pub fn group(mut self, group: &'static CommandGroup) -> Self {
         self.group_add(group);
         self.initialized = true;
@@ -444,6 +447,7 @@ impl StandardFramework {
     ///
     /// let framework = StandardFramework::new().on_dispatch_error(dispatch_error_hook);
     /// ```
+    #[must_use]
     pub fn on_dispatch_error(mut self, f: DispatchHook) -> Self {
         self.dispatch = Some(f);
 
@@ -451,6 +455,7 @@ impl StandardFramework {
     }
 
     /// Specify the function to be called on messages comprised of only the prefix.
+    #[must_use]
     pub fn prefix_only(mut self, f: PrefixOnlyHook) -> Self {
         self.prefix_only = Some(f);
 
@@ -502,6 +507,7 @@ impl StandardFramework {
     ///
     /// let framework = StandardFramework::new().before(before_hook);
     /// ```
+    #[must_use]
     pub fn before(mut self, f: BeforeHook) -> Self {
         self.before = Some(f);
 
@@ -532,6 +538,8 @@ impl StandardFramework {
     ///
     /// let framework = StandardFramework::new().after(after_hook);
     /// ```
+    #[must_use]
+
     pub fn after(mut self, f: AfterHook) -> Self {
         self.after = Some(f);
 
@@ -564,6 +572,7 @@ impl StandardFramework {
     ///
     /// let framework = StandardFramework::new().unrecognised_command(unrecognised_command_hook);
     /// ```
+    #[must_use]
     pub fn unrecognised_command(mut self, f: UnrecognisedHook) -> Self {
         self.unrecognised_command = Some(f);
 
@@ -589,6 +598,7 @@ impl StandardFramework {
     ///
     /// let framework = StandardFramework::new().normal_message(normal_message_hook);
     /// ```
+    #[must_use]
     pub fn normal_message(mut self, f: NormalMessageHook) -> Self {
         self.normal_message = Some(f);
 
@@ -598,6 +608,7 @@ impl StandardFramework {
     /// Sets what code should be executed when a user sends `(prefix)help`.
     ///
     /// If a command named `help` in a group was set, then this takes precedence first.
+    #[must_use]
     pub fn help(mut self, h: &'static HelpCommand) -> Self {
         self.help = Some(h);
 

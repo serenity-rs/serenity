@@ -147,6 +147,7 @@ struct FilterOptions {
 }
 
 /// Future building a stream of events.
+#[must_use = "Builders do nothing unless built"]
 pub struct EventCollectorBuilder {
     filter: Option<FilterOptions>,
     shard: Option<ShardMessenger>,

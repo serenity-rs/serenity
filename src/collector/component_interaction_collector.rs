@@ -195,6 +195,7 @@ impl_component_interaction_collector! {
     ComponentInteractionCollectorBuilder;
 }
 
+#[must_use = "Builders do nothing unless built"]
 pub struct ComponentInteractionCollectorBuilder {
     filter: Option<FilterOptions>,
     shard: Option<ShardMessenger>,
@@ -212,6 +213,7 @@ impl ComponentInteractionCollectorBuilder {
 
     /// Use the given configuration to build the [`ComponentInteractionCollector`].
     #[allow(clippy::unwrap_used)]
+    #[must_use]
     pub fn build(self) -> ComponentInteractionCollector {
         let shard_messenger = self.shard.unwrap();
         let (filter, receiver) = ComponentInteractionFilter::new(self.filter.unwrap());
@@ -226,6 +228,7 @@ impl ComponentInteractionCollectorBuilder {
     }
 }
 
+#[must_use = "Builders do nothing unless awaited"]
 pub struct CollectComponentInteraction {
     filter: Option<FilterOptions>,
     shard: Option<ShardMessenger>,
@@ -262,7 +265,7 @@ impl Future for CollectComponentInteraction {
                 }
                 .next()
                 .await
-            }))
+            }));
         }
 
         self.fut.as_mut().unwrap().as_mut().poll(ctx)

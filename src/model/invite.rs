@@ -213,6 +213,7 @@ impl Invite {
     /// assert_eq!(invite.url(), "https://discord.gg/WxZumR");
     /// # }
     /// ```
+    #[must_use]
     pub fn url(&self) -> String {
         format!("https://discord.gg/{}", self.code)
     }
@@ -401,6 +402,7 @@ impl RichInvite {
     /// assert_eq!(invite.url(), "https://discord.gg/WxZumR");
     /// # }
     /// ```
+    #[must_use]
     pub fn url(&self) -> String {
         format!("https://discord.gg/{}", self.code)
     }

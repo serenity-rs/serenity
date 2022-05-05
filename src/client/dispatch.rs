@@ -330,6 +330,7 @@ async fn dispatch_message(
 }
 // Once we can use `Box` as part of a pattern, we will reconsider boxing.
 #[allow(clippy::too_many_arguments)]
+#[cfg_attr(feature = "cache", allow(clippy::used_underscore_binding))]
 #[instrument(skip(event, data, event_handler, cache_and_http))]
 async fn handle_event(
     event: DispatchEvent,

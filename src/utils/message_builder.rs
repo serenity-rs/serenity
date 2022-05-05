@@ -1,4 +1,4 @@
-use std::fmt::{self, Write};
+use std::fmt;
 use std::ops::Add;
 
 use crate::model::guild::Emoji;
@@ -50,6 +50,7 @@ impl MessageBuilder {
     /// // alternatively:
     /// let message = MessageBuilder::default();
     /// ```
+    #[must_use]
     pub fn new() -> MessageBuilder {
         MessageBuilder::default()
     }
@@ -118,10 +119,7 @@ impl MessageBuilder {
     }
 
     fn _channel(&mut self, channel: ChannelId) -> &mut Self {
-        #[allow(clippy::let_underscore_must_use)]
-        let _ = write!(self.0, "{}", channel.mention());
-        // should not error, ignoring
-
+        self.0.push_str(&channel.mention().to_string());
         self
     }
 
@@ -152,19 +150,13 @@ impl MessageBuilder {
     ///
     /// [Display implementation]: crate::model::guild::Emoji#impl-Display
     pub fn emoji(&mut self, emoji: &Emoji) -> &mut Self {
-        #[allow(clippy::let_underscore_must_use)]
-        let _ = write!(self.0, "{}", emoji);
-        // should not error, ignoring
-
+        self.0.push_str(&emoji.to_string());
         self
     }
 
     /// Mentions something that implements the [`Mentionable`] trait.
     pub fn mention<M: Mentionable>(&mut self, item: &M) -> &mut Self {
-        #[allow(clippy::let_underscore_must_use)]
-        let _ = write!(self.0, "{}", item.mention());
-        // should not error, ignoring
-
+        self.0.push_str(&item.mention().to_string());
         self
     }
 
@@ -840,10 +832,7 @@ impl MessageBuilder {
     /// [`Role`]: crate::model::guild::Role
     /// [Display implementation]: RoleId#impl-Display
     pub fn role<R: Into<RoleId>>(&mut self, role: R) -> &mut Self {
-        #[allow(clippy::let_underscore_must_use)]
-        let _ = write!(self.0, "{}", role.into().mention());
-        // should not error, ignoring
-
+        self.0.push_str(&role.into().mention().to_string());
         self
     }
 
@@ -858,10 +847,7 @@ impl MessageBuilder {
     /// [`User`]: crate::model::user::User
     /// [Display implementation]: UserId#impl-Display
     pub fn user<U: Into<UserId>>(&mut self, user: U) -> &mut Self {
-        #[allow(clippy::let_underscore_must_use)]
-        let _ = write!(self.0, "{}", user.into().mention());
-        // should not error, ignoring
-
+        self.0.push_str(&user.into().mention().to_string());
         self
     }
 }
@@ -952,8 +938,7 @@ impl EmbedMessageBuilding for MessageBuilder {
         let name = name.into().to_string();
         let url = url.into().to_string();
 
-        #[allow(clippy::let_underscore_must_use)]
-        let _ = write!(self.0, "[{}]({})", name, url);
+        self.0.push_str(&format!("[{}]({})", name, url));
         // error cannot be returned, ignoring instead
 
         self
@@ -1094,6 +1079,7 @@ impl Content {
     }
 
     #[allow(clippy::inherent_to_string)]
+    #[must_use]
     pub fn to_string(&self) -> String {
         trait UnwrapWith {
             fn unwrap_with(&self, n: usize) -> usize;

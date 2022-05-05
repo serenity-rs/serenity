@@ -1200,11 +1200,13 @@ impl PartialGuild {
     }
 
     /// Returns a formatted URL of the guild's icon, if the guild has an icon.
+    #[must_use]
     pub fn icon_url(&self) -> Option<String> {
         self.icon.as_ref().map(|icon| cdn!("/icons/{}/{}.webp", self.id, icon))
     }
 
     /// Returns a formatted URL of the guild's banner, if the guild has a banner.
+    #[must_use]
     pub fn banner_url(&self) -> Option<String> {
         self.banner.as_ref().map(|banner| cdn!("/banners/{}/{}.webp", self.id, banner))
     }
@@ -1415,6 +1417,7 @@ impl PartialGuild {
 
     /// Returns the formatted URL of the guild's splash image, if one exists.
     #[inline]
+    #[must_use]
     pub fn splash_url(&self) -> Option<String> {
         self.splash.as_ref().map(|splash| cdn!("/splashes/{}/{}.webp?size=4096", self.id, splash))
     }
@@ -1521,6 +1524,7 @@ impl PartialGuild {
     /// # }
     /// ```
     #[inline]
+    #[must_use]
     pub fn role_by_name(&self, role_name: &str) -> Option<&Role> {
         self.roles.values().find(|role| role_name == role.name)
     }
@@ -1570,10 +1574,10 @@ impl<'de> Deserialize<'de> for PartialGuild {
     fn deserialize<D: Deserializer<'de>>(deserializer: D) -> StdResult<Self, D::Error> {
         let mut map = JsonMap::deserialize(deserializer)?;
 
-        let id = map.get("id").and_then(|x| x.as_str()).and_then(|x| x.parse::<u64>().ok());
+        let id = map.get("id").and_then(Value::as_str).and_then(|x| x.parse::<u64>().ok());
 
         if let Some(guild_id) = id {
-            if let Some(array) = map.get_mut("roles").and_then(|x| x.as_array_mut()) {
+            if let Some(array) = map.get_mut("roles").and_then(Value::as_array_mut) {
                 for value in array {
                     if let Some(role) = value.as_object_mut() {
                         role.insert("guild_id".to_string(), from_number(guild_id));

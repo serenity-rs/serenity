@@ -25,6 +25,7 @@ pub struct RequestBuilder<'a> {
 }
 
 impl<'a> RequestBuilder<'a> {
+    #[must_use]
     pub fn new(route_info: RouteInfo<'a>) -> Self {
         Self {
             body: None,
@@ -34,6 +35,7 @@ impl<'a> RequestBuilder<'a> {
         }
     }
 
+    #[must_use]
     pub fn build(self) -> Request<'a> {
         Request::new(self)
     }
@@ -72,6 +74,7 @@ pub struct Request<'a> {
 }
 
 impl<'a> Request<'a> {
+    #[must_use]
     pub fn new(builder: RequestBuilder<'a>) -> Self {
         let RequestBuilder {
             body,
@@ -144,26 +147,32 @@ impl<'a> Request<'a> {
         Ok(builder.headers(headers))
     }
 
+    #[must_use]
     pub fn body_ref(&self) -> &Option<&'a [u8]> {
         &self.body
     }
 
+    #[must_use]
     pub fn body_mut(&mut self) -> &mut Option<&'a [u8]> {
         &mut self.body
     }
 
+    #[must_use]
     pub fn headers_ref(&self) -> &Option<Headers> {
         &self.headers
     }
 
+    #[must_use]
     pub fn headers_mut(&mut self) -> &mut Option<Headers> {
         &mut self.headers
     }
 
+    #[must_use]
     pub fn route_ref(&self) -> &RouteInfo<'_> {
         &self.route
     }
 
+    #[must_use]
     pub fn route_mut(&mut self) -> &mut RouteInfo<'a> {
         &mut self.route
     }

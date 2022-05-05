@@ -122,27 +122,22 @@ impl ConnectionStage {
     ///
     /// assert!(!ConnectionStage::Connected.is_connecting());
     /// ```
+    #[must_use]
     pub fn is_connecting(self) -> bool {
-        use self::ConnectionStage::*;
-
-        match self {
-            Connecting | Handshake | Identifying | Resuming => true,
-            Connected | Disconnected => false,
-        }
+        use self::ConnectionStage::{Connecting, Handshake, Identifying, Resuming};
+        matches!(self, Connecting | Handshake | Identifying | Resuming)
     }
 }
 
 impl fmt::Display for ConnectionStage {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        use self::ConnectionStage::*;
-
         f.write_str(match *self {
-            Connected => "connected",
-            Connecting => "connecting",
-            Disconnected => "disconnected",
-            Handshake => "handshaking",
-            Identifying => "identifying",
-            Resuming => "resuming",
+            Self::Connected => "connected",
+            Self::Connecting => "connecting",
+            Self::Disconnected => "disconnected",
+            Self::Handshake => "handshaking",
+            Self::Identifying => "identifying",
+            Self::Resuming => "resuming",
         })
     }
 }

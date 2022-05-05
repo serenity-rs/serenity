@@ -307,15 +307,15 @@ impl ShardRunner {
         }
 
         // Send a Close Frame to Discord, which allows a bot to "log off"
-        #[allow(clippy::let_underscore_must_use)]
-        let _ = self
-            .shard
-            .client
-            .close(Some(CloseFrame {
-                code: close_code.into(),
-                reason: Cow::from(""),
-            }))
-            .await;
+        drop(
+            self.shard
+                .client
+                .close(Some(CloseFrame {
+                    code: close_code.into(),
+                    reason: Cow::from(""),
+                }))
+                .await,
+        );
 
         // In return, we wait for either a Close Frame response, or an error, after which this WS is deemed
         // disconnected from Discord.
@@ -384,18 +384,22 @@ impl ShardRunner {
 
                     true
                 },
-                ShardClientMessage::Manager(ShardManagerMessage::ShardUpdate {
-                    ..
-                })
-                | ShardClientMessage::Manager(ShardManagerMessage::ShutdownInitiated)
-                | ShardClientMessage::Manager(ShardManagerMessage::ShutdownFinished(_)) => {
+                ShardClientMessage::Manager(
+                    ShardManagerMessage::ShardUpdate {
+                        ..
+                    }
+                    | ShardManagerMessage::ShutdownInitiated
+                    | ShardManagerMessage::ShutdownFinished(_),
+                ) => {
                     // nb: not sent here
 
                     true
                 },
-                ShardClientMessage::Manager(ShardManagerMessage::ShardDisallowedGatewayIntents)
-                | ShardClientMessage::Manager(ShardManagerMessage::ShardInvalidAuthentication)
-                | ShardClientMessage::Manager(ShardManagerMessage::ShardInvalidGatewayIntents) => {
+                ShardClientMessage::Manager(
+                    ShardManagerMessage::ShardDisallowedGatewayIntents
+                    | ShardManagerMessage::ShardInvalidAuthentication
+                    | ShardManagerMessage::ShardInvalidGatewayIntents,
+                ) => {
                     // These variants should never be received.
                     warn!("[ShardRunner {:?}] Received a ShardError?", self.shard.shard_info(),);
 
@@ -539,9 +543,7 @@ impl ShardRunner {
                         self.shard.shard_info(),
                     );
 
-                    #[allow(clippy::let_underscore_must_use)]
-                    let _ = self.request_restart().await;
-
+                    drop(self.request_restart().await);
                     return Ok(false);
                 },
                 Err(_) => break,
@@ -675,12 +677,11 @@ impl ShardRunner {
 
     #[instrument(skip(self))]
     fn update_manager(&self) {
-        #[allow(clippy::let_underscore_must_use)]
-        let _ = self.manager_tx.unbounded_send(ShardManagerMessage::ShardUpdate {
+        drop(self.manager_tx.unbounded_send(ShardManagerMessage::ShardUpdate {
             id: ShardId(self.shard.shard_info()[0]),
             latency: self.shard.latency(),
             stage: self.shard.stage(),
-        });
+        }));
     }
 }
 

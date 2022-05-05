@@ -26,10 +26,12 @@ pub struct StickerPack {
 #[cfg(feature = "model")]
 impl StickerPack {
     /// Returns the sticker that is shown as the pack's icon
+    #[must_use]
     pub fn cover_sticker(&self) -> Option<&Sticker> {
         self.cover_sticker_id.and_then(|id| self.stickers.iter().find(|s| s.id == id))
     }
 
+    #[must_use]
     pub fn banner_url(&self) -> String {
         banner_url(self.banner_asset_id)
     }

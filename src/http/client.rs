@@ -70,6 +70,7 @@ impl HttpBuilder {
     }
 
     /// Sets the application_id to use interactions.
+    #[must_use]
     pub fn application_id(mut self, application_id: u64) -> Self {
         self.application_id = Some(application_id);
 
@@ -78,6 +79,7 @@ impl HttpBuilder {
 
     /// Sets a token for the bot. If the token is not prefixed "Bot ", this
     /// method will automatically do so.
+    #[must_use]
     pub fn token(mut self, token: impl AsRef<str>) -> Self {
         self.token = parse_token(token);
 
@@ -86,6 +88,7 @@ impl HttpBuilder {
 
     /// Sets the [`reqwest::Client`]. If one isn't provided, a default one will
     /// be used.
+    #[must_use]
     pub fn client(mut self, client: Client) -> Self {
         self.client = Some(client);
 
@@ -94,6 +97,7 @@ impl HttpBuilder {
 
     /// Sets the ratelimiter to be used. If one isn't provided, a default one
     /// will be used.
+    #[must_use]
     pub fn ratelimiter(mut self, ratelimiter: Ratelimiter) -> Self {
         self.ratelimiter = Some(ratelimiter);
 
@@ -108,6 +112,7 @@ impl HttpBuilder {
     /// another form of rate limiting. Disabling the ratelimiter has the main
     /// purpose of delegating rate limiting to an API proxy via [`Self::proxy`]
     /// instead of the current process.
+    #[must_use]
     pub fn ratelimiter_disabled(mut self, ratelimiter_disabled: bool) -> Self {
         self.ratelimiter_disabled = ratelimiter_disabled;
 
@@ -138,6 +143,7 @@ impl HttpBuilder {
     }
 
     /// Use the given configuration to build the `Http` client.
+    #[must_use]
     pub fn build(self) -> Http {
         let token = self.token;
 
@@ -212,6 +218,7 @@ impl fmt::Debug for Http {
 }
 
 impl Http {
+    #[must_use]
     pub fn new(token: &str) -> Self {
         let builder = configure_client_backend(Client::builder());
 
@@ -230,6 +237,7 @@ impl Http {
         }
     }
 
+    #[must_use]
     pub fn new_with_application_id(token: &str, application_id: u64) -> Self {
         let http = Self::new(token);
 

@@ -424,6 +424,7 @@ impl PresenceUser {
     /// Attempts to convert this [`PresenceUser`] instance into a [`User`].
     ///
     /// If one of [`User`]'s required fields is None in `self`, None is returned.
+    #[must_use]
     pub fn into_user(self) -> Option<User> {
         Some(User {
             avatar: self.avatar,
@@ -442,6 +443,7 @@ impl PresenceUser {
     /// Will clone individual fields if needed.
     ///
     /// If one of [`User`]'s required fields is None in `self`, None is returned.
+    #[must_use]
     pub fn to_user(&self) -> Option<User> {
         Some(User {
             avatar: self.avatar.clone(),
@@ -691,6 +693,7 @@ bitflags! {
 #[cfg(feature = "model")]
 impl GatewayIntents {
     /// Gets all of the intents that aren't considered privileged by Discord.
+    #[must_use]
     pub const fn non_privileged() -> GatewayIntents {
         // bitflags don't support const evaluation. Workaround.
         // See: https://github.com/bitflags/bitflags/issues/180
@@ -699,6 +702,7 @@ impl GatewayIntents {
 
     /// Gets all of the intents that are considered privileged by Discord.
     /// Use of these intents will require explicitly whitelisting the bot.
+    #[must_use]
     pub const fn privileged() -> GatewayIntents {
         // bitflags don't support const evaluation. Workaround.
         // See: https://github.com/bitflags/bitflags/issues/180
@@ -706,6 +710,7 @@ impl GatewayIntents {
     }
 
     /// Checks if any of the included intents are privileged.
+    #[must_use]
     pub fn is_privileged(self) -> bool {
         self.intersects(Self::privileged())
     }
@@ -714,6 +719,7 @@ impl GatewayIntents {
     /// [GUILDS] intent.
     ///
     /// [GUILDS]: Self::GUILDS
+    #[must_use]
     pub fn guilds(self) -> bool {
         self.contains(Self::GUILDS)
     }
@@ -722,6 +728,7 @@ impl GatewayIntents {
     /// [GUILD_MEMBERS] intent.
     ///
     /// [GUILD_MEMBERS]: Self::GUILD_MEMBERS
+    #[must_use]
     pub fn guild_members(self) -> bool {
         self.contains(Self::GUILD_MEMBERS)
     }
@@ -730,6 +737,7 @@ impl GatewayIntents {
     /// [GUILD_BANS] intent.
     ///
     /// [GUILD_BANS]: Self::GUILD_BANS
+    #[must_use]
     pub fn guild_bans(self) -> bool {
         self.contains(Self::GUILD_BANS)
     }
@@ -738,6 +746,7 @@ impl GatewayIntents {
     /// [GUILD_EMOJIS_AND_STICKERS] intent.
     ///
     /// [GUILD_EMOJIS_AND_STICKERS]: Self::GUILD_EMOJIS_AND_STICKERS
+    #[must_use]
     pub fn guild_emojis_and_stickers(self) -> bool {
         self.contains(Self::GUILD_EMOJIS_AND_STICKERS)
     }
@@ -746,6 +755,7 @@ impl GatewayIntents {
     /// [GUILD_INTEGRATIONS] intent.
     ///
     /// [GUILD_INTEGRATIONS]: Self::GUILD_INTEGRATIONS
+    #[must_use]
     pub fn guild_integrations(self) -> bool {
         self.contains(Self::GUILD_INTEGRATIONS)
     }
@@ -754,6 +764,7 @@ impl GatewayIntents {
     /// [GUILD_WEBHOOKS] intent.
     ///
     /// [GUILD_WEBHOOKS]: Self::GUILD_WEBHOOKS
+    #[must_use]
     pub fn guild_webhooks(self) -> bool {
         self.contains(Self::GUILD_WEBHOOKS)
     }
@@ -762,6 +773,7 @@ impl GatewayIntents {
     /// [GUILD_INVITES] intent.
     ///
     /// [GUILD_INVITES]: Self::GUILD_INVITES
+    #[must_use]
     pub fn guild_invites(self) -> bool {
         self.contains(Self::GUILD_INVITES)
     }
@@ -770,6 +782,7 @@ impl GatewayIntents {
     /// [GUILD_VOICE_STATES] intent.
     ///
     /// [GUILD_VOICE_STATES]: Self::GUILD_VOICE_STATES
+    #[must_use]
     pub fn guild_voice_states(self) -> bool {
         self.contains(Self::GUILD_VOICE_STATES)
     }
@@ -778,6 +791,7 @@ impl GatewayIntents {
     /// [GUILD_PRESENCES] intent.
     ///
     /// [GUILD_PRESENCES]: Self::GUILD_PRESENCES
+    #[must_use]
     pub fn guild_presences(self) -> bool {
         self.contains(Self::GUILD_PRESENCES)
     }
@@ -786,6 +800,7 @@ impl GatewayIntents {
     /// [GUILD_MESSAGE_REACTIONS] intent.
     ///
     /// [GUILD_MESSAGE_REACTIONS]: Self::GUILD_MESSAGE_REACTIONS
+    #[must_use]
     pub fn guild_message_reactions(self) -> bool {
         self.contains(Self::GUILD_MESSAGE_REACTIONS)
     }
@@ -794,6 +809,7 @@ impl GatewayIntents {
     /// [GUILD_MESSAGE_TYPING] intent.
     ///
     /// [GUILD_MESSAGE_TYPING]: Self::GUILD_MESSAGE_TYPING
+    #[must_use]
     pub fn guild_message_typing(self) -> bool {
         self.contains(Self::GUILD_MESSAGE_TYPING)
     }
@@ -802,6 +818,7 @@ impl GatewayIntents {
     /// [DIRECT_MESSAGES] intent.
     ///
     /// [DIRECT_MESSAGES]: Self::DIRECT_MESSAGES
+    #[must_use]
     pub fn direct_messages(self) -> bool {
         self.contains(Self::DIRECT_MESSAGES)
     }
@@ -810,6 +827,7 @@ impl GatewayIntents {
     /// [DIRECT_MESSAGE_REACTIONS] intent.
     ///
     /// [DIRECT_MESSAGE_REACTIONS]: Self::DIRECT_MESSAGE_REACTIONS
+    #[must_use]
     pub fn direct_message_reactions(self) -> bool {
         self.contains(Self::DIRECT_MESSAGE_REACTIONS)
     }
@@ -818,6 +836,7 @@ impl GatewayIntents {
     /// [DIRECT_MESSAGE_TYPING] intent.
     ///
     /// [DIRECT_MESSAGE_TYPING]: Self::DIRECT_MESSAGE_TYPING
+    #[must_use]
     pub fn direct_message_typing(self) -> bool {
         self.contains(Self::DIRECT_MESSAGE_TYPING)
     }
@@ -826,6 +845,7 @@ impl GatewayIntents {
     /// [MESSAGE_CONTENT] intent.
     ///
     /// [MESSAGE_CONTENT]: Self::MESSAGE_CONTENT
+    #[must_use]
     pub fn message_content(self) -> bool {
         self.contains(Self::MESSAGE_CONTENT)
     }
@@ -834,6 +854,7 @@ impl GatewayIntents {
     /// [GUILD_SCHEDULED_EVENTS] intent.
     ///
     /// [GUILD_SCHEDULED_EVENTS]: Self::GUILD_SCHEDULED_EVENTS
+    #[must_use]
     pub fn guild_scheduled_events(self) -> bool {
         self.contains(Self::GUILD_SCHEDULED_EVENTS)
     }

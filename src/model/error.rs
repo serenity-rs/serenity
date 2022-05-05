@@ -175,6 +175,7 @@ pub enum Error {
 impl Error {
     /// Return `true` if the model error is related to an item missing in the
     /// cache.
+    #[must_use]
     pub fn is_cache_err(&self) -> bool {
         matches!(
             self,

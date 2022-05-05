@@ -26,6 +26,7 @@ macro_rules! impl_message_collector {
                 ///
                 /// The filter checks whether the message has been sent
                 /// in the right guild, channel, and by the right author.
+                #[must_use]
                 pub fn filter_limit(mut self, limit: u32) -> Self {
                     self.filter.as_mut().unwrap().filter_limit = Some(limit);
 
@@ -38,6 +39,7 @@ macro_rules! impl_message_collector {
                 /// This is the last instance to pass for a message to count as *collected*.
                 ///
                 /// This function is intended to be a message content filter.
+                #[must_use]
                 pub fn filter<F: Fn(&Arc<Message>) -> bool + 'static + Send + Sync>(mut self, function: F) -> Self {
                     self.filter.as_mut().unwrap().filter = Some(Arc::new(function));
 
@@ -46,6 +48,7 @@ macro_rules! impl_message_collector {
 
                 /// Sets the required author ID of a message.
                 /// If a message does not meet this ID, it won't be received.
+                #[must_use]
                 pub fn author_id(mut self, author_id: impl Into<u64>) -> Self {
                     self.filter.as_mut().unwrap().author_id = Some(author_id.into());
 
@@ -54,6 +57,7 @@ macro_rules! impl_message_collector {
 
                 /// Sets the required channel ID of a message.
                 /// If a message does not meet this ID, it won't be received.
+                #[must_use]
                 pub fn channel_id(mut self, channel_id: impl Into<u64>) -> Self {
                     self.filter.as_mut().unwrap().channel_id = Some(channel_id.into());
 
@@ -62,6 +66,7 @@ macro_rules! impl_message_collector {
 
                 /// Sets the required guild ID of a message.
                 /// If a message does not meet this ID, it won't be received.
+                #[must_use]
                 pub fn guild_id(mut self, guild_id: impl Into<u64>) -> Self {
                     self.filter.as_mut().unwrap().guild_id = Some(guild_id.into());
 
@@ -70,6 +75,7 @@ macro_rules! impl_message_collector {
 
                 /// Sets a `duration` for how long the collector shall receive
                 /// messages.
+                #[must_use]
                 pub fn timeout(mut self, duration: Duration) -> Self {
                     self.timeout = Some(Box::pin(sleep(duration)));
 
@@ -179,6 +185,7 @@ impl MessageCollectorBuilder {
     /// A message is considered *collected*, if the message
     /// passes all the requirements.
     #[allow(clippy::unwrap_used)]
+    #[must_use]
     pub fn collect_limit(mut self, limit: u32) -> Self {
         self.filter.as_mut().unwrap().collect_limit = Some(limit);
 
@@ -187,6 +194,7 @@ impl MessageCollectorBuilder {
 
     /// Use the given configuration to build the [`MessageCollector`].
     #[allow(clippy::unwrap_used)]
+    #[must_use]
     pub fn build(self) -> MessageCollector {
         let shard_messenger = self.shard.unwrap();
         let (filter, receiver) = MessageFilter::new(self.filter.unwrap());
@@ -237,7 +245,7 @@ impl Future for CollectReply {
                 }
                 .next()
                 .await
-            }))
+            }));
         }
 
         self.fut.as_mut().unwrap().as_mut().poll(ctx)

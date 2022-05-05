@@ -428,7 +428,7 @@ impl Shard {
 
                 return Err(Error::Gateway(GatewayError::OverloadedShard));
             },
-            Some(4006) | Some(close_codes::SESSION_TIMEOUT) => {
+            Some(4006 | close_codes::SESSION_TIMEOUT) => {
                 info!("[Shard {:?}] Invalid session.", self.shard_info);
 
                 self.session_id = None;

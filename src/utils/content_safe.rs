@@ -19,6 +19,7 @@ pub struct ContentSafeOptions {
 }
 
 impl ContentSafeOptions {
+    #[must_use]
     pub fn new() -> Self {
         ContentSafeOptions::default()
     }
@@ -26,6 +27,7 @@ impl ContentSafeOptions {
     /// [`content_safe`] will replace role mentions (`<@&{id}>`) with its name
     /// prefixed with `@` (`@rolename`) or with `@deleted-role` if the
     /// identifier is invalid.
+    #[must_use]
     pub fn clean_role(mut self, b: bool) -> Self {
         self.clean_role = b;
 
@@ -35,6 +37,7 @@ impl ContentSafeOptions {
     /// If set to true, [`content_safe`] will replace user mentions
     /// (`<@!{id}>` or `<@{id}>`) with the user's name prefixed with `@`
     /// (`@username`) or with `@invalid-user` if the identifier is invalid.
+    #[must_use]
     pub fn clean_user(mut self, b: bool) -> Self {
         self.clean_user = b;
 
@@ -45,6 +48,7 @@ impl ContentSafeOptions {
     /// (`<#{id}>`) with the channel's name prefixed with `#`
     /// (`#channelname`) or with `#deleted-channel` if the identifier is
     /// invalid.
+    #[must_use]
     pub fn clean_channel(mut self, b: bool) -> Self {
         self.clean_channel = b;
 
@@ -54,6 +58,7 @@ impl ContentSafeOptions {
     /// If set to true, if [`content_safe`] replaces a user mention it will
     /// add their four digit discriminator with a preceeding `#`,
     /// turning `@username` to `@username#discriminator`.
+    #[must_use]
     pub fn show_discriminator(mut self, b: bool) -> Self {
         self.show_discriminator = b;
 
@@ -62,6 +67,7 @@ impl ContentSafeOptions {
 
     /// If set, [`content_safe`] will replace a user mention with the user's
     /// display name in passed `guild`.
+    #[must_use]
     pub fn display_as_member_from<G: Into<GuildId>>(mut self, guild: G) -> Self {
         self.guild_reference = Some(guild.into());
 
@@ -70,6 +76,7 @@ impl ContentSafeOptions {
 
     /// If set, [`content_safe`] will replace `@here` with a non-pinging
     /// alternative.
+    #[must_use]
     pub fn clean_here(mut self, b: bool) -> Self {
         self.clean_here = b;
 
@@ -78,6 +85,7 @@ impl ContentSafeOptions {
 
     /// If set, [`content_safe`] will replace `@everyone` with a non-pinging
     /// alternative.
+    #[must_use]
     pub fn clean_everyone(mut self, b: bool) -> Self {
         self.clean_everyone = b;
 
@@ -320,7 +328,7 @@ mod tests {
             splash: None,
             discovery_splash: None,
             system_channel_id: None,
-            system_channel_flags: Default::default(),
+            system_channel_flags: SystemChannelFlags::default(),
             rules_channel_id: None,
             public_updates_channel_id: None,
             verification_level: VerificationLevel::None,
