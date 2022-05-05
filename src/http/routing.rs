@@ -677,7 +677,6 @@ impl Route {
         api!("/guilds/{}?with_counts=true", guild_id)
     }
 
-    #[allow(clippy::let_underscore_must_use)]
     #[must_use]
     pub fn guild_audit_logs(
         guild_id: u64,
@@ -689,19 +688,19 @@ impl Route {
         let mut s = api!("/guilds/{}/audit-logs?", guild_id);
 
         if let Some(action_type) = action_type {
-            let _ = write!(s, "&action_type={}", action_type);
+            s.push_str(&format!("&action_type={}", action_type));
         }
 
         if let Some(before) = before {
-            let _ = write!(s, "&before={}", before);
+            s.push_str(&format!("&before={}", before));
         }
 
         if let Some(limit) = limit {
-            let _ = write!(s, "&limit={}", limit);
+            s.push_str(&format!("&limit={}", limit));
         }
 
         if let Some(user_id) = user_id {
-            let _ = write!(s, "&user_id={}", user_id);
+            s.push_str(&format!("&user_id={}", user_id));
         }
 
         s
@@ -841,6 +840,7 @@ impl Route {
         api!("/guilds/{}/roles", guild_id)
     }
 
+    #[must_use]
     pub fn guild_scheduled_event(
         guild_id: u64,
         event_id: u64,
@@ -848,22 +848,21 @@ impl Route {
     ) -> String {
         let mut s = api!("/guilds/{}/scheduled-events/{}", guild_id, event_id);
         if let Some(b) = with_user_count {
-            #[allow(clippy::let_underscore_must_use)]
-            let _ = write!(s, "?with_user_count={}", b);
+            s.push_str(&format!("?with_user_count={}", b));
         }
         s
     }
 
+    #[must_use]
     pub fn guild_scheduled_events(guild_id: u64, with_user_count: Option<bool>) -> String {
         let mut s = api!("/guilds/{}/scheduled-events", guild_id);
         if let Some(b) = with_user_count {
-            #[allow(clippy::let_underscore_must_use)]
-            let _ = write!(s, "?with_user_count={}", b);
+            s.push_str(&format!("?with_user_count={}", b));
         }
         s
     }
 
-    #[allow(clippy::let_underscore_must_use)]
+    #[must_use]
     pub fn guild_scheduled_event_users(
         guild_id: u64,
         event_id: u64,
@@ -875,19 +874,19 @@ impl Route {
         let mut s = api!("/guilds/{}/scheduled-events/{}/users?", guild_id, event_id);
 
         if let Some(limit) = limit {
-            let _ = write!(s, "&limit={}", limit);
+            s.push_str(&format!("&limit={}", limit));
         }
 
         if let Some(after) = after {
-            let _ = write!(s, "&after={}", after);
+            s.push_str(&format!("&after={}", after));
         }
 
         if let Some(before) = before {
-            let _ = write!(s, "&before={}", before);
+            s.push_str(&format!("&before={}", before));
         }
 
         if let Some(with_member) = with_member {
-            let _ = write!(s, "&with_member={}", with_member);
+            s.push_str(&format!("&with_member={}", with_member));
         }
 
         s
@@ -1022,7 +1021,6 @@ impl Route {
         api!("/users/{}/guilds", target)
     }
 
-    #[allow(clippy::let_underscore_must_use)]
     #[must_use]
     pub fn user_guilds_optioned<D: Display>(
         target: D,
