@@ -1,5 +1,5 @@
 use std::borrow::Cow;
-use std::fmt::{Display, Write};
+use std::fmt::Display;
 
 use super::LightMethod;
 use crate::constants;
