@@ -297,7 +297,6 @@
 <span id="292">292</span>
 <span id="293">293</span>
 <span id="294">294</span>
-<span id="295">295</span>
 </pre><pre class="rust"><code><span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;utils&quot;</span>))]</span>
 <span class="kw">use</span> <span class="ident">std::error::Error</span> <span class="kw">as</span> <span class="ident">StdError</span>;
 <span class="kw">use</span> <span class="ident">std::fmt</span>;
@@ -469,7 +468,6 @@
 <span class="kw">where</span>
     <span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Mention</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Copy</span>,
 {
-    <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
     <span class="kw">fn</span> <span class="ident">mention</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Mention</span> {
         (<span class="kw-2">*</span><span class="self">self</span>).<span class="ident">into</span>()
     }

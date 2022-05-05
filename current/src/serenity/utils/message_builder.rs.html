@@ -1483,21 +1483,7 @@
 <span id="1478">1478</span>
 <span id="1479">1479</span>
 <span id="1480">1480</span>
-<span id="1481">1481</span>
-<span id="1482">1482</span>
-<span id="1483">1483</span>
-<span id="1484">1484</span>
-<span id="1485">1485</span>
-<span id="1486">1486</span>
-<span id="1487">1487</span>
-<span id="1488">1488</span>
-<span id="1489">1489</span>
-<span id="1490">1490</span>
-<span id="1491">1491</span>
-<span id="1492">1492</span>
-<span id="1493">1493</span>
-<span id="1494">1494</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::fmt</span>::{<span class="self">self</span>, <span class="ident">Write</span>};
+</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::fmt</span>;
 <span class="kw">use</span> <span class="ident">std::ops::Add</span>;
 
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::guild::Emoji</span>;
@@ -1549,6 +1535,7 @@
     <span class="doccomment">/// // alternatively:</span>
     <span class="doccomment">/// let message = MessageBuilder::default();</span>
     <span class="doccomment">/// ```</span>
+    <span class="attribute">#[<span class="ident">must_use</span>]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="ident">MessageBuilder</span> {
         <span class="ident">MessageBuilder::default</span>()
     }
@@ -1617,10 +1604,7 @@
     }
 
     <span class="kw">fn</span> <span class="ident">_channel</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">channel</span>: <span class="ident">ChannelId</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
-        <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::let_underscore_must_use</span>)]</span>
-        <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="macro">write!</span>(<span class="self">self</span>.<span class="number">0</span>, <span class="string">&quot;{}&quot;</span>, <span class="ident">channel</span>.<span class="ident">mention</span>());
-        <span class="comment">// should not error, ignoring</span>
-
+        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">push_str</span>(<span class="kw-2">&amp;</span><span class="ident">channel</span>.<span class="ident">mention</span>().<span class="ident">to_string</span>());
         <span class="self">self</span>
     }
 
@@ -1651,19 +1635,13 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// [Display implementation]: crate::model::guild::Emoji#impl-Display</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">emoji</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">emoji</span>: <span class="kw-2">&amp;</span><span class="ident">Emoji</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
-        <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::let_underscore_must_use</span>)]</span>
-        <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="macro">write!</span>(<span class="self">self</span>.<span class="number">0</span>, <span class="string">&quot;{}&quot;</span>, <span class="ident">emoji</span>);
-        <span class="comment">// should not error, ignoring</span>
-
+        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">push_str</span>(<span class="kw-2">&amp;</span><span class="ident">emoji</span>.<span class="ident">to_string</span>());
         <span class="self">self</span>
     }
 
     <span class="doccomment">/// Mentions something that implements the [`Mentionable`] trait.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">mention</span><span class="op">&lt;</span><span class="ident">M</span>: <span class="ident">Mentionable</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">item</span>: <span class="kw-2">&amp;</span><span class="ident">M</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
-        <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::let_underscore_must_use</span>)]</span>
-        <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="macro">write!</span>(<span class="self">self</span>.<span class="number">0</span>, <span class="string">&quot;{}&quot;</span>, <span class="ident">item</span>.<span class="ident">mention</span>());
-        <span class="comment">// should not error, ignoring</span>
-
+        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">push_str</span>(<span class="kw-2">&amp;</span><span class="ident">item</span>.<span class="ident">mention</span>().<span class="ident">to_string</span>());
         <span class="self">self</span>
     }
 
@@ -2339,10 +2317,7 @@
     <span class="doccomment">/// [`Role`]: crate::model::guild::Role</span>
     <span class="doccomment">/// [Display implementation]: RoleId#impl-Display</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">role</span><span class="op">&lt;</span><span class="ident">R</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">RoleId</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">role</span>: <span class="ident">R</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
-        <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::let_underscore_must_use</span>)]</span>
-        <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="macro">write!</span>(<span class="self">self</span>.<span class="number">0</span>, <span class="string">&quot;{}&quot;</span>, <span class="ident">role</span>.<span class="ident">into</span>().<span class="ident">mention</span>());
-        <span class="comment">// should not error, ignoring</span>
-
+        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">push_str</span>(<span class="kw-2">&amp;</span><span class="ident">role</span>.<span class="ident">into</span>().<span class="ident">mention</span>().<span class="ident">to_string</span>());
         <span class="self">self</span>
     }
 
@@ -2357,10 +2332,7 @@
     <span class="doccomment">/// [`User`]: crate::model::user::User</span>
     <span class="doccomment">/// [Display implementation]: UserId#impl-Display</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">user</span><span class="op">&lt;</span><span class="ident">U</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">UserId</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">user</span>: <span class="ident">U</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
-        <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::let_underscore_must_use</span>)]</span>
-        <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="macro">write!</span>(<span class="self">self</span>.<span class="number">0</span>, <span class="string">&quot;{}&quot;</span>, <span class="ident">user</span>.<span class="ident">into</span>().<span class="ident">mention</span>());
-        <span class="comment">// should not error, ignoring</span>
-
+        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">push_str</span>(<span class="kw-2">&amp;</span><span class="ident">user</span>.<span class="ident">into</span>().<span class="ident">mention</span>().<span class="ident">to_string</span>());
         <span class="self">self</span>
     }
 }
@@ -2451,8 +2423,7 @@
         <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="ident">name</span>.<span class="ident">into</span>().<span class="ident">to_string</span>();
         <span class="kw">let</span> <span class="ident">url</span> <span class="op">=</span> <span class="ident">url</span>.<span class="ident">into</span>().<span class="ident">to_string</span>();
 
-        <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::let_underscore_must_use</span>)]</span>
-        <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="macro">write!</span>(<span class="self">self</span>.<span class="number">0</span>, <span class="string">&quot;[{}]({})&quot;</span>, <span class="ident">name</span>, <span class="ident">url</span>);
+        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">push_str</span>(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;[{}]({})&quot;</span>, <span class="ident">name</span>, <span class="ident">url</span>));
         <span class="comment">// error cannot be returned, ignoring instead</span>
 
         <span class="self">self</span>
@@ -2593,6 +2564,7 @@
     }
 
     <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::inherent_to_string</span>)]</span>
+    <span class="attribute">#[<span class="ident">must_use</span>]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">to_string</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">String</span> {
         <span class="kw">trait</span> <span class="ident">UnwrapWith</span> {
             <span class="kw">fn</span> <span class="ident">unwrap_with</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">n</span>: <span class="ident">usize</span>) -&gt; <span class="ident">usize</span>;

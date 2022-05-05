@@ -106,14 +106,14 @@
                 .<span class="ident">expect</span>(<span class="string">&quot;expected _errors&quot;</span>)
                 .<span class="ident">as_array</span>()
                 .<span class="ident">expect</span>(<span class="string">&quot;expected array&quot;</span>)
-                .<span class="ident">to_owned</span>();
+                .<span class="ident">clone</span>();
 
             <span class="comment">// FIXME: This is a workaround to a bug in the {Create,Edit}ScheduledEvent endpoints.</span>
             <span class="comment">// Occasionally there will be an additional nested _errors field. See the relevant</span>
             <span class="comment">// github issue: https://github.com/discord/discord-api-docs/issues/4811</span>
             <span class="kw">let</span> <span class="ident">found_errors</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">found_errors</span>[<span class="number">0</span>].<span class="ident">get</span>(<span class="string">&quot;_errors&quot;</span>) {
-                <span class="prelude-val">Some</span>(<span class="ident">array</span>) =&gt; <span class="ident">array</span>.<span class="ident">as_array</span>().<span class="ident">expect</span>(<span class="string">&quot;expected array&quot;</span>).<span class="ident">to_owned</span>(),
-                <span class="prelude-val">None</span> =&gt; <span class="ident">found_errors</span>,
+                <span class="prelude-val">Some</span>(<span class="ident">array</span>) =&gt; <span class="ident">array</span>.<span class="ident">as_array</span>().<span class="ident">expect</span>(<span class="string">&quot;expected array&quot;</span>),
+                <span class="prelude-val">None</span> =&gt; <span class="kw-2">&amp;</span><span class="ident">found_errors</span>,
             };
 
             <span class="kw">for</span> <span class="ident">error</span> <span class="kw">in</span> <span class="ident">found_errors</span> {

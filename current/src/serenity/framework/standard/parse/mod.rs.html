@@ -1072,7 +1072,7 @@
         }
     }
 
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">last</span> <span class="op">=</span> <span class="prelude-val">Err</span>(<span class="ident">ParseError::UnrecognisedCommand</span>(<span class="prelude-val">None</span>));
+    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">last</span> <span class="op">=</span> <span class="prelude-val">Err</span>::<span class="op">&lt;</span><span class="ident">Invoke</span>, <span class="kw">_</span><span class="op">&gt;</span>(<span class="ident">ParseError::UnrecognisedCommand</span>(<span class="prelude-val">None</span>));
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">is_prefixless</span> <span class="op">=</span> <span class="bool-val">false</span>;
 
     <span class="kw">for</span> (<span class="ident">group</span>, <span class="ident">map</span>) <span class="kw">in</span> <span class="ident">groups</span> {

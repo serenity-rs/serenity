@@ -467,6 +467,11 @@
 <span id="462">462</span>
 <span id="463">463</span>
 <span id="464">464</span>
+<span id="465">465</span>
+<span id="466">466</span>
+<span id="467">467</span>
+<span id="468">468</span>
+<span id="469">469</span>
 </pre><pre class="rust"><code><span class="doccomment">//! Routes are used for ratelimiting. These are to differentiate between the</span>
 <span class="doccomment">//! different _types_ of routes - such as getting the current user&#39;s channels -</span>
 <span class="doccomment">//! for the most part, with the exception being major parameters.</span>
@@ -608,6 +613,7 @@
     <span class="doccomment">/// #     Ok(())</span>
     <span class="doccomment">/// # }</span>
     <span class="doccomment">/// ```</span>
+    <span class="attribute">#[<span class="ident">must_use</span>]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">routes</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">RwLock</span><span class="op">&lt;</span><span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">Route</span>, <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Mutex</span><span class="op">&lt;</span><span class="ident">Ratelimit</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="ident">Arc::clone</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">routes</span>)
     }
@@ -625,7 +631,7 @@
 
         <span class="kw">loop</span> {
             <span class="comment">// This will block if another thread hit the global ratelimit.</span>
-            <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">global</span>.<span class="ident">lock</span>().<span class="kw">await</span>;
+            <span class="ident">drop</span>(<span class="self">self</span>.<span class="ident">global</span>.<span class="ident">lock</span>().<span class="kw">await</span>);
 
             <span class="comment">// Destructure the tuple instead of retrieving the third value to</span>
             <span class="comment">// take advantage of the type system. If `RouteInfo::deconstruct`</span>
@@ -672,7 +678,7 @@
             }
 
             <span class="kw">let</span> <span class="ident">redo</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">response</span>.<span class="ident">headers</span>().<span class="ident">get</span>(<span class="string">&quot;x-ratelimit-global&quot;</span>).<span class="ident">is_some</span>() {
-                <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">global</span>.<span class="ident">lock</span>().<span class="kw">await</span>;
+                <span class="ident">drop</span>(<span class="self">self</span>.<span class="ident">global</span>.<span class="ident">lock</span>().<span class="kw">await</span>);
 
                 <span class="prelude-val">Ok</span>(
                     <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">retry_after</span>) <span class="op">=</span>
@@ -796,24 +802,28 @@
 
     <span class="doccomment">/// The total number of requests that can be made in a period of time.</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
+    <span class="attribute">#[<span class="ident">must_use</span>]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">limit</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">i64</span> {
         <span class="self">self</span>.<span class="ident">limit</span>
     }
 
     <span class="doccomment">/// The number of requests remaining in the period of time.</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
+    <span class="attribute">#[<span class="ident">must_use</span>]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">remaining</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">i64</span> {
         <span class="self">self</span>.<span class="ident">remaining</span>
     }
 
     <span class="doccomment">/// The absolute time in milliseconds when the interval resets.</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
+    <span class="attribute">#[<span class="ident">must_use</span>]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">reset</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">SystemTime</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">reset</span>
     }
 
     <span class="doccomment">/// The total time in milliseconds when the interval resets.</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
+    <span class="attribute">#[<span class="ident">must_use</span>]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">reset_after</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Duration</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">reset_after</span>
     }
@@ -894,7 +904,7 @@
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">map</span> <span class="op">=</span> <span class="ident">HeaderMap::with_capacity</span>(<span class="ident">pairs</span>.<span class="ident">len</span>());
 
         <span class="kw">for</span> (<span class="ident">name</span>, <span class="ident">val</span>) <span class="kw">in</span> <span class="ident">pairs</span> {
-            <span class="ident">map</span>.<span class="ident">insert</span>(<span class="ident">name</span>, <span class="ident">val</span>.<span class="ident">to_owned</span>());
+            <span class="ident">map</span>.<span class="ident">insert</span>(<span class="ident">name</span>, <span class="ident">val</span>.<span class="ident">clone</span>());
         }
 
         <span class="ident">map</span>

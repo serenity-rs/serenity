@@ -223,6 +223,10 @@
 <span id="218">218</span>
 <span id="219">219</span>
 <span id="220">220</span>
+<span id="221">221</span>
+<span id="222">222</span>
+<span id="223">223</span>
+<span id="224">224</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::error::Error</span> <span class="kw">as</span> <span class="ident">StdError</span>;
 <span class="kw">use</span> <span class="ident">std::fmt</span>;
 
@@ -315,21 +319,25 @@
     }
 
     <span class="doccomment">/// Returns true when the error is caused by an unsuccessful request</span>
+    <span class="attribute">#[<span class="ident">must_use</span>]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_unsuccessful_request</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="macro">matches!</span>(<span class="self">self</span>, <span class="ident"><span class="self">Self</span>::UnsuccessfulRequest</span>(<span class="kw">_</span>))
     }
 
     <span class="doccomment">/// Returns true when the error is caused by the url containing invalid input</span>
+    <span class="attribute">#[<span class="ident">must_use</span>]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_url_error</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="macro">matches!</span>(<span class="self">self</span>, <span class="ident"><span class="self">Self</span>::Url</span>(<span class="kw">_</span>))
     }
 
     <span class="doccomment">/// Returns true when the error is caused by an invalid header</span>
+    <span class="attribute">#[<span class="ident">must_use</span>]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_invalid_header</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="macro">matches!</span>(<span class="self">self</span>, <span class="ident"><span class="self">Self</span>::InvalidHeader</span>(<span class="kw">_</span>))
     }
 
     <span class="doccomment">/// Returns the status code if the error is an unsuccessful request</span>
+    <span class="attribute">#[<span class="ident">must_use</span>]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">status_code</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">StatusCode</span><span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="self">self</span> {
             <span class="ident"><span class="self">Self</span>::UnsuccessfulRequest</span>(<span class="ident">res</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">res</span>.<span class="ident">status_code</span>),

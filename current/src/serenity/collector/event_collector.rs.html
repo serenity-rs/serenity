@@ -422,6 +422,7 @@
 <span id="417">417</span>
 <span id="418">418</span>
 <span id="419">419</span>
+<span id="420">420</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::fmt</span>;
 <span class="kw">use</span> <span class="ident">std::future::Future</span>;
 <span class="kw">use</span> <span class="ident">std::pin::Pin</span>;
@@ -571,6 +572,7 @@
 }
 
 <span class="doccomment">/// Future building a stream of events.</span>
+<span class="attribute">#[<span class="ident">must_use</span> <span class="op">=</span> <span class="string">&quot;Builders do nothing unless built&quot;</span>]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">EventCollectorBuilder</span> {
     <span class="ident">filter</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">FilterOptions</span><span class="op">&gt;</span>,
     <span class="ident">shard</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ShardMessenger</span><span class="op">&gt;</span>,

@@ -563,22 +563,22 @@
         <span class="ident">ApplicationCommandOptionType::User</span> =&gt; {
             <span class="kw">let</span> <span class="ident">id</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">UserId</span>(<span class="ident">string</span><span class="question-mark">?</span>.<span class="ident">parse</span>().<span class="ident">ok</span>()<span class="question-mark">?</span>);
 
-            <span class="kw">let</span> <span class="ident">user</span> <span class="op">=</span> <span class="ident">resolved</span>.<span class="ident">users</span>.<span class="ident">get</span>(<span class="ident">id</span>)<span class="question-mark">?</span>.<span class="ident">to_owned</span>();
-            <span class="kw">let</span> <span class="ident">member</span> <span class="op">=</span> <span class="ident">resolved</span>.<span class="ident">members</span>.<span class="ident">get</span>(<span class="ident">id</span>).<span class="ident">map</span>(<span class="ident">ToOwned::to_owned</span>);
+            <span class="kw">let</span> <span class="ident">user</span> <span class="op">=</span> <span class="ident">resolved</span>.<span class="ident">users</span>.<span class="ident">get</span>(<span class="ident">id</span>)<span class="question-mark">?</span>.<span class="ident">clone</span>();
+            <span class="kw">let</span> <span class="ident">member</span> <span class="op">=</span> <span class="ident">resolved</span>.<span class="ident">members</span>.<span class="ident">get</span>(<span class="ident">id</span>).<span class="ident">cloned</span>();
 
             <span class="prelude-val">Some</span>(<span class="ident">ApplicationCommandInteractionDataOptionValue::User</span>(<span class="ident">user</span>, <span class="ident">member</span>))
         },
         <span class="ident">ApplicationCommandOptionType::Role</span> =&gt; {
             <span class="kw">let</span> <span class="ident">id</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">RoleId</span>(<span class="ident">string</span><span class="question-mark">?</span>.<span class="ident">parse</span>().<span class="ident">ok</span>()<span class="question-mark">?</span>);
 
-            <span class="kw">let</span> <span class="ident">role</span> <span class="op">=</span> <span class="ident">resolved</span>.<span class="ident">roles</span>.<span class="ident">get</span>(<span class="ident">id</span>)<span class="question-mark">?</span>.<span class="ident">to_owned</span>();
+            <span class="kw">let</span> <span class="ident">role</span> <span class="op">=</span> <span class="ident">resolved</span>.<span class="ident">roles</span>.<span class="ident">get</span>(<span class="ident">id</span>)<span class="question-mark">?</span>.<span class="ident">clone</span>();
 
             <span class="prelude-val">Some</span>(<span class="ident">ApplicationCommandInteractionDataOptionValue::Role</span>(<span class="ident">role</span>))
         },
         <span class="ident">ApplicationCommandOptionType::Channel</span> =&gt; {
             <span class="kw">let</span> <span class="ident">id</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">ChannelId</span>(<span class="ident">string</span><span class="question-mark">?</span>.<span class="ident">parse</span>().<span class="ident">ok</span>()<span class="question-mark">?</span>);
 
-            <span class="kw">let</span> <span class="ident">channel</span> <span class="op">=</span> <span class="ident">resolved</span>.<span class="ident">channels</span>.<span class="ident">get</span>(<span class="ident">id</span>)<span class="question-mark">?</span>.<span class="ident">to_owned</span>();
+            <span class="kw">let</span> <span class="ident">channel</span> <span class="op">=</span> <span class="ident">resolved</span>.<span class="ident">channels</span>.<span class="ident">get</span>(<span class="ident">id</span>)<span class="question-mark">?</span>.<span class="ident">clone</span>();
 
             <span class="prelude-val">Some</span>(<span class="ident">ApplicationCommandInteractionDataOptionValue::Channel</span>(<span class="ident">channel</span>))
         },
@@ -586,12 +586,12 @@
             <span class="kw">let</span> <span class="ident">id</span>: <span class="ident">u64</span> <span class="op">=</span> <span class="ident">string</span><span class="question-mark">?</span>.<span class="ident">parse</span>().<span class="ident">ok</span>()<span class="question-mark">?</span>;
 
             <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">user</span>) <span class="op">=</span> <span class="ident">resolved</span>.<span class="ident">users</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="ident">UserId</span>(<span class="ident">id</span>)) {
-                <span class="kw">let</span> <span class="ident">user</span> <span class="op">=</span> <span class="ident">user</span>.<span class="ident">to_owned</span>();
-                <span class="kw">let</span> <span class="ident">member</span> <span class="op">=</span> <span class="ident">resolved</span>.<span class="ident">members</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="ident">UserId</span>(<span class="ident">id</span>)).<span class="ident">map</span>(<span class="ident">ToOwned::to_owned</span>);
+                <span class="kw">let</span> <span class="ident">user</span> <span class="op">=</span> <span class="ident">user</span>.<span class="ident">clone</span>();
+                <span class="kw">let</span> <span class="ident">member</span> <span class="op">=</span> <span class="ident">resolved</span>.<span class="ident">members</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="ident">UserId</span>(<span class="ident">id</span>)).<span class="ident">cloned</span>();
 
                 <span class="prelude-val">Some</span>(<span class="ident">ApplicationCommandInteractionDataOptionValue::User</span>(<span class="ident">user</span>, <span class="ident">member</span>))
             } <span class="kw">else</span> {
-                <span class="kw">let</span> <span class="ident">role</span> <span class="op">=</span> <span class="ident">resolved</span>.<span class="ident">roles</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="ident">RoleId</span>(<span class="ident">id</span>))<span class="question-mark">?</span>.<span class="ident">to_owned</span>();
+                <span class="kw">let</span> <span class="ident">role</span> <span class="op">=</span> <span class="ident">resolved</span>.<span class="ident">roles</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="ident">RoleId</span>(<span class="ident">id</span>))<span class="question-mark">?</span>.<span class="ident">clone</span>();
 
                 <span class="prelude-val">Some</span>(<span class="ident">ApplicationCommandInteractionDataOptionValue::Role</span>(<span class="ident">role</span>))
             }
@@ -611,7 +611,7 @@
         <span class="ident">ApplicationCommandOptionType::Attachment</span> =&gt; {
             <span class="kw">let</span> <span class="ident">id</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">AttachmentId</span>(<span class="ident">string</span><span class="question-mark">?</span>.<span class="ident">parse</span>().<span class="ident">ok</span>()<span class="question-mark">?</span>);
 
-            <span class="kw">let</span> <span class="ident">attachment</span> <span class="op">=</span> <span class="ident">resolved</span>.<span class="ident">attachments</span>.<span class="ident">get</span>(<span class="ident">id</span>)<span class="question-mark">?</span>.<span class="ident">to_owned</span>();
+            <span class="kw">let</span> <span class="ident">attachment</span> <span class="op">=</span> <span class="ident">resolved</span>.<span class="ident">attachments</span>.<span class="ident">get</span>(<span class="ident">id</span>)<span class="question-mark">?</span>.<span class="ident">clone</span>();
 
             <span class="prelude-val">Some</span>(<span class="ident">ApplicationCommandInteractionDataOptionValue::Attachment</span>(<span class="ident">attachment</span>))
         },

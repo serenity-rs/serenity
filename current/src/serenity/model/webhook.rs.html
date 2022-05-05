@@ -481,18 +481,9 @@
 <span id="476">476</span>
 <span id="477">477</span>
 <span id="478">478</span>
-<span id="479">479</span>
-<span id="480">480</span>
-<span id="481">481</span>
-<span id="482">482</span>
-<span id="483">483</span>
-<span id="484">484</span>
-<span id="485">485</span>
 </pre><pre class="rust"><code><span class="doccomment">//! Webhook model and implementations.</span>
 
 <span class="kw">use</span> <span class="ident">std::fmt</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident">std::mem</span>;
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
 <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::channel::Message</span>;
@@ -535,6 +526,7 @@
 
 <span class="kw">impl</span> <span class="ident">WebhookType</span> {
     <span class="attribute">#[<span class="ident">inline</span>]</span>
+    <span class="attribute">#[<span class="ident">must_use</span>]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">str</span> {
         <span class="kw">match</span> <span class="self">self</span> {
             <span class="ident">WebhookType::Incoming</span> =&gt; <span class="string">&quot;incoming&quot;</span>,
@@ -924,15 +916,9 @@
     <span class="doccomment">/// [`Error::Json`]: crate::error::Error::Json</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">refresh</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">token</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">token</span>.<span class="ident">as_ref</span>().<span class="ident">ok_or</span>(<span class="ident">ModelError::NoTokenSet</span>)<span class="question-mark">?</span>;
-        <span class="kw">match</span> <span class="ident">http</span>.<span class="ident">as_ref</span>().<span class="ident">get_webhook_with_token</span>(<span class="self">self</span>.<span class="ident">id</span>.<span class="number">0</span>, <span class="ident">token</span>).<span class="kw">await</span> {
-            <span class="prelude-val">Ok</span>(<span class="ident">replacement</span>) =&gt; {
-                <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::let_underscore_must_use</span>)]</span>
-                <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="ident">mem::replace</span>(<span class="self">self</span>, <span class="ident">replacement</span>);
-
-                <span class="prelude-val">Ok</span>(())
-            },
-            <span class="prelude-val">Err</span>(<span class="ident">why</span>) =&gt; <span class="prelude-val">Err</span>(<span class="ident">why</span>),
-        }
+        <span class="ident">http</span>.<span class="ident">as_ref</span>().<span class="ident">get_webhook_with_token</span>(<span class="self">self</span>.<span class="ident">id</span>.<span class="number">0</span>, <span class="ident">token</span>).<span class="kw">await</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">replacement</span><span class="op">|</span> {
+            <span class="kw-2">*</span><span class="self">self</span> <span class="op">=</span> <span class="ident">replacement</span>;
+        })
     }
 
     <span class="doccomment">/// Returns the url of the webhook.</span>

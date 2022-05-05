@@ -1147,6 +1147,11 @@
 <span id="1142">1142</span>
 <span id="1143">1143</span>
 <span id="1144">1144</span>
+<span id="1145">1145</span>
+<span id="1146">1146</span>
+<span id="1147">1147</span>
+<span id="1148">1148</span>
+<span id="1149">1149</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::collections::HashMap</span>;
 
 <span class="kw">use</span> <span class="ident">serde::de::Error</span> <span class="kw">as</span> <span class="ident">DeError</span>;
@@ -1462,10 +1467,10 @@
     <span class="kw">fn</span> <span class="ident">deserialize</span><span class="op">&lt;</span><span class="ident">D</span>: <span class="ident">Deserializer</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">deserializer</span>: <span class="ident">D</span>) -&gt; <span class="ident">StdResult</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">D::Error</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">map</span> <span class="op">=</span> <span class="ident">JsonMap::deserialize</span>(<span class="ident">deserializer</span>)<span class="question-mark">?</span>;
 
-        <span class="kw">let</span> <span class="ident">id</span> <span class="op">=</span> <span class="ident">map</span>.<span class="ident">get</span>(<span class="string">&quot;guild_id&quot;</span>).<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">x</span><span class="op">|</span> <span class="ident">x</span>.<span class="ident">as_str</span>()).<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">x</span><span class="op">|</span> <span class="ident">x</span>.<span class="ident">parse</span>::<span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span>().<span class="ident">ok</span>());
+        <span class="kw">let</span> <span class="ident">id</span> <span class="op">=</span> <span class="ident">map</span>.<span class="ident">get</span>(<span class="string">&quot;guild_id&quot;</span>).<span class="ident">and_then</span>(<span class="ident">Value::as_str</span>).<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">x</span><span class="op">|</span> <span class="ident">x</span>.<span class="ident">parse</span>::<span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span>().<span class="ident">ok</span>());
 
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">guild_id</span>) <span class="op">=</span> <span class="ident">id</span> {
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">member</span>) <span class="op">=</span> <span class="ident">map</span>.<span class="ident">get_mut</span>(<span class="string">&quot;member&quot;</span>).<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">x</span><span class="op">|</span> <span class="ident">x</span>.<span class="ident">as_object_mut</span>()) {
+            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">member</span>) <span class="op">=</span> <span class="ident">map</span>.<span class="ident">get_mut</span>(<span class="string">&quot;member&quot;</span>).<span class="ident">and_then</span>(<span class="ident">Value::as_object_mut</span>) {
                 <span class="ident">member</span>.<span class="ident">insert</span>(<span class="string">&quot;guild_id&quot;</span>.<span class="ident">to_string</span>(), <span class="ident">from_number</span>(<span class="ident">guild_id</span>));
             }
 
@@ -1621,6 +1626,7 @@
     <span class="doccomment">/// The target resolved data of [`target_id`]</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// [`target_id`]: Self::target_id</span>
+    <span class="attribute">#[<span class="ident">must_use</span>]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">target</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ResolvedTarget</span><span class="op">&gt;</span> {
         <span class="kw">match</span> (<span class="self">self</span>.<span class="ident">kind</span>, <span class="self">self</span>.<span class="ident">target_id</span>) {
             (<span class="ident">ApplicationCommandType::User</span>, <span class="prelude-val">Some</span>(<span class="ident">id</span>)) =&gt; {
@@ -1689,8 +1695,8 @@
         };
 
         <span class="prelude-val">Ok</span>(<span class="self">Self</span> {
-            <span class="ident">name</span>,
             <span class="ident">id</span>,
+            <span class="ident">name</span>,
             <span class="ident">kind</span>,
             <span class="ident">options</span>,
             <span class="ident">resolved</span>,
@@ -2138,11 +2144,13 @@
 
 <span class="kw">impl</span> <span class="ident">CommandPermissionId</span> {
     <span class="doccomment">/// Converts this [`CommandPermissionId`] to [`UserId`].</span>
+    <span class="attribute">#[<span class="ident">must_use</span>]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">to_user_id</span>(<span class="self">self</span>) -&gt; <span class="ident">UserId</span> {
         <span class="self">self</span>.<span class="number">0</span>.<span class="ident">into</span>()
     }
 
     <span class="doccomment">/// Converts this [`CommandPermissionId`] to [`RoleId`].</span>
+    <span class="attribute">#[<span class="ident">must_use</span>]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">to_role_id</span>(<span class="self">self</span>) -&gt; <span class="ident">RoleId</span> {
         <span class="self">self</span>.<span class="number">0</span>.<span class="ident">into</span>()
     }
@@ -2186,11 +2194,13 @@
 
 <span class="kw">impl</span> <span class="ident">TargetId</span> {
     <span class="doccomment">/// Converts this [`TargetId`] to [`UserId`].</span>
+    <span class="attribute">#[<span class="ident">must_use</span>]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">to_user_id</span>(<span class="self">self</span>) -&gt; <span class="ident">UserId</span> {
         <span class="self">self</span>.<span class="number">0</span>.<span class="ident">into</span>()
     }
 
     <span class="doccomment">/// Converts this [`TargetId`] to [`MessageId`].</span>
+    <span class="attribute">#[<span class="ident">must_use</span>]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">to_message_id</span>(<span class="self">self</span>) -&gt; <span class="ident">MessageId</span> {
         <span class="self">self</span>.<span class="number">0</span>.<span class="ident">into</span>()
     }

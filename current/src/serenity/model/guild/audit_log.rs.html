@@ -390,6 +390,8 @@
 <span id="385">385</span>
 <span id="386">386</span>
 <span id="387">387</span>
+<span id="388">388</span>
+<span id="389">389</span>
 </pre><pre class="rust"><code><span class="doccomment">//! Audit log types for administrative actions within guilds.</span>
 
 <span class="kw">use</span> <span class="ident">std::collections::HashMap</span>;
@@ -427,6 +429,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">Action</span> {
+    <span class="attribute">#[<span class="ident">must_use</span>]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">num</span>(<span class="self">self</span>) -&gt; <span class="ident">u8</span> {
         <span class="kw">match</span> <span class="self">self</span> {
             <span class="ident">Action::GuildUpdate</span> =&gt; <span class="number">1</span>,
@@ -448,6 +451,7 @@
 
     <span class="comment">// TODO: Change function to `from_value(u8) -&gt; Action` in the next version and return</span>
     <span class="comment">// `Action::Unknown(u8)` for unknown values.</span>
+    <span class="attribute">#[<span class="ident">must_use</span>]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_value</span>(<span class="ident">value</span>: <span class="ident">u8</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Action</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">action</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">value</span> {
             <span class="number">1</span> =&gt; <span class="ident">Action::GuildUpdate</span>,

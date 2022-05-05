@@ -53,6 +53,7 @@
 <span id="48">48</span>
 <span id="49">49</span>
 <span id="50">50</span>
+<span id="51">51</span>
 </pre><pre class="rust"><code><span class="doccomment">/// Settings for the cache.</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// # Examples</span>
@@ -77,6 +78,7 @@
 <span class="kw">impl</span> <span class="ident">Settings</span> {
     <span class="doccomment">/// Creates new settings to be used with a cache.</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
+    <span class="attribute">#[<span class="ident">must_use</span>]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="self">Self</span> {
         <span class="ident"><span class="self">Self</span>::default</span>()
     }

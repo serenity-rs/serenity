@@ -980,6 +980,7 @@
 <span id="975">975</span>
 <span id="976">976</span>
 <span id="977">977</span>
+<span id="978">978</span>
 </pre><pre class="rust"><code><span class="doccomment">//! The Client contains information about a single bot&#39;s token, as well</span>
 <span class="doccomment">//! as event handlers. Dispatching events to configured handlers and starting</span>
 <span class="doccomment">//! the shards&#39; connections are handled directly via the client. In addition,</span>
@@ -1047,6 +1048,7 @@
 
 <span class="doccomment">/// A builder implementing [`Future`] building a [`Client`] to interact with Discord.</span>
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;gateway&quot;</span>)]</span>
+<span class="attribute">#[<span class="ident">must_use</span> <span class="op">=</span> <span class="string">&quot;Builders do nothing unless they are awaited&quot;</span>]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ClientBuilder</span> {
     <span class="comment">// TODO: data, http and cache_settings are Options in order to take() them out in the Future impl.</span>
     <span class="comment">// This should be changed after the stabilization of std::future::IntoFuture.</span>
@@ -1378,12 +1380,12 @@
                 };
 
                 <span class="prelude-val">Ok</span>(<span class="ident">Client</span> {
-                    <span class="ident">ws_url</span>,
                     <span class="ident">data</span>,
                     <span class="ident">shard_manager</span>,
                     <span class="ident">shard_manager_worker</span>,
                     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;voice&quot;</span>)]</span>
                     <span class="ident">voice_manager</span>,
+                    <span class="ident">ws_url</span>,
                     <span class="ident">cache_and_http</span>,
                 })
             }));

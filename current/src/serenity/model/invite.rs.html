@@ -438,6 +438,8 @@
 <span id="433">433</span>
 <span id="434">434</span>
 <span id="435">435</span>
+<span id="436">436</span>
+<span id="437">437</span>
 </pre><pre class="rust"><code><span class="doccomment">//! Models for server and channel invites.</span>
 
 <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::prelude</span>::<span class="kw-2">*</span>;
@@ -653,6 +655,7 @@
     <span class="doccomment">/// assert_eq!(invite.url(), &quot;https://discord.gg/WxZumR&quot;);</span>
     <span class="doccomment">/// # }</span>
     <span class="doccomment">/// ```</span>
+    <span class="attribute">#[<span class="ident">must_use</span>]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">url</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">String</span> {
         <span class="macro">format!</span>(<span class="string">&quot;https://discord.gg/{}&quot;</span>, <span class="self">self</span>.<span class="ident">code</span>)
     }
@@ -841,6 +844,7 @@
     <span class="doccomment">/// assert_eq!(invite.url(), &quot;https://discord.gg/WxZumR&quot;);</span>
     <span class="doccomment">/// # }</span>
     <span class="doccomment">/// ```</span>
+    <span class="attribute">#[<span class="ident">must_use</span>]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">url</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">String</span> {
         <span class="macro">format!</span>(<span class="string">&quot;https://discord.gg/{}&quot;</span>, <span class="self">self</span>.<span class="ident">code</span>)
     }

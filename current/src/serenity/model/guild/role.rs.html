@@ -404,6 +404,8 @@
 <span id="399">399</span>
 <span id="400">400</span>
 <span id="401">401</span>
+<span id="402">402</span>
+<span id="403">403</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::cmp::Ordering</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;utils&quot;</span>))]</span>
 <span class="kw">use</span> <span class="ident">std::error::Error</span> <span class="kw">as</span> <span class="ident">StdError</span>;
@@ -581,6 +583,7 @@
 
     <span class="doccomment">/// Check that the role has the given permission.</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
+    <span class="attribute">#[<span class="ident">must_use</span>]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">has_permission</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">permission</span>: <span class="ident">Permissions</span>) -&gt; <span class="ident">bool</span> {
         <span class="self">self</span>.<span class="ident">permissions</span>.<span class="ident">contains</span>(<span class="ident">permission</span>)
     }
@@ -591,6 +594,7 @@
     <span class="doccomment">/// precisely equivalent to the given permissions. If you need only check</span>
     <span class="doccomment">/// that the role has at least the given permissions, pass `false`.</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
+    <span class="attribute">#[<span class="ident">must_use</span>]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">has_permissions</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">permissions</span>: <span class="ident">Permissions</span>, <span class="ident">precise</span>: <span class="ident">bool</span>) -&gt; <span class="ident">bool</span> {
         <span class="kw">if</span> <span class="ident">precise</span> {
             <span class="self">self</span>.<span class="ident">permissions</span> <span class="op">==</span> <span class="ident">permissions</span>

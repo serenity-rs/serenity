@@ -505,6 +505,8 @@
 <span id="500">500</span>
 <span id="501">501</span>
 <span id="502">502</span>
+<span id="503">503</span>
+<span id="504">504</span>
 </pre><pre class="rust"><code><span class="doccomment">//! A set of utilities to help with common use cases that are not required to</span>
 <span class="doccomment">//! fully use the library.</span>
 
@@ -568,6 +570,7 @@
 <span class="doccomment">/// ```</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// [`RichInvite`]: crate::model::invite::RichInvite</span>
+<span class="attribute">#[<span class="ident">must_use</span>]</span>
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">parse_invite</span>(<span class="ident">code</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">str</span> {
     <span class="kw">let</span> <span class="ident">code</span> <span class="op">=</span> <span class="ident">code</span>.<span class="ident">trim_start_matches</span>(<span class="string">&quot;http://&quot;</span>).<span class="ident">trim_start_matches</span>(<span class="string">&quot;https://&quot;</span>);
     <span class="kw">let</span> <span class="ident">lower</span> <span class="op">=</span> <span class="ident">code</span>.<span class="ident">to_lowercase</span>();
@@ -591,6 +594,7 @@
 <span class="doccomment">/// assert_eq!(parse_user_tag(&quot;kangalioo#9108&quot;), Some((&quot;kangalioo&quot;, 9108)));</span>
 <span class="doccomment">/// assert_eq!(parse_user_tag(&quot;kangalioo#10108&quot;), None);</span>
 <span class="doccomment">/// ```</span>
+<span class="attribute">#[<span class="ident">must_use</span>]</span>
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">parse_user_tag</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">u16</span>)<span class="op">&gt;</span> {
     <span class="kw">let</span> (<span class="ident">name</span>, <span class="ident">discrim</span>) <span class="op">=</span> <span class="ident">s</span>.<span class="ident">split_once</span>(<span class="string">&#39;#&#39;</span>)<span class="question-mark">?</span>;
     <span class="kw">let</span> <span class="ident">discrim</span> <span class="op">=</span> <span class="ident">discrim</span>.<span class="ident">parse</span>().<span class="ident">ok</span>()<span class="question-mark">?</span>;
@@ -830,8 +834,7 @@
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">f</span> <span class="op">=</span> <span class="ident">File::open</span>(<span class="ident">path</span>)<span class="question-mark">?</span>;
 
     <span class="comment">// errors here are intentionally ignored</span>
-    <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::let_underscore_must_use</span>)]</span>
-    <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="ident">f</span>.<span class="ident">read_to_end</span>(<span class="kw-2">&amp;mut</span> <span class="ident">v</span>);
+    <span class="ident">drop</span>(<span class="ident">f</span>.<span class="ident">read_to_end</span>(<span class="kw-2">&amp;mut</span> <span class="ident">v</span>));
 
     <span class="kw">let</span> <span class="ident">b64</span> <span class="op">=</span> <span class="ident">base64::encode</span>(<span class="kw-2">&amp;</span><span class="ident">v</span>);
     <span class="kw">let</span> <span class="ident">ext</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">path</span>.<span class="ident">extension</span>() <span class="op">==</span> <span class="prelude-val">Some</span>(<span class="ident">OsStr::new</span>(<span class="string">&quot;png&quot;</span>)) { <span class="string">&quot;png&quot;</span> } <span class="kw">else</span> { <span class="string">&quot;jpg&quot;</span> };
@@ -925,6 +928,7 @@
 <span class="doccomment">/// assert_eq!(id, 245037420704169985);</span>
 <span class="doccomment">/// assert_eq!(token, &quot;ig5AO-wdVWpCBtUUMxmgsWryqgsW3DChbKYOINftJ4DCrUbnkedoYZD0VOH1QLr-S3sV&quot;);</span>
 <span class="doccomment">/// ```</span>
+<span class="attribute">#[<span class="ident">must_use</span>]</span>
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">parse_webhook</span>(<span class="ident">url</span>: <span class="kw-2">&amp;</span><span class="ident">Url</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="ident">u64</span>, <span class="kw-2">&amp;</span><span class="ident">str</span>)<span class="op">&gt;</span> {
     <span class="kw">let</span> (<span class="ident">webhook_id</span>, <span class="ident">token</span>) <span class="op">=</span> <span class="ident">url</span>.<span class="ident">path</span>().<span class="ident">strip_prefix</span>(<span class="string">&quot;/api/webhooks/&quot;</span>)<span class="question-mark">?</span>.<span class="ident">split_once</span>(<span class="string">&#39;/&#39;</span>)<span class="question-mark">?</span>;
     <span class="kw">if</span> <span class="op">!</span>[<span class="string">&quot;http&quot;</span>, <span class="string">&quot;https&quot;</span>].<span class="ident">contains</span>(<span class="kw-2">&amp;</span><span class="ident">url</span>.<span class="ident">scheme</span>())

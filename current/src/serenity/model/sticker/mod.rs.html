@@ -170,6 +170,7 @@
 <span id="165">165</span>
 <span id="166">166</span>
 <span id="167">167</span>
+<span id="168">168</span>
 </pre><pre class="rust"><code><span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::builder::EditSticker</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
@@ -284,6 +285,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// **Note**: This will only be `None` if the format_type is unknown.</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
+    <span class="attribute">#[<span class="ident">must_use</span>]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">image_url</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
         <span class="ident">sticker_url</span>(<span class="self">self</span>.<span class="ident">id</span>, <span class="self">self</span>.<span class="ident">format_type</span>)
     }

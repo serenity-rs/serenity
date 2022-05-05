@@ -877,6 +877,7 @@
 <span id="872">872</span>
 <span id="873">873</span>
 <span id="874">874</span>
+<span id="875">875</span>
 </pre><pre class="rust"><code><span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
 <span class="kw">use</span> <span class="ident">std::fmt</span>;
 <span class="kw">use</span> <span class="ident">std::sync::Arc</span>;
@@ -1209,6 +1210,7 @@
 }
 <span class="comment">// Once we can use `Box` as part of a pattern, we will reconsider boxing.</span>
 <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::too_many_arguments</span>)]</span>
+<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>, <span class="ident">allow</span>(<span class="ident">clippy::used_underscore_binding</span>))]</span>
 <span class="attribute">#[<span class="ident">instrument</span>(<span class="ident">skip</span>(<span class="ident">event</span>, <span class="ident">data</span>, <span class="ident">event_handler</span>, <span class="ident">cache_and_http</span>))]</span>
 <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">handle_event</span>(
     <span class="ident">event</span>: <span class="ident">DispatchEvent</span>,

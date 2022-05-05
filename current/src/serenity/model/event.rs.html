@@ -1938,6 +1938,12 @@
 <span id="1933">1933</span>
 <span id="1934">1934</span>
 <span id="1935">1935</span>
+<span id="1936">1936</span>
+<span id="1937">1937</span>
+<span id="1938">1938</span>
+<span id="1939">1939</span>
+<span id="1940">1940</span>
+<span id="1941">1941</span>
 </pre><pre class="rust"><code><span class="doccomment">//! All the events this library handles.</span>
 
 <span class="kw">use</span> <span class="ident">std::collections::HashMap</span>;
@@ -2168,9 +2174,9 @@
 
                 <span class="prelude-val">Ok</span>(<span class="ident">GuildMembersChunkEvent</span> {
                     <span class="ident">guild_id</span>,
+                    <span class="ident">members</span>,
                     <span class="ident">chunk_index</span>,
                     <span class="ident">chunk_count</span>,
-                    <span class="ident">members</span>,
                     <span class="ident">nonce</span>,
                 })
             }
@@ -2758,10 +2764,9 @@
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
 <span class="kw">fn</span> <span class="ident">gid_from_channel</span>(<span class="ident">c</span>: <span class="kw-2">&amp;</span><span class="ident">Channel</span>) -&gt; <span class="ident">RelatedId</span><span class="op">&lt;</span><span class="ident">GuildId</span><span class="op">&gt;</span> {
-    <span class="kw">use</span> <span class="ident">RelatedId</span>::<span class="kw-2">*</span>;
     <span class="kw">match</span> <span class="ident">c</span> {
-        <span class="ident">Channel::Guild</span>(<span class="ident">g</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">g</span>.<span class="ident">guild_id</span>),
-        <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
+        <span class="ident">Channel::Guild</span>(<span class="ident">g</span>) =&gt; <span class="ident">RelatedId::Some</span>(<span class="ident">g</span>.<span class="ident">guild_id</span>),
+        <span class="kw">_</span> =&gt; <span class="ident">RelatedId::None</span>,
     }
 }
 
@@ -3126,6 +3131,7 @@
         }
     ),<span class="op">+</span> $(,)<span class="question-mark">?</span>) =&gt; {
         <span class="doccomment">/// User ID(s) related to this event.</span>
+        <span class="attribute">#[<span class="ident">must_use</span>]</span>
         <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">user_id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">RelatedId</span><span class="op">&lt;</span><span class="ident">UserId</span><span class="op">&gt;</span> {
             <span class="kw">use</span> <span class="ident">RelatedId</span>::<span class="kw-2">*</span>;
             <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">unused_variables</span>)]</span>
@@ -3139,6 +3145,7 @@
         }
 
         <span class="doccomment">/// Guild ID related to this event.</span>
+        <span class="attribute">#[<span class="ident">must_use</span>]</span>
         <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">guild_id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">RelatedId</span><span class="op">&lt;</span><span class="ident">GuildId</span><span class="op">&gt;</span> {
             <span class="kw">use</span> <span class="ident">RelatedId</span>::<span class="kw-2">*</span>;
             <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">unused_variables</span>)]</span>
@@ -3152,6 +3159,7 @@
         }
 
         <span class="doccomment">/// Channel ID(s) related to this event.</span>
+        <span class="attribute">#[<span class="ident">must_use</span>]</span>
         <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">channel_id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">RelatedId</span><span class="op">&lt;</span><span class="ident">ChannelId</span><span class="op">&gt;</span> {
             <span class="kw">use</span> <span class="ident">RelatedId</span>::<span class="kw-2">*</span>;
             <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">unused_variables</span>)]</span>
@@ -3165,6 +3173,7 @@
         }
 
         <span class="doccomment">/// Message ID(s) related to this event.</span>
+        <span class="attribute">#[<span class="ident">must_use</span>]</span>
         <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">message_id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">RelatedId</span><span class="op">&lt;</span><span class="ident">MessageId</span><span class="op">&gt;</span> {
             <span class="kw">use</span> <span class="ident">RelatedId</span>::<span class="kw-2">*</span>;
             <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">unused_variables</span>)]</span>
@@ -3181,6 +3190,7 @@
 
 <span class="kw">impl</span> <span class="ident">Event</span> {
     <span class="doccomment">/// Return the type of this event.</span>
+    <span class="attribute">#[<span class="ident">must_use</span>]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">event_type</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">EventType</span> {
         <span class="kw">match</span> <span class="self">self</span> {
             <span class="ident"><span class="self">Self</span>::ApplicationCommandPermissionsUpdate</span>(<span class="kw">_</span>) =&gt; {
@@ -3322,14 +3332,14 @@
             <span class="comment">// GuildUnavailable isn&#39;t actually received from the gateway, so it</span>
             <span class="comment">// can be lumped in with GuildCreate&#39;s arm.</span>
 
-            <span class="kw">if</span> <span class="ident">v</span>.<span class="ident">get</span>(<span class="string">&quot;unavailable&quot;</span>).<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">v</span><span class="op">|</span> <span class="ident">v</span>.<span class="ident">as_bool</span>()).<span class="ident">unwrap_or</span>(<span class="bool-val">false</span>) {
+            <span class="kw">if</span> <span class="ident">v</span>.<span class="ident">get</span>(<span class="string">&quot;unavailable&quot;</span>).<span class="ident">and_then</span>(<span class="ident">Value::as_bool</span>).<span class="ident">unwrap_or</span>(<span class="bool-val">false</span>) {
                 <span class="ident">Event::GuildUnavailable</span>(<span class="ident">from_value</span>(<span class="ident">v</span>)<span class="question-mark">?</span>)
             } <span class="kw">else</span> {
                 <span class="ident">Event::GuildCreate</span>(<span class="ident">from_value</span>(<span class="ident">v</span>)<span class="question-mark">?</span>)
             }
         },
         <span class="ident">EventType::GuildDelete</span> =&gt; {
-            <span class="kw">if</span> <span class="ident">v</span>.<span class="ident">get</span>(<span class="string">&quot;unavailable&quot;</span>).<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">v</span><span class="op">|</span> <span class="ident">v</span>.<span class="ident">as_bool</span>()).<span class="ident">unwrap_or</span>(<span class="bool-val">false</span>) {
+            <span class="kw">if</span> <span class="ident">v</span>.<span class="ident">get</span>(<span class="string">&quot;unavailable&quot;</span>).<span class="ident">and_then</span>(<span class="ident">Value::as_bool</span>).<span class="ident">unwrap_or</span>(<span class="bool-val">false</span>) {
                 <span class="ident">Event::GuildUnavailable</span>(<span class="ident">from_value</span>(<span class="ident">v</span>)<span class="question-mark">?</span>)
             } <span class="kw">else</span> {
                 <span class="ident">Event::GuildDelete</span>(<span class="ident">from_value</span>(<span class="ident">v</span>)<span class="question-mark">?</span>)
@@ -3636,6 +3646,7 @@
             <span class="macro-nonterminal">$</span><span class="macro-nonterminal">variant</span>:<span class="ident">path</span>, <span class="macro-nonterminal">$</span><span class="kw">_</span>:<span class="macro-nonterminal">pat</span> =&gt; { $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">input</span>:<span class="ident">tt</span>)<span class="op">*</span> }
         ),<span class="op">+</span> $(,)<span class="question-mark">?</span>
     ) =&gt; {
+        <span class="attribute">#[<span class="ident">must_use</span>]</span>
         <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">related_ids</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">RelatedIdsForEventType</span> {
             <span class="kw">match</span> <span class="self">self</span> {
                 <span class="ident"><span class="self">Self</span>::Other</span>(<span class="kw">_</span>) =&gt; <span class="ident">Default::default</span>(),
@@ -3730,6 +3741,7 @@
     <span class="doccomment">/// Return the event name of this event. Some events are synthetic, and we lack</span>
     <span class="doccomment">/// the information to recover the original event name for these events, in which</span>
     <span class="doccomment">/// case this method returns [`None`].</span>
+    <span class="attribute">#[<span class="ident">must_use</span>]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="self">self</span> {
             <span class="ident"><span class="self">Self</span>::ApplicationCommandPermissionsUpdate</span> =&gt; {
