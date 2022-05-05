@@ -1313,6 +1313,9 @@
 <span id="1308">1308</span>
 <span id="1309">1309</span>
 <span id="1310">1310</span>
+<span id="1311">1311</span>
+<span id="1312">1312</span>
+<span id="1313">1313</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::fmt</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
 <span class="kw">use</span> <span class="ident">std::sync::Arc</span>;
@@ -1458,6 +1461,7 @@
 <span class="kw">impl</span> <span class="ident">GuildChannel</span> {
     <span class="doccomment">/// Whether or not this channel is text-based, meaning that</span>
     <span class="doccomment">/// it is possible to send messages.</span>
+    <span class="attribute">#[<span class="ident">must_use</span>]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_text_based</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="macro">matches!</span>(<span class="self">self</span>.<span class="ident">kind</span>, <span class="ident">ChannelType::Text</span> <span class="op">|</span> <span class="ident">ChannelType::News</span>)
     }
@@ -1950,6 +1954,7 @@
     <span class="doccomment">/// Only [text channels][`ChannelType::Text`] are taken into consideration</span>
     <span class="doccomment">/// as being NSFW. [voice channels][`ChannelType::Voice`] are never NSFW.</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
+    <span class="attribute">#[<span class="ident">must_use</span>]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_nsfw</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="self">self</span>.<span class="ident">kind</span> <span class="op">==</span> <span class="ident">ChannelType::Text</span> <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">nsfw</span>
     }
@@ -1996,6 +2001,7 @@
     }
 
     <span class="doccomment">/// Returns the name of the guild channel.</span>
+    <span class="attribute">#[<span class="ident">must_use</span>]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">str</span> {
         <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">name</span>
     }

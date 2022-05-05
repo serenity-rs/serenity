@@ -364,10 +364,6 @@
 <span id="359">359</span>
 <span id="360">360</span>
 <span id="361">361</span>
-<span id="362">362</span>
-<span id="363">363</span>
-<span id="364">364</span>
-<span id="365">365</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::collections</span>::{<span class="ident">HashMap</span>, <span class="ident">VecDeque</span>};
 <span class="kw">use</span> <span class="ident">std::sync::Arc</span>;
 
@@ -639,13 +635,12 @@
     <span class="doccomment">/// know it should shut down. This _should never happen_. It may already be</span>
     <span class="doccomment">/// stopped.</span>
     <span class="attribute">#[<span class="ident">instrument</span>(<span class="ident">skip</span>(<span class="self">self</span>))]</span>
-    <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::let_underscore_must_use</span>)]</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">shutdown</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">shard_id</span>: <span class="ident">ShardId</span>, <span class="ident">code</span>: <span class="ident">u16</span>) {
         <span class="kw">const</span> <span class="ident">TIMEOUT</span>: <span class="ident">tokio::time::Duration</span> <span class="op">=</span> <span class="ident">tokio::time::Duration::from_secs</span>(<span class="number">5</span>);
 
         <span class="macro">info!</span>(<span class="string">&quot;Shutting down shard {}&quot;</span>, <span class="ident">shard_id</span>);
 
-        <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">shard_queuer</span>.<span class="ident">unbounded_send</span>(<span class="ident">ShardQueuerMessage::ShutdownShard</span>(<span class="ident">shard_id</span>, <span class="ident">code</span>));
+        <span class="ident">drop</span>(<span class="self">self</span>.<span class="ident">shard_queuer</span>.<span class="ident">unbounded_send</span>(<span class="ident">ShardQueuerMessage::ShutdownShard</span>(<span class="ident">shard_id</span>, <span class="ident">code</span>)));
 
         <span class="kw">match</span> <span class="ident">timeout</span>(<span class="ident">TIMEOUT</span>, <span class="self">self</span>.<span class="ident">shard_shutdown</span>.<span class="ident">next</span>()).<span class="kw">await</span> {
             <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">shutdown_shard_id</span>)) =&gt; {
@@ -671,7 +666,6 @@
     <span class="doccomment">/// If you only need to shutdown a select number of shards, prefer looping</span>
     <span class="doccomment">/// over the [`Self::shutdown`] method.</span>
     <span class="attribute">#[<span class="ident">instrument</span>(<span class="ident">skip</span>(<span class="self">self</span>))]</span>
-    <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::let_underscore_must_use</span>)]</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">shutdown_all</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
         <span class="kw">let</span> <span class="ident">keys</span> <span class="op">=</span> {
             <span class="kw">let</span> <span class="ident">runners</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">runners</span>.<span class="ident">lock</span>().<span class="kw">await</span>;
@@ -689,8 +683,8 @@
             <span class="self">self</span>.<span class="ident">shutdown</span>(<span class="ident">shard_id</span>, <span class="number">1000</span>).<span class="kw">await</span>;
         }
 
-        <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">shard_queuer</span>.<span class="ident">unbounded_send</span>(<span class="ident">ShardQueuerMessage::Shutdown</span>);
-        <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">monitor_tx</span>.<span class="ident">unbounded_send</span>(<span class="ident">ShardManagerMessage::ShutdownInitiated</span>);
+        <span class="ident">drop</span>(<span class="self">self</span>.<span class="ident">shard_queuer</span>.<span class="ident">unbounded_send</span>(<span class="ident">ShardQueuerMessage::Shutdown</span>));
+        <span class="ident">drop</span>(<span class="self">self</span>.<span class="ident">monitor_tx</span>.<span class="ident">unbounded_send</span>(<span class="ident">ShardManagerMessage::ShutdownInitiated</span>));
     }
 
     <span class="attribute">#[<span class="ident">instrument</span>(<span class="ident">skip</span>(<span class="self">self</span>))]</span>
@@ -699,8 +693,7 @@
 
         <span class="kw">let</span> <span class="ident">msg</span> <span class="op">=</span> <span class="ident">ShardQueuerMessage::Start</span>(<span class="ident">shard_info</span>[<span class="number">0</span>], <span class="ident">shard_info</span>[<span class="number">1</span>]);
 
-        <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::let_underscore_must_use</span>)]</span>
-        <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">shard_queuer</span>.<span class="ident">unbounded_send</span>(<span class="ident">msg</span>);
+        <span class="ident">drop</span>(<span class="self">self</span>.<span class="ident">shard_queuer</span>.<span class="ident">unbounded_send</span>(<span class="ident">msg</span>));
     }
 }
 
@@ -711,10 +704,9 @@
     <span class="doccomment">/// [`ShardQueuer`] to shutdown.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// [`ShardRunner`]: super::ShardRunner</span>
-    <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::let_underscore_must_use</span>)]</span>
     <span class="kw">fn</span> <span class="ident">drop</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
-        <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">shard_queuer</span>.<span class="ident">unbounded_send</span>(<span class="ident">ShardQueuerMessage::Shutdown</span>);
-        <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">monitor_tx</span>.<span class="ident">unbounded_send</span>(<span class="ident">ShardManagerMessage::ShutdownInitiated</span>);
+        <span class="ident">drop</span>(<span class="self">self</span>.<span class="ident">shard_queuer</span>.<span class="ident">unbounded_send</span>(<span class="ident">ShardQueuerMessage::Shutdown</span>));
+        <span class="ident">drop</span>(<span class="self">self</span>.<span class="ident">monitor_tx</span>.<span class="ident">unbounded_send</span>(<span class="ident">ShardManagerMessage::ShutdownInitiated</span>));
     }
 }
 

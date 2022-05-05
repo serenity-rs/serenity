@@ -521,6 +521,17 @@
 <span id="516">516</span>
 <span id="517">517</span>
 <span id="518">518</span>
+<span id="519">519</span>
+<span id="520">520</span>
+<span id="521">521</span>
+<span id="522">522</span>
+<span id="523">523</span>
+<span id="524">524</span>
+<span id="525">525</span>
+<span id="526">526</span>
+<span id="527">527</span>
+<span id="528">528</span>
+<span id="529">529</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::collections::HashMap</span>;
 
 <span class="kw">use</span> <span class="ident">async_trait::async_trait</span>;
@@ -528,12 +539,23 @@
 <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::context::Context</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::client::bridge::gateway::event</span>::<span class="kw-2">*</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::json::Value</span>;
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::interactions::application_command::ApplicationCommandPermission</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::interactions::Interaction</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::prelude</span>::<span class="kw-2">*</span>;
 
 <span class="doccomment">/// The core trait for handling events by serenity.</span>
 <span class="attribute">#[<span class="ident">async_trait</span>]</span>
 <span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">EventHandler</span>: <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> {
+    <span class="doccomment">/// Dispatched when the permissions of an application command was updated.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// Provides said permission&#39;s data.</span>
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">application_command_permissions_update</span>(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        <span class="ident">_ctx</span>: <span class="ident">Context</span>,
+        <span class="ident">_permission</span>: <span class="ident">ApplicationCommandPermission</span>,
+    ) {
+    }
+
     <span class="doccomment">/// Dispatched when the cache has received and inserted all data from</span>
     <span class="doccomment">/// guilds.</span>
     <span class="doccomment">///</span>

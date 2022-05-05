@@ -1237,7 +1237,7 @@
 
                 <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::Gateway</span>(<span class="ident">GatewayError::OverloadedShard</span>));
             },
-            <span class="prelude-val">Some</span>(<span class="number">4006</span>) <span class="op">|</span> <span class="prelude-val">Some</span>(<span class="ident">close_codes::SESSION_TIMEOUT</span>) =&gt; {
+            <span class="prelude-val">Some</span>(<span class="number">4006</span> <span class="op">|</span> <span class="ident">close_codes::SESSION_TIMEOUT</span>) =&gt; {
                 <span class="macro">info!</span>(<span class="string">&quot;[Shard {:?}] Invalid session.&quot;</span>, <span class="self">self</span>.<span class="ident">shard_info</span>);
 
                 <span class="self">self</span>.<span class="ident">session_id</span> <span class="op">=</span> <span class="prelude-val">None</span>;

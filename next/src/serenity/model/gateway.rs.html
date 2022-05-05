@@ -843,6 +843,27 @@
 <span id="838">838</span>
 <span id="839">839</span>
 <span id="840">840</span>
+<span id="841">841</span>
+<span id="842">842</span>
+<span id="843">843</span>
+<span id="844">844</span>
+<span id="845">845</span>
+<span id="846">846</span>
+<span id="847">847</span>
+<span id="848">848</span>
+<span id="849">849</span>
+<span id="850">850</span>
+<span id="851">851</span>
+<span id="852">852</span>
+<span id="853">853</span>
+<span id="854">854</span>
+<span id="855">855</span>
+<span id="856">856</span>
+<span id="857">857</span>
+<span id="858">858</span>
+<span id="859">859</span>
+<span id="860">860</span>
+<span id="861">861</span>
 </pre><pre class="rust"><code><span class="doccomment">//! Models pertaining to the gateway.</span>
 
 <span class="kw">use</span> <span class="ident">url::Url</span>;
@@ -1269,6 +1290,7 @@
     <span class="doccomment">/// Attempts to convert this [`PresenceUser`] instance into a [`User`].</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// If one of [`User`]&#39;s required fields is None in `self`, None is returned.</span>
+    <span class="attribute">#[<span class="ident">must_use</span>]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">into_user</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">User</span><span class="op">&gt;</span> {
         <span class="prelude-val">Some</span>(<span class="ident">User</span> {
             <span class="ident">avatar</span>: <span class="self">self</span>.<span class="ident">avatar</span>,
@@ -1287,6 +1309,7 @@
     <span class="doccomment">/// Will clone individual fields if needed.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// If one of [`User`]&#39;s required fields is None in `self`, None is returned.</span>
+    <span class="attribute">#[<span class="ident">must_use</span>]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">to_user</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">User</span><span class="op">&gt;</span> {
         <span class="prelude-val">Some</span>(<span class="ident">User</span> {
             <span class="ident">avatar</span>: <span class="self">self</span>.<span class="ident">avatar</span>.<span class="ident">clone</span>(),
@@ -1536,6 +1559,7 @@
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
 <span class="kw">impl</span> <span class="ident">GatewayIntents</span> {
     <span class="doccomment">/// Gets all of the intents that aren&#39;t considered privileged by Discord.</span>
+    <span class="attribute">#[<span class="ident">must_use</span>]</span>
     <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">non_privileged</span>() -&gt; <span class="ident">GatewayIntents</span> {
         <span class="comment">// bitflags don&#39;t support const evaluation. Workaround.</span>
         <span class="comment">// See: https://github.com/bitflags/bitflags/issues/180</span>
@@ -1544,6 +1568,7 @@
 
     <span class="doccomment">/// Gets all of the intents that are considered privileged by Discord.</span>
     <span class="doccomment">/// Use of these intents will require explicitly whitelisting the bot.</span>
+    <span class="attribute">#[<span class="ident">must_use</span>]</span>
     <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">privileged</span>() -&gt; <span class="ident">GatewayIntents</span> {
         <span class="comment">// bitflags don&#39;t support const evaluation. Workaround.</span>
         <span class="comment">// See: https://github.com/bitflags/bitflags/issues/180</span>
@@ -1551,6 +1576,7 @@
     }
 
     <span class="doccomment">/// Checks if any of the included intents are privileged.</span>
+    <span class="attribute">#[<span class="ident">must_use</span>]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_privileged</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="self">self</span>.<span class="ident">intersects</span>(<span class="ident"><span class="self">Self</span>::privileged</span>())
     }
@@ -1559,6 +1585,7 @@
     <span class="doccomment">/// [GUILDS] intent.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// [GUILDS]: Self::GUILDS</span>
+    <span class="attribute">#[<span class="ident">must_use</span>]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">guilds</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="self">self</span>.<span class="ident">contains</span>(<span class="ident"><span class="self">Self</span>::GUILDS</span>)
     }
@@ -1567,6 +1594,7 @@
     <span class="doccomment">/// [GUILD_MEMBERS] intent.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// [GUILD_MEMBERS]: Self::GUILD_MEMBERS</span>
+    <span class="attribute">#[<span class="ident">must_use</span>]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">guild_members</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="self">self</span>.<span class="ident">contains</span>(<span class="ident"><span class="self">Self</span>::GUILD_MEMBERS</span>)
     }
@@ -1575,6 +1603,7 @@
     <span class="doccomment">/// [GUILD_BANS] intent.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// [GUILD_BANS]: Self::GUILD_BANS</span>
+    <span class="attribute">#[<span class="ident">must_use</span>]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">guild_bans</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="self">self</span>.<span class="ident">contains</span>(<span class="ident"><span class="self">Self</span>::GUILD_BANS</span>)
     }
@@ -1583,6 +1612,7 @@
     <span class="doccomment">/// [GUILD_EMOJIS_AND_STICKERS] intent.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// [GUILD_EMOJIS_AND_STICKERS]: Self::GUILD_EMOJIS_AND_STICKERS</span>
+    <span class="attribute">#[<span class="ident">must_use</span>]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">guild_emojis_and_stickers</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="self">self</span>.<span class="ident">contains</span>(<span class="ident"><span class="self">Self</span>::GUILD_EMOJIS_AND_STICKERS</span>)
     }
@@ -1591,6 +1621,7 @@
     <span class="doccomment">/// [GUILD_INTEGRATIONS] intent.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// [GUILD_INTEGRATIONS]: Self::GUILD_INTEGRATIONS</span>
+    <span class="attribute">#[<span class="ident">must_use</span>]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">guild_integrations</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="self">self</span>.<span class="ident">contains</span>(<span class="ident"><span class="self">Self</span>::GUILD_INTEGRATIONS</span>)
     }
@@ -1599,6 +1630,7 @@
     <span class="doccomment">/// [GUILD_WEBHOOKS] intent.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// [GUILD_WEBHOOKS]: Self::GUILD_WEBHOOKS</span>
+    <span class="attribute">#[<span class="ident">must_use</span>]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">guild_webhooks</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="self">self</span>.<span class="ident">contains</span>(<span class="ident"><span class="self">Self</span>::GUILD_WEBHOOKS</span>)
     }
@@ -1607,6 +1639,7 @@
     <span class="doccomment">/// [GUILD_INVITES] intent.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// [GUILD_INVITES]: Self::GUILD_INVITES</span>
+    <span class="attribute">#[<span class="ident">must_use</span>]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">guild_invites</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="self">self</span>.<span class="ident">contains</span>(<span class="ident"><span class="self">Self</span>::GUILD_INVITES</span>)
     }
@@ -1615,6 +1648,7 @@
     <span class="doccomment">/// [GUILD_VOICE_STATES] intent.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// [GUILD_VOICE_STATES]: Self::GUILD_VOICE_STATES</span>
+    <span class="attribute">#[<span class="ident">must_use</span>]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">guild_voice_states</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="self">self</span>.<span class="ident">contains</span>(<span class="ident"><span class="self">Self</span>::GUILD_VOICE_STATES</span>)
     }
@@ -1623,6 +1657,7 @@
     <span class="doccomment">/// [GUILD_PRESENCES] intent.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// [GUILD_PRESENCES]: Self::GUILD_PRESENCES</span>
+    <span class="attribute">#[<span class="ident">must_use</span>]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">guild_presences</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="self">self</span>.<span class="ident">contains</span>(<span class="ident"><span class="self">Self</span>::GUILD_PRESENCES</span>)
     }
@@ -1631,6 +1666,7 @@
     <span class="doccomment">/// [GUILD_MESSAGE_REACTIONS] intent.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// [GUILD_MESSAGE_REACTIONS]: Self::GUILD_MESSAGE_REACTIONS</span>
+    <span class="attribute">#[<span class="ident">must_use</span>]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">guild_message_reactions</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="self">self</span>.<span class="ident">contains</span>(<span class="ident"><span class="self">Self</span>::GUILD_MESSAGE_REACTIONS</span>)
     }
@@ -1639,6 +1675,7 @@
     <span class="doccomment">/// [GUILD_MESSAGE_TYPING] intent.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// [GUILD_MESSAGE_TYPING]: Self::GUILD_MESSAGE_TYPING</span>
+    <span class="attribute">#[<span class="ident">must_use</span>]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">guild_message_typing</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="self">self</span>.<span class="ident">contains</span>(<span class="ident"><span class="self">Self</span>::GUILD_MESSAGE_TYPING</span>)
     }
@@ -1647,6 +1684,7 @@
     <span class="doccomment">/// [DIRECT_MESSAGES] intent.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// [DIRECT_MESSAGES]: Self::DIRECT_MESSAGES</span>
+    <span class="attribute">#[<span class="ident">must_use</span>]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">direct_messages</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="self">self</span>.<span class="ident">contains</span>(<span class="ident"><span class="self">Self</span>::DIRECT_MESSAGES</span>)
     }
@@ -1655,6 +1693,7 @@
     <span class="doccomment">/// [DIRECT_MESSAGE_REACTIONS] intent.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// [DIRECT_MESSAGE_REACTIONS]: Self::DIRECT_MESSAGE_REACTIONS</span>
+    <span class="attribute">#[<span class="ident">must_use</span>]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">direct_message_reactions</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="self">self</span>.<span class="ident">contains</span>(<span class="ident"><span class="self">Self</span>::DIRECT_MESSAGE_REACTIONS</span>)
     }
@@ -1663,6 +1702,7 @@
     <span class="doccomment">/// [DIRECT_MESSAGE_TYPING] intent.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// [DIRECT_MESSAGE_TYPING]: Self::DIRECT_MESSAGE_TYPING</span>
+    <span class="attribute">#[<span class="ident">must_use</span>]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">direct_message_typing</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="self">self</span>.<span class="ident">contains</span>(<span class="ident"><span class="self">Self</span>::DIRECT_MESSAGE_TYPING</span>)
     }
@@ -1671,6 +1711,7 @@
     <span class="doccomment">/// [MESSAGE_CONTENT] intent.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// [MESSAGE_CONTENT]: Self::MESSAGE_CONTENT</span>
+    <span class="attribute">#[<span class="ident">must_use</span>]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">message_content</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="self">self</span>.<span class="ident">contains</span>(<span class="ident"><span class="self">Self</span>::MESSAGE_CONTENT</span>)
     }
@@ -1679,6 +1720,7 @@
     <span class="doccomment">/// [GUILD_SCHEDULED_EVENTS] intent.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// [GUILD_SCHEDULED_EVENTS]: Self::GUILD_SCHEDULED_EVENTS</span>
+    <span class="attribute">#[<span class="ident">must_use</span>]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">guild_scheduled_events</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="self">self</span>.<span class="ident">contains</span>(<span class="ident"><span class="self">Self</span>::GUILD_SCHEDULED_EVENTS</span>)
     }

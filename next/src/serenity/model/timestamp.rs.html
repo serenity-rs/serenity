@@ -302,6 +302,8 @@
 <span id="297">297</span>
 <span id="298">298</span>
 <span id="299">299</span>
+<span id="300">300</span>
+<span id="301">301</span>
 </pre><pre class="rust"><code><span class="doccomment">//! Utilities for parsing and formatting RFC 3339 timestamps.</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! The [`Timestamp`] newtype wraps `chrono::DateTime&lt;Utc&gt;` or `time::OffsetDateTime` if the `time`</span>
@@ -368,6 +370,7 @@
             }
 
             <span class="doccomment">/// Create a new `Timestamp` with the current date and time in UTC.</span>
+            <span class="attribute">#[<span class="ident">must_use</span>]</span>
             <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">now</span>() -&gt; <span class="self">Self</span> {
                 <span class="self">Self</span>(<span class="ident">Utc::now</span>())
             }
@@ -383,6 +386,7 @@
             }
 
             <span class="doccomment">/// Returns the number of non-leap seconds since January 1, 1970 0:00:00 UTC</span>
+            <span class="attribute">#[<span class="ident">must_use</span>]</span>
             <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">unix_timestamp</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">i64</span> {
                 <span class="self">self</span>.<span class="number">0</span>.<span class="ident">timestamp</span>()
             }

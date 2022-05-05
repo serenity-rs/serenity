@@ -1227,6 +1227,7 @@
 <span id="1222">1222</span>
 <span id="1223">1223</span>
 <span id="1224">1224</span>
+<span id="1225">1225</span>
 </pre><pre class="rust"><code><span class="doccomment">//! A cache containing data received from [`Shard`]s.</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! Using the cache allows to avoid REST API requests via the [`http`] module</span>
@@ -1430,6 +1431,7 @@
 <span class="kw">impl</span> <span class="ident">Cache</span> {
     <span class="doccomment">/// Creates a new cache.</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
+    <span class="attribute">#[<span class="ident">must_use</span>]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="self">Self</span> {
         <span class="ident"><span class="self">Self</span>::default</span>()
     }
@@ -2406,7 +2408,7 @@
                     <span class="ident">splash</span>: <span class="prelude-val">None</span>,
                     <span class="ident">discovery_splash</span>: <span class="prelude-val">None</span>,
                     <span class="ident">system_channel_id</span>: <span class="prelude-val">None</span>,
-                    <span class="ident">system_channel_flags</span>: <span class="ident">Default::default</span>(),
+                    <span class="ident">system_channel_flags</span>: <span class="ident">SystemChannelFlags::default</span>(),
                     <span class="ident">rules_channel_id</span>: <span class="prelude-val">None</span>,
                     <span class="ident">public_updates_channel_id</span>: <span class="prelude-val">None</span>,
                     <span class="ident">verification_level</span>: <span class="ident">VerificationLevel::Low</span>,

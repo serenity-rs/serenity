@@ -1899,6 +1899,51 @@
 <span id="1894">1894</span>
 <span id="1895">1895</span>
 <span id="1896">1896</span>
+<span id="1897">1897</span>
+<span id="1898">1898</span>
+<span id="1899">1899</span>
+<span id="1900">1900</span>
+<span id="1901">1901</span>
+<span id="1902">1902</span>
+<span id="1903">1903</span>
+<span id="1904">1904</span>
+<span id="1905">1905</span>
+<span id="1906">1906</span>
+<span id="1907">1907</span>
+<span id="1908">1908</span>
+<span id="1909">1909</span>
+<span id="1910">1910</span>
+<span id="1911">1911</span>
+<span id="1912">1912</span>
+<span id="1913">1913</span>
+<span id="1914">1914</span>
+<span id="1915">1915</span>
+<span id="1916">1916</span>
+<span id="1917">1917</span>
+<span id="1918">1918</span>
+<span id="1919">1919</span>
+<span id="1920">1920</span>
+<span id="1921">1921</span>
+<span id="1922">1922</span>
+<span id="1923">1923</span>
+<span id="1924">1924</span>
+<span id="1925">1925</span>
+<span id="1926">1926</span>
+<span id="1927">1927</span>
+<span id="1928">1928</span>
+<span id="1929">1929</span>
+<span id="1930">1930</span>
+<span id="1931">1931</span>
+<span id="1932">1932</span>
+<span id="1933">1933</span>
+<span id="1934">1934</span>
+<span id="1935">1935</span>
+<span id="1936">1936</span>
+<span id="1937">1937</span>
+<span id="1938">1938</span>
+<span id="1939">1939</span>
+<span id="1940">1940</span>
+<span id="1941">1941</span>
 </pre><pre class="rust"><code><span class="doccomment">//! All the events this library handles.</span>
 
 <span class="kw">use</span> <span class="ident">std::collections::HashMap</span>;
@@ -1912,7 +1957,15 @@
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::constants::OpCode</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::internal::prelude</span>::<span class="kw-2">*</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::json::prelude</span>::<span class="kw-2">*</span>;
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::interactions::application_command::ApplicationCommandPermission</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::interactions::Interaction</span>;
+
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
+<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">transparent</span>)]</span>
+<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ApplicationCommandPermissionsUpdateEvent</span> {
+    <span class="kw">pub</span> <span class="ident">permission</span>: <span class="ident">ApplicationCommandPermission</span>,
+}
 
 <span class="doccomment">/// Event data for the channel creation event.</span>
 <span class="doccomment">///</span>
@@ -2121,9 +2174,9 @@
 
                 <span class="prelude-val">Ok</span>(<span class="ident">GuildMembersChunkEvent</span> {
                     <span class="ident">guild_id</span>,
+                    <span class="ident">members</span>,
                     <span class="ident">chunk_index</span>,
                     <span class="ident">chunk_count</span>,
-                    <span class="ident">members</span>,
                     <span class="ident">nonce</span>,
                 })
             }
@@ -2570,6 +2623,13 @@
 <span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
 <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">untagged</span>)]</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">Event</span> {
+    <span class="doccomment">/// The permissions of an [`ApplicationCommand`] was changed.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// Fires the [`EventHandler::application_command_permissions_update`] event.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// [`ApplicationCommand`]: crate::model::interactions::application_command::ApplicationCommand</span>
+    <span class="doccomment">/// [`EventHandler::application_command_permissions_update`]: crate::client::EventHandler::application_command_permissions_update</span>
+    <span class="ident">ApplicationCommandPermissionsUpdate</span>(<span class="ident">ApplicationCommandPermissionsUpdateEvent</span>),
     <span class="doccomment">/// A [`Channel`] was created.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// Fires the [`EventHandler::channel_create`] event.</span>
@@ -2704,17 +2764,22 @@
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
 <span class="kw">fn</span> <span class="ident">gid_from_channel</span>(<span class="ident">c</span>: <span class="kw-2">&amp;</span><span class="ident">Channel</span>) -&gt; <span class="ident">RelatedId</span><span class="op">&lt;</span><span class="ident">GuildId</span><span class="op">&gt;</span> {
-    <span class="kw">use</span> <span class="ident">RelatedId</span>::<span class="kw-2">*</span>;
     <span class="kw">match</span> <span class="ident">c</span> {
-        <span class="ident">Channel::Guild</span>(<span class="ident">g</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">g</span>.<span class="ident">guild_id</span>),
-        <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
+        <span class="ident">Channel::Guild</span>(<span class="ident">g</span>) =&gt; <span class="ident">RelatedId::Some</span>(<span class="ident">g</span>.<span class="ident">guild_id</span>),
+        <span class="kw">_</span> =&gt; <span class="ident">RelatedId::None</span>,
     }
 }
 
 <span class="macro">macro_rules!</span> <span class="ident">with_related_ids_for_event_types</span> {
     (<span class="macro-nonterminal">$</span><span class="kw">macro</span>:<span class="macro-nonterminal">ident</span>) =&gt; {
         <span class="macro-nonterminal">$</span><span class="macro">macro!</span> {
-            <span class="macro-nonterminal">Self::ChannelCreate</span>, <span class="ident"><span class="self">Self</span>::ChannelCreate</span>(<span class="ident">e</span>) =&gt; {
+            <span class="macro-nonterminal">Self::ApplicationCommandPermissionsUpdate</span>, <span class="ident"><span class="self">Self</span>::ApplicationCommandPermissionsUpdate</span>(<span class="ident">e</span>) =&gt; {
+                <span class="ident">user_id</span>: <span class="ident">Never</span>,
+                <span class="ident">guild_id</span>: <span class="prelude-val">Some</span>(<span class="ident">e</span>.<span class="ident">permission</span>.<span class="ident">guild_id</span>),
+                <span class="ident">channel_id</span>: <span class="ident">Never</span>,
+                <span class="ident">message_id</span>: <span class="ident">Never</span>,
+            },
+            <span class="ident"><span class="self">Self</span>::ChannelCreate</span>, <span class="ident"><span class="self">Self</span>::ChannelCreate</span>(<span class="ident">e</span>) =&gt; {
                 <span class="ident">user_id</span>: <span class="ident">Never</span>,
                 <span class="ident">guild_id</span>: <span class="ident">gid_from_channel</span>(<span class="kw-2">&amp;</span><span class="ident">e</span>.<span class="ident">channel</span>),
                 <span class="ident">channel_id</span>: <span class="prelude-val">Some</span>(<span class="ident">e</span>.<span class="ident">channel</span>.<span class="ident">id</span>()),
@@ -3066,6 +3131,7 @@
         }
     ),<span class="op">+</span> $(,)<span class="question-mark">?</span>) =&gt; {
         <span class="doccomment">/// User ID(s) related to this event.</span>
+        <span class="attribute">#[<span class="ident">must_use</span>]</span>
         <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">user_id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">RelatedId</span><span class="op">&lt;</span><span class="ident">UserId</span><span class="op">&gt;</span> {
             <span class="kw">use</span> <span class="ident">RelatedId</span>::<span class="kw-2">*</span>;
             <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">unused_variables</span>)]</span>
@@ -3079,6 +3145,7 @@
         }
 
         <span class="doccomment">/// Guild ID related to this event.</span>
+        <span class="attribute">#[<span class="ident">must_use</span>]</span>
         <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">guild_id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">RelatedId</span><span class="op">&lt;</span><span class="ident">GuildId</span><span class="op">&gt;</span> {
             <span class="kw">use</span> <span class="ident">RelatedId</span>::<span class="kw-2">*</span>;
             <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">unused_variables</span>)]</span>
@@ -3092,6 +3159,7 @@
         }
 
         <span class="doccomment">/// Channel ID(s) related to this event.</span>
+        <span class="attribute">#[<span class="ident">must_use</span>]</span>
         <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">channel_id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">RelatedId</span><span class="op">&lt;</span><span class="ident">ChannelId</span><span class="op">&gt;</span> {
             <span class="kw">use</span> <span class="ident">RelatedId</span>::<span class="kw-2">*</span>;
             <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">unused_variables</span>)]</span>
@@ -3105,6 +3173,7 @@
         }
 
         <span class="doccomment">/// Message ID(s) related to this event.</span>
+        <span class="attribute">#[<span class="ident">must_use</span>]</span>
         <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">message_id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">RelatedId</span><span class="op">&lt;</span><span class="ident">MessageId</span><span class="op">&gt;</span> {
             <span class="kw">use</span> <span class="ident">RelatedId</span>::<span class="kw-2">*</span>;
             <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">unused_variables</span>)]</span>
@@ -3121,8 +3190,12 @@
 
 <span class="kw">impl</span> <span class="ident">Event</span> {
     <span class="doccomment">/// Return the type of this event.</span>
+    <span class="attribute">#[<span class="ident">must_use</span>]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">event_type</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">EventType</span> {
         <span class="kw">match</span> <span class="self">self</span> {
+            <span class="ident"><span class="self">Self</span>::ApplicationCommandPermissionsUpdate</span>(<span class="kw">_</span>) =&gt; {
+                <span class="ident">EventType::ApplicationCommandPermissionsUpdate</span>
+            },
             <span class="ident"><span class="self">Self</span>::ChannelCreate</span>(<span class="kw">_</span>) =&gt; <span class="ident">EventType::ChannelCreate</span>,
             <span class="ident"><span class="self">Self</span>::ChannelDelete</span>(<span class="kw">_</span>) =&gt; <span class="ident">EventType::ChannelDelete</span>,
             <span class="ident"><span class="self">Self</span>::ChannelPinsUpdate</span>(<span class="kw">_</span>) =&gt; <span class="ident">EventType::ChannelPinsUpdate</span>,
@@ -3246,6 +3319,9 @@
 <span class="doccomment">/// Returns [`Error::Json`] if there is an error in deserializing the event data.</span>
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">deserialize_event_with_type</span>(<span class="ident">kind</span>: <span class="ident">EventType</span>, <span class="ident">v</span>: <span class="ident">Value</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Event</span><span class="op">&gt;</span> {
     <span class="prelude-val">Ok</span>(<span class="kw">match</span> <span class="ident">kind</span> {
+        <span class="ident">EventType::ApplicationCommandPermissionsUpdate</span> =&gt; {
+            <span class="ident">Event::ApplicationCommandPermissionsUpdate</span>(<span class="ident">from_value</span>(<span class="ident">v</span>)<span class="question-mark">?</span>)
+        },
         <span class="ident">EventType::ChannelCreate</span> =&gt; <span class="ident">Event::ChannelCreate</span>(<span class="ident">from_value</span>(<span class="ident">v</span>)<span class="question-mark">?</span>),
         <span class="ident">EventType::ChannelDelete</span> =&gt; <span class="ident">Event::ChannelDelete</span>(<span class="ident">from_value</span>(<span class="ident">v</span>)<span class="question-mark">?</span>),
         <span class="ident">EventType::ChannelPinsUpdate</span> =&gt; <span class="ident">Event::ChannelPinsUpdate</span>(<span class="ident">from_value</span>(<span class="ident">v</span>)<span class="question-mark">?</span>),
@@ -3256,14 +3332,14 @@
             <span class="comment">// GuildUnavailable isn&#39;t actually received from the gateway, so it</span>
             <span class="comment">// can be lumped in with GuildCreate&#39;s arm.</span>
 
-            <span class="kw">if</span> <span class="ident">v</span>.<span class="ident">get</span>(<span class="string">&quot;unavailable&quot;</span>).<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">v</span><span class="op">|</span> <span class="ident">v</span>.<span class="ident">as_bool</span>()).<span class="ident">unwrap_or</span>(<span class="bool-val">false</span>) {
+            <span class="kw">if</span> <span class="ident">v</span>.<span class="ident">get</span>(<span class="string">&quot;unavailable&quot;</span>).<span class="ident">and_then</span>(<span class="ident">Value::as_bool</span>).<span class="ident">unwrap_or</span>(<span class="bool-val">false</span>) {
                 <span class="ident">Event::GuildUnavailable</span>(<span class="ident">from_value</span>(<span class="ident">v</span>)<span class="question-mark">?</span>)
             } <span class="kw">else</span> {
                 <span class="ident">Event::GuildCreate</span>(<span class="ident">from_value</span>(<span class="ident">v</span>)<span class="question-mark">?</span>)
             }
         },
         <span class="ident">EventType::GuildDelete</span> =&gt; {
-            <span class="kw">if</span> <span class="ident">v</span>.<span class="ident">get</span>(<span class="string">&quot;unavailable&quot;</span>).<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">v</span><span class="op">|</span> <span class="ident">v</span>.<span class="ident">as_bool</span>()).<span class="ident">unwrap_or</span>(<span class="bool-val">false</span>) {
+            <span class="kw">if</span> <span class="ident">v</span>.<span class="ident">get</span>(<span class="string">&quot;unavailable&quot;</span>).<span class="ident">and_then</span>(<span class="ident">Value::as_bool</span>).<span class="ident">unwrap_or</span>(<span class="bool-val">false</span>) {
                 <span class="ident">Event::GuildUnavailable</span>(<span class="ident">from_value</span>(<span class="ident">v</span>)<span class="question-mark">?</span>)
             } <span class="kw">else</span> {
                 <span class="ident">Event::GuildDelete</span>(<span class="ident">from_value</span>(<span class="ident">v</span>)<span class="question-mark">?</span>)
@@ -3328,6 +3404,10 @@
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>, <span class="ident">PartialOrd</span>, <span class="ident">Ord</span>)]</span>
 <span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">EventType</span> {
+    <span class="doccomment">/// Indicator that an application command permission update payload was received.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// This maps to [`ApplicationCommandPermissionsUpdateEvent`].</span>
+    <span class="ident">ApplicationCommandPermissionsUpdate</span>,
     <span class="doccomment">/// Indicator that a channel create payload was received.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// This maps to [`ChannelCreateEvent`].</span>
@@ -3566,6 +3646,7 @@
             <span class="macro-nonterminal">$</span><span class="macro-nonterminal">variant</span>:<span class="ident">path</span>, <span class="macro-nonterminal">$</span><span class="kw">_</span>:<span class="macro-nonterminal">pat</span> =&gt; { $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">input</span>:<span class="ident">tt</span>)<span class="op">*</span> }
         ),<span class="op">+</span> $(,)<span class="question-mark">?</span>
     ) =&gt; {
+        <span class="attribute">#[<span class="ident">must_use</span>]</span>
         <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">related_ids</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">RelatedIdsForEventType</span> {
             <span class="kw">match</span> <span class="self">self</span> {
                 <span class="ident"><span class="self">Self</span>::Other</span>(<span class="kw">_</span>) =&gt; <span class="ident">Default::default</span>(),
@@ -3604,6 +3685,8 @@
 }
 
 <span class="kw">impl</span> <span class="ident">EventType</span> {
+    <span class="kw">const</span> <span class="ident">APPLICATION_COMMAND_PERMISSIONS_UPDATE</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> <span class="op">=</span>
+        <span class="string">&quot;APPLICATION_COMMAND_PERMISSIONS_UPDATE&quot;</span>;
     <span class="kw">const</span> <span class="ident">CHANNEL_CREATE</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;CHANNEL_CREATE&quot;</span>;
     <span class="kw">const</span> <span class="ident">CHANNEL_DELETE</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;CHANNEL_DELETE&quot;</span>;
     <span class="kw">const</span> <span class="ident">CHANNEL_PINS_UPDATE</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;CHANNEL_PINS_UPDATE&quot;</span>;
@@ -3658,8 +3741,12 @@
     <span class="doccomment">/// Return the event name of this event. Some events are synthetic, and we lack</span>
     <span class="doccomment">/// the information to recover the original event name for these events, in which</span>
     <span class="doccomment">/// case this method returns [`None`].</span>
+    <span class="attribute">#[<span class="ident">must_use</span>]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="self">self</span> {
+            <span class="ident"><span class="self">Self</span>::ApplicationCommandPermissionsUpdate</span> =&gt; {
+                <span class="prelude-val">Some</span>(<span class="ident"><span class="self">Self</span>::APPLICATION_COMMAND_PERMISSIONS_UPDATE</span>)
+            },
             <span class="ident"><span class="self">Self</span>::ChannelCreate</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident"><span class="self">Self</span>::CHANNEL_CREATE</span>),
             <span class="ident"><span class="self">Self</span>::ChannelDelete</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident"><span class="self">Self</span>::CHANNEL_DELETE</span>),
             <span class="ident"><span class="self">Self</span>::ChannelPinsUpdate</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident"><span class="self">Self</span>::CHANNEL_PINS_UPDATE</span>),
@@ -3740,6 +3827,9 @@
                 <span class="ident">E</span>: <span class="ident">DeError</span>,
             {
                 <span class="prelude-val">Ok</span>(<span class="kw">match</span> <span class="ident">v</span> {
+                    <span class="ident">EventType::APPLICATION_COMMAND_PERMISSIONS_UPDATE</span> =&gt; {
+                        <span class="ident">EventType::ApplicationCommandPermissionsUpdate</span>
+                    },
                     <span class="ident">EventType::CHANNEL_CREATE</span> =&gt; <span class="ident">EventType::ChannelCreate</span>,
                     <span class="ident">EventType::CHANNEL_DELETE</span> =&gt; <span class="ident">EventType::ChannelDelete</span>,
                     <span class="ident">EventType::CHANNEL_PINS_UPDATE</span> =&gt; <span class="ident">EventType::ChannelPinsUpdate</span>,

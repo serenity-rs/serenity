@@ -315,6 +315,9 @@
 <span id="310">310</span>
 <span id="311">311</span>
 <span id="312">312</span>
+<span id="313">313</span>
+<span id="314">314</span>
+<span id="315">315</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::fmt</span>;
 <span class="kw">use</span> <span class="ident">std::future::Future</span>;
 <span class="kw">use</span> <span class="ident">std::pin::Pin</span>;
@@ -515,6 +518,7 @@
     <span class="ident">ModalInteractionCollectorBuilder</span>;
 }
 
+<span class="attribute">#[<span class="ident">must_use</span> <span class="op">=</span> <span class="string">&quot;Builders do nothing unless built&quot;</span>]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ModalInteractionCollectorBuilder</span> {
     <span class="ident">filter</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">FilterOptions</span><span class="op">&gt;</span>,
     <span class="ident">shard</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ShardMessenger</span><span class="op">&gt;</span>,
@@ -532,6 +536,7 @@
 
     <span class="doccomment">/// Use the given configuration to build the [`ModalInteractionCollector`].</span>
     <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::unwrap_used</span>)]</span>
+    <span class="attribute">#[<span class="ident">must_use</span>]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">build</span>(<span class="self">self</span>) -&gt; <span class="ident">ModalInteractionCollector</span> {
         <span class="kw">let</span> <span class="ident">shard_messenger</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">shard</span>.<span class="ident">unwrap</span>();
         <span class="kw">let</span> (<span class="ident">filter</span>, <span class="ident">receiver</span>) <span class="op">=</span> <span class="ident">ModalInteractionFilter::new</span>(<span class="self">self</span>.<span class="ident">filter</span>.<span class="ident">unwrap</span>());
@@ -546,6 +551,7 @@
     }
 }
 
+<span class="attribute">#[<span class="ident">must_use</span> <span class="op">=</span> <span class="string">&quot;builders do nothing unless awaited&quot;</span>]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">CollectModalInteraction</span> {
     <span class="ident">filter</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">FilterOptions</span><span class="op">&gt;</span>,
     <span class="ident">shard</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ShardMessenger</span><span class="op">&gt;</span>,
@@ -582,7 +588,7 @@
                 }
                 .<span class="ident">next</span>()
                 .<span class="kw">await</span>
-            }))
+            }));
         }
 
         <span class="self">self</span>.<span class="ident">fut</span>.<span class="ident">as_mut</span>().<span class="ident">unwrap</span>().<span class="ident">as_mut</span>().<span class="ident">poll</span>(<span class="ident">ctx</span>)

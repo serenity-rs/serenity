@@ -953,6 +953,7 @@
 <span id="948">948</span>
 <span id="949">949</span>
 <span id="950">950</span>
+<span id="951">951</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::borrow::Cow</span>;
 <span class="kw">use</span> <span class="ident">std::fmt</span>;
 
@@ -1352,6 +1353,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">Change</span> {
+    <span class="attribute">#[<span class="ident">must_use</span>]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">key</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">str</span><span class="op">&gt;</span> {
         <span class="macro">macro_rules!</span> <span class="ident">variant_keys</span> {
             ($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">Variant</span>:<span class="ident">ident</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">key</span>:<span class="ident">literal</span>,)<span class="kw-2">*</span>) =&gt; {

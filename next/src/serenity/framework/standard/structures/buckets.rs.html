@@ -520,6 +520,14 @@
 <span id="515">515</span>
 <span id="516">516</span>
 <span id="517">517</span>
+<span id="518">518</span>
+<span id="519">519</span>
+<span id="520">520</span>
+<span id="521">521</span>
+<span id="522">522</span>
+<span id="523">523</span>
+<span id="524">524</span>
+<span id="525">525</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::collections::HashMap</span>;
 <span class="kw">use</span> <span class="ident">std::fmt</span>;
 <span class="kw">use</span> <span class="ident">std::time</span>::{<span class="ident">Duration</span>, <span class="ident">Instant</span>};
@@ -666,18 +674,21 @@
 <span class="kw">impl</span> <span class="ident">RateLimitInfo</span> {
     <span class="doccomment">/// Gets the duration of the rate limit in seconds.</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
+    <span class="attribute">#[<span class="ident">must_use</span>]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_secs</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u64</span> {
         <span class="self">self</span>.<span class="ident">rate_limit</span>.<span class="ident">as_secs</span>()
     }
 
     <span class="doccomment">/// Gets the duration of the rate limit in milliseconds.</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
+    <span class="attribute">#[<span class="ident">must_use</span>]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_millis</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u128</span> {
         <span class="self">self</span>.<span class="ident">rate_limit</span>.<span class="ident">as_millis</span>()
     }
 
     <span class="doccomment">/// Gets the duration of the rate limit in microseconds.</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
+    <span class="attribute">#[<span class="ident">must_use</span>]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_micros</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u128</span> {
         <span class="self">self</span>.<span class="ident">rate_limit</span>.<span class="ident">as_micros</span>()
     }
@@ -903,6 +914,7 @@
 
 <span class="kw">impl</span> <span class="ident">BucketBuilder</span> {
     <span class="doccomment">/// A bucket collecting tickets per command invocation.</span>
+    <span class="attribute">#[<span class="ident">must_use</span>]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new_global</span>() -&gt; <span class="self">Self</span> {
         <span class="self">Self</span> {
             <span class="ident">limited_for</span>: <span class="ident">LimitedFor::Global</span>,
@@ -911,6 +923,7 @@
     }
 
     <span class="doccomment">/// A bucket collecting tickets per user.</span>
+    <span class="attribute">#[<span class="ident">must_use</span>]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new_user</span>() -&gt; <span class="self">Self</span> {
         <span class="self">Self</span> {
             <span class="ident">limited_for</span>: <span class="ident">LimitedFor::User</span>,
@@ -919,6 +932,7 @@
     }
 
     <span class="doccomment">/// A bucket collecting tickets per guild.</span>
+    <span class="attribute">#[<span class="ident">must_use</span>]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new_guild</span>() -&gt; <span class="self">Self</span> {
         <span class="self">Self</span> {
             <span class="ident">limited_for</span>: <span class="ident">LimitedFor::Guild</span>,
@@ -927,6 +941,7 @@
     }
 
     <span class="doccomment">/// A bucket collecting tickets per channel.</span>
+    <span class="attribute">#[<span class="ident">must_use</span>]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new_channel</span>() -&gt; <span class="self">Self</span> {
         <span class="self">Self</span> {
             <span class="ident">limited_for</span>: <span class="ident">LimitedFor::Channel</span>,
@@ -939,6 +954,7 @@
     <span class="doccomment">/// This requires the cache, as messages do not contain their channel&#39;s</span>
     <span class="doccomment">/// category.</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
+    <span class="attribute">#[<span class="ident">must_use</span>]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new_category</span>() -&gt; <span class="self">Self</span> {
         <span class="self">Self</span> {
             <span class="ident">limited_for</span>: <span class="ident">LimitedFor::Category</span>,

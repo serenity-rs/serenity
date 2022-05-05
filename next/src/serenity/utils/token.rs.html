@@ -84,6 +84,7 @@
 <span id="79">79</span>
 <span id="80">80</span>
 <span id="81">81</span>
+<span id="82">82</span>
 </pre><pre class="rust"><code><span class="doccomment">//! Utilities to parse and validate Discord tokens.</span>
 
 <span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">fmt</span>, <span class="ident">str</span>};
@@ -137,7 +138,8 @@
 <span class="doccomment">/// the token generation unix timestamp.</span>
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">parse</span>(<span class="ident">token</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="ident">UserId</span>, <span class="ident">i64</span>)<span class="op">&gt;</span> {
     <span class="comment">// The token consists of three base64-encoded parts</span>
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">parts</span> <span class="op">=</span> <span class="ident">token</span>.<span class="ident">as_ref</span>().<span class="ident">split</span>(<span class="string">&#39;.&#39;</span>);
+    <span class="comment">// Tokens can be preceded by &quot;Bot &quot; (that&#39;s how the Discord API expects them)</span>
+    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">parts</span> <span class="op">=</span> <span class="ident">token</span>.<span class="ident">as_ref</span>().<span class="ident">trim_start_matches</span>(<span class="string">&quot;Bot &quot;</span>).<span class="ident">split</span>(<span class="string">&#39;.&#39;</span>);
 
     <span class="comment">// First part must be a base64-encoded stringified user ID</span>
     <span class="kw">let</span> <span class="ident">user_id</span> <span class="op">=</span> <span class="ident">base64::decode_config</span>(<span class="ident">parts</span>.<span class="ident">next</span>()<span class="question-mark">?</span>, <span class="ident">base64::URL_SAFE</span>).<span class="ident">ok</span>()<span class="question-mark">?</span>;
