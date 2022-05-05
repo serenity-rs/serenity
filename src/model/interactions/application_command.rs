@@ -107,7 +107,14 @@ impl ApplicationCommandInteraction {
     {
         let mut interaction_response = CreateInteractionResponse::default();
         f(&mut interaction_response);
+        self._create_interaction_response(http.as_ref(), interaction_response).await
+    }
 
+    async fn _create_interaction_response<'a>(
+        &self,
+        http: &Http,
+        interaction_response: CreateInteractionResponse<'a>,
+    ) -> Result<()> {
         let map = json::hashmap_to_json_map(interaction_response.0);
 
         Message::check_lengths(&map)?;
@@ -198,7 +205,14 @@ impl ApplicationCommandInteraction {
     {
         let mut interaction_response = CreateInteractionResponseFollowup::default();
         f(&mut interaction_response);
+        self._create_followup_message(http.as_ref(), interaction_response).await
+    }
 
+    async fn _create_followup_message<'a>(
+        &self,
+        http: &Http,
+        interaction_response: CreateInteractionResponseFollowup<'a>,
+    ) -> Result<Message> {
         let map = json::hashmap_to_json_map(interaction_response.0);
 
         Message::check_lengths(&map)?;

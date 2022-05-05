@@ -326,9 +326,15 @@ impl Message {
     where
         F: for<'b> FnOnce(&'b mut EditMessage<'a>) -> &'b mut EditMessage<'a>,
     {
+        let mut builder = self._prepare_edit_builder(cache_http.cache())?;
+        f(&mut builder);
+        self._send_edit(cache_http.http(), builder).await
+    }
+
+    fn _prepare_edit_builder<'a>(&self, cache: Option<&crate::Arc<Cache>>) -> Result<EditMessage<'a>> {
         #[cfg(feature = "cache")]
         {
-            if let Some(cache) = cache_http.cache() {
+            if let Some(cache) = cache {
                 if self.author.id != cache.current_user_id() {
                     return Err(Error::Model(ModelError::InvalidUser));
                 }
@@ -347,13 +353,13 @@ impl Message {
         for attachment in &self.attachments {
             builder.add_existing_attachment(attachment.id);
         }
+        Ok(builder)
+    }
 
-        f(&mut builder);
-
+    async fn _send_edit<'a>(&mut self, http: &Http, builder: EditMessage<'a>) -> Result<()> {
         let map = json::hashmap_to_json_map(builder.0);
 
-        *self = cache_http
-            .http()
+        *self = http
             .edit_message_and_attachments(
                 self.channel_id.0,
                 self.id.0,
@@ -361,9 +367,9 @@ impl Message {
                 builder.1,
             )
             .await?;
-
         Ok(())
     }
+
 
     pub(crate) fn transform_content(&mut self) {
         match self.kind {

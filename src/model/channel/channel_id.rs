@@ -764,19 +764,22 @@ impl ChannelId {
         for<'b> F: FnOnce(&'b mut CreateMessage<'a>) -> &'b mut CreateMessage<'a>,
     {
         let mut create_message = CreateMessage::default();
-        let msg = f(&mut create_message);
+        f(&mut create_message);
+        self._send_message(http.as_ref(), create_message).await
+    }
 
-        let map = json::hashmap_to_json_map(msg.0.clone());
+    async fn _send_message<'a>(self, http: &Http, msg: CreateMessage<'a>) -> Result<Message> {
+        let map = json::hashmap_to_json_map(msg.0);
 
         Message::check_lengths(&map)?;
 
         let message = if msg.2.is_empty() {
             http.as_ref().send_message(self.0, &Value::from(map)).await?
         } else {
-            http.as_ref().send_files(self.0, msg.2.clone(), &map).await?
+            http.as_ref().send_files(self.0, msg.2, &map).await?
         };
 
-        if let Some(reactions) = msg.1.clone() {
+        if let Some(reactions) = msg.1 {
             for reaction in reactions {
                 self.create_reaction(&http, message.id, reaction).await?;
             }
