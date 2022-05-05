@@ -181,11 +181,6 @@
 <span id="176">176</span>
 <span id="177">177</span>
 <span id="178">178</span>
-<span id="179">179</span>
-<span id="180">180</span>
-<span id="181">181</span>
-<span id="182">182</span>
-<span id="183">183</span>
 </pre><pre class="rust"><code><span class="doccomment">//! The gateway module contains the pieces - primarily the `Shard` -</span>
 <span class="doccomment">//! responsible for maintaining a WebSocket connection with Discord.</span>
 <span class="doccomment">//!</span>
@@ -236,13 +231,13 @@
 
 <span class="kw">mod</span> <span class="ident">error</span>;
 <span class="kw">mod</span> <span class="ident">shard</span>;
-<span class="kw">mod</span> <span class="ident">ws_client_ext</span>;
+<span class="kw">mod</span> <span class="ident">ws</span>;
 
 <span class="kw">use</span> <span class="ident">std::fmt</span>;
 
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="self">self</span>::error::Error</span> <span class="kw">as</span> <span class="ident">GatewayError</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="self">self</span>::shard::Shard</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="self">self</span>::ws_client_ext::WebSocketGatewayClientExt</span>;
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="self">self</span>::ws::WsClient</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;client&quot;</span>)]</span>
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::client::bridge::gateway::ShardClientMessage</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::json::Value</span>;
@@ -250,11 +245,6 @@
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::user::OnlineStatus</span>;
 
 <span class="kw">pub</span> <span class="kw">type</span> <span class="ident">CurrentPresence</span> <span class="op">=</span> (<span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Activity</span><span class="op">&gt;</span>, <span class="ident">OnlineStatus</span>);
-
-<span class="kw">use</span> <span class="ident">async_tungstenite::tokio::ConnectStream</span>;
-<span class="kw">use</span> <span class="ident">async_tungstenite::WebSocketStream</span>;
-
-<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">WsStream</span> <span class="op">=</span> <span class="ident">WebSocketStream</span><span class="op">&lt;</span><span class="ident">ConnectStream</span><span class="op">&gt;</span>;
 
 <span class="doccomment">/// Indicates the current connection stage of a [`Shard`].</span>
 <span class="doccomment">///</span>
