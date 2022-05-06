@@ -92,6 +92,7 @@ impl Typing {
     /// Returns false in case if typing has already been stopped.
     ///
     /// [`Channel`]: crate::model::channel::Channel
+    #[allow(clippy::must_use_candidate)]
     pub fn stop(self) -> bool {
         self.0.send(()).is_ok()
     }
