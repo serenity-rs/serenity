@@ -89,10 +89,10 @@ impl Typing {
     ///
     /// This should be used to stop typing after it is started using [`Typing::start`].
     /// Typing may persist for a few seconds on some clients after this is called.
+    /// Returns false in case if typing has already been stopped.
     ///
     /// [`Channel`]: crate::model::channel::Channel
-    #[must_use]
-    pub fn stop(self) -> Option<()> {
-        self.0.send(()).ok()
+    pub fn stop(self) -> bool {
+        self.0.send(()).is_ok()
     }
 }
