@@ -89,7 +89,7 @@ impl Typing {
     ///
     /// This should be used to stop typing after it is started using [`Typing::start`].
     /// Typing may persist for a few seconds on some clients after this is called.
-    /// Returns false in case if typing has already been stopped.
+    /// Returns false if typing has already stopped.
     ///
     /// [`Channel`]: crate::model::channel::Channel
     #[allow(clippy::must_use_candidate)]
