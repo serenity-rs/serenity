@@ -326,21 +326,20 @@ impl Message {
     where
         F: for<'b> FnOnce(&'b mut EditMessage<'a>) -> &'b mut EditMessage<'a>,
     {
-        let mut builder = self._prepare_edit_builder(cache_http.cache())?;
-        f(&mut builder);
-        self._send_edit(cache_http.http(), builder).await
-    }
-
-    fn _prepare_edit_builder<'a>(&self, cache: Option<&crate::Arc<Cache>>) -> Result<EditMessage<'a>> {
         #[cfg(feature = "cache")]
         {
-            if let Some(cache) = cache {
+            if let Some(cache) = cache_http.cache() {
                 if self.author.id != cache.current_user_id() {
                     return Err(Error::Model(ModelError::InvalidUser));
                 }
             }
         }
+        let mut builder = self._prepare_edit_builder()?;
+        f(&mut builder);
+        self._send_edit(cache_http.http(), builder).await
+    }
 
+    fn _prepare_edit_builder<'a>(&self) -> Result<EditMessage<'a>> {
         let mut builder = EditMessage::default();
 
         if !self.content.is_empty() {
@@ -369,7 +368,6 @@ impl Message {
             .await?;
         Ok(())
     }
-
 
     pub(crate) fn transform_content(&mut self) {
         match self.kind {
