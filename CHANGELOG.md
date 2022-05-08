@@ -3,6 +3,59 @@
 All notable changes to this project will be documented in this file.
 This project mostly adheres to [Semantic Versioning][semver].
 
+## [0.11.2] - 2021-05-08
+
+Thanks to the following for their contributions:
+
+- [@acdenisSK]
+- [@elkowar]
+- [@GnomedDev]
+- [@kangalioo]
+- [@MelonShooter]
+- [@mkrasnitski]
+- [@nickelc]
+- [@tedtramonte]
+
+### Added
+
+- [model] Implement Guild Scheduled Events support ([@mkrasnitski]) [c:e690ccd]
+- [model] Add initial application command permissions v2 support ([@nickelc]) [c:bca105a]
+- [model] Implement `Ord` and `PartialOrd` for `Timestamp` ([@tedtramonte]) [c:b1c3a62]
+- [model] Add new enum variant to `audit_log::Action` to represent unknown values ([@nickelc]) [c:b2ae872]
+- [model] Add `SUPPRESS_EMBEDS` flag for interaction response messages ([@nickelc]) [c:888c37f]
+- [builder] Add function for interaction followup messages to set or unset the ephemeral flag ([@nickelc]) [c:10d9297]
+- [model] Implement conversion from `Guild` to `PartialGuild` ([@kangalioo]) [c:475fc1f]
+
+### Changed
+
+- [model] Split up a few functions to minimize monomorphization-bloat ([@elkowar]) [c:39fb310]
+- [misc] Adapt the library to pass the majority of `clippy::pedantic` lints ([@GnomedDev]) [c:dc22cf2]
+- [utils] Strip leading "Bot " in parse_token ([@kangalioo]) [c:0a544c6]
+- [model] Replace feature gated `simd-json` trait imports with `json::prelude::*` ([@nickelc]) [c:3e454cc]
+- [gateway] Improve binary message deserialization time by optimizing `convert_ws_message` ([@MelonShooter]) [c:8b2326c]
+- [gateway] Remove duplicate WS client creation for native/rustls backends ([@nickelc]) [c:be17752]
+- [utils] Use `Cow` in `utils/content_safe.rs` to save on allocations ([@mkrasnitski]) [c:79a3cc8]
+- [misc] Use `dashmap` 5.2.0 for the MSRV build job ([@nickelc]) [c:2898af2]
+- [misc] Update `simd-json` to 0.4.14 ([@nickelc]) [c:0ba01a7]
+- [model] Optimize guild create & delete event deserialization ([@nickelc]) [c:47433de]
+- [model] Use `AttachmentType::data` in `EditRole::icon` ([@mkrasnitski]) [c:c3ad0b2]
+- [misc] Deny broken and private intra doc links ([@nickelc]) [c:56293bb]
+- [misc] Update `.git-blame-ignore-revs` ([@nickelc]) [c:75df53e]
+
+### Fixed
+
+- [misc] Fix wrong ID type in doc comment ([@nickelc]) [c:e1eaeeb]
+- [model] Fix lifetimes on interaction response methods ([@kangalioo]) [c:dd9d255]
+- [framework] Fix argument parsing when no delimiters are specified ([@acdenisSK]) [c:628c1ea] [c:889540a]
+- [misc] Fix unused import and deny unused items ([@nickelc]) [c:b1cc702]
+- [misc] Fix broken links in the readme ([@nickelc]) [c:fe53b16]
+
+### Removed
+
+- [misc] Remove unnecessary braces in use statement ([@nickelc]) [c:2f8e2b0]
+- [voice] Remove unused code related to the former voice functionality ([@nickelc]) [c:97ef906]
+- [examples] Remove unused `chrono` dependency in example 09 ([@acdenisSK]) [c:0450dde]
+
 ## [0.11.1] - 2021-04-18
 
 This is a light release to fix compilation on https://docs.rs.
@@ -4709,6 +4762,7 @@ Initial commit.
 
 <!-- COMPARISONS -->
 
+[0.11.2]: https://github.com/serenity-rs/serenity/compare/v0.11.1...v0.11.2
 [0.11.1]: https://github.com/serenity-rs/serenity/compare/v0.11.0...v0.11.1
 [0.11.0]: https://github.com/serenity-rs/serenity/compare/v0.10.10...v0.11.0
 [0.10.10]: https://github.com/serenity-rs/serenity/compare/v0.10.9...v0.10.10
@@ -4848,10 +4902,11 @@ Initial commit.
 [@drp19]: https://github.com/drp19
 [@Elinvynia]: https://github.com/Elinvynia
 [@Erk-]: https://github.com/Erk-
-[@eatsfoobars]: https://github.com/eatsfoobars
 [@eLunate]: https://github.com/eLunate
-[@emoticon]: https://github.com/emoticon
+[@eatsfoobars]: https://github.com/eatsfoobars
 [@efyang]: https://github.com/efyang
+[@elkowar]: https://github.com/elkowar
+[@emoticon]: https://github.com/emoticon
 [@FallenWarrior2k]: https://github.com/FallenWarrior2k
 [@FelixMcFelix]: https://github.com/FelixMcFelix
 [@Flat]: https://github.com/Flat
@@ -4978,9 +5033,10 @@ Initial commit.
 [@TheBlackfurGuy]: https://github.com/TheBlackfurGuy
 [@TheElec]: https://github.com/TheElec
 [@TheUnitedStatesOfAmerica]: https://github.com/TheUnitedStatesOfAmerica
-[@thelearnerofcode]: https://github.com/thelearnerofcode
 [@TitusEntertainment]: https://github.com/TitusEntertainment
 [@tarcieri]: https://github.com/tarcieri
+[@tedtramonte]: https://github.com/tedtramonte
+[@thelearnerofcode]: https://github.com/thelearnerofcode
 [@thebongy]: https://github.com/thebongy
 [@timotree3]: https://github.com/timotree3
 [@tmcarr]: https://github.com/tmcarr
@@ -5008,6 +5064,36 @@ Initial commit.
 
 
 <!-- COMMITS -->
+
+[c:e690ccd]: https://github.com/serenity-rs/serenity/commit/e690ccd17174f2b9dc3f6a1545f69a209a11241f
+[c:bca105a]: https://github.com/serenity-rs/serenity/commit/bca105a0b9bca26d272ddab5c8b99fd93517cbf6
+[c:b1c3a62]: https://github.com/serenity-rs/serenity/commit/b1c3a62161a640b7c11a39797d03697e6a4e2ff5
+[c:b2ae872]: https://github.com/serenity-rs/serenity/commit/b2ae872f7eba793c06370a58f59e60caceb59d66
+[c:888c37f]: https://github.com/serenity-rs/serenity/commit/888c37f044df92b1768661079385bdb1a09e2034
+[c:10d9297]: https://github.com/serenity-rs/serenity/commit/10d9297dda9aaa43a02b299ea6e4b05e7ca044d2
+[c:475fc1f]: https://github.com/serenity-rs/serenity/commit/475fc1fb1523f3d46b0119c2ba7e9fc1b4b43bfa
+[c:39fb310]: https://github.com/serenity-rs/serenity/commit/39fb310247e609ef7baa91fbe34493e16471372b
+[c:dc22cf2]: https://github.com/serenity-rs/serenity/commit/dc22cf2af034e521e11971af8f8cda0066d6a87a
+[c:0a544c6]: https://github.com/serenity-rs/serenity/commit/0a544c645995c5c8f9cddb0e6240bdb8854bd24b
+[c:3e454cc]: https://github.com/serenity-rs/serenity/commit/3e454cc50dfa290d07ea36ad058fd59355c9ff46
+[c:8b2326c]: https://github.com/serenity-rs/serenity/commit/8b2326c7523b74d4da39881b30a3a62f7411360d
+[c:be17752]: https://github.com/serenity-rs/serenity/commit/be1775240b0739d60653453a16d990500a945b11
+[c:79a3cc8]: https://github.com/serenity-rs/serenity/commit/79a3cc85bd014f285c753f370963823c4220ba72
+[c:2898af2]: https://github.com/serenity-rs/serenity/commit/2898af206e9ee6fdc383c5b00d876a8bf4b4b2d1
+[c:0ba01a7]: https://github.com/serenity-rs/serenity/commit/0ba01a73a25c98c5c32025e60ca15fdd21d7062b
+[c:47433de]: https://github.com/serenity-rs/serenity/commit/47433de14f1ef5fd98662bab7e699c187d73fddc
+[c:c3ad0b2]: https://github.com/serenity-rs/serenity/commit/c3ad0b2c49aeecddf7f28e324cf35c782245360e
+[c:56293bb]: https://github.com/serenity-rs/serenity/commit/56293bbef371e84a183ea413d77d44106578ee57
+[c:75df53e]: https://github.com/serenity-rs/serenity/commit/75df53e58fe591525ffdf726dcca3564d06cafdf
+[c:e1eaeeb]: https://github.com/serenity-rs/serenity/commit/e1eaeeb2dcf493cd64f6765bf88e5430b22f81e2
+[c:dd9d255]: https://github.com/serenity-rs/serenity/commit/dd9d2556cde3a4df0b2b434733fd355e9d4b5de5
+[c:628c1ea]: https://github.com/serenity-rs/serenity/commit/628c1ead2c7d091d689a57ca8b44a74594a97db7
+[c:889540a]: https://github.com/serenity-rs/serenity/commit/889540a0f336cbe23940acf11b17d2324e6f2a6a
+[c:b1cc702]: https://github.com/serenity-rs/serenity/commit/b1cc7022228608563e815c3f82b971d5ca6bfc74
+[c:fe53b16]: https://github.com/serenity-rs/serenity/commit/fe53b1681e80386bbb8b9b9e341926504748118e
+[c:2f8e2b0]: https://github.com/serenity-rs/serenity/commit/2f8e2b09479a4b5d466e7c89ccba04346729219a
+[c:97ef906]: https://github.com/serenity-rs/serenity/commit/97ef906b349c400141104602944186a977a75414
+[c:0450dde]: https://github.com/serenity-rs/serenity/commit/0450ddebb541dc5e9cef625b964cf8497b0d6cb7
 
 [c:9f11a3f]: https://github.com/serenity-rs/serenity/commit/9f11a3f2e9908ae33b3ab0dbd38ccf7fb96370ba
 
