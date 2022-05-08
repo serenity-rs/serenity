@@ -1289,6 +1289,10 @@
 <span id="1284">1284</span>
 <span id="1285">1285</span>
 <span id="1286">1286</span>
+<span id="1287">1287</span>
+<span id="1288">1288</span>
+<span id="1289">1289</span>
+<span id="1290">1290</span>
 </pre><pre class="rust"><code><span class="doccomment">//! Models relating to Discord channels.</span>
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
@@ -1623,7 +1627,12 @@
                 }
             }
         }
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">builder</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">_prepare_edit_builder</span>();
+        <span class="ident">f</span>(<span class="kw-2">&amp;mut</span> <span class="ident">builder</span>);
+        <span class="self">self</span>.<span class="ident">_send_edit</span>(<span class="ident">cache_http</span>.<span class="ident">http</span>(), <span class="ident">builder</span>).<span class="kw">await</span>
+    }
 
+    <span class="kw">fn</span> <span class="ident">_prepare_edit_builder</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">EditMessage</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">builder</span> <span class="op">=</span> <span class="ident">EditMessage::default</span>();
 
         <span class="kw">if</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">content</span>.<span class="ident">is_empty</span>() {
@@ -1636,13 +1645,13 @@
         <span class="kw">for</span> <span class="ident">attachment</span> <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">attachments</span> {
             <span class="ident">builder</span>.<span class="ident">add_existing_attachment</span>(<span class="ident">attachment</span>.<span class="ident">id</span>);
         }
+        <span class="ident">builder</span>
+    }
 
-        <span class="ident">f</span>(<span class="kw-2">&amp;mut</span> <span class="ident">builder</span>);
-
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">_send_edit</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">http</span>: <span class="kw-2">&amp;</span><span class="ident">Http</span>, <span class="ident">builder</span>: <span class="ident">EditMessage</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">map</span> <span class="op">=</span> <span class="ident">json::hashmap_to_json_map</span>(<span class="ident">builder</span>.<span class="number">0</span>);
 
-        <span class="kw-2">*</span><span class="self">self</span> <span class="op">=</span> <span class="ident">cache_http</span>
-            .<span class="ident">http</span>()
+        <span class="kw-2">*</span><span class="self">self</span> <span class="op">=</span> <span class="ident">http</span>
             .<span class="ident">edit_message_and_attachments</span>(
                 <span class="self">self</span>.<span class="ident">channel_id</span>.<span class="number">0</span>,
                 <span class="self">self</span>.<span class="ident">id</span>.<span class="number">0</span>,
@@ -1650,7 +1659,6 @@
                 <span class="ident">builder</span>.<span class="number">1</span>,
             )
             .<span class="kw">await</span><span class="question-mark">?</span>;
-
         <span class="prelude-val">Ok</span>(())
     }
 
