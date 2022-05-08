@@ -334,12 +334,12 @@ impl Message {
                 }
             }
         }
-        let mut builder = self._prepare_edit_builder()?;
+        let mut builder = self._prepare_edit_builder();
         f(&mut builder);
         self._send_edit(cache_http.http(), builder).await
     }
 
-    fn _prepare_edit_builder<'a>(&self) -> Result<EditMessage<'a>> {
+    fn _prepare_edit_builder<'a>(&self) -> EditMessage<'a> {
         let mut builder = EditMessage::default();
 
         if !self.content.is_empty() {
@@ -352,7 +352,7 @@ impl Message {
         for attachment in &self.attachments {
             builder.add_existing_attachment(attachment.id);
         }
-        Ok(builder)
+        builder
     }
 
     async fn _send_edit<'a>(&mut self, http: &Http, builder: EditMessage<'a>) -> Result<()> {
