@@ -148,8 +148,8 @@ impl<'a> Request<'a> {
     }
 
     #[must_use]
-    pub fn body_ref(&self) -> &Option<&'a [u8]> {
-        &self.body
+    pub fn body_ref(&self) -> Option<&'a [u8]> {
+        self.body
     }
 
     #[must_use]
