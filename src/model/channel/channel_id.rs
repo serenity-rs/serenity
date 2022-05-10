@@ -382,6 +382,20 @@ impl ChannelId {
             .await
     }
 
+    /// Follows the announcement channel
+    ///
+    /// Requires [Manage Webhook] permissions on the target channel.
+    ///
+    /// **Note**: Only available on announcement channels.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`Error::Http`] if the current user lacks permission.
+    /// [Manage Webhook]: Permissions::MANAGE_WEBHOOKS
+    pub async fn follow(self, http: impl AsRef<Http>, target_channel_id: impl Into<ChannelId>) -> Result<Webhook> {
+        http.as_ref().follow_news_channel(self.0, target_channel_id.into().0).await
+    }
+
     /// Attempts to find a [`Channel`] by its Id in the cache.
     #[cfg(feature = "cache")]
     #[inline]
