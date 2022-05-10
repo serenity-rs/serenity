@@ -101,6 +101,7 @@
 <span id="96">96</span>
 <span id="97">97</span>
 <span id="98">98</span>
+<span id="99">99</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::sync::Arc</span>;
 
 <span class="kw">use</span> <span class="ident">tokio::sync::oneshot::error::TryRecvError</span>;
@@ -192,11 +193,12 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// This should be used to stop typing after it is started using [`Typing::start`].</span>
     <span class="doccomment">/// Typing may persist for a few seconds on some clients after this is called.</span>
+    <span class="doccomment">/// Returns false if typing has already stopped.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// [`Channel`]: crate::model::channel::Channel</span>
-    <span class="attribute">#[<span class="ident">must_use</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">stop</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">send</span>(()).<span class="ident">ok</span>()
+    <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::must_use_candidate</span>)]</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">stop</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
+        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">send</span>(()).<span class="ident">is_ok</span>()
     }
 }
 </code></pre></div>
