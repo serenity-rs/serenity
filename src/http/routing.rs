@@ -1463,7 +1463,7 @@ pub enum RouteInfo<'a> {
         webhook_id: u64,
     },
     FollowNewsChannel {
-        channel_id: u64
+        channel_id: u64,
     },
     JoinThread {
         channel_id: u64,

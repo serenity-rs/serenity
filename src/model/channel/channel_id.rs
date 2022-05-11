@@ -392,7 +392,11 @@ impl ChannelId {
     ///
     /// Returns [`Error::Http`] if the current user lacks permission.
     /// [Manage Webhook]: Permissions::MANAGE_WEBHOOKS
-    pub async fn follow(self, http: impl AsRef<Http>, target_channel_id: impl Into<ChannelId>) -> Result<Webhook> {
+    pub async fn follow(
+        self,
+        http: impl AsRef<Http>,
+        target_channel_id: impl Into<ChannelId>,
+    ) -> Result<FollowedChannel> {
         http.as_ref().follow_news_channel(self.0, target_channel_id.into().0).await
     }
 

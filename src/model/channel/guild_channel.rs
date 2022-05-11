@@ -621,7 +621,11 @@ impl GuildChannel {
     /// Returns [`Error::Http`] if the current user lacks permission.
     /// [Manage Messages]: Permissions::MANAGE_MESSAGES
     #[inline]
-    pub async fn follow(self, http: impl AsRef<Http>, target_channel_id: impl Into<ChannelId>) -> Result<Webhook> {
+    pub async fn follow(
+        self,
+        http: impl AsRef<Http>,
+        target_channel_id: impl Into<ChannelId>,
+    ) -> Result<FollowedChannel> {
         self.id.follow(http, target_channel_id).await
     }
 

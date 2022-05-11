@@ -1766,7 +1766,11 @@ impl Http {
     }
 
     /// Follow an Announcement Channel to send messages to a target channel.
-    pub async fn follow_news_channel(&self, news_channel_id: u64, target_channel_id: u64) -> Result<Webhook> {
+    pub async fn follow_news_channel(
+        &self,
+        news_channel_id: u64,
+        target_channel_id: u64,
+    ) -> Result<FollowedChannel> {
         let map = json!({ "webhook_channel_id": target_channel_id });
         let body = to_vec(&map)?;
 
