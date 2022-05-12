@@ -6,9 +6,9 @@ use super::{CreateAllowedMentions, CreateEmbed};
 use crate::builder::CreateComponents;
 use crate::json;
 use crate::json::prelude::*;
+use crate::model::application::interaction::MessageFlags;
 #[cfg(feature = "model")]
 use crate::model::channel::AttachmentType;
-use crate::model::interactions::InteractionApplicationCommandCallbackDataFlags;
 
 #[derive(Clone, Debug, Default)]
 pub struct CreateInteractionResponseFollowup<'a>(
@@ -167,7 +167,7 @@ impl<'a> CreateInteractionResponseFollowup<'a> {
     }
 
     /// Sets the flags for the response.
-    pub fn flags(&mut self, flags: InteractionApplicationCommandCallbackDataFlags) -> &mut Self {
+    pub fn flags(&mut self, flags: MessageFlags) -> &mut Self {
         self.0.insert("flags", from_number(flags.bits()));
         self
     }
@@ -180,9 +180,9 @@ impl<'a> CreateInteractionResponseFollowup<'a> {
             .map_or(0, |f| f.as_u64().expect("Interaction response flag was not a number"));
 
         let flags = if ephemeral {
-            flags | InteractionApplicationCommandCallbackDataFlags::EPHEMERAL.bits()
+            flags | MessageFlags::EPHEMERAL.bits()
         } else {
-            flags & !InteractionApplicationCommandCallbackDataFlags::EPHEMERAL.bits()
+            flags & !MessageFlags::EPHEMERAL.bits()
         };
 
         self.0.insert("flags", from_number(flags));

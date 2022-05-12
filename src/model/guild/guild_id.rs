@@ -17,7 +17,14 @@ use crate::builder::{
     EditSticker,
 };
 #[cfg(feature = "model")]
-use crate::builder::{CreateScheduledEvent, EditScheduledEvent};
+use crate::builder::{
+    CreateApplicationCommand,
+    CreateApplicationCommandPermissionsData,
+    CreateApplicationCommands,
+    CreateApplicationCommandsPermissions,
+    CreateScheduledEvent,
+    EditScheduledEvent,
+};
 #[cfg(all(feature = "cache", feature = "model"))]
 use crate::cache::Cache;
 #[cfg(feature = "collector")]
@@ -39,17 +46,9 @@ use crate::json;
 use crate::json::json;
 #[cfg(feature = "model")]
 use crate::json::prelude::*;
-use crate::model::prelude::*;
 #[cfg(feature = "model")]
-use crate::{
-    builder::{
-        CreateApplicationCommand,
-        CreateApplicationCommandPermissionsData,
-        CreateApplicationCommands,
-        CreateApplicationCommandsPermissions,
-    },
-    model::interactions::application_command::{ApplicationCommand, ApplicationCommandPermission},
-};
+use crate::model::application::command::{Command, CommandPermission};
+use crate::model::prelude::*;
 
 #[cfg(feature = "model")]
 impl GuildId {
@@ -1424,25 +1423,24 @@ impl GuildId {
         ReactionCollectorBuilder::new(shard_messenger).guild_id(self.0)
     }
 
-    /// Creates a guild specific [`ApplicationCommand`]
+    /// Creates a guild specific [`Command`]
     ///
-    /// **Note**: Unlike global `ApplicationCommand`s, guild commands will update instantly.
+    /// **Note**: Unlike global `Command`s, guild commands will update instantly.
     ///
     /// # Errors
     ///
     /// Returns the same possible errors as [`create_global_application_command`].
     ///
-    /// [`ApplicationCommand`]: crate::model::interactions::application_command::ApplicationCommand
-    /// [`create_global_application_command`]: crate::model::interactions::application_command::ApplicationCommand::create_global_application_command
+    /// [`create_global_application_command`]: Command::create_global_application_command
     pub async fn create_application_command<F>(
         &self,
         http: impl AsRef<Http>,
         f: F,
-    ) -> Result<ApplicationCommand>
+    ) -> Result<Command>
     where
         F: FnOnce(&mut CreateApplicationCommand) -> &mut CreateApplicationCommand,
     {
-        let map = ApplicationCommand::build_application_command(f);
+        let map = Command::build_application_command(f);
         http.as_ref().create_guild_application_command(self.0, &Value::from(map)).await
     }
 
@@ -1452,12 +1450,12 @@ impl GuildId {
     ///
     /// Returns the same possible errors as [`set_global_application_commands`].
     ///
-    /// [`set_global_application_commands`]: crate::model::interactions::application_command::ApplicationCommand::set_global_application_commands
+    /// [`set_global_application_commands`]: Command::set_global_application_commands
     pub async fn set_application_commands<F>(
         &self,
         http: impl AsRef<Http>,
         f: F,
-    ) -> Result<Vec<ApplicationCommand>>
+    ) -> Result<Vec<Command>>
     where
         F: FnOnce(&mut CreateApplicationCommands) -> &mut CreateApplicationCommands,
     {
@@ -1468,11 +1466,9 @@ impl GuildId {
         http.as_ref().create_guild_application_commands(self.0, &Value::from(array.0)).await
     }
 
-    /// Creates a guild specific [`ApplicationCommandPermission`].
+    /// Creates a guild specific [`CommandPermission`].
     ///
     /// **Note**: It will update instantly.
-    ///
-    /// [`ApplicationCommandPermission`]: crate::model::interactions::application_command::ApplicationCommandPermission
     ///
     /// # Errors
     ///
@@ -1485,7 +1481,7 @@ impl GuildId {
         http: impl AsRef<Http>,
         command_id: CommandId,
         f: F,
-    ) -> Result<ApplicationCommandPermission>
+    ) -> Result<CommandPermission>
     where
         F: FnOnce(
             &mut CreateApplicationCommandPermissionsData,
@@ -1515,7 +1511,7 @@ impl GuildId {
         &self,
         http: impl AsRef<Http>,
         f: F,
-    ) -> Result<Vec<ApplicationCommandPermission>>
+    ) -> Result<Vec<CommandPermission>>
     where
         F: FnOnce(
             &mut CreateApplicationCommandsPermissions,
@@ -1535,10 +1531,7 @@ impl GuildId {
     ///
     /// [`Error::Http`]: crate::error::Error::Http
     /// [`Error::Json`]: crate::error::Error::Json
-    pub async fn get_application_commands(
-        &self,
-        http: impl AsRef<Http>,
-    ) -> Result<Vec<ApplicationCommand>> {
+    pub async fn get_application_commands(&self, http: impl AsRef<Http>) -> Result<Vec<Command>> {
         http.as_ref().get_guild_application_commands(self.0).await
     }
 
@@ -1554,7 +1547,7 @@ impl GuildId {
         &self,
         http: impl AsRef<Http>,
         command_id: CommandId,
-    ) -> Result<ApplicationCommand> {
+    ) -> Result<Command> {
         http.as_ref().get_guild_application_command(self.0, command_id.into()).await
     }
 
@@ -1571,11 +1564,11 @@ impl GuildId {
         http: impl AsRef<Http>,
         command_id: CommandId,
         f: F,
-    ) -> Result<ApplicationCommand>
+    ) -> Result<Command>
     where
         F: FnOnce(&mut CreateApplicationCommand) -> &mut CreateApplicationCommand,
     {
-        let map = ApplicationCommand::build_application_command(f);
+        let map = Command::build_application_command(f);
         http.as_ref()
             .edit_guild_application_command(self.0, command_id.into(), &Value::from(map))
             .await
@@ -1608,7 +1601,7 @@ impl GuildId {
     pub async fn get_application_commands_permissions(
         &self,
         http: impl AsRef<Http>,
-    ) -> Result<Vec<ApplicationCommandPermission>> {
+    ) -> Result<Vec<CommandPermission>> {
         http.as_ref().get_guild_application_commands_permissions(self.0).await
     }
 
@@ -1624,7 +1617,7 @@ impl GuildId {
         &self,
         http: impl AsRef<Http>,
         command_id: CommandId,
-    ) -> Result<ApplicationCommandPermission> {
+    ) -> Result<CommandPermission> {
         http.as_ref().get_guild_application_command_permissions(self.0, command_id.into()).await
     }
 

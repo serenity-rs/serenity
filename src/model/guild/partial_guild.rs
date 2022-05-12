@@ -4,6 +4,10 @@ use tracing::{error, warn};
 
 #[cfg(feature = "model")]
 use crate::builder::{
+    CreateApplicationCommand,
+    CreateApplicationCommandPermissionsData,
+    CreateApplicationCommands,
+    CreateApplicationCommandsPermissions,
     CreateChannel,
     CreateSticker,
     EditGuild,
@@ -28,18 +32,10 @@ use crate::collector::{
 use crate::http::{CacheHttp, Http};
 use crate::json::prelude::*;
 use crate::json::{from_number, from_value};
+#[cfg(feature = "model")]
+use crate::model::application::command::{Command, CommandPermission};
 use crate::model::prelude::*;
 use crate::model::utils::{emojis, roles, stickers};
-#[cfg(feature = "model")]
-use crate::{
-    builder::{
-        CreateApplicationCommand,
-        CreateApplicationCommandPermissionsData,
-        CreateApplicationCommands,
-        CreateApplicationCommandsPermissions,
-    },
-    model::interactions::application_command::{ApplicationCommand, ApplicationCommandPermission},
-};
 
 /// Partial information about a [`Guild`]. This does not include information
 /// like member data.
@@ -354,22 +350,20 @@ impl PartialGuild {
         self.id.create_integration(&http, integration_id, kind).await
     }
 
-    /// Creates a guild specific [`ApplicationCommand`]
+    /// Creates a guild specific [`Command`]
     ///
-    /// **Note**: Unlike global `ApplicationCommand`s, guild commands will update instantly.
+    /// **Note**: Unlike global `Command`s, guild commands will update instantly.
     ///
     /// # Errors
     ///
     /// Returns the same possible errors as `create_global_application_command`.
-    ///
-    /// [`ApplicationCommand`]: crate::model::interactions::application_command::ApplicationCommand
     #[allow(clippy::missing_errors_doc)]
     #[inline]
     pub async fn create_application_command<F>(
         &self,
         http: impl AsRef<Http>,
         f: F,
-    ) -> Result<ApplicationCommand>
+    ) -> Result<Command>
     where
         F: FnOnce(&mut CreateApplicationCommand) -> &mut CreateApplicationCommand,
     {
@@ -390,18 +384,16 @@ impl PartialGuild {
         &self,
         http: impl AsRef<Http>,
         f: F,
-    ) -> Result<Vec<ApplicationCommand>>
+    ) -> Result<Vec<Command>>
     where
         F: FnOnce(&mut CreateApplicationCommands) -> &mut CreateApplicationCommands,
     {
         self.id.set_application_commands(http, f).await
     }
 
-    /// Creates a guild specific [`ApplicationCommandPermission`].
+    /// Creates a guild specific [`CommandPermission`].
     ///
     /// **Note**: It will update instantly.
-    ///
-    /// [`ApplicationCommandPermission`]: crate::model::interactions::application_command::ApplicationCommandPermission
     ///
     /// # Errors
     ///
@@ -414,7 +406,7 @@ impl PartialGuild {
         http: impl AsRef<Http>,
         command_id: CommandId,
         f: F,
-    ) -> Result<ApplicationCommandPermission>
+    ) -> Result<CommandPermission>
     where
         F: FnOnce(
             &mut CreateApplicationCommandPermissionsData,
@@ -438,7 +430,7 @@ impl PartialGuild {
         &self,
         http: impl AsRef<Http>,
         f: F,
-    ) -> Result<Vec<ApplicationCommandPermission>>
+    ) -> Result<Vec<CommandPermission>>
     where
         F: FnOnce(
             &mut CreateApplicationCommandsPermissions,
@@ -455,10 +447,7 @@ impl PartialGuild {
     ///
     /// [`Error::Http`]: crate::error::Error::Http
     /// [`Error::Json`]: crate::error::Error::Json
-    pub async fn get_application_commands(
-        &self,
-        http: impl AsRef<Http>,
-    ) -> Result<Vec<ApplicationCommand>> {
+    pub async fn get_application_commands(&self, http: impl AsRef<Http>) -> Result<Vec<Command>> {
         self.id.get_application_commands(http).await
     }
 
@@ -474,7 +463,7 @@ impl PartialGuild {
         &self,
         http: impl AsRef<Http>,
         command_id: CommandId,
-    ) -> Result<ApplicationCommand> {
+    ) -> Result<Command> {
         self.id.get_application_command(http, command_id).await
     }
 
@@ -491,7 +480,7 @@ impl PartialGuild {
         http: impl AsRef<Http>,
         command_id: CommandId,
         f: F,
-    ) -> Result<ApplicationCommand>
+    ) -> Result<Command>
     where
         F: FnOnce(&mut CreateApplicationCommand) -> &mut CreateApplicationCommand,
     {
@@ -525,7 +514,7 @@ impl PartialGuild {
     pub async fn get_application_commands_permissions(
         &self,
         http: impl AsRef<Http>,
-    ) -> Result<Vec<ApplicationCommandPermission>> {
+    ) -> Result<Vec<CommandPermission>> {
         self.id.get_application_commands_permissions(http).await
     }
 
@@ -541,7 +530,7 @@ impl PartialGuild {
         &self,
         http: impl AsRef<Http>,
         command_id: CommandId,
-    ) -> Result<ApplicationCommandPermission> {
+    ) -> Result<CommandPermission> {
         self.id.get_application_command_permissions(http, command_id).await
     }
 

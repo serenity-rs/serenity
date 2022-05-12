@@ -4,17 +4,17 @@ pub mod message_component;
 pub mod modal;
 pub mod ping;
 
-use application_command::ApplicationCommandInteraction;
-use autocomplete::AutocompleteInteraction;
-use message_component::MessageComponentInteraction;
-use modal::ModalSubmitInteraction;
-use ping::PingInteraction;
 use serde::de::{Deserialize, Deserializer, Error as DeError};
 use serde::ser::{Serialize, Serializer};
 
-use super::prelude::*;
-use crate::internal::prelude::*;
-use crate::json::{from_value, Value};
+use self::application_command::ApplicationCommandInteraction;
+use self::autocomplete::AutocompleteInteraction;
+use self::message_component::MessageComponentInteraction;
+use self::modal::ModalSubmitInteraction;
+use self::ping::PingInteraction;
+use crate::json::{from_value, JsonMap, Value};
+use crate::model::id::{ApplicationId, InteractionId};
+use crate::model::user::User;
 
 #[derive(Clone, Debug)]
 pub enum Interaction {
@@ -133,7 +133,7 @@ impl Interaction {
 }
 
 impl<'de> Deserialize<'de> for Interaction {
-    fn deserialize<D: Deserializer<'de>>(deserializer: D) -> StdResult<Self, D::Error> {
+    fn deserialize<D: Deserializer<'de>>(deserializer: D) -> Result<Self, D::Error> {
         let map = JsonMap::deserialize(deserializer)?;
 
         let kind = map
@@ -170,10 +170,7 @@ impl<'de> Deserialize<'de> for Interaction {
 }
 
 impl Serialize for Interaction {
-    fn serialize<S>(&self, serializer: S) -> StdResult<S::Ok, S::Error>
-    where
-        S: Serializer,
-    {
+    fn serialize<S: Serializer>(&self, serializer: S) -> Result<S::Ok, S::Error> {
         match self {
             Interaction::Ping(i) => PingInteraction::serialize(i, serializer),
             Interaction::ApplicationCommand(i) => {
@@ -210,9 +207,9 @@ enum_number!(InteractionType {
 });
 
 bitflags! {
-    /// The flags for an interaction response.
+    /// The flags for an interaction response message.
     #[derive(Default)]
-    pub struct InteractionApplicationCommandCallbackDataFlags: u64 {
+    pub struct MessageFlags: u64 {
         /// Do not include any embeds when serializing this message.
         const SUPPRESS_EMBEDS = 1 << 2;
         /// Interaction message will only be visible to sender and will
@@ -231,9 +228,9 @@ pub struct MessageInteraction {
     /// The type of the interaction.
     #[serde(rename = "type")]
     pub kind: InteractionType,
-    /// The name of the [`ApplicationCommand`].
+    /// The name of the [`Command`].
     ///
-    /// [`ApplicationCommand`]: crate::model::interactions::application_command::ApplicationCommand
+    /// [`Command`]: crate::model::application::command::Command
     pub name: String,
     /// The user who invoked the interaction.
     pub user: User,

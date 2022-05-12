@@ -1,19 +1,19 @@
 use serde::de::Error as DeError;
 use serde::{Deserialize, Deserializer};
 
-use super::prelude::*;
 #[cfg(feature = "http")]
 use crate::builder::CreateAutocompleteResponse;
 #[cfg(feature = "http")]
 use crate::http::Http;
-use crate::internal::prelude::StdResult;
+use crate::internal::prelude::*;
 #[cfg(feature = "http")]
 use crate::json;
 use crate::json::prelude::*;
+use crate::model::application::interaction::application_command::CommandData;
+use crate::model::application::interaction::InteractionType;
+use crate::model::guild::Member;
 use crate::model::id::{ApplicationId, ChannelId, GuildId, InteractionId};
-use crate::model::interactions::application_command::ApplicationCommandInteractionData;
-use crate::model::interactions::InteractionType;
-use crate::model::prelude::User;
+use crate::model::user::User;
 
 /// An interaction received when the user fills in an autocomplete option
 #[derive(Clone, Debug, Serialize)]
@@ -27,7 +27,7 @@ pub struct AutocompleteInteraction {
     #[serde(rename = "type")]
     pub kind: InteractionType,
     /// The data of the interaction which was triggered.
-    pub data: ApplicationCommandInteractionData,
+    pub data: CommandData,
     /// The guild Id this interaction was sent from, if there is one.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub guild_id: Option<GuildId>,
@@ -139,7 +139,7 @@ impl<'de> Deserialize<'de> for AutocompleteInteraction {
         let data = map
             .remove("data")
             .ok_or_else(|| DeError::custom("expected data"))
-            .and_then(ApplicationCommandInteractionData::deserialize)
+            .and_then(CommandData::deserialize)
             .map_err(DeError::custom)?;
 
         let guild_id = map

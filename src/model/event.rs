@@ -11,14 +11,14 @@ use super::utils::{emojis, roles, stickers};
 use crate::constants::OpCode;
 use crate::internal::prelude::*;
 use crate::json::prelude::*;
-use crate::model::interactions::application_command::ApplicationCommandPermission;
-use crate::model::interactions::Interaction;
+use crate::model::application::command::CommandPermission;
+use crate::model::application::interaction::Interaction;
 
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[serde(transparent)]
 #[non_exhaustive]
 pub struct ApplicationCommandPermissionsUpdateEvent {
-    pub permission: ApplicationCommandPermission,
+    pub permission: CommandPermission,
 }
 
 /// Event data for the channel creation event.

@@ -1,5 +1,7 @@
+use serde::{Deserialize, Serialize};
+
+use crate::model::application::interaction::InteractionType;
 use crate::model::id::{ApplicationId, InteractionId};
-use crate::model::interactions::InteractionType;
 
 /// A ping interaction, which can only be received through an endpoint url.
 #[derive(Clone, Debug, Serialize, Deserialize)]

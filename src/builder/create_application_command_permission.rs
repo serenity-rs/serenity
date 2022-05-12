@@ -2,11 +2,11 @@ use std::collections::HashMap;
 
 use crate::json;
 use crate::json::prelude::*;
-use crate::model::interactions::application_command::ApplicationCommandPermissionType;
+use crate::model::application::command::CommandPermissionType;
 
-/// A builder for creating several [`ApplicationCommandPermission`].
+/// A builder for creating several [`CommandPermission`].
 ///
-/// [`ApplicationCommandPermission`]: crate::model::interactions::application_command::ApplicationCommandPermission
+/// [`CommandPermission`]: crate::model::application::command::CommandPermission
 #[derive(Clone, Debug, Default)]
 pub struct CreateApplicationCommandsPermissions(pub Vec<Value>);
 
@@ -53,9 +53,9 @@ impl CreateApplicationCommandsPermissions {
         self
     }
 }
-/// A builder for creating an [`ApplicationCommandPermission`].
+/// A builder for creating an [`CommandPermission`].
 ///
-/// [`ApplicationCommandPermission`]: crate::model::interactions::application_command::ApplicationCommandPermission
+/// [`CommandPermission`]: crate::model::application::command::CommandPermission
 #[derive(Clone, Debug, Default)]
 pub struct CreateApplicationCommandPermissions(pub HashMap<&'static str, Value>);
 
@@ -115,9 +115,9 @@ impl CreateApplicationCommandPermissions {
     }
 }
 
-/// A builder for creating several [`ApplicationCommandPermissionData`].
+/// A builder for creating several [`CommandPermissionData`].
 ///
-/// [`ApplicationCommandPermissionData`]: crate::model::interactions::application_command::ApplicationCommandPermissionData
+/// [`CommandPermissionData`]: crate::model::application::command::CommandPermissionData
 #[derive(Clone, Debug, Default)]
 pub struct CreateApplicationCommandPermissionsData(pub HashMap<&'static str, Value>);
 
@@ -169,37 +169,37 @@ impl CreateApplicationCommandPermissionsData {
     }
 }
 
-/// A builder for creating an [`ApplicationCommandPermissionData`].
+/// A builder for creating an [`CommandPermissionData`].
 ///
 /// All fields are required.
 ///
-/// [`ApplicationCommandPermissionData`]: crate::model::interactions::application_command::ApplicationCommandPermissionData
+/// [`CommandPermissionData`]: crate::model::application::command::CommandPermissionData
 #[derive(Clone, Debug, Default)]
 pub struct CreateApplicationCommandPermissionData(pub HashMap<&'static str, Value>);
 
 impl CreateApplicationCommandPermissionData {
-    /// Sets the `ApplicationCommandPermissionType` for the [`ApplicationCommandPermissionData`].
+    /// Sets the `CommandPermissionType` for the [`CommandPermissionData`].
     ///
-    /// [`ApplicationCommandPermissionData`]: crate::model::interactions::application_command::ApplicationCommandPermissionData
-    pub fn kind(&mut self, kind: ApplicationCommandPermissionType) -> &mut Self {
+    /// [`CommandPermissionData`]: crate::model::application::command::CommandPermissionData
+    pub fn kind(&mut self, kind: CommandPermissionType) -> &mut Self {
         self.0.insert("type", from_number(kind as u8));
         self
     }
 
-    /// Sets the CommandPermissionId for the [`ApplicationCommandPermissionData`].
+    /// Sets the CommandPermissionId for the [`CommandPermissionData`].
     ///
-    /// [`ApplicationCommandPermissionData`]: crate::model::interactions::application_command::ApplicationCommandPermissionData
+    /// [`CommandPermissionData`]: crate::model::application::command::CommandPermissionData
     pub fn id(&mut self, id: u64) -> &mut Self {
         self.0.insert("id", Value::from(id.to_string()));
         self
     }
 
-    /// Sets the permission for the [`ApplicationCommandPermissionData`].
+    /// Sets the permission for the [`CommandPermissionData`].
     ///
     /// **Note**: Setting it to `false` will only grey the application command in the
     /// list, it will not fully hide it to the user.
     ///
-    /// [`ApplicationCommandPermissionData`]: crate::model::interactions::application_command::ApplicationCommandPermissionData
+    /// [`CommandPermissionData`]: crate::model::application::command::CommandPermissionData
     pub fn permission(&mut self, permission: bool) -> &mut Self {
         self.0.insert("permission", Value::from(permission));
         self

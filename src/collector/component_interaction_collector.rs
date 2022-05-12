@@ -16,7 +16,7 @@ use tokio::time::{sleep, Sleep};
 
 use crate::client::bridge::gateway::ShardMessenger;
 use crate::collector::LazyArc;
-use crate::model::interactions::message_component::MessageComponentInteraction;
+use crate::model::application::interaction::message_component::MessageComponentInteraction;
 
 macro_rules! impl_component_interaction_collector {
     ($($name:ident;)*) => {

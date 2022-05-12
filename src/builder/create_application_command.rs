@@ -2,18 +2,15 @@ use std::collections::HashMap;
 
 use crate::json;
 use crate::json::prelude::*;
+use crate::model::application::command::{CommandOptionType, CommandType};
 use crate::model::channel::ChannelType;
-use crate::model::interactions::application_command::{
-    ApplicationCommandOptionType,
-    ApplicationCommandType,
-};
 use crate::model::Permissions;
 
-/// A builder for creating a new [`ApplicationCommandOption`].
+/// A builder for creating a new [`CommandOption`].
 ///
 /// [`Self::kind`], [`Self::name`], and [`Self::description`] are required fields.
 ///
-/// [`ApplicationCommandOption`]: crate::model::interactions::application_command::ApplicationCommandOption
+/// [`CommandOption`]: crate::model::application::command::CommandOption
 /// [`kind`]: Self::kind
 /// [`name`]: Self::name
 /// [`description`]: Self::description
@@ -21,8 +18,8 @@ use crate::model::Permissions;
 pub struct CreateApplicationCommandOption(pub HashMap<&'static str, Value>);
 
 impl CreateApplicationCommandOption {
-    /// Sets the ApplicationCommandOptionType.
-    pub fn kind(&mut self, kind: ApplicationCommandOptionType) -> &mut Self {
+    /// Sets the `CommandOptionType`.
+    pub fn kind(&mut self, kind: CommandOptionType) -> &mut Self {
         self.0.insert("type", from_number(kind as u8));
         self
     }
@@ -115,8 +112,8 @@ impl CreateApplicationCommandOption {
     ///
     /// **Note**: A command can have up to 25 subcommand groups, or subcommands. A subcommand group can have up to 25 subcommands. A subcommand can have up to 25 options.
     ///
-    /// [`SubCommandGroup`]: crate::model::interactions::application_command::ApplicationCommandOptionType::SubCommandGroup
-    /// [`SubCommand`]: crate::model::interactions::application_command::ApplicationCommandOptionType::SubCommand
+    /// [`SubCommandGroup`]: crate::model::application::command::CommandOptionType::SubCommandGroup
+    /// [`SubCommand`]: crate::model::application::command::CommandOptionType::SubCommand
     pub fn create_sub_option<F>(&mut self, f: F) -> &mut Self
     where
         F: FnOnce(&mut CreateApplicationCommandOption) -> &mut CreateApplicationCommandOption,
@@ -130,8 +127,8 @@ impl CreateApplicationCommandOption {
     ///
     /// **Note**: A command can have up to 25 subcommand groups, or subcommands. A subcommand group can have up to 25 subcommands. A subcommand can have up to 25 options.
     ///
-    /// [`SubCommandGroup`]: crate::model::interactions::application_command::ApplicationCommandOptionType::SubCommandGroup
-    /// [`SubCommand`]: crate::model::interactions::application_command::ApplicationCommandOptionType::SubCommand
+    /// [`SubCommandGroup`]: crate::model::application::command::CommandOptionType::SubCommandGroup
+    /// [`SubCommand`]: crate::model::application::command::CommandOptionType::SubCommand
     pub fn add_sub_option(&mut self, sub_option: CreateApplicationCommandOption) -> &mut Self {
         let new_option = json::hashmap_to_json_map(sub_option.0);
         let options = self.0.entry("options").or_insert_with(|| Value::from(Vec::<Value>::new()));
@@ -143,7 +140,7 @@ impl CreateApplicationCommandOption {
 
     /// If the option is a [`Channel`], it will only be able to show these types.
     ///
-    /// [`Channel`]: crate::model::interactions::application_command::ApplicationCommandOptionType::Channel
+    /// [`Channel`]: crate::model::application::command::CommandOptionType::Channel
     pub fn channel_types(&mut self, channel_types: &[ChannelType]) -> &mut Self {
         self.0.insert(
             "channel_types",
@@ -182,11 +179,11 @@ impl CreateApplicationCommandOption {
     }
 }
 
-/// A builder for creating a new [`ApplicationCommand`].
+/// A builder for creating a new [`Command`].
 ///
 /// [`Self::name`] and [`Self::description`] are required fields.
 ///
-/// [`ApplicationCommand`]: crate::model::interactions::application_command::ApplicationCommand
+/// [`Command`]: crate::model::application::command::Command
 #[derive(Clone, Debug, Default)]
 pub struct CreateApplicationCommand(pub HashMap<&'static str, Value>);
 
@@ -200,7 +197,7 @@ impl CreateApplicationCommand {
     }
 
     /// Specifies the type of the application command.
-    pub fn kind(&mut self, kind: ApplicationCommandType) -> &mut Self {
+    pub fn kind(&mut self, kind: CommandType) -> &mut Self {
         self.0.insert("type", from_number(kind as u8));
         self
     }
