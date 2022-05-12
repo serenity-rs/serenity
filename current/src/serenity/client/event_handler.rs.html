@@ -539,8 +539,8 @@
 <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::context::Context</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::client::bridge::gateway::event</span>::<span class="kw-2">*</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::json::Value</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::interactions::application_command::ApplicationCommandPermission</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::interactions::Interaction</span>;
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::application::command::CommandPermission</span>;
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::application::interaction::Interaction</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::prelude</span>::<span class="kw-2">*</span>;
 
 <span class="doccomment">/// The core trait for handling events by serenity.</span>
@@ -552,7 +552,7 @@
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">application_command_permissions_update</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">_ctx</span>: <span class="ident">Context</span>,
-        <span class="ident">_permission</span>: <span class="ident">ApplicationCommandPermission</span>,
+        <span class="ident">_permission</span>: <span class="ident">CommandPermission</span>,
     ) {
     }
 

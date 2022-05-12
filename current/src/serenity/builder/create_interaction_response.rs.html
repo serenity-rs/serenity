@@ -301,20 +301,14 @@
 <span id="296">296</span>
 <span id="297">297</span>
 <span id="298">298</span>
-<span id="299">299</span>
-<span id="300">300</span>
-<span id="301">301</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::collections::HashMap</span>;
 
 <span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">CreateAllowedMentions</span>, <span class="ident">CreateEmbed</span>};
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::builder::CreateComponents</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::json</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::json::prelude</span>::<span class="kw-2">*</span>;
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::application::interaction</span>::{<span class="ident">InteractionResponseType</span>, <span class="ident">MessageFlags</span>};
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::channel::AttachmentType</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::interactions</span>::{
-    <span class="ident">InteractionApplicationCommandCallbackDataFlags</span>,
-    <span class="ident">InteractionResponseType</span>,
-};
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">CreateInteractionResponse</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(
@@ -488,7 +482,7 @@
     }
 
     <span class="doccomment">/// Sets the flags for the message.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">flags</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">flags</span>: <span class="ident">InteractionApplicationCommandCallbackDataFlags</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">flags</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">flags</span>: <span class="ident">MessageFlags</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
         <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;flags&quot;</span>, <span class="ident">from_number</span>(<span class="ident">flags</span>.<span class="ident">bits</span>()));
         <span class="self">self</span>
     }
@@ -501,9 +495,9 @@
             .<span class="ident">map_or</span>(<span class="number">0</span>, <span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="ident">f</span>.<span class="ident">as_u64</span>().<span class="ident">expect</span>(<span class="string">&quot;Interaction response flag was not a number&quot;</span>));
 
         <span class="kw">let</span> <span class="ident">flags</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">ephemeral</span> {
-            <span class="ident">flags</span> <span class="op">|</span> <span class="ident">InteractionApplicationCommandCallbackDataFlags::EPHEMERAL</span>.<span class="ident">bits</span>()
+            <span class="ident">flags</span> <span class="op">|</span> <span class="ident">MessageFlags::EPHEMERAL</span>.<span class="ident">bits</span>()
         } <span class="kw">else</span> {
-            <span class="ident">flags</span> <span class="op">&amp;</span> <span class="op">!</span><span class="ident">InteractionApplicationCommandCallbackDataFlags::EPHEMERAL</span>.<span class="ident">bits</span>()
+            <span class="ident">flags</span> <span class="op">&amp;</span> <span class="op">!</span><span class="ident">MessageFlags::EPHEMERAL</span>.<span class="ident">bits</span>()
         };
 
         <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;flags&quot;</span>, <span class="ident">from_number</span>(<span class="ident">flags</span>));

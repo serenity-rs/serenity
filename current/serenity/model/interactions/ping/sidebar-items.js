@@ -1,1 +1,1 @@
-initSidebarItems({"struct":[["PingInteraction","A ping interaction, which can only be received through an endpoint url."]]});
+initSidebarItems({"type":[["PingInteraction","A ping interaction, which can only be received through an endpoint url."]]});
