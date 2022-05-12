@@ -1957,14 +1957,14 @@
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::constants::OpCode</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::internal::prelude</span>::<span class="kw-2">*</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::json::prelude</span>::<span class="kw-2">*</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::interactions::application_command::ApplicationCommandPermission</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::interactions::Interaction</span>;
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::application::command::CommandPermission</span>;
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::application::interaction::Interaction</span>;
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
 <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">transparent</span>)]</span>
 <span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ApplicationCommandPermissionsUpdateEvent</span> {
-    <span class="kw">pub</span> <span class="ident">permission</span>: <span class="ident">ApplicationCommandPermission</span>,
+    <span class="kw">pub</span> <span class="ident">permission</span>: <span class="ident">CommandPermission</span>,
 }
 
 <span class="doccomment">/// Event data for the channel creation event.</span>

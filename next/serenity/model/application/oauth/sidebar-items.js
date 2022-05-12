@@ -1,0 +1,1 @@
+initSidebarItems({"enum":[["Scope","The available OAuth2 Scopes."]]});

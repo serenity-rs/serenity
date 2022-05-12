@@ -733,9 +733,9 @@
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::framework::Framework</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::gateway</span>::{<span class="ident">GatewayError</span>, <span class="ident">InterMessage</span>, <span class="ident">ReconnectType</span>, <span class="ident">Shard</span>, <span class="ident">ShardAction</span>};
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::internal::prelude</span>::<span class="kw-2">*</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::event</span>::{<span class="ident">Event</span>, <span class="ident">GatewayEvent</span>};
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;collector&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::interactions::Interaction</span>;
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::application::interaction::Interaction</span>;
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::event</span>::{<span class="ident">Event</span>, <span class="ident">GatewayEvent</span>};
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::CacheAndHttp</span>;
 
 <span class="doccomment">/// A runner for managing a [`Shard`] and its respective WebSocket client.</span>

@@ -1851,23 +1851,16 @@
 <span id="1846">1846</span>
 <span id="1847">1847</span>
 <span id="1848">1848</span>
-<span id="1849">1849</span>
-<span id="1850">1850</span>
-<span id="1851">1851</span>
-<span id="1852">1852</span>
-<span id="1853">1853</span>
-<span id="1854">1854</span>
-<span id="1855">1855</span>
-<span id="1856">1856</span>
-<span id="1857">1857</span>
-<span id="1858">1858</span>
-<span id="1859">1859</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">serde::de::Error</span> <span class="kw">as</span> <span class="ident">DeError</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
 <span class="kw">use</span> <span class="ident">tracing</span>::{<span class="ident">error</span>, <span class="ident">warn</span>};
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::builder</span>::{
+    <span class="ident">CreateApplicationCommand</span>,
+    <span class="ident">CreateApplicationCommandPermissionsData</span>,
+    <span class="ident">CreateApplicationCommands</span>,
+    <span class="ident">CreateApplicationCommandsPermissions</span>,
     <span class="ident">CreateChannel</span>,
     <span class="ident">CreateSticker</span>,
     <span class="ident">EditGuild</span>,
@@ -1892,18 +1885,10 @@
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::http</span>::{<span class="ident">CacheHttp</span>, <span class="ident">Http</span>};
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::json::prelude</span>::<span class="kw-2">*</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::json</span>::{<span class="ident">from_number</span>, <span class="ident">from_value</span>};
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::application::command</span>::{<span class="ident">Command</span>, <span class="ident">CommandPermission</span>};
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::prelude</span>::<span class="kw-2">*</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::utils</span>::{<span class="ident">emojis</span>, <span class="ident">roles</span>, <span class="ident">stickers</span>};
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
-<span class="kw">use</span> <span class="kw">crate</span>::{
-    <span class="ident">builder</span>::{
-        <span class="ident">CreateApplicationCommand</span>,
-        <span class="ident">CreateApplicationCommandPermissionsData</span>,
-        <span class="ident">CreateApplicationCommands</span>,
-        <span class="ident">CreateApplicationCommandsPermissions</span>,
-    },
-    <span class="ident">model::interactions::application_command</span>::{<span class="ident">ApplicationCommand</span>, <span class="ident">ApplicationCommandPermission</span>},
-};
 
 <span class="doccomment">/// Partial information about a [`Guild`]. This does not include information</span>
 <span class="doccomment">/// like member data.</span>
@@ -2218,22 +2203,20 @@
         <span class="self">self</span>.<span class="ident">id</span>.<span class="ident">create_integration</span>(<span class="kw-2">&amp;</span><span class="ident">http</span>, <span class="ident">integration_id</span>, <span class="ident">kind</span>).<span class="kw">await</span>
     }
 
-    <span class="doccomment">/// Creates a guild specific [`ApplicationCommand`]</span>
+    <span class="doccomment">/// Creates a guild specific [`Command`]</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// **Note**: Unlike global `ApplicationCommand`s, guild commands will update instantly.</span>
+    <span class="doccomment">/// **Note**: Unlike global `Command`s, guild commands will update instantly.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// # Errors</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// Returns the same possible errors as `create_global_application_command`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`ApplicationCommand`]: crate::model::interactions::application_command::ApplicationCommand</span>
     <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::missing_errors_doc</span>)]</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">create_application_command</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>,
         <span class="ident">f</span>: <span class="ident">F</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">ApplicationCommand</span><span class="op">&gt;</span>
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Command</span><span class="op">&gt;</span>
     <span class="kw">where</span>
         <span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="kw-2">&amp;mut</span> <span class="ident">CreateApplicationCommand</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="ident">CreateApplicationCommand</span>,
     {
@@ -2254,18 +2237,16 @@
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>,
         <span class="ident">f</span>: <span class="ident">F</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ApplicationCommand</span><span class="op">&gt;</span><span class="op">&gt;</span>
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Command</span><span class="op">&gt;</span><span class="op">&gt;</span>
     <span class="kw">where</span>
         <span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="kw-2">&amp;mut</span> <span class="ident">CreateApplicationCommands</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="ident">CreateApplicationCommands</span>,
     {
         <span class="self">self</span>.<span class="ident">id</span>.<span class="ident">set_application_commands</span>(<span class="ident">http</span>, <span class="ident">f</span>).<span class="kw">await</span>
     }
 
-    <span class="doccomment">/// Creates a guild specific [`ApplicationCommandPermission`].</span>
+    <span class="doccomment">/// Creates a guild specific [`CommandPermission`].</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// **Note**: It will update instantly.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`ApplicationCommandPermission`]: crate::model::interactions::application_command::ApplicationCommandPermission</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// # Errors</span>
     <span class="doccomment">///</span>
@@ -2278,7 +2259,7 @@
         <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>,
         <span class="ident">command_id</span>: <span class="ident">CommandId</span>,
         <span class="ident">f</span>: <span class="ident">F</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">ApplicationCommandPermission</span><span class="op">&gt;</span>
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">CommandPermission</span><span class="op">&gt;</span>
     <span class="kw">where</span>
         <span class="ident">F</span>: <span class="ident">FnOnce</span>(
             <span class="kw-2">&amp;mut</span> <span class="ident">CreateApplicationCommandPermissionsData</span>,
@@ -2302,7 +2283,7 @@
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>,
         <span class="ident">f</span>: <span class="ident">F</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ApplicationCommandPermission</span><span class="op">&gt;</span><span class="op">&gt;</span>
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">CommandPermission</span><span class="op">&gt;</span><span class="op">&gt;</span>
     <span class="kw">where</span>
         <span class="ident">F</span>: <span class="ident">FnOnce</span>(
             <span class="kw-2">&amp;mut</span> <span class="ident">CreateApplicationCommandsPermissions</span>,
@@ -2319,10 +2300,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// [`Error::Http`]: crate::error::Error::Http</span>
     <span class="doccomment">/// [`Error::Json`]: crate::error::Error::Json</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_application_commands</span>(
-        <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ApplicationCommand</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_application_commands</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Command</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">id</span>.<span class="ident">get_application_commands</span>(<span class="ident">http</span>).<span class="kw">await</span>
     }
 
@@ -2338,7 +2316,7 @@
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>,
         <span class="ident">command_id</span>: <span class="ident">CommandId</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">ApplicationCommand</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Command</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">id</span>.<span class="ident">get_application_command</span>(<span class="ident">http</span>, <span class="ident">command_id</span>).<span class="kw">await</span>
     }
 
@@ -2355,7 +2333,7 @@
         <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>,
         <span class="ident">command_id</span>: <span class="ident">CommandId</span>,
         <span class="ident">f</span>: <span class="ident">F</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">ApplicationCommand</span><span class="op">&gt;</span>
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Command</span><span class="op">&gt;</span>
     <span class="kw">where</span>
         <span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="kw-2">&amp;mut</span> <span class="ident">CreateApplicationCommand</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="ident">CreateApplicationCommand</span>,
     {
@@ -2389,7 +2367,7 @@
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_application_commands_permissions</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ApplicationCommandPermission</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">CommandPermission</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">id</span>.<span class="ident">get_application_commands_permissions</span>(<span class="ident">http</span>).<span class="kw">await</span>
     }
 
@@ -2405,7 +2383,7 @@
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>,
         <span class="ident">command_id</span>: <span class="ident">CommandId</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">ApplicationCommandPermission</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">CommandPermission</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">id</span>.<span class="ident">get_application_command_permissions</span>(<span class="ident">http</span>, <span class="ident">command_id</span>).<span class="kw">await</span>
     }
 
