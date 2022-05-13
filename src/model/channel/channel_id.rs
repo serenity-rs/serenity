@@ -641,11 +641,7 @@ impl ChannelId {
     /// is over the above limit, containing the number of unicode code points
     /// over the limit.
     #[inline]
-    pub async fn say(
-        self,
-        http: impl AsRef<Http>,
-        content: impl Into<String>,
-    ) -> Result<Message> {
+    pub async fn say(self, http: impl AsRef<Http>, content: impl Into<String>) -> Result<Message> {
         self.send_message(&http, |m| m.content(content)).await
     }
 

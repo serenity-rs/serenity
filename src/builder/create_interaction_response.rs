@@ -269,7 +269,11 @@ impl CreateAutocompleteResponse {
     /// Adds a string autocomplete choice.
     ///
     /// **Note**: There can be no more than 25 choices set. Name must be between 1 and 100 characters. Value must be up to 100 characters.
-    pub fn add_string_choice(&mut self, name: impl Into<String>, value: impl Into<String>) -> &mut Self {
+    pub fn add_string_choice(
+        &mut self,
+        name: impl Into<String>,
+        value: impl Into<String>,
+    ) -> &mut Self {
         let choice = json!({
             "name": name.into(),
             "value": value.into()
