@@ -666,6 +666,7 @@ impl Http {
     ///
     /// Refer to Discord's [docs] for the object it takes.
     ///
+    /// [`Interaction`]: crate::model::application::interaction::Interaction
     /// [docs]: https://discord.com/developers/docs/interactions/slash-commands#interaction-interaction-response
     pub async fn create_interaction_response(
         &self,
@@ -689,6 +690,7 @@ impl Http {
     ///
     /// Refer to Discord's [docs] for the object it takes.
     ///
+    /// [`Interaction`]: crate::model::application::interaction::Interaction
     /// [docs]: https://discord.com/developers/docs/interactions/slash-commands#interaction-interaction-response
     pub async fn create_interaction_response_with_files(
         &self,

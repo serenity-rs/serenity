@@ -7,7 +7,7 @@ use crate::model::channel::ReactionType;
 
 /// A builder for creating several [`ActionRow`]s.
 ///
-/// [`ActionRow`]: crate::model::interactions::message_component::ActionRow
+/// [`ActionRow`]: crate::model::application::component::ActionRow
 #[derive(Clone, Debug, Default)]
 pub struct CreateComponents(pub Vec<Value>);
 
@@ -54,7 +54,7 @@ impl CreateComponents {
 
 /// A builder for creating an [`ActionRow`].
 ///
-/// [`ActionRow`]: crate::model::interactions::message_component::ActionRow
+/// [`ActionRow`]: crate::model::application::component::ActionRow
 #[derive(Clone, Debug, Default)]
 pub struct CreateActionRow(pub HashMap<&'static str, Value>);
 
@@ -140,7 +140,7 @@ impl CreateActionRow {
 
 /// A builder for creating a [`Button`].
 ///
-/// [`Button`]: crate::model::interactions::message_component::Button
+/// [`Button`]: crate::model::application::component::Button
 #[derive(Clone, Debug)]
 pub struct CreateButton(pub HashMap<&'static str, Value>);
 
@@ -224,7 +224,7 @@ impl CreateButton {
 
 /// A builder for creating a [`SelectMenu`].
 ///
-/// [`SelectMenu`]: crate::model::interactions::message_component::SelectMenu
+/// [`SelectMenu`]: crate::model::application::component::SelectMenu
 #[derive(Clone, Debug, Default)]
 pub struct CreateSelectMenu(pub HashMap<&'static str, Value>);
 
@@ -281,7 +281,7 @@ impl CreateSelectMenu {
 
 /// A builder for creating several [`SelectMenuOption`].
 ///
-/// [`SelectMenuOption`]: crate::model::interactions::message_component::SelectMenuOption
+/// [`SelectMenuOption`]: crate::model::application::component::SelectMenuOption
 #[derive(Clone, Debug, Default)]
 pub struct CreateSelectMenuOptions(pub Vec<Value>);
 
@@ -323,7 +323,7 @@ impl CreateSelectMenuOptions {
 
 /// A builder for creating a [`SelectMenuOption`].
 ///
-/// [`SelectMenuOption`]: crate::model::interactions::message_component::SelectMenuOption
+/// [`SelectMenuOption`]: crate::model::application::component::SelectMenuOption
 #[derive(Clone, Debug, Default)]
 pub struct CreateSelectMenuOption(pub HashMap<&'static str, Value>);
 
@@ -392,7 +392,7 @@ impl CreateSelectMenuOption {
 
 /// A builder for creating an [`InputText`].
 ///
-/// [`InputText`]: crate::model::interactions::message_component::InputText
+/// [`InputText`]: crate::model::application::component::InputText
 #[derive(Clone, Debug, Default)]
 pub struct CreateInputText(pub HashMap<&'static str, Value>);
 
