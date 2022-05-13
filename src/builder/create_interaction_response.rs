@@ -96,8 +96,8 @@ impl<'a> CreateInteractionResponseData<'a> {
     ///
     /// **Note**: Message contents must be under 2000 unicode code points.
     #[inline]
-    pub fn content<D: ToString>(&mut self, content: D) -> &mut Self {
-        self._content(content.to_string())
+    pub fn content(&mut self, content: impl Into<String>) -> &mut Self {
+        self._content(content.into())
     }
 
     fn _content(&mut self, content: String) -> &mut Self {
@@ -221,14 +221,14 @@ impl<'a> CreateInteractionResponseData<'a> {
     }
 
     /// Sets the custom id for modal interactions
-    pub fn custom_id<D: ToString>(&mut self, id: D) -> &mut Self {
-        self.0.insert("custom_id", Value::String(id.to_string()));
+    pub fn custom_id(&mut self, id: impl Into<String>) -> &mut Self {
+        self.0.insert("custom_id", Value::String(id.into()));
         self
     }
 
     /// Sets the title for modal interactions
-    pub fn title<D: ToString>(&mut self, title: D) -> &mut Self {
-        self.0.insert("title", Value::String(title.to_string()));
+    pub fn title(&mut self, title: impl Into<String>) -> &mut Self {
+        self.0.insert("title", Value::String(title.into()));
         self
     }
 }
@@ -258,9 +258,9 @@ impl CreateAutocompleteResponse {
     /// Add an int autocomplete choice.
     ///
     /// **Note**: There can be no more than 25 choices set. Name must be between 1 and 100 characters. Value must be between -2^53 and 2^53.
-    pub fn add_int_choice<D: ToString>(&mut self, name: D, value: i64) -> &mut Self {
+    pub fn add_int_choice(&mut self, name: impl Into<String>, value: i64) -> &mut Self {
         let choice = json!({
-            "name": name.to_string(),
+            "name": name.into(),
             "value" : value
         });
         self.add_choice(choice)
@@ -269,10 +269,10 @@ impl CreateAutocompleteResponse {
     /// Adds a string autocomplete choice.
     ///
     /// **Note**: There can be no more than 25 choices set. Name must be between 1 and 100 characters. Value must be up to 100 characters.
-    pub fn add_string_choice<D: ToString, E: ToString>(&mut self, name: D, value: E) -> &mut Self {
+    pub fn add_string_choice(&mut self, name: impl Into<String>, value: impl Into<String>) -> &mut Self {
         let choice = json!({
-            "name": name.to_string(),
-            "value": value.to_string()
+            "name": name.into(),
+            "value": value.into()
         });
         self.add_choice(choice)
     }
@@ -280,9 +280,9 @@ impl CreateAutocompleteResponse {
     /// Adds a number autocomplete choice.
     ///
     /// **Note**: There can be no more than 25 choices set. Name must be between 1 and 100 characters. Value must be between -2^53 and 2^53.
-    pub fn add_number_choice<D: ToString>(&mut self, name: D, value: f64) -> &mut Self {
+    pub fn add_number_choice(&mut self, name: impl Into<String>, value: f64) -> &mut Self {
         let choice = json!({
-            "name": name.to_string(),
+            "name": name.into(),
             "value" : value
         });
         self.add_choice(choice)

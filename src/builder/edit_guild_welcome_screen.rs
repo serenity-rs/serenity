@@ -19,8 +19,8 @@ impl EditGuildWelcomeScreen {
     }
 
     /// The server description shown in the welcome screen.
-    pub fn description<D: ToString>(&mut self, description: D) -> &mut Self {
-        self.0.insert("description", Value::from(description.to_string()));
+    pub fn description(&mut self, description: impl Into<String>) -> &mut Self {
+        self.0.insert("description", Value::String(description.into()));
 
         self
     }
@@ -76,8 +76,8 @@ impl CreateGuildWelcomeChannel {
     }
 
     /// The description shown for the channel. It is required.
-    pub fn description<D: ToString>(&mut self, description: D) -> &mut Self {
-        self.0.insert("description", Value::from(description.to_string()));
+    pub fn description(&mut self, description: impl Into<String>) -> &mut Self {
+        self.0.insert("description", Value::from(description.into()));
 
         self
     }

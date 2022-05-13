@@ -901,7 +901,7 @@ impl GuildChannel {
     pub async fn say(
         &self,
         http: impl AsRef<Http>,
-        content: impl std::fmt::Display,
+        content: impl Into<String>,
     ) -> Result<Message> {
         self.id.say(&http, content).await
     }

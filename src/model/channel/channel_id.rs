@@ -644,7 +644,7 @@ impl ChannelId {
     pub async fn say(
         self,
         http: impl AsRef<Http>,
-        content: impl std::fmt::Display,
+        content: impl Into<String>,
     ) -> Result<Message> {
         self.send_message(&http, |m| m.content(content)).await
     }
