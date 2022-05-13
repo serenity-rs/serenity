@@ -3989,6 +3989,8 @@
 <span id="3984">3984</span>
 <span id="3985">3985</span>
 <span id="3986">3986</span>
+<span id="3987">3987</span>
+<span id="3988">3988</span>
 </pre><pre class="rust"><code><span class="attribute">#![<span class="ident">allow</span>(<span class="ident">clippy::missing_errors_doc</span>)]</span>
 
 <span class="kw">use</span> <span class="ident">std::borrow::Cow</span>;
@@ -4657,6 +4659,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// Refer to Discord&#39;s [docs] for the object it takes.</span>
     <span class="doccomment">///</span>
+    <span class="doccomment">/// [`Interaction`]: crate::model::application::interaction::Interaction</span>
     <span class="doccomment">/// [docs]: https://discord.com/developers/docs/interactions/slash-commands#interaction-interaction-response</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">create_interaction_response</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
@@ -4680,6 +4683,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// Refer to Discord&#39;s [docs] for the object it takes.</span>
     <span class="doccomment">///</span>
+    <span class="doccomment">/// [`Interaction`]: crate::model::application::interaction::Interaction</span>
     <span class="doccomment">/// [docs]: https://discord.com/developers/docs/interactions/slash-commands#interaction-interaction-response</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">create_interaction_response_with_files</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
