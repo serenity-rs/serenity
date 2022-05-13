@@ -117,7 +117,7 @@ impl Activity {
     /// #[command]
     /// async fn activity(ctx: &Context, _msg: &Message, args: Args) -> CommandResult {
     ///     let name = args.message();
-    ///     ctx.set_activity(Activity::playing(&name)).await;
+    ///     ctx.set_activity(Activity::playing(name)).await;
     ///
     ///     Ok(())
     /// }
@@ -149,7 +149,7 @@ impl Activity {
     ///     const STREAM_URL: &str = "...";
     ///
     ///     let name = args.message();
-    ///     ctx.set_activity(Activity::streaming(&name, STREAM_URL)).await;
+    ///     ctx.set_activity(Activity::streaming(name, STREAM_URL)).await;
     ///
     ///     Ok(())
     /// }
@@ -181,7 +181,7 @@ impl Activity {
     /// #[command]
     /// async fn listen(ctx: &Context, _msg: &Message, args: Args) -> CommandResult {
     ///     let name = args.message();
-    ///     ctx.set_activity(Activity::listening(&name)).await;
+    ///     ctx.set_activity(Activity::listening(name)).await;
     ///
     ///     Ok(())
     /// }
@@ -210,7 +210,7 @@ impl Activity {
     /// #[command]
     /// async fn watch(ctx: &Context, _msg: &Message, args: Args) -> CommandResult {
     ///     let name = args.message();
-    ///     ctx.set_activity(Activity::watching(&name)).await;
+    ///     ctx.set_activity(Activity::watching(name)).await;
     ///
     ///     Ok(())
     /// }
@@ -239,7 +239,7 @@ impl Activity {
     /// #[command]
     /// async fn compete(ctx: &Context, _msg: &Message, args: Args) -> CommandResult {
     ///     let name = args.message();
-    ///     ctx.set_activity(Activity::competing(&name)).await;
+    ///     ctx.set_activity(Activity::competing(name)).await;
     ///
     ///     Ok(())
     /// }
