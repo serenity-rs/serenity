@@ -2623,11 +2623,11 @@
 <span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
 <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">untagged</span>)]</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">Event</span> {
-    <span class="doccomment">/// The permissions of an [`ApplicationCommand`] was changed.</span>
+    <span class="doccomment">/// The permissions of an [`Command`] was changed.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// Fires the [`EventHandler::application_command_permissions_update`] event.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [`ApplicationCommand`]: crate::model::interactions::application_command::ApplicationCommand</span>
+    <span class="doccomment">/// [`Command`]: crate::model::application::command::Command</span>
     <span class="doccomment">/// [`EventHandler::application_command_permissions_update`]: crate::client::EventHandler::application_command_permissions_update</span>
     <span class="ident">ApplicationCommandPermissionsUpdate</span>(<span class="ident">ApplicationCommandPermissionsUpdateEvent</span>),
     <span class="doccomment">/// A [`Channel`] was created.</span>
