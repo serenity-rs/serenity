@@ -121,7 +121,7 @@ pub struct Message {
     pub referenced_message: Option<Box<Message>>, // Boxed to avoid recursion
     /// Sent if the message is a response to an [`Interaction`].
     ///
-    /// [`Interaction`]: crate::model::interactions::Interaction
+    /// [`Interaction`]: crate::model::application::interaction::Interaction
     pub interaction: Option<MessageInteraction>,
     /// The components of this message
     #[serde(default)]

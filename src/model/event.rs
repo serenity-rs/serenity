@@ -677,11 +677,11 @@ impl<'de> Deserialize<'de> for GatewayEvent {
 #[non_exhaustive]
 #[serde(untagged)]
 pub enum Event {
-    /// The permissions of an [`ApplicationCommand`] was changed.
+    /// The permissions of an [`Command`] was changed.
     ///
     /// Fires the [`EventHandler::application_command_permissions_update`] event.
     ///
-    /// [`ApplicationCommand`]: crate::model::interactions::application_command::ApplicationCommand
+    /// [`Command`]: crate::model::application::command::Command
     /// [`EventHandler::application_command_permissions_update`]: crate::client::EventHandler::application_command_permissions_update
     ApplicationCommandPermissionsUpdate(ApplicationCommandPermissionsUpdateEvent),
     /// A [`Channel`] was created.
