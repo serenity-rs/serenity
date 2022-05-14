@@ -49,17 +49,8 @@ pub struct Command {
     /// By default, commands are visible.
     #[serde(default)]
     pub dm_permission: Option<bool>,
-    /// Whether the command is enabled by default when
-    /// the application is added to a guild.
-    #[serde(default = "default_permission_value")]
-    #[deprecated(note = "replaced by `default_member_permissions`")]
-    pub default_permission: bool,
     /// An autoincremented version identifier updated during substantial record changes.
     pub version: CommandVersionId,
-}
-
-fn default_permission_value() -> bool {
-    true
 }
 
 #[cfg(feature = "http")]

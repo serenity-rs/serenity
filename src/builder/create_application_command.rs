@@ -216,17 +216,6 @@ impl CreateApplicationCommand {
         self
     }
 
-    /// Specifies if the command should not be usable by default
-    ///
-    /// **Note**: Setting it to false will disable it for anyone,
-    /// including administrators and guild owners.
-    #[deprecated(note = "replaced by `default_member_permissions`")]
-    pub fn default_permission(&mut self, default_permission: bool) -> &mut Self {
-        self.0.insert("default_permission", Value::from(default_permission));
-
-        self
-    }
-
     /// Specifies the description of the application command.
     ///
     /// **Note**: Must be between 1 and 100 characters long.
