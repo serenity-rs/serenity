@@ -435,15 +435,6 @@
 <span id="430">430</span>
 <span id="431">431</span>
 <span id="432">432</span>
-<span id="433">433</span>
-<span id="434">434</span>
-<span id="435">435</span>
-<span id="436">436</span>
-<span id="437">437</span>
-<span id="438">438</span>
-<span id="439">439</span>
-<span id="440">440</span>
-<span id="441">441</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">serde</span>::{<span class="ident">Deserialize</span>, <span class="ident">Serialize</span>};
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http&quot;</span>)]</span>
@@ -495,17 +486,8 @@
     <span class="doccomment">/// By default, commands are visible.</span>
     <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">default</span>)]</span>
     <span class="kw">pub</span> <span class="ident">dm_permission</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// Whether the command is enabled by default when</span>
-    <span class="doccomment">/// the application is added to a guild.</span>
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">default</span> <span class="op">=</span> <span class="string">&quot;default_permission_value&quot;</span>)]</span>
-    <span class="attribute">#[<span class="ident">deprecated</span>(<span class="ident">note</span> <span class="op">=</span> <span class="string">&quot;replaced by `default_member_permissions`&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">default_permission</span>: <span class="ident">bool</span>,
     <span class="doccomment">/// An autoincremented version identifier updated during substantial record changes.</span>
     <span class="kw">pub</span> <span class="ident">version</span>: <span class="ident">CommandVersionId</span>,
-}
-
-<span class="kw">fn</span> <span class="ident">default_permission_value</span>() -&gt; <span class="ident">bool</span> {
-    <span class="bool-val">true</span>
 }
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http&quot;</span>)]</span>
