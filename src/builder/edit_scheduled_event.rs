@@ -30,14 +30,14 @@ impl EditScheduledEvent {
     }
 
     /// Sets the name of the scheduled event.
-    pub fn name<S: ToString>(&mut self, name: S) -> &mut Self {
-        self.0.insert("name", Value::from(name.to_string()));
+    pub fn name(&mut self, name: impl Into<String>) -> &mut Self {
+        self.0.insert("name", Value::String(name.into()));
         self
     }
 
     /// Sets the description of the scheduled event.
-    pub fn description<S: ToString>(&mut self, description: S) -> &mut Self {
-        self.0.insert("description", Value::from(description.to_string()));
+    pub fn description(&mut self, description: impl Into<String>) -> &mut Self {
+        self.0.insert("description", Value::from(description.into()));
         self
     }
 
@@ -116,9 +116,9 @@ impl EditScheduledEvent {
     ///
     /// [`kind`]: EditScheduledEvent::kind
     /// [`External`]: ScheduledEventType::External
-    pub fn location<S: ToString>(&mut self, location: S) -> &mut Self {
+    pub fn location(&mut self, location: impl Into<String>) -> &mut Self {
         let obj = json!({
-            "location": location.to_string(),
+            "location": location.into(),
         });
         self.0.insert("entity_metadata", obj);
         self

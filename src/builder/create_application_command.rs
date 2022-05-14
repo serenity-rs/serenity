@@ -27,8 +27,8 @@ impl CreateApplicationCommandOption {
     /// Sets the name of the option.
     ///
     /// **Note**: Must be between 1 and 32 lowercase characters, matching `r"^[\w-]{1,32}$"`.
-    pub fn name<D: ToString>(&mut self, name: D) -> &mut Self {
-        self.0.insert("name", Value::from(name.to_string()));
+    pub fn name(&mut self, name: impl Into<String>) -> &mut Self {
+        self.0.insert("name", Value::String(name.into()));
         self
     }
 
@@ -54,8 +54,8 @@ impl CreateApplicationCommandOption {
     /// Sets the description for the option.
     ///
     /// **Note**: Must be between 1 and 100 characters.
-    pub fn description<D: ToString>(&mut self, description: D) -> &mut Self {
-        self.0.insert("description", Value::from(description.to_string()));
+    pub fn description(&mut self, description: impl Into<String>) -> &mut Self {
+        self.0.insert("description", Value::String(description.into()));
         self
     }
 
@@ -101,9 +101,9 @@ impl CreateApplicationCommandOption {
     /// Adds an optional int-choice.
     ///
     /// **Note**: There can be no more than 25 choices set. Name must be between 1 and 100 characters. Value must be between -2^53 and 2^53.
-    pub fn add_int_choice<D: ToString>(&mut self, name: D, value: i32) -> &mut Self {
+    pub fn add_int_choice(&mut self, name: impl Into<String>, value: i32) -> &mut Self {
         let choice = json!({
-            "name": name.to_string(),
+            "name": name.into(),
             "value" : value
         });
         self.add_choice(choice)
@@ -130,10 +130,14 @@ impl CreateApplicationCommandOption {
     /// Adds an optional string-choice.
     ///
     /// **Note**: There can be no more than 25 choices set. Name must be between 1 and 100 characters. Value must be up to 100 characters.
-    pub fn add_string_choice<D: ToString, E: ToString>(&mut self, name: D, value: E) -> &mut Self {
+    pub fn add_string_choice(
+        &mut self,
+        name: impl Into<String>,
+        value: impl Into<String>,
+    ) -> &mut Self {
         let choice = json!({
-            "name": name.to_string(),
-            "value": value.to_string()
+            "name": name.into(),
+            "value": value.into()
         });
         self.add_choice(choice)
     }
@@ -159,9 +163,9 @@ impl CreateApplicationCommandOption {
     /// Adds an optional number-choice.
     ///
     /// **Note**: There can be no more than 25 choices set. Name must be between 1 and 100 characters. Value must be between -2^53 and 2^53.
-    pub fn add_number_choice<D: ToString>(&mut self, name: D, value: f64) -> &mut Self {
+    pub fn add_number_choice(&mut self, name: impl Into<String>, value: f64) -> &mut Self {
         let choice = json!({
-            "name": name.to_string(),
+            "name": name.into(),
             "value" : value
         });
         self.add_choice(choice)
@@ -287,8 +291,8 @@ impl CreateApplicationCommand {
     /// Specifies the name of the application command.
     ///
     /// **Note**: Must be between 1 and 32 lowercase characters, matching `r"^[\w-]{1,32}$"`. Two global commands of the same app cannot have the same name. Two guild-specific commands of the same app cannot have the same name.
-    pub fn name<D: ToString>(&mut self, name: D) -> &mut Self {
-        self.0.insert("name", Value::from(name.to_string()));
+    pub fn name(&mut self, name: impl Into<String>) -> &mut Self {
+        self.0.insert("name", Value::String(name.into()));
         self
     }
 
@@ -320,7 +324,7 @@ impl CreateApplicationCommand {
 
     /// Specifies the default permissions required to execute the command.
     pub fn default_member_permissions(&mut self, permissions: Permissions) -> &mut Self {
-        self.0.insert("default_member_permissions", Value::from(permissions.bits().to_string()));
+        self.0.insert("default_member_permissions", Value::String(permissions.bits().to_string()));
 
         self
     }
@@ -335,8 +339,8 @@ impl CreateApplicationCommand {
     /// Specifies the description of the application command.
     ///
     /// **Note**: Must be between 1 and 100 characters long.
-    pub fn description<D: ToString>(&mut self, description: D) -> &mut Self {
-        self.0.insert("description", Value::from(description.to_string()));
+    pub fn description(&mut self, description: impl Into<String>) -> &mut Self {
+        self.0.insert("description", Value::String(description.into()));
         self
     }
 
