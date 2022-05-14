@@ -453,8 +453,8 @@ impl Configuration {
     ///
     /// let framework = StandardFramework::new().configure(|c| c.prefix("!"));
     /// ```
-    pub fn prefix(&mut self, prefix: impl ToString) -> &mut Self {
-        let p = prefix.to_string();
+    pub fn prefix(&mut self, prefix: impl Into<String>) -> &mut Self {
+        let p = prefix.into();
         self.prefixes = if p.is_empty() { vec![] } else { vec![p] };
 
         self
