@@ -5,6 +5,14 @@ pub mod component;
 pub mod interaction;
 pub mod oauth;
 
+pub use interaction::{
+    Interaction,
+    InteractionResponseType,
+    InteractionType,
+    MessageFlags,
+    MessageInteraction,
+};
+
 use self::oauth::Scope;
 use super::id::{snowflake, ApplicationId, GuildId, SkuId, UserId};
 use super::user::User;
