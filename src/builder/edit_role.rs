@@ -102,8 +102,8 @@ impl EditRole {
     }
 
     /// The name of the role to set.
-    pub fn name<S: ToString>(&mut self, name: S) -> &mut Self {
-        self.0.insert("name", Value::from(name.to_string()));
+    pub fn name(&mut self, name: impl Into<String>) -> &mut Self {
+        self.0.insert("name", Value::String(name.into()));
         self
     }
 
@@ -121,9 +121,9 @@ impl EditRole {
     }
 
     /// The unicode emoji to set as the role image.
-    pub fn unicode_emoji<S: ToString>(&mut self, unicode_emoji: S) -> &mut Self {
+    pub fn unicode_emoji(&mut self, unicode_emoji: impl Into<String>) -> &mut Self {
         self.0.remove("icon");
-        self.0.insert("unicode_emoji", Value::String(unicode_emoji.to_string()));
+        self.0.insert("unicode_emoji", Value::String(unicode_emoji.into()));
 
         self
     }
