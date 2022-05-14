@@ -16,8 +16,8 @@ impl EditWebhookMessage {
     ///
     /// **Note**: Message contents must be under 2000 unicode code points.
     #[inline]
-    pub fn content<D: ToString>(&mut self, content: D) -> &mut Self {
-        self.0.insert("content", Value::from(content.to_string()));
+    pub fn content(&mut self, content: impl Into<String>) -> &mut Self {
+        self.0.insert("content", Value::String(content.into()));
         self
     }
 

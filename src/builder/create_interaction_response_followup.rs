@@ -22,34 +22,34 @@ impl<'a> CreateInteractionResponseFollowup<'a> {
     ///
     /// **Note**: Message contents must be under 2000 unicode code points.
     #[inline]
-    pub fn content<D: ToString>(&mut self, content: D) -> &mut Self {
-        self._content(content.to_string())
+    pub fn content(&mut self, content: impl Into<String>) -> &mut Self {
+        self._content(content.into())
     }
 
     fn _content(&mut self, content: String) -> &mut Self {
-        self.0.insert("content", Value::from(content));
+        self.0.insert("content", Value::String(content));
         self
     }
 
     /// Override the default username of the webhook
     #[inline]
-    pub fn username<D: ToString>(&mut self, username: D) -> &mut Self {
-        self._username(username.to_string())
+    pub fn username(&mut self, username: impl Into<String>) -> &mut Self {
+        self._username(username.into())
     }
 
     fn _username(&mut self, username: String) -> &mut Self {
-        self.0.insert("username", Value::from(username));
+        self.0.insert("username", Value::String(username));
         self
     }
 
     /// Override the default avatar of the webhook
     #[inline]
-    pub fn avatar<D: ToString>(&mut self, avatar_url: D) -> &mut Self {
-        self._avatar(avatar_url.to_string())
+    pub fn avatar(&mut self, avatar_url: impl Into<String>) -> &mut Self {
+        self._avatar(avatar_url.into())
     }
 
     fn _avatar(&mut self, avatar_url: String) -> &mut Self {
-        self.0.insert("avatar_url", Value::from(avatar_url));
+        self.0.insert("avatar_url", Value::String(avatar_url));
         self
     }
     /// Set whether the message is text-to-speech.

@@ -10,7 +10,7 @@ pub async fn multiply(ctx: &Context, msg: &Message, mut args: Args) -> CommandRe
 
     let product = one * two;
 
-    msg.channel_id.say(&ctx.http, product).await?;
+    msg.channel_id.say(&ctx.http, product.to_string()).await?;
 
     Ok(())
 }
