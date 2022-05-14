@@ -40,8 +40,8 @@ impl EditMember {
     /// Requires the [Manage Nicknames] permission.
     ///
     /// [Manage Nicknames]: crate::model::permissions::Permissions::MANAGE_NICKNAMES
-    pub fn nickname<S: ToString>(&mut self, nickname: S) -> &mut Self {
-        self.0.insert("nick", Value::from(nickname.to_string()));
+    pub fn nickname(&mut self, nickname: impl Into<String>) -> &mut Self {
+        self.0.insert("nick", Value::String(nickname.into()));
         self
     }
 

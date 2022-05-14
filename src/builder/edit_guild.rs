@@ -76,8 +76,8 @@ impl EditGuild {
     /// Set the name of the guild.
     ///
     /// **Note**: Must be between (and including) 2-100 characters.
-    pub fn name<S: ToString>(&mut self, name: S) -> &mut Self {
-        self.0.insert("name", Value::from(name.to_string()));
+    pub fn name(&mut self, name: impl Into<String>) -> &mut Self {
+        self.0.insert("name", Value::String(name.into()));
         self
     }
 
@@ -87,8 +87,8 @@ impl EditGuild {
     /// You can check this through a guild's [`features`] list.
     ///
     /// [`features`]: crate::model::guild::Guild::features
-    pub fn description<S: ToString>(&mut self, name: S) -> &mut Self {
-        self.0.insert("name", Value::from(name.to_string()));
+    pub fn description(&mut self, name: impl Into<String>) -> &mut Self {
+        self.0.insert("name", Value::String(name.into()));
         self
     }
 

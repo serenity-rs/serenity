@@ -57,7 +57,6 @@
 #![allow(
     // Allowed to avoid breaking changes.
     clippy::module_name_repetitions,
-    clippy::needless_pass_by_value,
     clippy::struct_excessive_bools,
     clippy::unused_self,
     // Allowed as they are too pedantic

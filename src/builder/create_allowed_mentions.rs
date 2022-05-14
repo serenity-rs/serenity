@@ -5,7 +5,7 @@ use serde::{Deserialize, Serialize};
 use crate::json::prelude::*;
 use crate::model::id::{RoleId, UserId};
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, Serialize, Deserialize)]
 pub enum ParseValue {
     #[serde(rename = "everyone")]
     Everyone,

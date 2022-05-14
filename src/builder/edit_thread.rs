@@ -9,8 +9,8 @@ impl EditThread {
     /// The name of the thread.
     ///
     /// **Note**: Must be between 2 and 100 characters long.
-    pub fn name<D: ToString>(&mut self, name: D) -> &mut Self {
-        self.0.insert("name", Value::from(name.to_string()));
+    pub fn name(&mut self, name: impl Into<String>) -> &mut Self {
+        self.0.insert("name", Value::String(name.into()));
 
         self
     }
