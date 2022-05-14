@@ -69,8 +69,8 @@ impl EditChannel {
     /// The name of the channel.
     ///
     /// Must be between 2 and 100 characters long.
-    pub fn name<S: ToString>(&mut self, name: S) -> &mut Self {
-        self.0.insert("name", Value::from(name.to_string()));
+    pub fn name(&mut self, name: impl Into<String>) -> &mut Self {
+        self.0.insert("name", Value::String(name.into()));
         self
     }
 
@@ -87,8 +87,8 @@ impl EditChannel {
     /// This is for [text] channels only.
     ///
     /// [text]: crate::model::channel::ChannelType::Text
-    pub fn topic<S: ToString>(&mut self, topic: S) -> &mut Self {
-        self.0.insert("topic", Value::from(topic.to_string()));
+    pub fn topic(&mut self, topic: impl Into<String>) -> &mut Self {
+        self.0.insert("topic", Value::String(topic.into()));
         self
     }
 

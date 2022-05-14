@@ -85,8 +85,8 @@ impl<'a> ExecuteWebhook<'a> {
     /// #     Ok(())
     /// # }
     /// ```
-    pub fn avatar_url<S: ToString>(&mut self, avatar_url: S) -> &mut Self {
-        self.0.insert("avatar_url", Value::from(avatar_url.to_string()));
+    pub fn avatar_url(&mut self, avatar_url: impl Into<String>) -> &mut Self {
+        self.0.insert("avatar_url", Value::String(avatar_url.into()));
         self
     }
 
@@ -114,8 +114,8 @@ impl<'a> ExecuteWebhook<'a> {
     /// #     Ok(())
     /// # }
     /// ```
-    pub fn content<S: ToString>(&mut self, content: S) -> &mut Self {
-        self.0.insert("content", Value::from(content.to_string()));
+    pub fn content(&mut self, content: impl Into<String>) -> &mut Self {
+        self.0.insert("content", Value::String(content.into()));
         self
     }
 
@@ -254,8 +254,8 @@ impl<'a> ExecuteWebhook<'a> {
     /// #     Ok(())
     /// # }
     /// ```
-    pub fn username<S: ToString>(&mut self, username: S) -> &mut Self {
-        self.0.insert("username", Value::from(username.to_string()));
+    pub fn username(&mut self, username: impl Into<String>) -> &mut Self {
+        self.0.insert("username", Value::String(username.into()));
         self
     }
 

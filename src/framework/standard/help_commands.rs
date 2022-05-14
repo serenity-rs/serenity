@@ -1050,7 +1050,7 @@ async fn send_single_command_embed(
     channel_id
         .send_message(&http, |m| {
             m.embed(|embed| {
-                embed.title(&command.name);
+                embed.title(command.name);
                 embed.colour(colour);
 
                 if let Some(desc) = command.description {
@@ -1065,7 +1065,7 @@ async fn send_single_command_embed(
                         format!("`{} {}`", command.name, usage)
                     };
 
-                    embed.field(&help_options.usage_label, full_usage_text, true);
+                    embed.field(help_options.usage_label, &full_usage_text, true);
                 }
 
                 if !command.usage_sample.is_empty() {
@@ -1079,35 +1079,35 @@ async fn send_single_command_embed(
                         let format_example = |example| format!("`{} {}`\n", command.name, example);
                         command.usage_sample.iter().map(format_example).collect::<String>()
                     };
-                    embed.field(&help_options.usage_sample_label, full_example_text, true);
+                    embed.field(help_options.usage_sample_label, &full_example_text, true);
                 }
 
-                embed.field(&help_options.grouped_label, command.group_name, true);
+                embed.field(help_options.grouped_label, command.group_name, true);
 
                 if !command.aliases.is_empty() {
                     embed.field(
-                        &help_options.aliases_label,
-                        format!("`{}`", command.aliases.join("`, `")),
+                        help_options.aliases_label,
+                        &format!("`{}`", command.aliases.join("`, `")),
                         true,
                     );
                 }
 
                 if !help_options.available_text.is_empty() && !command.availability.is_empty() {
-                    embed.field(&help_options.available_text, &command.availability, true);
+                    embed.field(help_options.available_text, command.availability, true);
                 }
 
                 if !command.checks.is_empty() {
                     embed.field(
-                        &help_options.checks_label,
-                        format!("`{}`", command.checks.join("`, `")),
+                        help_options.checks_label,
+                        &format!("`{}`", command.checks.join("`, `")),
                         true,
                     );
                 }
 
                 if !command.sub_commands.is_empty() {
                     embed.field(
-                        &help_options.sub_commands_label,
-                        format!("`{}`", command.sub_commands.join("`, `")),
+                        help_options.sub_commands_label,
+                        &format!("`{}`", command.sub_commands.join("`, `")),
                         true,
                     );
                 }

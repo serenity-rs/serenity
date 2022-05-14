@@ -898,11 +898,7 @@ impl GuildChannel {
     /// May also return [`Error::Http`] if the current user lacks permission
     /// to send a message to the channel.
     #[inline]
-    pub async fn say(
-        &self,
-        http: impl AsRef<Http>,
-        content: impl std::fmt::Display,
-    ) -> Result<Message> {
+    pub async fn say(&self, http: impl AsRef<Http>, content: impl Into<String>) -> Result<Message> {
         self.id.say(&http, content).await
     }
 
