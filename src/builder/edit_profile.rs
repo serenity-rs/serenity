@@ -95,8 +95,8 @@ impl EditProfile {
     /// and current discriminator, a new unique discriminator will be assigned.
     /// If there are no available discriminators with the requested username,
     /// an error will occur.
-    pub fn username<S: ToString>(&mut self, username: S) -> &mut Self {
-        self.0.insert("username", Value::from(username.to_string()));
+    pub fn username(&mut self, username: impl Into<String>) -> &mut Self {
+        self.0.insert("username", Value::from(username.into()));
         self
     }
 }

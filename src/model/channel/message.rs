@@ -680,7 +680,7 @@ impl Message {
     pub async fn reply(
         &self,
         cache_http: impl CacheHttp,
-        content: impl Display,
+        content: impl Into<String>,
     ) -> Result<Message> {
         self._reply(cache_http, content, Some(false)).await
     }
@@ -706,7 +706,7 @@ impl Message {
     pub async fn reply_ping(
         &self,
         cache_http: impl CacheHttp,
-        content: impl Display,
+        content: impl Into<String>,
     ) -> Result<Message> {
         self._reply(cache_http, content, Some(true)).await
     }
@@ -744,7 +744,7 @@ impl Message {
     async fn _reply(
         &self,
         cache_http: impl CacheHttp,
-        content: impl Display,
+        content: impl Into<String>,
         inlined: Option<bool>,
     ) -> Result<Message> {
         #[cfg(feature = "cache")]
