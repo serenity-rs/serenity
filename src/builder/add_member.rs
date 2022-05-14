@@ -13,8 +13,8 @@ impl AddMember {
     /// Sets the OAuth2 access token for this request.
     ///
     /// Requires the access token to have the `guilds.join` scope granted.
-    pub fn access_token(&mut self, access_token: impl ToString) -> &mut Self {
-        self.0.insert("access_token", Value::from(access_token.to_string()));
+    pub fn access_token(&mut self, access_token: impl Into<String>) -> &mut Self {
+        self.0.insert("access_token", Value::String(access_token.into()));
         self
     }
 
@@ -23,8 +23,8 @@ impl AddMember {
     /// Requires the [Manage Nicknames] permission.
     ///
     /// [Manage Nicknames]: crate::model::permissions::Permissions::MANAGE_NICKNAMES
-    pub fn nickname(&mut self, nickname: impl ToString) -> &mut Self {
-        self.0.insert("nick", Value::from(nickname.to_string()));
+    pub fn nickname(&mut self, nickname: impl Into<String>) -> &mut Self {
+        self.0.insert("nick", Value::String(nickname.into()));
         self
     }
 

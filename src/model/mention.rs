@@ -38,7 +38,7 @@ pub trait Mentionable {
     ///     to_channel
     ///         .id
     ///         .send_message(ctx, |m| {
-    ///             m.content(format_args!(
+    ///             m.content(format!(
     ///                 "Hi {member}, welcome to the server! \
     ///                 Please refer to {rules} for our code of conduct, \
     ///                 and enjoy your stay.",
