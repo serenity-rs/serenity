@@ -161,20 +161,20 @@ impl CreateButton {
     }
 
     /// The label of the button.
-    pub fn label<D: ToString>(&mut self, label: D) -> &mut Self {
-        self.0.insert("label", Value::from(label.to_string()));
+    pub fn label(&mut self, label: impl Into<String>) -> &mut Self {
+        self.0.insert("label", Value::String(label.into()));
         self
     }
 
     /// Sets the custom id of the button, a developer-defined identifier.
-    pub fn custom_id<D: ToString>(&mut self, id: D) -> &mut Self {
-        self.0.insert("custom_id", Value::from(id.to_string()));
+    pub fn custom_id(&mut self, id: impl Into<String>) -> &mut Self {
+        self.0.insert("custom_id", Value::String(id.into()));
         self
     }
 
     /// The url for url style button.
-    pub fn url<D: ToString>(&mut self, url: D) -> &mut Self {
-        self.0.insert("url", Value::from(url.to_string()));
+    pub fn url(&mut self, url: impl Into<String>) -> &mut Self {
+        self.0.insert("url", Value::String(url.into()));
         self
     }
 
@@ -188,18 +188,18 @@ impl CreateButton {
 
         match emoji {
             ReactionType::Unicode(u) => {
-                map.insert("name".to_string(), Value::from(u));
+                map.insert("name".into(), Value::from(u));
             },
             ReactionType::Custom {
                 animated,
                 id,
                 name,
             } => {
-                map.insert("animated".to_string(), Value::from(animated));
-                map.insert("id".to_string(), Value::from(id.to_string()));
+                map.insert("animated".into(), Value::from(animated));
+                map.insert("id".into(), Value::String(id.to_string()));
 
                 if let Some(name) = name {
-                    map.insert("name".to_string(), Value::from(name));
+                    map.insert("name".into(), Value::String(name));
                 }
             },
         };
@@ -230,14 +230,14 @@ pub struct CreateSelectMenu(pub HashMap<&'static str, Value>);
 
 impl CreateSelectMenu {
     /// The placeholder of the select menu.
-    pub fn placeholder<D: ToString>(&mut self, label: D) -> &mut Self {
-        self.0.insert("placeholder", Value::from(label.to_string()));
+    pub fn placeholder(&mut self, label: impl Into<String>) -> &mut Self {
+        self.0.insert("placeholder", Value::String(label.into()));
         self
     }
 
     /// Sets the custom id of the select menu, a developer-defined identifier.
-    pub fn custom_id<D: ToString>(&mut self, id: D) -> &mut Self {
-        self.0.insert("custom_id", Value::from(id.to_string()));
+    pub fn custom_id(&mut self, id: impl Into<String>) -> &mut Self {
+        self.0.insert("custom_id", Value::String(id.into()));
         self
     }
 
@@ -329,27 +329,27 @@ pub struct CreateSelectMenuOption(pub HashMap<&'static str, Value>);
 
 impl CreateSelectMenuOption {
     /// Creates an option.
-    pub fn new<L: ToString, V: ToString>(label: L, value: V) -> Self {
+    pub fn new(label: impl Into<String>, value: impl Into<String>) -> Self {
         let mut opt = Self::default();
         opt.label(label).value(value);
         opt
     }
 
     /// Sets the label of this option.
-    pub fn label<D: ToString>(&mut self, label: D) -> &mut Self {
-        self.0.insert("label", Value::from(label.to_string()));
+    pub fn label(&mut self, label: impl Into<String>) -> &mut Self {
+        self.0.insert("label", Value::String(label.into()));
         self
     }
 
     /// Sets the value of this option.
-    pub fn value<D: ToString>(&mut self, value: D) -> &mut Self {
-        self.0.insert("value", Value::from(value.to_string()));
+    pub fn value(&mut self, value: impl Into<String>) -> &mut Self {
+        self.0.insert("value", Value::String(value.into()));
         self
     }
 
     /// Sets the description shown on this option.
-    pub fn description<D: ToString>(&mut self, description: D) -> &mut Self {
-        self.0.insert("description", Value::from(description.to_string()));
+    pub fn description(&mut self, description: impl Into<String>) -> &mut Self {
+        self.0.insert("description", Value::String(description.into()));
         self
     }
 
@@ -363,18 +363,18 @@ impl CreateSelectMenuOption {
 
         match emoji {
             ReactionType::Unicode(u) => {
-                map.insert("name".to_string(), Value::from(u));
+                map.insert("name".into(), Value::String(u));
             },
             ReactionType::Custom {
                 animated,
                 id,
                 name,
             } => {
-                map.insert("animated".to_string(), Value::from(animated));
-                map.insert("id".to_string(), Value::from(id.to_string()));
+                map.insert("animated".into(), Value::from(animated));
+                map.insert("id".into(), Value::String(id.to_string()));
 
                 if let Some(name) = name {
-                    map.insert("name".to_string(), Value::from(name));
+                    map.insert("name".into(), Value::from(name));
                 }
             },
         };
@@ -398,8 +398,8 @@ pub struct CreateInputText(pub HashMap<&'static str, Value>);
 
 impl CreateInputText {
     /// Sets the custom id of the input text, a developer-defined identifier.
-    pub fn custom_id<D: ToString>(&mut self, id: D) -> &mut Self {
-        self.0.insert("custom_id", Value::from(id.to_string()));
+    pub fn custom_id(&mut self, id: impl Into<String>) -> &mut Self {
+        self.0.insert("custom_id", Value::from(id.into()));
         self
     }
 
@@ -410,14 +410,14 @@ impl CreateInputText {
     }
 
     /// Sets the label of this input text.
-    pub fn label<D: ToString>(&mut self, label: D) -> &mut Self {
-        self.0.insert("label", Value::from(label.to_string()));
+    pub fn label(&mut self, label: impl Into<String>) -> &mut Self {
+        self.0.insert("label", Value::String(label.into()));
         self
     }
 
     /// Sets the placeholder of this input text.
-    pub fn placeholder<D: ToString>(&mut self, label: D) -> &mut Self {
-        self.0.insert("placeholder", Value::from(label.to_string()));
+    pub fn placeholder(&mut self, label: impl Into<String>) -> &mut Self {
+        self.0.insert("placeholder", Value::String(label.into()));
         self
     }
 
@@ -434,8 +434,8 @@ impl CreateInputText {
     }
 
     /// Sets the value of this input text.
-    pub fn value<D: ToString>(&mut self, value: D) -> &mut Self {
-        self.0.insert("value", Value::from(value.to_string()));
+    pub fn value(&mut self, value: impl Into<String>) -> &mut Self {
+        self.0.insert("value", Value::String(value.into()));
         self
     }
 
