@@ -130,7 +130,7 @@ impl Sound {
         let mut b = CreateButton::default();
         b.custom_id(self.to_string().to_ascii_lowercase());
         b.emoji(self.emoji());
-        b.label(self);
+        b.label(self.to_string());
         b.style(ButtonStyle::Primary);
         b
     }
