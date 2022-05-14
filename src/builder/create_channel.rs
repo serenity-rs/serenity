@@ -16,8 +16,8 @@ impl CreateChannel {
     /// Specify how to call this new channel.
     ///
     /// **Note**: Must be between 2 and 100 characters long.
-    pub fn name<D: ToString>(&mut self, name: D) -> &mut Self {
-        self.0.insert("name", Value::from(name.to_string()));
+    pub fn name(&mut self, name: impl Into<String>) -> &mut Self {
+        self.0.insert("name", Value::String(name.into()));
 
         self
     }
@@ -38,8 +38,8 @@ impl CreateChannel {
     /// Set an interesting topic.
     ///
     /// **Note**: Must be between 0 and 1000 characters long.
-    pub fn topic<D: ToString>(&mut self, topic: D) -> &mut Self {
-        self.0.insert("topic", Value::from(topic.to_string()));
+    pub fn topic(&mut self, topic: impl Into<String>) -> &mut Self {
+        self.0.insert("topic", Value::String(topic.into()));
 
         self
     }
