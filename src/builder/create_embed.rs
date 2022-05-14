@@ -102,8 +102,8 @@ impl CreateEmbed {
     ///
     /// **Note**: This can't be longer than 4096 characters.
     #[inline]
-    pub fn description<D: ToString>(&mut self, description: D) -> &mut Self {
-        self.0.insert("description", Value::from(description.to_string()));
+    pub fn description(&mut self, description: impl Into<String>) -> &mut Self {
+        self.0.insert("description", Value::String(description.into()));
         self
     }
 
@@ -113,37 +113,26 @@ impl CreateEmbed {
     /// **Note**: Maximum amount of characters you can put is 256 in a field
     /// name and 1024 in a field value.
     #[inline]
-    pub fn field<T, U>(&mut self, name: T, value: U, inline: bool) -> &mut Self
-    where
-        T: ToString,
-        U: ToString,
-    {
-        self._field(name.to_string(), value.to_string(), inline);
-        self
-    }
+    pub fn field(&mut self, name: &str, value: &str, inline: bool) -> &mut Self {
+        let entry = self.0.entry("fields").or_insert_with(|| Value::from(Vec::<Value>::new()));
 
-    fn _field(&mut self, name: String, value: String, inline: bool) {
-        {
-            let entry = self.0.entry("fields").or_insert_with(|| Value::from(Vec::<Value>::new()));
-
-            if let Value::Array(ref mut inner) = *entry {
-                inner.push(json!({
-                    "inline": inline,
-                    "name": name,
-                    "value": value,
-                }));
-            }
+        if let Value::Array(ref mut inner) = *entry {
+            inner.push(json!({
+                "inline": inline,
+                "name": name,
+                "value": value,
+            }));
         }
+
+        self
     }
 
     /// Adds multiple fields at once.
     ///
     /// This is sugar to reduce the need of calling [`Self::field`] manually multiple times.
-    pub fn fields<T, U, It>(&mut self, fields: It) -> &mut Self
+    pub fn fields<'a, 'b, It>(&mut self, fields: It) -> &mut Self
     where
-        It: IntoIterator<Item = (T, U, bool)>,
-        T: ToString,
-        U: ToString,
+        It: IntoIterator<Item = (&'a str, &'b str, bool)>,
     {
         for (name, value, inline) in fields {
             self.field(name, value, inline);
@@ -174,7 +163,7 @@ impl CreateEmbed {
         self
     }
 
-    fn url_object(&mut self, name: &'static str, url: String) -> &mut Self {
+    fn url_object(&mut self, name: &'static str, url: &str) -> &mut Self {
         let obj = json!({
             "url": url,
         });
@@ -185,16 +174,16 @@ impl CreateEmbed {
 
     /// Set the image associated with the embed. This only supports HTTP(S).
     #[inline]
-    pub fn image<S: ToString>(&mut self, url: S) -> &mut Self {
-        self.url_object("image", url.to_string());
+    pub fn image(&mut self, url: &str) -> &mut Self {
+        self.url_object("image", url);
 
         self
     }
 
     /// Set the thumbnail of the embed. This only supports HTTP(S).
     #[inline]
-    pub fn thumbnail<S: ToString>(&mut self, url: S) -> &mut Self {
-        self.url_object("thumbnail", url.to_string());
+    pub fn thumbnail(&mut self, url: &str) -> &mut Self {
+        self.url_object("thumbnail", url);
         self
     }
 
@@ -300,20 +289,20 @@ impl CreateEmbed {
     }
 
     fn _timestamp(&mut self, timestamp: Timestamp) {
-        self.0.insert("timestamp", Value::from(timestamp.to_string()));
+        self.0.insert("timestamp", Value::String(timestamp.to_string()));
     }
 
     /// Set the title of the embed.
     #[inline]
-    pub fn title<D: ToString>(&mut self, title: D) -> &mut Self {
-        self.0.insert("title", Value::from(title.to_string()));
+    pub fn title(&mut self, title: impl Into<String>) -> &mut Self {
+        self.0.insert("title", Value::String(title.into()));
         self
     }
 
     /// Set the URL to direct to when clicking on the title.
     #[inline]
-    pub fn url<S: ToString>(&mut self, url: S) -> &mut Self {
-        self.0.insert("url", Value::from(url.to_string()));
+    pub fn url(&mut self, url: impl Into<String>) -> &mut Self {
+        self.0.insert("url", Value::String(url.into()));
         self
     }
 
@@ -324,10 +313,10 @@ impl CreateEmbed {
     ///
     /// [`ChannelId::send_files`]: crate::model::id::ChannelId::send_files
     #[inline]
-    pub fn attachment<S: ToString>(&mut self, filename: S) -> &mut Self {
-        let mut filename = filename.to_string();
+    pub fn attachment(&mut self, filename: impl Into<String>) -> &mut Self {
+        let mut filename = filename.into();
         filename.insert_str(0, "attachment://");
-        self.url_object("image", filename);
+        self.url_object("image", &filename);
 
         self
     }
@@ -337,7 +326,7 @@ impl Default for CreateEmbed {
     /// Creates a builder with default values, setting the `type` to `rich`.
     fn default() -> CreateEmbed {
         let mut map = HashMap::new();
-        map.insert("type", Value::from("rich".to_string()));
+        map.insert("type", Value::String("rich".into()));
 
         CreateEmbed(map)
     }
@@ -375,7 +364,7 @@ impl From<Embed> for CreateEmbed {
         }
 
         for field in embed.fields {
-            b.field(field.name, field.value, field.inline);
+            b.field(&field.name, &field.value, field.inline);
         }
 
         if let Some(image) = embed.image {
@@ -422,20 +411,20 @@ pub struct CreateEmbedAuthor(pub HashMap<&'static str, Value>);
 
 impl CreateEmbedAuthor {
     /// Set the URL of the author's icon.
-    pub fn icon_url<S: ToString>(&mut self, icon_url: S) -> &mut Self {
-        self.0.insert("icon_url", Value::from(icon_url.to_string()));
+    pub fn icon_url(&mut self, icon_url: impl Into<String>) -> &mut Self {
+        self.0.insert("icon_url", Value::String(icon_url.into()));
         self
     }
 
     /// Set the author's name.
-    pub fn name<S: ToString>(&mut self, name: S) -> &mut Self {
-        self.0.insert("name", Value::from(name.to_string()));
+    pub fn name(&mut self, name: impl Into<String>) -> &mut Self {
+        self.0.insert("name", Value::String(name.into()));
         self
     }
 
     /// Set the author's URL.
-    pub fn url<S: ToString>(&mut self, url: S) -> &mut Self {
-        self.0.insert("url", Value::from(url.to_string()));
+    pub fn url(&mut self, url: impl Into<String>) -> &mut Self {
+        self.0.insert("url", Value::String(url.into()));
         self
     }
 }
@@ -451,14 +440,14 @@ pub struct CreateEmbedFooter(pub HashMap<&'static str, Value>);
 
 impl CreateEmbedFooter {
     /// Set the icon URL's value. This only supports HTTP(S).
-    pub fn icon_url<S: ToString>(&mut self, icon_url: S) -> &mut Self {
-        self.0.insert("icon_url", Value::from(icon_url.to_string()));
+    pub fn icon_url(&mut self, icon_url: impl Into<String>) -> &mut Self {
+        self.0.insert("icon_url", Value::String(icon_url.into()));
         self
     }
 
     /// Set the footer's text.
-    pub fn text<S: ToString>(&mut self, text: S) -> &mut Self {
-        self.0.insert("text", Value::from(text.to_string()));
+    pub fn text(&mut self, text: impl Into<String>) -> &mut Self {
+        self.0.insert("text", Value::String(text.into()));
         self
     }
 }

@@ -117,16 +117,13 @@ impl Activity {
     /// #[command]
     /// async fn activity(ctx: &Context, _msg: &Message, args: Args) -> CommandResult {
     ///     let name = args.message();
-    ///     ctx.set_activity(Activity::playing(&name)).await;
+    ///     ctx.set_activity(Activity::playing(name)).await;
     ///
     ///     Ok(())
     /// }
     /// ```
-    pub fn playing<N>(name: N) -> Activity
-    where
-        N: ToString,
-    {
-        Activity::new(name.to_string(), ActivityType::Playing)
+    pub fn playing(name: impl Into<String>) -> Activity {
+        Activity::new(name.into(), ActivityType::Playing)
     }
 
     /// Creates an [`Activity`] struct that appears as a `Streaming <name>`
@@ -152,19 +149,15 @@ impl Activity {
     ///     const STREAM_URL: &str = "...";
     ///
     ///     let name = args.message();
-    ///     ctx.set_activity(Activity::streaming(&name, STREAM_URL)).await;
+    ///     ctx.set_activity(Activity::streaming(name, STREAM_URL)).await;
     ///
     ///     Ok(())
     /// }
     /// ```
-    pub fn streaming<N, U>(name: N, url: U) -> Activity
-    where
-        N: ToString,
-        U: AsRef<str>,
-    {
+    pub fn streaming(name: impl Into<String>, url: impl AsRef<str>) -> Activity {
         Activity {
             url: Some(Url::parse(url.as_ref()).expect("Failed to parse url")),
-            ..Activity::new(name.to_string(), ActivityType::Streaming)
+            ..Activity::new(name.into(), ActivityType::Streaming)
         }
     }
 
@@ -188,16 +181,13 @@ impl Activity {
     /// #[command]
     /// async fn listen(ctx: &Context, _msg: &Message, args: Args) -> CommandResult {
     ///     let name = args.message();
-    ///     ctx.set_activity(Activity::listening(&name)).await;
+    ///     ctx.set_activity(Activity::listening(name)).await;
     ///
     ///     Ok(())
     /// }
     /// ```
-    pub fn listening<N>(name: N) -> Activity
-    where
-        N: ToString,
-    {
-        Activity::new(name.to_string(), ActivityType::Listening)
+    pub fn listening(name: impl Into<String>) -> Activity {
+        Activity::new(name.into(), ActivityType::Listening)
     }
 
     /// Creates a [`Activity`] struct that appears as a `Watching <name>` status.
@@ -220,16 +210,13 @@ impl Activity {
     /// #[command]
     /// async fn watch(ctx: &Context, _msg: &Message, args: Args) -> CommandResult {
     ///     let name = args.message();
-    ///     ctx.set_activity(Activity::watching(&name)).await;
+    ///     ctx.set_activity(Activity::watching(name)).await;
     ///
     ///     Ok(())
     /// }
     /// ```
-    pub fn watching<N>(name: N) -> Activity
-    where
-        N: ToString,
-    {
-        Activity::new(name.to_string(), ActivityType::Watching)
+    pub fn watching(name: impl Into<String>) -> Activity {
+        Activity::new(name.into(), ActivityType::Watching)
     }
 
     /// Creates a [`Activity`] struct that appears as a `Competing in <name>` status.
@@ -252,16 +239,13 @@ impl Activity {
     /// #[command]
     /// async fn compete(ctx: &Context, _msg: &Message, args: Args) -> CommandResult {
     ///     let name = args.message();
-    ///     ctx.set_activity(Activity::competing(&name)).await;
+    ///     ctx.set_activity(Activity::competing(name)).await;
     ///
     ///     Ok(())
     /// }
     /// ```
-    pub fn competing<N>(name: N) -> Activity
-    where
-        N: ToString,
-    {
-        Activity::new(name.to_string(), ActivityType::Competing)
+    pub fn competing(name: impl Into<String>) -> Activity {
+        Activity::new(name.into(), ActivityType::Competing)
     }
 }
 
