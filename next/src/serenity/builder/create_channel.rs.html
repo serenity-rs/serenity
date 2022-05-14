@@ -186,8 +186,8 @@
     <span class="doccomment">/// Specify how to call this new channel.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// **Note**: Must be between 2 and 100 characters long.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">name</span><span class="op">&lt;</span><span class="ident">D</span>: <span class="ident">ToString</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">name</span>: <span class="ident">D</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;name&quot;</span>, <span class="ident">Value::from</span>(<span class="ident">name</span>.<span class="ident">to_string</span>()));
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">name</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">name</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
+        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;name&quot;</span>, <span class="ident">Value::String</span>(<span class="ident">name</span>.<span class="ident">into</span>()));
 
         <span class="self">self</span>
     }
@@ -208,8 +208,8 @@
     <span class="doccomment">/// Set an interesting topic.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// **Note**: Must be between 0 and 1000 characters long.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">topic</span><span class="op">&lt;</span><span class="ident">D</span>: <span class="ident">ToString</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">topic</span>: <span class="ident">D</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;topic&quot;</span>, <span class="ident">Value::from</span>(<span class="ident">topic</span>.<span class="ident">to_string</span>()));
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">topic</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">topic</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
+        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;topic&quot;</span>, <span class="ident">Value::String</span>(<span class="ident">topic</span>.<span class="ident">into</span>()));
 
         <span class="self">self</span>
     }

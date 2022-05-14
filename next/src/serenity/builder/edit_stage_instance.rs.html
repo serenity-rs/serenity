@@ -33,8 +33,8 @@
 
 <span class="kw">impl</span> <span class="ident">EditStageInstance</span> {
     <span class="doccomment">/// Sets the topic of the stage channel instance.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">topic</span><span class="op">&lt;</span><span class="ident">D</span>: <span class="ident">ToString</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">topic</span>: <span class="ident">D</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;topic&quot;</span>, <span class="ident">Value::from</span>(<span class="ident">topic</span>.<span class="ident">to_string</span>()));
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">topic</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">topic</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
+        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;topic&quot;</span>, <span class="ident">Value::String</span>(<span class="ident">topic</span>.<span class="ident">into</span>()));
 
         <span class="self">self</span>
     }

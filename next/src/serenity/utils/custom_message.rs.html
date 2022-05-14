@@ -356,8 +356,8 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// If not used, the default value is an empty string (`String::default()`).</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">content</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">ToString</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">s</span>: <span class="ident">T</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">msg</span>.<span class="ident">content</span> <span class="op">=</span> <span class="ident">s</span>.<span class="ident">to_string</span>();
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">content</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">s</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
+        <span class="self">self</span>.<span class="ident">msg</span>.<span class="ident">content</span> <span class="op">=</span> <span class="ident">s</span>.<span class="ident">into</span>();
 
         <span class="self">self</span>
     }

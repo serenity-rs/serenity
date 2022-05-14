@@ -848,22 +848,6 @@
 <span id="843">843</span>
 <span id="844">844</span>
 <span id="845">845</span>
-<span id="846">846</span>
-<span id="847">847</span>
-<span id="848">848</span>
-<span id="849">849</span>
-<span id="850">850</span>
-<span id="851">851</span>
-<span id="852">852</span>
-<span id="853">853</span>
-<span id="854">854</span>
-<span id="855">855</span>
-<span id="856">856</span>
-<span id="857">857</span>
-<span id="858">858</span>
-<span id="859">859</span>
-<span id="860">860</span>
-<span id="861">861</span>
 </pre><pre class="rust"><code><span class="doccomment">//! Models pertaining to the gateway.</span>
 
 <span class="kw">use</span> <span class="ident">url::Url</span>;
@@ -983,16 +967,13 @@
     <span class="doccomment">/// #[command]</span>
     <span class="doccomment">/// async fn activity(ctx: &amp;Context, _msg: &amp;Message, args: Args) -&gt; CommandResult {</span>
     <span class="doccomment">///     let name = args.message();</span>
-    <span class="doccomment">///     ctx.set_activity(Activity::playing(&amp;name)).await;</span>
+    <span class="doccomment">///     ctx.set_activity(Activity::playing(name)).await;</span>
     <span class="doccomment">///</span>
     <span class="doccomment">///     Ok(())</span>
     <span class="doccomment">/// }</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">playing</span><span class="op">&lt;</span><span class="ident">N</span><span class="op">&gt;</span>(<span class="ident">name</span>: <span class="ident">N</span>) -&gt; <span class="ident">Activity</span>
-    <span class="kw">where</span>
-        <span class="ident">N</span>: <span class="ident">ToString</span>,
-    {
-        <span class="ident">Activity::new</span>(<span class="ident">name</span>.<span class="ident">to_string</span>(), <span class="ident">ActivityType::Playing</span>)
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">playing</span>(<span class="ident">name</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>) -&gt; <span class="ident">Activity</span> {
+        <span class="ident">Activity::new</span>(<span class="ident">name</span>.<span class="ident">into</span>(), <span class="ident">ActivityType::Playing</span>)
     }
 
     <span class="doccomment">/// Creates an [`Activity`] struct that appears as a `Streaming &lt;name&gt;`</span>
@@ -1018,19 +999,15 @@
     <span class="doccomment">///     const STREAM_URL: &amp;str = &quot;...&quot;;</span>
     <span class="doccomment">///</span>
     <span class="doccomment">///     let name = args.message();</span>
-    <span class="doccomment">///     ctx.set_activity(Activity::streaming(&amp;name, STREAM_URL)).await;</span>
+    <span class="doccomment">///     ctx.set_activity(Activity::streaming(name, STREAM_URL)).await;</span>
     <span class="doccomment">///</span>
     <span class="doccomment">///     Ok(())</span>
     <span class="doccomment">/// }</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">streaming</span><span class="op">&lt;</span><span class="ident">N</span>, <span class="ident">U</span><span class="op">&gt;</span>(<span class="ident">name</span>: <span class="ident">N</span>, <span class="ident">url</span>: <span class="ident">U</span>) -&gt; <span class="ident">Activity</span>
-    <span class="kw">where</span>
-        <span class="ident">N</span>: <span class="ident">ToString</span>,
-        <span class="ident">U</span>: <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span>,
-    {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">streaming</span>(<span class="ident">name</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>, <span class="ident">url</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span>) -&gt; <span class="ident">Activity</span> {
         <span class="ident">Activity</span> {
             <span class="ident">url</span>: <span class="prelude-val">Some</span>(<span class="ident">Url::parse</span>(<span class="ident">url</span>.<span class="ident">as_ref</span>()).<span class="ident">expect</span>(<span class="string">&quot;Failed to parse url&quot;</span>)),
-            ..<span class="ident">Activity::new</span>(<span class="ident">name</span>.<span class="ident">to_string</span>(), <span class="ident">ActivityType::Streaming</span>)
+            ..<span class="ident">Activity::new</span>(<span class="ident">name</span>.<span class="ident">into</span>(), <span class="ident">ActivityType::Streaming</span>)
         }
     }
 
@@ -1054,16 +1031,13 @@
     <span class="doccomment">/// #[command]</span>
     <span class="doccomment">/// async fn listen(ctx: &amp;Context, _msg: &amp;Message, args: Args) -&gt; CommandResult {</span>
     <span class="doccomment">///     let name = args.message();</span>
-    <span class="doccomment">///     ctx.set_activity(Activity::listening(&amp;name)).await;</span>
+    <span class="doccomment">///     ctx.set_activity(Activity::listening(name)).await;</span>
     <span class="doccomment">///</span>
     <span class="doccomment">///     Ok(())</span>
     <span class="doccomment">/// }</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">listening</span><span class="op">&lt;</span><span class="ident">N</span><span class="op">&gt;</span>(<span class="ident">name</span>: <span class="ident">N</span>) -&gt; <span class="ident">Activity</span>
-    <span class="kw">where</span>
-        <span class="ident">N</span>: <span class="ident">ToString</span>,
-    {
-        <span class="ident">Activity::new</span>(<span class="ident">name</span>.<span class="ident">to_string</span>(), <span class="ident">ActivityType::Listening</span>)
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">listening</span>(<span class="ident">name</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>) -&gt; <span class="ident">Activity</span> {
+        <span class="ident">Activity::new</span>(<span class="ident">name</span>.<span class="ident">into</span>(), <span class="ident">ActivityType::Listening</span>)
     }
 
     <span class="doccomment">/// Creates a [`Activity`] struct that appears as a `Watching &lt;name&gt;` status.</span>
@@ -1086,16 +1060,13 @@
     <span class="doccomment">/// #[command]</span>
     <span class="doccomment">/// async fn watch(ctx: &amp;Context, _msg: &amp;Message, args: Args) -&gt; CommandResult {</span>
     <span class="doccomment">///     let name = args.message();</span>
-    <span class="doccomment">///     ctx.set_activity(Activity::watching(&amp;name)).await;</span>
+    <span class="doccomment">///     ctx.set_activity(Activity::watching(name)).await;</span>
     <span class="doccomment">///</span>
     <span class="doccomment">///     Ok(())</span>
     <span class="doccomment">/// }</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">watching</span><span class="op">&lt;</span><span class="ident">N</span><span class="op">&gt;</span>(<span class="ident">name</span>: <span class="ident">N</span>) -&gt; <span class="ident">Activity</span>
-    <span class="kw">where</span>
-        <span class="ident">N</span>: <span class="ident">ToString</span>,
-    {
-        <span class="ident">Activity::new</span>(<span class="ident">name</span>.<span class="ident">to_string</span>(), <span class="ident">ActivityType::Watching</span>)
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">watching</span>(<span class="ident">name</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>) -&gt; <span class="ident">Activity</span> {
+        <span class="ident">Activity::new</span>(<span class="ident">name</span>.<span class="ident">into</span>(), <span class="ident">ActivityType::Watching</span>)
     }
 
     <span class="doccomment">/// Creates a [`Activity`] struct that appears as a `Competing in &lt;name&gt;` status.</span>
@@ -1118,16 +1089,13 @@
     <span class="doccomment">/// #[command]</span>
     <span class="doccomment">/// async fn compete(ctx: &amp;Context, _msg: &amp;Message, args: Args) -&gt; CommandResult {</span>
     <span class="doccomment">///     let name = args.message();</span>
-    <span class="doccomment">///     ctx.set_activity(Activity::competing(&amp;name)).await;</span>
+    <span class="doccomment">///     ctx.set_activity(Activity::competing(name)).await;</span>
     <span class="doccomment">///</span>
     <span class="doccomment">///     Ok(())</span>
     <span class="doccomment">/// }</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">competing</span><span class="op">&lt;</span><span class="ident">N</span><span class="op">&gt;</span>(<span class="ident">name</span>: <span class="ident">N</span>) -&gt; <span class="ident">Activity</span>
-    <span class="kw">where</span>
-        <span class="ident">N</span>: <span class="ident">ToString</span>,
-    {
-        <span class="ident">Activity::new</span>(<span class="ident">name</span>.<span class="ident">to_string</span>(), <span class="ident">ActivityType::Competing</span>)
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">competing</span>(<span class="ident">name</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>) -&gt; <span class="ident">Activity</span> {
+        <span class="ident">Activity::new</span>(<span class="ident">name</span>.<span class="ident">into</span>(), <span class="ident">ActivityType::Competing</span>)
     }
 }
 

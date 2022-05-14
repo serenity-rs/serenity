@@ -301,6 +301,10 @@
 <span id="296">296</span>
 <span id="297">297</span>
 <span id="298">298</span>
+<span id="299">299</span>
+<span id="300">300</span>
+<span id="301">301</span>
+<span id="302">302</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::collections::HashMap</span>;
 
 <span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">CreateAllowedMentions</span>, <span class="ident">CreateEmbed</span>};
@@ -399,8 +403,8 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// **Note**: Message contents must be under 2000 unicode code points.</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">content</span><span class="op">&lt;</span><span class="ident">D</span>: <span class="ident">ToString</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">content</span>: <span class="ident">D</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">_content</span>(<span class="ident">content</span>.<span class="ident">to_string</span>())
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">content</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">content</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
+        <span class="self">self</span>.<span class="ident">_content</span>(<span class="ident">content</span>.<span class="ident">into</span>())
     }
 
     <span class="kw">fn</span> <span class="ident">_content</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">content</span>: <span class="ident">String</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
@@ -524,14 +528,14 @@
     }
 
     <span class="doccomment">/// Sets the custom id for modal interactions</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">custom_id</span><span class="op">&lt;</span><span class="ident">D</span>: <span class="ident">ToString</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">id</span>: <span class="ident">D</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;custom_id&quot;</span>, <span class="ident">Value::String</span>(<span class="ident">id</span>.<span class="ident">to_string</span>()));
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">custom_id</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">id</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
+        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;custom_id&quot;</span>, <span class="ident">Value::String</span>(<span class="ident">id</span>.<span class="ident">into</span>()));
         <span class="self">self</span>
     }
 
     <span class="doccomment">/// Sets the title for modal interactions</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">title</span><span class="op">&lt;</span><span class="ident">D</span>: <span class="ident">ToString</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">title</span>: <span class="ident">D</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;title&quot;</span>, <span class="ident">Value::String</span>(<span class="ident">title</span>.<span class="ident">to_string</span>()));
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">title</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">title</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
+        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;title&quot;</span>, <span class="ident">Value::String</span>(<span class="ident">title</span>.<span class="ident">into</span>()));
         <span class="self">self</span>
     }
 }
@@ -561,9 +565,9 @@
     <span class="doccomment">/// Add an int autocomplete choice.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// **Note**: There can be no more than 25 choices set. Name must be between 1 and 100 characters. Value must be between -2^53 and 2^53.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">add_int_choice</span><span class="op">&lt;</span><span class="ident">D</span>: <span class="ident">ToString</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">name</span>: <span class="ident">D</span>, <span class="ident">value</span>: <span class="ident">i64</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">add_int_choice</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">name</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>, <span class="ident">value</span>: <span class="ident">i64</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
         <span class="kw">let</span> <span class="ident">choice</span> <span class="op">=</span> <span class="macro">json!</span>({
-            <span class="string">&quot;name&quot;</span>: <span class="ident">name</span>.<span class="ident">to_string</span>(),
+            <span class="string">&quot;name&quot;</span>: <span class="ident">name</span>.<span class="ident">into</span>(),
             <span class="string">&quot;value&quot;</span> : <span class="ident">value</span>
         });
         <span class="self">self</span>.<span class="ident">add_choice</span>(<span class="ident">choice</span>)
@@ -572,10 +576,14 @@
     <span class="doccomment">/// Adds a string autocomplete choice.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// **Note**: There can be no more than 25 choices set. Name must be between 1 and 100 characters. Value must be up to 100 characters.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">add_string_choice</span><span class="op">&lt;</span><span class="ident">D</span>: <span class="ident">ToString</span>, <span class="ident">E</span>: <span class="ident">ToString</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">name</span>: <span class="ident">D</span>, <span class="ident">value</span>: <span class="ident">E</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">add_string_choice</span>(
+        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
+        <span class="ident">name</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
+        <span class="ident">value</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
+    ) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
         <span class="kw">let</span> <span class="ident">choice</span> <span class="op">=</span> <span class="macro">json!</span>({
-            <span class="string">&quot;name&quot;</span>: <span class="ident">name</span>.<span class="ident">to_string</span>(),
-            <span class="string">&quot;value&quot;</span>: <span class="ident">value</span>.<span class="ident">to_string</span>()
+            <span class="string">&quot;name&quot;</span>: <span class="ident">name</span>.<span class="ident">into</span>(),
+            <span class="string">&quot;value&quot;</span>: <span class="ident">value</span>.<span class="ident">into</span>()
         });
         <span class="self">self</span>.<span class="ident">add_choice</span>(<span class="ident">choice</span>)
     }
@@ -583,9 +591,9 @@
     <span class="doccomment">/// Adds a number autocomplete choice.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// **Note**: There can be no more than 25 choices set. Name must be between 1 and 100 characters. Value must be between -2^53 and 2^53.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">add_number_choice</span><span class="op">&lt;</span><span class="ident">D</span>: <span class="ident">ToString</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">name</span>: <span class="ident">D</span>, <span class="ident">value</span>: <span class="ident">f64</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">add_number_choice</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">name</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>, <span class="ident">value</span>: <span class="ident">f64</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
         <span class="kw">let</span> <span class="ident">choice</span> <span class="op">=</span> <span class="macro">json!</span>({
-            <span class="string">&quot;name&quot;</span>: <span class="ident">name</span>.<span class="ident">to_string</span>(),
+            <span class="string">&quot;name&quot;</span>: <span class="ident">name</span>.<span class="ident">into</span>(),
             <span class="string">&quot;value&quot;</span> : <span class="ident">value</span>
         });
         <span class="self">self</span>.<span class="ident">add_choice</span>(<span class="ident">choice</span>)
