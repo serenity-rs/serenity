@@ -82,10 +82,10 @@ async fn log_system_load(ctx: Arc<Context>) {
         .send_message(&ctx, |m| {
             m.embed(|e| {
                 e.title("System Resource Load")
-                    .field("CPU Load Average", format!("{:.2}%", cpu_load.one * 10.0), false)
+                    .field("CPU Load Average", &format!("{:.2}%", cpu_load.one * 10.0), false)
                     .field(
                         "Memory Usage",
-                        format!(
+                        &format!(
                             "{:.2} MB Free out of {:.2} MB",
                             mem_use.free as f32 / 1000.0,
                             mem_use.total as f32 / 1000.0
@@ -104,7 +104,7 @@ async fn set_status_to_current_time(ctx: Arc<Context>) {
     let current_time = Utc::now();
     let formatted_time = current_time.to_rfc2822();
 
-    ctx.set_activity(Activity::playing(&formatted_time)).await;
+    ctx.set_activity(Activity::playing(formatted_time)).await;
 }
 
 #[tokio::main]
