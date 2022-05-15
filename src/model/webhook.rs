@@ -122,6 +122,16 @@ impl Webhook {
     /// #     Ok(())
     /// # }
     /// ```
+    ///
+    /// # Errors
+    ///
+    /// Returns an [`Error::Http`] if the current user is not authenticated, or if the webhook does
+    /// not exist.
+    ///
+    /// May also return an [`Error::Json`] if there is an error in deserialising Discord's response.
+    ///
+    /// [`Error::Http`]: crate::error::Error::Http
+    /// [`Error::Json`]: crate::error::Error::Json
     pub async fn from_id(http: impl AsRef<Http>, webhook_id: impl Into<WebhookId>) -> Result<Self> {
         http.as_ref().get_webhook(webhook_id.into().0).await
     }
@@ -146,6 +156,15 @@ impl Webhook {
     /// #     Ok(())
     /// # }
     /// ```
+    ///
+    /// # Errors
+    ///
+    /// Returns an [`Error::Http`] if the webhook does not exist, or if the token is invalid.
+    ///
+    /// May also return an [`Error::Json`] if there is an error in deserialising Discord's response.
+    ///
+    /// [`Error::Http`]: crate::error::Error::Http
+    /// [`Error::Json`]: crate::error::Error::Json
     pub async fn from_id_with_token(
         http: impl AsRef<Http>,
         webhook_id: impl Into<WebhookId>,
@@ -172,6 +191,15 @@ impl Webhook {
     /// #     Ok(())
     /// # }
     /// ```
+    ///
+    /// # Errors
+    ///
+    /// Returns an [`Error::Http`] if the url is malformed, or otherwise if the webhook does not exist, or if the token is invalid.
+    ///
+    /// May also return an [`Error::Json`] if there is an error in deserialising Discord's response.
+    ///
+    /// [`Error::Http`]: crate::error::Error::Http
+    /// [`Error::Json`]: crate::error::Error::Json
     pub async fn from_url(http: impl AsRef<Http>, url: &str) -> Result<Self> {
         http.as_ref().get_webhook_from_url(url).await
     }
