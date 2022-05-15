@@ -103,6 +103,79 @@ impl fmt::Debug for Webhook {
 
 #[cfg(feature = "model")]
 impl Webhook {
+    /// Retrieves a webhook given its Id.
+    ///
+    /// This method requires authentication, whereas [`Webhook::from_id_with_token`] and
+    /// [`Webhook::from_url`] do not.
+    ///
+    /// # Examples
+    ///
+    /// Retrieve a webhook by Id:
+    ///
+    /// ```rust,no_run
+    /// # use serenity::http::Http;
+    /// #
+    /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
+    /// #     let http = Http::new("token");
+    /// let id = 245037420704169985;
+    /// let webhook = Webhook::from_id(&http, id).await?;
+    /// #     Ok(())
+    /// # }
+    /// ```
+    pub async fn from_id(http: impl AsRef<Http>, webhook_id: impl Into<WebhookId>) -> Result<Self> {
+        http.as_ref().get_webhook(webhook_id.into().0).await
+    }
+
+    /// Retrieves a webhook given its Id and unique token.
+    ///
+    /// This method does _not_ require authentication.
+    ///
+    /// # Examples
+    ///
+    /// Retrieve a webhook by Id and its unique token:
+    ///
+    /// ```rust,no_run
+    /// # use serenity::http::Http;
+    /// #
+    /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
+    /// #     let http = Http::new("token");
+    /// let id = 245037420704169985;
+    /// let token = "ig5AO-wdVWpCBtUUMxmgsWryqgsW3DChbKYOINftJ4DCrUbnkedoYZD0VOH1QLr-S3sV";
+    ///
+    /// let webhook = Webhook::from_id_with_token(&http, id, token).await?;
+    /// #     Ok(())
+    /// # }
+    /// ```
+    pub async fn from_id_with_token(
+        http: impl AsRef<Http>,
+        webhook_id: impl Into<WebhookId>,
+        token: &str,
+    ) -> Result<Self> {
+        http.as_ref().get_webhook_with_token(webhook_id.into().0, token).await
+    }
+
+    /// Retrieves a webhook given its url.
+    ///
+    /// This method does _not_ require authentication
+    ///
+    /// # Examples
+    ///
+    /// Retrieve a webhook by url:
+    ///
+    /// ```rust,no_run
+    /// # use serenity::http::Http;
+    /// #
+    /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
+    /// #     let http = Http::new("token");
+    /// let url = "https://discord.com/api/webhooks/245037420704169985/ig5AO-wdVWpCBtUUMxmgsWryqgsW3DChbKYOINftJ4DCrUbnkedoYZD0VOH1QLr-S3sV";
+    /// let webhook = Webhook::from_url(&http, url).await?;
+    /// #     Ok(())
+    /// # }
+    /// ```
+    pub async fn from_url(http: impl AsRef<Http>, url: &str) -> Result<Self> {
+        http.as_ref().get_webhook_from_url(url).await
+    }
+
     /// Deletes the webhook.
     ///
     /// As this calls the [`Http::delete_webhook_with_token`] function,
@@ -137,7 +210,7 @@ impl Webhook {
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// # let http = Http::new("token");
     /// let url = "https://discord.com/api/webhooks/245037420704169985/ig5AO-wdVWpCBtUUMxmgsWryqgsW3DChbKYOINftJ4DCrUbnkedoYZD0VOH1QLr-S3sV";
-    /// let mut webhook = http.get_webhook_from_url(url).await?;
+    /// let mut webhook = Webhook::from_url(&http, url).await?;
     ///
     /// webhook.edit_name(&http, "new name").await?;
     /// #     Ok(())
@@ -176,7 +249,7 @@ impl Webhook {
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// # let http = Http::new("token");
     /// let url = "https://discord.com/api/webhooks/245037420704169985/ig5AO-wdVWpCBtUUMxmgsWryqgsW3DChbKYOINftJ4DCrUbnkedoYZD0VOH1QLr-S3sV";
-    /// let mut webhook = http.get_webhook_from_url(url).await?;
+    /// let mut webhook = Webhook::from_url(&http, url).await?;
     ///
     /// webhook.edit_avatar(&http, "./webhook_img.png").await?;
     /// #     Ok(())
@@ -223,7 +296,7 @@ impl Webhook {
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// # let http = Http::new("token");
     /// let url = "https://discord.com/api/webhooks/245037420704169985/ig5AO-wdVWpCBtUUMxmgsWryqgsW3DChbKYOINftJ4DCrUbnkedoYZD0VOH1QLr-S3sV";
-    /// let mut webhook = http.get_webhook_from_url(url).await?;
+    /// let mut webhook = Webhook::from_url(&http, url).await?;
     ///
     /// webhook.delete_avatar(&http).await?;
     /// #     Ok(())
@@ -264,7 +337,7 @@ impl Webhook {
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// # let http = Http::new("token");
     /// let url = "https://discord.com/api/webhooks/245037420704169985/ig5AO-wdVWpCBtUUMxmgsWryqgsW3DChbKYOINftJ4DCrUbnkedoYZD0VOH1QLr-S3sV";
-    /// let mut webhook = http.get_webhook_from_url(url).await?;
+    /// let mut webhook = Webhook::from_url(&http, url).await?;
     ///
     /// webhook.execute(&http, false, |w| w.content("test")).await?;
     /// #     Ok(())
@@ -282,7 +355,7 @@ impl Webhook {
     /// use serenity::model::channel::Embed;
     ///
     /// let url = "https://discord.com/api/webhooks/245037420704169985/ig5AO-wdVWpCBtUUMxmgsWryqgsW3DChbKYOINftJ4DCrUbnkedoYZD0VOH1QLr-S3sV";
-    /// let mut webhook = http.get_webhook_from_url(url).await?;
+    /// let mut webhook = Webhook::from_url(&http, url).await?;
     ///
     /// let embed = Embed::fake(|e| {
     ///     e.title("Rust's website")
