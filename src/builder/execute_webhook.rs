@@ -25,6 +25,7 @@ use crate::model::channel::MessageFlags;
 /// ```rust,no_run
 /// use serenity::http::Http;
 /// use serenity::model::channel::Embed;
+/// use serenity::model::webhook::Webhook;
 /// use serenity::utils::Colour;
 ///
 /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
@@ -74,6 +75,7 @@ impl<'a> ExecuteWebhook<'a> {
     ///
     /// ```rust,no_run
     /// # use serenity::http::Http;
+    /// # use serenity::model::webhook::Webhook;
     /// #
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// # let http = Http::new("token");
@@ -101,6 +103,7 @@ impl<'a> ExecuteWebhook<'a> {
     ///
     /// ```rust,no_run
     /// # use serenity::http::Http;
+    /// # use serenity::model::webhook::Webhook;
     /// #
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// # let http = Http::new("token");
@@ -215,6 +218,7 @@ impl<'a> ExecuteWebhook<'a> {
     ///
     /// ```rust,no_run
     /// # use serenity::http::Http;
+    /// # use serenity::model::webhook::Webhook;
     /// #
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// # let http = Http::new("token");
@@ -241,6 +245,7 @@ impl<'a> ExecuteWebhook<'a> {
     ///
     /// ```rust,no_run
     /// # use serenity::http::Http;
+    /// # use serenity::model::webhook::Webhook;
     /// #
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// # let http = Http::new("token");
@@ -268,6 +273,7 @@ impl<'a> ExecuteWebhook<'a> {
     /// ```rust,no_run
     /// # use serenity::http::Http;
     /// # use serenity::model::channel::MessageFlags;
+    /// # use serenity::model::webhook::Webhook;
     /// #
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// # let http = Http::new("token");

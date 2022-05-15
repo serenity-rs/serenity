@@ -114,6 +114,7 @@ impl Webhook {
     ///
     /// ```rust,no_run
     /// # use serenity::http::Http;
+    /// # use serenity::model::webhook::Webhook;
     /// #
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// #     let http = Http::new("token");
@@ -146,6 +147,7 @@ impl Webhook {
     ///
     /// ```rust,no_run
     /// # use serenity::http::Http;
+    /// # use serenity::model::webhook::Webhook;
     /// #
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// #     let http = Http::new("token");
@@ -183,6 +185,7 @@ impl Webhook {
     ///
     /// ```rust,no_run
     /// # use serenity::http::Http;
+    /// # use serenity::model::webhook::Webhook;
     /// #
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// #     let http = Http::new("token");
@@ -234,6 +237,7 @@ impl Webhook {
     ///
     /// ```rust,no_run
     /// # use serenity::http::Http;
+    /// # use serenity::model::webhook::Webhook;
     /// #
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// # let http = Http::new("token");
@@ -273,6 +277,7 @@ impl Webhook {
     ///
     /// ```rust,no_run
     /// # use serenity::http::Http;
+    /// # use serenity::model::webhook::Webhook;
     /// #
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// # let http = Http::new("token");
@@ -320,6 +325,7 @@ impl Webhook {
     ///
     /// ```rust,no_run
     /// # use serenity::http::Http;
+    /// # use serenity::model::webhook::Webhook;
     /// #
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// # let http = Http::new("token");
@@ -361,6 +367,7 @@ impl Webhook {
     ///
     /// ```rust,no_run
     /// # use serenity::http::Http;
+    /// # use serenity::model::webhook::Webhook;
     /// #
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// # let http = Http::new("token");
@@ -377,6 +384,7 @@ impl Webhook {
     ///
     /// ```rust,no_run
     /// # use serenity::http::Http;
+    /// # use serenity::model::webhook::Webhook;
     /// #
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// # let http = Http::new("token");
