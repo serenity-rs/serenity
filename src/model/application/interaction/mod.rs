@@ -1,5 +1,4 @@
 pub mod application_command;
-pub mod autocomplete;
 pub mod message_component;
 pub mod modal;
 pub mod ping;
@@ -8,7 +7,6 @@ use serde::de::{Deserialize, Deserializer, Error as DeError};
 use serde::ser::{Serialize, Serializer};
 
 use self::application_command::ApplicationCommandInteraction;
-use self::autocomplete::AutocompleteInteraction;
 use self::message_component::MessageComponentInteraction;
 use self::modal::ModalSubmitInteraction;
 use self::ping::PingInteraction;
@@ -24,8 +22,8 @@ use crate::model::utils::deserialize_val;
 pub enum Interaction {
     Ping(PingInteraction),
     ApplicationCommand(ApplicationCommandInteraction),
+    Autocomplete(ApplicationCommandInteraction),
     MessageComponent(MessageComponentInteraction),
-    Autocomplete(AutocompleteInteraction),
     ModalSubmit(ModalSubmitInteraction),
 }
 
@@ -35,9 +33,8 @@ impl Interaction {
     pub fn id(&self) -> InteractionId {
         match self {
             Self::Ping(i) => i.id,
-            Self::ApplicationCommand(i) => i.id,
+            Self::ApplicationCommand(i) | Self::Autocomplete(i) => i.id,
             Self::MessageComponent(i) => i.id,
-            Self::Autocomplete(i) => i.id,
             Self::ModalSubmit(i) => i.id,
         }
     }
@@ -59,9 +56,8 @@ impl Interaction {
     pub fn application_id(&self) -> ApplicationId {
         match self {
             Self::Ping(i) => i.application_id,
-            Self::ApplicationCommand(i) => i.application_id,
+            Self::ApplicationCommand(i) | Self::Autocomplete(i) => i.application_id,
             Self::MessageComponent(i) => i.application_id,
-            Self::Autocomplete(i) => i.application_id,
             Self::ModalSubmit(i) => i.application_id,
         }
     }
@@ -71,9 +67,8 @@ impl Interaction {
     pub fn token(&self) -> &str {
         match self {
             Self::Ping(i) => i.token.as_str(),
-            Self::ApplicationCommand(i) => i.token.as_str(),
+            Self::ApplicationCommand(i) | Self::Autocomplete(i) => i.token.as_str(),
             Self::MessageComponent(i) => i.token.as_str(),
-            Self::Autocomplete(i) => i.token.as_str(),
             Self::ModalSubmit(i) => i.token.as_str(),
         }
     }
@@ -83,9 +78,8 @@ impl Interaction {
     pub fn guild_locale(&self) -> Option<&str> {
         match self {
             Self::Ping(i) => i.guild_locale.as_deref(),
-            Self::ApplicationCommand(i) => i.guild_locale.as_deref(),
+            Self::ApplicationCommand(i) | Self::Autocomplete(i) => i.guild_locale.as_deref(),
             Self::MessageComponent(i) => i.guild_locale.as_deref(),
-            Self::Autocomplete(i) => i.guild_locale.as_deref(),
             Self::ModalSubmit(i) => i.guild_locale.as_deref(),
         }
     }
@@ -117,9 +111,9 @@ impl Interaction {
         }
     }
 
-    /// Converts this to a [`AutocompleteInteraction`]
+    /// Converts this to a [`ApplicationCommandInteraction`]
     #[must_use]
-    pub fn autocomplete(self) -> Option<AutocompleteInteraction> {
+    pub fn autocomplete(self) -> Option<ApplicationCommandInteraction> {
         match self {
             Self::Autocomplete(i) => Some(i),
             _ => None,
@@ -162,9 +156,8 @@ impl Serialize for Interaction {
     fn serialize<S: Serializer>(&self, serializer: S) -> std::result::Result<S::Ok, S::Error> {
         match self {
             Self::Ping(i) => i.serialize(serializer),
-            Self::ApplicationCommand(i) => i.serialize(serializer),
+            Self::ApplicationCommand(i) | Self::Autocomplete(i) => i.serialize(serializer),
             Self::MessageComponent(i) => i.serialize(serializer),
-            Self::Autocomplete(i) => i.serialize(serializer),
             Self::ModalSubmit(i) => i.serialize(serializer),
         }
     }
