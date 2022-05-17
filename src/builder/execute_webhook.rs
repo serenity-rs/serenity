@@ -25,12 +25,13 @@ use crate::model::channel::MessageFlags;
 /// ```rust,no_run
 /// use serenity::http::Http;
 /// use serenity::model::channel::Embed;
+/// use serenity::model::webhook::Webhook;
 /// use serenity::utils::Colour;
 ///
 /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
 /// # let http = Http::new("token");
 /// let url = "https://discord.com/api/webhooks/245037420704169985/ig5AO-wdVWpCBtUUMxmgsWryqgsW3DChbKYOINftJ4DCrUbnkedoYZD0VOH1QLr-S3sV";
-/// let webhook = http.get_webhook_from_url(url).await?;
+/// let webhook = Webhook::from_url(&http, url).await?;
 ///
 /// let website = Embed::fake(|e| {
 ///     e.title("The Rust Language Website")
@@ -74,10 +75,11 @@ impl<'a> ExecuteWebhook<'a> {
     ///
     /// ```rust,no_run
     /// # use serenity::http::Http;
+    /// # use serenity::model::webhook::Webhook;
     /// #
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// # let http = Http::new("token");
-    /// # let webhook = http.get_webhook_with_token(0, "").await?;
+    /// # let webhook = Webhook::from_id_with_token(&http, 0, "").await?;
     /// #
     /// let avatar_url = "https://i.imgur.com/KTs6whd.jpg";
     ///
@@ -101,10 +103,11 @@ impl<'a> ExecuteWebhook<'a> {
     ///
     /// ```rust,no_run
     /// # use serenity::http::Http;
+    /// # use serenity::model::webhook::Webhook;
     /// #
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// # let http = Http::new("token");
-    /// # let webhook = http.get_webhook_with_token(0, "").await?;
+    /// # let webhook = Webhook::from_id_with_token(&http, 0, "").await?;
     /// #
     /// let execution = webhook.execute(&http, false, |w| w.content("foo")).await;
     ///
@@ -215,10 +218,11 @@ impl<'a> ExecuteWebhook<'a> {
     ///
     /// ```rust,no_run
     /// # use serenity::http::Http;
+    /// # use serenity::model::webhook::Webhook;
     /// #
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// # let http = Http::new("token");
-    /// # let webhook = http.get_webhook_with_token(0, "").await?;
+    /// # let webhook = Webhook::from_id_with_token(&http, 0, "").await?;
     /// #
     /// let execution = webhook.execute(&http, false, |w| w.content("hello").tts(true)).await;
     ///
@@ -241,10 +245,11 @@ impl<'a> ExecuteWebhook<'a> {
     ///
     /// ```rust,no_run
     /// # use serenity::http::Http;
+    /// # use serenity::model::webhook::Webhook;
     /// #
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// # let http = Http::new("token");
-    /// # let webhook = http.get_webhook_with_token(0, "").await?;
+    /// # let webhook = Webhook::from_id_with_token(&http, 0, "").await?;
     /// #
     /// let execution = webhook.execute(&http, false, |w| w.content("hello").username("hakase")).await;
     ///
@@ -268,10 +273,11 @@ impl<'a> ExecuteWebhook<'a> {
     /// ```rust,no_run
     /// # use serenity::http::Http;
     /// # use serenity::model::channel::MessageFlags;
+    /// # use serenity::model::webhook::Webhook;
     /// #
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// # let http = Http::new("token");
-    /// # let webhook = http.get_webhook_with_token(0, "").await?;
+    /// # let webhook = Webhook::from_id_with_token(&http, 0, "").await?;
     /// #
     /// let execution = webhook
     ///     .execute(&http, false, |w| {

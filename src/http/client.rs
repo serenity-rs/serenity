@@ -3479,8 +3479,8 @@ impl Http {
 
     /// Retrieves a webhook given its Id.
     ///
-    /// This method requires authentication, whereas [`Self::get_webhook_with_token`] and
-    /// [`Self::get_webhook_from_url`] do not.
+    /// This method requires authentication, whereas [`Http::get_webhook_with_token`] and
+    /// [`Http::get_webhook_from_url`] do not.
     ///
     /// # Examples
     ///
