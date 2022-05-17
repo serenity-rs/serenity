@@ -320,6 +320,12 @@
 <span id="315">315</span>
 <span id="316">316</span>
 <span id="317">317</span>
+<span id="318">318</span>
+<span id="319">319</span>
+<span id="320">320</span>
+<span id="321">321</span>
+<span id="322">322</span>
+<span id="323">323</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::collections::HashMap</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>))]</span>
 <span class="kw">use</span> <span class="ident">std::marker::PhantomData</span>;
@@ -347,12 +353,13 @@
 <span class="doccomment">/// ```rust,no_run</span>
 <span class="doccomment">/// use serenity::http::Http;</span>
 <span class="doccomment">/// use serenity::model::channel::Embed;</span>
+<span class="doccomment">/// use serenity::model::webhook::Webhook;</span>
 <span class="doccomment">/// use serenity::utils::Colour;</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// # async fn run() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {</span>
 <span class="doccomment">/// # let http = Http::new(&quot;token&quot;);</span>
 <span class="doccomment">/// let url = &quot;https://discord.com/api/webhooks/245037420704169985/ig5AO-wdVWpCBtUUMxmgsWryqgsW3DChbKYOINftJ4DCrUbnkedoYZD0VOH1QLr-S3sV&quot;;</span>
-<span class="doccomment">/// let webhook = http.get_webhook_from_url(url).await?;</span>
+<span class="doccomment">/// let webhook = Webhook::from_url(&amp;http, url).await?;</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// let website = Embed::fake(|e| {</span>
 <span class="doccomment">///     e.title(&quot;The Rust Language Website&quot;)</span>
@@ -396,10 +403,11 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// ```rust,no_run</span>
     <span class="doccomment">/// # use serenity::http::Http;</span>
+    <span class="doccomment">/// # use serenity::model::webhook::Webhook;</span>
     <span class="doccomment">/// #</span>
     <span class="doccomment">/// # async fn run() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {</span>
     <span class="doccomment">/// # let http = Http::new(&quot;token&quot;);</span>
-    <span class="doccomment">/// # let webhook = http.get_webhook_with_token(0, &quot;&quot;).await?;</span>
+    <span class="doccomment">/// # let webhook = Webhook::from_id_with_token(&amp;http, 0, &quot;&quot;).await?;</span>
     <span class="doccomment">/// #</span>
     <span class="doccomment">/// let avatar_url = &quot;https://i.imgur.com/KTs6whd.jpg&quot;;</span>
     <span class="doccomment">///</span>
@@ -423,10 +431,11 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// ```rust,no_run</span>
     <span class="doccomment">/// # use serenity::http::Http;</span>
+    <span class="doccomment">/// # use serenity::model::webhook::Webhook;</span>
     <span class="doccomment">/// #</span>
     <span class="doccomment">/// # async fn run() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {</span>
     <span class="doccomment">/// # let http = Http::new(&quot;token&quot;);</span>
-    <span class="doccomment">/// # let webhook = http.get_webhook_with_token(0, &quot;&quot;).await?;</span>
+    <span class="doccomment">/// # let webhook = Webhook::from_id_with_token(&amp;http, 0, &quot;&quot;).await?;</span>
     <span class="doccomment">/// #</span>
     <span class="doccomment">/// let execution = webhook.execute(&amp;http, false, |w| w.content(&quot;foo&quot;)).await;</span>
     <span class="doccomment">///</span>
@@ -537,10 +546,11 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// ```rust,no_run</span>
     <span class="doccomment">/// # use serenity::http::Http;</span>
+    <span class="doccomment">/// # use serenity::model::webhook::Webhook;</span>
     <span class="doccomment">/// #</span>
     <span class="doccomment">/// # async fn run() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {</span>
     <span class="doccomment">/// # let http = Http::new(&quot;token&quot;);</span>
-    <span class="doccomment">/// # let webhook = http.get_webhook_with_token(0, &quot;&quot;).await?;</span>
+    <span class="doccomment">/// # let webhook = Webhook::from_id_with_token(&amp;http, 0, &quot;&quot;).await?;</span>
     <span class="doccomment">/// #</span>
     <span class="doccomment">/// let execution = webhook.execute(&amp;http, false, |w| w.content(&quot;hello&quot;).tts(true)).await;</span>
     <span class="doccomment">///</span>
@@ -563,10 +573,11 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// ```rust,no_run</span>
     <span class="doccomment">/// # use serenity::http::Http;</span>
+    <span class="doccomment">/// # use serenity::model::webhook::Webhook;</span>
     <span class="doccomment">/// #</span>
     <span class="doccomment">/// # async fn run() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {</span>
     <span class="doccomment">/// # let http = Http::new(&quot;token&quot;);</span>
-    <span class="doccomment">/// # let webhook = http.get_webhook_with_token(0, &quot;&quot;).await?;</span>
+    <span class="doccomment">/// # let webhook = Webhook::from_id_with_token(&amp;http, 0, &quot;&quot;).await?;</span>
     <span class="doccomment">/// #</span>
     <span class="doccomment">/// let execution = webhook.execute(&amp;http, false, |w| w.content(&quot;hello&quot;).username(&quot;hakase&quot;)).await;</span>
     <span class="doccomment">///</span>
@@ -590,10 +601,11 @@
     <span class="doccomment">/// ```rust,no_run</span>
     <span class="doccomment">/// # use serenity::http::Http;</span>
     <span class="doccomment">/// # use serenity::model::channel::MessageFlags;</span>
+    <span class="doccomment">/// # use serenity::model::webhook::Webhook;</span>
     <span class="doccomment">/// #</span>
     <span class="doccomment">/// # async fn run() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {</span>
     <span class="doccomment">/// # let http = Http::new(&quot;token&quot;);</span>
-    <span class="doccomment">/// # let webhook = http.get_webhook_with_token(0, &quot;&quot;).await?;</span>
+    <span class="doccomment">/// # let webhook = Webhook::from_id_with_token(&amp;http, 0, &quot;&quot;).await?;</span>
     <span class="doccomment">/// #</span>
     <span class="doccomment">/// let execution = webhook</span>
     <span class="doccomment">///     .execute(&amp;http, false, |w| {</span>
