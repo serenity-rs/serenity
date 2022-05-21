@@ -314,14 +314,9 @@ pub(crate) fn dispatch<'rec>(
 
 async fn dispatch_message(
     context: Context,
-    mut message: Message,
+    message: Message,
     event_handler: &Arc<dyn EventHandler>,
 ) {
-    #[cfg(feature = "model")]
-    {
-        message.transform_content();
-    }
-
     let event_handler = Arc::clone(event_handler);
 
     spawn_named("dispatch::event_handler::message", async move {
