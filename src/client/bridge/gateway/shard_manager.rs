@@ -77,7 +77,7 @@ use crate::CacheAndHttp;
 ///     data: &data,
 ///     event_handler: &Some(event_handler),
 ///     raw_event_handler: &None,
-///     framework: &framework,
+///     framework: &Some(framework),
 ///     // the shard index to start initiating from
 ///     shard_index: 0,
 ///     // the number of shards to initiate (this initiates 0, 1, and 2)
