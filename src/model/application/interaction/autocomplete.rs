@@ -10,6 +10,8 @@ use crate::internal::prelude::*;
 use crate::json;
 use crate::json::prelude::*;
 use crate::model::application::interaction::application_command::CommandData;
+#[cfg(feature = "http")]
+use crate::model::application::interaction::InteractionResponseType;
 use crate::model::application::interaction::InteractionType;
 use crate::model::guild::Member;
 use crate::model::id::{ApplicationId, ChannelId, GuildId, InteractionId};
@@ -67,9 +69,8 @@ impl AutocompleteInteraction {
         f(&mut response);
         let data = json::hashmap_to_json_map(response.0);
 
-        // Autocomplete response type is 8
         let map = json!({
-            "type": 8,
+            "type": InteractionResponseType::Autocomplete as u8,
             "data": data,
         });
 
