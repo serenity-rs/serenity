@@ -129,7 +129,7 @@ impl ShardManager {
             event_handler: opt.event_handler.as_ref().map(Arc::clone),
             raw_event_handler: opt.raw_event_handler.as_ref().map(Arc::clone),
             #[cfg(feature = "framework")]
-            framework: Arc::clone(opt.framework),
+            framework: opt.framework.as_ref().map(Arc::clone),
             last_start: None,
             manager_tx: thread_tx.clone(),
             queue: VecDeque::new(),
@@ -349,7 +349,7 @@ pub struct ShardManagerOptions<'a> {
     pub event_handler: &'a Option<Arc<dyn EventHandler>>,
     pub raw_event_handler: &'a Option<Arc<dyn RawEventHandler>>,
     #[cfg(feature = "framework")]
-    pub framework: &'a Arc<dyn Framework + Send + Sync>,
+    pub framework: &'a Option<Arc<dyn Framework + Send + Sync>>,
     pub shard_index: u64,
     pub shard_init: u64,
     pub shard_total: u64,
