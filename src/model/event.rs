@@ -1721,13 +1721,6 @@ macro_rules! define_related_ids_for_event_type {
     (@munch ($id:ident: $_:expr, $($next:tt)*) -> {$($output:tt)*}) => {
         define_related_ids_for_event_type!{ @munch ($($next)*) -> {$($output)* ($id: true)} }
     };
-    // These are variants of the above to munch the last field.
-    (@munch ($id:ident: Never $(,)?) -> {$($output:tt)*}) => {
-        define_related_ids_for_event_type!{ @munch () -> {$($output)* ($id: false)} }
-    };
-    (@munch ($id:ident: $_:expr $(,)?) -> {$($output:tt)*}) => {
-        define_related_ids_for_event_type!{ @munch () -> {$($output)* ($id: true)} }
-    };
     // All input fields consumed; create the struct.
     (@munch () -> {$(($id:ident: $value:literal))+}) => {
         RelatedIdsForEventType {
