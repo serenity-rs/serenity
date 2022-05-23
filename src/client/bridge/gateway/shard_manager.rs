@@ -77,7 +77,7 @@ use crate::CacheAndHttp;
 ///     data: &data,
 ///     event_handler: &Some(event_handler),
 ///     raw_event_handler: &None,
-///     framework: &framework,
+///     framework: &Some(framework),
 ///     // the shard index to start initiating from
 ///     shard_index: 0,
 ///     // the number of shards to initiate (this initiates 0, 1, and 2)
@@ -129,7 +129,7 @@ impl ShardManager {
             event_handler: opt.event_handler.as_ref().map(Arc::clone),
             raw_event_handler: opt.raw_event_handler.as_ref().map(Arc::clone),
             #[cfg(feature = "framework")]
-            framework: Arc::clone(opt.framework),
+            framework: opt.framework.as_ref().map(Arc::clone),
             last_start: None,
             manager_tx: thread_tx.clone(),
             queue: VecDeque::new(),
@@ -349,7 +349,7 @@ pub struct ShardManagerOptions<'a> {
     pub event_handler: &'a Option<Arc<dyn EventHandler>>,
     pub raw_event_handler: &'a Option<Arc<dyn RawEventHandler>>,
     #[cfg(feature = "framework")]
-    pub framework: &'a Arc<dyn Framework + Send + Sync>,
+    pub framework: &'a Option<Arc<dyn Framework + Send + Sync>>,
     pub shard_index: u64,
     pub shard_init: u64,
     pub shard_total: u64,
