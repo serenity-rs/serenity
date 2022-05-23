@@ -369,26 +369,6 @@ impl Message {
         Ok(())
     }
 
-    pub(crate) fn transform_content(&mut self) {
-        match self.kind {
-            MessageType::PinsAdd => {
-                self.content =
-                    format!("{} pinned a message to this channel. See all the pins.", self.author);
-            },
-            MessageType::MemberJoin => {
-                let sec = self.timestamp.unix_timestamp() as usize;
-                let chosen = constants::JOIN_MESSAGES[sec % constants::JOIN_MESSAGES.len()];
-
-                self.content = if chosen.contains("$user") {
-                    chosen.replace("$user", &self.author.mention().to_string())
-                } else {
-                    chosen.to_string()
-                };
-            },
-            _ => {},
-        }
-    }
-
     /// Returns message content, but with user and role mentions replaced with
     /// names and everyone/here mentions cancelled.
     #[cfg(feature = "cache")]
