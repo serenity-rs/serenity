@@ -55,7 +55,7 @@ pub struct ShardQueuer {
     pub raw_event_handler: Option<Arc<dyn RawEventHandler>>,
     /// A copy of the framework
     #[cfg(feature = "framework")]
-    pub framework: Arc<dyn Framework + Send + Sync>,
+    pub framework: Option<Arc<dyn Framework + Send + Sync>>,
     /// The instant that a shard was last started.
     ///
     /// This is used to determine how long to wait between shard IDENTIFYs.
@@ -188,7 +188,7 @@ impl ShardQueuer {
             event_handler: self.event_handler.as_ref().map(Arc::clone),
             raw_event_handler: self.raw_event_handler.as_ref().map(Arc::clone),
             #[cfg(feature = "framework")]
-            framework: Arc::clone(&self.framework),
+            framework: self.framework.as_ref().map(Arc::clone),
             manager_tx: self.manager_tx.clone(),
             #[cfg(feature = "voice")]
             voice_manager: self.voice_manager.clone(),
