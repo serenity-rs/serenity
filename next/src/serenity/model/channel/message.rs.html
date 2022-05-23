@@ -1273,26 +1273,6 @@
 <span id="1268">1268</span>
 <span id="1269">1269</span>
 <span id="1270">1270</span>
-<span id="1271">1271</span>
-<span id="1272">1272</span>
-<span id="1273">1273</span>
-<span id="1274">1274</span>
-<span id="1275">1275</span>
-<span id="1276">1276</span>
-<span id="1277">1277</span>
-<span id="1278">1278</span>
-<span id="1279">1279</span>
-<span id="1280">1280</span>
-<span id="1281">1281</span>
-<span id="1282">1282</span>
-<span id="1283">1283</span>
-<span id="1284">1284</span>
-<span id="1285">1285</span>
-<span id="1286">1286</span>
-<span id="1287">1287</span>
-<span id="1288">1288</span>
-<span id="1289">1289</span>
-<span id="1290">1290</span>
 </pre><pre class="rust"><code><span class="doccomment">//! Models relating to Discord channels.</span>
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
@@ -1660,26 +1640,6 @@
             )
             .<span class="kw">await</span><span class="question-mark">?</span>;
         <span class="prelude-val">Ok</span>(())
-    }
-
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">transform_content</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
-        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">kind</span> {
-            <span class="ident">MessageType::PinsAdd</span> =&gt; {
-                <span class="self">self</span>.<span class="ident">content</span> <span class="op">=</span>
-                    <span class="macro">format!</span>(<span class="string">&quot;{} pinned a message to this channel. See all the pins.&quot;</span>, <span class="self">self</span>.<span class="ident">author</span>);
-            },
-            <span class="ident">MessageType::MemberJoin</span> =&gt; {
-                <span class="kw">let</span> <span class="ident">sec</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">timestamp</span>.<span class="ident">unix_timestamp</span>() <span class="kw">as</span> <span class="ident">usize</span>;
-                <span class="kw">let</span> <span class="ident">chosen</span> <span class="op">=</span> <span class="ident">constants::JOIN_MESSAGES</span>[<span class="ident">sec</span> <span class="op">%</span> <span class="ident">constants::JOIN_MESSAGES</span>.<span class="ident">len</span>()];
-
-                <span class="self">self</span>.<span class="ident">content</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">chosen</span>.<span class="ident">contains</span>(<span class="string">&quot;$user&quot;</span>) {
-                    <span class="ident">chosen</span>.<span class="ident">replace</span>(<span class="string">&quot;$user&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">author</span>.<span class="ident">mention</span>().<span class="ident">to_string</span>())
-                } <span class="kw">else</span> {
-                    <span class="ident">chosen</span>.<span class="ident">to_string</span>()
-                };
-            },
-            <span class="kw">_</span> =&gt; {},
-        }
     }
 
     <span class="doccomment">/// Returns message content, but with user and role mentions replaced with</span>
