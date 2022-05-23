@@ -471,11 +471,7 @@ impl ChannelId {
         http: impl AsRef<Http>,
         message_id: impl Into<MessageId>,
     ) -> Result<Message> {
-        http.as_ref().get_message(self.0, message_id.into().0).await.map(|mut msg| {
-            msg.transform_content();
-
-            msg
-        })
+        http.as_ref().get_message(self.0, message_id.into().0).await
     }
 
     /// Gets messages from the channel.
@@ -508,15 +504,7 @@ impl ChannelId {
             write!(query, "&before={}", before)?;
         }
 
-        http.as_ref().get_messages(self.0, &query).await.map(|msgs| {
-            msgs.into_iter()
-                .map(|mut msg| {
-                    msg.transform_content();
-
-                    msg
-                })
-                .collect::<Vec<Message>>()
-        })
+        http.as_ref().get_messages(self.0, &query).await
     }
 
     /// Streams over all the messages in a channel.
