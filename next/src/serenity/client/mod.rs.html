@@ -979,8 +979,6 @@
 <span id="974">974</span>
 <span id="975">975</span>
 <span id="976">976</span>
-<span id="977">977</span>
-<span id="978">978</span>
 </pre><pre class="rust"><code><span class="doccomment">//! The Client contains information about a single bot&#39;s token, as well</span>
 <span class="doccomment">//! as event handlers. Dispatching events to configured handlers and starting</span>
 <span class="doccomment">//! the shards&#39; connections are handled directly via the client. In addition,</span>
@@ -1340,9 +1338,7 @@
         <span class="kw">if</span> <span class="self">self</span>.<span class="ident">fut</span>.<span class="ident">is_none</span>() {
             <span class="kw">let</span> <span class="ident">data</span> <span class="op">=</span> <span class="ident">Arc::new</span>(<span class="ident">RwLock::new</span>(<span class="self">self</span>.<span class="ident">data</span>.<span class="ident">take</span>().<span class="ident">unwrap</span>()));
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;framework&quot;</span>)]</span>
-            <span class="kw">let</span> <span class="ident">framework</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">framework</span>.<span class="ident">take</span>()
-                .<span class="ident">expect</span>(<span class="string">&quot;The `framework`-feature is enabled (it&#39;s on by default), but no framework was provided.\n\
-                If you don&#39;t want to use the command framework, disable default features and specify all features you want to use.&quot;</span>);
+            <span class="kw">let</span> <span class="ident">framework</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">framework</span>.<span class="ident">take</span>();
             <span class="kw">let</span> <span class="ident">event_handler</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">event_handler</span>.<span class="ident">take</span>();
             <span class="kw">let</span> <span class="ident">raw_event_handler</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">raw_event_handler</span>.<span class="ident">take</span>();
             <span class="kw">let</span> <span class="ident">intents</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">intents</span>;
