@@ -161,7 +161,7 @@ impl DispatchEvent {
 pub(crate) fn dispatch<'rec>(
     // #[allow(unused_variables)]
     mut event: DispatchEvent,
-    #[cfg(feature = "framework")] framework: &'rec Arc<dyn Framework + Send + Sync>,
+    #[cfg(feature = "framework")] framework: &'rec Option<Arc<dyn Framework + Send + Sync>>,
     data: &'rec Arc<RwLock<TypeMap>>,
     event_handler: &'rec Option<Arc<dyn EventHandler>>,
     raw_event_handler: &'rec Option<Arc<dyn RawEventHandler>>,
@@ -187,11 +187,13 @@ pub(crate) fn dispatch<'rec>(
                         &cache_and_http.cache,
                     );
 
-                    let framework = Arc::clone(framework);
+                    if let Some(framework) = framework {
+                        let framework = Arc::clone(framework);
 
-                    spawn_named("dispatch::framework::message", async move {
-                        framework.dispatch(context, event.message).await;
-                    });
+                        spawn_named("dispatch::framework::message", async move {
+                            framework.dispatch(context, event.message).await;
+                        });
+                    }
                 }
             },
             (Some(ref h), None) => match event {
@@ -219,11 +221,13 @@ pub(crate) fn dispatch<'rec>(
                     {
                         dispatch_message(context.clone(), event.message.clone(), h).await;
 
-                        let framework = Arc::clone(framework);
+                        if let Some(framework) = framework {
+                            let framework = Arc::clone(framework);
 
-                        spawn_named("dispatch::framework::message", async move {
-                            framework.dispatch(context, event.message).await;
-                        });
+                            spawn_named("dispatch::framework::message", async move {
+                                framework.dispatch(context, event.message).await;
+                            });
+                        }
                     }
                 },
                 other => {
@@ -260,11 +264,13 @@ pub(crate) fn dispatch<'rec>(
                             let message = msg_event.message.clone();
                             event_handler.raw_event(context.clone(), event).await;
 
-                            let framework = Arc::clone(framework);
+                            if let Some(framework) = framework {
+                                let framework = Arc::clone(framework);
 
-                            spawn_named("dispatch::framework::message", async move {
-                                framework.dispatch(context, message).await;
-                            });
+                                spawn_named("dispatch::framework::message", async move {
+                                    framework.dispatch(context, message).await;
+                                });
+                            }
                         } else {
                             // Avoid cloning if there will be no framework dispatch.
                             event_handler.raw_event(context, event).await;
@@ -297,11 +303,13 @@ pub(crate) fn dispatch<'rec>(
                         {
                             dispatch_message(context.clone(), event.message.clone(), handler).await;
 
-                            let framework = Arc::clone(framework);
-                            let message = event.message;
-                            spawn_named("dispatch::framework::message", async move {
-                                framework.dispatch(context, message).await;
-                            });
+                            if let Some(framework) = framework {
+                                let framework = Arc::clone(framework);
+
+                                spawn_named("dispatch::framework::message", async move {
+                                    framework.dispatch(context, event.message).await;
+                                });
+                            }
                         }
                     },
                     other => {
