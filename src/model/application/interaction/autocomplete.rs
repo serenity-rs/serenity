@@ -101,20 +101,6 @@ impl<'de> Deserialize<'de> for AutocompleteInteraction {
                             }
                         }
                     }
-
-                    if let Some(channels) = resolved.get_mut("channels") {
-                        if let Some(values) = channels.as_object_mut() {
-                            for value in values.values_mut() {
-                                value
-                                    .as_object_mut()
-                                    .expect("couldn't deserialize application command")
-                                    .insert(
-                                        "guild_id".to_string(),
-                                        Value::from(guild_id.to_string()),
-                                    );
-                            }
-                        }
-                    }
                 }
             }
         }
