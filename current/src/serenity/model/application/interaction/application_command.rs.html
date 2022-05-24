@@ -729,20 +729,6 @@
 <span id="724">724</span>
 <span id="725">725</span>
 <span id="726">726</span>
-<span id="727">727</span>
-<span id="728">728</span>
-<span id="729">729</span>
-<span id="730">730</span>
-<span id="731">731</span>
-<span id="732">732</span>
-<span id="733">733</span>
-<span id="734">734</span>
-<span id="735">735</span>
-<span id="736">736</span>
-<span id="737">737</span>
-<span id="738">738</span>
-<span id="739">739</span>
-<span id="740">740</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::collections::HashMap</span>;
 
 <span class="kw">use</span> <span class="ident">serde::de::Error</span> <span class="kw">as</span> <span class="ident">DeError</span>;
@@ -1090,20 +1076,6 @@
                                     <span class="string">&quot;guild_id&quot;</span>.<span class="ident">to_string</span>(),
                                     <span class="ident">Value::from</span>(<span class="ident">guild_id</span>.<span class="ident">to_string</span>()),
                                 );
-                            }
-                        }
-                    }
-
-                    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">channels</span>) <span class="op">=</span> <span class="ident">resolved</span>.<span class="ident">get_mut</span>(<span class="string">&quot;channels&quot;</span>) {
-                        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">values</span>) <span class="op">=</span> <span class="ident">channels</span>.<span class="ident">as_object_mut</span>() {
-                            <span class="kw">for</span> <span class="ident">value</span> <span class="kw">in</span> <span class="ident">values</span>.<span class="ident">values_mut</span>() {
-                                <span class="ident">value</span>
-                                    .<span class="ident">as_object_mut</span>()
-                                    .<span class="ident">expect</span>(<span class="string">&quot;couldn&#39;t deserialize application command&quot;</span>)
-                                    .<span class="ident">insert</span>(
-                                        <span class="string">&quot;guild_id&quot;</span>.<span class="ident">to_string</span>(),
-                                        <span class="ident">Value::from</span>(<span class="ident">guild_id</span>.<span class="ident">to_string</span>()),
-                                    );
                             }
                         }
                     }
