@@ -1937,13 +1937,6 @@
 <span id="1932">1932</span>
 <span id="1933">1933</span>
 <span id="1934">1934</span>
-<span id="1935">1935</span>
-<span id="1936">1936</span>
-<span id="1937">1937</span>
-<span id="1938">1938</span>
-<span id="1939">1939</span>
-<span id="1940">1940</span>
-<span id="1941">1941</span>
 </pre><pre class="rust"><code><span class="doccomment">//! All the events this library handles.</span>
 
 <span class="kw">use</span> <span class="ident">std::collections::HashMap</span>;
@@ -3666,13 +3659,6 @@
     };
     (@<span class="ident">munch</span> (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">id</span>:<span class="ident">ident</span>: <span class="macro-nonterminal">$</span><span class="kw">_</span>:<span class="macro-nonterminal">expr</span>, $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">next</span>:<span class="ident">tt</span>)<span class="kw-2">*</span>) -&gt; {$(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">output</span>:<span class="ident">tt</span>)<span class="kw-2">*</span>}) =&gt; {
         <span class="macro">define_related_ids_for_event_type!</span>{ @<span class="ident">munch</span> ($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">next</span>)<span class="kw-2">*</span>) -&gt; {$(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">output</span>)<span class="op">*</span> (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">id</span>: <span class="bool-val">true</span>)} }
-    };
-    <span class="comment">// These are variants of the above to munch the last field.</span>
-    (@<span class="ident">munch</span> (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">id</span>:<span class="ident">ident</span>: <span class="ident">Never</span> $(,)<span class="question-mark">?</span>) -&gt; {$(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">output</span>:<span class="ident">tt</span>)<span class="kw-2">*</span>}) =&gt; {
-        <span class="macro">define_related_ids_for_event_type!</span>{ @<span class="ident">munch</span> () -&gt; {$(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">output</span>)<span class="op">*</span> (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">id</span>: <span class="bool-val">false</span>)} }
-    };
-    (@<span class="ident">munch</span> (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">id</span>:<span class="ident">ident</span>: <span class="macro-nonterminal">$</span><span class="kw">_</span>:<span class="macro-nonterminal">expr</span> $(,)<span class="question-mark">?</span>) -&gt; {$(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">output</span>:<span class="ident">tt</span>)<span class="kw-2">*</span>}) =&gt; {
-        <span class="macro">define_related_ids_for_event_type!</span>{ @<span class="ident">munch</span> () -&gt; {$(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">output</span>)<span class="op">*</span> (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">id</span>: <span class="bool-val">true</span>)} }
     };
     <span class="comment">// All input fields consumed; create the struct.</span>
     (@<span class="ident">munch</span> () -&gt; {$((<span class="macro-nonterminal">$</span><span class="macro-nonterminal">id</span>:<span class="ident">ident</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">value</span>:<span class="ident">literal</span>))<span class="op">+</span>}) =&gt; {
