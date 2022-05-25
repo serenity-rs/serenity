@@ -432,22 +432,6 @@
 <span id="427">427</span>
 <span id="428">428</span>
 <span id="429">429</span>
-<span id="430">430</span>
-<span id="431">431</span>
-<span id="432">432</span>
-<span id="433">433</span>
-<span id="434">434</span>
-<span id="435">435</span>
-<span id="436">436</span>
-<span id="437">437</span>
-<span id="438">438</span>
-<span id="439">439</span>
-<span id="440">440</span>
-<span id="441">441</span>
-<span id="442">442</span>
-<span id="443">443</span>
-<span id="444">444</span>
-<span id="445">445</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">serde::de</span>::{<span class="ident">Deserialize</span>, <span class="ident">Deserializer</span>, <span class="ident">Error</span> <span class="kw">as</span> <span class="ident">DeError</span>};
 <span class="kw">use</span> <span class="ident">serde::Serialize</span>;
 
@@ -758,22 +742,6 @@
                                 <span class="ident">value</span>
                                     .<span class="ident">as_object_mut</span>()
                                     .<span class="ident">expect</span>(<span class="string">&quot;couldn&#39;t deserialize message component&quot;</span>)
-                                    .<span class="ident">insert</span>(
-                                        <span class="string">&quot;guild_id&quot;</span>.<span class="ident">to_string</span>(),
-                                        <span class="ident">Value::from</span>(<span class="ident">guild_id</span>.<span class="ident">to_string</span>()),
-                                    );
-                            }
-                        }
-                    }
-
-                    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">channels</span>) <span class="op">=</span> <span class="ident">resolved</span>.<span class="ident">get_mut</span>(<span class="string">&quot;channels&quot;</span>) {
-                        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">values</span>) <span class="op">=</span> <span class="ident">channels</span>.<span class="ident">as_object_mut</span>() {
-                            <span class="kw">for</span> <span class="ident">value</span> <span class="kw">in</span> <span class="ident">values</span>.<span class="ident">values_mut</span>() {
-                                <span class="ident">value</span>
-                                    .<span class="ident">as_object_mut</span>()
-                                    .<span class="ident">expect</span>(
-                                        <span class="string">&quot;couldn&#39;t deserialize the message component interaction&quot;</span>,
-                                    )
                                     .<span class="ident">insert</span>(
                                         <span class="string">&quot;guild_id&quot;</span>.<span class="ident">to_string</span>(),
                                         <span class="ident">Value::from</span>(<span class="ident">guild_id</span>.<span class="ident">to_string</span>()),
