@@ -55,7 +55,7 @@ use serde::ser::{Serialize, Serializer};
 ///
 /// Using this macro
 ///
-/// ```rust,no_run
+/// ```ignore
 /// generate_get_permission_names! {
 ///     add_reactions: "Add Reactions",
 ///     administrator: "Administrator"
@@ -64,7 +64,7 @@ use serde::ser::{Serialize, Serializer};
 ///
 /// Generates this implementation:
 ///
-/// ```
+/// ```ignore
 /// impl Permissions {
 ///     fn get_permission_names(self) -> Vec<&'static str> {
 ///         let mut names = Vec::new();
