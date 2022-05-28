@@ -582,6 +582,45 @@ pub struct ThreadMembersUpdateEvent {
     pub removed_members_ids: Vec<UserId>,
 }
 
+#[derive(Clone, Debug, Deserialize, Serialize)]
+#[serde(transparent)]
+#[non_exhaustive]
+pub struct GuildScheduledEventCreateEvent {
+    pub event: ScheduledEvent,
+}
+
+#[derive(Clone, Debug, Deserialize, Serialize)]
+#[serde(transparent)]
+#[non_exhaustive]
+pub struct GuildScheduledEventUpdateEvent {
+    pub event: ScheduledEvent,
+}
+
+#[derive(Clone, Debug, Deserialize, Serialize)]
+#[serde(transparent)]
+#[non_exhaustive]
+pub struct GuildScheduledEventDeleteEvent {
+    pub event: ScheduledEvent,
+}
+
+#[derive(Clone, Debug, Deserialize, Serialize)]
+#[non_exhaustive]
+pub struct GuildScheduledEventUserAddEvent {
+    #[serde(rename = "guild_scheduled_event_id")]
+    scheduled_event_id: ScheduledEventId,
+    guild_id: GuildId,
+    user_id: UserId,
+}
+
+#[derive(Clone, Debug, Deserialize, Serialize)]
+#[non_exhaustive]
+pub struct GuildScheduledEventUserRemoveEvent {
+    #[serde(rename = "guild_scheduled_event_id")]
+    scheduled_event_id: ScheduledEventId,
+    guild_id: GuildId,
+    user_id: UserId,
+}
+
 #[allow(clippy::large_enum_variant)]
 #[derive(Debug, Clone, Serialize)]
 #[non_exhaustive]
@@ -812,6 +851,16 @@ pub enum Event {
     ///
     /// [`GatewayIntents::GUILDS`]: crate::model::gateway::GatewayIntents::GUILDS
     ThreadMembersUpdate(ThreadMembersUpdateEvent),
+    /// A scheduled event was created.
+    GuildScheduledEventCreate(GuildScheduledEventCreateEvent),
+    /// A scheduled event was updated.
+    GuildScheduledEventUpdate(GuildScheduledEventUpdateEvent),
+    /// A scheduled event was deleted.
+    GuildScheduledEventDelete(GuildScheduledEventDeleteEvent),
+    /// A guild member has subscribed to a scheduled event.
+    GuildScheduledEventUserAdd(GuildScheduledEventUserAddEvent),
+    /// A guild member has unsubscribed from a scheduled event.
+    GuildScheduledEventUserRemove(GuildScheduledEventUserRemoveEvent),
     /// An event type not covered by the above
     Unknown(UnknownEvent),
 }
@@ -932,6 +981,36 @@ macro_rules! with_related_ids_for_event_types {
             Self::GuildRoleUpdate, Self::GuildRoleUpdate(e) => {
                 user_id: Never,
                 guild_id: Some(e.role.guild_id),
+                channel_id: Never,
+                message_id: Never,
+            },
+            Self::GuildScheduledEventCreate, Self::GuildScheduledEventCreate(e) => {
+                user_id: e.event.creator_id.into(),
+                guild_id: Some(e.event.guild_id),
+                channel_id: e.event.channel_id.into(),
+                message_id: Never,
+            },
+            Self::GuildScheduledEventUpdate, Self::GuildScheduledEventUpdate(e) => {
+                user_id: e.event.creator_id.into(),
+                guild_id: Some(e.event.guild_id),
+                channel_id: e.event.channel_id.into(),
+                message_id: Never,
+            },
+            Self::GuildScheduledEventDelete, Self::GuildScheduledEventDelete(e) => {
+                user_id: e.event.creator_id.into(),
+                guild_id: Some(e.event.guild_id),
+                channel_id: e.event.channel_id.into(),
+                message_id: Never,
+            },
+            Self::GuildScheduledEventUserAdd, Self::GuildScheduledEventUserAdd(e) => {
+                user_id: Some(e.user_id),
+                guild_id: Some(e.guild_id),
+                channel_id: Never,
+                message_id: Never,
+            },
+            Self::GuildScheduledEventUserRemove, Self::GuildScheduledEventUserRemove(e) => {
+                user_id: Some(e.user_id),
+                guild_id: Some(e.guild_id),
                 channel_id: Never,
                 message_id: Never,
             },
@@ -1301,6 +1380,11 @@ impl Event {
             Self::ThreadListSync(_) => EventType::ThreadListSync,
             Self::ThreadMemberUpdate(_) => EventType::ThreadMemberUpdate,
             Self::ThreadMembersUpdate(_) => EventType::ThreadMembersUpdate,
+            Self::GuildScheduledEventCreate(_) => EventType::GuildScheduledEventCreate,
+            Self::GuildScheduledEventUpdate(_) => EventType::GuildScheduledEventUpdate,
+            Self::GuildScheduledEventDelete(_) => EventType::GuildScheduledEventDelete,
+            Self::GuildScheduledEventUserAdd(_) => EventType::GuildScheduledEventUserAdd,
+            Self::GuildScheduledEventUserRemove(_) => EventType::GuildScheduledEventUserRemove,
             Self::Unknown(unknown) => EventType::Other(unknown.kind.clone()),
         }
     }
@@ -1441,6 +1525,13 @@ pub fn deserialize_event_with_type(kind: EventType, v: Value) -> Result<Event> {
         EventType::ThreadListSync => Event::ThreadListSync(from_value(v)?),
         EventType::ThreadMemberUpdate => Event::ThreadMemberUpdate(from_value(v)?),
         EventType::ThreadMembersUpdate => Event::ThreadMembersUpdate(from_value(v)?),
+        EventType::GuildScheduledEventCreate => Event::GuildScheduledEventCreate(from_value(v)?),
+        EventType::GuildScheduledEventUpdate => Event::GuildScheduledEventUpdate(from_value(v)?),
+        EventType::GuildScheduledEventDelete => Event::GuildScheduledEventDelete(from_value(v)?),
+        EventType::GuildScheduledEventUserAdd => Event::GuildScheduledEventUserAdd(from_value(v)?),
+        EventType::GuildScheduledEventUserRemove => {
+            Event::GuildScheduledEventUserRemove(from_value(v)?)
+        },
         EventType::Other(kind) => Event::Unknown(UnknownEvent {
             kind,
             value: v,
@@ -1667,6 +1758,26 @@ pub enum EventType {
     ///
     /// This maps to [`ThreadMembersUpdateEvent`]
     ThreadMembersUpdate,
+    /// Indicator that a scheduled event create payload was received.
+    ///
+    /// This maps to [`GuildScheduledEventCreateEvent`].
+    GuildScheduledEventCreate,
+    /// Indicator that a scheduled event update payload was received.
+    ///
+    /// This maps to [`GuildScheduledEventUpdateEvent`].
+    GuildScheduledEventUpdate,
+    /// Indicator that a scheduled event delete payload was received.
+    ///
+    /// This maps to [`GuildScheduledEventDeleteEvent`].
+    GuildScheduledEventDelete,
+    /// Indicator that a guild member has subscribed to a scheduled event.
+    ///
+    /// This maps to [`GuildScheduledEventUserAddEvent`].
+    GuildScheduledEventUserAdd,
+    /// Indicator that a guild member has unsubscribed from a scheduled event.
+    ///
+    /// This maps to [`GuildScheduledEventUserRemoveEvent`].
+    GuildScheduledEventUserRemove,
     /// An unknown event was received over the gateway.
     ///
     /// This should be logged so that support for it can be added in the
@@ -1784,6 +1895,11 @@ impl EventType {
     const THREAD_LIST_SYNC: &'static str = "THREAD_LIST_SYNC";
     const THREAD_MEMBER_UPDATE: &'static str = "THREAD_MEMBER_UPDATE";
     const THREAD_MEMBERS_UPDATE: &'static str = "THREAD_MEMBERS_UPDATE";
+    const GUILD_SCHEDULED_EVENT_CREATE: &'static str = "GUILD_SCHEDULED_EVENT_CREATE";
+    const GUILD_SCHEDULED_EVENT_UPDATE: &'static str = "GUILD_SCHEDULED_EVENT_UPDATE";
+    const GUILD_SCHEDULED_EVENT_DELETE: &'static str = "GUILD_SCHEDULED_EVENT_DELETE";
+    const GUILD_SCHEDULED_EVENT_USER_ADD: &'static str = "GUILD_SCHEDULED_EVENT_USER_ADD";
+    const GUILD_SCHEDULED_EVENT_USER_REMOVE: &'static str = "GUILD_SCHEDULED_EVENT_USER_REMOVE";
 
     /// Return the event name of this event. Some events are synthetic, and we lack
     /// the information to recover the original event name for these events, in which
@@ -1844,6 +1960,11 @@ impl EventType {
             Self::ThreadListSync => Some(Self::THREAD_LIST_SYNC),
             Self::ThreadMemberUpdate => Some(Self::THREAD_MEMBER_UPDATE),
             Self::ThreadMembersUpdate => Some(Self::THREAD_MEMBERS_UPDATE),
+            Self::GuildScheduledEventCreate => Some(Self::GUILD_SCHEDULED_EVENT_CREATE),
+            Self::GuildScheduledEventUpdate => Some(Self::GUILD_SCHEDULED_EVENT_UPDATE),
+            Self::GuildScheduledEventDelete => Some(Self::GUILD_SCHEDULED_EVENT_DELETE),
+            Self::GuildScheduledEventUserAdd => Some(Self::GUILD_SCHEDULED_EVENT_USER_ADD),
+            Self::GuildScheduledEventUserRemove => Some(Self::GUILD_SCHEDULED_EVENT_USER_REMOVE),
             // GuildUnavailable is a synthetic event type, corresponding to either
             // `GUILD_CREATE` or `GUILD_DELETE`, but we don't have enough information
             // to recover the name here, so we return `None` instead.
@@ -1924,6 +2045,15 @@ impl<'de> Deserialize<'de> for EventType {
                     EventType::THREAD_CREATE => EventType::ThreadCreate,
                     EventType::THREAD_UPDATE => EventType::ThreadUpdate,
                     EventType::THREAD_DELETE => EventType::ThreadDelete,
+                    EventType::GUILD_SCHEDULED_EVENT_CREATE => EventType::GuildScheduledEventCreate,
+                    EventType::GUILD_SCHEDULED_EVENT_UPDATE => EventType::GuildScheduledEventUpdate,
+                    EventType::GUILD_SCHEDULED_EVENT_DELETE => EventType::GuildScheduledEventDelete,
+                    EventType::GUILD_SCHEDULED_EVENT_USER_ADD => {
+                        EventType::GuildScheduledEventUserAdd
+                    },
+                    EventType::GUILD_SCHEDULED_EVENT_USER_REMOVE => {
+                        EventType::GuildScheduledEventUserRemove
+                    },
                     other => EventType::Other(other.to_owned()),
                 })
             }

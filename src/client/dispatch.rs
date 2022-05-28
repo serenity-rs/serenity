@@ -871,5 +871,40 @@ async fn handle_event(
                 event_handler.thread_members_update(context, event).await;
             });
         },
+        DispatchEvent::Model(Event::GuildScheduledEventCreate(event)) => {
+            let event_handler = Arc::clone(event_handler);
+
+            spawn_named("dispatch::event_handler::guild_scheduled_event_create", async move {
+                event_handler.guild_scheduled_event_create(context, event.event).await;
+            });
+        },
+        DispatchEvent::Model(Event::GuildScheduledEventUpdate(event)) => {
+            let event_handler = Arc::clone(event_handler);
+
+            spawn_named("dispatch::event_handler::guild_scheduled_event_update", async move {
+                event_handler.guild_scheduled_event_update(context, event.event).await;
+            });
+        },
+        DispatchEvent::Model(Event::GuildScheduledEventDelete(event)) => {
+            let event_handler = Arc::clone(event_handler);
+
+            spawn_named("dispatch::event_handler::guild_scheduled_event_delete", async move {
+                event_handler.guild_scheduled_event_delete(context, event.event).await;
+            });
+        },
+        DispatchEvent::Model(Event::GuildScheduledEventUserAdd(event)) => {
+            let event_handler = Arc::clone(event_handler);
+
+            spawn_named("dispatch::event_handler::guild_scheduled_event_user_add", async move {
+                event_handler.guild_scheduled_event_user_add(context, event).await;
+            });
+        },
+        DispatchEvent::Model(Event::GuildScheduledEventUserRemove(event)) => {
+            let event_handler = Arc::clone(event_handler);
+
+            spawn_named("dispatch::event_handler::guild_scheduled_event_user_remove", async move {
+                event_handler.guild_scheduled_event_user_remove(context, event).await;
+            });
+        },
     }
 }
