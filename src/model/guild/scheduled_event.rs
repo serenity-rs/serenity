@@ -78,6 +78,8 @@ enum_number!(ScheduledEventType {
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct ScheduledEventMetadata {
+    // TODO: Change to `Option<String>` in next version.
+    #[serde(default)]
     pub location: String,
 }
 
