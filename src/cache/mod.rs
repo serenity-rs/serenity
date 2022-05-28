@@ -81,9 +81,9 @@ impl<K: Eq + Hash, V> std::ops::Deref for CacheRef<'_, K, V> {
     }
 }
 
-pub(crate) type GuildRef<'a> = CacheRef<'a, GuildId, Guild>;
-pub(crate) type GuildChannelRef<'a> = CacheRef<'a, ChannelId, GuildChannel>;
-pub(crate) type PrivateChannelRef<'a> = CacheRef<'a, ChannelId, PrivateChannel>;
+pub type GuildRef<'a> = CacheRef<'a, GuildId, Guild>;
+pub type GuildChannelRef<'a> = CacheRef<'a, ChannelId, GuildChannel>;
+pub type PrivateChannelRef<'a> = CacheRef<'a, ChannelId, PrivateChannel>;
 
 pub trait FromStrAndCache: Sized {
     type Err;
