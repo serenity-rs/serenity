@@ -2,9 +2,6 @@ use std::fmt;
 #[cfg(feature = "model")]
 use std::sync::Arc;
 
-#[cfg(feature = "cache")]
-use futures::stream::StreamExt;
-
 #[cfg(feature = "model")]
 use crate::builder::EditChannel;
 #[cfg(feature = "model")]
@@ -1064,7 +1061,7 @@ impl GuildChannel {
     /// will return: [`ModelError::InvalidChannelType`].
     #[cfg(feature = "cache")]
     #[inline]
-    pub async fn members(&self, cache: impl AsRef<Cache>) -> Result<Vec<Member>> {
+    pub fn members(&self, cache: impl AsRef<Cache>) -> Result<Vec<Member>> {
         let cache = cache.as_ref();
         let guild = cache.guild(self.guild_id).ok_or(ModelError::GuildNotFound)?;
 
@@ -1082,22 +1079,21 @@ impl GuildChannel {
                     })
                 })
                 .collect()),
-            ChannelType::News | ChannelType::Text => {
-                Ok(futures::stream::iter(guild.members.iter())
-                    .filter_map(|e| async move {
-                        if self
-                            .permissions_for_user(cache, e.0)
-                            .map(|p| p.contains(Permissions::VIEW_CHANNEL))
-                            .unwrap_or(false)
-                        {
-                            Some(e.1.clone())
-                        } else {
-                            None
-                        }
-                    })
-                    .collect::<Vec<Member>>()
-                    .await)
-            },
+            ChannelType::News | ChannelType::Text => Ok(guild
+                .members
+                .iter()
+                .filter_map(|e| {
+                    if self
+                        .permissions_for_user(cache, e.0)
+                        .map(|p| p.contains(Permissions::VIEW_CHANNEL))
+                        .unwrap_or(false)
+                    {
+                        Some(e.1.clone())
+                    } else {
+                        None
+                    }
+                })
+                .collect::<Vec<Member>>()),
             _ => Err(Error::from(ModelError::InvalidChannelType)),
         }
     }
