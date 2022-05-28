@@ -69,7 +69,7 @@ impl ArgumentConvert for Message {
 
         #[cfg(feature = "cache")]
         if let Some(msg) = ctx.cache.message(channel_id, message_id) {
-            return Ok(msg);
+            return Ok(msg.clone());
         }
 
         if cfg!(feature = "http") {

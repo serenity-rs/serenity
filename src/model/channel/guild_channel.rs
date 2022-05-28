@@ -20,7 +20,7 @@ use crate::builder::{
     GetMessages,
 };
 #[cfg(feature = "cache")]
-use crate::cache::Cache;
+use crate::cache::{self, Cache};
 #[cfg(feature = "collector")]
 use crate::client::bridge::gateway::ShardMessenger;
 #[cfg(feature = "collector")]
@@ -613,7 +613,7 @@ impl GuildChannel {
     /// Attempts to find this channel's guild in the Cache.
     #[cfg(feature = "cache")]
     #[inline]
-    pub fn guild(&self, cache: impl AsRef<Cache>) -> Option<Guild> {
+    pub fn guild<'a>(&self, cache: &'a impl AsRef<Cache>) -> Option<cache::GuildRef<'a>> {
         cache.as_ref().guild(self.guild_id)
     }
 
@@ -741,13 +741,13 @@ impl GuildChannel {
     /// #[serenity::async_trait]
     /// impl EventHandler for Handler {
     ///     async fn message(&self, context: Context, mut msg: Message) {
-    ///         let channel = match context.cache.guild_channel(msg.channel_id) {
-    ///             Some(channel) => channel,
+    ///         let current_user_id = context.cache.current_user_id();
+    ///         let permissions = match context.cache.guild_channel(msg.channel_id) {
+    ///             Some(channel) => channel.permissions_for_user(&context.cache, current_user_id),
     ///             None => return,
     ///         };
     ///
-    ///         let current_user_id = context.cache.current_user_id();
-    ///         if let Ok(permissions) = channel.permissions_for_user(&context.cache, current_user_id) {
+    ///         if let Ok(permissions) = permissions {
     ///             if !permissions.contains(Permissions::ATTACH_FILES | Permissions::SEND_MESSAGES) {
     ///                 return;
     ///             }
@@ -999,7 +999,8 @@ impl GuildChannel {
     /// # let cache = Cache::default();
     /// # let channel = cache
     /// #    .guild_channel(ChannelId(7))
-    /// #    .ok_or(ModelError::ItemMissing)?;
+    /// #    .ok_or(ModelError::ItemMissing)?
+    /// #    .clone();
     /// // Initiate typing (assuming http is `Arc<Http>` and `channel` is bound)
     /// let typing = channel.start_typing(&http)?;
     ///
