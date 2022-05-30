@@ -2899,6 +2899,19 @@
 <span id="2894">2894</span>
 <span id="2895">2895</span>
 <span id="2896">2896</span>
+<span id="2897">2897</span>
+<span id="2898">2898</span>
+<span id="2899">2899</span>
+<span id="2900">2900</span>
+<span id="2901">2901</span>
+<span id="2902">2902</span>
+<span id="2903">2903</span>
+<span id="2904">2904</span>
+<span id="2905">2905</span>
+<span id="2906">2906</span>
+<span id="2907">2907</span>
+<span id="2908">2908</span>
+<span id="2909">2909</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::borrow::Cow</span>;
 <span class="kw">use</span> <span class="ident">std::fmt::Display</span>;
 
@@ -3965,11 +3978,22 @@
     }
 
     <span class="attribute">#[<span class="ident">must_use</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">webhook_with_token_optioned</span><span class="op">&lt;</span><span class="ident">D</span><span class="op">&gt;</span>(<span class="ident">webhook_id</span>: <span class="ident">u64</span>, <span class="ident">token</span>: <span class="ident">D</span>, <span class="ident">wait</span>: <span class="ident">bool</span>) -&gt; <span class="ident">String</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">webhook_with_token_optioned</span><span class="op">&lt;</span><span class="ident">D</span><span class="op">&gt;</span>(
+        <span class="ident">webhook_id</span>: <span class="ident">u64</span>,
+        <span class="ident">thread_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span>,
+        <span class="ident">token</span>: <span class="ident">D</span>,
+        <span class="ident">wait</span>: <span class="ident">bool</span>,
+    ) -&gt; <span class="ident">String</span>
     <span class="kw">where</span>
         <span class="ident">D</span>: <span class="ident">Display</span>,
     {
-        <span class="macro">api!</span>(<span class="string">&quot;/webhooks/{}/{}?wait={}&quot;</span>, <span class="ident">webhook_id</span>, <span class="ident">token</span>, <span class="ident">wait</span>)
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">s</span> <span class="op">=</span> <span class="macro">api!</span>(<span class="string">&quot;/webhooks/{}/{}?wait={}&quot;</span>, <span class="ident">webhook_id</span>, <span class="ident">token</span>, <span class="ident">wait</span>);
+
+        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">thread_id</span>) <span class="op">=</span> <span class="ident">thread_id</span> {
+            <span class="ident">s</span>.<span class="ident">push_str</span>(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;&amp;thread_id={}&quot;</span>, <span class="ident">thread_id</span>));
+        }
+
+        <span class="ident">s</span>
     }
 
     <span class="attribute">#[<span class="ident">must_use</span>]</span>
@@ -4351,6 +4375,7 @@
         <span class="ident">token</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>,
         <span class="ident">wait</span>: <span class="ident">bool</span>,
         <span class="ident">webhook_id</span>: <span class="ident">u64</span>,
+        <span class="ident">thread_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span>,
     },
     <span class="ident">JoinThread</span> {
         <span class="ident">channel_id</span>: <span class="ident">u64</span>,
@@ -5240,10 +5265,11 @@
                 <span class="ident">token</span>,
                 <span class="ident">wait</span>,
                 <span class="ident">webhook_id</span>,
+                <span class="ident">thread_id</span>,
             } =&gt; (
                 <span class="ident">LightMethod::Post</span>,
                 <span class="ident">Route::WebhooksId</span>(<span class="ident">webhook_id</span>),
-                <span class="ident">Cow::from</span>(<span class="ident">Route::webhook_with_token_optioned</span>(<span class="ident">webhook_id</span>, <span class="ident">token</span>, <span class="ident">wait</span>)),
+                <span class="ident">Cow::from</span>(<span class="ident">Route::webhook_with_token_optioned</span>(<span class="ident">webhook_id</span>, <span class="ident">thread_id</span>, <span class="ident">token</span>, <span class="ident">wait</span>)),
             ),
             <span class="ident">RouteInfo::GetAuditLogs</span> {
                 <span class="ident">action_type</span>,
