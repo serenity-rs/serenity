@@ -1,3 +1,5 @@
+use std::collections::HashMap;
+
 use serde::{Deserialize, Serialize};
 
 #[cfg(feature = "http")]
@@ -38,8 +40,32 @@ pub struct Command {
     pub guild_id: Option<GuildId>,
     /// The command name.
     pub name: String,
+    /// The localized command name of the selected locale.
+    ///
+    /// If the name is localized, either this field or [`Self::name_localizations`]
+    /// is set, depending on which endpoint this data was retrieved from
+    /// ([source](https://discord.com/developers/docs/interactions/application-commands#retrieving-localized-commands)).
+    pub name_localized: Option<String>,
+    /// All localized command names.
+    ///
+    /// If the name is localized, either this field or [`Self::name_localized`]
+    /// is set, depending on which endpoint this data was retrieved from
+    /// ([source](https://discord.com/developers/docs/interactions/application-commands#retrieving-localized-commands)).
+    pub name_localizations: Option<HashMap<String, String>>,
     /// The command description.
     pub description: String,
+    /// The localized command description of the selected locale.
+    ///
+    /// If the description is localized, either this field or [`Self::description_localizations`]
+    /// is set, depending on which endpoint this data was retrieved from
+    /// ([source](https://discord.com/developers/docs/interactions/application-commands#retrieving-localized-commands)).
+    pub description_localized: Option<String>,
+    /// All localized command descriptions.
+    ///
+    /// If the description is localized, either this field or [`Self::description_localized`]
+    /// is set, depending on which endpoint this data was retrieved from
+    /// ([source](https://discord.com/developers/docs/interactions/application-commands#retrieving-localized-commands)).
+    pub description_localizations: Option<HashMap<String, String>>,
     /// The parameters for the command.
     #[serde(default)]
     pub options: Vec<CommandOption>,
