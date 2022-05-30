@@ -2176,6 +2176,9 @@ impl Http {
     ///
     /// This method does _not_ require authentication.
     ///
+    /// If `thread_id` is not `None`, then the message will be sent to the thread in the webhook's
+    /// associated [`Channel`] with the corresponding Id, which will be automatically unarchived.
+    ///
     /// Pass `true` to `wait` to wait for server confirmation of the message sending
     /// before receiving a response. From the [Discord docs]:
     ///
@@ -2213,15 +2216,16 @@ impl Http {
     /// let value = json!({"content": "test"});
     /// let map = value.as_object().unwrap();
     ///
-    /// let message = http.execute_webhook(id, token, true, map).await?;
+    /// let message = http.execute_webhook(id, None, token, true, map).await?;
     /// #     Ok(())
     /// # }
     /// ```
     ///
-    /// [Discord docs]: https://discord.com/developers/docs/resources/webhook#querystring-params
+    /// [Discord docs]: https://discord.com/developers/docs/resources/webhook#execute-webhook-query-string-params
     pub async fn execute_webhook(
         &self,
         webhook_id: u64,
+        thread_id: Option<u64>,
         token: &str,
         wait: bool,
         map: &JsonMap,
@@ -2240,6 +2244,7 @@ impl Http {
                     token,
                     wait,
                     webhook_id,
+                    thread_id,
                 },
             })
             .await?;
@@ -2261,6 +2266,7 @@ impl Http {
     pub async fn execute_webhook_with_files<'a, T, It: IntoIterator<Item = T>>(
         &self,
         webhook_id: u64,
+        thread_id: Option<u64>,
         token: &str,
         wait: bool,
         files: It,
@@ -2281,6 +2287,7 @@ impl Http {
                 token,
                 wait,
                 webhook_id,
+                thread_id,
             },
         })
         .await
