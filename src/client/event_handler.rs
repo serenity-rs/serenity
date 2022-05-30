@@ -519,6 +519,41 @@ pub trait EventHandler: Send + Sync {
         _thread_members_update: ThreadMembersUpdateEvent,
     ) {
     }
+
+    /// Dispatched when a scheduled event is created.
+    ///
+    /// Provides data about the scheduled event.
+    async fn guild_scheduled_event_create(&self, _ctx: Context, _event: ScheduledEvent) {}
+
+    /// Dispatched when a scheduled event is updated.
+    ///
+    /// Provides data about the scheduled event.
+    async fn guild_scheduled_event_update(&self, _ctx: Context, _event: ScheduledEvent) {}
+
+    /// Dispatched when a scheduled event is deleted.
+    ///
+    /// Provides data about the scheduled event.
+    async fn guild_scheduled_event_delete(&self, _ctx: Context, _event: ScheduledEvent) {}
+
+    /// Dispatched when a guild member has subscribed to a scheduled event.
+    ///
+    /// Provides data about the subscription.
+    async fn guild_scheduled_event_user_add(
+        &self,
+        _ctx: Context,
+        _subscribed: GuildScheduledEventUserAddEvent,
+    ) {
+    }
+
+    /// Dispatched when a guild member has unsubscribed from a scheduled event.
+    ///
+    /// Provides data about the cancelled subscription.
+    async fn guild_scheduled_event_user_remove(
+        &self,
+        _ctx: Context,
+        _unsubscribed: GuildScheduledEventUserRemoveEvent,
+    ) {
+    }
 }
 
 /// This core trait for handling raw events
