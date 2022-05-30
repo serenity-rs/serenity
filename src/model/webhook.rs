@@ -431,17 +431,82 @@ impl Webhook {
     where
         for<'b> F: FnOnce(&'b mut ExecuteWebhook<'a>) -> &'b mut ExecuteWebhook<'a>,
     {
+        self._execute(http, None, wait, f).await
+    }
+
+    /// Executes a webhook with the fields set via the given builder, in the context of the thread
+    /// with the provided Id. If the thread is archived, it will be automatically unarchived.
+    ///
+    /// # Examples
+    ///
+    /// Execute a webhook with message content of `test`:
+    ///
+    /// ```rust,no_run
+    /// # use serenity::http::Http;
+    /// # use serenity::model::webhook::Webhook;
+    /// #
+    /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
+    /// # let http = Http::new("token");
+    /// let url = "https://discord.com/api/webhooks/245037420704169985/ig5AO-wdVWpCBtUUMxmgsWryqgsW3DChbKYOINftJ4DCrUbnkedoYZD0VOH1QLr-S3sV";
+    /// let mut webhook = Webhook::from_url(&http, url).await?;
+    ///
+    /// webhook.execute_in_thread(&http, 12345, false, |w| w.content("test")).await?;
+    /// #     Ok(())
+    /// # }
+    /// ```
+    ///
+    /// # Errors
+    ///
+    /// Returns an [`Error::Model`] if the [`Self::token`] is [`None`].
+    ///
+    /// May also return an [`Error::Http`] if the content is malformed, if the webhook's token is
+    /// invalid. Additionally, this variant is returned if `thread_id` does not refer to a valid
+    /// thread, or if the thread it refers to does not belong to the webhook's associated
+    /// [`Channel`].
+    ///
+    /// Or may return an [`Error::Json`] if there is an error deserialising Discord's response.
+    ///
+    /// [`Error::Model`]: crate::error::Error::Model
+    /// [`Error::Http`]: crate::error::Error::Http
+    /// [`Error::Json`]: crate::error::Error::Json
+    #[inline]
+    pub async fn execute_in_thread<'a, F>(
+        &self,
+        http: impl AsRef<Http>,
+        thread_id: impl Into<ChannelId>,
+        wait: bool,
+        f: F,
+    ) -> Result<Option<Message>>
+    where
+        for<'b> F: FnOnce(&'b mut ExecuteWebhook<'a>) -> &'b mut ExecuteWebhook<'a>,
+    {
+        self._execute(http, Some(thread_id.into()), wait, f).await
+    }
+
+    #[inline]
+    async fn _execute<'a, F>(
+        &self,
+        http: impl AsRef<Http>,
+        thread_id: Option<ChannelId>,
+        wait: bool,
+        f: F,
+    ) -> Result<Option<Message>>
+    where
+        for<'b> F: FnOnce(&'b mut ExecuteWebhook<'a>) -> &'b mut ExecuteWebhook<'a>,
+    {
         let token = self.token.as_ref().ok_or(ModelError::NoTokenSet)?;
         let mut execute_webhook = ExecuteWebhook::default();
         f(&mut execute_webhook);
 
         let map = json::hashmap_to_json_map(execute_webhook.0);
+        let thread_id = thread_id.map(|id| id.0);
 
         if execute_webhook.1.is_empty() {
-            http.as_ref().execute_webhook(self.id.0, token, wait, &map).await
+            http.as_ref().execute_webhook(self.id.0, thread_id, token, wait, &map).await
         } else {
+            let files = execute_webhook.1.clone();
             http.as_ref()
-                .execute_webhook_with_files(self.id.0, token, wait, execute_webhook.1.clone(), &map)
+                .execute_webhook_with_files(self.id.0, thread_id, token, wait, files, &map)
                 .await
         }
     }
