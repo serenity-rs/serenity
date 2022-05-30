@@ -1064,11 +1064,22 @@ impl Route {
     }
 
     #[must_use]
-    pub fn webhook_with_token_optioned<D>(webhook_id: u64, token: D, wait: bool) -> String
+    pub fn webhook_with_token_optioned<D>(
+        webhook_id: u64,
+        thread_id: Option<u64>,
+        token: D,
+        wait: bool,
+    ) -> String
     where
         D: Display,
     {
-        api!("/webhooks/{}/{}?wait={}", webhook_id, token, wait)
+        let mut s = api!("/webhooks/{}/{}?wait={}", webhook_id, token, wait);
+
+        if let Some(thread_id) = thread_id {
+            s.push_str(&format!("&thread_id={}", thread_id));
+        }
+
+        s
     }
 
     #[must_use]
@@ -1450,6 +1461,7 @@ pub enum RouteInfo<'a> {
         token: &'a str,
         wait: bool,
         webhook_id: u64,
+        thread_id: Option<u64>,
     },
     JoinThread {
         channel_id: u64,
@@ -2339,10 +2351,11 @@ impl<'a> RouteInfo<'a> {
                 token,
                 wait,
                 webhook_id,
+                thread_id,
             } => (
                 LightMethod::Post,
                 Route::WebhooksId(webhook_id),
-                Cow::from(Route::webhook_with_token_optioned(webhook_id, token, wait)),
+                Cow::from(Route::webhook_with_token_optioned(webhook_id, thread_id, token, wait)),
             ),
             RouteInfo::GetAuditLogs {
                 action_type,
