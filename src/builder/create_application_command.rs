@@ -32,11 +32,49 @@ impl CreateApplicationCommandOption {
         self
     }
 
+    /// Specifies a localized name of the option.
+    ///
+    /// ```rust
+    /// # CreateApplicationCommandOption::default()
+    /// .name("age")
+    /// .name_localized("zh-CN", "岁数")
+    /// ```
+    pub fn name_localized<D: ToString, E: ToString>(&mut self, locale: E, name: D) -> &mut Self {
+        self.0
+            .entry("name_localizations")
+            .or_insert(Value::Object(Default::default()))
+            .as_object_mut()
+            .expect("must be object")
+            .insert(locale.to_string(), Value::String(name.to_string()));
+        self
+    }
+
     /// Sets the description for the option.
     ///
     /// **Note**: Must be between 1 and 100 characters.
     pub fn description<D: ToString>(&mut self, description: D) -> &mut Self {
         self.0.insert("description", Value::from(description.to_string()));
+        self
+    }
+
+    /// Specifies a localized description of the option.
+    ///
+    /// ```rust
+    /// # CreateApplicationCommandOption::default()
+    /// .description("Wish a friend a happy birthday")
+    /// .description_localized("zh-CN", "祝你朋友生日快乐")
+    /// ```
+    pub fn description_localized<D: ToString, E: ToString>(
+        &mut self,
+        locale: E,
+        description: D,
+    ) -> &mut Self {
+        self.0
+            .entry("description_localizations")
+            .or_insert(Value::Object(Default::default()))
+            .as_object_mut()
+            .expect("must be object")
+            .insert(locale.to_string(), Value::String(description.to_string()));
         self
     }
 
@@ -67,6 +105,24 @@ impl CreateApplicationCommandOption {
         self.add_choice(choice)
     }
 
+    /// Adds a localized optional int-choice. See [`Self::add_int_choice`] for more info.
+    pub fn add_int_choice_localized<L: ToString, D: ToString>(
+        &mut self,
+        name: D,
+        value: i32,
+        locales: impl IntoIterator<Item = (L, D)>,
+    ) -> &mut Self {
+        let choice = json!({
+            "name": name.to_string(),
+            "name_localizations": locales
+                .into_iter()
+                .map(|(locale, name)| (locale.to_string(), name.to_string()))
+                .collect::<Value>(),
+            "value" : value,
+        });
+        self.add_choice(choice)
+    }
+
     /// Adds an optional string-choice.
     ///
     /// **Note**: There can be no more than 25 choices set. Name must be between 1 and 100 characters. Value must be up to 100 characters.
@@ -78,6 +134,24 @@ impl CreateApplicationCommandOption {
         self.add_choice(choice)
     }
 
+    /// Adds a localized optional string-choice. See [`Self::add_string_choice`] for more info.
+    pub fn add_string_choice_localized<L: ToString, D: ToString, E: ToString>(
+        &mut self,
+        name: D,
+        value: E,
+        locales: impl IntoIterator<Item = (L, D)>,
+    ) -> &mut Self {
+        let choice = json!({
+            "name": name.to_string(),
+            "name_localizations": locales
+                .into_iter()
+                .map(|(locale, name)| (locale.to_string(), name.to_string()))
+                .collect::<Value>(),
+            "value": value.to_string(),
+        });
+        self.add_choice(choice)
+    }
+
     /// Adds an optional number-choice.
     ///
     /// **Note**: There can be no more than 25 choices set. Name must be between 1 and 100 characters. Value must be between -2^53 and 2^53.
@@ -85,6 +159,24 @@ impl CreateApplicationCommandOption {
         let choice = json!({
             "name": name.to_string(),
             "value" : value
+        });
+        self.add_choice(choice)
+    }
+
+    /// Adds a localized optional number-choice. See [`Self::add_number_choice`] for more info.
+    pub fn add_number_choice_localized<L: ToString, D: ToString>(
+        &mut self,
+        name: D,
+        value: f64,
+        locales: impl IntoIterator<Item = (L, D)>,
+    ) -> &mut Self {
+        let choice = json!({
+            "name": name.to_string(),
+            "name_localizations": locales
+                .into_iter()
+                .map(|(locale, name)| (locale.to_string(), name.to_string()))
+                .collect::<Value>(),
+            "value" : value,
         });
         self.add_choice(choice)
     }
@@ -196,6 +288,24 @@ impl CreateApplicationCommand {
         self
     }
 
+    /// Specifies a localized name of the application command.
+    ///
+    /// ```rust
+    /// # CreateApplicationCommand::default()
+    /// .name("birthday")
+    /// .name_localized("zh-CN", "生日")
+    /// .name_localized("el", "γενέθλια")
+    /// ```
+    pub fn name_localized<D: ToString, E: ToString>(&mut self, locale: E, name: D) -> &mut Self {
+        self.0
+            .entry("name_localizations")
+            .or_insert(Value::Object(Default::default()))
+            .as_object_mut()
+            .expect("must be object")
+            .insert(locale.to_string(), Value::String(name.to_string()));
+        self
+    }
+
     /// Specifies the type of the application command.
     pub fn kind(&mut self, kind: CommandType) -> &mut Self {
         self.0.insert("type", from_number(kind as u8));
@@ -232,6 +342,27 @@ impl CreateApplicationCommand {
     /// **Note**: Must be between 1 and 100 characters long.
     pub fn description<D: ToString>(&mut self, description: D) -> &mut Self {
         self.0.insert("description", Value::from(description.to_string()));
+        self
+    }
+
+    /// Specifies a localized description of the application command.
+    ///
+    /// ```rust
+    /// # CreateApplicationCommand::default()
+    /// .description("Wish a friend a happy birthday")
+    /// .description_localized("zh-CN", "祝你朋友生日快乐")
+    /// ```
+    pub fn description_localized<D: ToString, E: ToString>(
+        &mut self,
+        locale: E,
+        description: D,
+    ) -> &mut Self {
+        self.0
+            .entry("description_localizations")
+            .or_insert(Value::Object(Default::default()))
+            .as_object_mut()
+            .expect("must be object")
+            .insert(locale.to_string(), Value::String(description.to_string()));
         self
     }
 
