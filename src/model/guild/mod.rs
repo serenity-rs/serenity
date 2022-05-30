@@ -14,8 +14,6 @@ mod scheduled_event;
 mod system_channel;
 mod welcome_screen;
 
-#[cfg(feature = "model")]
-use futures::stream::StreamExt;
 use serde::de::Error as DeError;
 #[cfg(feature = "model")]
 use tracing::error;
@@ -1763,7 +1761,8 @@ impl Guild {
     /// **Note**: This will only search members that are cached. If you want to
     /// search all members in the guild via the Http API, use
     /// [`Self::search_members`].
-    pub async fn members_starting_with(
+    #[must_use]
+    pub fn members_starting_with(
         &self,
         prefix: &str,
         case_sensitive: bool,
@@ -1774,8 +1773,10 @@ impl Guild {
                 || !case_sensitive && starts_with_case_insensitive(name, prefix)
         }
 
-        let mut members = futures::stream::iter(self.members.values())
-            .filter_map(|member| async move {
+        let mut members = self
+            .members
+            .values()
+            .filter_map(|member| {
                 let username = &member.user.name;
 
                 if starts_with(prefix, case_sensitive, username) {
@@ -1793,8 +1794,7 @@ impl Guild {
                     }
                 }
             })
-            .collect::<Vec<(&Member, String)>>()
-            .await;
+            .collect::<Vec<(&Member, String)>>();
 
         if sorted {
             members.sort_by(|a, b| closest_to_origin(prefix, &a.1[..], &b.1[..]));
@@ -1835,7 +1835,8 @@ impl Guild {
     /// **Note**: This will only search members that are cached. If you want to
     /// search all members in the guild via the Http API, use
     /// [`Self::search_members`].
-    pub async fn members_containing(
+    #[must_use]
+    pub fn members_containing(
         &self,
         substring: &str,
         case_sensitive: bool,
@@ -1846,8 +1847,10 @@ impl Guild {
                 || !case_sensitive && contains_case_insensitive(name, substring)
         }
 
-        let mut members = futures::stream::iter(self.members.values())
-            .filter_map(|member| async move {
+        let mut members = self
+            .members
+            .values()
+            .filter_map(|member| {
                 let username = &member.user.name;
 
                 if contains(substring, case_sensitive, username) {
@@ -1865,8 +1868,7 @@ impl Guild {
                     }
                 }
             })
-            .collect::<Vec<(&Member, String)>>()
-            .await;
+            .collect::<Vec<(&Member, String)>>();
 
         if sorted {
             members.sort_by(|a, b| closest_to_origin(substring, &a.1[..], &b.1[..]));
@@ -1902,14 +1904,17 @@ impl Guild {
     /// **Note**: This will only search members that are cached. If you want to
     /// search all members in the guild via the Http API, use
     /// [`Self::search_members`].
-    pub async fn members_username_containing(
+    #[must_use]
+    pub fn members_username_containing(
         &self,
         substring: &str,
         case_sensitive: bool,
         sorted: bool,
     ) -> Vec<(&Member, String)> {
-        let mut members = futures::stream::iter(self.members.values())
-            .filter_map(|member| async move {
+        let mut members = self
+            .members
+            .values()
+            .filter_map(|member| {
                 let name = &member.user.name;
 
                 if (case_sensitive && name.contains(substring))
@@ -1920,8 +1925,7 @@ impl Guild {
                     None
                 }
             })
-            .collect::<Vec<(&Member, String)>>()
-            .await;
+            .collect::<Vec<(&Member, String)>>();
 
         if sorted {
             members.sort_by(|a, b| closest_to_origin(substring, &a.1[..], &b.1[..]));
@@ -1960,14 +1964,17 @@ impl Guild {
     /// **Note**: This will only search members that are cached. If you want to
     /// search all members in the guild via the Http API, use
     /// [`Self::search_members`].
-    pub async fn members_nick_containing(
+    #[must_use]
+    pub fn members_nick_containing(
         &self,
         substring: &str,
         case_sensitive: bool,
         sorted: bool,
     ) -> Vec<(&Member, String)> {
-        let mut members = futures::stream::iter(self.members.values())
-            .filter_map(|member| async move {
+        let mut members = self
+            .members
+            .values()
+            .filter_map(|member| {
                 let nick = match member.nick {
                     Some(ref nick) => nick.to_string(),
                     None => member.user.name.to_string(),
@@ -1981,8 +1988,7 @@ impl Guild {
                     None
                 }
             })
-            .collect::<Vec<(&Member, String)>>()
-            .await;
+            .collect::<Vec<(&Member, String)>>();
 
         if sorted {
             members.sort_by(|a, b| closest_to_origin(substring, &a.1[..], &b.1[..]));
