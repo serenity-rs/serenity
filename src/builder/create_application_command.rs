@@ -35,9 +35,10 @@ impl CreateApplicationCommandOption {
     /// Specifies a localized name of the option.
     ///
     /// ```rust
-    /// # CreateApplicationCommandOption::default()
+    /// # serenity::builder::CreateApplicationCommandOption::default()
     /// .name("age")
     /// .name_localized("zh-CN", "岁数")
+    /// # ;
     /// ```
     pub fn name_localized<D: ToString, E: ToString>(&mut self, locale: E, name: D) -> &mut Self {
         self.0
@@ -60,9 +61,10 @@ impl CreateApplicationCommandOption {
     /// Specifies a localized description of the option.
     ///
     /// ```rust
-    /// # CreateApplicationCommandOption::default()
+    /// # serenity::builder::CreateApplicationCommandOption::default()
     /// .description("Wish a friend a happy birthday")
     /// .description_localized("zh-CN", "祝你朋友生日快乐")
+    /// # ;
     /// ```
     pub fn description_localized<D: ToString, E: ToString>(
         &mut self,
@@ -291,10 +293,11 @@ impl CreateApplicationCommand {
     /// Specifies a localized name of the application command.
     ///
     /// ```rust
-    /// # CreateApplicationCommand::default()
+    /// # serenity::builder::CreateApplicationCommand::default()
     /// .name("birthday")
     /// .name_localized("zh-CN", "生日")
     /// .name_localized("el", "γενέθλια")
+    /// # ;
     /// ```
     pub fn name_localized<D: ToString, E: ToString>(&mut self, locale: E, name: D) -> &mut Self {
         self.0
@@ -348,9 +351,10 @@ impl CreateApplicationCommand {
     /// Specifies a localized description of the application command.
     ///
     /// ```rust
-    /// # CreateApplicationCommand::default()
+    /// # serenity::builder::CreateApplicationCommand::default()
     /// .description("Wish a friend a happy birthday")
     /// .description_localized("zh-CN", "祝你朋友生日快乐")
+    /// # ;
     /// ```
     pub fn description_localized<D: ToString, E: ToString>(
         &mut self,
