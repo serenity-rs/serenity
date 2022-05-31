@@ -1,5 +1,4 @@
 use std::collections::HashMap;
-use std::convert::identity;
 
 use serde::de::Error as DeError;
 use serde::{Deserialize, Deserializer};
@@ -684,14 +683,15 @@ macro_rules! generate_doc {
 }
 
 macro_rules! impl_as_ty {
-    ($($name:ident, $variant:ident, $type:ty, $value_op:expr;)*) => {
+    ($($name:ident, $variant:ident, $type:ty $(, $transform:expr)*;)*) => {
         $(
             generate_doc! {
                 #[generate_doc($variant, $type)]
                 #[must_use]
                 pub fn $name(&self) -> Option<$type> {
                     if let CommandDataOptionValue::$variant(value) = self {
-                        Some($value_op(value))
+                        $(let value = $transform(value);)*
+                        Some(value)
                     } else {
                         None
                     }
@@ -708,13 +708,13 @@ fn deref<T: Copy>(v: &T) -> T {
 
 impl CommandDataOptionValue {
     impl_as_ty!(
+        as_role, Role, &Role;
+        as_string, String, &str;
         as_number, Number, f64, deref;
-        as_role, Role, &Role, identity;
         as_integer, Integer, i64, deref;
         as_boolean, Boolean, bool, deref;
-        as_string, String, &str, identity;
-        as_channel, Channel, &PartialChannel, identity;
-        as_attachment, Attachment, &Attachment, identity;
+        as_channel, Channel, &PartialChannel;
+        as_attachment, Attachment, &Attachment;
     );
 
     generate_doc! {
