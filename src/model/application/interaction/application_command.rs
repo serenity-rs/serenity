@@ -677,8 +677,14 @@ pub enum CommandDataOptionValue {
 
 macro_rules! generate_doc {
     ($variant:ident, $type:ty) => {
-        concat!("If the value is `", stringify!($variant), "`, it returns the inner value as `", stringify!($type), "`.")
-    }
+        concat!(
+            "If the value is `",
+            stringify!($variant),
+            "`, it returns the inner value as `",
+            stringify!($type),
+            "`."
+        )
+    };
 }
 
 macro_rules! impl_as_ty {
@@ -723,7 +729,6 @@ impl CommandDataOptionValue {
             None
         }
     }
-
 }
 
 impl TargetId {
