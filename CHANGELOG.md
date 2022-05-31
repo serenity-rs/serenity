@@ -3,7 +3,7 @@
 All notable changes to this project will be documented in this file.
 This project mostly adheres to [Semantic Versioning][semver].
 
-## [0.11.2] - 2021-05-08
+## [0.11.2] - 2022-05-08
 
 Thanks to the following for their contributions:
 
@@ -56,7 +56,7 @@ Thanks to the following for their contributions:
 - [voice] Remove unused code related to the former voice functionality ([@nickelc]) [c:97ef906]
 - [examples] Remove unused `chrono` dependency in example 09 ([@acdenisSK]) [c:0450dde]
 
-## [0.11.1] - 2021-04-18
+## [0.11.1] - 2022-04-18
 
 This is a light release to fix compilation on https://docs.rs.
 
@@ -68,7 +68,7 @@ Thanks to the following for their contributions:
 
 - [misc] Manually specify list of features for docs.rs to build ([@acdenisSK]) [c:9f11a3f]
 
-## [0.11.0] - 2021-04-18
+## [0.11.0] - 2022-04-18
 
 Thanks to the following for their contributions:
 
@@ -344,7 +344,7 @@ Thanks to the following for their contributions:
 - [model] Remove invalid `GuildChannel::send_message` note ([@MathyouMB]) [c:73ff5ba]
 - [examples] Remove outdated reference to `kankyo::load()` in example 06 ([@ben-brook]) [c:db101fd]
 
-## [0.10.10] - 2021-01-22
+## [0.10.10] - 2022-01-22
 
 Thanks to the following for their contributions:
 
