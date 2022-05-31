@@ -1,4 +1,5 @@
 use std::collections::HashMap;
+use std::convert::identity;
 
 use serde::de::Error as DeError;
 use serde::{Deserialize, Deserializer};
@@ -673,6 +674,58 @@ pub enum CommandDataOptionValue {
     Role(Role),
     Number(f64),
     Attachment(Attachment),
+}
+
+macro_rules! generate_doc {
+    (#[generate_doc($variant:ident, $type:ty)] $it:item) => {
+        #[doc=concat!("If the value is `", stringify!($variant), "`, it returns the inner value as `", stringify!($type), "`.")]
+        $it
+    };
+}
+
+macro_rules! impl_as_ty {
+    ($($name:ident, $variant:ident, $type:ty, $value_op:expr;)*) => {
+        $(
+            generate_doc!{
+                #[generate_doc($variant, $type)]
+                pub fn $name(&self) -> Option<$type> {
+                    if let CommandDataOptionValue::$variant(value) = self {
+                        Some($value_op(value))
+                    } else {
+                        None
+                    }
+                }
+            }
+        )*
+    };
+}
+
+#[inline(always)]
+fn deref<T: Copy>(v: &T) -> T {
+    *v
+}
+
+impl CommandDataOptionValue {
+    impl_as_ty!(
+        as_number, Number, f64, deref;
+        as_role, Role, &Role, identity;
+        as_integer, Integer, i64, deref;
+        as_boolean, Boolean, bool, deref;
+        as_string, String, &str, identity;
+        as_channel, Channel, &PartialChannel, identity;
+        as_attachment, Attachment, &Attachment, identity;
+    );
+
+    generate_doc! {
+        #[generate_doc(User, (&User, Option<PartialMember>))]
+        pub fn as_user(&self) -> Option<(&User, &Option<PartialMember>)> {
+            if let CommandDataOptionValue::User(user, member) = self {
+                Some((user, member))
+            } else {
+                None
+            }
+        }
+    }
 }
 
 impl TargetId {
