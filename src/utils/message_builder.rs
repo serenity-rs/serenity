@@ -1,4 +1,4 @@
-use std::fmt;
+use std::fmt::{self as fmt, Write};
 use std::ops::Add;
 
 use crate::model::guild::Emoji;
@@ -938,8 +938,7 @@ impl EmbedMessageBuilding for MessageBuilder {
         let name = name.into().to_string();
         let url = url.into().to_string();
 
-        self.0.push_str(&format!("[{}]({})", name, url));
-        // error cannot be returned, ignoring instead
+        write!(self.0, "[{}]({})", name, url).unwrap();
 
         self
     }
