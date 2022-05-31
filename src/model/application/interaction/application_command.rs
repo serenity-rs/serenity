@@ -688,6 +688,7 @@ macro_rules! impl_as_ty {
         $(
             generate_doc! {
                 #[generate_doc($variant, $type)]
+                #[must_use]
                 pub fn $name(&self) -> Option<$type> {
                     if let CommandDataOptionValue::$variant(value) = self {
                         Some($value_op(value))
@@ -718,6 +719,7 @@ impl CommandDataOptionValue {
 
     generate_doc! {
         #[generate_doc(User, (&User, Option<PartialMember>))]
+        #[must_use]
         pub fn as_user(&self) -> Option<(&User, &Option<PartialMember>)> {
             if let CommandDataOptionValue::User(user, member) = self {
                 Some((user, member))
