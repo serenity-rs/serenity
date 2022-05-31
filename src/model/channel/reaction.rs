@@ -195,10 +195,6 @@ impl Reaction {
     ///
     /// Requires the [Read Message History] permission.
     ///
-    /// **Note**: This will send a request to the REST API. Prefer maintaining
-    /// your own message cache or otherwise having the message available if
-    /// possible.
-    ///
     /// # Errors
     ///
     /// Returns [`Error::Http`] if the current user lacks permission to
@@ -206,8 +202,8 @@ impl Reaction {
     ///
     /// [Read Message History]: Permissions::READ_MESSAGE_HISTORY
     #[inline]
-    pub async fn message(&self, http: impl AsRef<Http>) -> Result<Message> {
-        self.channel_id.message(&http, self.message_id).await
+    pub async fn message(&self, cache_http: impl CacheHttp) -> Result<Message> {
+        self.channel_id.message(&cache_http, self.message_id).await
     }
 
     /// Retrieves the user that made the reaction.
