@@ -686,7 +686,7 @@ macro_rules! generate_doc {
 macro_rules! impl_as_ty {
     ($($name:ident, $variant:ident, $type:ty, $value_op:expr;)*) => {
         $(
-            generate_doc!{
+            generate_doc! {
                 #[generate_doc($variant, $type)]
                 pub fn $name(&self) -> Option<$type> {
                     if let CommandDataOptionValue::$variant(value) = self {
