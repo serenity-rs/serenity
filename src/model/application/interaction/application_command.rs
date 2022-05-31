@@ -676,25 +676,22 @@ pub enum CommandDataOptionValue {
 }
 
 macro_rules! generate_doc {
-    (#[generate_doc($variant:ident, $type:ty)] $it:item) => {
-        #[doc=concat!("If the value is `", stringify!($variant), "`, it returns the inner value as `", stringify!($type), "`.")]
-        $it
-    };
+    ($variant:ident, $type:ty) => {
+        concat!("If the value is `", stringify!($variant), "`, it returns the inner value as `", stringify!($type), "`.")
+    }
 }
 
 macro_rules! impl_as_ty {
-    ($($name:ident, $variant:ident, $type:ty $(, $transform:expr)*;)*) => {
+    ($($name:ident, $variant:ident, $type:ty $(=> $transform:path)?;)*) => {
         $(
-            generate_doc! {
-                #[generate_doc($variant, $type)]
-                #[must_use]
-                pub fn $name(&self) -> Option<$type> {
-                    if let CommandDataOptionValue::$variant(value) = self {
-                        $(let value = $transform(value);)*
-                        Some(value)
-                    } else {
-                        None
-                    }
+            #[must_use]
+            #[doc=generate_doc!($variant, $type)]
+            pub fn $name(&self) -> Option<$type> {
+                if let CommandDataOptionValue::$variant(value) = self {
+                    $(let value = $transform(value);)*
+                    Some(value)
+                } else {
+                    None
                 }
             }
         )*
@@ -710,24 +707,23 @@ impl CommandDataOptionValue {
     impl_as_ty!(
         as_role, Role, &Role;
         as_string, String, &str;
-        as_number, Number, f64, deref;
-        as_integer, Integer, i64, deref;
-        as_boolean, Boolean, bool, deref;
+        as_number, Number, f64 => deref;
+        as_integer, Integer, i64 => deref;
+        as_boolean, Boolean, bool => deref;
         as_channel, Channel, &PartialChannel;
         as_attachment, Attachment, &Attachment;
     );
 
-    generate_doc! {
-        #[generate_doc(User, (&User, Option<PartialMember>))]
-        #[must_use]
-        pub fn as_user(&self) -> Option<(&User, &Option<PartialMember>)> {
-            if let CommandDataOptionValue::User(user, member) = self {
-                Some((user, member))
-            } else {
-                None
-            }
+    #[must_use]
+    #[doc=generate_doc!(User, (&User, Option<PartialMember>))]
+    pub fn as_user(&self) -> Option<(&User, &Option<PartialMember>)> {
+        if let CommandDataOptionValue::User(user, member) = self {
+            Some((user, member))
+        } else {
+            None
         }
     }
+
 }
 
 impl TargetId {
