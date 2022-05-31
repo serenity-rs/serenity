@@ -701,7 +701,7 @@ macro_rules! impl_as_ty {
     };
 }
 
-#[inline(always)]
+#[inline]
 fn deref<T: Copy>(v: &T) -> T {
     *v
 }
