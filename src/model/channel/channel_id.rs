@@ -438,6 +438,9 @@ impl ChannelId {
 
     /// Gets a message from the channel.
     ///
+    /// If the cache feature is enabled the cache will be checked
+    /// first. If not found it will resort to an http request.
+    ///
     /// Requires the [Read Message History] permission.
     ///
     /// # Errors
@@ -448,10 +451,19 @@ impl ChannelId {
     #[inline]
     pub async fn message(
         self,
-        http: impl AsRef<Http>,
+        cache_http: impl CacheHttp,
         message_id: impl Into<MessageId>,
     ) -> Result<Message> {
-        http.as_ref().get_message(self.0, message_id.into().0).await
+        let message_id = message_id.into();
+
+        #[cfg(feature = "cache")]
+        if let Some(cache) = cache_http.cache() {
+            if let Some(message) = cache.message(self, message_id) {
+                return Ok(message);
+            }
+        }
+
+        cache_http.http().get_message(self.0, message_id.0).await
     }
 
     /// Gets messages from the channel.
