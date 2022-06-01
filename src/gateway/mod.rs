@@ -150,7 +150,7 @@ impl fmt::Display for ConnectionStage {
 #[non_exhaustive]
 pub enum InterMessage {
     #[cfg(feature = "client")]
-    Client(Box<ShardClientMessage>),
+    Client(ShardClientMessage),
     Json(Value),
 }
 

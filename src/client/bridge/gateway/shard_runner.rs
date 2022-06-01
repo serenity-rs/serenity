@@ -369,120 +369,113 @@ impl ShardRunner {
     #[instrument(skip(self))]
     async fn handle_rx_value(&mut self, value: InterMessage) -> bool {
         match value {
-            InterMessage::Client(value) => match *value {
-                ShardClientMessage::Manager(ShardManagerMessage::Restart(id)) => {
-                    self.checked_shutdown(id, 4000).await
-                },
-                ShardClientMessage::Manager(ShardManagerMessage::Shutdown(id, code)) => {
-                    self.checked_shutdown(id, code).await
-                },
-                ShardClientMessage::Manager(ShardManagerMessage::ShutdownAll) => {
-                    // This variant should never be received.
-                    warn!("[ShardRunner {:?}] Received a ShutdownAll?", self.shard.shard_info(),);
+            InterMessage::Client(value) => match value {
+                ShardClientMessage::Manager(msg) => match msg {
+                    ShardManagerMessage::Restart(id) => self.checked_shutdown(id, 4000).await,
+                    ShardManagerMessage::Shutdown(id, code) => {
+                        self.checked_shutdown(id, code).await
+                    },
+                    ShardManagerMessage::ShutdownAll => {
+                        // This variant should never be received.
+                        warn!(
+                            "[ShardRunner {:?}] Received a ShutdownAll?",
+                            self.shard.shard_info(),
+                        );
 
-                    true
-                },
-                ShardClientMessage::Manager(
+                        true
+                    },
                     ShardManagerMessage::ShardUpdate {
                         ..
                     }
                     | ShardManagerMessage::ShutdownInitiated
-                    | ShardManagerMessage::ShutdownFinished(_),
-                ) => {
-                    // nb: not sent here
-
-                    true
-                },
-                ShardClientMessage::Manager(
+                    | ShardManagerMessage::ShutdownFinished(_) => {
+                        // nb: not sent here
+                        true
+                    },
                     ShardManagerMessage::ShardDisallowedGatewayIntents
                     | ShardManagerMessage::ShardInvalidAuthentication
-                    | ShardManagerMessage::ShardInvalidGatewayIntents,
-                ) => {
-                    // These variants should never be received.
-                    warn!("[ShardRunner {:?}] Received a ShardError?", self.shard.shard_info(),);
+                    | ShardManagerMessage::ShardInvalidGatewayIntents => {
+                        // These variants should never be received.
+                        warn!("[ShardRunner {:?}] Received a ShardError?", self.shard.shard_info(),);
 
-                    true
+                        true
+                    },
                 },
-                ShardClientMessage::Runner(ShardRunnerMessage::ChunkGuild {
-                    guild_id,
-                    limit,
-                    filter,
-                    nonce,
-                }) => {
-                    self.shard.chunk_guild(guild_id, limit, filter, nonce.as_deref()).await.is_ok()
-                },
-                ShardClientMessage::Runner(ShardRunnerMessage::Close(code, reason)) => {
-                    let reason = reason.unwrap_or_default();
-                    let close = CloseFrame {
-                        code: code.into(),
-                        reason: Cow::from(reason),
-                    };
-                    self.shard.client.close(Some(close)).await.is_ok()
-                },
-                ShardClientMessage::Runner(ShardRunnerMessage::Message(msg)) => {
-                    self.shard.client.send(msg).await.is_ok()
-                },
-                ShardClientMessage::Runner(ShardRunnerMessage::SetActivity(activity)) => {
-                    // To avoid a clone of `activity`, we do a little bit of
-                    // trickery here:
-                    //
-                    // First, we obtain a reference to the current presence of
-                    // the shard, and create a new presence tuple of the new
-                    // activity we received over the channel as well as the
-                    // online status that the shard already had.
-                    //
-                    // We then (attempt to) send the websocket message with the
-                    // status update, expressively returning:
-                    //
-                    // - whether the message successfully sent
-                    // - the original activity we received over the channel
-                    self.shard.set_activity(activity);
+                ShardClientMessage::Runner(msg) => match *msg {
+                    ShardRunnerMessage::ChunkGuild {
+                        guild_id,
+                        limit,
+                        filter,
+                        nonce,
+                    } => self
+                        .shard
+                        .chunk_guild(guild_id, limit, filter, nonce.as_deref())
+                        .await
+                        .is_ok(),
+                    ShardRunnerMessage::Close(code, reason) => {
+                        let reason = reason.unwrap_or_default();
+                        let close = CloseFrame {
+                            code: code.into(),
+                            reason: Cow::from(reason),
+                        };
+                        self.shard.client.close(Some(close)).await.is_ok()
+                    },
+                    ShardRunnerMessage::Message(msg) => self.shard.client.send(msg).await.is_ok(),
+                    ShardRunnerMessage::SetActivity(activity) => {
+                        // To avoid a clone of `activity`, we do a little bit of
+                        // trickery here:
+                        //
+                        // First, we obtain a reference to the current presence of
+                        // the shard, and create a new presence tuple of the new
+                        // activity we received over the channel as well as the
+                        // online status that the shard already had.
+                        //
+                        // We then (attempt to) send the websocket message with the
+                        // status update, expressively returning:
+                        //
+                        // - whether the message successfully sent
+                        // - the original activity we received over the channel
+                        self.shard.set_activity(activity);
+                        self.shard.update_presence().await.is_ok()
+                    },
+                    ShardRunnerMessage::SetPresence(status, activity) => {
+                        self.shard.set_presence(status, activity);
+                        self.shard.update_presence().await.is_ok()
+                    },
+                    ShardRunnerMessage::SetStatus(status) => {
+                        self.shard.set_status(status);
+                        self.shard.update_presence().await.is_ok()
+                    },
+                    #[cfg(feature = "collector")]
+                    ShardRunnerMessage::SetEventFilter(collector) => {
+                        self.event_filters.push(collector);
 
-                    self.shard.update_presence().await.is_ok()
-                },
-                ShardClientMessage::Runner(ShardRunnerMessage::SetPresence(status, activity)) => {
-                    self.shard.set_presence(status, activity);
+                        true
+                    },
+                    #[cfg(feature = "collector")]
+                    ShardRunnerMessage::SetMessageFilter(collector) => {
+                        self.message_filters.push(collector);
 
-                    self.shard.update_presence().await.is_ok()
-                },
-                ShardClientMessage::Runner(ShardRunnerMessage::SetStatus(status)) => {
-                    self.shard.set_status(status);
+                        true
+                    },
+                    #[cfg(feature = "collector")]
+                    ShardRunnerMessage::SetReactionFilter(collector) => {
+                        self.reaction_filters.push(collector);
 
-                    self.shard.update_presence().await.is_ok()
-                },
-                #[cfg(feature = "collector")]
-                ShardClientMessage::Runner(ShardRunnerMessage::SetEventFilter(collector)) => {
-                    self.event_filters.push(collector);
+                        true
+                    },
+                    #[cfg(feature = "collector")]
+                    ShardRunnerMessage::SetComponentInteractionFilter(collector) => {
+                        self.component_interaction_filters.push(collector);
 
-                    true
-                },
-                #[cfg(feature = "collector")]
-                ShardClientMessage::Runner(ShardRunnerMessage::SetMessageFilter(collector)) => {
-                    self.message_filters.push(collector);
+                        true
+                    },
+                    #[cfg(feature = "collector")]
+                    ShardRunnerMessage::SetModalInteractionFilter(collector) => {
+                        self.modal_interaction_filters.push(collector);
 
-                    true
-                },
-                #[cfg(feature = "collector")]
-                ShardClientMessage::Runner(ShardRunnerMessage::SetReactionFilter(collector)) => {
-                    self.reaction_filters.push(collector);
-
-                    true
-                },
-                #[cfg(feature = "collector")]
-                ShardClientMessage::Runner(ShardRunnerMessage::SetComponentInteractionFilter(
-                    collector,
-                )) => {
-                    self.component_interaction_filters.push(collector);
-
-                    true
-                },
-                #[cfg(feature = "collector")]
-                ShardClientMessage::Runner(ShardRunnerMessage::SetModalInteractionFilter(
-                    collector,
-                )) => {
-                    self.modal_interaction_filters.push(collector);
-
-                    true
+                        true
+                    },
                 },
             },
             InterMessage::Json(value) => {
