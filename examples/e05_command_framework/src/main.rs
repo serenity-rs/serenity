@@ -415,17 +415,22 @@ async fn some_long_command(ctx: &Context, msg: &Message, args: Args) -> CommandR
 async fn about_role(ctx: &Context, msg: &Message, args: Args) -> CommandResult {
     let potential_role_name = args.rest();
 
-    if let Some(guild) = msg.guild(&ctx.cache) {
-        // `role_by_name()` allows us to attempt attaining a reference to a role
-        // via its name.
-        if let Some(role) = guild.role_by_name(potential_role_name) {
-            if let Err(why) = msg.channel_id.say(&ctx.http, &format!("Role-ID: {}", role.id)).await
-            {
-                println!("Error sending message: {:?}", why);
-            }
+    // We avoid cloning anything out of the cache
+    // so have to keep `GuildRef` in it's own scope
+    let to_send = {
+        let guild = msg.guild(&ctx.cache);
+        guild
+            .as_ref()
+            .and_then(|g| g.role_by_name(potential_role_name))
+            .map(|g| format!("Role-ID: {}", g))
+    };
 
-            return Ok(());
+    if let Some(to_send) = to_send {
+        if let Err(why) = msg.channel_id.say(&ctx.http, to_send).await {
+            println!("Error sending message: {:?}", why);
         }
+
+        return Ok(());
     }
 
     msg.channel_id

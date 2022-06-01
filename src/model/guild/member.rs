@@ -205,12 +205,12 @@ impl Member {
     /// Determines the member's colour.
     #[cfg(feature = "cache")]
     pub fn colour(&self, cache: impl AsRef<Cache>) -> Option<Colour> {
-        let guild_roles = cache.as_ref().guild_field(self.guild_id, |g| g.roles.clone())?;
+        let guild = cache.as_ref().guild(self.guild_id)?;
 
         let mut roles = self
             .roles
             .iter()
-            .filter_map(|role_id| guild_roles.get(role_id))
+            .filter_map(|role_id| guild.roles.get(role_id))
             .collect::<Vec<&Role>>();
 
         roles.sort_by_key(|&b| Reverse(b));
@@ -225,7 +225,7 @@ impl Member {
     /// one returns [`None`])
     #[cfg(feature = "cache")]
     pub fn default_channel(&self, cache: impl AsRef<Cache>) -> Option<GuildChannel> {
-        let guild = self.guild_id.to_guild_cached(cache)?;
+        let guild = self.guild_id.to_guild_cached(&cache)?;
 
         let member = guild.members.get(&self.user.id)?;
 
@@ -343,12 +343,12 @@ impl Member {
     /// role with the lowest ID is the highest.
     #[cfg(feature = "cache")]
     pub fn highest_role_info(&self, cache: impl AsRef<Cache>) -> Option<(RoleId, i64)> {
-        let guild_roles = cache.as_ref().guild_field(self.guild_id, |g| g.roles.clone())?;
+        let guild = cache.as_ref().guild(self.guild_id)?;
 
         let mut highest = None;
 
         for role_id in &self.roles {
-            if let Some(role) = guild_roles.get(role_id) {
+            if let Some(role) = guild.roles.get(role_id) {
                 // Skip this role if this role in iteration has:
                 //
                 // - a position less than the recorded highest
@@ -501,12 +501,8 @@ impl Member {
     /// found.
     #[cfg(feature = "cache")]
     pub fn permissions(&self, cache: impl AsRef<Cache>) -> Result<Permissions> {
-        let perms_opt = cache
-            .as_ref()
-            .guild_field(self.guild_id, |guild| guild._member_permission_from_member(self));
-
-        match perms_opt {
-            Some(perms) => Ok(perms),
+        match cache.as_ref().guild(self.guild_id) {
+            Some(guild) => Ok(guild._member_permission_from_member(self)),
             None => Err(From::from(ModelError::GuildNotFound)),
         }
     }
@@ -589,10 +585,11 @@ impl Member {
         Some(
             cache
                 .as_ref()
-                .guild_field(self.guild_id, |g| g.roles.clone())?
-                .into_iter()
-                .map(|(_, v)| v)
-                .filter(|role| self.roles.contains(&role.id))
+                .guild(self.guild_id)?
+                .roles
+                .iter()
+                .filter(|(id, _)| self.roles.contains(id))
+                .map(|(_, v)| v.clone())
                 .collect(),
         )
     }
