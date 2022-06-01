@@ -1418,9 +1418,13 @@
 <span id="1413">1413</span>
 <span id="1414">1414</span>
 <span id="1415">1415</span>
+<span id="1416">1416</span>
+<span id="1417">1417</span>
 </pre><pre class="rust"><code><span class="doccomment">//! User information-related models.</span>
 
 <span class="kw">use</span> <span class="ident">std::fmt</span>;
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
+<span class="kw">use</span> <span class="ident">std::fmt::Write</span>;
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
 <span class="kw">use</span> <span class="ident">futures::future</span>::{<span class="ident">BoxFuture</span>, <span class="ident">FutureExt</span>};
@@ -2718,7 +2722,7 @@
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">tag</span> <span class="op">=</span> <span class="ident">String::with_capacity</span>(<span class="number">37</span>);
     <span class="ident">tag</span>.<span class="ident">push_str</span>(<span class="ident">name</span>);
     <span class="ident">tag</span>.<span class="ident">push</span>(<span class="string">&#39;#&#39;</span>);
-    <span class="ident">tag</span>.<span class="ident">push_str</span>(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;{:04}&quot;</span>, <span class="ident">discriminator</span>));
+    <span class="macro">write!</span>(<span class="ident">tag</span>, <span class="string">&quot;{:04}&quot;</span>, <span class="ident">discriminator</span>).<span class="ident">unwrap</span>();
 
     <span class="ident">tag</span>
 }

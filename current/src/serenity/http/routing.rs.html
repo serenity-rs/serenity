@@ -2896,11 +2896,8 @@
 <span id="2891">2891</span>
 <span id="2892">2892</span>
 <span id="2893">2893</span>
-<span id="2894">2894</span>
-<span id="2895">2895</span>
-<span id="2896">2896</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::borrow::Cow</span>;
-<span class="kw">use</span> <span class="ident">std::fmt::Display</span>;
+<span class="kw">use</span> <span class="ident">std::fmt</span>::{<span class="ident">Display</span>, <span class="ident">Write</span>};
 
 <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::LightMethod</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::constants</span>;
@@ -3435,7 +3432,7 @@
         );
 
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">after</span>) <span class="op">=</span> <span class="ident">after</span> {
-            <span class="ident">url</span>.<span class="ident">push_str</span>(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;&amp;after={}&quot;</span>, <span class="ident">after</span>));
+            <span class="macro">write!</span>(<span class="ident">url</span>, <span class="string">&quot;&amp;after={}&quot;</span>, <span class="ident">after</span>).<span class="ident">unwrap</span>();
         }
 
         <span class="ident">url</span>
@@ -3510,11 +3507,11 @@
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">s</span> <span class="op">=</span> <span class="macro">api!</span>(<span class="string">&quot;/channels/{}/threads/archived/public&quot;</span>, <span class="ident">channel_id</span>);
 
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">id</span>) <span class="op">=</span> <span class="ident">before</span> {
-            <span class="ident">s</span>.<span class="ident">push_str</span>(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;&amp;before={}&quot;</span>, <span class="ident">id</span>));
+            <span class="macro">write!</span>(<span class="ident">s</span>, <span class="string">&quot;&amp;before={}&quot;</span>, <span class="ident">id</span>).<span class="ident">unwrap</span>();
         }
 
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">limit</span>) <span class="op">=</span> <span class="ident">limit</span> {
-            <span class="ident">s</span>.<span class="ident">push_str</span>(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;&amp;limit={}&quot;</span>, <span class="ident">limit</span>));
+            <span class="macro">write!</span>(<span class="ident">s</span>, <span class="string">&quot;&amp;limit={}&quot;</span>, <span class="ident">limit</span>).<span class="ident">unwrap</span>();
         }
 
         <span class="ident">s</span>
@@ -3529,11 +3526,11 @@
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">s</span> <span class="op">=</span> <span class="macro">api!</span>(<span class="string">&quot;/channels/{}/threads/archived/private&quot;</span>, <span class="ident">channel_id</span>);
 
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">id</span>) <span class="op">=</span> <span class="ident">before</span> {
-            <span class="ident">s</span>.<span class="ident">push_str</span>(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;&amp;before={}&quot;</span>, <span class="ident">id</span>));
+            <span class="macro">write!</span>(<span class="ident">s</span>, <span class="string">&quot;&amp;before={}&quot;</span>, <span class="ident">id</span>).<span class="ident">unwrap</span>();
         }
 
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">limit</span>) <span class="op">=</span> <span class="ident">limit</span> {
-            <span class="ident">s</span>.<span class="ident">push_str</span>(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;&amp;limit={}&quot;</span>, <span class="ident">limit</span>));
+            <span class="macro">write!</span>(<span class="ident">s</span>, <span class="string">&quot;&amp;limit={}&quot;</span>, <span class="ident">limit</span>).<span class="ident">unwrap</span>();
         }
 
         <span class="ident">s</span>
@@ -3548,11 +3545,11 @@
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">s</span> <span class="op">=</span> <span class="macro">api!</span>(<span class="string">&quot;/channels/{}/users/@me/threads/archived/private&quot;</span>, <span class="ident">channel_id</span>);
 
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">id</span>) <span class="op">=</span> <span class="ident">before</span> {
-            <span class="ident">s</span>.<span class="ident">push_str</span>(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;&amp;before={}&quot;</span>, <span class="ident">id</span>));
+            <span class="macro">write!</span>(<span class="ident">s</span>, <span class="string">&quot;&amp;before={}&quot;</span>, <span class="ident">id</span>).<span class="ident">unwrap</span>();
         }
 
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">limit</span>) <span class="op">=</span> <span class="ident">limit</span> {
-            <span class="ident">s</span>.<span class="ident">push_str</span>(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;&amp;limit={}&quot;</span>, <span class="ident">limit</span>));
+            <span class="macro">write!</span>(<span class="ident">s</span>, <span class="string">&quot;&amp;limit={}&quot;</span>, <span class="ident">limit</span>).<span class="ident">unwrap</span>();
         }
 
         <span class="ident">s</span>
@@ -3589,19 +3586,19 @@
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">s</span> <span class="op">=</span> <span class="macro">api!</span>(<span class="string">&quot;/guilds/{}/audit-logs?&quot;</span>, <span class="ident">guild_id</span>);
 
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">action_type</span>) <span class="op">=</span> <span class="ident">action_type</span> {
-            <span class="ident">s</span>.<span class="ident">push_str</span>(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;&amp;action_type={}&quot;</span>, <span class="ident">action_type</span>));
+            <span class="macro">write!</span>(<span class="ident">s</span>, <span class="string">&quot;&amp;action_type={}&quot;</span>, <span class="ident">action_type</span>).<span class="ident">unwrap</span>();
         }
 
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">before</span>) <span class="op">=</span> <span class="ident">before</span> {
-            <span class="ident">s</span>.<span class="ident">push_str</span>(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;&amp;before={}&quot;</span>, <span class="ident">before</span>));
+            <span class="macro">write!</span>(<span class="ident">s</span>, <span class="string">&quot;&amp;before={}&quot;</span>, <span class="ident">before</span>).<span class="ident">unwrap</span>();
         }
 
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">limit</span>) <span class="op">=</span> <span class="ident">limit</span> {
-            <span class="ident">s</span>.<span class="ident">push_str</span>(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;&amp;limit={}&quot;</span>, <span class="ident">limit</span>));
+            <span class="macro">write!</span>(<span class="ident">s</span>, <span class="string">&quot;&amp;limit={}&quot;</span>, <span class="ident">limit</span>).<span class="ident">unwrap</span>();
         }
 
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">user_id</span>) <span class="op">=</span> <span class="ident">user_id</span> {
-            <span class="ident">s</span>.<span class="ident">push_str</span>(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;&amp;user_id={}&quot;</span>, <span class="ident">user_id</span>));
+            <span class="macro">write!</span>(<span class="ident">s</span>, <span class="string">&quot;&amp;user_id={}&quot;</span>, <span class="ident">user_id</span>).<span class="ident">unwrap</span>();
         }
 
         <span class="ident">s</span>
@@ -3691,11 +3688,8 @@
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">guild_members_search</span>(<span class="ident">guild_id</span>: <span class="ident">u64</span>, <span class="ident">query</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">limit</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span>) -&gt; <span class="ident">String</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">s</span> <span class="op">=</span> <span class="macro">api!</span>(<span class="string">&quot;/guilds/{}/members/search?&quot;</span>, <span class="ident">guild_id</span>);
 
-        <span class="ident">s</span>.<span class="ident">push_str</span>(<span class="kw-2">&amp;</span><span class="macro">format!</span>(
-            <span class="string">&quot;&amp;query={}&amp;limit={}&quot;</span>,
-            <span class="ident">query</span>,
-            <span class="ident">limit</span>.<span class="ident">unwrap_or</span>(<span class="ident">constants::MEMBER_FETCH_LIMIT</span>)
-        ));
+        <span class="macro">write!</span>(<span class="ident">s</span>, <span class="string">&quot;&amp;query={}&amp;limit={}&quot;</span>, <span class="ident">query</span>, <span class="ident">limit</span>.<span class="ident">unwrap_or</span>(<span class="ident">constants::MEMBER_FETCH_LIMIT</span>))
+            .<span class="ident">unwrap</span>();
         <span class="ident">s</span>
     }
 
@@ -3704,10 +3698,10 @@
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">s</span> <span class="op">=</span> <span class="macro">api!</span>(<span class="string">&quot;/guilds/{}/members?&quot;</span>, <span class="ident">guild_id</span>);
 
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">after</span>) <span class="op">=</span> <span class="ident">after</span> {
-            <span class="ident">s</span>.<span class="ident">push_str</span>(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;&amp;after={}&quot;</span>, <span class="ident">after</span>));
+            <span class="macro">write!</span>(<span class="ident">s</span>, <span class="string">&quot;&amp;after={}&quot;</span>, <span class="ident">after</span>).<span class="ident">unwrap</span>();
         }
 
-        <span class="ident">s</span>.<span class="ident">push_str</span>(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;&amp;limit={}&quot;</span>, <span class="ident">limit</span>.<span class="ident">unwrap_or</span>(<span class="ident">constants::MEMBER_FETCH_LIMIT</span>)));
+        <span class="macro">write!</span>(<span class="ident">s</span>, <span class="string">&quot;&amp;limit={}&quot;</span>, <span class="ident">limit</span>.<span class="ident">unwrap_or</span>(<span class="ident">constants::MEMBER_FETCH_LIMIT</span>)).<span class="ident">unwrap</span>();
         <span class="ident">s</span>
     }
 
@@ -3749,7 +3743,7 @@
     ) -&gt; <span class="ident">String</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">s</span> <span class="op">=</span> <span class="macro">api!</span>(<span class="string">&quot;/guilds/{}/scheduled-events/{}&quot;</span>, <span class="ident">guild_id</span>, <span class="ident">event_id</span>);
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">b</span>) <span class="op">=</span> <span class="ident">with_user_count</span> {
-            <span class="ident">s</span>.<span class="ident">push_str</span>(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;?with_user_count={}&quot;</span>, <span class="ident">b</span>));
+            <span class="macro">write!</span>(<span class="ident">s</span>, <span class="string">&quot;?with_user_count={}&quot;</span>, <span class="ident">b</span>).<span class="ident">unwrap</span>();
         }
         <span class="ident">s</span>
     }
@@ -3758,7 +3752,7 @@
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">guild_scheduled_events</span>(<span class="ident">guild_id</span>: <span class="ident">u64</span>, <span class="ident">with_user_count</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span>) -&gt; <span class="ident">String</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">s</span> <span class="op">=</span> <span class="macro">api!</span>(<span class="string">&quot;/guilds/{}/scheduled-events&quot;</span>, <span class="ident">guild_id</span>);
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">b</span>) <span class="op">=</span> <span class="ident">with_user_count</span> {
-            <span class="ident">s</span>.<span class="ident">push_str</span>(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;?with_user_count={}&quot;</span>, <span class="ident">b</span>));
+            <span class="macro">write!</span>(<span class="ident">s</span>, <span class="string">&quot;?with_user_count={}&quot;</span>, <span class="ident">b</span>).<span class="ident">unwrap</span>();
         }
         <span class="ident">s</span>
     }
@@ -3775,19 +3769,19 @@
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">s</span> <span class="op">=</span> <span class="macro">api!</span>(<span class="string">&quot;/guilds/{}/scheduled-events/{}/users?&quot;</span>, <span class="ident">guild_id</span>, <span class="ident">event_id</span>);
 
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">limit</span>) <span class="op">=</span> <span class="ident">limit</span> {
-            <span class="ident">s</span>.<span class="ident">push_str</span>(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;&amp;limit={}&quot;</span>, <span class="ident">limit</span>));
+            <span class="macro">write!</span>(<span class="ident">s</span>, <span class="string">&quot;&amp;limit={}&quot;</span>, <span class="ident">limit</span>).<span class="ident">unwrap</span>();
         }
 
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">after</span>) <span class="op">=</span> <span class="ident">after</span> {
-            <span class="ident">s</span>.<span class="ident">push_str</span>(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;&amp;after={}&quot;</span>, <span class="ident">after</span>));
+            <span class="macro">write!</span>(<span class="ident">s</span>, <span class="string">&quot;&amp;after={}&quot;</span>, <span class="ident">after</span>).<span class="ident">unwrap</span>();
         }
 
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">before</span>) <span class="op">=</span> <span class="ident">before</span> {
-            <span class="ident">s</span>.<span class="ident">push_str</span>(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;&amp;before={}&quot;</span>, <span class="ident">before</span>));
+            <span class="macro">write!</span>(<span class="ident">s</span>, <span class="string">&quot;&amp;before={}&quot;</span>, <span class="ident">before</span>).<span class="ident">unwrap</span>();
         }
 
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">with_member</span>) <span class="op">=</span> <span class="ident">with_member</span> {
-            <span class="ident">s</span>.<span class="ident">push_str</span>(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;&amp;with_member={}&quot;</span>, <span class="ident">with_member</span>));
+            <span class="macro">write!</span>(<span class="ident">s</span>, <span class="string">&quot;&amp;with_member={}&quot;</span>, <span class="ident">with_member</span>).<span class="ident">unwrap</span>();
         }
 
         <span class="ident">s</span>
@@ -3932,15 +3926,15 @@
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">s</span> <span class="op">=</span> <span class="macro">api!</span>(<span class="string">&quot;/users/{}/guilds?&quot;</span>, <span class="ident">target</span>);
 
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">limit</span>) <span class="op">=</span> <span class="ident">limit</span> {
-            <span class="ident">s</span>.<span class="ident">push_str</span>(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;&amp;limit={}&quot;</span>, <span class="ident">limit</span>));
+            <span class="macro">write!</span>(<span class="ident">s</span>, <span class="string">&quot;&amp;limit={}&quot;</span>, <span class="ident">limit</span>).<span class="ident">unwrap</span>();
         }
 
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">after</span>) <span class="op">=</span> <span class="ident">after</span> {
-            <span class="ident">s</span>.<span class="ident">push_str</span>(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;&amp;after={}&quot;</span>, <span class="ident">after</span>));
+            <span class="macro">write!</span>(<span class="ident">s</span>, <span class="string">&quot;&amp;after={}&quot;</span>, <span class="ident">after</span>).<span class="ident">unwrap</span>();
         }
 
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">before</span>) <span class="op">=</span> <span class="ident">before</span> {
-            <span class="ident">s</span>.<span class="ident">push_str</span>(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;&amp;before={}&quot;</span>, <span class="ident">before</span>));
+            <span class="macro">write!</span>(<span class="ident">s</span>, <span class="string">&quot;&amp;before={}&quot;</span>, <span class="ident">before</span>).<span class="ident">unwrap</span>();
         }
 
         <span class="ident">s</span>
