@@ -1,6 +1,8 @@
 //! User information-related models.
 
 use std::fmt;
+#[cfg(feature = "model")]
+use std::fmt::Write;
 
 #[cfg(feature = "model")]
 use futures::future::{BoxFuture, FutureExt};
@@ -1298,7 +1300,7 @@ fn tag(name: &str, discriminator: u16) -> String {
     let mut tag = String::with_capacity(37);
     tag.push_str(name);
     tag.push('#');
-    tag.push_str(&format!("{:04}", discriminator));
+    write!(tag, "{:04}", discriminator).unwrap();
 
     tag
 }

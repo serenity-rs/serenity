@@ -1,5 +1,5 @@
 use std::borrow::Cow;
-use std::fmt::Display;
+use std::fmt::{Display, Write};
 
 use super::LightMethod;
 use crate::constants;
@@ -534,7 +534,7 @@ impl Route {
         );
 
         if let Some(after) = after {
-            url.push_str(&format!("&after={}", after));
+            write!(url, "&after={}", after).unwrap();
         }
 
         url
@@ -609,11 +609,11 @@ impl Route {
         let mut s = api!("/channels/{}/threads/archived/public", channel_id);
 
         if let Some(id) = before {
-            s.push_str(&format!("&before={}", id));
+            write!(s, "&before={}", id).unwrap();
         }
 
         if let Some(limit) = limit {
-            s.push_str(&format!("&limit={}", limit));
+            write!(s, "&limit={}", limit).unwrap();
         }
 
         s
@@ -628,11 +628,11 @@ impl Route {
         let mut s = api!("/channels/{}/threads/archived/private", channel_id);
 
         if let Some(id) = before {
-            s.push_str(&format!("&before={}", id));
+            write!(s, "&before={}", id).unwrap();
         }
 
         if let Some(limit) = limit {
-            s.push_str(&format!("&limit={}", limit));
+            write!(s, "&limit={}", limit).unwrap();
         }
 
         s
@@ -647,11 +647,11 @@ impl Route {
         let mut s = api!("/channels/{}/users/@me/threads/archived/private", channel_id);
 
         if let Some(id) = before {
-            s.push_str(&format!("&before={}", id));
+            write!(s, "&before={}", id).unwrap();
         }
 
         if let Some(limit) = limit {
-            s.push_str(&format!("&limit={}", limit));
+            write!(s, "&limit={}", limit).unwrap();
         }
 
         s
@@ -688,19 +688,19 @@ impl Route {
         let mut s = api!("/guilds/{}/audit-logs?", guild_id);
 
         if let Some(action_type) = action_type {
-            s.push_str(&format!("&action_type={}", action_type));
+            write!(s, "&action_type={}", action_type).unwrap();
         }
 
         if let Some(before) = before {
-            s.push_str(&format!("&before={}", before));
+            write!(s, "&before={}", before).unwrap();
         }
 
         if let Some(limit) = limit {
-            s.push_str(&format!("&limit={}", limit));
+            write!(s, "&limit={}", limit).unwrap();
         }
 
         if let Some(user_id) = user_id {
-            s.push_str(&format!("&user_id={}", user_id));
+            write!(s, "&user_id={}", user_id).unwrap();
         }
 
         s
@@ -790,11 +790,8 @@ impl Route {
     pub fn guild_members_search(guild_id: u64, query: &str, limit: Option<u64>) -> String {
         let mut s = api!("/guilds/{}/members/search?", guild_id);
 
-        s.push_str(&format!(
-            "&query={}&limit={}",
-            query,
-            limit.unwrap_or(constants::MEMBER_FETCH_LIMIT)
-        ));
+        write!(s, "&query={}&limit={}", query, limit.unwrap_or(constants::MEMBER_FETCH_LIMIT))
+            .unwrap();
         s
     }
 
@@ -803,10 +800,10 @@ impl Route {
         let mut s = api!("/guilds/{}/members?", guild_id);
 
         if let Some(after) = after {
-            s.push_str(&format!("&after={}", after));
+            write!(s, "&after={}", after).unwrap();
         }
 
-        s.push_str(&format!("&limit={}", limit.unwrap_or(constants::MEMBER_FETCH_LIMIT)));
+        write!(s, "&limit={}", limit.unwrap_or(constants::MEMBER_FETCH_LIMIT)).unwrap();
         s
     }
 
@@ -848,7 +845,7 @@ impl Route {
     ) -> String {
         let mut s = api!("/guilds/{}/scheduled-events/{}", guild_id, event_id);
         if let Some(b) = with_user_count {
-            s.push_str(&format!("?with_user_count={}", b));
+            write!(s, "?with_user_count={}", b).unwrap();
         }
         s
     }
@@ -857,7 +854,7 @@ impl Route {
     pub fn guild_scheduled_events(guild_id: u64, with_user_count: Option<bool>) -> String {
         let mut s = api!("/guilds/{}/scheduled-events", guild_id);
         if let Some(b) = with_user_count {
-            s.push_str(&format!("?with_user_count={}", b));
+            write!(s, "?with_user_count={}", b).unwrap();
         }
         s
     }
@@ -874,19 +871,19 @@ impl Route {
         let mut s = api!("/guilds/{}/scheduled-events/{}/users?", guild_id, event_id);
 
         if let Some(limit) = limit {
-            s.push_str(&format!("&limit={}", limit));
+            write!(s, "&limit={}", limit).unwrap();
         }
 
         if let Some(after) = after {
-            s.push_str(&format!("&after={}", after));
+            write!(s, "&after={}", after).unwrap();
         }
 
         if let Some(before) = before {
-            s.push_str(&format!("&before={}", before));
+            write!(s, "&before={}", before).unwrap();
         }
 
         if let Some(with_member) = with_member {
-            s.push_str(&format!("&with_member={}", with_member));
+            write!(s, "&with_member={}", with_member).unwrap();
         }
 
         s
@@ -1031,15 +1028,15 @@ impl Route {
         let mut s = api!("/users/{}/guilds?", target);
 
         if let Some(limit) = limit {
-            s.push_str(&format!("&limit={}", limit));
+            write!(s, "&limit={}", limit).unwrap();
         }
 
         if let Some(after) = after {
-            s.push_str(&format!("&after={}", after));
+            write!(s, "&after={}", after).unwrap();
         }
 
         if let Some(before) = before {
-            s.push_str(&format!("&before={}", before));
+            write!(s, "&before={}", before).unwrap();
         }
 
         s

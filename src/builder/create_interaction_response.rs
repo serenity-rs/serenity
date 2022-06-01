@@ -236,7 +236,7 @@ impl<'a> CreateInteractionResponseData<'a> {
 #[derive(Clone, Debug)]
 pub struct CreateAutocompleteResponse(pub HashMap<&'static str, Value>);
 
-impl<'a> Default for CreateAutocompleteResponse {
+impl Default for CreateAutocompleteResponse {
     fn default() -> CreateAutocompleteResponse {
         let mut map = HashMap::new();
         map.insert("choices", Value::Array(vec![]));

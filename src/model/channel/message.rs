@@ -2,6 +2,8 @@
 
 #[cfg(feature = "model")]
 use std::fmt::Display;
+#[cfg(all(feature = "cache", feature = "model"))]
+use std::fmt::Write;
 
 #[cfg(all(feature = "model", feature = "utils"))]
 use crate::builder::{CreateEmbed, EditMessage};
@@ -399,8 +401,7 @@ impl Message {
             at_distinct.push('@');
             at_distinct.push_str(&u.name);
             at_distinct.push('#');
-
-            at_distinct.push_str(&format!("{:04}", u.discriminator));
+            write!(at_distinct, "{:04}", u.discriminator).unwrap();
 
             let mut m = u.mention().to_string();
             // Check whether we're replacing a nickname mention or a normal mention.

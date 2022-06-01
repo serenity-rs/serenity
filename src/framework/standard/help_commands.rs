@@ -985,17 +985,18 @@ fn flatten_group_to_plain_string(
     let repeated_indent_str = help_options.indention_prefix.repeat(nest_level);
 
     if nest_level > 0 {
-        group_text.push_str(&format!("\n{}**{}**", repeated_indent_str, group.name));
+        write!(group_text, "\n{}**{}**", repeated_indent_str, group.name).unwrap();
     }
 
     if group.prefixes.is_empty() {
         group_text.push_str(": ");
     } else {
-        group_text.push_str(&format!(
+        write!(
+            group_text,
             " ({}: `{}`): ",
             help_options.group_prefix,
             group.prefixes.join("`, `"),
-        ));
+        ).unwrap();
     }
 
     let joined_commands = group.command_names.join(", ");
@@ -1268,7 +1269,7 @@ fn grouped_commands_to_plain_string(
     result.push('\n');
 
     for group in groups {
-        result.push_str(&format!("\n**{}**", &group.name));
+        write!(result, "\n**{}**", &group.name).unwrap();
 
         flatten_group_to_plain_string(&mut result, group, 0, help_options);
     }
@@ -1279,69 +1280,71 @@ fn grouped_commands_to_plain_string(
 /// Turns a single command into a [`String`] taking plain help format into account.
 #[cfg(all(feature = "cache", feature = "http"))]
 fn single_command_to_plain_string(help_options: &HelpOptions, command: &Command<'_>) -> String {
-    let mut result = String::default();
+    let mut result = String::new();
 
-    result.push_str(&format!("__**{}**__\n", command.name));
+    writeln!(result, "__**{}**__", command.name).unwrap();
 
     if !command.aliases.is_empty() {
-        result.push_str(&format!(
-            "**{}**: `{}`",
-            help_options.aliases_label,
-            command.aliases.join("`, `")
-        ));
+        write!(result, "**{}**: `{}`", help_options.aliases_label, command.aliases.join("`, `"))
+            .unwrap();
     }
 
     if let Some(description) = command.description {
-        result.push_str(&format!("**{}**: {}\n", help_options.description_label, description));
+        writeln!(result, "**{}**: {}", help_options.description_label, description).unwrap();
     };
 
     if let Some(usage) = command.usage {
         if let Some(first_prefix) = command.group_prefixes.get(0) {
-            result.push_str(&format!(
-                "**{}**: `{} {} {}`\n",
+            writeln!(
+                result,
+                "**{}**: `{} {} {}`",
                 help_options.usage_label, first_prefix, command.name, usage
-            ));
+            )
+            .unwrap();
         } else {
-            result.push_str(&format!(
-                "**{}**: `{} {}`\n",
-                help_options.usage_label, command.name, usage
-            ));
+            writeln!(result, "**{}**: `{} {}`", help_options.usage_label, command.name, usage)
+                .unwrap();
         }
     }
 
     if !command.usage_sample.is_empty() {
         if let Some(first_prefix) = command.group_prefixes.get(0) {
             let format_example = |example| {
-                result.push_str(&format!(
-                    "**{}**: `{} {} {}`\n",
+                writeln!(
+                    result,
+                    "**{}**: `{} {} {}`",
                     help_options.usage_sample_label, first_prefix, command.name, example
-                ));
+                )
+                .unwrap();
             };
             command.usage_sample.iter().for_each(format_example);
         } else {
             let format_example = |example| {
-                result.push_str(&format!(
-                    "**{}**: `{} {}`\n",
+                writeln!(
+                    result,
+                    "**{}**: `{} {}`",
                     help_options.usage_sample_label, command.name, example
-                ));
+                )
+                .unwrap();
             };
             command.usage_sample.iter().for_each(format_example);
         }
     }
 
-    result.push_str(&format!("**{}**: {}\n", help_options.grouped_label, command.group_name));
+    writeln!(result, "**{}**: {}", help_options.grouped_label, command.group_name).unwrap();
 
     if !help_options.available_text.is_empty() && !command.availability.is_empty() {
-        result
-            .push_str(&format!("**{}**: {}\n", help_options.available_text, command.availability));
+        writeln!(result, "**{}**: {}", help_options.available_text, command.availability).unwrap();
     }
 
     if !command.sub_commands.is_empty() {
-        result.push_str(&format!(
-            "**{}**: `{}`\n",
+        writeln!(
+            result,
+            "**{}**: `{}`",
             help_options.sub_commands_label,
             command.sub_commands.join("`, `"),
-        ));
+        )
+        .unwrap();
     }
 
     result
