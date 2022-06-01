@@ -452,18 +452,13 @@ mod tests {
     fn test_parse_header_errors() {
         let headers = headers();
 
-        // This macro wouldn't be needed if `Error::Http` didn't
-        // box its error, or if box patterns were stable.
-        macro_rules! is_err {
-            ($header:expr, $err:pat) => {
-                match parse_header::<i64>(&headers, $header).unwrap_err() {
-                    Error::Http(x) => matches!(*x, $err),
-                    _ => false,
-                }
-            };
-        }
-
-        assert!(is_err!("x-bad-num", HttpError::RateLimitI64F64));
-        assert!(is_err!("x-bad-unicode", HttpError::RateLimitUtf8));
+        assert!(matches!(
+            parse_header::<i64>(&headers, "x-bad-num").unwrap_err(),
+            Error::Http(HttpError::RateLimitI64F64)
+        ));
+        assert!(matches!(
+            parse_header::<i64>(&headers, "x-bad-unicode").unwrap_err(),
+            Error::Http(HttpError::RateLimitUtf8)
+        ));
     }
 }
