@@ -8,7 +8,7 @@ use std::fmt::Write;
 #[cfg(all(feature = "model", feature = "utils"))]
 use crate::builder::{CreateEmbed, EditMessage};
 #[cfg(all(feature = "cache", feature = "model"))]
-use crate::cache::Cache;
+use crate::cache::{Cache, GuildRef};
 #[cfg(feature = "collector")]
 use crate::client::bridge::gateway::ShardMessenger;
 #[cfg(feature = "collector")]
@@ -443,28 +443,8 @@ impl Message {
     ///
     /// Requires the `cache` feature be enabled.
     #[cfg(feature = "cache")]
-    pub fn guild(&self, cache: impl AsRef<Cache>) -> Option<Guild> {
-        cache.as_ref().guild(self.guild_id?)
-    }
-
-    /// Returns a field to the [`Guild`] for the message if one is in the cache.
-    /// The field can be selected via the `field_accessor`.
-    ///
-    /// Returns [`None`] if the guild's ID could not be found via [`Self::guild_id`] or
-    /// if the Guild itself is not cached.
-    ///
-    /// Requires the `cache` feature be enabled.
-    #[cfg(feature = "cache")]
-    pub fn guild_field<Ret, Fun>(
-        &self,
-        cache: impl AsRef<Cache>,
-        field_accessor: Fun,
-    ) -> Option<Ret>
-    where
-        Ret: Clone,
-        Fun: FnOnce(&Guild) -> Ret,
-    {
-        cache.as_ref().guild_field(self.guild_id?, field_accessor)
+    pub fn guild<'a>(&self, cache: &'a Cache) -> Option<GuildRef<'a>> {
+        cache.guild(self.guild_id?)
     }
 
     /// True if message was sent using direct messages.
