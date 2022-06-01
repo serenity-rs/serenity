@@ -1188,46 +1188,6 @@
 <span id="1183">1183</span>
 <span id="1184">1184</span>
 <span id="1185">1185</span>
-<span id="1186">1186</span>
-<span id="1187">1187</span>
-<span id="1188">1188</span>
-<span id="1189">1189</span>
-<span id="1190">1190</span>
-<span id="1191">1191</span>
-<span id="1192">1192</span>
-<span id="1193">1193</span>
-<span id="1194">1194</span>
-<span id="1195">1195</span>
-<span id="1196">1196</span>
-<span id="1197">1197</span>
-<span id="1198">1198</span>
-<span id="1199">1199</span>
-<span id="1200">1200</span>
-<span id="1201">1201</span>
-<span id="1202">1202</span>
-<span id="1203">1203</span>
-<span id="1204">1204</span>
-<span id="1205">1205</span>
-<span id="1206">1206</span>
-<span id="1207">1207</span>
-<span id="1208">1208</span>
-<span id="1209">1209</span>
-<span id="1210">1210</span>
-<span id="1211">1211</span>
-<span id="1212">1212</span>
-<span id="1213">1213</span>
-<span id="1214">1214</span>
-<span id="1215">1215</span>
-<span id="1216">1216</span>
-<span id="1217">1217</span>
-<span id="1218">1218</span>
-<span id="1219">1219</span>
-<span id="1220">1220</span>
-<span id="1221">1221</span>
-<span id="1222">1222</span>
-<span id="1223">1223</span>
-<span id="1224">1224</span>
-<span id="1225">1225</span>
 </pre><pre class="rust"><code><span class="doccomment">//! A cache containing data received from [`Shard`]s.</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! Using the cache allows to avoid REST API requests via the [`http`] module</span>
@@ -1262,7 +1222,7 @@
 
 <span class="kw">use</span> <span class="ident">std::collections::hash_map::RandomState</span>;
 <span class="kw">use</span> <span class="ident">std::collections</span>::{<span class="ident">HashMap</span>, <span class="ident">VecDeque</span>};
-<span class="kw">use</span> <span class="ident">std::hash::BuildHasher</span>;
+<span class="kw">use</span> <span class="ident">std::hash</span>::{<span class="ident">BuildHasher</span>, <span class="ident">Hash</span>};
 <span class="kw">use</span> <span class="ident">std::str::FromStr</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;temp_cache&quot;</span>)]</span>
 <span class="kw">use</span> <span class="ident">std::time::Duration</span>;
@@ -1270,6 +1230,7 @@
 <span class="kw">use</span> <span class="ident">dashmap::iter::Iter</span>;
 <span class="kw">use</span> <span class="ident">dashmap::mapref::entry::Entry</span>;
 <span class="kw">use</span> <span class="ident">dashmap::mapref::multiple::RefMulti</span>;
+<span class="kw">use</span> <span class="ident">dashmap::mapref::one::Ref</span>;
 <span class="kw">use</span> <span class="ident">dashmap</span>::{<span class="ident">DashMap</span>, <span class="ident">DashSet</span>};
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;temp_cache&quot;</span>)]</span>
 <span class="kw">use</span> <span class="ident">moka::dash::Cache</span> <span class="kw">as</span> <span class="ident">DashCache</span>;
@@ -1285,6 +1246,34 @@
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="self">self</span>::settings::Settings</span>;
 
 <span class="kw">type</span> <span class="ident">MessageCache</span> <span class="op">=</span> <span class="ident">DashMap</span><span class="op">&lt;</span><span class="ident">ChannelId</span>, <span class="ident">DashMap</span><span class="op">&lt;</span><span class="ident">MessageId</span>, <span class="ident">Message</span><span class="op">&gt;</span><span class="op">&gt;</span>;
+
+<span class="kw">struct</span> <span class="ident">NotSend</span>();
+
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">CacheRef</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">K</span>, <span class="ident">V</span><span class="op">&gt;</span> {
+    <span class="ident">inner</span>: <span class="ident">Ref</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">K</span>, <span class="ident">V</span><span class="op">&gt;</span>,
+    <span class="ident">phantom</span>: <span class="ident">std::marker::PhantomData</span><span class="op">&lt;</span><span class="kw-2">*const</span> <span class="ident">NotSend</span><span class="op">&gt;</span>,
+}
+
+<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">K</span>, <span class="ident">V</span><span class="op">&gt;</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">Ref</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">K</span>, <span class="ident">V</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">CacheRef</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">K</span>, <span class="ident">V</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">inner</span>: <span class="ident">Ref</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">K</span>, <span class="ident">V</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
+        <span class="self">Self</span> {
+            <span class="ident">inner</span>,
+            <span class="ident">phantom</span>: <span class="ident">std::marker::PhantomData</span>,
+        }
+    }
+}
+
+<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">K</span>: <span class="ident">Eq</span> <span class="op">+</span> <span class="ident">Hash</span>, <span class="ident">V</span><span class="op">&gt;</span> <span class="ident">std::ops::Deref</span> <span class="kw">for</span> <span class="ident">CacheRef</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">K</span>, <span class="ident">V</span><span class="op">&gt;</span> {
+    <span class="kw">type</span> <span class="ident">Target</span> <span class="op">=</span> <span class="ident">V</span>;
+
+    <span class="kw">fn</span> <span class="ident">deref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident"><span class="self">Self</span>::Target</span> {
+        <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">value</span>()
+    }
+}
+
+<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">GuildRef</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">CacheRef</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">GuildId</span>, <span class="ident">Guild</span><span class="op">&gt;</span>;
+<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">GuildChannelRef</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">CacheRef</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">ChannelId</span>, <span class="ident">GuildChannel</span><span class="op">&gt;</span>;
+<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">PrivateChannelRef</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">CacheRef</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">ChannelId</span>, <span class="ident">PrivateChannel</span><span class="op">&gt;</span>;
 
 <span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">FromStrAndCache</span>: <span class="ident">Sized</span> {
     <span class="kw">type</span> <span class="prelude-val">Err</span>;
@@ -1631,10 +1620,7 @@
         <span class="prelude-val">Some</span>(<span class="ident">selector</span>(<span class="ident">message_iter</span>))
     }
 
-    <span class="doccomment">/// Clones an entire guild from the cache based on the given `id`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// In order to clone only a field of the guild, use [`Self::guild_field`].</span>
-    <span class="doccomment">///</span>
+    <span class="doccomment">/// Gets a reference to a guild from the cache based on the given `id`.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// # Examples</span>
     <span class="doccomment">///</span>
@@ -1647,48 +1633,15 @@
     <span class="doccomment">/// // assuming the cache is in scope, e.g. via `Context`</span>
     <span class="doccomment">/// if let Some(guild) = cache.guild(7) {</span>
     <span class="doccomment">///     println!(&quot;Guild name: {}&quot;, guild.name);</span>
-    <span class="doccomment">/// }</span>
+    <span class="doccomment">/// };</span>
     <span class="doccomment">/// ```</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">guild</span><span class="op">&lt;</span><span class="ident">G</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">GuildId</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">id</span>: <span class="ident">G</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Guild</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">guild</span><span class="op">&lt;</span><span class="ident">G</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">GuildId</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">id</span>: <span class="ident">G</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">GuildRef</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">_guild</span>(<span class="ident">id</span>.<span class="ident">into</span>())
     }
 
-    <span class="kw">fn</span> <span class="ident">_guild</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">id</span>: <span class="ident">GuildId</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Guild</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">guilds</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="ident">id</span>).<span class="ident">map</span>(<span class="op">|</span><span class="ident">i</span><span class="op">|</span> <span class="ident">i</span>.<span class="ident">clone</span>())
-    }
-
-    <span class="doccomment">/// This method allows to select a field of the guild instead of</span>
-    <span class="doccomment">/// the entire guild by providing a `field_selector`-closure picking what</span>
-    <span class="doccomment">/// you want to clone.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```rust,no_run</span>
-    <span class="doccomment">/// # use serenity::cache::Cache;</span>
-    <span class="doccomment">/// #</span>
-    <span class="doccomment">/// # fn run() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {</span>
-    <span class="doccomment">/// # let cache = Cache::default();</span>
-    <span class="doccomment">/// // We clone only the `len()` returned `usize` instead of the entire guild or the channels.</span>
-    <span class="doccomment">/// if let Some(channel_len) = cache.guild_field(7, |guild| guild.channels.len()) {</span>
-    <span class="doccomment">///     println!(&quot;Guild channels count: {}&quot;, channel_len);</span>
-    <span class="doccomment">/// }</span>
-    <span class="doccomment">/// #   Ok(())</span>
-    <span class="doccomment">/// # }</span>
-    <span class="doccomment">/// ```</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">guild_field</span><span class="op">&lt;</span><span class="ident">Ret</span>, <span class="ident">Fun</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">id</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">GuildId</span><span class="op">&gt;</span>, <span class="ident">field_selector</span>: <span class="ident">Fun</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Ret</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">Fun</span>: <span class="ident">FnOnce</span>(<span class="kw-2">&amp;</span><span class="ident">Guild</span>) -&gt; <span class="ident">Ret</span>,
-    {
-        <span class="self">self</span>.<span class="ident">_guild_field</span>(<span class="ident">id</span>.<span class="ident">into</span>(), <span class="ident">field_selector</span>)
-    }
-
-    <span class="kw">fn</span> <span class="ident">_guild_field</span><span class="op">&lt;</span><span class="ident">Ret</span>, <span class="ident">Fun</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">id</span>: <span class="ident">GuildId</span>, <span class="ident">field_accessor</span>: <span class="ident">Fun</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Ret</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">Fun</span>: <span class="ident">FnOnce</span>(<span class="kw-2">&amp;</span><span class="ident">Guild</span>) -&gt; <span class="ident">Ret</span>,
-    {
-        <span class="kw">let</span> <span class="ident">guild</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">guilds</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="ident">id</span>)<span class="question-mark">?</span>;
-
-        <span class="prelude-val">Some</span>(<span class="ident">field_accessor</span>(<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">guild</span>))
+    <span class="kw">fn</span> <span class="ident">_guild</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">id</span>: <span class="ident">GuildId</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">GuildRef</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+        <span class="self">self</span>.<span class="ident">guilds</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="ident">id</span>).<span class="ident">map</span>(<span class="ident">Into::into</span>)
     }
 
     <span class="doccomment">/// Returns the number of cached guilds.</span>
@@ -1716,7 +1669,8 @@
     <span class="doccomment">/// #[serenity::async_trait]</span>
     <span class="doccomment">/// impl EventHandler for Handler {</span>
     <span class="doccomment">///     async fn message(&amp;self, context: Context, message: Message) {</span>
-    <span class="doccomment">///         let channel = match context.cache.guild_channel(message.channel_id) {</span>
+    <span class="doccomment">///         let channel_opt = context.cache.guild_channel(message.channel_id).map(|c| c.clone());</span>
+    <span class="doccomment">///         let channel = match channel_opt {</span>
     <span class="doccomment">///             Some(channel) =&gt; channel,</span>
     <span class="doccomment">///             None =&gt; {</span>
     <span class="doccomment">///                 let result = message</span>
@@ -1745,49 +1699,12 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// [`EventHandler::message`]: crate::client::EventHandler::message</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">guild_channel</span><span class="op">&lt;</span><span class="ident">C</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">ChannelId</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">id</span>: <span class="ident">C</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">GuildChannel</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">guild_channel</span><span class="op">&lt;</span><span class="ident">C</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">ChannelId</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">id</span>: <span class="ident">C</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">GuildChannelRef</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">_guild_channel</span>(<span class="ident">id</span>.<span class="ident">into</span>())
     }
 
-    <span class="kw">fn</span> <span class="ident">_guild_channel</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">id</span>: <span class="ident">ChannelId</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">GuildChannel</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">channels</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="ident">id</span>).<span class="ident">map</span>(<span class="op">|</span><span class="ident">i</span><span class="op">|</span> <span class="ident">i</span>.<span class="ident">clone</span>())
-    }
-
-    <span class="doccomment">/// This method allows to only clone a field of the guild channel instead of</span>
-    <span class="doccomment">/// the entire guild by providing a `field_selector`-closure picking what</span>
-    <span class="doccomment">/// you want to clone.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```rust,no_run</span>
-    <span class="doccomment">/// # use serenity::cache::Cache;</span>
-    <span class="doccomment">/// #</span>
-    <span class="doccomment">/// # fn run() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {</span>
-    <span class="doccomment">/// # let cache = Cache::default();</span>
-    <span class="doccomment">/// // We clone only the `name` instead of the entire channel.</span>
-    <span class="doccomment">/// if let Some(channel_name) = cache.guild_channel_field(7, |channel| channel.name.clone()) {</span>
-    <span class="doccomment">///     println!(&quot;Guild channel name: {}&quot;, channel_name);</span>
-    <span class="doccomment">/// }</span>
-    <span class="doccomment">/// #   Ok(())</span>
-    <span class="doccomment">/// # }</span>
-    <span class="doccomment">/// ```</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">guild_channel_field</span><span class="op">&lt;</span><span class="ident">Ret</span>, <span class="ident">Fun</span><span class="op">&gt;</span>(
-        <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">id</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">ChannelId</span><span class="op">&gt;</span>,
-        <span class="ident">field_selector</span>: <span class="ident">Fun</span>,
-    ) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Ret</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">Fun</span>: <span class="ident">FnOnce</span>(<span class="kw-2">&amp;</span><span class="ident">GuildChannel</span>) -&gt; <span class="ident">Ret</span>,
-    {
-        <span class="self">self</span>.<span class="ident">_guild_channel_field</span>(<span class="ident">id</span>.<span class="ident">into</span>(), <span class="ident">field_selector</span>)
-    }
-
-    <span class="kw">fn</span> <span class="ident">_guild_channel_field</span><span class="op">&lt;</span><span class="ident">Ret</span>, <span class="ident">Fun</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">id</span>: <span class="ident">ChannelId</span>, <span class="ident">field_selector</span>: <span class="ident">Fun</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Ret</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">Fun</span>: <span class="ident">FnOnce</span>(<span class="kw-2">&amp;</span><span class="ident">GuildChannel</span>) -&gt; <span class="ident">Ret</span>,
-    {
-        <span class="kw">let</span> <span class="ident">channel</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">channels</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="ident">id</span>)<span class="question-mark">?</span>;
-
-        <span class="prelude-val">Some</span>(<span class="ident">field_selector</span>(<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">channel</span>))
+    <span class="kw">fn</span> <span class="ident">_guild_channel</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">id</span>: <span class="ident">ChannelId</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">GuildChannelRef</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+        <span class="self">self</span>.<span class="ident">channels</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="ident">id</span>).<span class="ident">map</span>(<span class="ident">Into::into</span>)
     }
 
     <span class="doccomment">/// Retrieves a [`Guild`]&#39;s member from the cache based on the guild&#39;s and</span>
@@ -2026,15 +1943,18 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// if let Some(channel) = cache.private_channel(7) {</span>
     <span class="doccomment">///     println!(&quot;The recipient is {}&quot;, channel.recipient);</span>
-    <span class="doccomment">/// }</span>
+    <span class="doccomment">/// };</span>
     <span class="doccomment">/// ```</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">private_channel</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">channel_id</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">ChannelId</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">PrivateChannel</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">private_channel</span>(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        <span class="ident">channel_id</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">ChannelId</span><span class="op">&gt;</span>,
+    ) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">PrivateChannelRef</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">_private_channel</span>(<span class="ident">channel_id</span>.<span class="ident">into</span>())
     }
 
-    <span class="kw">fn</span> <span class="ident">_private_channel</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">channel_id</span>: <span class="ident">ChannelId</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">PrivateChannel</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">private_channels</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="ident">channel_id</span>).<span class="ident">map</span>(<span class="op">|</span><span class="ident">i</span><span class="op">|</span> <span class="ident">i</span>.<span class="ident">clone</span>())
+    <span class="kw">fn</span> <span class="ident">_private_channel</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">channel_id</span>: <span class="ident">ChannelId</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">PrivateChannelRef</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+        <span class="self">self</span>.<span class="ident">private_channels</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="ident">channel_id</span>).<span class="ident">map</span>(<span class="ident">Into::into</span>)
     }
 
     <span class="doccomment">/// Retrieves a [`Guild`]&#39;s role by their Ids.</span>

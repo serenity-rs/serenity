@@ -251,6 +251,7 @@
 <span id="246">246</span>
 <span id="247">247</span>
 <span id="248">248</span>
+<span id="249">249</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::collections::HashMap</span>;
 
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::json</span>::{<span class="ident">from_number</span>, <span class="ident">Value</span>, <span class="ident">NULL</span>};
@@ -279,7 +280,8 @@
 <span class="doccomment">/// impl EventHandler for Handler {</span>
 <span class="doccomment">///     async fn message(&amp;self, context: Context, msg: Message) {</span>
 <span class="doccomment">///         if msg.content == &quot;!createinvite&quot; {</span>
-<span class="doccomment">///             let channel = match context.cache.guild_channel(msg.channel_id) {</span>
+<span class="doccomment">///             let channel_opt = context.cache.guild_channel(msg.channel_id).map(|c| c.clone());</span>
+<span class="doccomment">///             let channel = match channel_opt {</span>
 <span class="doccomment">///                 Some(channel) =&gt; channel,</span>
 <span class="doccomment">///                 None =&gt; {</span>
 <span class="doccomment">///                     let _ = msg.channel_id.say(&amp;context, &quot;Error creating invite&quot;).await;</span>
@@ -344,7 +346,7 @@
     <span class="doccomment">/// # #[cfg(all(feature = &quot;cache&quot;, feature = &quot;client&quot;, feature = &quot;framework&quot;, feature = &quot;http&quot;))]</span>
     <span class="doccomment">/// # #[command]</span>
     <span class="doccomment">/// # async fn example(context: &amp;Context) -&gt; CommandResult {</span>
-    <span class="doccomment">/// #     let channel = context.cache.guild_channel(81384788765712384).unwrap();</span>
+    <span class="doccomment">/// #     let channel = context.cache.guild_channel(81384788765712384).unwrap().clone();</span>
     <span class="doccomment">/// #</span>
     <span class="doccomment">/// let invite = channel.create_invite(context, |i| i.max_age(3600)).await?;</span>
     <span class="doccomment">/// #     Ok(())</span>
@@ -375,7 +377,7 @@
     <span class="doccomment">/// # #[cfg(all(feature = &quot;cache&quot;, feature = &quot;client&quot;, feature = &quot;framework&quot;, feature = &quot;http&quot;))]</span>
     <span class="doccomment">/// # #[command]</span>
     <span class="doccomment">/// # async fn example(context: &amp;Context) -&gt; CommandResult {</span>
-    <span class="doccomment">/// #     let channel = context.cache.guild_channel(81384788765712384).unwrap();</span>
+    <span class="doccomment">/// #     let channel = context.cache.guild_channel(81384788765712384).unwrap().clone();</span>
     <span class="doccomment">/// #</span>
     <span class="doccomment">/// let invite = channel.create_invite(context, |i| i.max_uses(5)).await?;</span>
     <span class="doccomment">/// #     Ok(())</span>
@@ -404,7 +406,7 @@
     <span class="doccomment">/// # #[cfg(all(feature = &quot;cache&quot;, feature = &quot;client&quot;, feature = &quot;framework&quot;, feature = &quot;http&quot;))]</span>
     <span class="doccomment">/// # #[command]</span>
     <span class="doccomment">/// # async fn example(context: &amp;Context) -&gt; CommandResult {</span>
-    <span class="doccomment">/// #     let channel = context.cache.guild_channel(81384788765712384).unwrap();</span>
+    <span class="doccomment">/// #     let channel = context.cache.guild_channel(81384788765712384).unwrap().clone();</span>
     <span class="doccomment">/// #</span>
     <span class="doccomment">/// let invite = channel.create_invite(context, |i| i.temporary(true)).await?;</span>
     <span class="doccomment">/// #     Ok(())</span>
@@ -435,7 +437,7 @@
     <span class="doccomment">/// # #[cfg(all(feature = &quot;cache&quot;, feature = &quot;client&quot;, feature = &quot;framework&quot;, feature = &quot;http&quot;))]</span>
     <span class="doccomment">/// # #[command]</span>
     <span class="doccomment">/// # async fn example(context: &amp;Context) -&gt; CommandResult {</span>
-    <span class="doccomment">/// #     let channel = context.cache.guild_channel(81384788765712384).unwrap();</span>
+    <span class="doccomment">/// #     let channel = context.cache.guild_channel(81384788765712384).unwrap().clone();</span>
     <span class="doccomment">/// #</span>
     <span class="doccomment">/// let invite = channel.create_invite(context, |i| i.unique(true)).await?;</span>
     <span class="doccomment">/// #     Ok(())</span>
