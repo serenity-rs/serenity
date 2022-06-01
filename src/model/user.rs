@@ -4,8 +4,6 @@ use std::fmt;
 #[cfg(feature = "model")]
 use std::fmt::Write;
 
-#[cfg(feature = "model")]
-use futures::future::{BoxFuture, FutureExt};
 use serde::{Deserialize, Serialize};
 
 use super::prelude::*;
@@ -898,9 +896,6 @@ impl User {
     /// the [`Cache`] if it is available, and then check if that guild has the
     /// given [`Role`].
     ///
-    /// Three forms of data may be passed in to the guild parameter: either a
-    /// [`PartialGuild`], a [`GuildId`], or a `u64`.
-    ///
     /// # Examples
     ///
     /// Check if a guild has a [`Role`] by Id:
@@ -927,50 +922,10 @@ impl User {
     pub async fn has_role(
         &self,
         cache_http: impl CacheHttp,
-        guild: impl Into<GuildContainer>,
+        guild_id: impl Into<GuildId>,
         role: impl Into<RoleId>,
     ) -> Result<bool> {
-        self._has_role(&cache_http, guild.into(), role.into()).await
-    }
-
-    fn _has_role<'a>(
-        &'a self,
-        cache_http: &'a impl CacheHttp,
-        guild: GuildContainer,
-        role: RoleId,
-    ) -> BoxFuture<'a, Result<bool>> {
-        async move {
-            match guild {
-                GuildContainer::Guild(partial_guild) => {
-                    self._has_role(cache_http, GuildContainer::Id(partial_guild.id), role).await
-                },
-                GuildContainer::Id(guild_id) => {
-                    // Silences a warning when compiling without the `cache` feature.
-                    #[allow(unused_mut)]
-                    let mut has_role = None;
-
-                    #[cfg(feature = "cache")]
-                    {
-                        if let Some(cache) = cache_http.cache() {
-                            if let Some(member) = cache.member(guild_id, self.id) {
-                                has_role = Some(member.roles.contains(&role));
-                            }
-                        }
-                    }
-
-                    if let Some(has_role) = has_role {
-                        Ok(has_role)
-                    } else {
-                        cache_http
-                            .http()
-                            .get_member(guild_id.0, self.id.0)
-                            .await
-                            .map(|m| m.roles.contains(&role))
-                    }
-                },
-            }
-        }
-        .boxed()
+        guild_id.into().member(cache_http, self).await.map(|m| m.roles.contains(&role.into()))
     }
 
     /// Refreshes the information about the user.
