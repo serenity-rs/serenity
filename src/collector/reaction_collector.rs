@@ -15,7 +15,7 @@ use tokio::sync::mpsc::{
 use tokio::time::{sleep, Sleep};
 
 use crate::client::bridge::gateway::ShardMessenger;
-use crate::collector::LazyArc;
+use crate::collector::{FilterFn, LazyArc};
 use crate::model::channel::Reaction;
 use crate::model::id::UserId;
 
@@ -48,8 +48,8 @@ macro_rules! impl_reaction_collector {
                 /// This is the last instance to pass for a reaction to count as *collected*.
                 ///
                 /// This function is intended to be a reaction content filter.
-                pub fn filter<F: Fn(&Arc<Reaction>) -> bool + 'static + Send + Sync>(mut self, function: F) -> Self {
-                    self.filter.as_mut().unwrap().filter = Some(Arc::new(function));
+                pub fn filter<F: Fn(&Reaction) -> bool + 'static + Send + Sync>(mut self, function: F) -> Self {
+                    self.filter.as_mut().unwrap().filter = Some(FilterFn(Arc::new(function)));
 
                     self
                 }
@@ -216,8 +216,8 @@ impl ReactionFilter {
     /// Checks if the `reaction` passes set constraints.
     /// Constraints are optional, as it is possible to limit reactions to
     /// be sent by a specific author or in a specific guild.
-    fn is_passing_constraints(&self, reaction: &mut LazyReactionAction<'_>) -> bool {
-        let reaction = match (reaction.added, &mut reaction.reaction) {
+    fn is_passing_constraints(&self, reaction: &LazyReactionAction<'_>) -> bool {
+        let reaction = match (reaction.added, &reaction.reaction) {
             (true, reaction) => {
                 if self.options.accept_added {
                     reaction
@@ -234,7 +234,6 @@ impl ReactionFilter {
             },
         };
 
-        // TODO: On next branch, switch filter arg to &T so this as_arc() call can be removed.
         self.options.guild_id.map_or(true, |id| Some(id) == reaction.guild_id.map(|g| g.0))
             && self.options.message_id.map_or(true, |id| id == reaction.message_id.0)
             && self.options.channel_id.map_or(true, |id| id == reaction.channel_id.0)
@@ -242,7 +241,7 @@ impl ReactionFilter {
                 .options
                 .author_id
                 .map_or(true, |id| id == reaction.user_id.unwrap_or(UserId(0)).0)
-            && self.options.filter.as_ref().map_or(true, |f| f(&reaction.as_arc()))
+            && self.options.filter.as_ref().map_or(true, |f| f.0(reaction))
     }
 
     /// Checks if the filter is within set receive and collect limits.
@@ -258,7 +257,7 @@ impl ReactionFilter {
 struct FilterOptions {
     filter_limit: Option<u32>,
     collect_limit: Option<u32>,
-    filter: Option<Arc<dyn Fn(&Arc<Reaction>) -> bool + 'static + Send + Sync>>,
+    filter: Option<FilterFn<Reaction>>,
     channel_id: Option<u64>,
     guild_id: Option<u64>,
     author_id: Option<u64>,
