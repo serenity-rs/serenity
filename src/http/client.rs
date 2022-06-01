@@ -3955,7 +3955,7 @@ impl Http {
         if response.status().is_success() {
             Ok(response)
         } else {
-            Err(Error::Http(Box::new(HttpError::from_response(response).await)))
+            Err(Error::Http(HttpError::from_response(response).await))
         }
     }
 
@@ -3974,7 +3974,7 @@ impl Http {
         debug!("Expected {}, got {}", expected, response.status());
         trace!("Unsuccessful response: {:?}", response);
 
-        Err(Error::Http(Box::new(HttpError::from_response(response).await)))
+        Err(Error::Http(HttpError::from_response(response).await))
     }
 }
 
