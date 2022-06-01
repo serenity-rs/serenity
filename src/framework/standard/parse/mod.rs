@@ -33,7 +33,8 @@ fn permissions_in(
     member: &Member,
     roles: &HashMap<RoleId, Role>,
 ) -> Permissions {
-    if ctx.cache.guild_field(guild_id, |guild| member.user.id == guild.owner_id) == Some(true) {
+    let guild = ctx.cache.guild(guild_id);
+    if guild.as_ref().map(|guild| member.user.id == guild.owner_id) == Some(true) {
         return Permissions::all();
     }
 
@@ -59,8 +60,8 @@ fn permissions_in(
         return Permissions::all();
     }
 
-    if let Some(Some(Channel::Guild(channel))) =
-        ctx.cache.guild_field(guild_id, |guild| guild.channels.get(&channel_id).cloned())
+    if let Some(Channel::Guild(channel)) =
+        guild.and_then(|guild| guild.channels.get(&channel_id).cloned())
     {
         if channel.kind == ChannelType::Text {
             permissions &= !(Permissions::CONNECT
@@ -260,21 +261,16 @@ async fn check_discrepancy(
     #[cfg(feature = "cache")]
     {
         if let Some(guild_id) = msg.guild_id {
-            let member = match ctx
-                .cache
-                .guild_field(guild_id, |guild| guild.members.get(&msg.author.id).cloned())
-            {
-                Some(Some(member)) => member,
-                // Member not found.
-                Some(None) => match ctx.http.get_member(guild_id.0, msg.author.id.0).await {
-                    Ok(member) => member,
-                    Err(_) => return Ok(()),
-                },
-                // Guild not found.
+            let roles = match ctx.cache.guild(guild_id) {
+                Some(guild) => guild.roles.clone(),
                 None => return Ok(()),
             };
-            #[allow(clippy::unwrap_used)] // Allowing unwrap because should always return Some()
-            let roles = ctx.cache.guild_field(guild_id, |guild| guild.roles.clone()).unwrap();
+
+            let member = match guild_id.member(ctx, msg.author.id).await {
+                Ok(m) => m,
+                Err(_) => return Ok(()),
+            };
+
             let perms = permissions_in(ctx, guild_id, msg.channel_id, &member, &roles);
 
             if !(perms.contains(*options.required_permissions())
