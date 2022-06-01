@@ -254,16 +254,17 @@ fn check_common_behaviour(
         return help_options.lacking_permissions;
     }
 
-    msg.guild_field(&cache, |guild| {
-        if let Some(member) = guild.members.get(&msg.author.id) {
-            if !has_correct_roles(options, &guild.roles, member) {
-                return help_options.lacking_role;
+    msg.guild(cache.as_ref())
+        .and_then(|guild| {
+            if let Some(member) = guild.members.get(&msg.author.id) {
+                if !has_correct_roles(options, &guild.roles, member) {
+                    return Some(help_options.lacking_role);
+                }
             }
-        }
 
-        HelpBehaviour::Nothing
-    })
-    .unwrap_or(HelpBehaviour::Nothing)
+            None
+        })
+        .unwrap_or(HelpBehaviour::Nothing)
 }
 
 #[cfg(all(feature = "cache", feature = "http"))]

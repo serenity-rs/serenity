@@ -2,9 +2,6 @@ use std::fmt;
 #[cfg(feature = "model")]
 use std::sync::Arc;
 
-#[cfg(feature = "cache")]
-use futures::stream::StreamExt;
-
 #[cfg(feature = "model")]
 use crate::builder::EditChannel;
 #[cfg(feature = "model")]
@@ -20,7 +17,7 @@ use crate::builder::{
     GetMessages,
 };
 #[cfg(feature = "cache")]
-use crate::cache::Cache;
+use crate::cache::{self, Cache};
 #[cfg(feature = "collector")]
 use crate::client::bridge::gateway::ShardMessenger;
 #[cfg(feature = "collector")]
@@ -632,7 +629,7 @@ impl GuildChannel {
     /// Attempts to find this channel's guild in the Cache.
     #[cfg(feature = "cache")]
     #[inline]
-    pub fn guild(&self, cache: impl AsRef<Cache>) -> Option<Guild> {
+    pub fn guild<'a>(&self, cache: &'a impl AsRef<Cache>) -> Option<cache::GuildRef<'a>> {
         cache.as_ref().guild(self.guild_id)
     }
 
@@ -760,13 +757,13 @@ impl GuildChannel {
     /// #[serenity::async_trait]
     /// impl EventHandler for Handler {
     ///     async fn message(&self, context: Context, mut msg: Message) {
-    ///         let channel = match context.cache.guild_channel(msg.channel_id) {
-    ///             Some(channel) => channel,
+    ///         let current_user_id = context.cache.current_user_id();
+    ///         let permissions = match context.cache.guild_channel(msg.channel_id) {
+    ///             Some(channel) => channel.permissions_for_user(&context.cache, current_user_id),
     ///             None => return,
     ///         };
     ///
-    ///         let current_user_id = context.cache.current_user_id();
-    ///         if let Ok(permissions) = channel.permissions_for_user(&context.cache, current_user_id) {
+    ///         if let Ok(permissions) = permissions {
     ///             if !permissions.contains(Permissions::ATTACH_FILES | Permissions::SEND_MESSAGES) {
     ///                 return;
     ///             }
@@ -1018,7 +1015,8 @@ impl GuildChannel {
     /// # let cache = Cache::default();
     /// # let channel = cache
     /// #    .guild_channel(ChannelId(7))
-    /// #    .ok_or(ModelError::ItemMissing)?;
+    /// #    .ok_or(ModelError::ItemMissing)?
+    /// #    .clone();
     /// // Initiate typing (assuming http is `Arc<Http>` and `channel` is bound)
     /// let typing = channel.start_typing(&http)?;
     ///
@@ -1082,7 +1080,7 @@ impl GuildChannel {
     /// will return: [`ModelError::InvalidChannelType`].
     #[cfg(feature = "cache")]
     #[inline]
-    pub async fn members(&self, cache: impl AsRef<Cache>) -> Result<Vec<Member>> {
+    pub fn members(&self, cache: impl AsRef<Cache>) -> Result<Vec<Member>> {
         let cache = cache.as_ref();
         let guild = cache.guild(self.guild_id).ok_or(ModelError::GuildNotFound)?;
 
@@ -1100,22 +1098,21 @@ impl GuildChannel {
                     })
                 })
                 .collect()),
-            ChannelType::News | ChannelType::Text => {
-                Ok(futures::stream::iter(guild.members.iter())
-                    .filter_map(|e| async move {
-                        if self
-                            .permissions_for_user(cache, e.0)
-                            .map(|p| p.contains(Permissions::VIEW_CHANNEL))
-                            .unwrap_or(false)
-                        {
-                            Some(e.1.clone())
-                        } else {
-                            None
-                        }
-                    })
-                    .collect::<Vec<Member>>()
-                    .await)
-            },
+            ChannelType::News | ChannelType::Text => Ok(guild
+                .members
+                .iter()
+                .filter_map(|e| {
+                    if self
+                        .permissions_for_user(cache, e.0)
+                        .map(|p| p.contains(Permissions::VIEW_CHANNEL))
+                        .unwrap_or(false)
+                    {
+                        Some(e.1.clone())
+                    } else {
+                        None
+                    }
+                })
+                .collect::<Vec<Member>>()),
             _ => Err(Error::from(ModelError::InvalidChannelType)),
         }
     }
