@@ -408,23 +408,7 @@
 <span id="403">403</span>
 <span id="404">404</span>
 <span id="405">405</span>
-<span id="406">406</span>
-<span id="407">407</span>
-<span id="408">408</span>
-<span id="409">409</span>
-<span id="410">410</span>
-<span id="411">411</span>
-<span id="412">412</span>
-<span id="413">413</span>
-<span id="414">414</span>
-<span id="415">415</span>
-<span id="416">416</span>
-<span id="417">417</span>
-<span id="418">418</span>
-<span id="419">419</span>
-<span id="420">420</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::fmt</span>;
-<span class="kw">use</span> <span class="ident">std::future::Future</span>;
+</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::future::Future</span>;
 <span class="kw">use</span> <span class="ident">std::pin::Pin</span>;
 <span class="kw">use</span> <span class="ident">std::sync::Arc</span>;
 <span class="kw">use</span> <span class="ident">std::task</span>::{<span class="ident">Context</span> <span class="kw">as</span> <span class="ident">FutContext</span>, <span class="ident">Poll</span>};
@@ -439,7 +423,7 @@
 <span class="kw">use</span> <span class="ident">tokio::time</span>::{<span class="ident">sleep</span>, <span class="ident">Sleep</span>};
 
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::client::bridge::gateway::ShardMessenger</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::collector</span>::{<span class="ident">CollectorError</span>, <span class="ident">LazyArc</span>};
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::collector</span>::{<span class="ident">CollectorError</span>, <span class="ident">FilterFn</span>, <span class="ident">LazyArc</span>};
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::event</span>::{<span class="ident">Event</span>, <span class="ident">EventType</span>, <span class="ident">RelatedIdsForEventType</span>};
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::id</span>::{<span class="ident">ChannelId</span>, <span class="ident">GuildId</span>, <span class="ident">MessageId</span>, <span class="ident">UserId</span>};
 <span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">Error</span>, <span class="prelude-ty">Result</span>};
@@ -524,8 +508,7 @@
     <span class="doccomment">/// Checks if the `event` passes set constraints.</span>
     <span class="doccomment">/// Constraints are optional, as it is possible to limit events to</span>
     <span class="doccomment">/// be sent by a specific user or in a specifc guild.</span>
-    <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::wrong_self_convention</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">is_passing_constraints</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">event</span>: <span class="kw-2">&amp;mut</span> <span class="ident">LazyArc</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">Event</span><span class="op">&gt;</span>) -&gt; <span class="ident">bool</span> {
+    <span class="kw">fn</span> <span class="ident">is_passing_constraints</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">event</span>: <span class="kw-2">&amp;</span><span class="ident">Event</span>) -&gt; <span class="ident">bool</span> {
         <span class="kw">fn</span> <span class="ident">empty_or_any</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">F</span><span class="op">&gt;</span>(<span class="ident">slice</span>: <span class="kw-2">&amp;</span>[<span class="ident">T</span>], <span class="ident">f</span>: <span class="ident">F</span>) -&gt; <span class="ident">bool</span>
         <span class="kw">where</span>
             <span class="ident">F</span>: <span class="ident">Fn</span>(<span class="kw-2">&amp;</span><span class="ident">T</span>) -&gt; <span class="ident">bool</span>,
@@ -533,12 +516,11 @@
             <span class="ident">slice</span>.<span class="ident">is_empty</span>() <span class="op">|</span><span class="op">|</span> <span class="ident">slice</span>.<span class="ident">iter</span>().<span class="ident">any</span>(<span class="ident">f</span>)
         }
 
-        <span class="comment">// TODO: On next branch, switch filter arg to &amp;T so this as_arc() call can be removed.</span>
         <span class="ident">empty_or_any</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">options</span>.<span class="ident">guild_id</span>, <span class="op">|</span><span class="ident">id</span><span class="op">|</span> <span class="ident">event</span>.<span class="ident">guild_id</span>().<span class="ident">contains</span>(<span class="ident">id</span>))
             <span class="op">&amp;&amp;</span> <span class="ident">empty_or_any</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">options</span>.<span class="ident">user_id</span>, <span class="op">|</span><span class="ident">id</span><span class="op">|</span> <span class="ident">event</span>.<span class="ident">user_id</span>().<span class="ident">contains</span>(<span class="ident">id</span>))
             <span class="op">&amp;&amp;</span> <span class="ident">empty_or_any</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">options</span>.<span class="ident">channel_id</span>, <span class="op">|</span><span class="ident">id</span><span class="op">|</span> <span class="ident">event</span>.<span class="ident">channel_id</span>().<span class="ident">contains</span>(<span class="ident">id</span>))
             <span class="op">&amp;&amp;</span> <span class="ident">empty_or_any</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">options</span>.<span class="ident">message_id</span>, <span class="op">|</span><span class="ident">id</span><span class="op">|</span> <span class="ident">event</span>.<span class="ident">message_id</span>().<span class="ident">contains</span>(<span class="ident">id</span>))
-            <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">options</span>.<span class="ident">filter</span>.<span class="ident">as_mut</span>().<span class="ident">map_or</span>(<span class="bool-val">true</span>, <span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="ident">f</span>.<span class="number">0</span>(<span class="kw-2">&amp;</span><span class="ident">event</span>.<span class="ident">as_arc</span>()))
+            <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">options</span>.<span class="ident">filter</span>.<span class="ident">as_ref</span>().<span class="ident">map_or</span>(<span class="bool-val">true</span>, <span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="ident">f</span>.<span class="number">0</span>(<span class="ident">event</span>))
     }
 
     <span class="doccomment">/// Checks if the filter is within set receive and collect limits.</span>
@@ -550,21 +532,12 @@
     }
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>)]</span>
-<span class="kw">struct</span> <span class="ident">FilterFn</span>(<span class="ident">Arc</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">Fn</span>(<span class="kw-2">&amp;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Event</span><span class="op">&gt;</span>) -&gt; <span class="ident">bool</span> <span class="op">+</span> <span class="lifetime">&#39;static</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span><span class="op">&gt;</span>);
-
-<span class="kw">impl</span> <span class="ident">fmt::Debug</span> <span class="kw">for</span> <span class="ident">FilterFn</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;Arc&lt;dyn Fn(&amp;Arc&lt;Event&gt;) -&gt; bool + &#39;static + Send + Sync&gt;&quot;</span>)
-    }
-}
-
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Default</span>)]</span>
 <span class="kw">struct</span> <span class="ident">FilterOptions</span> {
     <span class="ident">event_types</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">EventType</span><span class="op">&gt;</span>,
     <span class="ident">filter_limit</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
     <span class="ident">collect_limit</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
-    <span class="ident">filter</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">FilterFn</span><span class="op">&gt;</span>,
+    <span class="ident">filter</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">FilterFn</span><span class="op">&lt;</span><span class="ident">Event</span><span class="op">&gt;</span><span class="op">&gt;</span>,
     <span class="ident">channel_id</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ChannelId</span><span class="op">&gt;</span>,
     <span class="ident">guild_id</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">GuildId</span><span class="op">&gt;</span>,
     <span class="ident">user_id</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">UserId</span><span class="op">&gt;</span>,
@@ -616,10 +589,7 @@
     <span class="doccomment">/// process.</span>
     <span class="doccomment">/// This is the last step to pass for a event to count as *collected*.</span>
     <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::unwrap_used</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">filter</span><span class="op">&lt;</span><span class="ident">F</span>: <span class="ident">Fn</span>(<span class="kw-2">&amp;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Event</span><span class="op">&gt;</span>) -&gt; <span class="ident">bool</span> <span class="op">+</span> <span class="lifetime">&#39;static</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span><span class="op">&gt;</span>(
-        <span class="kw-2">mut</span> <span class="self">self</span>,
-        <span class="ident">function</span>: <span class="ident">F</span>,
-    ) -&gt; <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">filter</span><span class="op">&lt;</span><span class="ident">F</span>: <span class="ident">Fn</span>(<span class="kw-2">&amp;</span><span class="ident">Event</span>) -&gt; <span class="ident">bool</span> <span class="op">+</span> <span class="lifetime">&#39;static</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span><span class="op">&gt;</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">function</span>: <span class="ident">F</span>) -&gt; <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">filter</span>.<span class="ident">as_mut</span>().<span class="ident">unwrap</span>().<span class="ident">filter</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">FilterFn</span>(<span class="ident">Arc::new</span>(<span class="ident">function</span>)));
 
         <span class="self">self</span>

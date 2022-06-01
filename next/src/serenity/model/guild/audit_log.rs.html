@@ -350,12 +350,6 @@
 <span id="345">345</span>
 <span id="346">346</span>
 <span id="347">347</span>
-<span id="348">348</span>
-<span id="349">349</span>
-<span id="350">350</span>
-<span id="351">351</span>
-<span id="352">352</span>
-<span id="353">353</span>
 </pre><pre class="rust"><code><span class="doccomment">//! Audit log types for administrative actions within guilds.</span>
 
 <span class="kw">use</span> <span class="ident">std::collections::HashMap</span>;
@@ -413,11 +407,9 @@
         }
     }
 
-    <span class="comment">// TODO: Change function to `from_value(u8) -&gt; Action` in the next version and return</span>
-    <span class="comment">// `Action::Unknown(u8)` for unknown values.</span>
     <span class="attribute">#[<span class="ident">must_use</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_value</span>(<span class="ident">value</span>: <span class="ident">u8</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Action</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">action</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">value</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_value</span>(<span class="ident">value</span>: <span class="ident">u8</span>) -&gt; <span class="ident">Action</span> {
+        <span class="kw">match</span> <span class="ident">value</span> {
             <span class="number">1</span> =&gt; <span class="ident">Action::GuildUpdate</span>,
             <span class="number">10</span>..<span class="op">=</span><span class="number">12</span> =&gt; <span class="ident">Action::Channel</span>(<span class="kw">unsafe</span> { <span class="ident">transmute</span>(<span class="ident">value</span>) }),
             <span class="number">13</span>..<span class="op">=</span><span class="number">15</span> =&gt; <span class="ident">Action::ChannelOverwrite</span>(<span class="kw">unsafe</span> { <span class="ident">transmute</span>(<span class="ident">value</span>) }),
@@ -431,17 +423,15 @@
             <span class="number">83</span>..<span class="op">=</span><span class="number">85</span> =&gt; <span class="ident">Action::StageInstance</span>(<span class="kw">unsafe</span> { <span class="ident">transmute</span>(<span class="ident">value</span>) }),
             <span class="number">90</span>..<span class="op">=</span><span class="number">92</span> =&gt; <span class="ident">Action::Sticker</span>(<span class="kw">unsafe</span> { <span class="ident">transmute</span>(<span class="ident">value</span>) }),
             <span class="number">110</span>..<span class="op">=</span><span class="number">112</span> =&gt; <span class="ident">Action::Thread</span>(<span class="kw">unsafe</span> { <span class="ident">transmute</span>(<span class="ident">value</span>) }),
-            <span class="kw">_</span> =&gt; <span class="kw">return</span> <span class="prelude-val">None</span>,
-        };
-
-        <span class="prelude-val">Some</span>(<span class="ident">action</span>)
+            <span class="kw">_</span> =&gt; <span class="ident">Action::Unknown</span>(<span class="ident">value</span>),
+        }
     }
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="ident">Deserialize</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Action</span> {
     <span class="kw">fn</span> <span class="ident">deserialize</span><span class="op">&lt;</span><span class="ident">D</span>: <span class="ident">Deserializer</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">deserializer</span>: <span class="ident">D</span>) -&gt; <span class="ident">StdResult</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">D::Error</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">value</span> <span class="op">=</span> <span class="ident">u8::deserialize</span>(<span class="ident">deserializer</span>)<span class="question-mark">?</span>;
-        <span class="prelude-val">Ok</span>(<span class="ident">Action::from_value</span>(<span class="ident">value</span>).<span class="ident">unwrap_or</span>(<span class="ident">Action::Unknown</span>(<span class="ident">value</span>)))
+        <span class="prelude-val">Ok</span>(<span class="ident">Action::from_value</span>(<span class="ident">value</span>))
     }
 }
 
@@ -635,7 +625,7 @@
     <span class="kw">fn</span> <span class="ident">action_value</span>() {
         <span class="macro">macro_rules!</span> <span class="ident">assert_action</span> {
             (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">action</span>:<span class="ident">pat</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">num</span>:<span class="ident">literal</span>) =&gt; {{
-                <span class="kw">let</span> <span class="ident">a</span> <span class="op">=</span> <span class="ident">Action::from_value</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">num</span>).<span class="ident">expect</span>(<span class="string">&quot;invalid action value&quot;</span>);
+                <span class="kw">let</span> <span class="ident">a</span> <span class="op">=</span> <span class="ident">Action::from_value</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">num</span>);
                 <span class="macro">assert!</span>(<span class="macro">matches!</span>(<span class="ident">a</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">action</span>), <span class="string">&quot;{:?} didn&#39;t match the variant&quot;</span>, <span class="ident">a</span>);
                 <span class="macro">assert_eq!</span>(<span class="ident">a</span>.<span class="ident">num</span>(), <span class="macro-nonterminal">$</span><span class="macro-nonterminal">num</span>);
             }};
@@ -685,9 +675,7 @@
         <span class="macro">assert_action!</span>(<span class="ident">Action::Thread</span>(<span class="ident">ThreadAction::Create</span>), <span class="number">110</span>);
         <span class="macro">assert_action!</span>(<span class="ident">Action::Thread</span>(<span class="ident">ThreadAction::Update</span>), <span class="number">111</span>);
         <span class="macro">assert_action!</span>(<span class="ident">Action::Thread</span>(<span class="ident">ThreadAction::Delete</span>), <span class="number">112</span>);
-
-        <span class="comment">// TODO: use `assert_action!` when `Action::from_value` returns `Action::Unknown`</span>
-        <span class="macro">assert_eq!</span>(<span class="ident">Action::Unknown</span>(<span class="number">234</span>).<span class="ident">num</span>(), <span class="number">234</span>);
+        <span class="macro">assert_action!</span>(<span class="ident">Action::Unknown</span>(<span class="number">234</span>), <span class="number">234</span>);
     }
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
