@@ -3267,38 +3267,6 @@
 <span id="3262">3262</span>
 <span id="3263">3263</span>
 <span id="3264">3264</span>
-<span id="3265">3265</span>
-<span id="3266">3266</span>
-<span id="3267">3267</span>
-<span id="3268">3268</span>
-<span id="3269">3269</span>
-<span id="3270">3270</span>
-<span id="3271">3271</span>
-<span id="3272">3272</span>
-<span id="3273">3273</span>
-<span id="3274">3274</span>
-<span id="3275">3275</span>
-<span id="3276">3276</span>
-<span id="3277">3277</span>
-<span id="3278">3278</span>
-<span id="3279">3279</span>
-<span id="3280">3280</span>
-<span id="3281">3281</span>
-<span id="3282">3282</span>
-<span id="3283">3283</span>
-<span id="3284">3284</span>
-<span id="3285">3285</span>
-<span id="3286">3286</span>
-<span id="3287">3287</span>
-<span id="3288">3288</span>
-<span id="3289">3289</span>
-<span id="3290">3290</span>
-<span id="3291">3291</span>
-<span id="3292">3292</span>
-<span id="3293">3293</span>
-<span id="3294">3294</span>
-<span id="3295">3295</span>
-<span id="3296">3296</span>
 </pre><pre class="rust"><code><span class="doccomment">//! Models relating to guilds and types that it owns.</span>
 
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">audit_log</span>;
@@ -6268,20 +6236,6 @@
     <span class="ident">value_a</span>.<span class="ident">cmp</span>(<span class="kw-2">&amp;</span><span class="ident">value_b</span>)
 }
 
-<span class="doccomment">/// A container for guilds.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// This is used to differentiate whether a guild itself can be used or whether</span>
-<span class="doccomment">/// a guild needs to be retrieved from the cache.</span>
-<span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::large_enum_variant</span>)]</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>)]</span>
-<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">GuildContainer</span> {
-    <span class="doccomment">/// A guild which can have its contents directly searched.</span>
-    <span class="ident">Guild</span>(<span class="ident">PartialGuild</span>),
-    <span class="doccomment">/// A guild&#39;s id, which can be used to search the cache for a guild.</span>
-    <span class="ident">Id</span>(<span class="ident">GuildId</span>),
-}
-
 <span class="doccomment">/// A [`Guild`] widget.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Serialize</span>, <span class="ident">Deserialize</span>)]</span>
 <span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
@@ -6331,24 +6285,6 @@
 
             <span class="macro">cdn!</span>(<span class="string">&quot;/icons/{}/{}.{}&quot;</span>, <span class="self">self</span>.<span class="ident">id</span>, <span class="ident">icon</span>, <span class="ident">ext</span>)
         })
-    }
-}
-
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">PartialGuild</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">GuildContainer</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">guild</span>: <span class="ident">PartialGuild</span>) -&gt; <span class="ident">GuildContainer</span> {
-        <span class="ident">GuildContainer::Guild</span>(<span class="ident">guild</span>)
-    }
-}
-
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">GuildId</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">GuildContainer</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">guild_id</span>: <span class="ident">GuildId</span>) -&gt; <span class="ident">GuildContainer</span> {
-        <span class="ident">GuildContainer::Id</span>(<span class="ident">guild_id</span>)
-    }
-}
-
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">GuildContainer</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">id</span>: <span class="ident">u64</span>) -&gt; <span class="ident">GuildContainer</span> {
-        <span class="ident">GuildContainer::Id</span>(<span class="ident">GuildId</span>(<span class="ident">id</span>))
     }
 }
 
