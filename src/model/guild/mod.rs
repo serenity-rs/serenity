@@ -3012,20 +3012,6 @@ fn closest_to_origin(origin: &str, word_a: &str, word_b: &str) -> std::cmp::Orde
     value_a.cmp(&value_b)
 }
 
-/// A container for guilds.
-///
-/// This is used to differentiate whether a guild itself can be used or whether
-/// a guild needs to be retrieved from the cache.
-#[allow(clippy::large_enum_variant)]
-#[derive(Clone, Debug)]
-#[non_exhaustive]
-pub enum GuildContainer {
-    /// A guild which can have its contents directly searched.
-    Guild(PartialGuild),
-    /// A guild's id, which can be used to search the cache for a guild.
-    Id(GuildId),
-}
-
 /// A [`Guild`] widget.
 ///
 /// [Discord docs](https://discord.com/developers/docs/resources/guild#guild-widget-settings-object).
@@ -3082,24 +3068,6 @@ impl GuildInfo {
 
             cdn!("/icons/{}/{}.{}", self.id, icon, ext)
         })
-    }
-}
-
-impl From<PartialGuild> for GuildContainer {
-    fn from(guild: PartialGuild) -> GuildContainer {
-        GuildContainer::Guild(guild)
-    }
-}
-
-impl From<GuildId> for GuildContainer {
-    fn from(guild_id: GuildId) -> GuildContainer {
-        GuildContainer::Id(guild_id)
-    }
-}
-
-impl From<u64> for GuildContainer {
-    fn from(id: u64) -> GuildContainer {
-        GuildContainer::Id(GuildId(id))
     }
 }
 
