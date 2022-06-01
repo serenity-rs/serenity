@@ -143,7 +143,7 @@ impl ModalInteractionFilter {
     /// Checks if the `interaction` passes set constraints.
     /// Constraints are optional, as it is possible to limit interactions to
     /// be sent by a specific author or in a specific guild.
-    fn is_passing_constraints(&self, interaction: &ModalSubmitInteraction,) -> bool {
+    fn is_passing_constraints(&self, interaction: &ModalSubmitInteraction) -> bool {
         self.options.guild_id.map_or(true, |id| Some(id) == interaction.guild_id.map(|g| g.0))
             && self
                 .options

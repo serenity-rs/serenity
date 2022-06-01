@@ -112,7 +112,9 @@ impl MessageFilter {
     /// Sends a `message` to the consuming collector if the `message` conforms
     /// to the constraints and the limits are not reached yet.
     pub(crate) fn send_message(&mut self, message: &mut LazyArc<'_, Message>) -> bool {
-        if self.is_passing_constraints(message) && self.options.filter.as_ref().map_or(true, |f| f.0(message)) {
+        if self.is_passing_constraints(message)
+            && self.options.filter.as_ref().map_or(true, |f| f.0(message))
+        {
             self.collected += 1;
 
             if self.sender.send(message.as_arc()).is_err() {
