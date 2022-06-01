@@ -1,4 +1,3 @@
-use std::fmt;
 use std::future::Future;
 use std::pin::Pin;
 use std::sync::Arc;
@@ -15,7 +14,7 @@ use tokio::sync::mpsc::{
 use tokio::time::{sleep, Sleep};
 
 use crate::client::bridge::gateway::ShardMessenger;
-use crate::collector::LazyArc;
+use crate::collector::{FilterFn, LazyArc};
 use crate::model::channel::Message;
 
 macro_rules! impl_message_collector {
@@ -40,8 +39,8 @@ macro_rules! impl_message_collector {
                 ///
                 /// This function is intended to be a message content filter.
                 #[must_use]
-                pub fn filter<F: Fn(&Arc<Message>) -> bool + 'static + Send + Sync>(mut self, function: F) -> Self {
-                    self.filter.as_mut().unwrap().filter = Some(Arc::new(function));
+                pub fn filter<F: Fn(&Message) -> bool + 'static + Send + Sync>(mut self, function: F) -> Self {
+                    self.filter.as_mut().unwrap().filter = Some(FilterFn(Arc::new(function)));
 
                     self
                 }
@@ -113,14 +112,13 @@ impl MessageFilter {
     /// Sends a `message` to the consuming collector if the `message` conforms
     /// to the constraints and the limits are not reached yet.
     pub(crate) fn send_message(&mut self, message: &mut LazyArc<'_, Message>) -> bool {
-        if self.is_passing_constraints(message) {
-            // TODO: On next branch, switch filter arg to &T so this as_arc() call can be removed.
-            if self.options.filter.as_ref().map_or(true, |f| f(&message.as_arc())) {
-                self.collected += 1;
+        if self.is_passing_constraints(message)
+            && self.options.filter.as_ref().map_or(true, |f| f.0(message))
+        {
+            self.collected += 1;
 
-                if self.sender.send(message.as_arc()).is_err() {
-                    return false;
-                }
+            if self.sender.send(message.as_arc()).is_err() {
+                return false;
             }
         }
 
@@ -147,11 +145,11 @@ impl MessageFilter {
     }
 }
 
-#[derive(Clone, Default)]
+#[derive(Clone, Default, Debug)]
 struct FilterOptions {
     filter_limit: Option<u32>,
     collect_limit: Option<u32>,
-    filter: Option<Arc<dyn Fn(&Arc<Message>) -> bool + 'static + Send + Sync>>,
+    filter: Option<FilterFn<Message>>,
     channel_id: Option<u64>,
     guild_id: Option<u64>,
     author_id: Option<u64>,
@@ -249,18 +247,6 @@ impl Future for CollectReply {
         }
 
         self.fut.as_mut().unwrap().as_mut().poll(ctx)
-    }
-}
-
-impl fmt::Debug for FilterOptions {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        f.debug_struct("MessageFilter")
-            .field("collect_limit", &self.collect_limit)
-            .field("filter", &"Option<Arc<dyn Fn(&Arc<Message>) -> bool + 'static + Send + Sync>>")
-            .field("channel_id", &self.channel_id)
-            .field("guild_id", &self.guild_id)
-            .field("author_id", &self.author_id)
-            .finish()
     }
 }
 

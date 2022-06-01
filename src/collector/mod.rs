@@ -2,6 +2,7 @@
 //! filter lets them pass, and collects if the receive, collect, or time limits
 //! are not reached yet.
 
+use std::fmt;
 use std::sync::Arc;
 
 mod error;
@@ -18,6 +19,16 @@ pub use event_collector::*;
 pub use message_collector::*;
 pub use modal_interaction_collector::*;
 pub use reaction_collector::*;
+
+#[derive(Clone)]
+struct FilterFn<Arg>(Arc<dyn Fn(&Arg) -> bool + 'static + Send + Sync>);
+impl<Arg> fmt::Debug for FilterFn<Arg> {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.debug_tuple("FilterFn")
+            .field(&format_args!("Arc<dyn Fn({}) -> bool", stringify!(Arg)))
+            .finish()
+    }
+}
 
 /// Wraps a &T and clones the value into an Arc<T> lazily. Used with collectors to allow inspecting
 /// the value in filters while only cloning values that actually match.
