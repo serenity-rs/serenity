@@ -55,11 +55,9 @@ impl Action {
         }
     }
 
-    // TODO: Change function to `from_value(u8) -> Action` in the next version and return
-    // `Action::Unknown(u8)` for unknown values.
     #[must_use]
-    pub fn from_value(value: u8) -> Option<Action> {
-        let action = match value {
+    pub fn from_value(value: u8) -> Action {
+        match value {
             1 => Action::GuildUpdate,
             10..=12 => Action::Channel(unsafe { transmute(value) }),
             13..=15 => Action::ChannelOverwrite(unsafe { transmute(value) }),
@@ -73,17 +71,15 @@ impl Action {
             83..=85 => Action::StageInstance(unsafe { transmute(value) }),
             90..=92 => Action::Sticker(unsafe { transmute(value) }),
             110..=112 => Action::Thread(unsafe { transmute(value) }),
-            _ => return None,
-        };
-
-        Some(action)
+            _ => Action::Unknown(value),
+        }
     }
 }
 
 impl<'de> Deserialize<'de> for Action {
     fn deserialize<D: Deserializer<'de>>(deserializer: D) -> StdResult<Self, D::Error> {
         let value = u8::deserialize(deserializer)?;
-        Ok(Action::from_value(value).unwrap_or(Action::Unknown(value)))
+        Ok(Action::from_value(value))
     }
 }
 
@@ -277,7 +273,7 @@ mod tests {
     fn action_value() {
         macro_rules! assert_action {
             ($action:pat, $num:literal) => {{
-                let a = Action::from_value($num).expect("invalid action value");
+                let a = Action::from_value($num);
                 assert!(matches!(a, $action), "{:?} didn't match the variant", a);
                 assert_eq!(a.num(), $num);
             }};
@@ -327,9 +323,7 @@ mod tests {
         assert_action!(Action::Thread(ThreadAction::Create), 110);
         assert_action!(Action::Thread(ThreadAction::Update), 111);
         assert_action!(Action::Thread(ThreadAction::Delete), 112);
-
-        // TODO: use `assert_action!` when `Action::from_value` returns `Action::Unknown`
-        assert_eq!(Action::Unknown(234).num(), 234);
+        assert_action!(Action::Unknown(234), 234);
     }
 
     #[test]
