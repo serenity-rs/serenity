@@ -95,7 +95,7 @@ pub enum Error {
     ///
     /// [`http`]: crate::http
     #[cfg(feature = "http")]
-    Http(Box<HttpError>),
+    Http(HttpError),
     /// An error from the `tungstenite` crate.
     #[cfg(feature = "gateway")]
     Tungstenite(TungsteniteError),
@@ -149,7 +149,7 @@ impl From<TungsteniteError> for Error {
 #[cfg(feature = "http")]
 impl From<HttpError> for Error {
     fn from(e: HttpError) -> Error {
-        Error::Http(Box::new(e))
+        Error::Http(e)
     }
 }
 
