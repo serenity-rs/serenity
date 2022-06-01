@@ -259,10 +259,8 @@ impl StandardFramework {
                     return Some(DispatchError::BlockedGuild);
                 }
 
-                let owner_id_option = ctx.cache.guild_field(guild_id, |guild| guild.owner_id);
-
-                if let Some(owner_id) = owner_id_option {
-                    if self.config.blocked_users.contains(&owner_id) {
+                if let Some(guild) = ctx.cache.guild(guild_id) {
+                    if self.config.blocked_users.contains(&guild.owner_id) {
                         return Some(DispatchError::BlockedGuild);
                     }
                 }
@@ -861,7 +859,8 @@ pub(crate) fn has_correct_permissions(
         true
     } else {
         message
-            .guild_field(cache, |guild| {
+            .guild(cache.as_ref())
+            .map(|guild| {
                 let channel = match guild.channels.get(&message.channel_id) {
                     Some(Channel::Guild(channel)) => channel,
                     _ => return false,

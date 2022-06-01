@@ -32,7 +32,7 @@
 
 use std::collections::hash_map::RandomState;
 use std::collections::{HashMap, VecDeque};
-use std::hash::BuildHasher;
+use std::hash::{BuildHasher, Hash};
 use std::str::FromStr;
 #[cfg(feature = "temp_cache")]
 use std::time::Duration;
@@ -40,6 +40,7 @@ use std::time::Duration;
 use dashmap::iter::Iter;
 use dashmap::mapref::entry::Entry;
 use dashmap::mapref::multiple::RefMulti;
+use dashmap::mapref::one::Ref;
 use dashmap::{DashMap, DashSet};
 #[cfg(feature = "temp_cache")]
 use moka::dash::Cache as DashCache;
@@ -55,6 +56,34 @@ pub use self::cache_update::CacheUpdate;
 pub use self::settings::Settings;
 
 type MessageCache = DashMap<ChannelId, DashMap<MessageId, Message>>;
+
+struct NotSend();
+
+pub struct CacheRef<'a, K, V> {
+    inner: Ref<'a, K, V>,
+    phantom: std::marker::PhantomData<*const NotSend>,
+}
+
+impl<'a, K, V> From<Ref<'a, K, V>> for CacheRef<'a, K, V> {
+    fn from(inner: Ref<'a, K, V>) -> Self {
+        Self {
+            inner,
+            phantom: std::marker::PhantomData,
+        }
+    }
+}
+
+impl<K: Eq + Hash, V> std::ops::Deref for CacheRef<'_, K, V> {
+    type Target = V;
+
+    fn deref(&self) -> &Self::Target {
+        self.inner.value()
+    }
+}
+
+pub type GuildRef<'a> = CacheRef<'a, GuildId, Guild>;
+pub type GuildChannelRef<'a> = CacheRef<'a, ChannelId, GuildChannel>;
+pub type PrivateChannelRef<'a> = CacheRef<'a, ChannelId, PrivateChannel>;
 
 pub trait FromStrAndCache: Sized {
     type Err;
@@ -401,10 +430,7 @@ impl Cache {
         Some(selector(message_iter))
     }
 
-    /// Clones an entire guild from the cache based on the given `id`.
-    ///
-    /// In order to clone only a field of the guild, use [`Self::guild_field`].
-    ///
+    /// Gets a reference to a guild from the cache based on the given `id`.
     ///
     /// # Examples
     ///
@@ -417,48 +443,15 @@ impl Cache {
     /// // assuming the cache is in scope, e.g. via `Context`
     /// if let Some(guild) = cache.guild(7) {
     ///     println!("Guild name: {}", guild.name);
-    /// }
+    /// };
     /// ```
     #[inline]
-    pub fn guild<G: Into<GuildId>>(&self, id: G) -> Option<Guild> {
+    pub fn guild<G: Into<GuildId>>(&self, id: G) -> Option<GuildRef<'_>> {
         self._guild(id.into())
     }
 
-    fn _guild(&self, id: GuildId) -> Option<Guild> {
-        self.guilds.get(&id).map(|i| i.clone())
-    }
-
-    /// This method allows to select a field of the guild instead of
-    /// the entire guild by providing a `field_selector`-closure picking what
-    /// you want to clone.
-    ///
-    /// ```rust,no_run
-    /// # use serenity::cache::Cache;
-    /// #
-    /// # fn run() -> Result<(), Box<dyn std::error::Error>> {
-    /// # let cache = Cache::default();
-    /// // We clone only the `len()` returned `usize` instead of the entire guild or the channels.
-    /// if let Some(channel_len) = cache.guild_field(7, |guild| guild.channels.len()) {
-    ///     println!("Guild channels count: {}", channel_len);
-    /// }
-    /// #   Ok(())
-    /// # }
-    /// ```
-    #[inline]
-    pub fn guild_field<Ret, Fun>(&self, id: impl Into<GuildId>, field_selector: Fun) -> Option<Ret>
-    where
-        Fun: FnOnce(&Guild) -> Ret,
-    {
-        self._guild_field(id.into(), field_selector)
-    }
-
-    fn _guild_field<Ret, Fun>(&self, id: GuildId, field_accessor: Fun) -> Option<Ret>
-    where
-        Fun: FnOnce(&Guild) -> Ret,
-    {
-        let guild = self.guilds.get(&id)?;
-
-        Some(field_accessor(&*guild))
+    fn _guild(&self, id: GuildId) -> Option<GuildRef<'_>> {
+        self.guilds.get(&id).map(Into::into)
     }
 
     /// Returns the number of cached guilds.
@@ -486,7 +479,8 @@ impl Cache {
     /// #[serenity::async_trait]
     /// impl EventHandler for Handler {
     ///     async fn message(&self, context: Context, message: Message) {
-    ///         let channel = match context.cache.guild_channel(message.channel_id) {
+    ///         let channel_opt = context.cache.guild_channel(message.channel_id).map(|c| c.clone());
+    ///         let channel = match channel_opt {
     ///             Some(channel) => channel,
     ///             None => {
     ///                 let result = message
@@ -515,49 +509,12 @@ impl Cache {
     ///
     /// [`EventHandler::message`]: crate::client::EventHandler::message
     #[inline]
-    pub fn guild_channel<C: Into<ChannelId>>(&self, id: C) -> Option<GuildChannel> {
+    pub fn guild_channel<C: Into<ChannelId>>(&self, id: C) -> Option<GuildChannelRef<'_>> {
         self._guild_channel(id.into())
     }
 
-    fn _guild_channel(&self, id: ChannelId) -> Option<GuildChannel> {
-        self.channels.get(&id).map(|i| i.clone())
-    }
-
-    /// This method allows to only clone a field of the guild channel instead of
-    /// the entire guild by providing a `field_selector`-closure picking what
-    /// you want to clone.
-    ///
-    /// ```rust,no_run
-    /// # use serenity::cache::Cache;
-    /// #
-    /// # fn run() -> Result<(), Box<dyn std::error::Error>> {
-    /// # let cache = Cache::default();
-    /// // We clone only the `name` instead of the entire channel.
-    /// if let Some(channel_name) = cache.guild_channel_field(7, |channel| channel.name.clone()) {
-    ///     println!("Guild channel name: {}", channel_name);
-    /// }
-    /// #   Ok(())
-    /// # }
-    /// ```
-    #[inline]
-    pub fn guild_channel_field<Ret, Fun>(
-        &self,
-        id: impl Into<ChannelId>,
-        field_selector: Fun,
-    ) -> Option<Ret>
-    where
-        Fun: FnOnce(&GuildChannel) -> Ret,
-    {
-        self._guild_channel_field(id.into(), field_selector)
-    }
-
-    fn _guild_channel_field<Ret, Fun>(&self, id: ChannelId, field_selector: Fun) -> Option<Ret>
-    where
-        Fun: FnOnce(&GuildChannel) -> Ret,
-    {
-        let channel = self.channels.get(&id)?;
-
-        Some(field_selector(&*channel))
+    fn _guild_channel(&self, id: ChannelId) -> Option<GuildChannelRef<'_>> {
+        self.channels.get(&id).map(Into::into)
     }
 
     /// Retrieves a [`Guild`]'s member from the cache based on the guild's and
@@ -796,15 +753,18 @@ impl Cache {
     ///
     /// if let Some(channel) = cache.private_channel(7) {
     ///     println!("The recipient is {}", channel.recipient);
-    /// }
+    /// };
     /// ```
     #[inline]
-    pub fn private_channel(&self, channel_id: impl Into<ChannelId>) -> Option<PrivateChannel> {
+    pub fn private_channel(
+        &self,
+        channel_id: impl Into<ChannelId>,
+    ) -> Option<PrivateChannelRef<'_>> {
         self._private_channel(channel_id.into())
     }
 
-    fn _private_channel(&self, channel_id: ChannelId) -> Option<PrivateChannel> {
-        self.private_channels.get(&channel_id).map(|i| i.clone())
+    fn _private_channel(&self, channel_id: ChannelId) -> Option<PrivateChannelRef<'_>> {
+        self.private_channels.get(&channel_id).map(Into::into)
     }
 
     /// Retrieves a [`Guild`]'s role by their Ids.
