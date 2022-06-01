@@ -63,14 +63,12 @@ pub use self::shard_runner_message::{ChunkGuildFilter, ShardRunnerMessage};
 use crate::gateway::ConnectionStage;
 
 /// A message either for a [`ShardManager`] or a [`ShardRunner`].
-// Once we can use `Box` as part of a pattern, we will reconsider boxing.
-#[allow(clippy::large_enum_variant)]
 #[derive(Clone, Debug)]
 pub enum ShardClientMessage {
     /// A message intended to be worked with by a [`ShardManager`].
     Manager(ShardManagerMessage),
     /// A message intended to be worked with by a [`ShardRunner`].
-    Runner(ShardRunnerMessage),
+    Runner(Box<ShardRunnerMessage>),
 }
 
 /// A message for a [`ShardManager`] relating to an operation with a shard.
