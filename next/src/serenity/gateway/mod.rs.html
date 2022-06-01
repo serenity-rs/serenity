@@ -328,7 +328,7 @@
 <span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">InterMessage</span> {
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;client&quot;</span>)]</span>
-    <span class="ident">Client</span>(<span class="ident">Box</span><span class="op">&lt;</span><span class="ident">ShardClientMessage</span><span class="op">&gt;</span>),
+    <span class="ident">Client</span>(<span class="ident">ShardClientMessage</span>),
     <span class="ident">Json</span>(<span class="ident">Value</span>),
 }
 

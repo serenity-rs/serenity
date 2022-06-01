@@ -160,8 +160,6 @@
 <span id="155">155</span>
 <span id="156">156</span>
 <span id="157">157</span>
-<span id="158">158</span>
-<span id="159">159</span>
 </pre><pre class="rust"><code><span class="doccomment">//! The client gateway bridge is support essential for the [`client`] module.</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! This is made available for user use if one wishes to be lower-level or avoid</span>
@@ -227,14 +225,12 @@
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::gateway::ConnectionStage</span>;
 
 <span class="doccomment">/// A message either for a [`ShardManager`] or a [`ShardRunner`].</span>
-<span class="comment">// Once we can use `Box` as part of a pattern, we will reconsider boxing.</span>
-<span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::large_enum_variant</span>)]</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>)]</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">ShardClientMessage</span> {
     <span class="doccomment">/// A message intended to be worked with by a [`ShardManager`].</span>
     <span class="ident">Manager</span>(<span class="ident">ShardManagerMessage</span>),
     <span class="doccomment">/// A message intended to be worked with by a [`ShardRunner`].</span>
-    <span class="ident">Runner</span>(<span class="ident">ShardRunnerMessage</span>),
+    <span class="ident">Runner</span>(<span class="ident">Box</span><span class="op">&lt;</span><span class="ident">ShardRunnerMessage</span><span class="op">&gt;</span>),
 }
 
 <span class="doccomment">/// A message for a [`ShardManager`] relating to an operation with a shard.</span>

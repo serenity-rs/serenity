@@ -694,13 +694,6 @@
 <span id="689">689</span>
 <span id="690">690</span>
 <span id="691">691</span>
-<span id="692">692</span>
-<span id="693">693</span>
-<span id="694">694</span>
-<span id="695">695</span>
-<span id="696">696</span>
-<span id="697">697</span>
-<span id="698">698</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::borrow::Cow</span>;
 <span class="kw">use</span> <span class="ident">std::sync::Arc</span>;
 
@@ -1072,120 +1065,113 @@
     <span class="attribute">#[<span class="ident">instrument</span>(<span class="ident">skip</span>(<span class="self">self</span>))]</span>
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">handle_rx_value</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">value</span>: <span class="ident">InterMessage</span>) -&gt; <span class="ident">bool</span> {
         <span class="kw">match</span> <span class="ident">value</span> {
-            <span class="ident">InterMessage::Client</span>(<span class="ident">value</span>) =&gt; <span class="kw">match</span> <span class="kw-2">*</span><span class="ident">value</span> {
-                <span class="ident">ShardClientMessage::Manager</span>(<span class="ident">ShardManagerMessage::Restart</span>(<span class="ident">id</span>)) =&gt; {
-                    <span class="self">self</span>.<span class="ident">checked_shutdown</span>(<span class="ident">id</span>, <span class="number">4000</span>).<span class="kw">await</span>
-                },
-                <span class="ident">ShardClientMessage::Manager</span>(<span class="ident">ShardManagerMessage::Shutdown</span>(<span class="ident">id</span>, <span class="ident">code</span>)) =&gt; {
-                    <span class="self">self</span>.<span class="ident">checked_shutdown</span>(<span class="ident">id</span>, <span class="ident">code</span>).<span class="kw">await</span>
-                },
-                <span class="ident">ShardClientMessage::Manager</span>(<span class="ident">ShardManagerMessage::ShutdownAll</span>) =&gt; {
-                    <span class="comment">// This variant should never be received.</span>
-                    <span class="macro">warn!</span>(<span class="string">&quot;[ShardRunner {:?}] Received a ShutdownAll?&quot;</span>, <span class="self">self</span>.<span class="ident">shard</span>.<span class="ident">shard_info</span>(),);
+            <span class="ident">InterMessage::Client</span>(<span class="ident">value</span>) =&gt; <span class="kw">match</span> <span class="ident">value</span> {
+                <span class="ident">ShardClientMessage::Manager</span>(<span class="ident">msg</span>) =&gt; <span class="kw">match</span> <span class="ident">msg</span> {
+                    <span class="ident">ShardManagerMessage::Restart</span>(<span class="ident">id</span>) =&gt; <span class="self">self</span>.<span class="ident">checked_shutdown</span>(<span class="ident">id</span>, <span class="number">4000</span>).<span class="kw">await</span>,
+                    <span class="ident">ShardManagerMessage::Shutdown</span>(<span class="ident">id</span>, <span class="ident">code</span>) =&gt; {
+                        <span class="self">self</span>.<span class="ident">checked_shutdown</span>(<span class="ident">id</span>, <span class="ident">code</span>).<span class="kw">await</span>
+                    },
+                    <span class="ident">ShardManagerMessage::ShutdownAll</span> =&gt; {
+                        <span class="comment">// This variant should never be received.</span>
+                        <span class="macro">warn!</span>(
+                            <span class="string">&quot;[ShardRunner {:?}] Received a ShutdownAll?&quot;</span>,
+                            <span class="self">self</span>.<span class="ident">shard</span>.<span class="ident">shard_info</span>(),
+                        );
 
-                    <span class="bool-val">true</span>
-                },
-                <span class="ident">ShardClientMessage::Manager</span>(
+                        <span class="bool-val">true</span>
+                    },
                     <span class="ident">ShardManagerMessage::ShardUpdate</span> {
                         ..
                     }
                     <span class="op">|</span> <span class="ident">ShardManagerMessage::ShutdownInitiated</span>
-                    <span class="op">|</span> <span class="ident">ShardManagerMessage::ShutdownFinished</span>(<span class="kw">_</span>),
-                ) =&gt; {
-                    <span class="comment">// nb: not sent here</span>
-
-                    <span class="bool-val">true</span>
-                },
-                <span class="ident">ShardClientMessage::Manager</span>(
+                    <span class="op">|</span> <span class="ident">ShardManagerMessage::ShutdownFinished</span>(<span class="kw">_</span>) =&gt; {
+                        <span class="comment">// nb: not sent here</span>
+                        <span class="bool-val">true</span>
+                    },
                     <span class="ident">ShardManagerMessage::ShardDisallowedGatewayIntents</span>
                     <span class="op">|</span> <span class="ident">ShardManagerMessage::ShardInvalidAuthentication</span>
-                    <span class="op">|</span> <span class="ident">ShardManagerMessage::ShardInvalidGatewayIntents</span>,
-                ) =&gt; {
-                    <span class="comment">// These variants should never be received.</span>
-                    <span class="macro">warn!</span>(<span class="string">&quot;[ShardRunner {:?}] Received a ShardError?&quot;</span>, <span class="self">self</span>.<span class="ident">shard</span>.<span class="ident">shard_info</span>(),);
+                    <span class="op">|</span> <span class="ident">ShardManagerMessage::ShardInvalidGatewayIntents</span> =&gt; {
+                        <span class="comment">// These variants should never be received.</span>
+                        <span class="macro">warn!</span>(<span class="string">&quot;[ShardRunner {:?}] Received a ShardError?&quot;</span>, <span class="self">self</span>.<span class="ident">shard</span>.<span class="ident">shard_info</span>(),);
 
-                    <span class="bool-val">true</span>
+                        <span class="bool-val">true</span>
+                    },
                 },
-                <span class="ident">ShardClientMessage::Runner</span>(<span class="ident">ShardRunnerMessage::ChunkGuild</span> {
-                    <span class="ident">guild_id</span>,
-                    <span class="ident">limit</span>,
-                    <span class="ident">filter</span>,
-                    <span class="ident">nonce</span>,
-                }) =&gt; {
-                    <span class="self">self</span>.<span class="ident">shard</span>.<span class="ident">chunk_guild</span>(<span class="ident">guild_id</span>, <span class="ident">limit</span>, <span class="ident">filter</span>, <span class="ident">nonce</span>.<span class="ident">as_deref</span>()).<span class="kw">await</span>.<span class="ident">is_ok</span>()
-                },
-                <span class="ident">ShardClientMessage::Runner</span>(<span class="ident">ShardRunnerMessage::Close</span>(<span class="ident">code</span>, <span class="ident">reason</span>)) =&gt; {
-                    <span class="kw">let</span> <span class="ident">reason</span> <span class="op">=</span> <span class="ident">reason</span>.<span class="ident">unwrap_or_default</span>();
-                    <span class="kw">let</span> <span class="ident">close</span> <span class="op">=</span> <span class="ident">CloseFrame</span> {
-                        <span class="ident">code</span>: <span class="ident">code</span>.<span class="ident">into</span>(),
-                        <span class="ident">reason</span>: <span class="ident">Cow::from</span>(<span class="ident">reason</span>),
-                    };
-                    <span class="self">self</span>.<span class="ident">shard</span>.<span class="ident">client</span>.<span class="ident">close</span>(<span class="prelude-val">Some</span>(<span class="ident">close</span>)).<span class="kw">await</span>.<span class="ident">is_ok</span>()
-                },
-                <span class="ident">ShardClientMessage::Runner</span>(<span class="ident">ShardRunnerMessage::Message</span>(<span class="ident">msg</span>)) =&gt; {
-                    <span class="self">self</span>.<span class="ident">shard</span>.<span class="ident">client</span>.<span class="ident">send</span>(<span class="ident">msg</span>).<span class="kw">await</span>.<span class="ident">is_ok</span>()
-                },
-                <span class="ident">ShardClientMessage::Runner</span>(<span class="ident">ShardRunnerMessage::SetActivity</span>(<span class="ident">activity</span>)) =&gt; {
-                    <span class="comment">// To avoid a clone of `activity`, we do a little bit of</span>
-                    <span class="comment">// trickery here:</span>
-                    <span class="comment">//</span>
-                    <span class="comment">// First, we obtain a reference to the current presence of</span>
-                    <span class="comment">// the shard, and create a new presence tuple of the new</span>
-                    <span class="comment">// activity we received over the channel as well as the</span>
-                    <span class="comment">// online status that the shard already had.</span>
-                    <span class="comment">//</span>
-                    <span class="comment">// We then (attempt to) send the websocket message with the</span>
-                    <span class="comment">// status update, expressively returning:</span>
-                    <span class="comment">//</span>
-                    <span class="comment">// - whether the message successfully sent</span>
-                    <span class="comment">// - the original activity we received over the channel</span>
-                    <span class="self">self</span>.<span class="ident">shard</span>.<span class="ident">set_activity</span>(<span class="ident">activity</span>);
+                <span class="ident">ShardClientMessage::Runner</span>(<span class="ident">msg</span>) =&gt; <span class="kw">match</span> <span class="kw-2">*</span><span class="ident">msg</span> {
+                    <span class="ident">ShardRunnerMessage::ChunkGuild</span> {
+                        <span class="ident">guild_id</span>,
+                        <span class="ident">limit</span>,
+                        <span class="ident">filter</span>,
+                        <span class="ident">nonce</span>,
+                    } =&gt; <span class="self">self</span>
+                        .<span class="ident">shard</span>
+                        .<span class="ident">chunk_guild</span>(<span class="ident">guild_id</span>, <span class="ident">limit</span>, <span class="ident">filter</span>, <span class="ident">nonce</span>.<span class="ident">as_deref</span>())
+                        .<span class="kw">await</span>
+                        .<span class="ident">is_ok</span>(),
+                    <span class="ident">ShardRunnerMessage::Close</span>(<span class="ident">code</span>, <span class="ident">reason</span>) =&gt; {
+                        <span class="kw">let</span> <span class="ident">reason</span> <span class="op">=</span> <span class="ident">reason</span>.<span class="ident">unwrap_or_default</span>();
+                        <span class="kw">let</span> <span class="ident">close</span> <span class="op">=</span> <span class="ident">CloseFrame</span> {
+                            <span class="ident">code</span>: <span class="ident">code</span>.<span class="ident">into</span>(),
+                            <span class="ident">reason</span>: <span class="ident">Cow::from</span>(<span class="ident">reason</span>),
+                        };
+                        <span class="self">self</span>.<span class="ident">shard</span>.<span class="ident">client</span>.<span class="ident">close</span>(<span class="prelude-val">Some</span>(<span class="ident">close</span>)).<span class="kw">await</span>.<span class="ident">is_ok</span>()
+                    },
+                    <span class="ident">ShardRunnerMessage::Message</span>(<span class="ident">msg</span>) =&gt; <span class="self">self</span>.<span class="ident">shard</span>.<span class="ident">client</span>.<span class="ident">send</span>(<span class="ident">msg</span>).<span class="kw">await</span>.<span class="ident">is_ok</span>(),
+                    <span class="ident">ShardRunnerMessage::SetActivity</span>(<span class="ident">activity</span>) =&gt; {
+                        <span class="comment">// To avoid a clone of `activity`, we do a little bit of</span>
+                        <span class="comment">// trickery here:</span>
+                        <span class="comment">//</span>
+                        <span class="comment">// First, we obtain a reference to the current presence of</span>
+                        <span class="comment">// the shard, and create a new presence tuple of the new</span>
+                        <span class="comment">// activity we received over the channel as well as the</span>
+                        <span class="comment">// online status that the shard already had.</span>
+                        <span class="comment">//</span>
+                        <span class="comment">// We then (attempt to) send the websocket message with the</span>
+                        <span class="comment">// status update, expressively returning:</span>
+                        <span class="comment">//</span>
+                        <span class="comment">// - whether the message successfully sent</span>
+                        <span class="comment">// - the original activity we received over the channel</span>
+                        <span class="self">self</span>.<span class="ident">shard</span>.<span class="ident">set_activity</span>(<span class="ident">activity</span>);
+                        <span class="self">self</span>.<span class="ident">shard</span>.<span class="ident">update_presence</span>().<span class="kw">await</span>.<span class="ident">is_ok</span>()
+                    },
+                    <span class="ident">ShardRunnerMessage::SetPresence</span>(<span class="ident">status</span>, <span class="ident">activity</span>) =&gt; {
+                        <span class="self">self</span>.<span class="ident">shard</span>.<span class="ident">set_presence</span>(<span class="ident">status</span>, <span class="ident">activity</span>);
+                        <span class="self">self</span>.<span class="ident">shard</span>.<span class="ident">update_presence</span>().<span class="kw">await</span>.<span class="ident">is_ok</span>()
+                    },
+                    <span class="ident">ShardRunnerMessage::SetStatus</span>(<span class="ident">status</span>) =&gt; {
+                        <span class="self">self</span>.<span class="ident">shard</span>.<span class="ident">set_status</span>(<span class="ident">status</span>);
+                        <span class="self">self</span>.<span class="ident">shard</span>.<span class="ident">update_presence</span>().<span class="kw">await</span>.<span class="ident">is_ok</span>()
+                    },
+                    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;collector&quot;</span>)]</span>
+                    <span class="ident">ShardRunnerMessage::SetEventFilter</span>(<span class="ident">collector</span>) =&gt; {
+                        <span class="self">self</span>.<span class="ident">event_filters</span>.<span class="ident">push</span>(<span class="ident">collector</span>);
 
-                    <span class="self">self</span>.<span class="ident">shard</span>.<span class="ident">update_presence</span>().<span class="kw">await</span>.<span class="ident">is_ok</span>()
-                },
-                <span class="ident">ShardClientMessage::Runner</span>(<span class="ident">ShardRunnerMessage::SetPresence</span>(<span class="ident">status</span>, <span class="ident">activity</span>)) =&gt; {
-                    <span class="self">self</span>.<span class="ident">shard</span>.<span class="ident">set_presence</span>(<span class="ident">status</span>, <span class="ident">activity</span>);
+                        <span class="bool-val">true</span>
+                    },
+                    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;collector&quot;</span>)]</span>
+                    <span class="ident">ShardRunnerMessage::SetMessageFilter</span>(<span class="ident">collector</span>) =&gt; {
+                        <span class="self">self</span>.<span class="ident">message_filters</span>.<span class="ident">push</span>(<span class="ident">collector</span>);
 
-                    <span class="self">self</span>.<span class="ident">shard</span>.<span class="ident">update_presence</span>().<span class="kw">await</span>.<span class="ident">is_ok</span>()
-                },
-                <span class="ident">ShardClientMessage::Runner</span>(<span class="ident">ShardRunnerMessage::SetStatus</span>(<span class="ident">status</span>)) =&gt; {
-                    <span class="self">self</span>.<span class="ident">shard</span>.<span class="ident">set_status</span>(<span class="ident">status</span>);
+                        <span class="bool-val">true</span>
+                    },
+                    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;collector&quot;</span>)]</span>
+                    <span class="ident">ShardRunnerMessage::SetReactionFilter</span>(<span class="ident">collector</span>) =&gt; {
+                        <span class="self">self</span>.<span class="ident">reaction_filters</span>.<span class="ident">push</span>(<span class="ident">collector</span>);
 
-                    <span class="self">self</span>.<span class="ident">shard</span>.<span class="ident">update_presence</span>().<span class="kw">await</span>.<span class="ident">is_ok</span>()
-                },
-                <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;collector&quot;</span>)]</span>
-                <span class="ident">ShardClientMessage::Runner</span>(<span class="ident">ShardRunnerMessage::SetEventFilter</span>(<span class="ident">collector</span>)) =&gt; {
-                    <span class="self">self</span>.<span class="ident">event_filters</span>.<span class="ident">push</span>(<span class="ident">collector</span>);
+                        <span class="bool-val">true</span>
+                    },
+                    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;collector&quot;</span>)]</span>
+                    <span class="ident">ShardRunnerMessage::SetComponentInteractionFilter</span>(<span class="ident">collector</span>) =&gt; {
+                        <span class="self">self</span>.<span class="ident">component_interaction_filters</span>.<span class="ident">push</span>(<span class="ident">collector</span>);
 
-                    <span class="bool-val">true</span>
-                },
-                <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;collector&quot;</span>)]</span>
-                <span class="ident">ShardClientMessage::Runner</span>(<span class="ident">ShardRunnerMessage::SetMessageFilter</span>(<span class="ident">collector</span>)) =&gt; {
-                    <span class="self">self</span>.<span class="ident">message_filters</span>.<span class="ident">push</span>(<span class="ident">collector</span>);
+                        <span class="bool-val">true</span>
+                    },
+                    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;collector&quot;</span>)]</span>
+                    <span class="ident">ShardRunnerMessage::SetModalInteractionFilter</span>(<span class="ident">collector</span>) =&gt; {
+                        <span class="self">self</span>.<span class="ident">modal_interaction_filters</span>.<span class="ident">push</span>(<span class="ident">collector</span>);
 
-                    <span class="bool-val">true</span>
-                },
-                <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;collector&quot;</span>)]</span>
-                <span class="ident">ShardClientMessage::Runner</span>(<span class="ident">ShardRunnerMessage::SetReactionFilter</span>(<span class="ident">collector</span>)) =&gt; {
-                    <span class="self">self</span>.<span class="ident">reaction_filters</span>.<span class="ident">push</span>(<span class="ident">collector</span>);
-
-                    <span class="bool-val">true</span>
-                },
-                <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;collector&quot;</span>)]</span>
-                <span class="ident">ShardClientMessage::Runner</span>(<span class="ident">ShardRunnerMessage::SetComponentInteractionFilter</span>(
-                    <span class="ident">collector</span>,
-                )) =&gt; {
-                    <span class="self">self</span>.<span class="ident">component_interaction_filters</span>.<span class="ident">push</span>(<span class="ident">collector</span>);
-
-                    <span class="bool-val">true</span>
-                },
-                <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;collector&quot;</span>)]</span>
-                <span class="ident">ShardClientMessage::Runner</span>(<span class="ident">ShardRunnerMessage::SetModalInteractionFilter</span>(
-                    <span class="ident">collector</span>,
-                )) =&gt; {
-                    <span class="self">self</span>.<span class="ident">modal_interaction_filters</span>.<span class="ident">push</span>(<span class="ident">collector</span>);
-
-                    <span class="bool-val">true</span>
+                        <span class="bool-val">true</span>
+                    },
                 },
             },
             <span class="ident">InterMessage::Json</span>(<span class="ident">value</span>) =&gt; {

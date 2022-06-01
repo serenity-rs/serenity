@@ -318,7 +318,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// [`http`]: crate::http</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http&quot;</span>)]</span>
-    <span class="ident">Http</span>(<span class="ident">Box</span><span class="op">&lt;</span><span class="ident">HttpError</span><span class="op">&gt;</span>),
+    <span class="ident">Http</span>(<span class="ident">HttpError</span>),
     <span class="doccomment">/// An error from the `tungstenite` crate.</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;gateway&quot;</span>)]</span>
     <span class="ident">Tungstenite</span>(<span class="ident">TungsteniteError</span>),
@@ -372,7 +372,7 @@
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http&quot;</span>)]</span>
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">HttpError</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Error</span> {
     <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">e</span>: <span class="ident">HttpError</span>) -&gt; <span class="ident">Error</span> {
-        <span class="ident">Error::Http</span>(<span class="ident">Box::new</span>(<span class="ident">e</span>))
+        <span class="ident">Error::Http</span>(<span class="ident">e</span>)
     }
 }
 

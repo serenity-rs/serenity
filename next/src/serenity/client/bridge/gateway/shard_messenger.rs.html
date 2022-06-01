@@ -546,7 +546,7 @@
     <span class="doccomment">/// Returns a [`TrySendError`] if the shard&#39;s receiver was closed.</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">send_to_shard</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">msg</span>: <span class="ident">ShardRunnerMessage</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">TrySendError</span><span class="op">&lt;</span><span class="ident">InterMessage</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">tx</span>.<span class="ident">unbounded_send</span>(<span class="ident">InterMessage::Client</span>(<span class="ident">Box::new</span>(<span class="ident">ShardClientMessage::Runner</span>(<span class="ident">msg</span>))))
+        <span class="self">self</span>.<span class="ident">tx</span>.<span class="ident">unbounded_send</span>(<span class="ident">InterMessage::Client</span>(<span class="ident">ShardClientMessage::Runner</span>(<span class="ident">Box::new</span>(<span class="ident">msg</span>))))
     }
 
     <span class="doccomment">/// Sets a new filter for an event collector.</span>
