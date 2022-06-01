@@ -26,7 +26,7 @@ use crate::builder::{
     EditScheduledEvent,
 };
 #[cfg(all(feature = "cache", feature = "model"))]
-use crate::cache::Cache;
+use crate::cache::{Cache, GuildRef};
 #[cfg(feature = "collector")]
 use crate::client::bridge::gateway::ShardMessenger;
 #[cfg(feature = "collector")]
@@ -804,7 +804,7 @@ impl GuildId {
     /// Tries to find the [`Guild`] by its Id in the cache.
     #[cfg(feature = "cache")]
     #[inline]
-    pub fn to_guild_cached(self, cache: impl AsRef<Cache>) -> Option<Guild> {
+    pub fn to_guild_cached(self, cache: &impl AsRef<Cache>) -> Option<GuildRef<'_>> {
         cache.as_ref().guild(self)
     }
 
@@ -1083,8 +1083,7 @@ impl GuildId {
     #[cfg(feature = "cache")]
     #[must_use]
     pub fn name(self, cache: impl AsRef<Cache>) -> Option<String> {
-        let guild = self.to_guild_cached(&cache)?;
-        Some(guild.name)
+        self.to_guild_cached(cache.as_ref()).map(|g| g.name.clone())
     }
 
     /// Disconnects a member from a voice channel in the guild.
