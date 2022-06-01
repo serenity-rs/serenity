@@ -1,4 +1,3 @@
-use std::fmt;
 use std::future::Future;
 use std::pin::Pin;
 use std::sync::Arc;
@@ -14,7 +13,7 @@ use tokio::sync::mpsc::{
 use tokio::time::{sleep, Sleep};
 
 use crate::client::bridge::gateway::ShardMessenger;
-use crate::collector::{CollectorError, LazyArc};
+use crate::collector::{CollectorError, FilterFn, LazyArc};
 use crate::model::event::{Event, EventType, RelatedIdsForEventType};
 use crate::model::id::{ChannelId, GuildId, MessageId, UserId};
 use crate::{Error, Result};
@@ -98,9 +97,8 @@ impl EventFilter {
 
     /// Checks if the `event` passes set constraints.
     /// Constraints are optional, as it is possible to limit events to
-    /// be sent by a specific user or in a specific guild.
-    #[allow(clippy::wrong_self_convention)]
-    fn is_passing_constraints(&mut self, event: &mut LazyArc<'_, Event>) -> bool {
+    /// be sent by a specific user or in a specifc guild.
+    fn is_passing_constraints(&self, event: &Event) -> bool {
         fn empty_or_any<T, F>(slice: &[T], f: F) -> bool
         where
             F: Fn(&T) -> bool,
@@ -108,12 +106,11 @@ impl EventFilter {
             slice.is_empty() || slice.iter().any(f)
         }
 
-        // TODO: On next branch, switch filter arg to &T so this as_arc() call can be removed.
         empty_or_any(&self.options.guild_id, |id| event.guild_id().contains(id))
             && empty_or_any(&self.options.user_id, |id| event.user_id().contains(id))
             && empty_or_any(&self.options.channel_id, |id| event.channel_id().contains(id))
             && empty_or_any(&self.options.message_id, |id| event.message_id().contains(id))
-            && self.options.filter.as_mut().map_or(true, |f| f.0(&event.as_arc()))
+            && self.options.filter.as_ref().map_or(true, |f| f.0(event))
     }
 
     /// Checks if the filter is within set receive and collect limits.
@@ -125,21 +122,12 @@ impl EventFilter {
     }
 }
 
-#[derive(Clone)]
-struct FilterFn(Arc<dyn Fn(&Arc<Event>) -> bool + 'static + Send + Sync>);
-
-impl fmt::Debug for FilterFn {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        f.write_str("Arc<dyn Fn(&Arc<Event>) -> bool + 'static + Send + Sync>")
-    }
-}
-
 #[derive(Clone, Debug, Default)]
 struct FilterOptions {
     event_types: Vec<EventType>,
     filter_limit: Option<u32>,
     collect_limit: Option<u32>,
-    filter: Option<FilterFn>,
+    filter: Option<FilterFn<Event>>,
     channel_id: Vec<ChannelId>,
     guild_id: Vec<GuildId>,
     user_id: Vec<UserId>,
@@ -191,10 +179,7 @@ impl EventCollectorBuilder {
     /// process.
     /// This is the last step to pass for a event to count as *collected*.
     #[allow(clippy::unwrap_used)]
-    pub fn filter<F: Fn(&Arc<Event>) -> bool + 'static + Send + Sync>(
-        mut self,
-        function: F,
-    ) -> Self {
+    pub fn filter<F: Fn(&Event) -> bool + 'static + Send + Sync>(mut self, function: F) -> Self {
         self.filter.as_mut().unwrap().filter = Some(FilterFn(Arc::new(function)));
 
         self
