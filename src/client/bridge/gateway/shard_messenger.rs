@@ -249,7 +249,7 @@ impl ShardMessenger {
     /// Returns a [`TrySendError`] if the shard's receiver was closed.
     #[inline]
     pub fn send_to_shard(&self, msg: ShardRunnerMessage) -> Result<(), TrySendError<InterMessage>> {
-        self.tx.unbounded_send(InterMessage::Client(Box::new(ShardClientMessage::Runner(msg))))
+        self.tx.unbounded_send(InterMessage::Client(ShardClientMessage::Runner(Box::new(msg))))
     }
 
     /// Sets a new filter for an event collector.
