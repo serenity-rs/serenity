@@ -15,7 +15,7 @@ use tokio::sync::mpsc::{
 use tokio::time::{sleep, Sleep};
 
 use crate::client::bridge::gateway::ShardMessenger;
-use crate::collector::LazyArc;
+use crate::collector::{FilterFn, LazyArc};
 use crate::model::application::interaction::message_component::MessageComponentInteraction;
 
 macro_rules! impl_component_interaction_collector {
@@ -47,8 +47,8 @@ macro_rules! impl_component_interaction_collector {
                 /// This is the last instance to pass for an interaction to count as *collected*.
                 ///
                 /// This function is intended to be an interaction filter.
-                pub fn filter<F: Fn(&Arc<MessageComponentInteraction>) -> bool + 'static + Send + Sync>(mut self, function: F) -> Self {
-                    self.filter.as_mut().unwrap().filter = Some(Arc::new(function));
+                pub fn filter<F: Fn(&MessageComponentInteraction) -> bool + 'static + Send + Sync>(mut self, function: F) -> Self {
+                    self.filter.as_mut().unwrap().filter = Some(FilterFn(Arc::new(function)));
 
                     self
                 }
@@ -143,16 +143,12 @@ impl ComponentInteractionFilter {
     /// Checks if the `interaction` passes set constraints.
     /// Constraints are optional, as it is possible to limit interactions to
     /// be sent by a specific author or in a specific guild.
-    fn is_passing_constraints(
-        &self,
-        interaction: &mut LazyArc<'_, MessageComponentInteraction>,
-    ) -> bool {
-        // TODO: On next branch, switch filter arg to &T so this as_arc() call can be removed.
+    fn is_passing_constraints(&self, interaction: &MessageComponentInteraction) -> bool {
         self.options.guild_id.map_or(true, |id| Some(id) == interaction.guild_id.map(|g| g.0))
             && self.options.message_id.map_or(true, |id| interaction.message.id.0 == id)
             && self.options.channel_id.map_or(true, |id| id == interaction.channel_id.as_ref().0)
             && self.options.author_id.map_or(true, |id| id == interaction.user.id.0)
-            && self.options.filter.as_ref().map_or(true, |f| f(&interaction.as_arc()))
+            && self.options.filter.as_ref().map_or(true, |f| f.0(interaction))
     }
 
     /// Checks if the filter is within set receive and collect limits.
@@ -168,7 +164,7 @@ impl ComponentInteractionFilter {
 struct FilterOptions {
     filter_limit: Option<u32>,
     collect_limit: Option<u32>,
-    filter: Option<Arc<dyn Fn(&Arc<MessageComponentInteraction>) -> bool + 'static + Send + Sync>>,
+    filter: Option<FilterFn<MessageComponentInteraction>>,
     channel_id: Option<u64>,
     guild_id: Option<u64>,
     author_id: Option<u64>,
