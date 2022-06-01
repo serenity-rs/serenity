@@ -1005,7 +1005,11 @@ impl User {
             }
         }
 
-        guild_id.member(cache_http, &self.id).await.ok().and_then(|member| member.nick)
+        guild_id
+            .member(&cache_http, &self.id)
+            .await
+            .ok()
+            .and_then(|member| member.nick.as_ref().map(String::clone))
     }
 
     /// Returns a future that will await one message by this user.
