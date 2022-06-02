@@ -613,10 +613,6 @@ pub struct CommandDataOption {
     /// The resolved object of the given `value`, if there is one.
     #[serde(default)]
     pub resolved: Option<CommandDataOptionValue>,
-    /// For `Autocomplete` Interactions this will be `true` if
-    /// this option is currently focused by the user.
-    #[serde(default)]
-    pub focused: bool,
 }
 
 impl<'de> Deserialize<'de> for CommandDataOption {
@@ -644,18 +640,12 @@ impl<'de> Deserialize<'de> for CommandDataOption {
             .map_err(DeError::custom)?
             .unwrap_or_default();
 
-        let focused = match map.get("focused") {
-            Some(value) => value.as_bool().ok_or_else(|| DeError::custom("expected bool"))?,
-            None => false,
-        };
-
         Ok(Self {
             name,
             value,
             kind,
             options,
             resolved: None,
-            focused,
         })
     }
 }
