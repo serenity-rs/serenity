@@ -53,6 +53,9 @@ jobs:
             dont-test: true
           - name: builder without model
             features: builder
+          - name: unstable Discord API (no default features)
+            features: unstable_discord_api
+            dont-test: true
 
     steps:
       - name: Checkout sources
