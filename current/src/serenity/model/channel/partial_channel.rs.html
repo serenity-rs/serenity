@@ -21,8 +21,18 @@
 <span id="16">16</span>
 <span id="17">17</span>
 <span id="18">18</span>
+<span id="19">19</span>
+<span id="20">20</span>
+<span id="21">21</span>
+<span id="22">22</span>
+<span id="23">23</span>
+<span id="24">24</span>
+<span id="25">25</span>
+<span id="26">26</span>
+<span id="27">27</span>
+<span id="28">28</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::channel::ChannelType</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::id::ChannelId</span>;
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::id</span>::{<span class="ident">ChannelId</span>, <span class="ident">WebhookId</span>};
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::Permissions</span>;
 
 <span class="doccomment">/// A container for any partial channel.</span>
@@ -38,6 +48,16 @@
     <span class="kw">pub</span> <span class="ident">kind</span>: <span class="ident">ChannelType</span>,
     <span class="doccomment">/// The channel permissions.</span>
     <span class="kw">pub</span> <span class="ident">permissions</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Permissions</span><span class="op">&gt;</span>,
+}
+
+<span class="doccomment">/// A container for the IDs returned by following a news channel.</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Serialize</span>, <span class="ident">Deserialize</span>)]</span>
+<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">FollowedChannel</span> {
+    <span class="doccomment">/// The source announcement channel</span>
+    <span class="ident">channel_id</span>: <span class="ident">ChannelId</span>,
+    <span class="doccomment">/// The created webhook ID in the target channel</span>
+    <span class="ident">webhook_id</span>: <span class="ident">WebhookId</span>,
 }
 </code></pre></div>
 </section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.61.0-nightly (3c17c84a3 2022-03-21)" ></div>

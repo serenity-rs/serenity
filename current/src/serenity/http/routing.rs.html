@@ -2896,6 +2896,27 @@
 <span id="2891">2891</span>
 <span id="2892">2892</span>
 <span id="2893">2893</span>
+<span id="2894">2894</span>
+<span id="2895">2895</span>
+<span id="2896">2896</span>
+<span id="2897">2897</span>
+<span id="2898">2898</span>
+<span id="2899">2899</span>
+<span id="2900">2900</span>
+<span id="2901">2901</span>
+<span id="2902">2902</span>
+<span id="2903">2903</span>
+<span id="2904">2904</span>
+<span id="2905">2905</span>
+<span id="2906">2906</span>
+<span id="2907">2907</span>
+<span id="2908">2908</span>
+<span id="2909">2909</span>
+<span id="2910">2910</span>
+<span id="2911">2911</span>
+<span id="2912">2912</span>
+<span id="2913">2913</span>
+<span id="2914">2914</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::borrow::Cow</span>;
 <span class="kw">use</span> <span class="ident">std::fmt</span>::{<span class="ident">Display</span>, <span class="ident">Write</span>};
 
@@ -3051,6 +3072,12 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// [`ChannelId`]: crate::model::id::ChannelId</span>
     <span class="ident">ChannelsIdMeJoindedArchivedPrivateThreads</span>(<span class="ident">u64</span>),
+    <span class="doccomment">/// Route for the `/channels/{channel.id}/followers` path.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// The data is the relevant [`ChannelId`].</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// [`ChannelId`]: crate::model::id::ChannelId</span>
+    <span class="ident">FollowNewsChannel</span>(<span class="ident">u64</span>),
     <span class="doccomment">/// Route for the `/gateway` path.</span>
     <span class="ident">Gateway</span>,
     <span class="doccomment">/// Route for the `/gateway/bot` path.</span>
@@ -3446,6 +3473,11 @@
     <span class="attribute">#[<span class="ident">must_use</span>]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">channel_messages_bulk_delete</span>(<span class="ident">channel_id</span>: <span class="ident">u64</span>) -&gt; <span class="ident">String</span> {
         <span class="macro">api!</span>(<span class="string">&quot;/channels/{}/messages/bulk-delete&quot;</span>, <span class="ident">channel_id</span>)
+    }
+
+    <span class="attribute">#[<span class="ident">must_use</span>]</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">channel_follow_news</span>(<span class="ident">channel_id</span>: <span class="ident">u64</span>) -&gt; <span class="ident">String</span> {
+        <span class="macro">api!</span>(<span class="string">&quot;/channels/{}/followers&quot;</span>, <span class="ident">channel_id</span>)
     }
 
     <span class="attribute">#[<span class="ident">must_use</span>]</span>
@@ -4346,6 +4378,9 @@
         <span class="ident">wait</span>: <span class="ident">bool</span>,
         <span class="ident">webhook_id</span>: <span class="ident">u64</span>,
     },
+    <span class="ident">FollowNewsChannel</span> {
+        <span class="ident">channel_id</span>: <span class="ident">u64</span>,
+    },
     <span class="ident">JoinThread</span> {
         <span class="ident">channel_id</span>: <span class="ident">u64</span>,
     },
@@ -5238,6 +5273,13 @@
                 <span class="ident">LightMethod::Post</span>,
                 <span class="ident">Route::WebhooksId</span>(<span class="ident">webhook_id</span>),
                 <span class="ident">Cow::from</span>(<span class="ident">Route::webhook_with_token_optioned</span>(<span class="ident">webhook_id</span>, <span class="ident">token</span>, <span class="ident">wait</span>)),
+            ),
+            <span class="ident">RouteInfo::FollowNewsChannel</span> {
+                <span class="ident">channel_id</span>,
+            } =&gt; (
+                <span class="ident">LightMethod::Post</span>,
+                <span class="ident">Route::FollowNewsChannel</span>(<span class="ident">channel_id</span>),
+                <span class="ident">Cow::from</span>(<span class="ident">Route::channel_follow_news</span>(<span class="ident">channel_id</span>)),
             ),
             <span class="ident">RouteInfo::GetAuditLogs</span> {
                 <span class="ident">action_type</span>,
