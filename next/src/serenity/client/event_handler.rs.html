@@ -532,6 +532,41 @@
 <span id="527">527</span>
 <span id="528">528</span>
 <span id="529">529</span>
+<span id="530">530</span>
+<span id="531">531</span>
+<span id="532">532</span>
+<span id="533">533</span>
+<span id="534">534</span>
+<span id="535">535</span>
+<span id="536">536</span>
+<span id="537">537</span>
+<span id="538">538</span>
+<span id="539">539</span>
+<span id="540">540</span>
+<span id="541">541</span>
+<span id="542">542</span>
+<span id="543">543</span>
+<span id="544">544</span>
+<span id="545">545</span>
+<span id="546">546</span>
+<span id="547">547</span>
+<span id="548">548</span>
+<span id="549">549</span>
+<span id="550">550</span>
+<span id="551">551</span>
+<span id="552">552</span>
+<span id="553">553</span>
+<span id="554">554</span>
+<span id="555">555</span>
+<span id="556">556</span>
+<span id="557">557</span>
+<span id="558">558</span>
+<span id="559">559</span>
+<span id="560">560</span>
+<span id="561">561</span>
+<span id="562">562</span>
+<span id="563">563</span>
+<span id="564">564</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::collections::HashMap</span>;
 
 <span class="kw">use</span> <span class="ident">async_trait::async_trait</span>;
@@ -1051,6 +1086,41 @@
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">_ctx</span>: <span class="ident">Context</span>,
         <span class="ident">_thread_members_update</span>: <span class="ident">ThreadMembersUpdateEvent</span>,
+    ) {
+    }
+
+    <span class="doccomment">/// Dispatched when a scheduled event is created.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// Provides data about the scheduled event.</span>
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">guild_scheduled_event_create</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_ctx</span>: <span class="ident">Context</span>, <span class="ident">_event</span>: <span class="ident">ScheduledEvent</span>) {}
+
+    <span class="doccomment">/// Dispatched when a scheduled event is updated.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// Provides data about the scheduled event.</span>
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">guild_scheduled_event_update</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_ctx</span>: <span class="ident">Context</span>, <span class="ident">_event</span>: <span class="ident">ScheduledEvent</span>) {}
+
+    <span class="doccomment">/// Dispatched when a scheduled event is deleted.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// Provides data about the scheduled event.</span>
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">guild_scheduled_event_delete</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_ctx</span>: <span class="ident">Context</span>, <span class="ident">_event</span>: <span class="ident">ScheduledEvent</span>) {}
+
+    <span class="doccomment">/// Dispatched when a guild member has subscribed to a scheduled event.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// Provides data about the subscription.</span>
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">guild_scheduled_event_user_add</span>(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        <span class="ident">_ctx</span>: <span class="ident">Context</span>,
+        <span class="ident">_subscribed</span>: <span class="ident">GuildScheduledEventUserAddEvent</span>,
+    ) {
+    }
+
+    <span class="doccomment">/// Dispatched when a guild member has unsubscribed from a scheduled event.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// Provides data about the cancelled subscription.</span>
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">guild_scheduled_event_user_remove</span>(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        <span class="ident">_ctx</span>: <span class="ident">Context</span>,
+        <span class="ident">_unsubscribed</span>: <span class="ident">GuildScheduledEventUserRemoveEvent</span>,
     ) {
     }
 }

@@ -1377,9 +1377,13 @@
 <span id="1372">1372</span>
 <span id="1373">1373</span>
 <span id="1374">1374</span>
+<span id="1375">1375</span>
+<span id="1376">1376</span>
 </pre><pre class="rust"><code><span class="doccomment">//! User information-related models.</span>
 
 <span class="kw">use</span> <span class="ident">std::fmt</span>;
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
+<span class="kw">use</span> <span class="ident">std::fmt::Write</span>;
 
 <span class="kw">use</span> <span class="ident">serde</span>::{<span class="ident">Deserialize</span>, <span class="ident">Serialize</span>};
 
@@ -2636,7 +2640,7 @@
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">tag</span> <span class="op">=</span> <span class="ident">String::with_capacity</span>(<span class="number">37</span>);
     <span class="ident">tag</span>.<span class="ident">push_str</span>(<span class="ident">name</span>);
     <span class="ident">tag</span>.<span class="ident">push</span>(<span class="string">&#39;#&#39;</span>);
-    <span class="ident">tag</span>.<span class="ident">push_str</span>(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;{:04}&quot;</span>, <span class="ident">discriminator</span>));
+    <span class="macro">write!</span>(<span class="ident">tag</span>, <span class="string">&quot;{:04}&quot;</span>, <span class="ident">discriminator</span>).<span class="ident">unwrap</span>();
 
     <span class="ident">tag</span>
 }

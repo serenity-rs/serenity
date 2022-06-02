@@ -322,6 +322,8 @@
 <span id="317">317</span>
 <span id="318">318</span>
 <span id="319">319</span>
+<span id="320">320</span>
+<span id="321">321</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::collections::HashMap</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>))]</span>
 <span class="kw">use</span> <span class="ident">std::marker::PhantomData</span>;
@@ -638,7 +640,9 @@
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">map</span> <span class="op">=</span> <span class="ident">HashMap::new</span>();
         <span class="ident">map</span>.<span class="ident">insert</span>(<span class="string">&quot;tts&quot;</span>, <span class="ident">Value::from</span>(<span class="bool-val">false</span>));
 
-        <span class="ident">CreateMessage</span>(<span class="ident">map</span>, <span class="prelude-val">None</span>, <span class="ident">Vec::default</span>())
+        <span class="comment">// Necessary because the type of the third field is different without model feature</span>
+        <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::default_trait_access</span>)]</span>
+        <span class="ident">CreateMessage</span>(<span class="ident">map</span>, <span class="prelude-val">None</span>, <span class="ident">Default::default</span>())
     }
 }
 </code></pre></div>

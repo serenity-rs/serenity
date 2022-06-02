@@ -1482,8 +1482,7 @@
 <span id="1477">1477</span>
 <span id="1478">1478</span>
 <span id="1479">1479</span>
-<span id="1480">1480</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::fmt</span>;
+</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::fmt</span>::{<span class="self">self</span> <span class="kw">as</span> <span class="ident">fmt</span>, <span class="ident">Write</span>};
 <span class="kw">use</span> <span class="ident">std::ops::Add</span>;
 
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::guild::Emoji</span>;
@@ -2423,8 +2422,7 @@
         <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="ident">name</span>.<span class="ident">into</span>().<span class="ident">to_string</span>();
         <span class="kw">let</span> <span class="ident">url</span> <span class="op">=</span> <span class="ident">url</span>.<span class="ident">into</span>().<span class="ident">to_string</span>();
 
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">push_str</span>(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;[{}]({})&quot;</span>, <span class="ident">name</span>, <span class="ident">url</span>));
-        <span class="comment">// error cannot be returned, ignoring instead</span>
+        <span class="macro">write!</span>(<span class="self">self</span>.<span class="number">0</span>, <span class="string">&quot;[{}]({})&quot;</span>, <span class="ident">name</span>, <span class="ident">url</span>).<span class="ident">unwrap</span>();
 
         <span class="self">self</span>
     }
