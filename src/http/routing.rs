@@ -153,6 +153,12 @@ pub enum Route {
     ///
     /// [`ChannelId`]: crate::model::id::ChannelId
     ChannelsIdMeJoindedArchivedPrivateThreads(u64),
+    /// Route for the `/channels/{channel.id}/followers` path.
+    ///
+    /// The data is the relevant [`ChannelId`].
+    ///
+    /// [`ChannelId`]: crate::model::id::ChannelId
+    FollowNewsChannel(u64),
     /// Route for the `/gateway` path.
     Gateway,
     /// Route for the `/gateway/bot` path.
@@ -548,6 +554,11 @@ impl Route {
     #[must_use]
     pub fn channel_messages_bulk_delete(channel_id: u64) -> String {
         api!("/channels/{}/messages/bulk-delete", channel_id)
+    }
+
+    #[must_use]
+    pub fn channel_follow_news(channel_id: u64) -> String {
+        api!("/channels/{}/followers", channel_id)
     }
 
     #[must_use]
@@ -1448,6 +1459,9 @@ pub enum RouteInfo<'a> {
         wait: bool,
         webhook_id: u64,
     },
+    FollowNewsChannel {
+        channel_id: u64,
+    },
     JoinThread {
         channel_id: u64,
     },
@@ -2340,6 +2354,13 @@ impl<'a> RouteInfo<'a> {
                 LightMethod::Post,
                 Route::WebhooksId(webhook_id),
                 Cow::from(Route::webhook_with_token_optioned(webhook_id, token, wait)),
+            ),
+            RouteInfo::FollowNewsChannel {
+                channel_id,
+            } => (
+                LightMethod::Post,
+                Route::FollowNewsChannel(channel_id),
+                Cow::from(Route::channel_follow_news(channel_id)),
             ),
             RouteInfo::GetAuditLogs {
                 action_type,

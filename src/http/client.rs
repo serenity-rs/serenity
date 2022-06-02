@@ -1758,6 +1758,26 @@ impl Http {
         .await
     }
 
+    /// Follow an Announcement Channel to send messages to a target channel.
+    pub async fn follow_news_channel(
+        &self,
+        news_channel_id: u64,
+        target_channel_id: u64,
+    ) -> Result<FollowedChannel> {
+        let map = json!({ "webhook_channel_id": target_channel_id });
+        let body = to_vec(&map)?;
+
+        self.fire(Request {
+            body: Some(&body),
+            multipart: None,
+            headers: None,
+            route: RouteInfo::FollowNewsChannel {
+                channel_id: news_channel_id,
+            },
+        })
+        .await
+    }
+
     /// Gets the initial interaction response.
     pub async fn get_original_interaction_response(
         &self,
