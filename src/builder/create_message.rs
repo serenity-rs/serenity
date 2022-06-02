@@ -314,6 +314,8 @@ impl<'a> Default for CreateMessage<'a> {
         let mut map = HashMap::new();
         map.insert("tts", Value::from(false));
 
-        CreateMessage(map, None, Vec::default())
+        // Necessary because the type of the third field is different without model feature
+        #[allow(clippy::default_trait_access)]
+        CreateMessage(map, None, Default::default())
     }
 }

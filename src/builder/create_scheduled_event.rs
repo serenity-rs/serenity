@@ -2,6 +2,7 @@ use std::collections::HashMap;
 
 #[cfg(feature = "model")]
 use crate::http::Http;
+#[cfg(feature = "model")]
 use crate::internal::prelude::*;
 use crate::json::{json, Value};
 #[cfg(feature = "model")]

@@ -318,6 +318,8 @@ impl<'a> Default for ExecuteWebhook<'a> {
         let mut map = HashMap::new();
         map.insert("tts", Value::from(false));
 
-        ExecuteWebhook(map, Vec::default())
+        // Necessary because the type of the second field is different without model feature
+        #[allow(clippy::default_trait_access)]
+        ExecuteWebhook(map, Default::default())
     }
 }
