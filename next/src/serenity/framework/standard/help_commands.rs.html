@@ -1453,9 +1453,6 @@
 <span id="1448">1448</span>
 <span id="1449">1449</span>
 <span id="1450">1450</span>
-<span id="1451">1451</span>
-<span id="1452">1452</span>
-<span id="1453">1453</span>
 </pre><pre class="rust"><code><span class="doccomment">//! A collection of default help commands for the framework.</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! # Example</span>
@@ -2038,7 +2035,7 @@
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">similar_commands</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">SuggestedCommandName</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">name</span> <span class="op">=</span> <span class="ident">name</span>.<span class="ident">to_string</span>();
 
-    <span class="kw">match</span> <span class="ident">nested_group_command_search</span>(
+    <span class="ident">nested_group_command_search</span>(
         <span class="ident">ctx</span>,
         <span class="ident">msg</span>,
         <span class="ident">groups</span>,
@@ -2048,10 +2045,7 @@
         <span class="ident">owners</span>,
     )
     .<span class="kw">await</span>
-    {
-        <span class="prelude-val">Ok</span>(<span class="ident">found</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">found</span>),
-        <span class="prelude-val">Err</span>(()) =&gt; <span class="prelude-val">Err</span>(<span class="ident">similar_commands</span>),
-    }
+    .<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">similar_commands</span>)
 }
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
