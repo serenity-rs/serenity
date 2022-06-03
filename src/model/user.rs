@@ -1005,7 +1005,23 @@ impl User {
         cache_http: impl CacheHttp,
         guild_id: impl Into<GuildId>,
     ) -> Option<String> {
-        guild_id.into().member(cache_http, &self.id).await.ok().and_then(|member| member.nick)
+        let guild_id = guild_id.into();
+
+        // This can't be removed because `GuildId::member` clones the entire `Member` struct if
+        // it's present in the cache, which is expensive.
+        #[cfg(feature = "cache")]
+        {
+            if let Some(cache) = cache_http.cache() {
+                if let Some(guild) = guild_id.to_guild_cached(cache) {
+                    if let Some(member) = guild.members.get(&self.id) {
+                        return member.nick.clone();
+                    }
+                }
+            }
+        }
+
+        // At this point we're guaranteed to do an API call.
+        guild_id.member(cache_http, &self.id).await.ok().and_then(|member| member.nick)
     }
 
     /// Returns a future that will await one message by this user.
