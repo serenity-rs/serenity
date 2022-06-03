@@ -1095,7 +1095,7 @@ impl Route {
         let mut s = api!("/webhooks/{}/{}?wait={}", webhook_id, token, wait);
 
         if let Some(thread_id) = thread_id {
-            s.push_str(&format!("&thread_id={}", thread_id));
+            write!(s, "&thread_id={}", thread_id).unwrap();
         }
 
         s
