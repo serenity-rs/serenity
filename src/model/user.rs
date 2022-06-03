@@ -1005,24 +1005,7 @@ impl User {
         cache_http: impl CacheHttp,
         guild_id: impl Into<GuildId>,
     ) -> Option<String> {
-        let guild_id = guild_id.into();
-
-        #[cfg(feature = "cache")]
-        {
-            if let Some(cache) = cache_http.cache() {
-                if let Some(guild) = guild_id.to_guild_cached(cache) {
-                    if let Some(member) = guild.members.get(&self.id) {
-                        return member.nick.clone();
-                    }
-                }
-            }
-        }
-
-        guild_id
-            .member(&cache_http, &self.id)
-            .await
-            .ok()
-            .and_then(|member| member.nick.as_ref().map(String::clone))
+        guild_id.into().member(cache_http, &self.id).await.ok().and_then(|member| member.nick)
     }
 
     /// Returns a future that will await one message by this user.
