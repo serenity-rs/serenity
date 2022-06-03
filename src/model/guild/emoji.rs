@@ -2,8 +2,8 @@ use std::fmt;
 
 #[cfg(all(feature = "cache", feature = "model"))]
 use crate::cache::Cache;
-#[cfg(feature = "cache")]
-use crate::http::Http;
+#[cfg(any(feature = "cache", feature = "model"))]
+use crate::http::CacheHttp;
 #[cfg(all(feature = "cache", feature = "model"))]
 use crate::internal::prelude::*;
 #[cfg(all(feature = "cache", feature = "model"))]
@@ -96,13 +96,9 @@ impl Emoji {
     /// [Manage Emojis and Stickers]: crate::model::permissions::Permissions::MANAGE_EMOJIS_AND_STICKERS
     #[cfg(feature = "cache")]
     #[inline]
-    pub async fn delete<T: AsRef<Cache> + AsRef<Http>>(&self, cache_http: T) -> Result<()> {
-        match self.find_guild_id(&cache_http) {
-            Some(guild_id) => {
-                AsRef::<Http>::as_ref(&cache_http).delete_emoji(guild_id.0, self.id.0).await
-            },
-            None => Err(Error::Model(ModelError::ItemMissing)),
-        }
+    pub async fn delete(&self, cache_http: impl CacheHttp) -> Result<()> {
+        let guild_id = self.try_find_guild_id(&cache_http)?;
+        cache_http.http().delete_emoji(guild_id.0, self.id.0).await
     }
 
     /// Edits the emoji by updating it with a new name.
@@ -117,25 +113,13 @@ impl Emoji {
     ///
     /// [Manage Emojis and Stickers]: crate::model::permissions::Permissions::MANAGE_EMOJIS_AND_STICKERS
     #[cfg(feature = "cache")]
-    pub async fn edit<T: AsRef<Cache> + AsRef<Http>>(
-        &mut self,
-        cache_http: T,
-        name: &str,
-    ) -> Result<()> {
-        match self.find_guild_id(&cache_http) {
-            Some(guild_id) => {
-                let map = json!({
-                    "name": name,
-                });
+    pub async fn edit(&mut self, cache_http: impl CacheHttp, name: &str) -> Result<()> {
+        let guild_id = self.try_find_guild_id(&cache_http)?;
+        let map = json!({ "name": name });
 
-                *self = AsRef::<Http>::as_ref(&cache_http)
-                    .edit_emoji(guild_id.0, self.id.0, &map, None)
-                    .await?;
+        *self = cache_http.http().edit_emoji(guild_id.0, self.id.0, &map, None).await?;
 
-                Ok(())
-            },
-            None => Err(Error::Model(ModelError::ItemMissing)),
-        }
+        Ok(())
     }
 
     /// Finds the [`Guild`] that owns the emoji by looking through the Cache.
@@ -170,6 +154,15 @@ impl Emoji {
         }
 
         None
+    }
+
+    #[cfg(feature = "cache")]
+    #[inline]
+    fn try_find_guild_id(&self, cache_http: impl CacheHttp) -> Result<GuildId> {
+        cache_http
+            .cache()
+            .and_then(|c| self.find_guild_id(c))
+            .ok_or(Error::Model(ModelError::ItemMissing))
     }
 
     /// Generates a URL to the emoji's image.

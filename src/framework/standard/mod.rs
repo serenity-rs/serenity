@@ -860,7 +860,7 @@ pub(crate) fn has_correct_permissions(
     } else {
         message
             .guild(cache.as_ref())
-            .map(|guild| {
+            .map_or(false, |guild| {
                 let channel = match guild.channels.get(&message.channel_id) {
                     Some(Channel::Guild(channel)) => channel,
                     _ => return false,
@@ -885,7 +885,6 @@ pub(crate) fn has_correct_permissions(
                     },
                 }
             })
-            .unwrap_or(false)
     }
 }
 
