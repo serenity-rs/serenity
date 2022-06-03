@@ -2,7 +2,7 @@ use std::fmt;
 
 #[cfg(all(feature = "cache", feature = "model"))]
 use crate::cache::Cache;
-#[cfg(any(feature = "cache", feature = "model"))]
+#[cfg(all(feature = "cache", feature = "model"))]
 use crate::http::CacheHttp;
 #[cfg(all(feature = "cache", feature = "model"))]
 use crate::internal::prelude::*;
