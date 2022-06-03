@@ -13,6 +13,7 @@ mod scheduled_event;
 mod system_channel;
 mod welcome_screen;
 
+#[cfg(feature = "model")]
 use std::borrow::Cow;
 
 use serde::de::Error as DeError;
