@@ -580,7 +580,7 @@ async fn fetch_single_command<'a>(
     let mut similar_commands: Vec<SuggestedCommandName> = Vec::new();
     let mut name = name.to_string();
 
-    match nested_group_command_search(
+    nested_group_command_search(
         ctx,
         msg,
         groups,
@@ -590,10 +590,7 @@ async fn fetch_single_command<'a>(
         owners,
     )
     .await
-    {
-        Ok(found) => Ok(found),
-        Err(()) => Err(similar_commands),
-    }
+    .map_err(|_| similar_commands)
 }
 
 #[cfg(feature = "cache")]
