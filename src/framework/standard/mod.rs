@@ -858,34 +858,31 @@ pub(crate) fn has_correct_permissions(
     if options.required_permissions().is_empty() {
         true
     } else {
-        message
-            .guild(cache.as_ref())
-            .map(|guild| {
-                let channel = match guild.channels.get(&message.channel_id) {
-                    Some(Channel::Guild(channel)) => channel,
-                    _ => return false,
-                };
+        message.guild(cache.as_ref()).map_or(false, |guild| {
+            let channel = match guild.channels.get(&message.channel_id) {
+                Some(Channel::Guild(channel)) => channel,
+                _ => return false,
+            };
 
-                let member = match guild.members.get(&message.author.id) {
-                    Some(member) => member,
-                    None => return false,
-                };
+            let member = match guild.members.get(&message.author.id) {
+                Some(member) => member,
+                None => return false,
+            };
 
-                match guild.user_permissions_in(channel, member) {
-                    Ok(perms) => perms.contains(*options.required_permissions()),
-                    Err(e) => {
-                        tracing::error!(
-                            "Error getting permissions for user {} in channel {}: {}",
-                            member.user.id,
-                            channel.id,
-                            e
-                        );
+            match guild.user_permissions_in(channel, member) {
+                Ok(perms) => perms.contains(*options.required_permissions()),
+                Err(e) => {
+                    tracing::error!(
+                        "Error getting permissions for user {} in channel {}: {}",
+                        member.user.id,
+                        channel.id,
+                        e
+                    );
 
-                        false
-                    },
-                }
-            })
-            .unwrap_or(false)
+                    false
+                },
+            }
+        })
     }
 }
 
