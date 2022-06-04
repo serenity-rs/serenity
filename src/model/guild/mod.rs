@@ -2672,19 +2672,19 @@ impl<'de> Deserialize<'de> for Guild {
 
         let presences = map
             .remove("presences")
-            .ok_or_else(|| DeError::custom("expected guild presences"))
+            .ok_or_else(|| DeError::missing_field("presences"))
             .and_then(presences::deserialize)
             .map_err(DeError::custom)?;
 
         let voice_states = map
             .remove("voice_states")
-            .ok_or_else(|| DeError::custom("expected guild voice_states"))
+            .ok_or_else(|| DeError::missing_field("voice_states"))
             .and_then(deserialize_voice_states)
             .map_err(DeError::custom)?;
 
         let roles = map
             .remove("roles")
-            .ok_or_else(|| DeError::custom("expected guild roles"))
+            .ok_or_else(|| DeError::missing_field("roles"))
             .and_then(roles::deserialize)
             .map_err(DeError::custom)?;
 
