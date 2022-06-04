@@ -140,9 +140,7 @@ impl<'de> Deserialize<'de> for Interaction {
         let map = value.as_object().ok_or_else(|| DeError::custom("expected JsonMap"))?;
 
         let raw_kind = map.get("type").ok_or_else(|| DeError::missing_field("type"))?;
-        let kind = deserialize_val(raw_kind.clone())?;
-
-        match kind {
+        match deserialize_val(raw_kind.clone())? {
             InteractionType::ApplicationCommand => {
                 from_value(value).map(Interaction::ApplicationCommand)
             },
