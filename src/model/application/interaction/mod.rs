@@ -12,7 +12,8 @@ use self::autocomplete::AutocompleteInteraction;
 use self::message_component::MessageComponentInteraction;
 use self::modal::ModalSubmitInteraction;
 use self::ping::PingInteraction;
-use crate::json::{from_value, Value};
+use crate::internal::prelude::*;
+use crate::json::from_value;
 use crate::model::id::{ApplicationId, InteractionId};
 use crate::model::user::User;
 use crate::model::utils::deserialize_val;
@@ -134,7 +135,7 @@ impl Interaction {
 }
 
 impl<'de> Deserialize<'de> for Interaction {
-    fn deserialize<D: Deserializer<'de>>(deserializer: D) -> Result<Self, D::Error> {
+    fn deserialize<D: Deserializer<'de>>(deserializer: D) -> std::result::Result<Self, D::Error> {
         let value = Value::deserialize(deserializer)?;
         let map = value.as_object().ok_or_else(|| DeError::custom("expected JsonMap"))?;
 
@@ -158,17 +159,13 @@ impl<'de> Deserialize<'de> for Interaction {
 }
 
 impl Serialize for Interaction {
-    fn serialize<S: Serializer>(&self, serializer: S) -> Result<S::Ok, S::Error> {
+    fn serialize<S: Serializer>(&self, serializer: S) -> std::result::Result<S::Ok, S::Error> {
         match self {
-            Interaction::Ping(i) => PingInteraction::serialize(i, serializer),
-            Interaction::ApplicationCommand(i) => {
-                ApplicationCommandInteraction::serialize(i, serializer)
-            },
-            Interaction::MessageComponent(i) => {
-                MessageComponentInteraction::serialize(i, serializer)
-            },
-            Interaction::Autocomplete(i) => AutocompleteInteraction::serialize(i, serializer),
-            Interaction::ModalSubmit(i) => ModalSubmitInteraction::serialize(i, serializer),
+            Interaction::Ping(i) => i.serialize(serializer),
+            Interaction::ApplicationCommand(i) => i.serialize(serializer),
+            Interaction::MessageComponent(i) => i.serialize(serializer),
+            Interaction::Autocomplete(i) => i.serialize(serializer),
+            Interaction::ModalSubmit(i) => i.serialize(serializer),
         }
     }
 }
