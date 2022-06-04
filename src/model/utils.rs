@@ -29,12 +29,20 @@ pub fn is_false(v: &bool) -> bool {
     !v
 }
 
+pub fn deserialize_val<T, E>(val: Value) -> StdResult<T, E>
+where
+    T: serde::de::DeserializeOwned,
+    E: serde::de::Error,
+{
+    T::deserialize(val).map_err(serde::de::Error::custom)
+}
+
 pub fn remove_from_map_opt<T, E>(map: &mut JsonMap, key: &str) -> StdResult<Option<T>, E>
 where
     T: serde::de::DeserializeOwned,
     E: serde::de::Error,
 {
-    map.remove(key).map(T::deserialize).transpose().map_err(serde::de::Error::custom)
+    map.remove(key).map(deserialize_val).transpose()
 }
 
 pub fn remove_from_map<T, E>(map: &mut JsonMap, key: &'static str) -> StdResult<T, E>

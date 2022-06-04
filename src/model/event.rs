@@ -7,7 +7,7 @@ use std::fmt;
 use serde::de::{Error as DeError, IgnoredAny, MapAccess};
 
 use super::prelude::*;
-use super::utils::{emojis, remove_from_map, roles, stickers};
+use super::utils::{deserialize_val, emojis, roles, stickers};
 use crate::constants::OpCode;
 use crate::internal::prelude::*;
 use crate::json::prelude::*;
@@ -637,32 +637,45 @@ pub enum GatewayEvent {
 
 impl<'de> Deserialize<'de> for GatewayEvent {
     fn deserialize<D: Deserializer<'de>>(deserializer: D) -> StdResult<Self, D::Error> {
-        let mut map = JsonMap::deserialize(deserializer)?;
+        #[derive(Deserialize)]
+        struct RawGatewayEvent {
+            d: Option<serde_json::Value>,
+            t: Option<EventType>,
+            s: Option<u64>,
+            op: OpCode,
+        }
 
-        Ok(match remove_from_map(&mut map, "op")? {
+        let raw = RawGatewayEvent::deserialize(deserializer)?;
+
+        Ok(match raw.op {
             OpCode::Event => {
-                let s = remove_from_map(&mut map, "s")?;
-                let payload = remove_from_map(&mut map, "d")?;
-                let kind: EventType = remove_from_map(&mut map, "t")?;
+                let kind = raw.t.ok_or_else(|| DeError::missing_field("t"))?;
+                let s = raw.s.ok_or_else(|| DeError::missing_field("s"))?;
+                let payload = raw.d.ok_or_else(|| DeError::missing_field("d"))?;
 
                 let x = deserialize_event_with_type(kind.clone(), payload)
                     .map_err(|why| DeError::custom(format_args!("event {:?}: {}", kind, why)))?;
 
                 GatewayEvent::Dispatch(s, x)
             },
-            OpCode::Heartbeat => GatewayEvent::Heartbeat(remove_from_map(&mut map, "s")?),
+            OpCode::Heartbeat => {
+                GatewayEvent::Heartbeat(raw.s.ok_or_else(|| DeError::missing_field("2"))?)
+            },
             OpCode::InvalidSession => {
-                let resumable = remove_from_map(&mut map, "d")?;
+                let resumable = deserialize_val(raw.d.ok_or_else(|| DeError::missing_field("d"))?)?;
 
                 GatewayEvent::InvalidateSession(resumable)
             },
             OpCode::Hello => {
-                #[derive(serde::Deserialize)]
-                struct HelloRawInner {
+                #[derive(Deserialize)]
+                struct HelloPayload {
                     heartbeat_interval: u64,
                 }
 
-                let inner: HelloRawInner = remove_from_map(&mut map, "d")?;
+                let inner = deserialize_val::<HelloPayload, _>(
+                    raw.d.ok_or_else(|| DeError::missing_field("d"))?,
+                )?;
+
                 GatewayEvent::Hello(inner.heartbeat_interval)
             },
             OpCode::Reconnect => GatewayEvent::Reconnect,
