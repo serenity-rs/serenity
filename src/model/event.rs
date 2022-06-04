@@ -7,7 +7,7 @@ use std::fmt;
 use serde::de::{Error as DeError, IgnoredAny, MapAccess};
 
 use super::prelude::*;
-use super::utils::{emojis, roles, stickers};
+use super::utils::{emojis, remove_from_map, roles, stickers};
 use crate::constants::OpCode;
 use crate::internal::prelude::*;
 use crate::json::prelude::*;
@@ -639,71 +639,33 @@ impl<'de> Deserialize<'de> for GatewayEvent {
     fn deserialize<D: Deserializer<'de>>(deserializer: D) -> StdResult<Self, D::Error> {
         let mut map = JsonMap::deserialize(deserializer)?;
 
-        let op = map
-            .remove("op")
-            .ok_or_else(|| DeError::custom("expected op"))
-            .and_then(OpCode::deserialize)
-            .map_err(DeError::custom)?;
-
-        Ok(match op {
+        Ok(match remove_from_map(&mut map, "op")? {
             OpCode::Event => {
-                let s = map
-                    .remove("s")
-                    .ok_or_else(|| DeError::custom("expected gateway event sequence"))
-                    .and_then(u64::deserialize)
-                    .map_err(DeError::custom)?;
-                let kind = map
-                    .remove("t")
-                    .ok_or_else(|| DeError::custom("expected gateway event type"))
-                    .and_then(EventType::deserialize)
-                    .map_err(DeError::custom)?;
-                let payload = map
-                    .remove("d")
-                    .ok_or_else(|| Error::Decode("expected gateway event d", Value::from(map)))
-                    .map_err(DeError::custom)?;
+                let s = remove_from_map(&mut map, "s")?;
+                let payload = remove_from_map(&mut map, "d")?;
+                let kind: EventType = remove_from_map(&mut map, "t")?;
 
-                let x = match deserialize_event_with_type(kind.clone(), payload) {
-                    Ok(x) => x,
-                    Err(why) => {
-                        return Err(DeError::custom(format_args!("event {:?}: {}", kind, why)));
-                    },
-                };
+                let x = deserialize_event_with_type(kind.clone(), payload)
+                    .map_err(|why| DeError::custom(format_args!("event {:?}: {}", kind, why)))?;
 
                 GatewayEvent::Dispatch(s, x)
             },
-            OpCode::Heartbeat => {
-                let s = map
-                    .remove("s")
-                    .ok_or_else(|| DeError::custom("Expected heartbeat s"))
-                    .and_then(u64::deserialize)
-                    .map_err(DeError::custom)?;
-
-                GatewayEvent::Heartbeat(s)
-            },
-            OpCode::Reconnect => GatewayEvent::Reconnect,
+            OpCode::Heartbeat => GatewayEvent::Heartbeat(remove_from_map(&mut map, "s")?),
             OpCode::InvalidSession => {
-                let resumable = map
-                    .remove("d")
-                    .ok_or_else(|| DeError::custom("expected gateway invalid session d"))
-                    .and_then(bool::deserialize)
-                    .map_err(DeError::custom)?;
+                let resumable = remove_from_map(&mut map, "d")?;
 
                 GatewayEvent::InvalidateSession(resumable)
             },
             OpCode::Hello => {
-                let mut d = map
-                    .remove("d")
-                    .ok_or_else(|| DeError::custom("expected gateway hello d"))
-                    .and_then(JsonMap::deserialize)
-                    .map_err(DeError::custom)?;
-                let interval = d
-                    .remove("heartbeat_interval")
-                    .ok_or_else(|| DeError::custom("expected gateway hello interval"))
-                    .and_then(u64::deserialize)
-                    .map_err(DeError::custom)?;
+                #[derive(serde::Deserialize)]
+                struct HelloRawInner {
+                    heartbeat_interval: u64,
+                }
 
-                GatewayEvent::Hello(interval)
+                let inner: HelloRawInner = remove_from_map(&mut map, "d")?;
+                GatewayEvent::Hello(inner.heartbeat_interval)
             },
+            OpCode::Reconnect => GatewayEvent::Reconnect,
             OpCode::HeartbeatAck => GatewayEvent::HeartbeatAck,
             _ => return Err(DeError::custom("invalid opcode")),
         })
