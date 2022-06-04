@@ -15,7 +15,7 @@ use self::ping::PingInteraction;
 use crate::json::{from_value, Value};
 use crate::model::id::{ApplicationId, InteractionId};
 use crate::model::user::User;
-use crate::model::utils::remove_from_map;
+use crate::model::utils::deserialize_val;
 
 #[derive(Clone, Debug)]
 pub enum Interaction {
@@ -135,10 +135,13 @@ impl Interaction {
 
 impl<'de> Deserialize<'de> for Interaction {
     fn deserialize<D: Deserializer<'de>>(deserializer: D) -> Result<Self, D::Error> {
-        let mut value = Value::deserialize(deserializer)?;
-        let map = value.as_object_mut().ok_or_else(|| DeError::custom("expected JsonMap"))?;
+        let value = Value::deserialize(deserializer)?;
+        let map = value.as_object().ok_or_else(|| DeError::custom("expected JsonMap"))?;
 
-        match remove_from_map(map, "type")? {
+        let raw_kind = map.get("type").ok_or_else(|| DeError::missing_field("type"))?;
+        let kind = deserialize_val(raw_kind.clone())?;
+
+        match kind {
             InteractionType::ApplicationCommand => {
                 from_value(value).map(Interaction::ApplicationCommand)
             },
