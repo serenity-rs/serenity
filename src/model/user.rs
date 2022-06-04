@@ -1007,6 +1007,8 @@ impl User {
     ) -> Option<String> {
         let guild_id = guild_id.into();
 
+        // This can't be removed because `GuildId::member` clones the entire `Member` struct if
+        // it's present in the cache, which is expensive.
         #[cfg(feature = "cache")]
         {
             if let Some(cache) = cache_http.cache() {
@@ -1018,11 +1020,8 @@ impl User {
             }
         }
 
-        guild_id
-            .member(&cache_http, &self.id)
-            .await
-            .ok()
-            .and_then(|member| member.nick.as_ref().map(String::clone))
+        // At this point we're guaranteed to do an API call.
+        guild_id.member(cache_http, &self.id).await.ok().and_then(|member| member.nick)
     }
 
     /// Returns a future that will await one message by this user.

@@ -413,29 +413,15 @@ async fn some_long_command(ctx: &Context, msg: &Message, args: Args) -> CommandR
 // Limits the usage of this command to roles named:
 #[allowed_roles("mods", "ultimate neko")]
 async fn about_role(ctx: &Context, msg: &Message, args: Args) -> CommandResult {
-    let potential_role_name = args.rest();
-
-    // We avoid cloning anything out of the cache
-    // so have to keep `GuildRef` in it's own scope
-    let to_send = {
-        let guild = msg.guild(&ctx.cache);
-        guild
-            .as_ref()
-            .and_then(|g| g.role_by_name(potential_role_name))
-            .map(|g| format!("Role-ID: {}", g))
+    let role_name = args.rest();
+    let to_send = match msg.guild(&ctx.cache).as_deref().and_then(|g| g.role_by_name(role_name)) {
+        Some(role_id) => format!("Role-ID: {}", role_id),
+        None => format!("Could not find role name: {:?}", role_name),
     };
 
-    if let Some(to_send) = to_send {
-        if let Err(why) = msg.channel_id.say(&ctx.http, to_send).await {
-            println!("Error sending message: {:?}", why);
-        }
-
-        return Ok(());
+    if let Err(why) = msg.channel_id.say(&ctx.http, to_send).await {
+        println!("Error sending message: {:?}", why);
     }
-
-    msg.channel_id
-        .say(&ctx.http, format!("Could not find role named: {:?}", potential_role_name))
-        .await?;
 
     Ok(())
 }
