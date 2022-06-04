@@ -1430,7 +1430,7 @@ impl<T> TryFrom<RelatedId<T>> for Option<T> {
 /// # Errors
 ///
 /// Returns [`Error::Json`] if there is an error in deserializing the event data.
-pub fn deserialize_event_with_type(kind: EventType, v: Value) -> Result<Event> {
+pub fn deserialize_event_with_type(kind: EventType, mut v: Value) -> Result<Event> {
     Ok(match kind {
         EventType::ApplicationCommandPermissionsUpdate => {
             Event::ApplicationCommandPermissionsUpdate(from_value(v)?)
@@ -1448,6 +1448,26 @@ pub fn deserialize_event_with_type(kind: EventType, v: Value) -> Result<Event> {
             if v.get("unavailable").and_then(Value::as_bool).unwrap_or(false) {
                 Event::GuildUnavailable(from_value(v)?)
             } else {
+                fn add_guild_id_to_map(map: &mut JsonMap, key: &str, id: GuildId) {
+                    if let Some(array) = map.get_mut(key).and_then(Value::as_array_mut) {
+                        for value in array {
+                            if let Some(item) = value.as_object_mut() {
+                                item.insert("guild_id".to_string(), from_number(id.0));
+                            }
+                        }
+                    }
+                }
+
+                let map = v.as_object_mut().expect("TODO REMOVE!!!! expected object!");
+
+                let id_val =
+                    map.get("id").ok_or_else(|| Error::Json(DeError::missing_field("id")))?;
+                let id = from_value(id_val.clone())?;
+
+                add_guild_id_to_map(map, "channels", id);
+                add_guild_id_to_map(map, "members", id);
+                add_guild_id_to_map(map, "roles", id);
+
                 Event::GuildCreate(from_value(v)?)
             }
         },

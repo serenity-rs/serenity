@@ -37,6 +37,7 @@ where
     T::deserialize(val).map_err(serde::de::Error::custom)
 }
 
+#[allow(unused)]
 pub fn remove_from_map_opt<T, E>(map: &mut JsonMap, key: &str) -> StdResult<Option<T>, E>
 where
     T: serde::de::DeserializeOwned,
@@ -45,6 +46,7 @@ where
     map.remove(key).map(deserialize_val).transpose()
 }
 
+#[allow(unused)]
 pub fn remove_from_map<T, E>(map: &mut JsonMap, key: &'static str) -> StdResult<T, E>
 where
     T: serde::de::DeserializeOwned,
