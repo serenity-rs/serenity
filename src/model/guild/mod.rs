@@ -66,7 +66,8 @@ use crate::collector::{
 use crate::constants::LARGE_THRESHOLD;
 #[cfg(feature = "model")]
 use crate::http::{CacheHttp, Http, UserPagination};
-use crate::json::prelude::*;
+#[cfg(feature = "model")]
+use crate::json::prelude::json;
 #[cfg(feature = "model")]
 use crate::model::application::command::{Command, CommandPermission};
 use crate::model::prelude::*;
