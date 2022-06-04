@@ -1434,7 +1434,9 @@ pub fn deserialize_event_with_type(kind: EventType, mut v: Value) -> Result<Even
             if v.get("unavailable").and_then(Value::as_bool).unwrap_or(false) {
                 Event::GuildUnavailable(from_value(v)?)
             } else {
-                let map = v.as_object_mut().ok_or_else(|| Error::Json(DeError::custom("expected JsonMap")))?;
+                let map = v
+                    .as_object_mut()
+                    .ok_or_else(|| Error::Json(DeError::custom("expected JsonMap")))?;
 
                 let id_val =
                     map.get("id").ok_or_else(|| Error::Json(DeError::missing_field("id")))?;
