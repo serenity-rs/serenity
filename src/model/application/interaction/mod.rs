@@ -12,9 +12,10 @@ use self::autocomplete::AutocompleteInteraction;
 use self::message_component::MessageComponentInteraction;
 use self::modal::ModalSubmitInteraction;
 use self::ping::PingInteraction;
-use crate::json::{from_value, JsonMap, Value};
+use crate::json::{from_value, Value};
 use crate::model::id::{ApplicationId, InteractionId};
 use crate::model::user::User;
+use crate::model::utils::remove_from_map;
 
 #[derive(Clone, Debug)]
 pub enum Interaction {
@@ -134,38 +135,22 @@ impl Interaction {
 
 impl<'de> Deserialize<'de> for Interaction {
     fn deserialize<D: Deserializer<'de>>(deserializer: D) -> Result<Self, D::Error> {
-        let map = JsonMap::deserialize(deserializer)?;
+        let mut value = Value::deserialize(deserializer)?;
+        let map = value.as_object_mut().ok_or_else(|| DeError::custom("expected JsonMap"))?;
 
-        let kind = map
-            .get("type")
-            .ok_or_else(|| DeError::custom("expected type"))
-            .and_then(InteractionType::deserialize)
-            .map_err(DeError::custom)?;
-
-        match kind {
-            InteractionType::Ping => from_value::<PingInteraction>(Value::from(map))
-                .map(Interaction::Ping)
-                .map_err(DeError::custom),
+        match remove_from_map(map, "type")? {
             InteractionType::ApplicationCommand => {
-                from_value::<ApplicationCommandInteraction>(Value::from(map))
-                    .map(Interaction::ApplicationCommand)
-                    .map_err(DeError::custom)
+                from_value(value).map(Interaction::ApplicationCommand)
             },
             InteractionType::MessageComponent => {
-                from_value::<MessageComponentInteraction>(Value::from(map))
-                    .map(Interaction::MessageComponent)
-                    .map_err(DeError::custom)
+                from_value(value).map(Interaction::MessageComponent)
             },
-            InteractionType::Autocomplete => {
-                from_value::<AutocompleteInteraction>(Value::from(map))
-                    .map(Interaction::Autocomplete)
-                    .map_err(DeError::custom)
-            },
-            InteractionType::ModalSubmit => from_value::<ModalSubmitInteraction>(Value::from(map))
-                .map(Interaction::ModalSubmit)
-                .map_err(DeError::custom),
-            InteractionType::Unknown => Err(DeError::custom("Unknown interaction type")),
+            InteractionType::Autocomplete => from_value(value).map(Interaction::Autocomplete),
+            InteractionType::ModalSubmit => from_value(value).map(Interaction::ModalSubmit),
+            InteractionType::Ping => from_value(value).map(Interaction::Ping),
+            InteractionType::Unknown => return Err(DeError::custom("Unknown interaction type")),
         }
+        .map_err(DeError::custom)
     }
 }
 
