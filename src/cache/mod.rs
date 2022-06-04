@@ -181,8 +181,7 @@ pub struct Cache {
     pub(crate) private_channels: DashMap<ChannelId, PrivateChannel>,
     /// The total number of shards being used by the bot.
     pub(crate) shard_count: RwLock<u64>,
-    /// A list of guilds which are "unavailable". Refer to the documentation for
-    /// [`Event::GuildUnavailable`] for more information on when this can occur.
+    /// A list of guilds which are "unavailable".
     ///
     /// Additionally, guilds are always unavailable for bot users when a Ready
     /// is received. Guilds are "sent in" over time through the receiving of
