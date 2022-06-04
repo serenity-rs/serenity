@@ -67,17 +67,17 @@ use crate::CacheAndHttp;
 ///
 /// # let cache_and_http: Arc<CacheAndHttp> = unimplemented!();
 /// # let http = &cache_and_http.http;
-/// let gateway_url = Arc::new(Mutex::new(http.get_gateway().await?.url));
+/// let ws_url = Arc::new(Mutex::new(http.get_gateway().await?.url));
 /// let data = Arc::new(RwLock::new(TypeMap::new()));
 /// let event_handler = Arc::new(Handler) as Arc<dyn EventHandler>;
 /// let framework =
 ///     Arc::new(StandardFramework::new()) as Arc<dyn Framework + Send + Sync + 'static>;
 ///
 /// ShardManager::new(ShardManagerOptions {
-///     data: &data,
-///     event_handler: &Some(event_handler),
-///     raw_event_handler: &None,
-///     framework: &Some(framework),
+///     data,
+///     event_handler: Some(event_handler),
+///     raw_event_handler: None,
+///     framework: Some(framework),
 ///     // the shard index to start initiating from
 ///     shard_index: 0,
 ///     // the number of shards to initiate (this initiates 0, 1, and 2)
@@ -85,9 +85,9 @@ use crate::CacheAndHttp;
 ///     // the total number of shards in use
 ///     shard_total: 5,
 ///     # #[cfg(feature = "voice")]
-///     # voice_manager: &None,
-///     ws_url: &gateway_url,
-///     # cache_and_http: &cache_and_http,
+///     # voice_manager: None,
+///     ws_url,
+///     # cache_and_http,
 ///     intents: GatewayIntents::non_privileged(),
 /// });
 /// #     Ok(())
@@ -117,7 +117,7 @@ pub struct ShardManager {
 impl ShardManager {
     /// Creates a new shard manager, returning both the manager and a monitor
     /// for usage in a separate thread.
-    pub async fn new(opt: ShardManagerOptions<'_>) -> (Arc<Mutex<Self>>, ShardManagerMonitor) {
+    pub async fn new(opt: ShardManagerOptions) -> (Arc<Mutex<Self>>, ShardManagerMonitor) {
         let (thread_tx, thread_rx) = mpsc::unbounded();
         let (shard_queue_tx, shard_queue_rx) = mpsc::unbounded();
 
@@ -125,20 +125,20 @@ impl ShardManager {
         let (shutdown_send, shutdown_recv) = mpsc::unbounded();
 
         let mut shard_queuer = ShardQueuer {
-            data: Arc::clone(opt.data),
-            event_handler: opt.event_handler.as_ref().map(Arc::clone),
-            raw_event_handler: opt.raw_event_handler.as_ref().map(Arc::clone),
+            data: opt.data,
+            event_handler: opt.event_handler,
+            raw_event_handler: opt.raw_event_handler,
             #[cfg(feature = "framework")]
-            framework: opt.framework.as_ref().map(Arc::clone),
+            framework: opt.framework,
             last_start: None,
             manager_tx: thread_tx.clone(),
             queue: VecDeque::new(),
             runners: Arc::clone(&runners),
             rx: shard_queue_rx,
             #[cfg(feature = "voice")]
-            voice_manager: opt.voice_manager.clone(),
-            ws_url: Arc::clone(opt.ws_url),
-            cache_and_http: Arc::clone(opt.cache_and_http),
+            voice_manager: opt.voice_manager,
+            ws_url: opt.ws_url,
+            cache_and_http: opt.cache_and_http,
             intents: opt.intents,
         };
 
@@ -344,18 +344,18 @@ impl Drop for ShardManager {
     }
 }
 
-pub struct ShardManagerOptions<'a> {
-    pub data: &'a Arc<RwLock<TypeMap>>,
-    pub event_handler: &'a Option<Arc<dyn EventHandler>>,
-    pub raw_event_handler: &'a Option<Arc<dyn RawEventHandler>>,
+pub struct ShardManagerOptions {
+    pub data: Arc<RwLock<TypeMap>>,
+    pub event_handler: Option<Arc<dyn EventHandler>>,
+    pub raw_event_handler: Option<Arc<dyn RawEventHandler>>,
     #[cfg(feature = "framework")]
-    pub framework: &'a Option<Arc<dyn Framework + Send + Sync>>,
+    pub framework: Option<Arc<dyn Framework + Send + Sync>>,
     pub shard_index: u64,
     pub shard_init: u64,
     pub shard_total: u64,
     #[cfg(feature = "voice")]
-    pub voice_manager: &'a Option<Arc<dyn VoiceGatewayManager + Send + Sync + 'static>>,
-    pub ws_url: &'a Arc<Mutex<String>>,
-    pub cache_and_http: &'a Arc<CacheAndHttp>,
+    pub voice_manager: Option<Arc<dyn VoiceGatewayManager + Send + Sync + 'static>>,
+    pub ws_url: Arc<Mutex<String>>,
+    pub cache_and_http: Arc<CacheAndHttp>,
     pub intents: GatewayIntents,
 }
