@@ -223,9 +223,11 @@ impl Channel {
 
 impl<'de> Deserialize<'de> for Channel {
     fn deserialize<D: Deserializer<'de>>(deserializer: D) -> StdResult<Self, D::Error> {
-        let v = JsonMap::deserialize(deserializer)?;
+        let value = Value::deserialize(deserializer)?;
+        let map = value.as_object().ok_or_else(|| DeError::custom("expected a JsonMap"))?;
+
         let kind = {
-            let kind = v.get("type").ok_or_else(|| DeError::missing_field("type"))?;
+            let kind = map.get("type").ok_or_else(|| DeError::missing_field("type"))?;
 
             match kind.as_u64() {
                 Some(kind) => kind,
@@ -239,17 +241,12 @@ impl<'de> Deserialize<'de> for Channel {
         };
 
         match kind {
-            0 | 2 | 5 | 10 | 11 | 12 | 13 | 14 | 15 => from_value::<GuildChannel>(Value::from(v))
-                .map(Channel::Guild)
-                .map_err(DeError::custom),
-            1 => from_value::<PrivateChannel>(Value::from(v))
-                .map(Channel::Private)
-                .map_err(DeError::custom),
-            4 => from_value::<ChannelCategory>(Value::from(v))
-                .map(Channel::Category)
-                .map_err(DeError::custom),
-            _ => Err(DeError::custom("Unknown channel type")),
+            0 | 2 | 5 | 10 | 11 | 12 | 13 | 14 | 15 => from_value(value).map(Channel::Guild),
+            1 => from_value(value).map(Channel::Private),
+            4 => from_value(value).map(Channel::Category),
+            _ => return Err(DeError::custom("Unknown channel type")),
         }
+        .map_err(DeError::custom)
     }
 }
 
