@@ -377,18 +377,18 @@ impl Future for ClientBuilder {
 
                 let (shard_manager, shard_manager_worker) = {
                     ShardManager::new(ShardManagerOptions {
-                        data: &data,
-                        event_handler: &event_handler,
-                        raw_event_handler: &raw_event_handler,
+                        data: Arc::clone(&data),
+                        event_handler,
+                        raw_event_handler,
                         #[cfg(feature = "framework")]
-                        framework: &framework,
+                        framework,
                         shard_index: 0,
                         shard_init: 0,
                         shard_total: 0,
                         #[cfg(feature = "voice")]
-                        voice_manager: &voice_manager,
-                        ws_url: &ws_url,
-                        cache_and_http: &cache_and_http,
+                        voice_manager: voice_manager.as_ref().map(Arc::clone),
+                        ws_url: Arc::clone(&ws_url),
+                        cache_and_http: Arc::clone(&cache_and_http),
                         intents,
                     })
                     .await
