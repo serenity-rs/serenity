@@ -228,16 +228,12 @@ impl<'de> Deserialize<'de> for Channel {
 
         let kind = {
             let kind = map.get("type").ok_or_else(|| DeError::missing_field("type"))?;
-
-            match kind.as_u64() {
-                Some(kind) => kind,
-                None => {
-                    return Err(DeError::invalid_type(
-                        Unexpected::Other("non-positive integer"),
-                        &"a positive integer",
-                    ));
-                },
-            }
+            kind.as_u64().ok_or_else(|| {
+                DeError::invalid_type(
+                    Unexpected::Other("non-positive integer"),
+                    &"a positive integer",
+                )
+            })?
         };
 
         match kind {
