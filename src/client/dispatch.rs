@@ -584,7 +584,7 @@ async fn handle_event(
         Event::GuildUpdate(mut event) => {
             spawn_named("dispatch::event_handler::guild_update", async move {
                 feature_cache! {{
-                    let before = cache_and_http.cache.guild(&event.guild.id).map(|g| g.clone());
+                    let before = cache_and_http.cache.guild(&event.guild.id).as_deref().cloned();
 
                     update(&cache_and_http, &mut event);
 
