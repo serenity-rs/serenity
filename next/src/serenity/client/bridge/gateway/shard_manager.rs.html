@@ -433,17 +433,17 @@
 <span class="doccomment">///</span>
 <span class="doccomment">/// # let cache_and_http: Arc&lt;CacheAndHttp&gt; = unimplemented!();</span>
 <span class="doccomment">/// # let http = &amp;cache_and_http.http;</span>
-<span class="doccomment">/// let gateway_url = Arc::new(Mutex::new(http.get_gateway().await?.url));</span>
+<span class="doccomment">/// let ws_url = Arc::new(Mutex::new(http.get_gateway().await?.url));</span>
 <span class="doccomment">/// let data = Arc::new(RwLock::new(TypeMap::new()));</span>
 <span class="doccomment">/// let event_handler = Arc::new(Handler) as Arc&lt;dyn EventHandler&gt;;</span>
 <span class="doccomment">/// let framework =</span>
 <span class="doccomment">///     Arc::new(StandardFramework::new()) as Arc&lt;dyn Framework + Send + Sync + &#39;static&gt;;</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// ShardManager::new(ShardManagerOptions {</span>
-<span class="doccomment">///     data: &amp;data,</span>
-<span class="doccomment">///     event_handler: &amp;Some(event_handler),</span>
-<span class="doccomment">///     raw_event_handler: &amp;None,</span>
-<span class="doccomment">///     framework: &amp;Some(framework),</span>
+<span class="doccomment">///     data,</span>
+<span class="doccomment">///     event_handler: Some(event_handler),</span>
+<span class="doccomment">///     raw_event_handler: None,</span>
+<span class="doccomment">///     framework: Some(framework),</span>
 <span class="doccomment">///     // the shard index to start initiating from</span>
 <span class="doccomment">///     shard_index: 0,</span>
 <span class="doccomment">///     // the number of shards to initiate (this initiates 0, 1, and 2)</span>
@@ -451,9 +451,9 @@
 <span class="doccomment">///     // the total number of shards in use</span>
 <span class="doccomment">///     shard_total: 5,</span>
 <span class="doccomment">///     # #[cfg(feature = &quot;voice&quot;)]</span>
-<span class="doccomment">///     # voice_manager: &amp;None,</span>
-<span class="doccomment">///     ws_url: &amp;gateway_url,</span>
-<span class="doccomment">///     # cache_and_http: &amp;cache_and_http,</span>
+<span class="doccomment">///     # voice_manager: None,</span>
+<span class="doccomment">///     ws_url,</span>
+<span class="doccomment">///     # cache_and_http,</span>
 <span class="doccomment">///     intents: GatewayIntents::non_privileged(),</span>
 <span class="doccomment">/// });</span>
 <span class="doccomment">/// #     Ok(())</span>
@@ -483,7 +483,7 @@
 <span class="kw">impl</span> <span class="ident">ShardManager</span> {
     <span class="doccomment">/// Creates a new shard manager, returning both the manager and a monitor</span>
     <span class="doccomment">/// for usage in a separate thread.</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">opt</span>: <span class="ident">ShardManagerOptions</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; (<span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Mutex</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span><span class="op">&gt;</span>, <span class="ident">ShardManagerMonitor</span>) {
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">opt</span>: <span class="ident">ShardManagerOptions</span>) -&gt; (<span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Mutex</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span><span class="op">&gt;</span>, <span class="ident">ShardManagerMonitor</span>) {
         <span class="kw">let</span> (<span class="ident">thread_tx</span>, <span class="ident">thread_rx</span>) <span class="op">=</span> <span class="ident">mpsc::unbounded</span>();
         <span class="kw">let</span> (<span class="ident">shard_queue_tx</span>, <span class="ident">shard_queue_rx</span>) <span class="op">=</span> <span class="ident">mpsc::unbounded</span>();
 
@@ -491,20 +491,20 @@
         <span class="kw">let</span> (<span class="ident">shutdown_send</span>, <span class="ident">shutdown_recv</span>) <span class="op">=</span> <span class="ident">mpsc::unbounded</span>();
 
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">shard_queuer</span> <span class="op">=</span> <span class="ident">ShardQueuer</span> {
-            <span class="ident">data</span>: <span class="ident">Arc::clone</span>(<span class="ident">opt</span>.<span class="ident">data</span>),
-            <span class="ident">event_handler</span>: <span class="ident">opt</span>.<span class="ident">event_handler</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="ident">Arc::clone</span>),
-            <span class="ident">raw_event_handler</span>: <span class="ident">opt</span>.<span class="ident">raw_event_handler</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="ident">Arc::clone</span>),
+            <span class="ident">data</span>: <span class="ident">opt</span>.<span class="ident">data</span>,
+            <span class="ident">event_handler</span>: <span class="ident">opt</span>.<span class="ident">event_handler</span>,
+            <span class="ident">raw_event_handler</span>: <span class="ident">opt</span>.<span class="ident">raw_event_handler</span>,
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;framework&quot;</span>)]</span>
-            <span class="ident">framework</span>: <span class="ident">opt</span>.<span class="ident">framework</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="ident">Arc::clone</span>),
+            <span class="ident">framework</span>: <span class="ident">opt</span>.<span class="ident">framework</span>,
             <span class="ident">last_start</span>: <span class="prelude-val">None</span>,
             <span class="ident">manager_tx</span>: <span class="ident">thread_tx</span>.<span class="ident">clone</span>(),
             <span class="ident">queue</span>: <span class="ident">VecDeque::new</span>(),
             <span class="ident">runners</span>: <span class="ident">Arc::clone</span>(<span class="kw-2">&amp;</span><span class="ident">runners</span>),
             <span class="ident">rx</span>: <span class="ident">shard_queue_rx</span>,
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;voice&quot;</span>)]</span>
-            <span class="ident">voice_manager</span>: <span class="ident">opt</span>.<span class="ident">voice_manager</span>.<span class="ident">clone</span>(),
-            <span class="ident">ws_url</span>: <span class="ident">Arc::clone</span>(<span class="ident">opt</span>.<span class="ident">ws_url</span>),
-            <span class="ident">cache_and_http</span>: <span class="ident">Arc::clone</span>(<span class="ident">opt</span>.<span class="ident">cache_and_http</span>),
+            <span class="ident">voice_manager</span>: <span class="ident">opt</span>.<span class="ident">voice_manager</span>,
+            <span class="ident">ws_url</span>: <span class="ident">opt</span>.<span class="ident">ws_url</span>,
+            <span class="ident">cache_and_http</span>: <span class="ident">opt</span>.<span class="ident">cache_and_http</span>,
             <span class="ident">intents</span>: <span class="ident">opt</span>.<span class="ident">intents</span>,
         };
 
@@ -710,19 +710,19 @@
     }
 }
 
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ShardManagerOptions</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">pub</span> <span class="ident">data</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">RwLock</span><span class="op">&lt;</span><span class="ident">TypeMap</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span> <span class="ident">event_handler</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">EventHandler</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span> <span class="ident">raw_event_handler</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">RawEventHandler</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ShardManagerOptions</span> {
+    <span class="kw">pub</span> <span class="ident">data</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">RwLock</span><span class="op">&lt;</span><span class="ident">TypeMap</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">event_handler</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">EventHandler</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">raw_event_handler</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">RawEventHandler</span><span class="op">&gt;</span><span class="op">&gt;</span>,
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;framework&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">framework</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">Framework</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">framework</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">Framework</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span><span class="op">&gt;</span><span class="op">&gt;</span>,
     <span class="kw">pub</span> <span class="ident">shard_index</span>: <span class="ident">u64</span>,
     <span class="kw">pub</span> <span class="ident">shard_init</span>: <span class="ident">u64</span>,
     <span class="kw">pub</span> <span class="ident">shard_total</span>: <span class="ident">u64</span>,
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;voice&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">voice_manager</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">VoiceGatewayManager</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="lifetime">&#39;static</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span> <span class="ident">ws_url</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Mutex</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span> <span class="ident">cache_and_http</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">CacheAndHttp</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">voice_manager</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">VoiceGatewayManager</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="lifetime">&#39;static</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">ws_url</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Mutex</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">cache_and_http</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">CacheAndHttp</span><span class="op">&gt;</span>,
     <span class="kw">pub</span> <span class="ident">intents</span>: <span class="ident">GatewayIntents</span>,
 }
 </code></pre></div>
