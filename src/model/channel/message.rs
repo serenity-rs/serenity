@@ -464,21 +464,10 @@ impl Message {
     ///
     /// [`ModelError::ItemMissing`] is returned if [`Self::guild_id`] is [`None`].
     pub async fn member(&self, cache_http: impl CacheHttp) -> Result<Member> {
-        let guild_id = match self.guild_id {
-            Some(guild_id) => guild_id,
-            None => return Err(Error::Model(ModelError::ItemMissing)),
-        };
-
-        #[cfg(feature = "cache")]
-        {
-            if let Some(cache) = cache_http.cache() {
-                if let Some(member) = cache.member(guild_id, self.author.id) {
-                    return Ok(member);
-                }
-            }
+        match self.guild_id {
+            Some(guild_id) => guild_id.member(cache_http, self.author.id).await,
+            None => Err(Error::Model(ModelError::ItemMissing)),
         }
-
-        cache_http.http().get_member(guild_id.0, self.author.id.0).await
     }
 
     /// Checks the length of a string to ensure that it is within Discord's
