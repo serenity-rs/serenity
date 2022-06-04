@@ -280,7 +280,7 @@
 <span class="doccomment">/// impl EventHandler for Handler {</span>
 <span class="doccomment">///     async fn message(&amp;self, context: Context, msg: Message) {</span>
 <span class="doccomment">///         if msg.content == &quot;!createinvite&quot; {</span>
-<span class="doccomment">///             let channel_opt = context.cache.guild_channel(msg.channel_id).map(|c| c.clone());</span>
+<span class="doccomment">///             let channel_opt = context.cache.guild_channel(msg.channel_id).as_deref().cloned();</span>
 <span class="doccomment">///             let channel = match channel_opt {</span>
 <span class="doccomment">///                 Some(channel) =&gt; channel,</span>
 <span class="doccomment">///                 None =&gt; {</span>

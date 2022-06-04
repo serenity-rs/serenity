@@ -1378,7 +1378,6 @@
 <span id="1373">1373</span>
 <span id="1374">1374</span>
 <span id="1375">1375</span>
-<span id="1376">1376</span>
 </pre><pre class="rust"><code><span class="doccomment">//! User information-related models.</span>
 
 <span class="kw">use</span> <span class="ident">std::fmt</span>;
@@ -2388,6 +2387,8 @@
     ) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">guild_id</span> <span class="op">=</span> <span class="ident">guild_id</span>.<span class="ident">into</span>();
 
+        <span class="comment">// This can&#39;t be removed because `GuildId::member` clones the entire `Member` struct if</span>
+        <span class="comment">// it&#39;s present in the cache, which is expensive.</span>
         <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
         {
             <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">cache</span>) <span class="op">=</span> <span class="ident">cache_http</span>.<span class="ident">cache</span>() {
@@ -2399,11 +2400,8 @@
             }
         }
 
-        <span class="ident">guild_id</span>
-            .<span class="ident">member</span>(<span class="kw-2">&amp;</span><span class="ident">cache_http</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">id</span>)
-            .<span class="kw">await</span>
-            .<span class="ident">ok</span>()
-            .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">member</span><span class="op">|</span> <span class="ident">member</span>.<span class="ident">nick</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="ident">String::clone</span>))
+        <span class="comment">// At this point we&#39;re guaranteed to do an API call.</span>
+        <span class="ident">guild_id</span>.<span class="ident">member</span>(<span class="ident">cache_http</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">id</span>).<span class="kw">await</span>.<span class="ident">ok</span>().<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">member</span><span class="op">|</span> <span class="ident">member</span>.<span class="ident">nick</span>)
     }
 
     <span class="doccomment">/// Returns a future that will await one message by this user.</span>
