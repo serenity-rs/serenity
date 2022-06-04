@@ -316,13 +316,6 @@ pub struct InviteDeleteEvent {
 }
 
 #[derive(Clone, Debug, Deserialize, Serialize)]
-#[non_exhaustive]
-pub struct GuildUnavailableEvent {
-    #[serde(rename = "id")]
-    pub guild_id: GuildId,
-}
-
-#[derive(Clone, Debug, Deserialize, Serialize)]
 #[serde(transparent)]
 #[non_exhaustive]
 pub struct GuildUpdateEvent {

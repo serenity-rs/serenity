@@ -158,9 +158,8 @@ pub struct Cache {
     /// A map of channels in [`Guild`]s that the current user has received data
     /// for.
     ///
-    /// When a [`Event::GuildDelete`] or [`Event::GuildUnavailable`] is
-    /// received and processed by the cache, the relevant channels are also
-    /// removed from this map.
+    /// When a [`Event::GuildDelete`] is received and processed by the cache,
+    /// the relevant channels are also removed from this map.
     pub(crate) channels: DashMap<ChannelId, GuildChannel>,
     /// Cache of channels that have been fetched via to_channel.
     ///
