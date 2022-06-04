@@ -30,12 +30,12 @@ use crate::collector::{
 };
 #[cfg(feature = "model")]
 use crate::http::{CacheHttp, Http};
+use crate::json::from_value;
 use crate::json::prelude::*;
-use crate::json::{from_number, from_value};
 #[cfg(feature = "model")]
 use crate::model::application::command::{Command, CommandPermission};
 use crate::model::prelude::*;
-use crate::model::utils::{emojis, roles, stickers};
+use crate::model::utils::{add_guild_id_to_map, emojis, remove_from_map, roles, stickers};
 
 /// Partial information about a [`Guild`]. This does not include information
 /// like member data.
@@ -1563,17 +1563,9 @@ impl<'de> Deserialize<'de> for PartialGuild {
     fn deserialize<D: Deserializer<'de>>(deserializer: D) -> StdResult<Self, D::Error> {
         let mut map = JsonMap::deserialize(deserializer)?;
 
-        let id = map.get("id").and_then(Value::as_str).and_then(|x| x.parse::<u64>().ok());
+        let id = remove_from_map(&mut map, "id")?;
 
-        if let Some(guild_id) = id {
-            if let Some(array) = map.get_mut("roles").and_then(Value::as_array_mut) {
-                for value in array {
-                    if let Some(role) = value.as_object_mut() {
-                        role.insert("guild_id".to_string(), from_number(guild_id));
-                    }
-                }
-            }
-        }
+        add_guild_id_to_map(&mut map, "roles", id);
 
         let afk_channel_id = match map.remove("afk_channel_id") {
             Some(v) => from_value::<Option<ChannelId>>(v).map_err(DeError::custom)?,
@@ -1603,11 +1595,6 @@ impl<'de> Deserialize<'de> for PartialGuild {
             Some(v) => Option::<String>::deserialize(v).map_err(DeError::custom)?,
             None => None,
         };
-        let id = map
-            .remove("id")
-            .ok_or_else(|| DeError::custom("expected guild id"))
-            .and_then(GuildId::deserialize)
-            .map_err(DeError::custom)?;
         let mfa_level = map
             .remove("mfa_level")
             .ok_or_else(|| DeError::custom("expected guild mfa_level"))

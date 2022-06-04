@@ -7,7 +7,7 @@ use std::fmt;
 use serde::de::{Error as DeError, IgnoredAny, MapAccess};
 
 use super::prelude::*;
-use super::utils::{deserialize_val, emojis, roles, stickers};
+use super::utils::{add_guild_id_to_map, deserialize_val, emojis, roles, stickers};
 use crate::constants::OpCode;
 use crate::internal::prelude::*;
 use crate::json::prelude::*;
@@ -241,18 +241,11 @@ impl<'de> Deserialize<'de> for GuildMembersChunkEvent {
     }
 }
 
-#[derive(Clone, Debug, Serialize)]
+#[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 pub struct GuildRoleCreateEvent {
+    #[serde(deserialize_with = "roles::deserialize_event")]
     pub role: Role,
-}
-
-impl<'de> Deserialize<'de> for GuildRoleCreateEvent {
-    fn deserialize<D: Deserializer<'de>>(deserializer: D) -> StdResult<Self, D::Error> {
-        Ok(Self {
-            role: roles::deserialize_event(deserializer)?,
-        })
-    }
 }
 
 #[derive(Clone, Debug, Deserialize, Serialize)]
@@ -262,18 +255,11 @@ pub struct GuildRoleDeleteEvent {
     pub role_id: RoleId,
 }
 
-#[derive(Clone, Debug, Serialize)]
+#[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 pub struct GuildRoleUpdateEvent {
+    #[serde(deserialize_with = "roles::deserialize_event")]
     pub role: Role,
-}
-
-impl<'de> Deserialize<'de> for GuildRoleUpdateEvent {
-    fn deserialize<D: Deserializer<'de>>(deserializer: D) -> StdResult<Self, D::Error> {
-        Ok(Self {
-            role: roles::deserialize_event(deserializer)?,
-        })
-    }
 }
 
 #[derive(Clone, Debug, Deserialize, Serialize)]
@@ -1448,17 +1434,7 @@ pub fn deserialize_event_with_type(kind: EventType, mut v: Value) -> Result<Even
             if v.get("unavailable").and_then(Value::as_bool).unwrap_or(false) {
                 Event::GuildUnavailable(from_value(v)?)
             } else {
-                fn add_guild_id_to_map(map: &mut JsonMap, key: &str, id: GuildId) {
-                    if let Some(array) = map.get_mut(key).and_then(Value::as_array_mut) {
-                        for value in array {
-                            if let Some(item) = value.as_object_mut() {
-                                item.insert("guild_id".to_string(), from_number(id.0));
-                            }
-                        }
-                    }
-                }
-
-                let map = v.as_object_mut().expect("TODO REMOVE!!!! expected object!");
+                let map = v.as_object_mut().ok_or_else(|| Error::Json(DeError::custom("expected JsonMap")))?;
 
                 let id_val =
                     map.get("id").ok_or_else(|| Error::Json(DeError::missing_field("id")))?;
