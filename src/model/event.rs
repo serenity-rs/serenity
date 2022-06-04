@@ -7,10 +7,17 @@ use std::fmt;
 use serde::de::{Error as DeError, IgnoredAny, MapAccess};
 
 use super::prelude::*;
-use super::utils::{add_guild_id_to_map, deserialize_val, emojis, roles, stickers};
+use super::utils::{
+    add_guild_id_to_map,
+    deserialize_val,
+    emojis,
+    remove_from_map,
+    remove_from_map_opt,
+    roles,
+    stickers,
+};
 use crate::constants::OpCode;
 use crate::internal::prelude::*;
-use crate::json::prelude::*;
 use crate::model::application::command::CommandPermission;
 use crate::model::application::interaction::Interaction;
 
@@ -71,11 +78,29 @@ pub struct GuildBanRemoveEvent {
     pub user: User,
 }
 
-#[derive(Clone, Debug, Deserialize, Serialize)]
+#[derive(Clone, Debug, Serialize)]
 #[serde(transparent)]
 #[non_exhaustive]
 pub struct GuildCreateEvent {
     pub guild: Guild,
+}
+
+impl<'de> Deserialize<'de> for GuildCreateEvent {
+    fn deserialize<D: Deserializer<'de>>(deserializer: D) -> StdResult<Self, D::Error> {
+        let mut value = Value::deserialize(deserializer)?;
+        let map = value.as_object_mut().ok_or_else(|| DeError::custom("expected JsonMap"))?;
+
+        let id_val = map.get("id").ok_or_else(|| DeError::missing_field("id"))?;
+        let id = deserialize_val(id_val.clone())?;
+
+        add_guild_id_to_map(map, "channels", id);
+        add_guild_id_to_map(map, "members", id);
+        add_guild_id_to_map(map, "roles", id);
+
+        deserialize_val(value).map(|guild| Self {
+            guild,
+        })
+    }
 }
 
 #[derive(Clone, Debug, Deserialize, Serialize)]
@@ -623,45 +648,27 @@ pub enum GatewayEvent {
 
 impl<'de> Deserialize<'de> for GatewayEvent {
     fn deserialize<D: Deserializer<'de>>(deserializer: D) -> StdResult<Self, D::Error> {
-        #[derive(Deserialize)]
-        struct RawGatewayEvent {
-            d: Option<serde_json::Value>,
-            t: Option<EventType>,
-            s: Option<u64>,
-            op: OpCode,
-        }
+        let mut value = Value::deserialize(deserializer)?;
+        let map = value.as_object_mut().ok_or_else(|| DeError::custom("expected JsonMap"))?;
 
-        let raw = RawGatewayEvent::deserialize(deserializer)?;
+        let seq = remove_from_map_opt(map, "s")?.flatten();
 
-        Ok(match raw.op {
-            OpCode::Event => {
-                let kind = raw.t.ok_or_else(|| DeError::missing_field("t"))?;
-                let s = raw.s.ok_or_else(|| DeError::missing_field("s"))?;
-                let payload = raw.d.ok_or_else(|| DeError::missing_field("d"))?;
-
-                let x = deserialize_event_with_type(kind.clone(), payload)
-                    .map_err(|why| DeError::custom(format_args!("event {:?}: {}", kind, why)))?;
-
-                GatewayEvent::Dispatch(s, x)
-            },
+        Ok(match remove_from_map(map, "op")? {
+            OpCode::Event => Self::Dispatch(
+                seq.ok_or_else(|| DeError::missing_field("s"))?,
+                deserialize_val(value)?,
+            ),
             OpCode::Heartbeat => {
-                GatewayEvent::Heartbeat(raw.s.ok_or_else(|| DeError::missing_field("2"))?)
+                GatewayEvent::Heartbeat(seq.ok_or_else(|| DeError::missing_field("s"))?)
             },
-            OpCode::InvalidSession => {
-                let resumable = deserialize_val(raw.d.ok_or_else(|| DeError::missing_field("d"))?)?;
-
-                GatewayEvent::InvalidateSession(resumable)
-            },
+            OpCode::InvalidSession => GatewayEvent::InvalidateSession(remove_from_map(map, "d")?),
             OpCode::Hello => {
                 #[derive(Deserialize)]
                 struct HelloPayload {
                     heartbeat_interval: u64,
                 }
 
-                let inner = deserialize_val::<HelloPayload, _>(
-                    raw.d.ok_or_else(|| DeError::missing_field("d"))?,
-                )?;
-
+                let inner: HelloPayload = remove_from_map(map, "d")?;
                 GatewayEvent::Hello(inner.heartbeat_interval)
             },
             OpCode::Reconnect => GatewayEvent::Reconnect,
@@ -674,8 +681,9 @@ impl<'de> Deserialize<'de> for GatewayEvent {
 /// Event received over a websocket connection
 #[allow(clippy::large_enum_variant)]
 #[derive(Clone, Debug, Deserialize, Serialize)]
+#[serde(rename_all = "SCREAMING_SNAKE_CASE")]
+#[serde(tag = "t", content = "d")]
 #[non_exhaustive]
-#[serde(untagged)]
 pub enum Event {
     /// The permissions of an [`Command`] was changed.
     ///
@@ -724,8 +732,6 @@ pub enum Event {
     GuildRoleUpdate(GuildRoleUpdateEvent),
     /// A [`Sticker`] was created, updated, or deleted
     GuildStickersUpdate(GuildStickersUpdateEvent),
-    /// When a guild is unavailable, such as due to a Discord server outage.
-    GuildUnavailable(GuildUnavailableEvent),
     GuildUpdate(GuildUpdateEvent),
     /// An [`Invite`] was created.
     ///
@@ -823,7 +829,8 @@ pub enum Event {
     /// A guild member has unsubscribed from a scheduled event.
     GuildScheduledEventUserRemove(GuildScheduledEventUserRemoveEvent),
     /// An event type not covered by the above
-    Unknown(UnknownEvent),
+    #[serde(other)]
+    Unknown,
 }
 
 #[cfg(feature = "model")]
@@ -976,12 +983,6 @@ macro_rules! with_related_ids_for_event_types {
                 message_id: Never,
             },
             Self::GuildStickersUpdate, Self::GuildStickersUpdate(e) => {
-                user_id: Never,
-                guild_id: Some(e.guild_id),
-                channel_id: Never,
-                message_id: Never,
-            },
-            Self::GuildUnavailable, Self::GuildUnavailable(e) => {
                 user_id: Never,
                 guild_id: Some(e.guild_id),
                 channel_id: Never,
@@ -1230,7 +1231,7 @@ macro_rules! define_event_related_id_methods {
             use RelatedId::*;
             #[allow(unused_variables)]
             match self {
-                Self::Unknown(_) => Never,
+                Self::Unknown => Never,
                 $(
                     $(#[$attr])?
                     $variant => $user_id
@@ -1244,7 +1245,7 @@ macro_rules! define_event_related_id_methods {
             use RelatedId::*;
             #[allow(unused_variables)]
             match self {
-                Self::Unknown(_) => Never,
+                Self::Unknown => Never,
                 $(
                     $(#[$attr])?
                     $variant => $guild_id
@@ -1258,7 +1259,7 @@ macro_rules! define_event_related_id_methods {
             use RelatedId::*;
             #[allow(unused_variables)]
             match self {
-                Self::Unknown(_) => Never,
+                Self::Unknown => Never,
                 $(
                     $(#[$attr])?
                     $variant => $channel_id
@@ -1272,7 +1273,7 @@ macro_rules! define_event_related_id_methods {
             use RelatedId::*;
             #[allow(unused_variables)]
             match self {
-                Self::Unknown(_) => Never,
+                Self::Unknown => Never,
                 $(
                     $(#[$attr])?
                     $variant => $message_id
@@ -1308,7 +1309,6 @@ impl Event {
             Self::GuildRoleDelete(_) => EventType::GuildRoleDelete,
             Self::GuildRoleUpdate(_) => EventType::GuildRoleUpdate,
             Self::GuildStickersUpdate(_) => EventType::GuildStickersUpdate,
-            Self::GuildUnavailable(_) => EventType::GuildUnavailable,
             Self::GuildUpdate(_) => EventType::GuildUpdate,
             Self::InviteCreate(_) => EventType::InviteCreate,
             Self::InviteDelete(_) => EventType::InviteDelete,
@@ -1346,7 +1346,7 @@ impl Event {
             Self::GuildScheduledEventDelete(_) => EventType::GuildScheduledEventDelete,
             Self::GuildScheduledEventUserAdd(_) => EventType::GuildScheduledEventUserAdd,
             Self::GuildScheduledEventUserRemove(_) => EventType::GuildScheduledEventUserRemove,
-            Self::Unknown(unknown) => EventType::Other(unknown.kind.clone()),
+            Self::Unknown => EventType::Other,
         }
     }
 
@@ -1399,117 +1399,6 @@ impl<T> TryFrom<RelatedId<T>> for Option<T> {
             RelatedId::Multiple(t) => Err(t),
         }
     }
-}
-
-/// Deserializes a [`serde_json::Value`] into an [`Event`].
-///
-/// The given [`EventType`] is used to determine what event to deserialize into.
-/// For example, an [`EventType::ChannelCreate`] will cause the given value to
-/// attempt to be deserialized into a [`ChannelCreateEvent`].
-///
-/// Special handling is done in regards to [`EventType::GuildCreate`] and
-/// [`EventType::GuildDelete`]: they check for an `"unavailable"` key and, if
-/// present and containing a value of `true`, will cause a
-/// [`GuildUnavailableEvent`] to be returned. Otherwise, all other event types
-/// correlate to the deserialization of their appropriate event.
-///
-/// # Errors
-///
-/// Returns [`Error::Json`] if there is an error in deserializing the event data.
-pub fn deserialize_event_with_type(kind: EventType, mut v: Value) -> Result<Event> {
-    Ok(match kind {
-        EventType::ApplicationCommandPermissionsUpdate => {
-            Event::ApplicationCommandPermissionsUpdate(from_value(v)?)
-        },
-        EventType::ChannelCreate => Event::ChannelCreate(from_value(v)?),
-        EventType::ChannelDelete => Event::ChannelDelete(from_value(v)?),
-        EventType::ChannelPinsUpdate => Event::ChannelPinsUpdate(from_value(v)?),
-        EventType::ChannelUpdate => Event::ChannelUpdate(from_value(v)?),
-        EventType::GuildBanAdd => Event::GuildBanAdd(from_value(v)?),
-        EventType::GuildBanRemove => Event::GuildBanRemove(from_value(v)?),
-        EventType::GuildCreate | EventType::GuildUnavailable => {
-            // GuildUnavailable isn't actually received from the gateway, so it
-            // can be lumped in with GuildCreate's arm.
-
-            if v.get("unavailable").and_then(Value::as_bool).unwrap_or(false) {
-                Event::GuildUnavailable(from_value(v)?)
-            } else {
-                let map = v
-                    .as_object_mut()
-                    .ok_or_else(|| Error::Json(DeError::custom("expected JsonMap")))?;
-
-                let id_val =
-                    map.get("id").ok_or_else(|| Error::Json(DeError::missing_field("id")))?;
-                let id = from_value(id_val.clone())?;
-
-                add_guild_id_to_map(map, "channels", id);
-                add_guild_id_to_map(map, "members", id);
-                add_guild_id_to_map(map, "roles", id);
-
-                Event::GuildCreate(from_value(v)?)
-            }
-        },
-        EventType::GuildDelete => {
-            if v.get("unavailable").and_then(Value::as_bool).unwrap_or(false) {
-                Event::GuildUnavailable(from_value(v)?)
-            } else {
-                Event::GuildDelete(from_value(v)?)
-            }
-        },
-        EventType::GuildEmojisUpdate => Event::GuildEmojisUpdate(from_value(v)?),
-        EventType::GuildIntegrationsUpdate => Event::GuildIntegrationsUpdate(from_value(v)?),
-        EventType::GuildMemberAdd => Event::GuildMemberAdd(from_value(v)?),
-        EventType::GuildMemberRemove => Event::GuildMemberRemove(from_value(v)?),
-        EventType::GuildMemberUpdate => Event::GuildMemberUpdate(from_value(v)?),
-        EventType::GuildMembersChunk => Event::GuildMembersChunk(from_value(v)?),
-        EventType::GuildRoleCreate => Event::GuildRoleCreate(from_value(v)?),
-        EventType::GuildRoleDelete => Event::GuildRoleDelete(from_value(v)?),
-        EventType::GuildRoleUpdate => Event::GuildRoleUpdate(from_value(v)?),
-        EventType::GuildStickersUpdate => Event::GuildStickersUpdate(from_value(v)?),
-        EventType::InviteCreate => Event::InviteCreate(from_value(v)?),
-        EventType::InviteDelete => Event::InviteDelete(from_value(v)?),
-        EventType::GuildUpdate => Event::GuildUpdate(from_value(v)?),
-        EventType::MessageCreate => Event::MessageCreate(from_value(v)?),
-        EventType::MessageDelete => Event::MessageDelete(from_value(v)?),
-        EventType::MessageDeleteBulk => Event::MessageDeleteBulk(from_value(v)?),
-        EventType::ReactionAdd => Event::ReactionAdd(from_value(v)?),
-        EventType::ReactionRemove => Event::ReactionRemove(from_value(v)?),
-        EventType::ReactionRemoveAll => Event::ReactionRemoveAll(from_value(v)?),
-        EventType::MessageUpdate => Event::MessageUpdate(from_value(v)?),
-        EventType::PresenceUpdate => Event::PresenceUpdate(from_value(v)?),
-        EventType::PresencesReplace => Event::PresencesReplace(from_value(v)?),
-        EventType::Ready => Event::Ready(from_value(v)?),
-        EventType::Resumed => Event::Resumed(from_value(v)?),
-        EventType::TypingStart => Event::TypingStart(from_value(v)?),
-        EventType::UserUpdate => Event::UserUpdate(from_value(v)?),
-        EventType::VoiceServerUpdate => Event::VoiceServerUpdate(from_value(v)?),
-        EventType::VoiceStateUpdate => Event::VoiceStateUpdate(from_value(v)?),
-        EventType::WebhookUpdate => Event::WebhookUpdate(from_value(v)?),
-        EventType::InteractionCreate => Event::InteractionCreate(from_value(v)?),
-        EventType::IntegrationCreate => Event::IntegrationCreate(from_value(v)?),
-        EventType::IntegrationUpdate => Event::IntegrationUpdate(from_value(v)?),
-        EventType::IntegrationDelete => Event::IntegrationDelete(from_value(v)?),
-        EventType::StageInstanceCreate => Event::StageInstanceCreate(from_value(v)?),
-        EventType::StageInstanceUpdate => Event::StageInstanceUpdate(from_value(v)?),
-        EventType::StageInstanceDelete => Event::StageInstanceDelete(from_value(v)?),
-        EventType::ThreadCreate => Event::ThreadCreate(from_value(v)?),
-        EventType::ThreadUpdate => Event::ThreadUpdate(from_value(v)?),
-        EventType::ThreadDelete => Event::ThreadDelete(from_value(v)?),
-        EventType::ThreadListSync => Event::ThreadListSync(from_value(v)?),
-        EventType::ThreadMemberUpdate => Event::ThreadMemberUpdate(from_value(v)?),
-        EventType::ThreadMembersUpdate => Event::ThreadMembersUpdate(from_value(v)?),
-        EventType::GuildScheduledEventCreate => Event::GuildScheduledEventCreate(from_value(v)?),
-        EventType::GuildScheduledEventUpdate => Event::GuildScheduledEventUpdate(from_value(v)?),
-        EventType::GuildScheduledEventDelete => Event::GuildScheduledEventDelete(from_value(v)?),
-        EventType::GuildScheduledEventUserAdd => Event::GuildScheduledEventUserAdd(from_value(v)?),
-        EventType::GuildScheduledEventUserRemove => {
-            Event::GuildScheduledEventUserRemove(from_value(v)?)
-        },
-        EventType::Other(kind) => Event::Unknown(UnknownEvent {
-            kind,
-            value: v,
-        }),
-    })
 }
 
 /// The type of event dispatch received from the gateway.
@@ -1598,10 +1487,6 @@ pub enum EventType {
     ///
     /// This maps to [`GuildStickersUpdateEvent`].
     GuildStickersUpdate,
-    /// Indicator that a guild unavailable payload was received.
-    ///
-    /// This maps to [`GuildUnavailableEvent`].
-    GuildUnavailable,
     /// Indicator that a guild update payload was received.
     ///
     /// This maps to [`GuildUpdateEvent`].
@@ -1755,7 +1640,7 @@ pub enum EventType {
     ///
     /// This should be logged so that support for it can be added in the
     /// library.
-    Other(String),
+    Other,
 }
 
 impl From<&Event> for EventType {
@@ -1787,7 +1672,7 @@ macro_rules! define_related_ids_for_event_type {
         #[must_use]
         pub fn related_ids(&self) -> RelatedIdsForEventType {
             match self {
-                Self::Other(_) => Default::default(),
+                Self::Other => Default::default(),
                 $(
                     $(#[$attr])?
                     $variant =>
@@ -1938,100 +1823,9 @@ impl EventType {
             Self::GuildScheduledEventDelete => Some(Self::GUILD_SCHEDULED_EVENT_DELETE),
             Self::GuildScheduledEventUserAdd => Some(Self::GUILD_SCHEDULED_EVENT_USER_ADD),
             Self::GuildScheduledEventUserRemove => Some(Self::GUILD_SCHEDULED_EVENT_USER_REMOVE),
-            // GuildUnavailable is a synthetic event type, corresponding to either
-            // `GUILD_CREATE` or `GUILD_DELETE`, but we don't have enough information
-            // to recover the name here, so we return `None` instead.
-            Self::GuildUnavailable => None,
-            Self::Other(other) => Some(other),
+            Self::Other => None,
         }
     }
 
     with_related_ids_for_event_types!(define_related_ids_for_event_type);
-}
-
-impl<'de> Deserialize<'de> for EventType {
-    fn deserialize<D>(deserializer: D) -> StdResult<Self, D::Error>
-    where
-        D: Deserializer<'de>,
-    {
-        struct EventTypeVisitor;
-
-        impl<'de> Visitor<'de> for EventTypeVisitor {
-            type Value = EventType;
-
-            fn expecting(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-                f.write_str("event type str")
-            }
-
-            fn visit_str<E>(self, v: &str) -> StdResult<Self::Value, E>
-            where
-                E: DeError,
-            {
-                Ok(match v {
-                    EventType::APPLICATION_COMMAND_PERMISSIONS_UPDATE => {
-                        EventType::ApplicationCommandPermissionsUpdate
-                    },
-                    EventType::CHANNEL_CREATE => EventType::ChannelCreate,
-                    EventType::CHANNEL_DELETE => EventType::ChannelDelete,
-                    EventType::CHANNEL_PINS_UPDATE => EventType::ChannelPinsUpdate,
-                    EventType::CHANNEL_UPDATE => EventType::ChannelUpdate,
-                    EventType::GUILD_BAN_ADD => EventType::GuildBanAdd,
-                    EventType::GUILD_BAN_REMOVE => EventType::GuildBanRemove,
-                    EventType::GUILD_CREATE => EventType::GuildCreate,
-                    EventType::GUILD_DELETE => EventType::GuildDelete,
-                    EventType::GUILD_EMOJIS_UPDATE => EventType::GuildEmojisUpdate,
-                    EventType::GUILD_INTEGRATIONS_UPDATE => EventType::GuildIntegrationsUpdate,
-                    EventType::GUILD_MEMBER_ADD => EventType::GuildMemberAdd,
-                    EventType::GUILD_MEMBER_REMOVE => EventType::GuildMemberRemove,
-                    EventType::GUILD_MEMBER_UPDATE => EventType::GuildMemberUpdate,
-                    EventType::GUILD_MEMBERS_CHUNK => EventType::GuildMembersChunk,
-                    EventType::GUILD_ROLE_CREATE => EventType::GuildRoleCreate,
-                    EventType::GUILD_ROLE_DELETE => EventType::GuildRoleDelete,
-                    EventType::GUILD_ROLE_UPDATE => EventType::GuildRoleUpdate,
-                    EventType::GUILD_STICKERS_UPDATE => EventType::GuildStickersUpdate,
-                    EventType::INVITE_CREATE => EventType::InviteCreate,
-                    EventType::INVITE_DELETE => EventType::InviteDelete,
-                    EventType::GUILD_UPDATE => EventType::GuildUpdate,
-                    EventType::MESSAGE_CREATE => EventType::MessageCreate,
-                    EventType::MESSAGE_DELETE => EventType::MessageDelete,
-                    EventType::MESSAGE_DELETE_BULK => EventType::MessageDeleteBulk,
-                    EventType::MESSAGE_REACTION_ADD => EventType::ReactionAdd,
-                    EventType::MESSAGE_REACTION_REMOVE => EventType::ReactionRemove,
-                    EventType::MESSAGE_REACTION_REMOVE_ALL => EventType::ReactionRemoveAll,
-                    EventType::MESSAGE_UPDATE => EventType::MessageUpdate,
-                    EventType::PRESENCE_UPDATE => EventType::PresenceUpdate,
-                    EventType::PRESENCES_REPLACE => EventType::PresencesReplace,
-                    EventType::READY => EventType::Ready,
-                    EventType::RESUMED => EventType::Resumed,
-                    EventType::TYPING_START => EventType::TypingStart,
-                    EventType::USER_UPDATE => EventType::UserUpdate,
-                    EventType::VOICE_SERVER_UPDATE => EventType::VoiceServerUpdate,
-                    EventType::VOICE_STATE_UPDATE => EventType::VoiceStateUpdate,
-                    EventType::WEBHOOKS_UPDATE => EventType::WebhookUpdate,
-                    EventType::INTERACTION_CREATE => EventType::InteractionCreate,
-                    EventType::INTEGRATION_CREATE => EventType::IntegrationCreate,
-                    EventType::INTEGRATION_UPDATE => EventType::IntegrationUpdate,
-                    EventType::INTEGRATION_DELETE => EventType::IntegrationDelete,
-                    EventType::STAGE_INSTANCE_CREATE => EventType::StageInstanceCreate,
-                    EventType::STAGE_INSTANCE_UPDATE => EventType::StageInstanceUpdate,
-                    EventType::STAGE_INSTANCE_DELETE => EventType::StageInstanceDelete,
-                    EventType::THREAD_CREATE => EventType::ThreadCreate,
-                    EventType::THREAD_UPDATE => EventType::ThreadUpdate,
-                    EventType::THREAD_DELETE => EventType::ThreadDelete,
-                    EventType::GUILD_SCHEDULED_EVENT_CREATE => EventType::GuildScheduledEventCreate,
-                    EventType::GUILD_SCHEDULED_EVENT_UPDATE => EventType::GuildScheduledEventUpdate,
-                    EventType::GUILD_SCHEDULED_EVENT_DELETE => EventType::GuildScheduledEventDelete,
-                    EventType::GUILD_SCHEDULED_EVENT_USER_ADD => {
-                        EventType::GuildScheduledEventUserAdd
-                    },
-                    EventType::GUILD_SCHEDULED_EVENT_USER_REMOVE => {
-                        EventType::GuildScheduledEventUserRemove
-                    },
-                    other => EventType::Other(other.to_owned()),
-                })
-            }
-        }
-
-        deserializer.deserialize_str(EventTypeVisitor)
-    }
 }

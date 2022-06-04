@@ -117,9 +117,6 @@ impl DispatchEvent {
             Self::Model(Event::GuildStickersUpdate(ref mut event)) => {
                 update(cache_and_http, event);
             },
-            Self::Model(Event::GuildUnavailable(ref mut event)) => {
-                update(cache_and_http, event);
-            },
             // Already handled by the framework check macro
             Self::Model(Event::MessageCreate(_)) => {},
             Self::Model(Event::MessageUpdate(ref mut event)) => {
@@ -598,14 +595,6 @@ async fn handle_event(
                 event_handler.guild_stickers_update(context, event.guild_id, event.stickers).await;
             });
         },
-        DispatchEvent::Model(Event::GuildUnavailable(mut event)) => {
-            update(&cache_and_http, &mut event);
-            let event_handler = Arc::clone(event_handler);
-
-            spawn_named("dispatch::event_handler::guild_unavailable", async move {
-                event_handler.guild_unavailable(context, event.guild_id).await;
-            });
-        },
         DispatchEvent::Model(Event::GuildUpdate(mut event)) => {
             let event_handler = Arc::clone(event_handler);
 
@@ -732,11 +721,11 @@ async fn handle_event(
                 event_handler.typing_start(context, event).await;
             });
         },
-        DispatchEvent::Model(Event::Unknown(event)) => {
+        DispatchEvent::Model(Event::Unknown) => {
             let event_handler = Arc::clone(event_handler);
 
             spawn_named("dispatch::event_handler::unknown", async move {
-                event_handler.unknown(context, event.kind, event.value).await;
+                event_handler.unknown(context).await;
             });
         },
         DispatchEvent::Model(Event::UserUpdate(mut event)) => {
