@@ -72,7 +72,14 @@ use crate::json::prelude::*;
 #[cfg(feature = "model")]
 use crate::model::application::command::{Command, CommandPermission};
 use crate::model::prelude::*;
-use crate::model::utils::{emojis, presences, roles, stickers};
+use crate::model::utils::{
+    emojis,
+    presences,
+    remove_from_map,
+    remove_from_map_opt,
+    roles,
+    stickers,
+};
 use crate::model::Timestamp;
 
 /// A representation of a banning of a user.
@@ -2632,24 +2639,10 @@ impl<'de> Deserialize<'de> for Guild {
             if let Some(array) = map.get_mut(key).and_then(Value::as_array_mut) {
                 for value in array {
                     if let Some(item) = value.as_object_mut() {
-                        item.insert("guild_id".to_string(), from_number(id.get()));
+                        item.insert("guild_id".to_string(), from_number(id.0));
                     }
                 }
             }
-        }
-
-        fn remove_from_map_opt<T: serde::de::DeserializeOwned, E: DeError>(
-            map: &mut JsonMap,
-            key: &str,
-        ) -> StdResult<Option<T>, E> {
-            map.remove(key).map(T::deserialize).transpose().map_err(DeError::custom)
-        }
-
-        fn remove_from_map<T: serde::de::DeserializeOwned, E: DeError>(
-            map: &mut JsonMap,
-            key: &'static str,
-        ) -> StdResult<T, E> {
-            remove_from_map_opt(map, key)?.ok_or_else(|| DeError::missing_field(key))
         }
 
         let mut map = JsonMap::deserialize(deserializer)?;
@@ -2718,34 +2711,35 @@ impl<'de> Deserialize<'de> for Guild {
             roles,
             voice_states,
             stickers,
-            afk_channel_id: remove_from_map_opt(&mut map, "afk_channel_id")?,
+            afk_channel_id: remove_from_map_opt(&mut map, "afk_channel_id")?.flatten(),
             afk_timeout: remove_from_map(&mut map, "afk_timeout")?,
-            application_id: remove_from_map_opt(&mut map, "application_id")?,
+            application_id: remove_from_map_opt(&mut map, "application_id")?.flatten(),
             default_message_notifications: remove_from_map(
                 &mut map,
                 "default_message_notifications",
             )?,
             explicit_content_filter: remove_from_map(&mut map, "explicit_content_filter")?,
             features: remove_from_map(&mut map, "features")?,
-            icon: remove_from_map_opt(&mut map, "icon")?,
+            icon: remove_from_map_opt(&mut map, "icon")?.flatten(),
             joined_at: remove_from_map(&mut map, "joined_at")?,
             large: remove_from_map(&mut map, "large")?,
             member_count: remove_from_map(&mut map, "member_count")?,
             mfa_level: remove_from_map(&mut map, "mfa_level")?,
             name: remove_from_map(&mut map, "name")?,
             owner_id: remove_from_map(&mut map, "owner_id")?,
-            splash: remove_from_map_opt(&mut map, "splash")?,
-            discovery_splash: remove_from_map_opt(&mut map, "discovery_splash")?,
-            system_channel_id: remove_from_map_opt(&mut map, "system_channel_id")?,
+            splash: remove_from_map_opt(&mut map, "splash")?.flatten(),
+            discovery_splash: remove_from_map_opt(&mut map, "discovery_splash")?.flatten(),
+            system_channel_id: remove_from_map_opt(&mut map, "system_channel_id")?.flatten(),
             system_channel_flags: remove_from_map(&mut map, "system_channel_flags")?,
-            rules_channel_id: remove_from_map_opt(&mut map, "rules_channel_id")?,
-            public_updates_channel_id: remove_from_map_opt(&mut map, "public_updates_channel_id")?,
+            rules_channel_id: remove_from_map_opt(&mut map, "rules_channel_id")?.flatten(),
+            public_updates_channel_id: remove_from_map_opt(&mut map, "public_updates_channel_id")?
+                .flatten(),
             verification_level: remove_from_map(&mut map, "verification_level")?,
-            description: remove_from_map_opt(&mut map, "description")?,
+            description: remove_from_map_opt(&mut map, "description")?.flatten(),
             premium_tier: remove_from_map_opt(&mut map, "premium_tier")?.unwrap_or_default(),
             premium_subscription_count,
-            banner: remove_from_map_opt(&mut map, "banner")?,
-            vanity_url_code: remove_from_map_opt(&mut map, "vanity_url_code")?,
+            banner: remove_from_map_opt(&mut map, "banner")?.flatten(),
+            vanity_url_code: remove_from_map_opt(&mut map, "vanity_url_code")?.flatten(),
             preferred_locale: remove_from_map(&mut map, "preferred_locale")?,
             welcome_screen: remove_from_map_opt(&mut map, "welcome_screen")?,
             approximate_member_count: remove_from_map_opt(&mut map, "approximate_member_count")?,
@@ -2755,10 +2749,10 @@ impl<'de> Deserialize<'de> for Guild {
             )?,
             nsfw_level: remove_from_map(&mut map, "nsfw_level")?,
             max_video_channel_users: remove_from_map_opt(&mut map, "max_video_channel_users")?,
-            max_presences: remove_from_map_opt(&mut map, "max_presences")?,
+            max_presences: remove_from_map_opt(&mut map, "max_presences")?.flatten(),
             max_members: remove_from_map_opt(&mut map, "max_members")?,
-            widget_enabled: remove_from_map_opt(&mut map, "widget_enabled")?,
-            widget_channel_id: remove_from_map_opt(&mut map, "widget_channel_id")?,
+            widget_enabled: remove_from_map_opt(&mut map, "widget_enabled")?.flatten(),
+            widget_channel_id: remove_from_map_opt(&mut map, "widget_channel_id")?.flatten(),
             stage_instances: remove_from_map_opt(&mut map, "stage_instances")?.unwrap_or_default(),
             threads: remove_from_map_opt(&mut map, "threads")?.unwrap_or_default(),
         })
