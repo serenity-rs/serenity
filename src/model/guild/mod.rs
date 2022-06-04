@@ -2653,8 +2653,8 @@ impl<'de> Deserialize<'de> for Guild {
         add_guild_id_to_map(&mut map, "roles", id);
 
         let channels = map
-            .remove("emojis")
-            .ok_or_else(|| DeError::missing_field("emojis"))
+            .remove("channels")
+            .ok_or_else(|| DeError::missing_field("channels"))
             .and_then(deserialize_guild_channels)
             .map_err(DeError::custom)?;
 
