@@ -1243,17 +1243,6 @@
 <span id="1238">1238</span>
 <span id="1239">1239</span>
 <span id="1240">1240</span>
-<span id="1241">1241</span>
-<span id="1242">1242</span>
-<span id="1243">1243</span>
-<span id="1244">1244</span>
-<span id="1245">1245</span>
-<span id="1246">1246</span>
-<span id="1247">1247</span>
-<span id="1248">1248</span>
-<span id="1249">1249</span>
-<span id="1250">1250</span>
-<span id="1251">1251</span>
 </pre><pre class="rust"><code><span class="doccomment">//! Models relating to Discord channels.</span>
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
@@ -1720,21 +1709,10 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// [`ModelError::ItemMissing`] is returned if [`Self::guild_id`] is [`None`].</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">member</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">cache_http</span>: <span class="kw">impl</span> <span class="ident">CacheHttp</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Member</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">guild_id</span> <span class="op">=</span> <span class="kw">match</span> <span class="self">self</span>.<span class="ident">guild_id</span> {
-            <span class="prelude-val">Some</span>(<span class="ident">guild_id</span>) =&gt; <span class="ident">guild_id</span>,
-            <span class="prelude-val">None</span> =&gt; <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::Model</span>(<span class="ident">ModelError::ItemMissing</span>)),
-        };
-
-        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
-        {
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">cache</span>) <span class="op">=</span> <span class="ident">cache_http</span>.<span class="ident">cache</span>() {
-                <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">member</span>) <span class="op">=</span> <span class="ident">cache</span>.<span class="ident">member</span>(<span class="ident">guild_id</span>, <span class="self">self</span>.<span class="ident">author</span>.<span class="ident">id</span>) {
-                    <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">member</span>);
-                }
-            }
+        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">guild_id</span> {
+            <span class="prelude-val">Some</span>(<span class="ident">guild_id</span>) =&gt; <span class="ident">guild_id</span>.<span class="ident">member</span>(<span class="ident">cache_http</span>, <span class="self">self</span>.<span class="ident">author</span>.<span class="ident">id</span>).<span class="kw">await</span>,
+            <span class="prelude-val">None</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">Error::Model</span>(<span class="ident">ModelError::ItemMissing</span>)),
         }
-
-        <span class="ident">cache_http</span>.<span class="ident">http</span>().<span class="ident">get_member</span>(<span class="ident">guild_id</span>.<span class="number">0</span>, <span class="self">self</span>.<span class="ident">author</span>.<span class="ident">id</span>.<span class="number">0</span>).<span class="kw">await</span>
     }
 
     <span class="doccomment">/// Checks the length of a string to ensure that it is within Discord&#39;s</span>
