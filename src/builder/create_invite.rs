@@ -26,7 +26,7 @@ use crate::model::invite::InviteTargetType;
 /// impl EventHandler for Handler {
 ///     async fn message(&self, context: Context, msg: Message) {
 ///         if msg.content == "!createinvite" {
-///             let channel_opt = context.cache.guild_channel(msg.channel_id).map(|c| c.clone());
+///             let channel_opt = context.cache.guild_channel(msg.channel_id).as_deref().cloned();
 ///             let channel = match channel_opt {
 ///                 Some(channel) => channel,
 ///                 None => {
