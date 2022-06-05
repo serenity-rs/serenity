@@ -345,17 +345,15 @@ async fn handle_event(
     #[cfg(feature = "cache")]
     let context = context(data, runner_tx, shard_id, &cache_and_http.http, &cache_and_http.cache);
 
+    let event_handler = Arc::clone(event_handler);
+
     match event {
         DispatchEvent::Client(ClientEvent::ShardStageUpdate(event)) => {
-            let event_handler = Arc::clone(event_handler);
-
             spawn_named("dispatch::event_handler::shard_stage_update", async move {
                 event_handler.shard_stage_update(context, event).await;
             });
         },
         DispatchEvent::Model(Event::ApplicationCommandPermissionsUpdate(event)) => {
-            let event_handler = Arc::clone(event_handler);
-
             spawn_named(
                 "dispatch::event_handler::application_command_permissions_update",
                 async move {
@@ -369,15 +367,11 @@ async fn handle_event(
             update(&cache_and_http, &mut event);
             match event.channel {
                 Channel::Guild(channel) => {
-                    let event_handler = Arc::clone(event_handler);
-
                     spawn_named("dispatch::event_handler::channel_create", async move {
                         event_handler.channel_create(context, &channel).await;
                     });
                 },
                 Channel::Category(channel) => {
-                    let event_handler = Arc::clone(event_handler);
-
                     spawn_named("dispatch::event_handler::category_create", async move {
                         event_handler.category_create(context, &channel).await;
                     });
@@ -392,15 +386,11 @@ async fn handle_event(
             match event.channel {
                 Channel::Private(_) => {},
                 Channel::Guild(channel) => {
-                    let event_handler = Arc::clone(event_handler);
-
                     spawn_named("dispatch::event_handler::channel_delete", async move {
                         event_handler.channel_delete(context, &channel).await;
                     });
                 },
                 Channel::Category(channel) => {
-                    let event_handler = Arc::clone(event_handler);
-
                     spawn_named("dispatch::event_handler::category_delete", async move {
                         event_handler.category_delete(context, &channel).await;
                     });
@@ -408,15 +398,11 @@ async fn handle_event(
             }
         },
         DispatchEvent::Model(Event::ChannelPinsUpdate(event)) => {
-            let event_handler = Arc::clone(event_handler);
-
             spawn_named("dispatch::event_handler::channel_pins_update", async move {
                 event_handler.channel_pins_update(context, event).await;
             });
         },
         DispatchEvent::Model(Event::ChannelUpdate(mut event)) => {
-            let event_handler = Arc::clone(event_handler);
-
             spawn_named("dispatch::event_handler::channel_update", async move {
                 feature_cache! {{
                     let old_channel = cache_and_http.cache.as_ref().channel(event.channel.id());
@@ -431,15 +417,11 @@ async fn handle_event(
             });
         },
         DispatchEvent::Model(Event::GuildBanAdd(event)) => {
-            let event_handler = Arc::clone(event_handler);
-
             spawn_named("dispatch::event_handler::guild_ban_addition", async move {
                 event_handler.guild_ban_addition(context, event.guild_id, event.user).await;
             });
         },
         DispatchEvent::Model(Event::GuildBanRemove(event)) => {
-            let event_handler = Arc::clone(event_handler);
-
             spawn_named("dispatch::event_handler::guild_ban_removal", async move {
                 event_handler.guild_ban_removal(context, event.guild_id, event.user).await;
             });
@@ -461,15 +443,13 @@ async fn handle_event(
                         .iter()
                         .map(|i| *i.key())
                         .collect::<Vec<GuildId>>();
-                    let event_handler = Arc::clone(event_handler);
+                    let event_handler = Arc::clone(&event_handler);
 
                     spawn_named("dispatch::event_handler::cache_ready", async move {
                         event_handler.cache_ready(context, guild_amount).await;
                     });
                 }
             }
-
-            let event_handler = Arc::clone(event_handler);
 
             spawn_named("dispatch::event_handler::guild_create", async move {
                 feature_cache! {{
@@ -481,7 +461,6 @@ async fn handle_event(
         },
         DispatchEvent::Model(Event::GuildDelete(mut event)) => {
             let _full = update(&cache_and_http, &mut event);
-            let event_handler = Arc::clone(event_handler);
 
             spawn_named("dispatch::event_handler::guild_delete", async move {
                 feature_cache! {{
@@ -493,15 +472,12 @@ async fn handle_event(
         },
         DispatchEvent::Model(Event::GuildEmojisUpdate(mut event)) => {
             update(&cache_and_http, &mut event);
-            let event_handler = Arc::clone(event_handler);
 
             spawn_named("dispatch::event_handler::guild_emojis_update", async move {
                 event_handler.guild_emojis_update(context, event.guild_id, event.emojis).await;
             });
         },
         DispatchEvent::Model(Event::GuildIntegrationsUpdate(event)) => {
-            let event_handler = Arc::clone(event_handler);
-
             spawn_named("dispatch::event_handler::guild_integrations_update", async move {
                 event_handler.guild_integrations_update(context, event.guild_id).await;
             });
@@ -509,15 +485,12 @@ async fn handle_event(
         DispatchEvent::Model(Event::GuildMemberAdd(mut event)) => {
             update(&cache_and_http, &mut event);
 
-            let event_handler = Arc::clone(event_handler);
-
             spawn_named("dispatch::event_handler::guild_member_addition", async move {
                 event_handler.guild_member_addition(context, event.member).await;
             });
         },
         DispatchEvent::Model(Event::GuildMemberRemove(mut event)) => {
             let _member = update(&cache_and_http, &mut event);
-            let event_handler = Arc::clone(event_handler);
 
             spawn_named("dispatch::event_handler::guild_member_removal", async move {
                 feature_cache! {{
@@ -535,8 +508,6 @@ async fn handle_event(
                 None
             }};
 
-            let event_handler = Arc::clone(event_handler);
-
             spawn_named("dispatch::event_handler::guild_member_update", async move {
                 feature_cache! {{
                     if let Some(after) = _after {
@@ -549,7 +520,6 @@ async fn handle_event(
         },
         DispatchEvent::Model(Event::GuildMembersChunk(mut event)) => {
             update(&cache_and_http, &mut event);
-            let event_handler = Arc::clone(event_handler);
 
             spawn_named("dispatch::event_handler::guild_members_chunk", async move {
                 event_handler.guild_members_chunk(context, event).await;
@@ -557,7 +527,6 @@ async fn handle_event(
         },
         DispatchEvent::Model(Event::GuildRoleCreate(mut event)) => {
             update(&cache_and_http, &mut event);
-            let event_handler = Arc::clone(event_handler);
 
             spawn_named("dispatch::event_handler::guild_role_create", async move {
                 event_handler.guild_role_create(context, event.role).await;
@@ -565,7 +534,6 @@ async fn handle_event(
         },
         DispatchEvent::Model(Event::GuildRoleDelete(mut event)) => {
             let _role = update(&cache_and_http, &mut event);
-            let event_handler = Arc::clone(event_handler);
 
             spawn_named("dispatch::event_handler::guild_role_delete", async move {
                 feature_cache! {{
@@ -577,7 +545,6 @@ async fn handle_event(
         },
         DispatchEvent::Model(Event::GuildRoleUpdate(mut event)) => {
             let _before = update(&cache_and_http, &mut event);
-            let event_handler = Arc::clone(event_handler);
 
             spawn_named("dispatch::event_handler::guild_role_update", async move {
                 feature_cache! {{
@@ -589,7 +556,6 @@ async fn handle_event(
         },
         DispatchEvent::Model(Event::GuildStickersUpdate(mut event)) => {
             update(&cache_and_http, &mut event);
-            let event_handler = Arc::clone(event_handler);
 
             tokio::spawn(async move {
                 event_handler.guild_stickers_update(context, event.guild_id, event.stickers).await;
@@ -597,15 +563,12 @@ async fn handle_event(
         },
         DispatchEvent::Model(Event::GuildUnavailable(mut event)) => {
             update(&cache_and_http, &mut event);
-            let event_handler = Arc::clone(event_handler);
 
             spawn_named("dispatch::event_handler::guild_unavailable", async move {
                 event_handler.guild_unavailable(context, event.guild_id).await;
             });
         },
         DispatchEvent::Model(Event::GuildUpdate(mut event)) => {
-            let event_handler = Arc::clone(event_handler);
-
             spawn_named("dispatch::event_handler::guild_update", async move {
                 feature_cache! {{
                     let before = cache_and_http.cache
@@ -622,15 +585,11 @@ async fn handle_event(
             });
         },
         DispatchEvent::Model(Event::InviteCreate(event)) => {
-            let event_handler = Arc::clone(event_handler);
-
             spawn_named("dispatch::event_handler::invite_create", async move {
                 event_handler.invite_create(context, event).await;
             });
         },
         DispatchEvent::Model(Event::InviteDelete(event)) => {
-            let event_handler = Arc::clone(event_handler);
-
             spawn_named("dispatch::event_handler::invite_delete", async move {
                 event_handler.invite_delete(context, event).await;
             });
@@ -638,8 +597,6 @@ async fn handle_event(
         // Already handled by the framework check macro
         DispatchEvent::Model(Event::MessageCreate(_)) => {},
         DispatchEvent::Model(Event::MessageDeleteBulk(event)) => {
-            let event_handler = Arc::clone(event_handler);
-
             spawn_named("dispatch::event_handler::message_delete_bulk", async move {
                 event_handler
                     .message_delete_bulk(context, event.channel_id, event.ids, event.guild_id)
@@ -647,8 +604,6 @@ async fn handle_event(
             });
         },
         DispatchEvent::Model(Event::MessageDelete(event)) => {
-            let event_handler = Arc::clone(event_handler);
-
             spawn_named("dispatch::event_handler::message_delete", async move {
                 event_handler
                     .message_delete(context, event.channel_id, event.message_id, event.guild_id)
@@ -657,7 +612,6 @@ async fn handle_event(
         },
         DispatchEvent::Model(Event::MessageUpdate(mut event)) => {
             let _before = update(&cache_and_http, &mut event);
-            let event_handler = Arc::clone(event_handler);
 
             spawn_named("dispatch::event_handler::message_update", async move {
                 feature_cache! {{
@@ -670,7 +624,6 @@ async fn handle_event(
         },
         DispatchEvent::Model(Event::PresencesReplace(mut event)) => {
             update(&cache_and_http, &mut event);
-            let event_handler = Arc::clone(event_handler);
 
             spawn_named("dispatch::event_handler::presence_replace", async move {
                 event_handler.presence_replace(context, event.presences).await;
@@ -679,29 +632,21 @@ async fn handle_event(
         DispatchEvent::Model(Event::PresenceUpdate(mut event)) => {
             update(&cache_and_http, &mut event);
 
-            let event_handler = Arc::clone(event_handler);
-
             spawn_named("dispatch::event_handler::presence_update", async move {
                 event_handler.presence_update(context, event.presence).await;
             });
         },
         DispatchEvent::Model(Event::ReactionAdd(event)) => {
-            let event_handler = Arc::clone(event_handler);
-
             spawn_named("dispatch::event_handler::reaction_add", async move {
                 event_handler.reaction_add(context, event.reaction).await;
             });
         },
         DispatchEvent::Model(Event::ReactionRemove(event)) => {
-            let event_handler = Arc::clone(event_handler);
-
             spawn_named("dispatch::event_handler::reaction_remove", async move {
                 event_handler.reaction_remove(context, event.reaction).await;
             });
         },
         DispatchEvent::Model(Event::ReactionRemoveAll(event)) => {
-            let event_handler = Arc::clone(event_handler);
-
             spawn_named("dispatch::event_handler::remove_all", async move {
                 event_handler
                     .reaction_remove_all(context, event.channel_id, event.message_id)
@@ -710,36 +655,27 @@ async fn handle_event(
         },
         DispatchEvent::Model(Event::Ready(mut event)) => {
             update(&cache_and_http, &mut event);
-            let event_handler = Arc::clone(event_handler);
-
             spawn_named("dispatch::event_handler::ready", async move {
                 event_handler.ready(context, event.ready).await;
             });
         },
         DispatchEvent::Model(Event::Resumed(event)) => {
-            let event_handler = Arc::clone(event_handler);
-
             spawn_named("dispatch::event_handler::resume", async move {
                 event_handler.resume(context, event).await;
             });
         },
         DispatchEvent::Model(Event::TypingStart(event)) => {
-            let event_handler = Arc::clone(event_handler);
-
             spawn_named("dispatch::event_handler::typing_start", async move {
                 event_handler.typing_start(context, event).await;
             });
         },
         DispatchEvent::Model(Event::Unknown(event)) => {
-            let event_handler = Arc::clone(event_handler);
-
             spawn_named("dispatch::event_handler::unknown", async move {
                 event_handler.unknown(context, event.kind, event.value).await;
             });
         },
         DispatchEvent::Model(Event::UserUpdate(mut event)) => {
             let _before = update(&cache_and_http, &mut event);
-            let event_handler = Arc::clone(event_handler);
 
             spawn_named("dispatch::event_handler::user_update", async move {
                 feature_cache! {{
@@ -750,15 +686,12 @@ async fn handle_event(
             });
         },
         DispatchEvent::Model(Event::VoiceServerUpdate(event)) => {
-            let event_handler = Arc::clone(event_handler);
-
             spawn_named("dispatch::event_handler::voice_server_update", async move {
                 event_handler.voice_server_update(context, event).await;
             });
         },
         DispatchEvent::Model(Event::VoiceStateUpdate(mut event)) => {
             let _before = update(&cache_and_http, &mut event);
-            let event_handler = Arc::clone(event_handler);
 
             spawn_named("dispatch::event_handler::voice_state_update", async move {
                 feature_cache! {{
@@ -769,36 +702,26 @@ async fn handle_event(
             });
         },
         DispatchEvent::Model(Event::WebhookUpdate(event)) => {
-            let event_handler = Arc::clone(event_handler);
-
             spawn_named("dispatch::event_handler::webhook_update", async move {
                 event_handler.webhook_update(context, event.guild_id, event.channel_id).await;
             });
         },
         DispatchEvent::Model(Event::InteractionCreate(event)) => {
-            let event_handler = Arc::clone(event_handler);
-
             spawn_named("dispatch::event_handler::interaction_create", async move {
                 event_handler.interaction_create(context, event.interaction).await;
             });
         },
         DispatchEvent::Model(Event::IntegrationCreate(event)) => {
-            let event_handler = Arc::clone(event_handler);
-
             spawn_named("dispatch::event_handler::integration_create", async move {
                 event_handler.integration_create(context, event.integration).await;
             });
         },
         DispatchEvent::Model(Event::IntegrationUpdate(event)) => {
-            let event_handler = Arc::clone(event_handler);
-
             spawn_named("dispatch::event_handler::integration_update", async move {
                 event_handler.integration_update(context, event.integration).await;
             });
         },
         DispatchEvent::Model(Event::IntegrationDelete(event)) => {
-            let event_handler = Arc::clone(event_handler);
-
             spawn_named("dispatch::event_handler::integration_delete", async move {
                 event_handler
                     .integration_delete(context, event.id, event.guild_id, event.application_id)
@@ -806,29 +729,22 @@ async fn handle_event(
             });
         },
         DispatchEvent::Model(Event::StageInstanceCreate(event)) => {
-            let event_handler = Arc::clone(event_handler);
-
             spawn_named("dispatch::event_handler::stage_instance_create", async move {
                 event_handler.stage_instance_create(context, event.stage_instance).await;
             });
         },
         DispatchEvent::Model(Event::StageInstanceUpdate(event)) => {
-            let event_handler = Arc::clone(event_handler);
-
             spawn_named("dispatch::event_handler::stage_instance_update", async move {
                 event_handler.stage_instance_update(context, event.stage_instance).await;
             });
         },
         DispatchEvent::Model(Event::StageInstanceDelete(event)) => {
-            let event_handler = Arc::clone(event_handler);
-
             spawn_named("dispatch::event_handler::stage_instance_delete", async move {
                 event_handler.stage_instance_delete(context, event.stage_instance).await;
             });
         },
         DispatchEvent::Model(Event::ThreadCreate(mut event)) => {
             update(&cache_and_http, &mut event);
-            let event_handler = Arc::clone(event_handler);
 
             spawn_named("dispatch::event_handler::thread_create", async move {
                 event_handler.thread_create(context, event.thread).await;
@@ -836,7 +752,6 @@ async fn handle_event(
         },
         DispatchEvent::Model(Event::ThreadUpdate(mut event)) => {
             update(&cache_and_http, &mut event);
-            let event_handler = Arc::clone(event_handler);
 
             spawn_named("dispatch::event_handler::thread_update", async move {
                 event_handler.thread_update(context, event.thread).await;
@@ -844,64 +759,47 @@ async fn handle_event(
         },
         DispatchEvent::Model(Event::ThreadDelete(mut event)) => {
             update(&cache_and_http, &mut event);
-            let event_handler = Arc::clone(event_handler);
 
             spawn_named("dispatch::event_handler::thread_delete", async move {
                 event_handler.thread_delete(context, event.thread).await;
             });
         },
         DispatchEvent::Model(Event::ThreadListSync(event)) => {
-            let event_handler = Arc::clone(event_handler);
-
             spawn_named("dispatch::event_handler::thread_list_sync", async move {
                 event_handler.thread_list_sync(context, event).await;
             });
         },
         DispatchEvent::Model(Event::ThreadMemberUpdate(event)) => {
-            let event_handler = Arc::clone(event_handler);
-
             spawn_named("dispatch::event_handler::thread_member_update", async move {
                 event_handler.thread_member_update(context, event.member).await;
             });
         },
         DispatchEvent::Model(Event::ThreadMembersUpdate(event)) => {
-            let event_handler = Arc::clone(event_handler);
-
             spawn_named("dispatch::event_handler::thread_members_update", async move {
                 event_handler.thread_members_update(context, event).await;
             });
         },
         DispatchEvent::Model(Event::GuildScheduledEventCreate(event)) => {
-            let event_handler = Arc::clone(event_handler);
-
             spawn_named("dispatch::event_handler::guild_scheduled_event_create", async move {
                 event_handler.guild_scheduled_event_create(context, event.event).await;
             });
         },
         DispatchEvent::Model(Event::GuildScheduledEventUpdate(event)) => {
-            let event_handler = Arc::clone(event_handler);
-
             spawn_named("dispatch::event_handler::guild_scheduled_event_update", async move {
                 event_handler.guild_scheduled_event_update(context, event.event).await;
             });
         },
         DispatchEvent::Model(Event::GuildScheduledEventDelete(event)) => {
-            let event_handler = Arc::clone(event_handler);
-
             spawn_named("dispatch::event_handler::guild_scheduled_event_delete", async move {
                 event_handler.guild_scheduled_event_delete(context, event.event).await;
             });
         },
         DispatchEvent::Model(Event::GuildScheduledEventUserAdd(event)) => {
-            let event_handler = Arc::clone(event_handler);
-
             spawn_named("dispatch::event_handler::guild_scheduled_event_user_add", async move {
                 event_handler.guild_scheduled_event_user_add(context, event).await;
             });
         },
         DispatchEvent::Model(Event::GuildScheduledEventUserRemove(event)) => {
-            let event_handler = Arc::clone(event_handler);
-
             spawn_named("dispatch::event_handler::guild_scheduled_event_user_remove", async move {
                 event_handler.guild_scheduled_event_user_remove(context, event).await;
             });
