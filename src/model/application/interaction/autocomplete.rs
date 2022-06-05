@@ -8,6 +8,7 @@ use crate::http::Http;
 use crate::internal::prelude::*;
 #[cfg(feature = "http")]
 use crate::json;
+#[cfg(feature = "http")]
 use crate::json::prelude::*;
 use crate::model::application::interaction::application_command::CommandData;
 #[cfg(feature = "http")]

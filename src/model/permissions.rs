@@ -41,6 +41,7 @@
 //! [Manage Roles]: Permissions::MANAGE_ROLES
 //! [Manage Webhooks]: Permissions::MANAGE_WEBHOOKS
 
+#[cfg(feature = "model")]
 use std::fmt;
 
 use serde::de::{Deserialize, Deserializer, Error as DeError};
