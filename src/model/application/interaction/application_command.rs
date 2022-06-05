@@ -435,7 +435,7 @@ impl<'de> Deserialize<'de> for CommandData {
             resolved,
             id: remove_from_map(&mut map, "id")?,
             name: remove_from_map(&mut map, "name")?,
-            kind: remove_from_map(&mut map, "kind")?,
+            kind: remove_from_map(&mut map, "type")?,
             guild_id: remove_from_map_opt(&mut map, "guild_id")?.flatten(),
             target_id: remove_from_map_opt(&mut map, "target_id")?.flatten(),
         })
