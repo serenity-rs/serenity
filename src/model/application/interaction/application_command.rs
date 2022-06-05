@@ -14,11 +14,10 @@ use crate::http::Http;
 use crate::internal::prelude::*;
 #[cfg(feature = "http")]
 use crate::json;
-use crate::json::from_number;
 use crate::model::application::command::{CommandOptionType, CommandType};
 #[cfg(feature = "http")]
 use crate::model::application::interaction::InteractionResponseType;
-use crate::model::application::interaction::InteractionType;
+use crate::model::application::interaction::{add_guild_id_to_resolved, InteractionType};
 use crate::model::channel::{Attachment, Message, PartialChannel};
 use crate::model::guild::{Member, PartialMember, Role};
 use crate::model::id::{
@@ -336,23 +335,7 @@ impl<'de> Deserialize<'de> for ApplicationCommandInteraction {
         let guild_id = remove_from_map_opt::<GuildId, _>(&mut map, "guild_id")?;
 
         if let Some(guild_id) = guild_id {
-            if let Some(member) = map.get_mut("member").and_then(Value::as_object_mut) {
-                member.insert("guild_id".to_string(), from_number(guild_id.0));
-            }
-
-            if let Some(data) = map.get_mut("data") {
-                if let Some(resolved) = data.get_mut("resolved") {
-                    if let Some(roles) = resolved.get_mut("roles") {
-                        if let Some(values) = roles.as_object_mut() {
-                            for value in values.values_mut() {
-                                if let Some(role) = value.as_object_mut() {
-                                    role.insert("guild_id".to_string(), from_number(guild_id.0));
-                                };
-                            }
-                        }
-                    }
-                }
-            }
+            add_guild_id_to_resolved(&mut map, guild_id);
         }
 
         let member = remove_from_map_opt::<Member, _>(&mut map, "member")?;

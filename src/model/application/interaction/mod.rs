@@ -13,8 +13,8 @@ use self::message_component::MessageComponentInteraction;
 use self::modal::ModalSubmitInteraction;
 use self::ping::PingInteraction;
 use crate::internal::prelude::*;
-use crate::json::from_value;
-use crate::model::id::{ApplicationId, InteractionId};
+use crate::json::{from_number, from_value};
+use crate::model::id::{ApplicationId, GuildId, InteractionId};
 use crate::model::user::User;
 use crate::model::utils::deserialize_val;
 
@@ -231,4 +231,24 @@ pub enum InteractionResponseType {
     UpdateMessage = 7,
     Autocomplete = 8,
     Modal = 9,
+}
+
+fn add_guild_id_to_resolved(map: &mut JsonMap, guild_id: GuildId) {
+    if let Some(member) = map.get_mut("member").and_then(Value::as_object_mut) {
+        member.insert("guild_id".to_string(), from_number(guild_id.0));
+    }
+
+    if let Some(data) = map.get_mut("data") {
+        if let Some(resolved) = data.get_mut("resolved") {
+            if let Some(roles) = resolved.get_mut("roles") {
+                if let Some(values) = roles.as_object_mut() {
+                    for value in values.values_mut() {
+                        if let Some(role) = value.as_object_mut() {
+                            role.insert("guild_id".to_string(), from_number(guild_id.0));
+                        };
+                    }
+                }
+            }
+        }
+    }
 }
