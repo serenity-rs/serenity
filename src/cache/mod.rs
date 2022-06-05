@@ -57,16 +57,16 @@ pub use self::settings::Settings;
 
 type MessageCache = DashMap<ChannelId, DashMap<MessageId, Message>>;
 
-struct NotSend();
+struct NotSend;
 
 pub struct CacheRef<'a, K, V> {
     inner: Ref<'a, K, V>,
     phantom: std::marker::PhantomData<*const NotSend>,
 }
 
-impl<'a, K, V> From<Ref<'a, K, V>> for CacheRef<'a, K, V> {
-    fn from(inner: Ref<'a, K, V>) -> Self {
-        Self {
+impl<'a, K, V> CacheRef<'a, K, V> {
+    fn from_ref(inner: Ref<'a, K, V>) -> Self {
+        CacheRef {
             inner,
             phantom: std::marker::PhantomData,
         }
@@ -449,7 +449,7 @@ impl Cache {
     }
 
     fn _guild(&self, id: GuildId) -> Option<GuildRef<'_>> {
-        self.guilds.get(&id).map(Into::into)
+        self.guilds.get(&id).map(CacheRef::from_ref)
     }
 
     /// Returns the number of cached guilds.
@@ -477,7 +477,7 @@ impl Cache {
     /// #[serenity::async_trait]
     /// impl EventHandler for Handler {
     ///     async fn message(&self, context: Context, message: Message) {
-    ///         let channel_opt = context.cache.guild_channel(message.channel_id).map(|c| c.clone());
+    ///         let channel_opt = context.cache.guild_channel(message.channel_id).as_deref().cloned();
     ///         let channel = match channel_opt {
     ///             Some(channel) => channel,
     ///             None => {
@@ -512,7 +512,7 @@ impl Cache {
     }
 
     fn _guild_channel(&self, id: ChannelId) -> Option<GuildChannelRef<'_>> {
-        self.channels.get(&id).map(Into::into)
+        self.channels.get(&id).map(CacheRef::from_ref)
     }
 
     /// Retrieves a [`Guild`]'s member from the cache based on the guild's and
@@ -762,7 +762,7 @@ impl Cache {
     }
 
     fn _private_channel(&self, channel_id: ChannelId) -> Option<PrivateChannelRef<'_>> {
-        self.private_channels.get(&channel_id).map(Into::into)
+        self.private_channels.get(&channel_id).map(CacheRef::from_ref)
     }
 
     /// Retrieves a [`Guild`]'s role by their Ids.

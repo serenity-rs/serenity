@@ -14,6 +14,9 @@ mod system_channel;
 mod welcome_screen;
 
 #[cfg(feature = "model")]
+use std::borrow::Cow;
+
+#[cfg(feature = "model")]
 use tracing::error;
 #[cfg(all(feature = "model", feature = "cache"))]
 use tracing::warn;
@@ -1585,6 +1588,9 @@ impl Guild {
 
     /// Gets a user's [`Member`] for the guild by Id.
     ///
+    /// If the cache feature is enabled [`Self::members`] will be checked
+    /// first, if so, a reference to the member will be returned.
+    ///
     /// # Errors
     ///
     /// Returns an [`Error::Http`] if the user is not in
@@ -1596,8 +1602,14 @@ impl Guild {
         &self,
         cache_http: impl CacheHttp,
         user_id: impl Into<UserId>,
-    ) -> Result<Member> {
-        self.id.member(cache_http, user_id).await
+    ) -> Result<Cow<'_, Member>> {
+        let user_id = user_id.into();
+
+        if let Some(member) = self.members.get(&user_id) {
+            Ok(Cow::Borrowed(member))
+        } else {
+            cache_http.http().get_member(self.id.0, user_id.0).await.map(Cow::Owned)
+        }
     }
 
     /// Gets a list of the guild's members.
