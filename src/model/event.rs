@@ -1630,9 +1630,6 @@ pub enum EventType {
     /// This maps to [`GuildScheduledEventUserRemoveEvent`].
     GuildScheduledEventUserRemove,
     /// An unknown event was received over the gateway.
-    ///
-    /// This should be logged so that support for it can be added in the
-    /// library.
     Other,
 }
 

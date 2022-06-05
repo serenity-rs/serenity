@@ -722,11 +722,7 @@ async fn handle_event(
             });
         },
         DispatchEvent::Model(Event::Unknown) => {
-            let event_handler = Arc::clone(event_handler);
-
-            spawn_named("dispatch::event_handler::unknown", async move {
-                event_handler.unknown(context).await;
-            });
+            // No point in handling this event, gives no info.
         },
         DispatchEvent::Model(Event::UserUpdate(mut event)) => {
             let _before = update(&cache_and_http, &mut event);

@@ -389,11 +389,6 @@ pub trait EventHandler: Send + Sync {
     /// Dispatched when a user starts typing.
     async fn typing_start(&self, _ctx: Context, _: TypingStartEvent) {}
 
-    /// Dispatched when an unknown event was sent from discord.
-    ///
-    /// Provides the event's name and its unparsed data.
-    async fn unknown(&self, _ctx: Context) {}
-
     /// Dispatched when the bot's data is updated.
     ///
     /// Provides the old and new data.
