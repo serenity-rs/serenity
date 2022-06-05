@@ -15,7 +15,7 @@ use crate::json;
 use crate::model::application::component::ComponentType;
 #[cfg(feature = "http")]
 use crate::model::application::interaction::InteractionResponseType;
-use crate::model::application::interaction::InteractionType;
+use crate::model::application::interaction::{add_guild_id_to_resolved, InteractionType};
 use crate::model::channel::Message;
 use crate::model::guild::Member;
 #[cfg(feature = "http")]
@@ -293,16 +293,22 @@ impl<'de> Deserialize<'de> for MessageComponentInteraction {
     fn deserialize<D: Deserializer<'de>>(deserializer: D) -> StdResult<Self, D::Error> {
         let mut map = JsonMap::deserialize(deserializer)?;
 
+        let guild_id = remove_from_map_opt(&mut map, "guild_id")?;
+
+        if let Some(guild_id) = guild_id {
+            add_guild_id_to_resolved(&mut map, guild_id);
+        }
+
         let member = remove_from_map_opt::<Member, _>(&mut map, "member")?;
         let user = remove_from_map_opt(&mut map, "user")?
             .or_else(|| member.as_ref().map(|m| m.user.clone()))
             .ok_or_else(|| DeError::custom("expected user or member"))?;
 
         Ok(Self {
+            guild_id,
             member,
             user,
             id: remove_from_map(&mut map, "id")?,
-            guild_id: remove_from_map_opt(&mut map, "guild_id")?,
             application_id: remove_from_map(&mut map, "application_id")?,
             kind: remove_from_map(&mut map, "type")?,
             data: remove_from_map(&mut map, "data")?,
