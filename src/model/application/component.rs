@@ -1,8 +1,10 @@
 use serde::de::{Deserialize, Deserializer, Error as DeError};
 use serde::ser::{Serialize, Serializer};
 
-use crate::json::{from_value, JsonMap, Value};
+use crate::internal::prelude::*;
+use crate::json::from_value;
 use crate::model::channel::ReactionType;
+use crate::model::utils::deserialize_val;
 
 /// The type of a component
 #[derive(Copy, Clone, Debug, Hash, Eq, PartialEq, PartialOrd, Ord)]
@@ -44,39 +46,27 @@ pub enum ActionRowComponent {
 }
 
 impl<'de> Deserialize<'de> for ActionRowComponent {
-    fn deserialize<D: Deserializer<'de>>(deserializer: D) -> Result<Self, D::Error> {
-        let map = JsonMap::deserialize(deserializer)?;
+    fn deserialize<D: Deserializer<'de>>(deserializer: D) -> std::result::Result<Self, D::Error> {
+        let value = Value::deserialize(deserializer)?;
+        let map = value.as_object().ok_or_else(|| DeError::custom("expected JsonMap"))?;
 
-        let kind = map
-            .get("type")
-            .ok_or_else(|| DeError::custom("expected type"))
-            .and_then(ComponentType::deserialize)
-            .map_err(DeError::custom)?;
-
-        match kind {
-            ComponentType::Button => from_value::<Button>(Value::from(map))
-                .map(ActionRowComponent::Button)
-                .map_err(DeError::custom),
-            ComponentType::SelectMenu => from_value::<SelectMenu>(Value::from(map))
-                .map(ActionRowComponent::SelectMenu)
-                .map_err(DeError::custom),
-            ComponentType::InputText => from_value::<InputText>(Value::from(map))
-                .map(ActionRowComponent::InputText)
-                .map_err(DeError::custom),
-            _ => Err(DeError::custom("Unknown component type")),
+        let raw_kind = map.get("type").ok_or_else(|| DeError::missing_field("type"))?;
+        match deserialize_val(raw_kind.clone())? {
+            ComponentType::Button => from_value(value).map(ActionRowComponent::Button),
+            ComponentType::InputText => from_value(value).map(ActionRowComponent::InputText),
+            ComponentType::SelectMenu => from_value(value).map(ActionRowComponent::SelectMenu),
+            _ => return Err(DeError::custom("Unknown component type")),
         }
+        .map_err(DeError::custom)
     }
 }
 
 impl Serialize for ActionRowComponent {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: Serializer,
-    {
+    fn serialize<S: Serializer>(&self, serializer: S) -> std::result::Result<S::Ok, S::Error> {
         match self {
-            ActionRowComponent::Button(c) => Button::serialize(c, serializer),
-            ActionRowComponent::SelectMenu(c) => SelectMenu::serialize(c, serializer),
-            ActionRowComponent::InputText(c) => InputText::serialize(c, serializer),
+            ActionRowComponent::Button(c) => c.serialize(serializer),
+            ActionRowComponent::InputText(c) => c.serialize(serializer),
+            ActionRowComponent::SelectMenu(c) => c.serialize(serializer),
         }
     }
 }

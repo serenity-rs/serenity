@@ -5,7 +5,7 @@ use std::sync::Arc;
 use futures::channel::mpsc::UnboundedSender as Sender;
 use futures::future::{BoxFuture, FutureExt};
 use tokio::sync::RwLock;
-use tracing::instrument;
+use tracing::{instrument, warn};
 use typemap_rev::TypeMap;
 
 #[cfg(feature = "gateway")]
@@ -115,9 +115,6 @@ impl DispatchEvent {
                 update(cache_and_http, event);
             },
             Self::Model(Event::GuildStickersUpdate(ref mut event)) => {
-                update(cache_and_http, event);
-            },
-            Self::Model(Event::GuildUnavailable(ref mut event)) => {
                 update(cache_and_http, event);
             },
             // Already handled by the framework check macro
@@ -598,14 +595,6 @@ async fn handle_event(
                 event_handler.guild_stickers_update(context, event.guild_id, event.stickers).await;
             });
         },
-        DispatchEvent::Model(Event::GuildUnavailable(mut event)) => {
-            update(&cache_and_http, &mut event);
-            let event_handler = Arc::clone(event_handler);
-
-            spawn_named("dispatch::event_handler::guild_unavailable", async move {
-                event_handler.guild_unavailable(context, event.guild_id).await;
-            });
-        },
         DispatchEvent::Model(Event::GuildUpdate(mut event)) => {
             let event_handler = Arc::clone(event_handler);
 
@@ -732,13 +721,7 @@ async fn handle_event(
                 event_handler.typing_start(context, event).await;
             });
         },
-        DispatchEvent::Model(Event::Unknown(event)) => {
-            let event_handler = Arc::clone(event_handler);
-
-            spawn_named("dispatch::event_handler::unknown", async move {
-                event_handler.unknown(context, event.kind, event.value).await;
-            });
-        },
+        DispatchEvent::Model(Event::Unknown) => warn!("An unknown event was received"),
         DispatchEvent::Model(Event::UserUpdate(mut event)) => {
             let _before = update(&cache_and_http, &mut event);
             let event_handler = Arc::clone(event_handler);
