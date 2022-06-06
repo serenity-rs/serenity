@@ -174,6 +174,7 @@ impl PrivateChannel {
     /// `false`, due to DMs not being considered NSFW.
     #[inline]
     #[must_use]
+    #[allow(clippy::unused_self)]
     pub fn is_nsfw(&self) -> bool {
         false
     }
