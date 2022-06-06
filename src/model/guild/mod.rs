@@ -2197,7 +2197,7 @@ impl Guild {
     /// [Kick Members]: Permissions::KICK_MEMBERS
     /// [`Error::Http`]: crate::error::Error::Http
     /// [`Error::Json`]: crate::error::Error::Json
-    pub async fn prune_count(&self, cache_http: impl CacheHttp, days: u16) -> Result<GuildPrune> {
+    pub async fn prune_count(&self, cache_http: impl CacheHttp, days: u8) -> Result<GuildPrune> {
         #[cfg(feature = "cache")]
         {
             if cache_http.cache().is_some() {
@@ -2469,7 +2469,7 @@ impl Guild {
     /// [Kick Members]: Permissions::KICK_MEMBERS
     /// [`Error::Http`]: crate::error::Error::Http
     /// [`Error::Json`]: crate::error::Error::Json
-    pub async fn start_prune(&self, cache_http: impl CacheHttp, days: u16) -> Result<GuildPrune> {
+    pub async fn start_prune(&self, cache_http: impl CacheHttp, days: u8) -> Result<GuildPrune> {
         #[cfg(feature = "cache")]
         {
             if cache_http.cache().is_some() {
