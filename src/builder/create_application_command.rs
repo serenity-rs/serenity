@@ -43,7 +43,7 @@ impl CreateApplicationCommandOption {
     pub fn name_localized<D: ToString, E: ToString>(&mut self, locale: E, name: D) -> &mut Self {
         self.0
             .entry("name_localizations")
-            .or_insert(Value::Object(Default::default()))
+            .or_insert_with(|| Value::Object(JsonMap::new()))
             .as_object_mut()
             .expect("must be object")
             .insert(locale.to_string(), Value::String(name.to_string()));
@@ -73,7 +73,7 @@ impl CreateApplicationCommandOption {
     ) -> &mut Self {
         self.0
             .entry("description_localizations")
-            .or_insert(Value::Object(Default::default()))
+            .or_insert_with(|| Value::Object(JsonMap::new()))
             .as_object_mut()
             .expect("must be object")
             .insert(locale.to_string(), Value::String(description.to_string()));
@@ -302,7 +302,7 @@ impl CreateApplicationCommand {
     pub fn name_localized<D: ToString, E: ToString>(&mut self, locale: E, name: D) -> &mut Self {
         self.0
             .entry("name_localizations")
-            .or_insert(Value::Object(Default::default()))
+            .or_insert_with(|| Value::Object(JsonMap::new()))
             .as_object_mut()
             .expect("must be object")
             .insert(locale.to_string(), Value::String(name.to_string()));
@@ -363,7 +363,7 @@ impl CreateApplicationCommand {
     ) -> &mut Self {
         self.0
             .entry("description_localizations")
-            .or_insert(Value::Object(Default::default()))
+            .or_insert_with(|| Value::Object(JsonMap::new()))
             .as_object_mut()
             .expect("must be object")
             .insert(locale.to_string(), Value::String(description.to_string()));
