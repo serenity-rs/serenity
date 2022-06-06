@@ -94,4 +94,4 @@ pub use self::edit_thread::EditThread;
 pub use self::edit_voice_state::EditVoiceState;
 pub use self::edit_webhook_message::EditWebhookMessage;
 pub use self::execute_webhook::ExecuteWebhook;
-pub use self::get_messages::GetMessages;
+pub use self::get_messages::{GetMessages, SearchFilter};
