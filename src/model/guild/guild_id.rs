@@ -197,11 +197,6 @@ impl GuildId {
     ) -> Result<HashMap<ChannelId, GuildChannel>> {
         let mut channels = HashMap::new();
 
-        // Clippy is suggesting:
-        // consider removing
-        // `http.as_ref().get_channels(self.0)?()`:
-        // `http.as_ref().get_channels(self.0)?`.
-        #[allow(clippy::useless_conversion)]
         for channel in http.as_ref().get_channels(self.0).await? {
             channels.insert(channel.id, channel);
         }
@@ -793,7 +788,6 @@ impl GuildId {
     pub async fn roles(self, http: impl AsRef<Http>) -> Result<HashMap<RoleId, Role>> {
         let mut roles = HashMap::new();
 
-        #[allow(clippy::useless_conversion)]
         for role in http.as_ref().get_guild_roles(self.0).await? {
             roles.insert(role.id, role);
         }

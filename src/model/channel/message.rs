@@ -544,7 +544,7 @@ impl Message {
         cache_http: impl CacheHttp,
         reaction_type: &ReactionType,
     ) -> Result<Reaction> {
-        #[allow(unused_mut)]
+        #[cfg_attr(not(feature = "cache"), allow(unused_mut))]
         let mut user_id = None;
 
         #[cfg(feature = "cache")]
