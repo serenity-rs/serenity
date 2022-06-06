@@ -40,10 +40,11 @@ impl CreateApplicationCommandOption {
     /// .name_localized("zh-CN", "岁数")
     /// # ;
     /// ```
+    #[allow(clippy::default_trait_access)]
     pub fn name_localized<D: ToString, E: ToString>(&mut self, locale: E, name: D) -> &mut Self {
         self.0
             .entry("name_localizations")
-            .or_insert_with(|| Value::Object(JsonMap::new()))
+            .or_insert_with(|| Value::Object(Default::default()))
             .as_object_mut()
             .expect("must be object")
             .insert(locale.to_string(), Value::String(name.to_string()));
@@ -66,6 +67,7 @@ impl CreateApplicationCommandOption {
     /// .description_localized("zh-CN", "祝你朋友生日快乐")
     /// # ;
     /// ```
+    #[allow(clippy::default_trait_access)]
     pub fn description_localized<D: ToString, E: ToString>(
         &mut self,
         locale: E,
@@ -73,7 +75,7 @@ impl CreateApplicationCommandOption {
     ) -> &mut Self {
         self.0
             .entry("description_localizations")
-            .or_insert_with(|| Value::Object(JsonMap::new()))
+            .or_insert_with(|| Value::Object(Default::default()))
             .as_object_mut()
             .expect("must be object")
             .insert(locale.to_string(), Value::String(description.to_string()));
@@ -299,10 +301,11 @@ impl CreateApplicationCommand {
     /// .name_localized("el", "γενέθλια")
     /// # ;
     /// ```
+    #[allow(clippy::default_trait_access)]
     pub fn name_localized<D: ToString, E: ToString>(&mut self, locale: E, name: D) -> &mut Self {
         self.0
             .entry("name_localizations")
-            .or_insert_with(|| Value::Object(JsonMap::new()))
+            .or_insert_with(|| Value::Object(Default::default()))
             .as_object_mut()
             .expect("must be object")
             .insert(locale.to_string(), Value::String(name.to_string()));
@@ -356,6 +359,7 @@ impl CreateApplicationCommand {
     /// .description_localized("zh-CN", "祝你朋友生日快乐")
     /// # ;
     /// ```
+    #[allow(clippy::default_trait_access)]
     pub fn description_localized<D: ToString, E: ToString>(
         &mut self,
         locale: E,
@@ -363,7 +367,7 @@ impl CreateApplicationCommand {
     ) -> &mut Self {
         self.0
             .entry("description_localizations")
-            .or_insert_with(|| Value::Object(JsonMap::new()))
+            .or_insert_with(|| Value::Object(Default::default()))
             .as_object_mut()
             .expect("must be object")
             .insert(locale.to_string(), Value::String(description.to_string()));
