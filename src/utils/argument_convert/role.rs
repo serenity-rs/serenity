@@ -7,7 +7,6 @@ use crate::prelude::*;
 /// Error that can be returned from [`Role::convert`].
 #[non_exhaustive]
 #[derive(Debug)]
-#[allow(clippy::enum_variant_names)]
 pub enum RoleParseError {
     /// When the operation was invoked outside a guild.
     NotInGuild,
