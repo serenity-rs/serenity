@@ -721,7 +721,7 @@ async fn handle_event(
                 event_handler.typing_start(context, event).await;
             });
         },
-        DispatchEvent::Model(Event::Unknown) => warn!("An unknown event was recieved"),
+        DispatchEvent::Model(Event::Unknown) => warn!("An unknown event was received"),
         DispatchEvent::Model(Event::UserUpdate(mut event)) => {
             let _before = update(&cache_and_http, &mut event);
             let event_handler = Arc::clone(event_handler);
