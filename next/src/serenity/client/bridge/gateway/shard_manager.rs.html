@@ -364,6 +364,7 @@
 <span id="359">359</span>
 <span id="360">360</span>
 <span id="361">361</span>
+<span id="362">362</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::collections</span>::{<span class="ident">HashMap</span>, <span class="ident">VecDeque</span>};
 <span class="kw">use</span> <span class="ident">std::sync::Arc</span>;
 
@@ -483,7 +484,8 @@
 <span class="kw">impl</span> <span class="ident">ShardManager</span> {
     <span class="doccomment">/// Creates a new shard manager, returning both the manager and a monitor</span>
     <span class="doccomment">/// for usage in a separate thread.</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">opt</span>: <span class="ident">ShardManagerOptions</span>) -&gt; (<span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Mutex</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span><span class="op">&gt;</span>, <span class="ident">ShardManagerMonitor</span>) {
+    <span class="attribute">#[<span class="ident">must_use</span>]</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">opt</span>: <span class="ident">ShardManagerOptions</span>) -&gt; (<span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Mutex</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span><span class="op">&gt;</span>, <span class="ident">ShardManagerMonitor</span>) {
         <span class="kw">let</span> (<span class="ident">thread_tx</span>, <span class="ident">thread_rx</span>) <span class="op">=</span> <span class="ident">mpsc::unbounded</span>();
         <span class="kw">let</span> (<span class="ident">shard_queue_tx</span>, <span class="ident">shard_queue_rx</span>) <span class="op">=</span> <span class="ident">mpsc::unbounded</span>();
 
