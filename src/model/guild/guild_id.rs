@@ -195,18 +195,9 @@ impl GuildId {
         self,
         http: impl AsRef<Http>,
     ) -> Result<HashMap<ChannelId, GuildChannel>> {
-        let mut channels = HashMap::new();
+        let channels = http.as_ref().get_channels(self.0).await?;
 
-        // Clippy is suggesting:
-        // consider removing
-        // `http.as_ref().get_channels(self.0)?()`:
-        // `http.as_ref().get_channels(self.0)?`.
-        #[allow(clippy::useless_conversion)]
-        for channel in http.as_ref().get_channels(self.0).await? {
-            channels.insert(channel.id, channel);
-        }
-
-        Ok(channels)
+        Ok(channels.into_iter().map(|c| (c.id, c)).collect())
     }
 
     /// Creates a [`GuildChannel`] in the the guild.
@@ -791,14 +782,9 @@ impl GuildId {
     /// Returns [`Error::Http`] if the current user is not in
     /// the guild.
     pub async fn roles(self, http: impl AsRef<Http>) -> Result<HashMap<RoleId, Role>> {
-        let mut roles = HashMap::new();
+        let roles = http.as_ref().get_guild_roles(self.0).await?;
 
-        #[allow(clippy::useless_conversion)]
-        for role in http.as_ref().get_guild_roles(self.0).await? {
-            roles.insert(role.id, role);
-        }
-
-        Ok(roles)
+        Ok(roles.into_iter().map(|r| (r.id, r)).collect())
     }
 
     /// Tries to find the [`Guild`] by its Id in the cache.
