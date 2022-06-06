@@ -1,5 +1,3 @@
-use std::collections::HashMap;
-
 use crate::model::id::MessageId;
 
 /// Builds a request to the API to retrieve messages.
@@ -43,8 +41,11 @@ use crate::model::id::MessageId;
 /// ```
 ///
 /// [`GuildChannel::messages`]: crate::model::channel::GuildChannel::messages
-#[derive(Clone, Debug, Default)]
-pub struct GetMessages(pub HashMap<&'static str, u64>);
+#[derive(Clone, Copy, Debug, Default)]
+pub struct GetMessages {
+    pub search_filter: Option<SearchFilter>,
+    pub limit: Option<u8>,
+}
 
 impl GetMessages {
     /// Indicates to retrieve the messages after a specific message, given by
@@ -56,7 +57,7 @@ impl GetMessages {
     }
 
     fn _after(&mut self, message_id: MessageId) {
-        self.0.insert("after", message_id.0);
+        self.search_filter = Some(SearchFilter::After(message_id));
     }
 
     /// Indicates to retrieve the messages _around_ a specific message in either
@@ -68,7 +69,7 @@ impl GetMessages {
     }
 
     fn _around(&mut self, message_id: MessageId) {
-        self.0.insert("around", message_id.0);
+        self.search_filter = Some(SearchFilter::Around(message_id));
     }
 
     /// Indicates to retrieve the messages before a specific message, given by
@@ -80,7 +81,7 @@ impl GetMessages {
     }
 
     fn _before(&mut self, message_id: MessageId) {
-        self.0.insert("before", message_id.0);
+        self.search_filter = Some(SearchFilter::Before(message_id));
     }
 
     /// The maximum number of messages to retrieve for the query.
@@ -90,8 +91,15 @@ impl GetMessages {
     /// **Note**: This field is capped to 100 messages due to a Discord
     /// limitation. If an amount larger than 100 is supplied, it will be
     /// reduced.
-    pub fn limit(&mut self, limit: u64) -> &mut Self {
-        self.0.insert("limit", if limit > 100 { 100 } else { limit });
+    pub fn limit(&mut self, limit: u8) -> &mut Self {
+        self.limit = Some(limit.min(100));
         self
     }
+}
+
+#[derive(Clone, Copy, Debug)]
+pub enum SearchFilter {
+    After(MessageId),
+    Around(MessageId),
+    Before(MessageId),
 }

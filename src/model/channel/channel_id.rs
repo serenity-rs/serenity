@@ -17,6 +17,7 @@ use crate::builder::{
     EditStageInstance,
     EditThread,
     GetMessages,
+    SearchFilter,
 };
 #[cfg(all(feature = "cache", feature = "model"))]
 use crate::cache::Cache;
@@ -505,15 +506,14 @@ impl ChannelId {
     {
         let mut get_messages = GetMessages::default();
         builder(&mut get_messages);
-        let mut map = get_messages.0;
-        let mut query = format!("?limit={}", map.remove(&"limit").unwrap_or(50));
+        let mut query = format!("?limit={}", get_messages.limit.unwrap_or(50));
 
-        if let Some(after) = map.remove(&"after") {
-            write!(query, "&after={}", after)?;
-        } else if let Some(around) = map.remove(&"around") {
-            write!(query, "&around={}", around)?;
-        } else if let Some(before) = map.remove(&"before") {
-            write!(query, "&before={}", before)?;
+        if let Some(filter) = get_messages.search_filter {
+            match filter {
+                SearchFilter::After(after) => write!(query, "&after={}", after)?,
+                SearchFilter::Around(around) => write!(query, "&around={}", around)?,
+                SearchFilter::Before(before) => write!(query, "&before={}", before)?,
+            }
         }
 
         http.as_ref().get_messages(self.0, &query).await
