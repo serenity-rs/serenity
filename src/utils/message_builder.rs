@@ -119,7 +119,7 @@ impl MessageBuilder {
     }
 
     fn _channel(&mut self, channel: ChannelId) -> &mut Self {
-        self.0.push_str(&channel.mention().to_string());
+        self._push(&channel.mention());
         self
     }
 
@@ -150,13 +150,13 @@ impl MessageBuilder {
     ///
     /// [Display implementation]: crate::model::guild::Emoji#impl-Display
     pub fn emoji(&mut self, emoji: &Emoji) -> &mut Self {
-        self.0.push_str(&emoji.to_string());
+        self._push(&emoji);
         self
     }
 
     /// Mentions something that implements the [`Mentionable`] trait.
     pub fn mention<M: Mentionable>(&mut self, item: &M) -> &mut Self {
-        self.0.push_str(&item.mention().to_string());
+        self._push(&item.mention());
         self
     }
 
@@ -184,11 +184,12 @@ impl MessageBuilder {
     /// ```
     #[inline]
     pub fn push(&mut self, content: impl Into<Content>) -> &mut Self {
-        self._push(&content.into().to_string())
+        self._push(&content.into())
     }
 
-    fn _push(&mut self, content: &str) -> &mut Self {
-        self.0.push_str(content);
+    #[inline]
+    fn _push<C: std::fmt::Display + ?Sized>(&mut self, content: &C) -> &mut Self {
+        write!(self.0, "{}", content).unwrap();
 
         self
     }
@@ -243,7 +244,7 @@ impl MessageBuilder {
         }
 
         self.0.push('\n');
-        self.0.push_str(&content.into().to_string());
+        self._push(&content.into());
         self.0.push_str("\n```");
 
         self
@@ -275,7 +276,7 @@ impl MessageBuilder {
     /// ```
     pub fn push_mono(&mut self, content: impl Into<Content>) -> &mut Self {
         self.0.push('`');
-        self.0.push_str(&content.into().to_string());
+        self._push(&content.into());
         self.0.push('`');
 
         self
@@ -304,7 +305,7 @@ impl MessageBuilder {
     /// ```
     pub fn push_italic(&mut self, content: impl Into<Content>) -> &mut Self {
         self.0.push('_');
-        self.0.push_str(&content.into().to_string());
+        self._push(&content.into());
         self.0.push('_');
 
         self
@@ -313,7 +314,7 @@ impl MessageBuilder {
     /// Pushes an inline bold text to the content.
     pub fn push_bold(&mut self, content: impl Into<Content>) -> &mut Self {
         self.0.push_str("**");
-        self.0.push_str(&content.into().to_string());
+        self._push(&content.into());
         self.0.push_str("**");
 
         self
@@ -322,7 +323,7 @@ impl MessageBuilder {
     /// Pushes an underlined inline text to the content.
     pub fn push_underline(&mut self, content: impl Into<Content>) -> &mut Self {
         self.0.push_str("__");
-        self.0.push_str(&content.into().to_string());
+        self._push(&content.into());
         self.0.push_str("__");
 
         self
@@ -331,7 +332,7 @@ impl MessageBuilder {
     /// Pushes a strikethrough inline text to the content.
     pub fn push_strike(&mut self, content: impl Into<Content>) -> &mut Self {
         self.0.push_str("~~");
-        self.0.push_str(&content.into().to_string());
+        self._push(&content.into());
         self.0.push_str("~~");
 
         self
@@ -340,7 +341,7 @@ impl MessageBuilder {
     /// Pushes a spoiler'd inline text to the content.
     pub fn push_spoiler(&mut self, content: impl Into<Content>) -> &mut Self {
         self.0.push_str("||");
-        self.0.push_str(&content.into().to_string());
+        self._push(&content.into());
         self.0.push_str("||");
 
         self
@@ -349,7 +350,7 @@ impl MessageBuilder {
     /// Pushes a quoted inline text to the content
     pub fn push_quote(&mut self, content: impl Into<Content>) -> &mut Self {
         self.0.push_str("> ");
-        self.0.push_str(&content.into().to_string());
+        self._push(&content.into());
 
         self
     }
@@ -522,7 +523,7 @@ impl MessageBuilder {
             c.inner =
                 normalize(&c.inner).replace('*', "\\*").replace('`', "\\`").replace('_', "\\_");
 
-            self.0.push_str(&c.to_string());
+            self._push(&c);
         }
 
         self
@@ -544,7 +545,7 @@ impl MessageBuilder {
         {
             let mut c = content.into();
             c.inner = normalize(&c.inner).replace("```", " ");
-            self.0.push_str(&c.to_string());
+            self._push(&c);
         }
         self.0.push_str("\n```");
 
@@ -557,7 +558,7 @@ impl MessageBuilder {
         {
             let mut c = content.into();
             c.inner = normalize(&c.inner).replace('`', "'");
-            self.0.push_str(&c.to_string());
+            self._push(&c);
         }
         self.0.push('`');
 
@@ -570,7 +571,7 @@ impl MessageBuilder {
         {
             let mut c = content.into();
             c.inner = normalize(&c.inner).replace('_', " ");
-            self.0.push_str(&c.to_string());
+            self._push(&c);
         }
         self.0.push('_');
 
@@ -583,7 +584,7 @@ impl MessageBuilder {
         {
             let mut c = content.into();
             c.inner = normalize(&c.inner).replace("**", " ");
-            self.0.push_str(&c.to_string());
+            self._push(&c);
         }
         self.0.push_str("**");
 
@@ -596,7 +597,7 @@ impl MessageBuilder {
         {
             let mut c = content.into();
             c.inner = normalize(&c.inner).replace("__", " ");
-            self.0.push_str(&c.to_string());
+            self._push(&c);
         }
         self.0.push_str("__");
 
@@ -609,7 +610,7 @@ impl MessageBuilder {
         {
             let mut c = content.into();
             c.inner = normalize(&c.inner).replace("~~", " ");
-            self.0.push_str(&c.to_string());
+            self._push(&c);
         }
         self.0.push_str("~~");
 
@@ -622,7 +623,7 @@ impl MessageBuilder {
         {
             let mut c = content.into();
             c.inner = normalize(&c.inner).replace("||", " ");
-            self.0.push_str(&c.to_string());
+            self._push(&c);
         }
         self.0.push_str("||");
 
@@ -635,7 +636,7 @@ impl MessageBuilder {
         {
             let mut c = content.into();
             c.inner = normalize(&c.inner).replace("> ", " ");
-            self.0.push_str(&c.to_string());
+            self._push(&c);
         }
 
         self
@@ -832,7 +833,7 @@ impl MessageBuilder {
     /// [`Role`]: crate::model::guild::Role
     /// [Display implementation]: RoleId#impl-Display
     pub fn role<R: Into<RoleId>>(&mut self, role: R) -> &mut Self {
-        self.0.push_str(&role.into().mention().to_string());
+        self._push(&role.into().mention());
         self
     }
 
@@ -847,7 +848,7 @@ impl MessageBuilder {
     /// [`User`]: crate::model::user::User
     /// [Display implementation]: UserId#impl-Display
     pub fn user<U: Into<UserId>>(&mut self, user: U) -> &mut Self {
-        self.0.push_str(&user.into().mention().to_string());
+        self._push(&user.into().mention());
         self
     }
 }
@@ -935,10 +936,7 @@ pub trait EmbedMessageBuilding {
 
 impl EmbedMessageBuilding for MessageBuilder {
     fn push_named_link(&mut self, name: impl Into<Content>, url: impl Into<Content>) -> &mut Self {
-        let name = name.into().to_string();
-        let url = url.into().to_string();
-
-        write!(self.0, "[{}]({})", name, url).unwrap();
+        write!(self.0, "[{}]({})", name.into(), url.into()).unwrap();
 
         self
     }
@@ -952,13 +950,13 @@ impl EmbedMessageBuilding for MessageBuilder {
         {
             let mut c = name.into();
             c.inner = normalize(&c.inner).replace(']', " ");
-            self.0.push_str(&c.to_string());
+            self._push(&c);
         }
         self.0.push_str("](");
         {
             let mut c = url.into();
             c.inner = normalize(&c.inner).replace(')', " ");
-            self.0.push_str(&c.to_string());
+            self._push(&c);
         }
         self.0.push(')');
 
@@ -1002,22 +1000,22 @@ pub struct Content {
     pub spoiler: bool,
 }
 
-impl<T: ToString> Add<T> for Content {
+impl<T: Into<String>> Add<T> for Content {
     type Output = Content;
 
     fn add(mut self, rhs: T) -> Content {
-        self.inner += &rhs.to_string();
+        self.inner += &rhs.into();
 
         self
     }
 }
 
-impl<T: ToString> Add<T> for ContentModifier {
+impl<T: Into<String>> Add<T> for ContentModifier {
     type Output = Content;
 
     fn add(self, rhs: T) -> Content {
         let mut nc = self.to_content();
-        nc.inner += &rhs.to_string();
+        nc.inner += &rhs.into();
 
         nc
     }
@@ -1076,98 +1074,69 @@ impl Content {
             },
         }
     }
+}
 
-    #[allow(clippy::inherent_to_string)]
-    #[must_use]
-    pub fn to_string(&self) -> String {
-        trait UnwrapWith {
-            fn unwrap_with(&self, n: usize) -> usize;
-        }
-
-        impl UnwrapWith for bool {
-            fn unwrap_with(&self, n: usize) -> usize {
-                if *self {
-                    n
-                } else {
-                    0
-                }
-            }
-        }
-
-        let capacity = self.inner.len()
-            + self.spoiler.unwrap_with(4)
-            + self.bold.unwrap_with(4)
-            + self.italic.unwrap_with(2)
-            + self.strikethrough.unwrap_with(4)
-            + self.underline.unwrap_with(4)
-            + self.code.unwrap_with(2);
-
-        let mut new_str = String::with_capacity(capacity);
-
+impl std::fmt::Display for Content {
+    fn fmt(&self, fmt: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         if self.spoiler {
-            new_str.push_str("||");
+            fmt.write_str("||")?;
         }
 
         if self.bold {
-            new_str.push_str("**");
+            fmt.write_str("**")?;
         }
 
         if self.italic {
-            new_str.push('*');
+            fmt.write_char('*')?;
         }
 
         if self.strikethrough {
-            new_str.push_str("~~");
+            fmt.write_str("~~")?;
         }
 
         if self.underline {
-            new_str.push_str("__");
+            fmt.write_str("__")?;
         }
 
         if self.code {
-            new_str.push('`');
+            fmt.write_char('`')?;
         }
 
-        new_str.push_str(&self.inner);
+        fmt.write_str(&self.inner)?;
 
         if self.code {
-            new_str.push('`');
+            fmt.write_char('`')?;
         }
 
         if self.underline {
-            new_str.push_str("__");
+            fmt.write_str("__")?;
         }
 
         if self.strikethrough {
-            new_str.push_str("~~");
+            fmt.write_str("~~")?;
         }
 
         if self.italic {
-            new_str.push('*');
+            fmt.write_char('*')?;
         }
 
         if self.bold {
-            new_str.push_str("**");
+            fmt.write_str("**")?;
         }
 
         if self.spoiler {
-            new_str.push_str("||");
+            fmt.write_str("||")?;
         }
 
-        new_str
+        Ok(())
     }
 }
 
-impl<T: fmt::Display> From<T> for Content {
+impl<T: Into<String>> From<T> for Content {
     fn from(t: T) -> Content {
         Content {
-            italic: false,
-            bold: false,
-            strikethrough: false,
-            inner: t.to_string(),
-            code: false,
-            underline: false,
-            spoiler: false,
+            inner: t.into(),
+            ..Default::default()
         }
     }
 }
