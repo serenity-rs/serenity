@@ -829,7 +829,7 @@ impl Route {
     }
 
     #[must_use]
-    pub fn guild_prune(guild_id: u64, days: u64) -> String {
+    pub fn guild_prune(guild_id: u64, days: u8) -> String {
         api!("/guilds/{}/prune?days={}", guild_id, days)
     }
 
@@ -1603,7 +1603,7 @@ pub enum RouteInfo<'a> {
         guild_id: u64,
     },
     GetGuildPruneCount {
-        days: u64,
+        days: u8,
         guild_id: u64,
     },
     GetGuildRegions {
@@ -1728,7 +1728,7 @@ pub enum RouteInfo<'a> {
         limit: Option<u64>,
     },
     StartGuildPrune {
-        days: u64,
+        days: u8,
         guild_id: u64,
     },
     StartIntegrationSync {
