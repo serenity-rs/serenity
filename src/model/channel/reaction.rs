@@ -130,14 +130,13 @@ impl Reaction {
     /// [Manage Messages]: Permissions::MANAGE_MESSAGES
     /// [permissions]: super::permissions
     pub async fn delete(&self, cache_http: impl CacheHttp) -> Result<()> {
-        // Silences a warning when compiling without the `cache` feature.
-        #[allow(unused_mut)]
+        #[cfg_attr(not(feature = "cache"), allow(unused_mut))]
         let mut user_id = self.user_id.map(|id| id.0);
 
         #[cfg(feature = "cache")]
         {
             if let Some(cache) = cache_http.cache() {
-                if self.user_id.is_some() && self.user_id == Some(cache.current_user().id) {
+                if self.user_id == Some(cache.current_user().id) {
                     user_id = None;
                 }
 
@@ -315,7 +314,6 @@ pub enum ReactionType {
 }
 
 impl<'de> Deserialize<'de> for ReactionType {
-    #[allow(clippy::unwrap_used)] // allow unwrap here because name being none is unreachable
     fn deserialize<D: Deserializer<'de>>(deserializer: D) -> StdResult<Self, D::Error> {
         #[derive(Deserialize)]
         #[serde(field_identifier, rename_all = "snake_case")]
