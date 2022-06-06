@@ -1213,7 +1213,9 @@ impl PartialGuild {
     /// the API response.
     ///
     /// [Kick Members]: Permissions::KICK_MEMBERS
-    pub async fn start_prune(&self, cache_http: impl CacheHttp, days: u16) -> Result<GuildPrune> {
+    /// [`Error::Http`]: crate::error::Error::Http
+    /// [`Error::Json`]: crate::error::Error::Json
+    pub async fn start_prune(&self, cache_http: impl CacheHttp, days: u8) -> Result<GuildPrune> {
         #[cfg(feature = "cache")]
         {
             if cache_http.cache().is_some() {
@@ -1444,7 +1446,7 @@ impl PartialGuild {
     /// [Kick Members]: Permissions::KICK_MEMBERS
     /// [`Guild::prune_count`]: crate::model::guild::Guild::prune_count
     #[inline]
-    pub async fn prune_count(&self, http: impl AsRef<Http>, days: u16) -> Result<GuildPrune> {
+    pub async fn prune_count(&self, http: impl AsRef<Http>, days: u8) -> Result<GuildPrune> {
         self.id.prune_count(&http, days).await
     }
 
