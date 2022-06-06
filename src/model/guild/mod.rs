@@ -654,7 +654,6 @@ impl Guild {
     /// # Errors
     ///
     /// Returns the same possible errors as `create_global_application_command`.
-    #[allow(clippy::missing_errors_doc)]
     #[inline]
     pub async fn create_application_command<F>(
         &self,
