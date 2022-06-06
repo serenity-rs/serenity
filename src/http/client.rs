@@ -1711,7 +1711,7 @@ impl Http {
 
     /// Crossposts a message by Id.
     ///
-    /// **Note**: Only available on announcements channels.
+    /// **Note**: Only available on news channels.
     pub async fn crosspost_message(&self, channel_id: u64, message_id: u64) -> Result<Message> {
         self.fire(Request {
             body: None,
@@ -1758,7 +1758,7 @@ impl Http {
         .await
     }
 
-    /// Follow an Announcement Channel to send messages to a target channel.
+    /// Follow a News Channel to send messages to a target channel.
     pub async fn follow_news_channel(
         &self,
         news_channel_id: u64,

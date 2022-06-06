@@ -610,11 +610,11 @@ impl GuildChannel {
         }
     }
 
-    /// Follows the announcement channel
+    /// Follows the News Channel
     ///
     /// Requires [Manage Webhook] permissions on the target channel.
     ///
-    /// **Note**: Only available on announcement channels.
+    /// **Note**: Only available on news channels.
     ///
     /// # Errors
     ///

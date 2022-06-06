@@ -21,7 +21,7 @@ pub struct PartialChannel {
 #[derive(Clone, Debug, Serialize, Deserialize)]
 #[non_exhaustive]
 pub struct FollowedChannel {
-    /// The source announcement channel
+    /// The source news channel
     channel_id: ChannelId,
     /// The created webhook ID in the target channel
     webhook_id: WebhookId,

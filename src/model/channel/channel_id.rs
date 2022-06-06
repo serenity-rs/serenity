@@ -382,11 +382,11 @@ impl ChannelId {
             .await
     }
 
-    /// Follows the announcement channel
+    /// Follows the News Channel
     ///
     /// Requires [Manage Webhook] permissions on the target channel.
     ///
-    /// **Note**: Only available on announcement channels.
+    /// **Note**: Only available on news channels.
     ///
     /// # Errors
     ///
@@ -581,7 +581,7 @@ impl ChannelId {
     ///
     /// Requires either to be the message author or to have manage [Manage Messages] permissions on this channel.
     ///
-    /// **Note**: Only available on announcements channels.
+    /// **Note**: Only available on news channels.
     ///
     /// # Errors
     ///
