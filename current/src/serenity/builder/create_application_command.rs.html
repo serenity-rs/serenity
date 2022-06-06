@@ -454,6 +454,10 @@
 <span id="449">449</span>
 <span id="450">450</span>
 <span id="451">451</span>
+<span id="452">452</span>
+<span id="453">453</span>
+<span id="454">454</span>
+<span id="455">455</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::collections::HashMap</span>;
 
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::json</span>;
@@ -496,10 +500,11 @@
     <span class="doccomment">/// .name_localized(&quot;zh-CN&quot;, &quot;岁数&quot;)</span>
     <span class="doccomment">/// # ;</span>
     <span class="doccomment">/// ```</span>
+    <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::default_trait_access</span>)]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">name_localized</span><span class="op">&lt;</span><span class="ident">D</span>: <span class="ident">ToString</span>, <span class="ident">E</span>: <span class="ident">ToString</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">locale</span>: <span class="ident">E</span>, <span class="ident">name</span>: <span class="ident">D</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
         <span class="self">self</span>.<span class="number">0</span>
             .<span class="ident">entry</span>(<span class="string">&quot;name_localizations&quot;</span>)
-            .<span class="ident">or_insert</span>(<span class="ident">Value::Object</span>(<span class="ident">Default::default</span>()))
+            .<span class="ident">or_insert_with</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">Value::Object</span>(<span class="ident">Default::default</span>()))
             .<span class="ident">as_object_mut</span>()
             .<span class="ident">expect</span>(<span class="string">&quot;must be object&quot;</span>)
             .<span class="ident">insert</span>(<span class="ident">locale</span>.<span class="ident">to_string</span>(), <span class="ident">Value::String</span>(<span class="ident">name</span>.<span class="ident">to_string</span>()));
@@ -522,6 +527,7 @@
     <span class="doccomment">/// .description_localized(&quot;zh-CN&quot;, &quot;祝你朋友生日快乐&quot;)</span>
     <span class="doccomment">/// # ;</span>
     <span class="doccomment">/// ```</span>
+    <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::default_trait_access</span>)]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">description_localized</span><span class="op">&lt;</span><span class="ident">D</span>: <span class="ident">ToString</span>, <span class="ident">E</span>: <span class="ident">ToString</span><span class="op">&gt;</span>(
         <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
         <span class="ident">locale</span>: <span class="ident">E</span>,
@@ -529,7 +535,7 @@
     ) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
         <span class="self">self</span>.<span class="number">0</span>
             .<span class="ident">entry</span>(<span class="string">&quot;description_localizations&quot;</span>)
-            .<span class="ident">or_insert</span>(<span class="ident">Value::Object</span>(<span class="ident">Default::default</span>()))
+            .<span class="ident">or_insert_with</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">Value::Object</span>(<span class="ident">Default::default</span>()))
             .<span class="ident">as_object_mut</span>()
             .<span class="ident">expect</span>(<span class="string">&quot;must be object&quot;</span>)
             .<span class="ident">insert</span>(<span class="ident">locale</span>.<span class="ident">to_string</span>(), <span class="ident">Value::String</span>(<span class="ident">description</span>.<span class="ident">to_string</span>()));
@@ -755,10 +761,11 @@
     <span class="doccomment">/// .name_localized(&quot;el&quot;, &quot;γενέθλια&quot;)</span>
     <span class="doccomment">/// # ;</span>
     <span class="doccomment">/// ```</span>
+    <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::default_trait_access</span>)]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">name_localized</span><span class="op">&lt;</span><span class="ident">D</span>: <span class="ident">ToString</span>, <span class="ident">E</span>: <span class="ident">ToString</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">locale</span>: <span class="ident">E</span>, <span class="ident">name</span>: <span class="ident">D</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
         <span class="self">self</span>.<span class="number">0</span>
             .<span class="ident">entry</span>(<span class="string">&quot;name_localizations&quot;</span>)
-            .<span class="ident">or_insert</span>(<span class="ident">Value::Object</span>(<span class="ident">Default::default</span>()))
+            .<span class="ident">or_insert_with</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">Value::Object</span>(<span class="ident">Default::default</span>()))
             .<span class="ident">as_object_mut</span>()
             .<span class="ident">expect</span>(<span class="string">&quot;must be object&quot;</span>)
             .<span class="ident">insert</span>(<span class="ident">locale</span>.<span class="ident">to_string</span>(), <span class="ident">Value::String</span>(<span class="ident">name</span>.<span class="ident">to_string</span>()));
@@ -812,6 +819,7 @@
     <span class="doccomment">/// .description_localized(&quot;zh-CN&quot;, &quot;祝你朋友生日快乐&quot;)</span>
     <span class="doccomment">/// # ;</span>
     <span class="doccomment">/// ```</span>
+    <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::default_trait_access</span>)]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">description_localized</span><span class="op">&lt;</span><span class="ident">D</span>: <span class="ident">ToString</span>, <span class="ident">E</span>: <span class="ident">ToString</span><span class="op">&gt;</span>(
         <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
         <span class="ident">locale</span>: <span class="ident">E</span>,
@@ -819,7 +827,7 @@
     ) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
         <span class="self">self</span>.<span class="number">0</span>
             .<span class="ident">entry</span>(<span class="string">&quot;description_localizations&quot;</span>)
-            .<span class="ident">or_insert</span>(<span class="ident">Value::Object</span>(<span class="ident">Default::default</span>()))
+            .<span class="ident">or_insert_with</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">Value::Object</span>(<span class="ident">Default::default</span>()))
             .<span class="ident">as_object_mut</span>()
             .<span class="ident">expect</span>(<span class="string">&quot;must be object&quot;</span>)
             .<span class="ident">insert</span>(<span class="ident">locale</span>.<span class="ident">to_string</span>(), <span class="ident">Value::String</span>(<span class="ident">description</span>.<span class="ident">to_string</span>()));
