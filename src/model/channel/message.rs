@@ -587,13 +587,13 @@ impl Message {
         cache_http: impl CacheHttp,
         reaction_type: impl Into<ReactionType>,
     ) -> Result<Reaction> {
-        self._react(cache_http, &reaction_type.into()).await
+        self._react(cache_http, reaction_type.into()).await
     }
 
     async fn _react(
         &self,
         cache_http: impl CacheHttp,
-        reaction_type: &ReactionType,
+        reaction_type: ReactionType,
     ) -> Result<Reaction> {
         #[allow(unused_mut)]
         let mut user_id = None;
@@ -614,11 +614,11 @@ impl Message {
             }
         }
 
-        cache_http.http().create_reaction(self.channel_id.0, self.id.0, reaction_type).await?;
+        cache_http.http().create_reaction(self.channel_id.0, self.id.0, &reaction_type).await?;
 
         Ok(Reaction {
             channel_id: self.channel_id,
-            emoji: reaction_type.clone(),
+            emoji: reaction_type,
             message_id: self.id,
             user_id,
             guild_id: self.guild_id,
