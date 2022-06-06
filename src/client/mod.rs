@@ -375,7 +375,7 @@ impl Future for ClientBuilder {
             self.fut = Some(Box::pin(async move {
                 let ws_url = Arc::new(Mutex::new(http.get_gateway().await?.url));
 
-                let (shard_manager, shard_manager_worker) = {
+                let (shard_manager, shard_manager_worker) =
                     ShardManager::new(ShardManagerOptions {
                         data: Arc::clone(&data),
                         event_handler,
@@ -390,9 +390,7 @@ impl Future for ClientBuilder {
                         ws_url: Arc::clone(&ws_url),
                         cache_and_http: Arc::clone(&cache_and_http),
                         intents,
-                    })
-                    .await
-                };
+                    });
 
                 Ok(Client {
                     data,

@@ -501,10 +501,6 @@ pub struct CommandDataOption {
     /// The resolved object of the given `value`, if there is one.
     #[serde(default)]
     pub resolved: Option<CommandDataOptionValue>,
-    /// For `Autocomplete` Interactions this will be `true` if
-    /// this option is currently focused by the user.
-    #[serde(default)]
-    pub focused: bool,
 }
 
 /// The resolved value of an [`CommandDataOption`].
