@@ -117,7 +117,8 @@ pub struct ShardManager {
 impl ShardManager {
     /// Creates a new shard manager, returning both the manager and a monitor
     /// for usage in a separate thread.
-    pub async fn new(opt: ShardManagerOptions) -> (Arc<Mutex<Self>>, ShardManagerMonitor) {
+    #[must_use]
+    pub fn new(opt: ShardManagerOptions) -> (Arc<Mutex<Self>>, ShardManagerMonitor) {
         let (thread_tx, thread_rx) = mpsc::unbounded();
         let (shard_queue_tx, shard_queue_rx) = mpsc::unbounded();
 
