@@ -719,11 +719,6 @@
 <span id="714">714</span>
 <span id="715">715</span>
 <span id="716">716</span>
-<span id="717">717</span>
-<span id="718">718</span>
-<span id="719">719</span>
-<span id="720">720</span>
-<span id="721">721</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::collections::HashSet</span>;
 
 <span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">Cache</span>, <span class="ident">CacheUpdate</span>};
@@ -744,7 +739,6 @@
     <span class="ident">GuildRoleDeleteEvent</span>,
     <span class="ident">GuildRoleUpdateEvent</span>,
     <span class="ident">GuildStickersUpdateEvent</span>,
-    <span class="ident">GuildUnavailableEvent</span>,
     <span class="ident">GuildUpdateEvent</span>,
     <span class="ident">MessageCreateEvent</span>,
     <span class="ident">MessageUpdateEvent</span>,
@@ -940,6 +934,13 @@
     <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">Guild</span>;
 
     <span class="kw">fn</span> <span class="ident">update</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">cache</span>: <span class="kw-2">&amp;</span><span class="ident">Cache</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Output</span><span class="op">&gt;</span> {
+        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">guild</span>.<span class="ident">unavailable</span> {
+            <span class="ident">cache</span>.<span class="ident">unavailable_guilds</span>.<span class="ident">insert</span>(<span class="self">self</span>.<span class="ident">guild</span>.<span class="ident">id</span>);
+            <span class="ident">cache</span>.<span class="ident">guilds</span>.<span class="ident">remove</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">guild</span>.<span class="ident">id</span>);
+
+            <span class="kw">return</span> <span class="prelude-val">None</span>;
+        }
+
         <span class="kw">match</span> <span class="ident">cache</span>.<span class="ident">guilds</span>.<span class="ident">remove</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">guild</span>.<span class="ident">id</span>) {
             <span class="prelude-val">Some</span>(<span class="ident">guild</span>) =&gt; {
                 <span class="kw">for</span> (<span class="ident">channel_id</span>, <span class="ident">channel</span>) <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="ident">guild</span>.<span class="number">1</span>.<span class="ident">channels</span> {
@@ -1118,17 +1119,6 @@
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">mut</span> <span class="ident">guild</span>) <span class="op">=</span> <span class="ident">cache</span>.<span class="ident">guilds</span>.<span class="ident">get_mut</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">guild_id</span>) {
             <span class="ident">guild</span>.<span class="ident">stickers</span>.<span class="ident">clone_from</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">stickers</span>);
         }
-
-        <span class="prelude-val">None</span>
-    }
-}
-
-<span class="kw">impl</span> <span class="ident">CacheUpdate</span> <span class="kw">for</span> <span class="ident">GuildUnavailableEvent</span> {
-    <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> ();
-
-    <span class="kw">fn</span> <span class="ident">update</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">cache</span>: <span class="kw-2">&amp;</span><span class="ident">Cache</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="ident">cache</span>.<span class="ident">unavailable_guilds</span>.<span class="ident">insert</span>(<span class="self">self</span>.<span class="ident">guild_id</span>);
-        <span class="ident">cache</span>.<span class="ident">guilds</span>.<span class="ident">remove</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">guild_id</span>);
 
         <span class="prelude-val">None</span>
     }

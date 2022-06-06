@@ -192,21 +192,13 @@
 <span id="187">187</span>
 <span id="188">188</span>
 <span id="189">189</span>
-<span id="190">190</span>
-<span id="191">191</span>
-<span id="192">192</span>
-<span id="193">193</span>
-<span id="194">194</span>
-<span id="195">195</span>
-<span id="196">196</span>
-<span id="197">197</span>
-<span id="198">198</span>
-<span id="199">199</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">serde::de</span>::{<span class="ident">Deserialize</span>, <span class="ident">Deserializer</span>, <span class="ident">Error</span> <span class="kw">as</span> <span class="ident">DeError</span>};
 <span class="kw">use</span> <span class="ident">serde::ser</span>::{<span class="ident">Serialize</span>, <span class="ident">Serializer</span>};
 
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::json</span>::{<span class="ident">from_value</span>, <span class="ident">JsonMap</span>, <span class="ident">Value</span>};
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::internal::prelude</span>::<span class="kw-2">*</span>;
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::json::from_value</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::channel::ReactionType</span>;
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::utils::deserialize_val</span>;
 
 <span class="doccomment">/// The type of a component</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Hash</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>, <span class="ident">PartialOrd</span>, <span class="ident">Ord</span>)]</span>
@@ -248,39 +240,27 @@
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="ident">Deserialize</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">ActionRowComponent</span> {
-    <span class="kw">fn</span> <span class="ident">deserialize</span><span class="op">&lt;</span><span class="ident">D</span>: <span class="ident">Deserializer</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">deserializer</span>: <span class="ident">D</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">D::Error</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">map</span> <span class="op">=</span> <span class="ident">JsonMap::deserialize</span>(<span class="ident">deserializer</span>)<span class="question-mark">?</span>;
+    <span class="kw">fn</span> <span class="ident">deserialize</span><span class="op">&lt;</span><span class="ident">D</span>: <span class="ident">Deserializer</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">deserializer</span>: <span class="ident">D</span>) -&gt; <span class="ident">std::result::Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">D::Error</span><span class="op">&gt;</span> {
+        <span class="kw">let</span> <span class="ident">value</span> <span class="op">=</span> <span class="ident">Value::deserialize</span>(<span class="ident">deserializer</span>)<span class="question-mark">?</span>;
+        <span class="kw">let</span> <span class="ident">map</span> <span class="op">=</span> <span class="ident">value</span>.<span class="ident">as_object</span>().<span class="ident">ok_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">DeError::custom</span>(<span class="string">&quot;expected JsonMap&quot;</span>))<span class="question-mark">?</span>;
 
-        <span class="kw">let</span> <span class="ident">kind</span> <span class="op">=</span> <span class="ident">map</span>
-            .<span class="ident">get</span>(<span class="string">&quot;type&quot;</span>)
-            .<span class="ident">ok_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">DeError::custom</span>(<span class="string">&quot;expected type&quot;</span>))
-            .<span class="ident">and_then</span>(<span class="ident">ComponentType::deserialize</span>)
-            .<span class="ident">map_err</span>(<span class="ident">DeError::custom</span>)<span class="question-mark">?</span>;
-
-        <span class="kw">match</span> <span class="ident">kind</span> {
-            <span class="ident">ComponentType::Button</span> =&gt; <span class="ident">from_value</span>::<span class="op">&lt;</span><span class="ident">Button</span><span class="op">&gt;</span>(<span class="ident">Value::from</span>(<span class="ident">map</span>))
-                .<span class="ident">map</span>(<span class="ident">ActionRowComponent::Button</span>)
-                .<span class="ident">map_err</span>(<span class="ident">DeError::custom</span>),
-            <span class="ident">ComponentType::SelectMenu</span> =&gt; <span class="ident">from_value</span>::<span class="op">&lt;</span><span class="ident">SelectMenu</span><span class="op">&gt;</span>(<span class="ident">Value::from</span>(<span class="ident">map</span>))
-                .<span class="ident">map</span>(<span class="ident">ActionRowComponent::SelectMenu</span>)
-                .<span class="ident">map_err</span>(<span class="ident">DeError::custom</span>),
-            <span class="ident">ComponentType::InputText</span> =&gt; <span class="ident">from_value</span>::<span class="op">&lt;</span><span class="ident">InputText</span><span class="op">&gt;</span>(<span class="ident">Value::from</span>(<span class="ident">map</span>))
-                .<span class="ident">map</span>(<span class="ident">ActionRowComponent::InputText</span>)
-                .<span class="ident">map_err</span>(<span class="ident">DeError::custom</span>),
-            <span class="kw">_</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">DeError::custom</span>(<span class="string">&quot;Unknown component type&quot;</span>)),
+        <span class="kw">let</span> <span class="ident">raw_kind</span> <span class="op">=</span> <span class="ident">map</span>.<span class="ident">get</span>(<span class="string">&quot;type&quot;</span>).<span class="ident">ok_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">DeError::missing_field</span>(<span class="string">&quot;type&quot;</span>))<span class="question-mark">?</span>;
+        <span class="kw">match</span> <span class="ident">deserialize_val</span>(<span class="ident">raw_kind</span>.<span class="ident">clone</span>())<span class="question-mark">?</span> {
+            <span class="ident">ComponentType::Button</span> =&gt; <span class="ident">from_value</span>(<span class="ident">value</span>).<span class="ident">map</span>(<span class="ident">ActionRowComponent::Button</span>),
+            <span class="ident">ComponentType::InputText</span> =&gt; <span class="ident">from_value</span>(<span class="ident">value</span>).<span class="ident">map</span>(<span class="ident">ActionRowComponent::InputText</span>),
+            <span class="ident">ComponentType::SelectMenu</span> =&gt; <span class="ident">from_value</span>(<span class="ident">value</span>).<span class="ident">map</span>(<span class="ident">ActionRowComponent::SelectMenu</span>),
+            <span class="kw">_</span> =&gt; <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">DeError::custom</span>(<span class="string">&quot;Unknown component type&quot;</span>)),
         }
+        .<span class="ident">map_err</span>(<span class="ident">DeError::custom</span>)
     }
 }
 
 <span class="kw">impl</span> <span class="ident">Serialize</span> <span class="kw">for</span> <span class="ident">ActionRowComponent</span> {
-    <span class="kw">fn</span> <span class="ident">serialize</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">serializer</span>: <span class="ident">S</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">S::Ok</span>, <span class="ident">S::Error</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">S</span>: <span class="ident">Serializer</span>,
-    {
+    <span class="kw">fn</span> <span class="ident">serialize</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">Serializer</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">serializer</span>: <span class="ident">S</span>) -&gt; <span class="ident">std::result::Result</span><span class="op">&lt;</span><span class="ident">S::Ok</span>, <span class="ident">S::Error</span><span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">ActionRowComponent::Button</span>(<span class="ident">c</span>) =&gt; <span class="ident">Button::serialize</span>(<span class="ident">c</span>, <span class="ident">serializer</span>),
-            <span class="ident">ActionRowComponent::SelectMenu</span>(<span class="ident">c</span>) =&gt; <span class="ident">SelectMenu::serialize</span>(<span class="ident">c</span>, <span class="ident">serializer</span>),
-            <span class="ident">ActionRowComponent::InputText</span>(<span class="ident">c</span>) =&gt; <span class="ident">InputText::serialize</span>(<span class="ident">c</span>, <span class="ident">serializer</span>),
+            <span class="ident">ActionRowComponent::Button</span>(<span class="ident">c</span>) =&gt; <span class="ident">c</span>.<span class="ident">serialize</span>(<span class="ident">serializer</span>),
+            <span class="ident">ActionRowComponent::InputText</span>(<span class="ident">c</span>) =&gt; <span class="ident">c</span>.<span class="ident">serialize</span>(<span class="ident">serializer</span>),
+            <span class="ident">ActionRowComponent::SelectMenu</span>(<span class="ident">c</span>) =&gt; <span class="ident">c</span>.<span class="ident">serialize</span>(<span class="ident">serializer</span>),
         }
     }
 }

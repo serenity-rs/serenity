@@ -1186,8 +1186,6 @@
 <span id="1181">1181</span>
 <span id="1182">1182</span>
 <span id="1183">1183</span>
-<span id="1184">1184</span>
-<span id="1185">1185</span>
 </pre><pre class="rust"><code><span class="doccomment">//! A cache containing data received from [`Shard`]s.</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! Using the cache allows to avoid REST API requests via the [`http`] module</span>
@@ -1348,9 +1346,8 @@
     <span class="doccomment">/// A map of channels in [`Guild`]s that the current user has received data</span>
     <span class="doccomment">/// for.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// When a [`Event::GuildDelete`] or [`Event::GuildUnavailable`] is</span>
-    <span class="doccomment">/// received and processed by the cache, the relevant channels are also</span>
-    <span class="doccomment">/// removed from this map.</span>
+    <span class="doccomment">/// When a [`Event::GuildDelete`] is received and processed by the cache,</span>
+    <span class="doccomment">/// the relevant channels are also removed from this map.</span>
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">channels</span>: <span class="ident">DashMap</span><span class="op">&lt;</span><span class="ident">ChannelId</span>, <span class="ident">GuildChannel</span><span class="op">&gt;</span>,
     <span class="doccomment">/// Cache of channels that have been fetched via to_channel.</span>
     <span class="doccomment">///</span>
@@ -1372,8 +1369,7 @@
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">private_channels</span>: <span class="ident">DashMap</span><span class="op">&lt;</span><span class="ident">ChannelId</span>, <span class="ident">PrivateChannel</span><span class="op">&gt;</span>,
     <span class="doccomment">/// The total number of shards being used by the bot.</span>
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">shard_count</span>: <span class="ident">RwLock</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// A list of guilds which are &quot;unavailable&quot;. Refer to the documentation for</span>
-    <span class="doccomment">/// [`Event::GuildUnavailable`] for more information on when this can occur.</span>
+    <span class="doccomment">/// A list of guilds which are &quot;unavailable&quot;.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// Additionally, guilds are always unavailable for bot users when a Ready</span>
     <span class="doccomment">/// is received. Guilds are &quot;sent in&quot; over time through the receiving of</span>

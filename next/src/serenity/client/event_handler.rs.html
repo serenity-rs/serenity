@@ -561,19 +561,12 @@
 <span id="556">556</span>
 <span id="557">557</span>
 <span id="558">558</span>
-<span id="559">559</span>
-<span id="560">560</span>
-<span id="561">561</span>
-<span id="562">562</span>
-<span id="563">563</span>
-<span id="564">564</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::collections::HashMap</span>;
 
 <span class="kw">use</span> <span class="ident">async_trait::async_trait</span>;
 
 <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::context::Context</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::client::bridge::gateway::event</span>::<span class="kw-2">*</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::json::Value</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::application::command::CommandPermission</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::application::interaction::Interaction</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::prelude</span>::<span class="kw-2">*</span>;
@@ -958,11 +951,6 @@
 
     <span class="doccomment">/// Dispatched when a user starts typing.</span>
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">typing_start</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_ctx</span>: <span class="ident">Context</span>, <span class="kw">_</span>: <span class="ident">TypingStartEvent</span>) {}
-
-    <span class="doccomment">/// Dispatched when an unknown event was sent from discord.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Provides the event&#39;s name and its unparsed data.</span>
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">unknown</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_ctx</span>: <span class="ident">Context</span>, <span class="ident">_name</span>: <span class="ident">String</span>, <span class="ident">_raw</span>: <span class="ident">Value</span>) {}
 
     <span class="doccomment">/// Dispatched when the bot&#39;s data is updated.</span>
     <span class="doccomment">///</span>
