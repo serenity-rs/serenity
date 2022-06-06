@@ -1118,12 +1118,8 @@ impl GuildId {
     ///
     /// [Kick Members]: Permissions::KICK_MEMBERS
     #[inline]
-    pub async fn prune_count(self, http: impl AsRef<Http>, days: u16) -> Result<GuildPrune> {
-        let map = json!({
-            "days": days,
-        });
-
-        http.as_ref().get_guild_prune_count(self.0, &map).await
+    pub async fn prune_count(self, http: impl AsRef<Http>, days: u8) -> Result<GuildPrune> {
+        http.as_ref().get_guild_prune_count(self.0, days).await
     }
 
     /// Re-orders the channels of the guild.
@@ -1339,8 +1335,8 @@ impl GuildId {
     ///
     /// [Kick Members]: Permissions::KICK_MEMBERS
     #[inline]
-    pub async fn start_prune(self, http: impl AsRef<Http>, days: u16) -> Result<GuildPrune> {
-        http.as_ref().start_guild_prune(self.0, days as u64, None).await
+    pub async fn start_prune(self, http: impl AsRef<Http>, days: u8) -> Result<GuildPrune> {
+        http.as_ref().start_guild_prune(self.0, days, None).await
     }
 
     /// Unbans a [`User`] from the guild.

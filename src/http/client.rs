@@ -2964,21 +2964,13 @@ impl Http {
     }
 
     /// Gets the amount of users that can be pruned.
-    pub async fn get_guild_prune_count(&self, guild_id: u64, map: &Value) -> Result<GuildPrune> {
-        // Note for 0.6.x: turn this into a function parameter.
-        #[derive(Deserialize)]
-        struct GetGuildPruneCountRequest {
-            days: u64,
-        }
-
-        let req = from_value::<GetGuildPruneCountRequest>(map.clone())?;
-
+    pub async fn get_guild_prune_count(&self, guild_id: u64, days: u8) -> Result<GuildPrune> {
         self.fire(Request {
             body: None,
             multipart: None,
             headers: None,
             route: RouteInfo::GetGuildPruneCount {
-                days: req.days,
+                days,
                 guild_id,
             },
         })
@@ -3790,7 +3782,7 @@ impl Http {
     pub async fn start_guild_prune(
         &self,
         guild_id: u64,
-        days: u64,
+        days: u8,
         audit_log_reason: Option<&str>,
     ) -> Result<GuildPrune> {
         self.fire(Request {
