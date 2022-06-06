@@ -30,7 +30,7 @@ use crate::model::id::{
     UserId,
 };
 use crate::model::user::User;
-use crate::model::utils::{remove_from_map, remove_from_map_opt};
+use crate::model::utils::{deserialize_val, remove_from_map, remove_from_map_opt};
 
 /// An interaction received when the user fills in an autocomplete option
 #[derive(Clone, Debug, Serialize)]
@@ -253,7 +253,7 @@ impl<'de> Deserialize<'de> for CommandDataOption {
                             if value.is_some() {
                                 return Err(DeError::duplicate_field("value"));
                             }
-                            value = Some(map.next_value::<serde_value::Value>()?);
+                            value = Some(map.next_value::<Value>()?);
                         },
                         Field::Options => {
                             if options.is_some() {
@@ -289,60 +289,41 @@ impl<'de> Deserialize<'de> for CommandDataOption {
                     });
                 }
 
+                let value = || value.ok_or_else(|| DeError::missing_field("value"));
+                let options = || options.ok_or_else(|| DeError::missing_field("options"));
+
                 let value = match kind {
-                    CommandOptionType::Boolean => {
-                        let value = value.ok_or_else(|| DeError::missing_field("value"))?;
-                        let value = bool::deserialize(value).map_err(DeError::custom)?;
-                        CommandDataOptionValue::Boolean(value)
-                    },
-                    CommandOptionType::Integer => {
-                        let value = value.ok_or_else(|| DeError::missing_field("value"))?;
-                        let value = i64::deserialize(value).map_err(DeError::custom)?;
-                        CommandDataOptionValue::Integer(value)
-                    },
-                    CommandOptionType::Number => {
-                        let value = value.ok_or_else(|| DeError::missing_field("value"))?;
-                        let value = f64::deserialize(value).map_err(DeError::custom)?;
-                        CommandDataOptionValue::Number(value)
-                    },
-                    CommandOptionType::String => {
-                        let value = value.ok_or_else(|| DeError::missing_field("value"))?;
-                        let value = String::deserialize(value).map_err(DeError::custom)?;
-                        CommandDataOptionValue::String(value)
-                    },
-                    CommandOptionType::SubCommand => {
-                        let options = options.ok_or_else(|| DeError::missing_field("options"))?;
-                        CommandDataOptionValue::SubCommand(options)
-                    },
-                    CommandOptionType::SubCommandGroup => {
-                        let options = options.ok_or_else(|| DeError::missing_field("options"))?;
-                        CommandDataOptionValue::SubCommandGroup(options)
-                    },
-                    CommandOptionType::Attachment => {
-                        let value = value.ok_or_else(|| DeError::missing_field("value"))?;
-                        let value = AttachmentId::deserialize(value).map_err(DeError::custom)?;
-                        CommandDataOptionValue::Attachment(value)
-                    },
-                    CommandOptionType::Channel => {
-                        let value = value.ok_or_else(|| DeError::missing_field("value"))?;
-                        let value = ChannelId::deserialize(value).map_err(DeError::custom)?;
-                        CommandDataOptionValue::Channel(value)
-                    },
-                    CommandOptionType::Mentionable => {
-                        let value = value.ok_or_else(|| DeError::missing_field("value"))?;
-                        let value = GenericId::deserialize(value).map_err(DeError::custom)?;
-                        CommandDataOptionValue::Mentionable(value)
+                    CommandOptionType::User => {
+                        CommandDataOptionValue::User(deserialize_val(value()?)?)
                     },
                     CommandOptionType::Role => {
-                        let value = value.ok_or_else(|| DeError::missing_field("value"))?;
-                        let value = RoleId::deserialize(value).map_err(DeError::custom)?;
-                        CommandDataOptionValue::Role(value)
+                        CommandDataOptionValue::Role(deserialize_val(value()?)?)
                     },
-                    CommandOptionType::User => {
-                        let value = value.ok_or_else(|| DeError::missing_field("value"))?;
-                        let value = UserId::deserialize(value).map_err(DeError::custom)?;
-                        CommandDataOptionValue::User(value)
+                    CommandOptionType::Number => {
+                        CommandDataOptionValue::Number(deserialize_val(value()?)?)
                     },
+                    CommandOptionType::String => {
+                        CommandDataOptionValue::String(deserialize_val(value()?)?)
+                    },
+                    CommandOptionType::Boolean => {
+                        CommandDataOptionValue::Boolean(deserialize_val(value()?)?)
+                    },
+                    CommandOptionType::Integer => {
+                        CommandDataOptionValue::Integer(deserialize_val(value()?)?)
+                    },
+                    CommandOptionType::Channel => {
+                        CommandDataOptionValue::Channel(deserialize_val(value()?)?)
+                    },
+                    CommandOptionType::Attachment => {
+                        CommandDataOptionValue::Attachment(deserialize_val(value()?)?)
+                    },
+                    CommandOptionType::Mentionable => {
+                        CommandDataOptionValue::Mentionable(deserialize_val(value()?)?)
+                    },
+                    CommandOptionType::SubCommandGroup => {
+                        CommandDataOptionValue::SubCommandGroup(options()?)
+                    },
+                    CommandOptionType::SubCommand => CommandDataOptionValue::SubCommand(options()?),
                     CommandOptionType::Unknown => CommandDataOptionValue::Unknown,
                 };
 
@@ -391,10 +372,10 @@ impl Serialize for CommandDataOption {
             CommandDataOptionValue::Mentionable(v) => s.serialize_field("value", v)?,
             CommandDataOptionValue::Role(v) => s.serialize_field("value", v)?,
             CommandDataOptionValue::User(v) => s.serialize_field("value", v)?,
-            CommandDataOptionValue::SubCommand(o) | CommandDataOptionValue::SubCommandGroup(o) => {
-                if !o.is_empty() {
-                    s.serialize_field("options", o)?;
-                }
+            CommandDataOptionValue::SubCommand(o) | CommandDataOptionValue::SubCommandGroup(o)
+                if !o.is_empty() =>
+            {
+                s.serialize_field("options", o)?;
             },
             _ => {},
         }
