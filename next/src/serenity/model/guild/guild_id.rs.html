@@ -1821,20 +1821,6 @@
 <span id="1816">1816</span>
 <span id="1817">1817</span>
 <span id="1818">1818</span>
-<span id="1819">1819</span>
-<span id="1820">1820</span>
-<span id="1821">1821</span>
-<span id="1822">1822</span>
-<span id="1823">1823</span>
-<span id="1824">1824</span>
-<span id="1825">1825</span>
-<span id="1826">1826</span>
-<span id="1827">1827</span>
-<span id="1828">1828</span>
-<span id="1829">1829</span>
-<span id="1830">1830</span>
-<span id="1831">1831</span>
-<span id="1832">1832</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::fmt</span>;
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
@@ -2032,18 +2018,9 @@
         <span class="self">self</span>,
         <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>,
     ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">ChannelId</span>, <span class="ident">GuildChannel</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">channels</span> <span class="op">=</span> <span class="ident">HashMap::new</span>();
+        <span class="kw">let</span> <span class="ident">channels</span> <span class="op">=</span> <span class="ident">http</span>.<span class="ident">as_ref</span>().<span class="ident">get_channels</span>(<span class="self">self</span>.<span class="number">0</span>).<span class="kw">await</span><span class="question-mark">?</span>;
 
-        <span class="comment">// Clippy is suggesting:</span>
-        <span class="comment">// consider removing</span>
-        <span class="comment">// `http.as_ref().get_channels(self.0)?()`:</span>
-        <span class="comment">// `http.as_ref().get_channels(self.0)?`.</span>
-        <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::useless_conversion</span>)]</span>
-        <span class="kw">for</span> <span class="ident">channel</span> <span class="kw">in</span> <span class="ident">http</span>.<span class="ident">as_ref</span>().<span class="ident">get_channels</span>(<span class="self">self</span>.<span class="number">0</span>).<span class="kw">await</span><span class="question-mark">?</span> {
-            <span class="ident">channels</span>.<span class="ident">insert</span>(<span class="ident">channel</span>.<span class="ident">id</span>, <span class="ident">channel</span>);
-        }
-
-        <span class="prelude-val">Ok</span>(<span class="ident">channels</span>)
+        <span class="prelude-val">Ok</span>(<span class="ident">channels</span>.<span class="ident">into_iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> (<span class="ident">c</span>.<span class="ident">id</span>, <span class="ident">c</span>)).<span class="ident">collect</span>())
     }
 
     <span class="doccomment">/// Creates a [`GuildChannel`] in the the guild.</span>
@@ -2628,14 +2605,9 @@
     <span class="doccomment">/// Returns [`Error::Http`] if the current user is not in</span>
     <span class="doccomment">/// the guild.</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">roles</span>(<span class="self">self</span>, <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">RoleId</span>, <span class="ident">Role</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">roles</span> <span class="op">=</span> <span class="ident">HashMap::new</span>();
+        <span class="kw">let</span> <span class="ident">roles</span> <span class="op">=</span> <span class="ident">http</span>.<span class="ident">as_ref</span>().<span class="ident">get_guild_roles</span>(<span class="self">self</span>.<span class="number">0</span>).<span class="kw">await</span><span class="question-mark">?</span>;
 
-        <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::useless_conversion</span>)]</span>
-        <span class="kw">for</span> <span class="ident">role</span> <span class="kw">in</span> <span class="ident">http</span>.<span class="ident">as_ref</span>().<span class="ident">get_guild_roles</span>(<span class="self">self</span>.<span class="number">0</span>).<span class="kw">await</span><span class="question-mark">?</span> {
-            <span class="ident">roles</span>.<span class="ident">insert</span>(<span class="ident">role</span>.<span class="ident">id</span>, <span class="ident">role</span>);
-        }
-
-        <span class="prelude-val">Ok</span>(<span class="ident">roles</span>)
+        <span class="prelude-val">Ok</span>(<span class="ident">roles</span>.<span class="ident">into_iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">r</span><span class="op">|</span> (<span class="ident">r</span>.<span class="ident">id</span>, <span class="ident">r</span>)).<span class="ident">collect</span>())
     }
 
     <span class="doccomment">/// Tries to find the [`Guild`] by its Id in the cache.</span>

@@ -94,7 +94,6 @@
 <span id="89">89</span>
 <span id="90">90</span>
 <span id="91">91</span>
-<span id="92">92</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::fmt</span>;
 
 <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::ArgumentConvert</span>;
@@ -104,7 +103,6 @@
 <span class="doccomment">/// Error that can be returned from [`Role::convert`].</span>
 <span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::enum_variant_names</span>)]</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">RoleParseError</span> {
     <span class="doccomment">/// When the operation was invoked outside a guild.</span>
     <span class="ident">NotInGuild</span>,
