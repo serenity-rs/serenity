@@ -5,7 +5,6 @@ use async_tungstenite::tungstenite;
 use async_tungstenite::tungstenite::error::Error as TungsteniteError;
 use async_tungstenite::tungstenite::protocol::frame::CloseFrame;
 use futures::channel::mpsc::{self, UnboundedReceiver as Receiver, UnboundedSender as Sender};
-use serde::Deserialize;
 use tokio::sync::RwLock;
 use tracing::{debug, error, info, instrument, trace, warn};
 use typemap_rev::TypeMap;
@@ -551,8 +550,7 @@ impl ShardRunner {
     #[instrument(skip(self))]
     async fn recv_event(&mut self) -> Result<(Option<Event>, Option<ShardAction>, bool)> {
         let gw_event = match self.shard.client.recv_json().await {
-            Ok(Some(value)) => GatewayEvent::deserialize(value).map(Some).map_err(From::from),
-            Ok(None) => Ok(None),
+            Ok(inner) => Ok(inner),
             Err(Error::Tungstenite(TungsteniteError::Io(_))) => {
                 debug!("Attempting to auto-reconnect");
 

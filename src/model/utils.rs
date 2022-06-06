@@ -12,6 +12,7 @@ use super::prelude::*;
 use crate::cache::Cache;
 #[cfg(feature = "cache")]
 use crate::internal::prelude::*;
+use crate::json::from_number;
 use crate::model::application::command::CommandOptionType;
 use crate::model::application::interaction::application_command::{
     CommandDataOption,
@@ -27,6 +28,40 @@ pub fn default_true() -> bool {
 #[allow(clippy::trivially_copy_pass_by_ref)]
 pub fn is_false(v: &bool) -> bool {
     !v
+}
+
+pub fn deserialize_val<T, E>(val: Value) -> StdResult<T, E>
+where
+    T: serde::de::DeserializeOwned,
+    E: serde::de::Error,
+{
+    T::deserialize(val).map_err(serde::de::Error::custom)
+}
+
+pub fn remove_from_map_opt<T, E>(map: &mut JsonMap, key: &str) -> StdResult<Option<T>, E>
+where
+    T: serde::de::DeserializeOwned,
+    E: serde::de::Error,
+{
+    map.remove(key).map(deserialize_val).transpose()
+}
+
+pub fn remove_from_map<T, E>(map: &mut JsonMap, key: &'static str) -> StdResult<T, E>
+where
+    T: serde::de::DeserializeOwned,
+    E: serde::de::Error,
+{
+    remove_from_map_opt(map, key)?.ok_or_else(|| serde::de::Error::missing_field(key))
+}
+
+pub fn add_guild_id_to_map(map: &mut JsonMap, key: &str, id: GuildId) {
+    if let Some(array) = map.get_mut(key).and_then(Value::as_array_mut) {
+        for value in array {
+            if let Some(item) = value.as_object_mut() {
+                item.insert("guild_id".to_string(), from_number(id.0));
+            }
+        }
+    }
 }
 
 /// Used with `#[serde(with = "emojis")]`

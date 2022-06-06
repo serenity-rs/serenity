@@ -41,9 +41,10 @@
 //! [Manage Roles]: Permissions::MANAGE_ROLES
 //! [Manage Webhooks]: Permissions::MANAGE_WEBHOOKS
 
+#[cfg(feature = "model")]
 use std::fmt;
 
-use serde::de::{Deserialize, Deserializer};
+use serde::de::{Deserialize, Deserializer, Error as DeError};
 use serde::ser::{Serialize, Serializer};
 
 /// This macro generates the [`Permissions::get_permission_names`] method.
@@ -775,32 +776,15 @@ impl Permissions {
 
 impl<'de> Deserialize<'de> for Permissions {
     fn deserialize<D: Deserializer<'de>>(deserializer: D) -> Result<Self, D::Error> {
-        struct StringVisitor;
+        let permissions_str = String::deserialize(deserializer)?;
+        let permissions_num = permissions_str.parse().map_err(DeError::custom)?;
 
-        impl<'de> serde::de::Visitor<'de> for StringVisitor {
-            type Value = Permissions;
-
-            fn expecting(&self, formatter: &mut fmt::Formatter<'_>) -> fmt::Result {
-                formatter.write_str("permissions string")
-            }
-
-            fn visit_str<E>(self, v: &str) -> Result<Self::Value, E>
-            where
-                E: serde::de::Error,
-            {
-                let value = v.parse().map_err(E::custom)?;
-                Ok(Permissions::from_bits_truncate(value))
-            }
-        }
-        deserializer.deserialize_str(StringVisitor)
+        Ok(Permissions::from_bits_truncate(permissions_num))
     }
 }
 
 impl Serialize for Permissions {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: Serializer,
-    {
+    fn serialize<S: Serializer>(&self, serializer: S) -> Result<S::Ok, S::Error> {
         serializer.collect_str(&self.bits())
     }
 }

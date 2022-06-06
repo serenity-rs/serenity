@@ -14,7 +14,9 @@ use tracing::warn;
 #[cfg(feature = "model")]
 use crate::http::{CacheHttp, Http};
 use crate::internal::prelude::*;
+use crate::json::from_number;
 use crate::model::prelude::*;
+use crate::model::utils::{remove_from_map, remove_from_map_opt};
 
 /// An emoji reaction to a message.
 #[derive(Clone, Debug, Serialize)]
@@ -40,54 +42,23 @@ impl<'de> Deserialize<'de> for Reaction {
     fn deserialize<D: Deserializer<'de>>(deserializer: D) -> StdResult<Self, D::Error> {
         let mut map = JsonMap::deserialize(deserializer)?;
 
-        let channel_id = map
-            .remove("channel_id")
-            .ok_or_else(|| DeError::custom("expected channel_id"))
-            .and_then(ChannelId::deserialize)
-            .map_err(DeError::custom)?;
-
-        let message_id = map
-            .remove("message_id")
-            .ok_or_else(|| DeError::custom("expected message_id"))
-            .and_then(MessageId::deserialize)
-            .map_err(DeError::custom)?;
-
-        let emoji = map
-            .remove("emoji")
-            .ok_or_else(|| DeError::custom("expected emoji"))
-            .and_then(ReactionType::deserialize)
-            .map_err(DeError::custom)?;
-
-        let user_id =
-            map.remove("user_id").map(UserId::deserialize).transpose().map_err(DeError::custom)?;
-
-        let guild_id = map
-            .remove("guild_id")
-            .map(GuildId::deserialize)
-            .transpose()
-            .map_err(DeError::custom)?;
+        let guild_id = remove_from_map_opt::<GuildId, _>(&mut map, "guild_id")?;
 
         if let Some(id) = guild_id {
             if let Some(member) = map.get_mut("member") {
                 if let Some(object) = member.as_object_mut() {
-                    object.insert("guild_id".to_owned(), Value::from(id.to_string()));
+                    object.insert("guild_id".to_owned(), from_number(id.0));
                 }
             }
         }
 
-        let member = map
-            .remove("member")
-            .map(PartialMember::deserialize)
-            .transpose()
-            .map_err(DeError::custom)?;
-
         Ok(Self {
-            channel_id,
-            emoji,
-            message_id,
-            user_id,
             guild_id,
-            member,
+            channel_id: remove_from_map(&mut map, "channel_id")?,
+            message_id: remove_from_map(&mut map, "message_id")?,
+            user_id: remove_from_map_opt(&mut map, "user_id")?,
+            member: remove_from_map_opt(&mut map, "member")?,
+            emoji: remove_from_map(&mut map, "emoji")?,
         })
     }
 }
