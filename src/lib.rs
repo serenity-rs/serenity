@@ -60,7 +60,6 @@
     clippy::needless_pass_by_value,
     clippy::struct_excessive_bools,
     clippy::ref_option_ref,
-    clippy::unused_self,
     // Allowed as they are too pedantic 
     clippy::cast_possible_truncation,
     clippy::unreadable_literal,
