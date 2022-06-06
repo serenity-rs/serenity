@@ -479,10 +479,7 @@ pub async fn command(
                     last = res;
                 }
             },
-            #[allow(clippy::items_after_statements)]
             Map::Prefixless(subgroups, commands) => {
-                is_prefixless = true;
-
                 fn command_name_if_recognised(res: &Result<Invoke, ParseError>) -> Option<&str> {
                     match res {
                         Ok(Invoke::Command {
@@ -495,6 +492,8 @@ pub async fn command(
                         }) => Some(command_name),
                     }
                 }
+
+                is_prefixless = true;
 
                 let res = handle_group(stream, ctx, msg, config, subgroups).await;
 
