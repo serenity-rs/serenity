@@ -5724,7 +5724,7 @@
 
     <span class="doccomment">/// Crossposts a message by Id.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// **Note**: Only available on announcements channels.</span>
+    <span class="doccomment">/// **Note**: Only available on news channels.</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">crosspost_message</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">channel_id</span>: <span class="ident">u64</span>, <span class="ident">message_id</span>: <span class="ident">u64</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Message</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">fire</span>(<span class="ident">Request</span> {
             <span class="ident">body</span>: <span class="prelude-val">None</span>,
@@ -5771,7 +5771,7 @@
         .<span class="kw">await</span>
     }
 
-    <span class="doccomment">/// Follow an Announcement Channel to send messages to a target channel.</span>
+    <span class="doccomment">/// Follow a News Channel to send messages to a target channel.</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">follow_news_channel</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">news_channel_id</span>: <span class="ident">u64</span>,
