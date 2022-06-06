@@ -3761,7 +3761,7 @@
     }
 
     <span class="attribute">#[<span class="ident">must_use</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">guild_prune</span>(<span class="ident">guild_id</span>: <span class="ident">u64</span>, <span class="ident">days</span>: <span class="ident">u64</span>) -&gt; <span class="ident">String</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">guild_prune</span>(<span class="ident">guild_id</span>: <span class="ident">u64</span>, <span class="ident">days</span>: <span class="ident">u8</span>) -&gt; <span class="ident">String</span> {
         <span class="macro">api!</span>(<span class="string">&quot;/guilds/{}/prune?days={}&quot;</span>, <span class="ident">guild_id</span>, <span class="ident">days</span>)
     }
 
@@ -4535,7 +4535,7 @@
         <span class="ident">guild_id</span>: <span class="ident">u64</span>,
     },
     <span class="ident">GetGuildPruneCount</span> {
-        <span class="ident">days</span>: <span class="ident">u64</span>,
+        <span class="ident">days</span>: <span class="ident">u8</span>,
         <span class="ident">guild_id</span>: <span class="ident">u64</span>,
     },
     <span class="ident">GetGuildRegions</span> {
@@ -4660,7 +4660,7 @@
         <span class="ident">limit</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span>,
     },
     <span class="ident">StartGuildPrune</span> {
-        <span class="ident">days</span>: <span class="ident">u64</span>,
+        <span class="ident">days</span>: <span class="ident">u8</span>,
         <span class="ident">guild_id</span>: <span class="ident">u64</span>,
     },
     <span class="ident">StartIntegrationSync</span> {

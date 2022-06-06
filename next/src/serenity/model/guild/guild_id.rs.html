@@ -1835,10 +1835,6 @@
 <span id="1830">1830</span>
 <span id="1831">1831</span>
 <span id="1832">1832</span>
-<span id="1833">1833</span>
-<span id="1834">1834</span>
-<span id="1835">1835</span>
-<span id="1836">1836</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::fmt</span>;
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
@@ -2959,12 +2955,8 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// [Kick Members]: Permissions::KICK_MEMBERS</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">prune_count</span>(<span class="self">self</span>, <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>, <span class="ident">days</span>: <span class="ident">u16</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">GuildPrune</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">map</span> <span class="op">=</span> <span class="macro">json!</span>({
-            <span class="string">&quot;days&quot;</span>: <span class="ident">days</span>,
-        });
-
-        <span class="ident">http</span>.<span class="ident">as_ref</span>().<span class="ident">get_guild_prune_count</span>(<span class="self">self</span>.<span class="number">0</span>, <span class="kw-2">&amp;</span><span class="ident">map</span>).<span class="kw">await</span>
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">prune_count</span>(<span class="self">self</span>, <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>, <span class="ident">days</span>: <span class="ident">u8</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">GuildPrune</span><span class="op">&gt;</span> {
+        <span class="ident">http</span>.<span class="ident">as_ref</span>().<span class="ident">get_guild_prune_count</span>(<span class="self">self</span>.<span class="number">0</span>, <span class="ident">days</span>).<span class="kw">await</span>
     }
 
     <span class="doccomment">/// Re-orders the channels of the guild.</span>
@@ -3180,8 +3172,8 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// [Kick Members]: Permissions::KICK_MEMBERS</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">start_prune</span>(<span class="self">self</span>, <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>, <span class="ident">days</span>: <span class="ident">u16</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">GuildPrune</span><span class="op">&gt;</span> {
-        <span class="ident">http</span>.<span class="ident">as_ref</span>().<span class="ident">start_guild_prune</span>(<span class="self">self</span>.<span class="number">0</span>, <span class="ident">days</span> <span class="kw">as</span> <span class="ident">u64</span>, <span class="prelude-val">None</span>).<span class="kw">await</span>
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">start_prune</span>(<span class="self">self</span>, <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>, <span class="ident">days</span>: <span class="ident">u8</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">GuildPrune</span><span class="op">&gt;</span> {
+        <span class="ident">http</span>.<span class="ident">as_ref</span>().<span class="ident">start_guild_prune</span>(<span class="self">self</span>.<span class="number">0</span>, <span class="ident">days</span>, <span class="prelude-val">None</span>).<span class="kw">await</span>
     }
 
     <span class="doccomment">/// Unbans a [`User`] from the guild.</span>

@@ -5478,7 +5478,7 @@
     <span class="doccomment">/// [Kick Members]: Permissions::KICK_MEMBERS</span>
     <span class="doccomment">/// [`Error::Http`]: crate::error::Error::Http</span>
     <span class="doccomment">/// [`Error::Json`]: crate::error::Error::Json</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">prune_count</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">cache_http</span>: <span class="kw">impl</span> <span class="ident">CacheHttp</span>, <span class="ident">days</span>: <span class="ident">u16</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">GuildPrune</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">prune_count</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">cache_http</span>: <span class="kw">impl</span> <span class="ident">CacheHttp</span>, <span class="ident">days</span>: <span class="ident">u8</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">GuildPrune</span><span class="op">&gt;</span> {
         <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
         {
             <span class="kw">if</span> <span class="ident">cache_http</span>.<span class="ident">cache</span>().<span class="ident">is_some</span>() {
@@ -5750,7 +5750,7 @@
     <span class="doccomment">/// [Kick Members]: Permissions::KICK_MEMBERS</span>
     <span class="doccomment">/// [`Error::Http`]: crate::error::Error::Http</span>
     <span class="doccomment">/// [`Error::Json`]: crate::error::Error::Json</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">start_prune</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">cache_http</span>: <span class="kw">impl</span> <span class="ident">CacheHttp</span>, <span class="ident">days</span>: <span class="ident">u16</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">GuildPrune</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">start_prune</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">cache_http</span>: <span class="kw">impl</span> <span class="ident">CacheHttp</span>, <span class="ident">days</span>: <span class="ident">u8</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">GuildPrune</span><span class="op">&gt;</span> {
         <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
         {
             <span class="kw">if</span> <span class="ident">cache_http</span>.<span class="ident">cache</span>().<span class="ident">is_some</span>() {
