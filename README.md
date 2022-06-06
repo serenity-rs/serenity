@@ -151,7 +151,7 @@ instead of `rustls_backend`.
 ratelimits, or use the interval given by Discord that might be less efficient
 due to latency in the network. If you turn this feature on, it is recommended to
 synchronise your clock with an NTP server (such as Google's).
-- **tokio_task_builder**: Enables tokio's `tracing` feature and uses `tokio::task::Builder` to spawn tasks with names if `RUSTFLAGS="--cfg tokio_unstable` is set.
+- **tokio_task_builder**: Enables tokio's `tracing` feature and uses `tokio::task::Builder` to spawn tasks with names if `RUSTFLAGS="--cfg tokio_unstable"` is set.
 - **unstable_discord_api**: Enables features of the Discord API that do not have a stable interface. The features might not have official documentation or are subject to change.
 - **simdjson**: Enables SIMD accelerated JSON parsing and rendering for API calls, use with `RUSTFLAGS="-C target-cpu=native"`
 - **temp_cache**: Enables temporary caching in functions that retrieve data via the HTTP API.
