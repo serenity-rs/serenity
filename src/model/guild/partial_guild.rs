@@ -1632,8 +1632,11 @@ impl<'de> Deserialize<'de> for PartialGuild {
             banner: remove_from_map_opt(&mut map, "banner")?.flatten(),
             vanity_url_code: remove_from_map_opt(&mut map, "vanity_url_code")?.flatten(),
             welcome_screen: remove_from_map_opt(&mut map, "welcome_screen")?,
-            approximate_member_count: remove_from_map(&mut map, "approximate_member_count")?,
-            approximate_presence_count: remove_from_map(&mut map, "approximate_presence_count")?,
+            approximate_member_count: remove_from_map_opt(&mut map, "approximate_member_count")?,
+            approximate_presence_count: remove_from_map_opt(
+                &mut map,
+                "approximate_presence_count",
+            )?,
             nsfw_level: remove_from_map(&mut map, "nsfw_level")?,
             max_video_channel_users: remove_from_map(&mut map, "max_video_channel_users")?,
             max_presences: remove_from_map_opt(&mut map, "max_presences")?.flatten(),
