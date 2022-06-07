@@ -15,6 +15,7 @@ use super::utils::{
     remove_from_map_opt,
     roles,
     stickers,
+    ignore_input,
 };
 use crate::constants::OpCode;
 use crate::internal::prelude::*;
@@ -266,11 +267,19 @@ impl<'de> Deserialize<'de> for GuildMembersChunkEvent {
     }
 }
 
-#[derive(Clone, Debug, Deserialize, Serialize)]
+#[derive(Clone, Debug, Serialize)]
 #[non_exhaustive]
 pub struct GuildRoleCreateEvent {
-    #[serde(deserialize_with = "roles::deserialize_event")]
     pub role: Role,
+}
+
+impl<'de> Deserialize<'de> for GuildRoleCreateEvent {
+    /// Custom deserializer to pass entire payload to roles::deserialize_event, does not work using `deserialize_with`
+    fn deserialize<D: Deserializer<'de>>(deserializer: D) -> StdResult<Self, D::Error> {
+        Ok(Self {
+            role: roles::deserialize_event(deserializer)?,
+        })
+    }
 }
 
 #[derive(Clone, Debug, Deserialize, Serialize)]
@@ -280,11 +289,19 @@ pub struct GuildRoleDeleteEvent {
     pub role_id: RoleId,
 }
 
-#[derive(Clone, Debug, Deserialize, Serialize)]
+#[derive(Clone, Debug, Serialize)]
 #[non_exhaustive]
 pub struct GuildRoleUpdateEvent {
-    #[serde(deserialize_with = "roles::deserialize_event")]
     pub role: Role,
+}
+
+impl<'de> Deserialize<'de> for GuildRoleUpdateEvent {
+    /// Custom deserializer to pass entire payload to roles::deserialize_event, does not work using `deserialize_with`
+    fn deserialize<D: Deserializer<'de>>(deserializer: D) -> StdResult<Self, D::Error> {
+        Ok(Self {
+            role: roles::deserialize_event(deserializer)?,
+        })
+    }
 }
 
 #[derive(Clone, Debug, Deserialize, Serialize)]
@@ -822,7 +839,7 @@ pub enum Event {
     /// A guild member has unsubscribed from a scheduled event.
     GuildScheduledEventUserRemove(GuildScheduledEventUserRemoveEvent),
     /// An event type not covered by the above
-    #[serde(other)]
+    #[serde(other, deserialize_with = "ignore_input")]
     Unknown,
 }
 
