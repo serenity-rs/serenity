@@ -492,6 +492,11 @@
 <span id="487">487</span>
 <span id="488">488</span>
 <span id="489">489</span>
+<span id="490">490</span>
+<span id="491">491</span>
+<span id="492">492</span>
+<span id="493">493</span>
+<span id="494">494</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::collections::HashMap</span>;
 <span class="kw">use</span> <span class="ident">std::fmt</span>;
 <span class="kw">use</span> <span class="ident">std::hash::Hash</span>;
@@ -522,6 +527,11 @@
 <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::trivially_copy_pass_by_ref</span>)]</span>
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_false</span>(<span class="ident">v</span>: <span class="kw-2">&amp;</span><span class="ident">bool</span>) -&gt; <span class="ident">bool</span> {
     <span class="op">!</span><span class="ident">v</span>
+}
+
+<span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::unnecessary_wraps</span>)]</span>
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">ignore_input</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span>, <span class="ident">D</span>: <span class="ident">Deserializer</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="kw">_</span>: <span class="ident">D</span>) -&gt; <span class="ident">StdResult</span><span class="op">&lt;</span>(), <span class="ident">D::Error</span><span class="op">&gt;</span> {
+    <span class="prelude-val">Ok</span>(())
 }
 
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">deserialize_val</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">E</span><span class="op">&gt;</span>(<span class="ident">val</span>: <span class="ident">Value</span>) -&gt; <span class="ident">StdResult</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">E</span><span class="op">&gt;</span>

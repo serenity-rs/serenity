@@ -1824,6 +1824,23 @@
 <span id="1819">1819</span>
 <span id="1820">1820</span>
 <span id="1821">1821</span>
+<span id="1822">1822</span>
+<span id="1823">1823</span>
+<span id="1824">1824</span>
+<span id="1825">1825</span>
+<span id="1826">1826</span>
+<span id="1827">1827</span>
+<span id="1828">1828</span>
+<span id="1829">1829</span>
+<span id="1830">1830</span>
+<span id="1831">1831</span>
+<span id="1832">1832</span>
+<span id="1833">1833</span>
+<span id="1834">1834</span>
+<span id="1835">1835</span>
+<span id="1836">1836</span>
+<span id="1837">1837</span>
+<span id="1838">1838</span>
 </pre><pre class="rust"><code><span class="doccomment">//! All the events this library handles.</span>
 
 <span class="kw">use</span> <span class="ident">std::collections::HashMap</span>;
@@ -1837,6 +1854,7 @@
     <span class="ident">add_guild_id_to_map</span>,
     <span class="ident">deserialize_val</span>,
     <span class="ident">emojis</span>,
+    <span class="ident">ignore_input</span>,
     <span class="ident">remove_from_map</span>,
     <span class="ident">remove_from_map_opt</span>,
     <span class="ident">roles</span>,
@@ -2092,11 +2110,19 @@
     }
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Serialize</span>)]</span>
 <span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">GuildRoleCreateEvent</span> {
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">deserialize_with</span> <span class="op">=</span> <span class="string">&quot;roles::deserialize_event&quot;</span>)]</span>
     <span class="kw">pub</span> <span class="ident">role</span>: <span class="ident">Role</span>,
+}
+
+<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="ident">Deserialize</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">GuildRoleCreateEvent</span> {
+    <span class="doccomment">/// Custom deserializer to pass entire payload to roles::deserialize_event, does not work using `deserialize_with`</span>
+    <span class="kw">fn</span> <span class="ident">deserialize</span><span class="op">&lt;</span><span class="ident">D</span>: <span class="ident">Deserializer</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">deserializer</span>: <span class="ident">D</span>) -&gt; <span class="ident">StdResult</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">D::Error</span><span class="op">&gt;</span> {
+        <span class="prelude-val">Ok</span>(<span class="self">Self</span> {
+            <span class="ident">role</span>: <span class="ident">roles::deserialize_event</span>(<span class="ident">deserializer</span>)<span class="question-mark">?</span>,
+        })
+    }
 }
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
@@ -2106,11 +2132,19 @@
     <span class="kw">pub</span> <span class="ident">role_id</span>: <span class="ident">RoleId</span>,
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Serialize</span>)]</span>
 <span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">GuildRoleUpdateEvent</span> {
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">deserialize_with</span> <span class="op">=</span> <span class="string">&quot;roles::deserialize_event&quot;</span>)]</span>
     <span class="kw">pub</span> <span class="ident">role</span>: <span class="ident">Role</span>,
+}
+
+<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="ident">Deserialize</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">GuildRoleUpdateEvent</span> {
+    <span class="doccomment">/// Custom deserializer to pass entire payload to roles::deserialize_event, does not work using `deserialize_with`</span>
+    <span class="kw">fn</span> <span class="ident">deserialize</span><span class="op">&lt;</span><span class="ident">D</span>: <span class="ident">Deserializer</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">deserializer</span>: <span class="ident">D</span>) -&gt; <span class="ident">StdResult</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">D::Error</span><span class="op">&gt;</span> {
+        <span class="prelude-val">Ok</span>(<span class="self">Self</span> {
+            <span class="ident">role</span>: <span class="ident">roles::deserialize_event</span>(<span class="ident">deserializer</span>)<span class="question-mark">?</span>,
+        })
+    }
 }
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
@@ -2648,7 +2682,7 @@
     <span class="doccomment">/// A guild member has unsubscribed from a scheduled event.</span>
     <span class="ident">GuildScheduledEventUserRemove</span>(<span class="ident">GuildScheduledEventUserRemoveEvent</span>),
     <span class="doccomment">/// An event type not covered by the above</span>
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">other</span>)]</span>
+    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">other</span>, <span class="ident">deserialize_with</span> <span class="op">=</span> <span class="string">&quot;ignore_input&quot;</span>)]</span>
     <span class="ident">Unknown</span>,
 }
 

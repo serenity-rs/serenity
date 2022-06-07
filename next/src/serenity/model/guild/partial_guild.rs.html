@@ -1696,6 +1696,9 @@
 <span id="1691">1691</span>
 <span id="1692">1692</span>
 <span id="1693">1693</span>
+<span id="1694">1694</span>
+<span id="1695">1695</span>
+<span id="1696">1696</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">serde::de::Error</span> <span class="kw">as</span> <span class="ident">DeError</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
 <span class="kw">use</span> <span class="ident">tracing</span>::{<span class="ident">error</span>, <span class="ident">warn</span>};
@@ -3330,8 +3333,11 @@
             <span class="ident">banner</span>: <span class="ident">remove_from_map_opt</span>(<span class="kw-2">&amp;mut</span> <span class="ident">map</span>, <span class="string">&quot;banner&quot;</span>)<span class="question-mark">?</span>.<span class="ident">flatten</span>(),
             <span class="ident">vanity_url_code</span>: <span class="ident">remove_from_map_opt</span>(<span class="kw-2">&amp;mut</span> <span class="ident">map</span>, <span class="string">&quot;vanity_url_code&quot;</span>)<span class="question-mark">?</span>.<span class="ident">flatten</span>(),
             <span class="ident">welcome_screen</span>: <span class="ident">remove_from_map_opt</span>(<span class="kw-2">&amp;mut</span> <span class="ident">map</span>, <span class="string">&quot;welcome_screen&quot;</span>)<span class="question-mark">?</span>,
-            <span class="ident">approximate_member_count</span>: <span class="ident">remove_from_map</span>(<span class="kw-2">&amp;mut</span> <span class="ident">map</span>, <span class="string">&quot;approximate_member_count&quot;</span>)<span class="question-mark">?</span>,
-            <span class="ident">approximate_presence_count</span>: <span class="ident">remove_from_map</span>(<span class="kw-2">&amp;mut</span> <span class="ident">map</span>, <span class="string">&quot;approximate_presence_count&quot;</span>)<span class="question-mark">?</span>,
+            <span class="ident">approximate_member_count</span>: <span class="ident">remove_from_map_opt</span>(<span class="kw-2">&amp;mut</span> <span class="ident">map</span>, <span class="string">&quot;approximate_member_count&quot;</span>)<span class="question-mark">?</span>,
+            <span class="ident">approximate_presence_count</span>: <span class="ident">remove_from_map_opt</span>(
+                <span class="kw-2">&amp;mut</span> <span class="ident">map</span>,
+                <span class="string">&quot;approximate_presence_count&quot;</span>,
+            )<span class="question-mark">?</span>,
             <span class="ident">nsfw_level</span>: <span class="ident">remove_from_map</span>(<span class="kw-2">&amp;mut</span> <span class="ident">map</span>, <span class="string">&quot;nsfw_level&quot;</span>)<span class="question-mark">?</span>,
             <span class="ident">max_video_channel_users</span>: <span class="ident">remove_from_map</span>(<span class="kw-2">&amp;mut</span> <span class="ident">map</span>, <span class="string">&quot;max_video_channel_users&quot;</span>)<span class="question-mark">?</span>,
             <span class="ident">max_presences</span>: <span class="ident">remove_from_map_opt</span>(<span class="kw-2">&amp;mut</span> <span class="ident">map</span>, <span class="string">&quot;max_presences&quot;</span>)<span class="question-mark">?</span>.<span class="ident">flatten</span>(),
