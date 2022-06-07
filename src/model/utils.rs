@@ -30,6 +30,11 @@ pub fn is_false(v: &bool) -> bool {
     !v
 }
 
+#[allow(clippy::unnecessary_wraps)]
+pub fn ignore_input<'de, D: Deserializer<'de>>(_: D) -> StdResult<(), D::Error> {
+    Ok(())
+}
+
 pub fn deserialize_val<T, E>(val: Value) -> StdResult<T, E>
 where
     T: serde::de::DeserializeOwned,
