@@ -352,28 +352,15 @@ impl GuildId {
         http.as_ref().create_scheduled_event(self.get(), &builder, None).await
     }
 
-    /// Creates a new sticker in the guild with the data set, if any.
+    /// Returns a request builder that, when executed, will create a new sticker in the guild.
     ///
     /// **Note**: Requires the [Manage Emojis and Stickers] permission.
     ///
-    /// # Errors
-    ///
-    /// Returns [`Error::Http`] if the current user lacks permission,
-    /// or if invalid data is given.
-    ///
     /// [Manage Emojis and Stickers]: crate::model::permissions::Permissions::MANAGE_EMOJIS_AND_STICKERS
     #[inline]
-    pub async fn create_sticker<'a, F>(self, http: impl AsRef<Http>, f: F) -> Result<Sticker>
-    where
-        for<'b> F: FnOnce(&'b mut CreateSticker<'a>) -> &'b mut CreateSticker<'a>,
-    {
-        let mut create_sticker = CreateSticker::default();
-        f(&mut create_sticker);
-
-        let (map, file) =
-            create_sticker.build().ok_or(Error::Model(ModelError::NoStickerFileSet))?;
-
-        http.as_ref().create_sticker(self.get(), map, file, None).await
+    #[must_use]
+    pub fn create_sticker<'a>(&self) -> CreateSticker<'a> {
+        CreateSticker::new(*self)
     }
 
     /// Deletes the current guild if the current account is the owner of the

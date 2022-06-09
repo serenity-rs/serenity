@@ -316,7 +316,11 @@ impl Guild {
     }
 
     #[cfg(feature = "cache")]
-    async fn has_perms(&self, cache_http: impl CacheHttp, mut permissions: Permissions) -> bool {
+    pub(crate) async fn has_perms(
+        &self,
+        cache_http: impl CacheHttp,
+        mut permissions: Permissions,
+    ) -> bool {
         if let Some(cache) = cache_http.cache() {
             let user_id = cache.current_user().id;
 
@@ -904,32 +908,14 @@ impl Guild {
         self.id.create_scheduled_event(cache_http.http(), f).await
     }
 
-    /// Creates a new sticker in the guild with the data set, if any.
+    /// Returns a request builder that, when executed, will create a new sticker in the guild.
     ///
     /// **Note**: Requires the [Manage Emojis and Stickers] permission.
     ///
-    /// # Errors
-    ///
-    /// If the `cache` is enabled, returns a [`ModelError::InvalidPermissions`]
-    /// if the current user does not have permission to manage roles.
-    ///
     /// [Manage Emojis and Stickers]: crate::model::permissions::Permissions::MANAGE_EMOJIS_AND_STICKERS
-    pub async fn create_sticker<'a, F>(&self, cache_http: impl CacheHttp, f: F) -> Result<Sticker>
-    where
-        for<'b> F: FnOnce(&'b mut CreateSticker<'a>) -> &'b mut CreateSticker<'a>,
-    {
-        #[cfg(feature = "cache")]
-        {
-            if cache_http.cache().is_some() {
-                let req = Permissions::MANAGE_EMOJIS_AND_STICKERS;
-
-                if !self.has_perms(&cache_http, req).await {
-                    return Err(Error::Model(ModelError::InvalidPermissions(req)));
-                }
-            }
-        }
-
-        self.id.create_sticker(cache_http.http(), f).await
+    #[must_use]
+    pub fn create_sticker<'a>(&self) -> CreateSticker<'a> {
+        CreateSticker::new(self.id)
     }
 
     /// Deletes the current guild if the current user is the owner of the

@@ -868,18 +868,18 @@ impl Http {
     ///
     /// [Manage Emojis and Stickers]: Permissions::MANAGE_EMOJIS_AND_STICKERS
     // Manual async fn to decorate the lifetime manually, avoiding a compiler bug
-    pub fn create_sticker<'a>(
-        &'a self,
+    pub async fn create_sticker<'a>(
+        &self,
         guild_id: u64,
-        map: Vec<(Cow<'static, str>, Cow<'static, str>)>,
+        map: Vec<(&'static str, String)>,
         file: impl Into<AttachmentType<'a>>,
         audit_log_reason: Option<&str>,
-    ) -> impl std::future::Future<Output = Result<Sticker>> + 'a {
+    ) -> Result<Sticker> {
         self.fire(Request {
             body: None,
             multipart: Some(Multipart {
                 files: vec![file.into()],
-                fields: map,
+                fields: map.into_iter().map(|(k, v)| (k.into(), v.into())).collect(),
                 payload_json: None,
             }),
             headers: audit_log_reason.map(reason_into_header),
@@ -887,6 +887,7 @@ impl Http {
                 guild_id,
             },
         })
+        .await
     }
 
     /// Creates a webhook for the given [channel][`GuildChannel`]'s Id, passing in
