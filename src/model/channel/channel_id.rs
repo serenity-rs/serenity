@@ -991,44 +991,17 @@ impl ChannelId {
         http.as_ref().delete_stage_instance(self.get()).await
     }
 
-    /// Creates a public thread that is connected to a message.
-    ///
-    /// # Errors
-    ///
-    /// Returns [`Error::Http`] if the current user lacks permission.
-    pub async fn create_public_thread<F>(
-        &self,
-        http: impl AsRef<Http>,
-        message_id: impl Into<MessageId>,
-        f: F,
-    ) -> Result<GuildChannel>
-    where
-        F: FnOnce(&mut CreateThread) -> &mut CreateThread,
-    {
-        let mut instance = CreateThread::default();
-        f(&mut instance);
-
-        http.as_ref().create_public_thread(self.get(), message_id.into().get(), &instance).await
+    /// Returns a request builder that, when executed, will create a public thread that is
+    /// connected to a message.
+    #[must_use]
+    pub fn create_public_thread(&self, message_id: impl Into<MessageId>) -> CreateThread {
+        CreateThread::new(*self, Some(message_id.into()))
     }
 
-    /// Creates a private thread.
-    ///
-    /// # Errors
-    ///
-    /// Returns [`Error::Http`] if the current user lacks permission.
-    pub async fn create_private_thread<F>(
-        &self,
-        http: impl AsRef<Http>,
-        f: F,
-    ) -> Result<GuildChannel>
-    where
-        F: FnOnce(&mut CreateThread) -> &mut CreateThread,
-    {
-        let mut instance = CreateThread::default();
-        instance.kind(ChannelType::PrivateThread);
-        f(&mut instance);
-
-        http.as_ref().create_private_thread(self.get(), &instance).await
+    /// Returns a request builder that will create a private thread on execution.
+    #[must_use]
+    pub fn create_private_thread(&self) -> CreateThread {
+        CreateThread::new(*self, None).kind(ChannelType::PrivateThread)
     }
 
     /// Gets the thread members, if this channel is a thread.
