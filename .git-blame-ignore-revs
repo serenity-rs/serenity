@@ -18,3 +18,6 @@ dae2cb77b407044f44a7a2790d93efba3891854e
 
 # Format imports with module granularity (#1846)
 4c97810b6d25617fa0a0a4b4769deb751a17d373
+
+# Unify the rustfmt configurations
+aafc1d04ac04fc9691d7bf56c1b4e8eb7cfd6597
