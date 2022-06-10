@@ -1,5 +1,6 @@
-use serde::{Deserialize, Serialize};
 use std::net::IpAddr;
+
+use serde::{Deserialize, Serialize};
 
 /// The client's response to a connection offer.
 #[derive(Clone, Debug, Deserialize, Eq, Hash, PartialEq, Serialize)]

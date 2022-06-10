@@ -12,12 +12,10 @@ mod protocol_data;
 mod speaking_state;
 mod util;
 
-pub use self::{
-    close_code::CloseCode,
-    event::Event,
-    opcode::OpCode,
-    protocol_data::ProtocolData,
-    speaking_state::SpeakingState,
-};
-
 pub use enum_primitive::FromPrimitive;
+
+pub use self::close_code::CloseCode;
+pub use self::event::Event;
+pub use self::opcode::OpCode;
+pub use self::protocol_data::ProtocolData;
+pub use self::speaking_state::SpeakingState;

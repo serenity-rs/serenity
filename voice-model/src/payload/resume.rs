@@ -1,5 +1,6 @@
-use crate::id::GuildId;
 use serde::{Deserialize, Serialize};
+
+use crate::id::GuildId;
 
 /// Sent by the client after a disconnect to attempt to resume a session.
 #[derive(Clone, Debug, Deserialize, Eq, Hash, PartialEq, Serialize)]

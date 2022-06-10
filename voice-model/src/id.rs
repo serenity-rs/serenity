@@ -1,7 +1,9 @@
 //! A collection of newtypes defining type-strong IDs.
-use crate::util::json_safe_u64;
-use serde::{Deserialize, Serialize};
 use std::fmt;
+
+use serde::{Deserialize, Serialize};
+
+use crate::util::json_safe_u64;
 
 #[derive(
     Clone, Copy, Debug, Default, Deserialize, Eq, Hash, Ord, PartialEq, PartialOrd, Serialize,

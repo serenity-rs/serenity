@@ -1,5 +1,7 @@
-use crate::{id::UserId, speaking_state::SpeakingState};
 use serde::{Deserialize, Serialize};
+
+use crate::id::UserId;
+use crate::speaking_state::SpeakingState;
 
 /// Used to indicate which users are speaking, or to inform Discord that the client is now speaking.
 #[derive(Clone, Copy, Debug, Deserialize, Eq, Hash, PartialEq, Serialize)]

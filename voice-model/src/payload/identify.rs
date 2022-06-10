@@ -1,5 +1,6 @@
-use crate::id::*;
 use serde::{Deserialize, Serialize};
+
+use crate::id::*;
 
 /// Used to begin a voice websocket connection.
 #[derive(Clone, Debug, Deserialize, Eq, Hash, PartialEq, Serialize)]

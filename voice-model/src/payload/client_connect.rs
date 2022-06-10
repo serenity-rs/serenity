@@ -1,5 +1,6 @@
-use crate::id::UserId;
 use serde::{Deserialize, Serialize};
+
+use crate::id::UserId;
 
 /// Message indicating that another user has connected to the voice channel.
 ///

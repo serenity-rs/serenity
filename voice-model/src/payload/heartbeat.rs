@@ -1,5 +1,6 @@
-use crate::util::json_safe_u64;
 use serde::{Deserialize, Serialize};
+
+use crate::util::json_safe_u64;
 
 /// Used to keep the websocket connection alive.
 #[derive(Clone, Copy, Debug, Deserialize, Eq, Hash, PartialEq, Serialize)]

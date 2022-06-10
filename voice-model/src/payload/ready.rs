@@ -1,5 +1,6 @@
-use serde::{Deserialize, Serialize};
 use std::net::IpAddr;
+
+use serde::{Deserialize, Serialize};
 
 /// RTP server's connection offer and supported encryption modes.
 #[derive(Clone, Debug, Deserialize, Eq, Hash, PartialEq, Serialize)]

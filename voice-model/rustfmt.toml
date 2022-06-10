@@ -1,6 +1,16 @@
-imports_layout = "HorizontalVertical"
-match_arm_blocks = false
+edition = "2018"
 match_block_trailing_comma = true
 newline_style = "Unix"
 use_field_init_shorthand = true
+use_small_heuristics = "Max"
 use_try_shorthand = true
+
+# nightly/unstable features
+format_code_in_doc_comments = true
+group_imports = "StdExternalCrate"
+imports_granularity = "Module"
+imports_layout = "HorizontalVertical"
+match_arm_blocks = false
+normalize_comments = true
+overflow_delimited_expr = true
+struct_lit_single_line = false

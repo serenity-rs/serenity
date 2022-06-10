@@ -1,5 +1,7 @@
 use bitflags::bitflags;
-use serde::{de::Deserializer, ser::Serializer, Deserialize, Serialize};
+use serde::de::Deserializer;
+use serde::ser::Serializer;
+use serde::{Deserialize, Serialize};
 
 bitflags! {
     /// Flag set describing how a speaker is sending audio.

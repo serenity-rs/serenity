@@ -1,5 +1,6 @@
-use crate::util::json_safe_u64;
 use serde::{Deserialize, Serialize};
+
+use crate::util::json_safe_u64;
 
 /// Heartbeat ACK, received by the client to show the server's receipt of a heartbeat.
 #[derive(Clone, Copy, Debug, Deserialize, Eq, Hash, PartialEq, Serialize)]

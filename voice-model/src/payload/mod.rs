@@ -12,16 +12,14 @@ mod select_protocol;
 mod session_description;
 mod speaking;
 
-pub use self::{
-    client_connect::ClientConnect,
-    client_disconnect::ClientDisconnect,
-    heartbeat::Heartbeat,
-    heartbeat_ack::HeartbeatAck,
-    hello::Hello,
-    identify::Identify,
-    ready::Ready,
-    resume::Resume,
-    select_protocol::SelectProtocol,
-    session_description::SessionDescription,
-    speaking::Speaking,
-};
+pub use self::client_connect::ClientConnect;
+pub use self::client_disconnect::ClientDisconnect;
+pub use self::heartbeat::Heartbeat;
+pub use self::heartbeat_ack::HeartbeatAck;
+pub use self::hello::Hello;
+pub use self::identify::Identify;
+pub use self::ready::Ready;
+pub use self::resume::Resume;
+pub use self::select_protocol::SelectProtocol;
+pub use self::session_description::SessionDescription;
+pub use self::speaking::Speaking;

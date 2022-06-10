@@ -1,5 +1,6 @@
-use crate::protocol_data::ProtocolData;
 use serde::{Deserialize, Serialize};
+
+use crate::protocol_data::ProtocolData;
 
 /// Used to select the voice protocol and encryption mechanism.
 #[derive(Clone, Debug, Deserialize, Eq, Hash, PartialEq, Serialize)]
