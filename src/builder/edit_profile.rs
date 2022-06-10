@@ -53,42 +53,6 @@ impl EditProfile {
         self
     }
 
-    /// Modifies the current user's email address.
-    ///
-    /// Note that when modifying the email address, the current password must
-    /// also be [provided].
-    ///
-    /// No validation is performed on this by the library.
-    ///
-    /// **Note**: This can only be used by user accounts.
-    ///
-    /// [provided]: Self::password
-    pub fn email(&mut self, email: &str) -> &mut Self {
-        self.0.insert("email", Value::from(email.to_string()));
-        self
-    }
-
-    /// Modifies the current user's password.
-    ///
-    /// Note that when modifying the password, the current password must also be
-    /// [provided].
-    ///
-    /// [provided]: Self::password
-    pub fn new_password(&mut self, new_password: &str) -> &mut Self {
-        self.0.insert("new_password", Value::from(new_password.to_string()));
-        self
-    }
-
-    /// Used for providing the current password as verification when
-    /// [modifying the password] or [modifying the associated email address].
-    ///
-    /// [modifying the password]: Self::new_password
-    /// [modifying the associated email address]: Self::email
-    pub fn password(&mut self, password: &str) -> &mut Self {
-        self.0.insert("password", Value::from(password.to_string()));
-        self
-    }
-
     /// Modifies the current user's username.
     ///
     /// When modifying the username, if another user has the same _new_ username
