@@ -35,7 +35,7 @@ use crate::http::{CacheHttp, Http, Typing};
 #[cfg(all(feature = "cache", feature = "model"))]
 use crate::internal::prelude::*;
 #[cfg(feature = "model")]
-use crate::json::{self, from_number};
+use crate::json;
 #[cfg(feature = "model")]
 use crate::model::channel::AttachmentType;
 use crate::model::prelude::*;
@@ -427,10 +427,6 @@ impl GuildChannel {
                 )?;
             }
         }
-
-        let mut map = HashMap::new();
-        map.insert("name", Value::from(self.name.clone()));
-        map.insert("position", from_number(self.position));
 
         let mut edit_channel = EditChannel::default();
         f(&mut edit_channel);
