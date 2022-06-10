@@ -147,7 +147,7 @@ impl EditGuild {
     /// [`features`]: crate::model::guild::Guild::features
     pub fn discovery_splash(&mut self, splash: Option<&str>) -> &mut Self {
         let splash = splash.map_or(NULL, |x| Value::from(x.to_string()));
-        self.0.insert("splash", splash);
+        self.0.insert("discovery_splash", splash);
         self
     }
 
