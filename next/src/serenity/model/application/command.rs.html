@@ -435,7 +435,35 @@
 <span id="430">430</span>
 <span id="431">431</span>
 <span id="432">432</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">serde</span>::{<span class="ident">Deserialize</span>, <span class="ident">Serialize</span>};
+<span id="433">433</span>
+<span id="434">434</span>
+<span id="435">435</span>
+<span id="436">436</span>
+<span id="437">437</span>
+<span id="438">438</span>
+<span id="439">439</span>
+<span id="440">440</span>
+<span id="441">441</span>
+<span id="442">442</span>
+<span id="443">443</span>
+<span id="444">444</span>
+<span id="445">445</span>
+<span id="446">446</span>
+<span id="447">447</span>
+<span id="448">448</span>
+<span id="449">449</span>
+<span id="450">450</span>
+<span id="451">451</span>
+<span id="452">452</span>
+<span id="453">453</span>
+<span id="454">454</span>
+<span id="455">455</span>
+<span id="456">456</span>
+<span id="457">457</span>
+<span id="458">458</span>
+</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::collections::HashMap</span>;
+
+<span class="kw">use</span> <span class="ident">serde</span>::{<span class="ident">Deserialize</span>, <span class="ident">Serialize</span>};
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http&quot;</span>)]</span>
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::builder</span>::{<span class="ident">CreateApplicationCommand</span>, <span class="ident">CreateApplicationCommands</span>};
@@ -475,8 +503,32 @@
     <span class="kw">pub</span> <span class="ident">guild_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">GuildId</span><span class="op">&gt;</span>,
     <span class="doccomment">/// The command name.</span>
     <span class="kw">pub</span> <span class="ident">name</span>: <span class="ident">String</span>,
+    <span class="doccomment">/// The localized command name of the selected locale.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// If the name is localized, either this field or [`Self::name_localizations`]</span>
+    <span class="doccomment">/// is set, depending on which endpoint this data was retrieved from</span>
+    <span class="doccomment">/// ([source](https://discord.com/developers/docs/interactions/application-commands#retrieving-localized-commands)).</span>
+    <span class="kw">pub</span> <span class="ident">name_localized</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// All localized command names.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// If the name is localized, either this field or [`Self::name_localized`]</span>
+    <span class="doccomment">/// is set, depending on which endpoint this data was retrieved from</span>
+    <span class="doccomment">/// ([source](https://discord.com/developers/docs/interactions/application-commands#retrieving-localized-commands)).</span>
+    <span class="kw">pub</span> <span class="ident">name_localizations</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">String</span><span class="op">&gt;</span><span class="op">&gt;</span>,
     <span class="doccomment">/// The command description.</span>
     <span class="kw">pub</span> <span class="ident">description</span>: <span class="ident">String</span>,
+    <span class="doccomment">/// The localized command description of the selected locale.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// If the description is localized, either this field or [`Self::description_localizations`]</span>
+    <span class="doccomment">/// is set, depending on which endpoint this data was retrieved from</span>
+    <span class="doccomment">/// ([source](https://discord.com/developers/docs/interactions/application-commands#retrieving-localized-commands)).</span>
+    <span class="kw">pub</span> <span class="ident">description_localized</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// All localized command descriptions.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// If the description is localized, either this field or [`Self::description_localized`]</span>
+    <span class="doccomment">/// is set, depending on which endpoint this data was retrieved from</span>
+    <span class="doccomment">/// ([source](https://discord.com/developers/docs/interactions/application-commands#retrieving-localized-commands)).</span>
+    <span class="kw">pub</span> <span class="ident">description_localizations</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">String</span><span class="op">&gt;</span><span class="op">&gt;</span>,
     <span class="doccomment">/// The parameters for the command.</span>
     <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">default</span>)]</span>
     <span class="kw">pub</span> <span class="ident">options</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">CommandOption</span><span class="op">&gt;</span>,
