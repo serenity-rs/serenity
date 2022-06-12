@@ -3896,7 +3896,7 @@ impl Http {
     /// let route_info = RouteInfo::CreateMessage { channel_id };
     ///
     /// let mut request = RequestBuilder::new(route_info);
-    /// request.body(Some(&bytes));
+    /// request.body(Some(bytes));
     ///
     /// let message = http.fire::<Message>(request.build()).await?;
     ///
@@ -3944,7 +3944,7 @@ impl Http {
     /// let route_info = RouteInfo::CreateMessage { channel_id };
     ///
     /// let mut request = RequestBuilder::new(route_info);
-    /// request.body(Some(&bytes));
+    /// request.body(Some(bytes));
     ///
     /// let response = http.request(request.build()).await?;
     ///
