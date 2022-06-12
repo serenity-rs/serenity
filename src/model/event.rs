@@ -9,6 +9,7 @@ use serde::de::{Error as DeError, IgnoredAny, MapAccess};
 use super::application::component::ActionRow;
 use super::prelude::*;
 use super::utils::{
+    add_guild_id_to_map,
     deserialize_val,
     emojis,
     ignore_input,
@@ -121,7 +122,7 @@ pub struct GuildBanRemoveEvent {
 }
 
 /// [Discord docs](https://discord.com/developers/docs/topics/gateway#guild-create).
-#[derive(Clone, Debug, Deserialize, Serialize)]
+#[derive(Clone, Debug, Serialize)]
 #[serde(transparent)]
 #[non_exhaustive]
 pub struct GuildCreateEvent {
@@ -129,6 +130,24 @@ pub struct GuildCreateEvent {
 }
 
 /// [Discord docs](https://discord.com/developers/docs/topics/gateway#guild-delete).
+impl<'de> Deserialize<'de> for GuildCreateEvent {
+    fn deserialize<D: Deserializer<'de>>(deserializer: D) -> StdResult<Self, D::Error> {
+        let mut value = Value::deserialize(deserializer)?;
+        let map = value.as_object_mut().ok_or_else(|| DeError::custom("expected JsonMap"))?;
+
+        let id_val = map.get("id").ok_or_else(|| DeError::missing_field("id"))?;
+        let id = deserialize_val(id_val.clone())?;
+
+        add_guild_id_to_map(map, "channels", id);
+        add_guild_id_to_map(map, "members", id);
+        add_guild_id_to_map(map, "roles", id);
+
+        deserialize_val(value).map(|guild| Self {
+            guild,
+        })
+    }
+}
+
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[serde(transparent)]
 #[non_exhaustive]
