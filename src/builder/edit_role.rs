@@ -1,5 +1,6 @@
 #[cfg(feature = "model")]
 use crate::http::Http;
+#[cfg(feature = "model")]
 use crate::internal::prelude::*;
 #[cfg(feature = "model")]
 use crate::model::channel::AttachmentType;
@@ -80,12 +81,12 @@ impl EditRole {
         EditRole {
             hoist: Some(role.hoist),
             mentionable: Some(role.mentionable),
-            name: Some(role.name),
+            name: Some(role.name.clone()),
             permissions: Some(role.permissions.bits()),
             position: Some(role.position),
             colour: Some(colour),
-            unicode_emoji: role.unicode_emoji,
-            icon: role.icon,
+            unicode_emoji: role.unicode_emoji.clone(),
+            icon: role.icon.clone(),
         }
     }
 
