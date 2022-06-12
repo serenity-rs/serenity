@@ -803,10 +803,9 @@ impl Http {
     pub async fn create_role(
         &self,
         guild_id: u64,
-        map: &JsonMap,
+        body: Vec<u8>,
         audit_log_reason: Option<&str>,
     ) -> Result<Role> {
-        let body = to_vec(map)?;
         let mut value = self
             .request(Request {
                 body: Some(body),
@@ -1838,10 +1837,9 @@ impl Http {
         &self,
         guild_id: u64,
         role_id: u64,
-        map: &JsonMap,
+        body: Vec<u8>,
         audit_log_reason: Option<&str>,
     ) -> Result<Role> {
-        let body = to_vec(&map)?;
         let mut value = self
             .request(Request {
                 body: Some(body),
