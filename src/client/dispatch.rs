@@ -5,7 +5,7 @@ use std::sync::Arc;
 use futures::channel::mpsc::UnboundedSender as Sender;
 use futures::future::{BoxFuture, FutureExt};
 use tokio::sync::RwLock;
-use tracing::instrument;
+use tracing::{instrument, warn};
 use typemap_rev::TypeMap;
 
 #[cfg(feature = "gateway")]
@@ -115,9 +115,6 @@ impl DispatchEvent {
                 update(cache_and_http, event);
             },
             Self::Model(Event::GuildStickersUpdate(ref mut event)) => {
-                update(cache_and_http, event);
-            },
-            Self::Model(Event::GuildUnavailable(ref mut event)) => {
                 update(cache_and_http, event);
             },
             // Already handled by the framework check macro
@@ -574,13 +571,6 @@ async fn handle_event(
                 event_handler.guild_stickers_update(context, event.guild_id, event.stickers).await;
             });
         },
-        Event::GuildUnavailable(mut event) => {
-            update(&cache_and_http, &mut event);
-
-            spawn_named("dispatch::event_handler::guild_unavailable", async move {
-                event_handler.guild_unavailable(context, event.guild_id).await;
-            });
-        },
         Event::GuildUpdate(mut event) => {
             spawn_named("dispatch::event_handler::guild_update", async move {
                 feature_cache! {{
@@ -681,11 +671,7 @@ async fn handle_event(
                 event_handler.typing_start(context, event).await;
             });
         },
-        Event::Unknown(event) => {
-            spawn_named("dispatch::event_handler::unknown", async move {
-                event_handler.unknown(context, event.kind, event.value).await;
-            });
-        },
+        Event::Unknown => warn!("An unknown event was received"),
         Event::UserUpdate(mut event) => {
             let _before = update(&cache_and_http, &mut event);
 
