@@ -1,4 +1,5 @@
-use crate::model::{Timestamp, id::ChannelId};
+use crate::model::id::ChannelId;
+use crate::model::Timestamp;
 
 /// A builder which edits a user's voice state, to be used in conjunction with
 /// [`GuildChannel::edit_voice_state`].
@@ -10,7 +11,7 @@ pub struct EditVoiceState {
     #[serde(skip_serializing_if = "Option::is_none")]
     suppress: Option<bool>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    request_to_speak_timestamp: Option<Option<Timestamp>>
+    request_to_speak_timestamp: Option<Option<Timestamp>>,
 }
 
 impl EditVoiceState {
