@@ -1960,9 +1960,7 @@ impl Http {
     }
 
     /// Edits a thread channel in the [`GuildChannel`] given its Id.
-    pub async fn edit_thread(&self, channel_id: u64, map: &JsonMap) -> Result<GuildChannel> {
-        let body = to_vec(map)?;
-
+    pub async fn edit_thread(&self, channel_id: u64, body: Vec<u8>) -> Result<GuildChannel> {
         self.fire(Request {
             body: Some(body),
             multipart: None,
