@@ -2007,9 +2007,7 @@ impl Http {
     /// #     Ok(())
     /// # }
     /// ```
-    pub async fn edit_voice_state(&self, guild_id: u64, user_id: u64, map: &JsonMap) -> Result<()> {
-        let body = to_vec(map)?;
-
+    pub async fn edit_voice_state(&self, guild_id: u64, user_id: u64, body: Vec<u8>) -> Result<()> {
         self.wind(204, Request {
             body: Some(body),
             multipart: None,
@@ -2057,9 +2055,7 @@ impl Http {
     /// #     Ok(())
     /// # }
     /// ```
-    pub async fn edit_voice_state_me(&self, guild_id: u64, map: &JsonMap) -> Result<()> {
-        let body = to_vec(map)?;
-
+    pub async fn edit_voice_state_me(&self, guild_id: u64, body: Vec<u8>) -> Result<()> {
         self.wind(204, Request {
             body: Some(body),
             multipart: None,

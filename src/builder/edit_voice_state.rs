@@ -1,15 +1,17 @@
-use std::collections::HashMap;
-
-use crate::internal::prelude::*;
-use crate::json;
-use crate::model::Timestamp;
+use crate::model::{Timestamp, id::ChannelId};
 
 /// A builder which edits a user's voice state, to be used in conjunction with
 /// [`GuildChannel::edit_voice_state`].
 ///
 /// [`GuildChannel::edit_voice_state`]: crate::model::channel::GuildChannel::edit_voice_state
-#[derive(Clone, Debug, Default)]
-pub struct EditVoiceState(pub HashMap<&'static str, Value>);
+#[derive(Clone, Debug, Default, Serialize)]
+pub struct EditVoiceState {
+    pub(crate) channel_id: Option<ChannelId>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    suppress: Option<bool>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    request_to_speak_timestamp: Option<Option<Timestamp>>
+}
 
 impl EditVoiceState {
     /// Whether to suppress the user. Setting this to false will invite a user
@@ -20,7 +22,7 @@ impl EditVoiceState {
     ///
     /// [Mute Members]: crate::model::permissions::Permissions::MUTE_MEMBERS
     pub fn suppress(&mut self, deafen: bool) -> &mut Self {
-        self.0.insert("suppress", Value::from(deafen));
+        self.suppress = Some(deafen);
         self
     }
 
@@ -50,12 +52,7 @@ impl EditVoiceState {
         &mut self,
         timestamp: Option<T>,
     ) -> &mut Self {
-        if let Some(timestamp) = timestamp {
-            self.0.insert("request_to_speak_timestamp", Value::from(timestamp.into().to_string()));
-        } else {
-            self.0.insert("request_to_speak_timestamp", json::NULL);
-        }
-
+        self.request_to_speak_timestamp = Some(timestamp.map(Into::into));
         self
     }
 }
