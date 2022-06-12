@@ -4,7 +4,6 @@ use async_trait::async_trait;
 
 use super::context::Context;
 use crate::client::bridge::gateway::event::*;
-use crate::json::Value;
 use crate::model::application::command::CommandPermission;
 use crate::model::application::interaction::Interaction;
 use crate::model::prelude::*;
@@ -259,11 +258,6 @@ pub trait EventHandler: Send + Sync {
     ) {
     }
 
-    /// Dispatched when a guild became unavailable.
-    ///
-    /// Provides the guild's id.
-    async fn guild_unavailable(&self, _ctx: Context, _guild_id: GuildId) {}
-
     /// Dispatched when the guild is updated.
     ///
     /// Provides the guild's old full data (if available) and the new, albeit partial data.
@@ -389,11 +383,6 @@ pub trait EventHandler: Send + Sync {
 
     /// Dispatched when a user starts typing.
     async fn typing_start(&self, _ctx: Context, _: TypingStartEvent) {}
-
-    /// Dispatched when an unknown event was sent from discord.
-    ///
-    /// Provides the event's name and its unparsed data.
-    async fn unknown(&self, _ctx: Context, _name: String, _raw: Value) {}
 
     /// Dispatched when the bot's data is updated.
     ///
