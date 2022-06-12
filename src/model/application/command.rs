@@ -295,8 +295,14 @@ pub struct CommandOption {
     pub kind: CommandOptionType,
     /// The option name.
     pub name: String,
+    /// Localizations of the option name with locale as the key
+    #[serde(default)]
+    pub name_localizations: std::collections::HashMap<String, String>,
     /// The option description.
     pub description: String,
+    /// Localizations of the option description with locale as the key
+    #[serde(default)]
+    pub description_localizations: std::collections::HashMap<String, String>,
     /// Whether the parameter is optional or required.
     #[serde(default)]
     pub required: bool,
@@ -368,6 +374,9 @@ enum_number!(CommandOptionType {
 pub struct CommandOptionChoice {
     /// The choice name.
     pub name: String,
+    /// Localizations of the choice name, with locale as key
+    #[serde(default)]
+    pub name_localizations: std::collections::HashMap<String, String>,
     /// The choice value.
     pub value: Value,
 }
