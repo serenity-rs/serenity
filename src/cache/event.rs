@@ -18,7 +18,6 @@ use crate::model::event::{
     GuildRoleDeleteEvent,
     GuildRoleUpdateEvent,
     GuildStickersUpdateEvent,
-    GuildUnavailableEvent,
     GuildUpdateEvent,
     MessageCreateEvent,
     MessageUpdateEvent,
@@ -214,6 +213,13 @@ impl CacheUpdate for GuildDeleteEvent {
     type Output = Guild;
 
     fn update(&mut self, cache: &Cache) -> Option<Self::Output> {
+        if self.guild.unavailable {
+            cache.unavailable_guilds.insert(self.guild.id);
+            cache.guilds.remove(&self.guild.id);
+
+            return None;
+        }
+
         match cache.guilds.remove(&self.guild.id) {
             Some(guild) => {
                 for (channel_id, channel) in &guild.1.channels {
@@ -392,17 +398,6 @@ impl CacheUpdate for GuildStickersUpdateEvent {
         if let Some(mut guild) = cache.guilds.get_mut(&self.guild_id) {
             guild.stickers.clone_from(&self.stickers);
         }
-
-        None
-    }
-}
-
-impl CacheUpdate for GuildUnavailableEvent {
-    type Output = ();
-
-    fn update(&mut self, cache: &Cache) -> Option<()> {
-        cache.unavailable_guilds.insert(self.guild_id);
-        cache.guilds.remove(&self.guild_id);
 
         None
     }

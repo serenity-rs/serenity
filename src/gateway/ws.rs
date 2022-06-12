@@ -16,6 +16,7 @@ use crate::client::bridge::gateway::ChunkGuildFilter;
 use crate::constants::{self, OpCode};
 use crate::gateway::{CurrentPresence, GatewayError};
 use crate::json::{from_str, json, to_string, Value};
+use crate::model::event::GatewayEvent;
 use crate::model::gateway::GatewayIntents;
 use crate::model::id::GuildId;
 use crate::{Error, Result};
@@ -38,7 +39,7 @@ impl WsClient {
         Ok(Self(stream))
     }
 
-    pub(crate) async fn recv_json(&mut self) -> Result<Option<Value>> {
+    pub(crate) async fn recv_json(&mut self) -> Result<Option<GatewayEvent>> {
         let message = match timeout(TIMEOUT, self.0.next()).await {
             Ok(Some(Ok(msg))) => msg,
             Ok(Some(Err(e))) => return Err(e.into()),
