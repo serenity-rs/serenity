@@ -24,6 +24,8 @@ use crate::model::id::{
 use crate::model::Permissions;
 
 /// The base command model that belongs to an application.
+///
+/// [Discord docs](https://discord.com/developers/docs/interactions/application-commands#application-command-object-application-command-structure).
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 pub struct Command {
@@ -270,6 +272,8 @@ impl Command {
 }
 
 /// The type of an application command.
+///
+/// [Discord docs](https://discord.com/developers/docs/interactions/application-commands#application-command-object-application-command-types).
 #[derive(Copy, Clone, Debug, Hash, Eq, PartialEq, PartialOrd, Ord)]
 #[non_exhaustive]
 #[repr(u8)]
@@ -287,6 +291,8 @@ enum_number!(CommandType {
 });
 
 /// The parameters for an [`Command`].
+///
+/// [Discord docs](https://discord.com/developers/docs/interactions/application-commands#application-command-object-application-command-option-structure).
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 pub struct CommandOption {
@@ -333,9 +339,13 @@ pub struct CommandOption {
     /// Maximum permitted value for Integer or Number options
     #[serde(default)]
     pub max_value: Option<serde_json::Number>,
+    #[serde(default)]
+    pub autocomplete: bool,
 }
 
 /// The type of an [`CommandOption`].
+///
+/// [Discord docs](https://discord.com/developers/docs/interactions/application-commands#application-command-object-application-command-option-type).
 #[derive(Copy, Clone, Debug, Hash, Eq, PartialEq, PartialOrd, Ord)]
 #[non_exhaustive]
 #[repr(u8)]
@@ -369,6 +379,8 @@ enum_number!(CommandOptionType {
 });
 
 /// The only valid values a user can pick in an [`CommandOption`].
+///
+/// [Discord docs](https://discord.com/developers/docs/interactions/application-commands#application-command-object-application-command-option-choice-structure).
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 pub struct CommandOptionChoice {
@@ -382,6 +394,8 @@ pub struct CommandOptionChoice {
 }
 
 /// An [`Command`] permission.
+///
+/// [Discord docs](https://discord.com/developers/docs/interactions/application-commands#application-command-permissions-object-guild-application-command-permissions-structure).
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 pub struct CommandPermission {
@@ -396,6 +410,8 @@ pub struct CommandPermission {
 }
 
 /// The [`CommandPermission`] data.
+///
+/// [Discord docs](https://discord.com/developers/docs/interactions/application-commands#application-command-permissions-object-application-command-permissions-structure).
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 pub struct CommandPermissionData {
@@ -409,6 +425,8 @@ pub struct CommandPermissionData {
 }
 
 /// The type of an [`CommandPermissionData`].
+///
+/// [Discord docs](https://discord.com/developers/docs/interactions/application-commands#application-command-permissions-object-application-command-permission-type).
 #[derive(Copy, Clone, Debug, Hash, Eq, PartialEq, PartialOrd, Ord)]
 #[non_exhaustive]
 #[repr(u8)]

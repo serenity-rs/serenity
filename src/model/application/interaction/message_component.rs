@@ -25,6 +25,8 @@ use crate::model::id::{ApplicationId, ChannelId, GuildId, InteractionId};
 use crate::model::user::User;
 
 /// An interaction triggered by a message component.
+///
+/// [Discord docs](https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-object-interaction-structure).
 #[derive(Clone, Debug, Serialize)]
 #[non_exhaustive]
 pub struct MessageComponentInteraction {
@@ -37,9 +39,6 @@ pub struct MessageComponentInteraction {
     pub kind: InteractionType,
     /// The data of the interaction which was triggered.
     pub data: MessageComponentInteractionData,
-    /// The message this interaction was triggered by, if
-    /// it is a component.
-    pub message: Message,
     /// The guild Id this interaction was sent from, if there is one.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub guild_id: Option<GuildId>,
@@ -56,10 +55,13 @@ pub struct MessageComponentInteraction {
     pub token: String,
     /// Always `1`.
     pub version: u8,
-    /// The guild's preferred locale.
-    pub guild_locale: Option<String>,
+    /// The message this interaction was triggered by, if
+    /// it is a component.
+    pub message: Message,
     /// The selected language of the invoking user.
     pub locale: String,
+    /// The guild's preferred locale.
+    pub guild_locale: Option<String>,
 }
 
 #[cfg(feature = "http")]
@@ -414,6 +416,8 @@ impl<'de> Deserialize<'de> for MessageComponentInteraction {
 }
 
 /// A message component interaction data, provided by [`MessageComponentInteraction::data`]
+///
+/// [Discord docs](https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-object-interaction-data-structure).
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 pub struct MessageComponentInteractionData {
