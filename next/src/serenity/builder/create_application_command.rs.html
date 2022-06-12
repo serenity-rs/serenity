@@ -451,6 +451,14 @@
 <span id="446">446</span>
 <span id="447">447</span>
 <span id="448">448</span>
+<span id="449">449</span>
+<span id="450">450</span>
+<span id="451">451</span>
+<span id="452">452</span>
+<span id="453">453</span>
+<span id="454">454</span>
+<span id="455">455</span>
+<span id="456">456</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::collections::HashMap</span>;
 
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::json</span>;
@@ -494,13 +502,17 @@
     <span class="doccomment">/// # ;</span>
     <span class="doccomment">/// ```</span>
     <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::default_trait_access</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">name_localized</span><span class="op">&lt;</span><span class="ident">D</span>: <span class="ident">ToString</span>, <span class="ident">E</span>: <span class="ident">ToString</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">locale</span>: <span class="ident">E</span>, <span class="ident">name</span>: <span class="ident">D</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">name_localized</span>(
+        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
+        <span class="ident">locale</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
+        <span class="ident">name</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
+    ) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
         <span class="self">self</span>.<span class="number">0</span>
             .<span class="ident">entry</span>(<span class="string">&quot;name_localizations&quot;</span>)
             .<span class="ident">or_insert_with</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">Value::Object</span>(<span class="ident">Default::default</span>()))
             .<span class="ident">as_object_mut</span>()
             .<span class="ident">expect</span>(<span class="string">&quot;must be object&quot;</span>)
-            .<span class="ident">insert</span>(<span class="ident">locale</span>.<span class="ident">to_string</span>(), <span class="ident">Value::String</span>(<span class="ident">name</span>.<span class="ident">to_string</span>()));
+            .<span class="ident">insert</span>(<span class="ident">locale</span>.<span class="ident">into</span>(), <span class="ident">Value::String</span>(<span class="ident">name</span>.<span class="ident">into</span>()));
         <span class="self">self</span>
     }
 
@@ -521,17 +533,17 @@
     <span class="doccomment">/// # ;</span>
     <span class="doccomment">/// ```</span>
     <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::default_trait_access</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">description_localized</span><span class="op">&lt;</span><span class="ident">D</span>: <span class="ident">ToString</span>, <span class="ident">E</span>: <span class="ident">ToString</span><span class="op">&gt;</span>(
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">description_localized</span>(
         <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
-        <span class="ident">locale</span>: <span class="ident">E</span>,
-        <span class="ident">description</span>: <span class="ident">D</span>,
+        <span class="ident">locale</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
+        <span class="ident">description</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
     ) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
         <span class="self">self</span>.<span class="number">0</span>
             .<span class="ident">entry</span>(<span class="string">&quot;description_localizations&quot;</span>)
             .<span class="ident">or_insert_with</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">Value::Object</span>(<span class="ident">Default::default</span>()))
             .<span class="ident">as_object_mut</span>()
             .<span class="ident">expect</span>(<span class="string">&quot;must be object&quot;</span>)
-            .<span class="ident">insert</span>(<span class="ident">locale</span>.<span class="ident">to_string</span>(), <span class="ident">Value::String</span>(<span class="ident">description</span>.<span class="ident">to_string</span>()));
+            .<span class="ident">insert</span>(<span class="ident">locale</span>.<span class="ident">into</span>(), <span class="ident">Value::String</span>(<span class="ident">description</span>.<span class="ident">into</span>()));
         <span class="self">self</span>
     }
 
@@ -563,17 +575,17 @@
     }
 
     <span class="doccomment">/// Adds a localized optional int-choice. See [`Self::add_int_choice`] for more info.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">add_int_choice_localized</span><span class="op">&lt;</span><span class="ident">L</span>: <span class="ident">ToString</span>, <span class="ident">D</span>: <span class="ident">ToString</span><span class="op">&gt;</span>(
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">add_int_choice_localized</span>(
         <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
-        <span class="ident">name</span>: <span class="ident">D</span>,
+        <span class="ident">name</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
         <span class="ident">value</span>: <span class="ident">i32</span>,
-        <span class="ident">locales</span>: <span class="kw">impl</span> <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> (<span class="ident">L</span>, <span class="ident">D</span>)<span class="op">&gt;</span>,
+        <span class="ident">locales</span>: <span class="kw">impl</span> <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> (<span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>, <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>)<span class="op">&gt;</span>,
     ) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
         <span class="kw">let</span> <span class="ident">choice</span> <span class="op">=</span> <span class="macro">json!</span>({
-            <span class="string">&quot;name&quot;</span>: <span class="ident">name</span>.<span class="ident">to_string</span>(),
+            <span class="string">&quot;name&quot;</span>: <span class="ident">name</span>.<span class="ident">into</span>(),
             <span class="string">&quot;name_localizations&quot;</span>: <span class="ident">locales</span>
                 .<span class="ident">into_iter</span>()
-                .<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">locale</span>, <span class="ident">name</span>)<span class="op">|</span> (<span class="ident">locale</span>.<span class="ident">to_string</span>(), <span class="ident">name</span>.<span class="ident">to_string</span>()))
+                .<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">locale</span>, <span class="ident">name</span>)<span class="op">|</span> (<span class="ident">locale</span>.<span class="ident">into</span>(), <span class="ident">name</span>.<span class="ident">into</span>()))
                 .<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Value</span><span class="op">&gt;</span>(),
             <span class="string">&quot;value&quot;</span> : <span class="ident">value</span>,
         });
@@ -596,19 +608,19 @@
     }
 
     <span class="doccomment">/// Adds a localized optional string-choice. See [`Self::add_string_choice`] for more info.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">add_string_choice_localized</span><span class="op">&lt;</span><span class="ident">L</span>: <span class="ident">ToString</span>, <span class="ident">D</span>: <span class="ident">ToString</span>, <span class="ident">E</span>: <span class="ident">ToString</span><span class="op">&gt;</span>(
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">add_string_choice_localized</span>(
         <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
-        <span class="ident">name</span>: <span class="ident">D</span>,
-        <span class="ident">value</span>: <span class="ident">E</span>,
-        <span class="ident">locales</span>: <span class="kw">impl</span> <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> (<span class="ident">L</span>, <span class="ident">D</span>)<span class="op">&gt;</span>,
+        <span class="ident">name</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
+        <span class="ident">value</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
+        <span class="ident">locales</span>: <span class="kw">impl</span> <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> (<span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>, <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>)<span class="op">&gt;</span>,
     ) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
         <span class="kw">let</span> <span class="ident">choice</span> <span class="op">=</span> <span class="macro">json!</span>({
-            <span class="string">&quot;name&quot;</span>: <span class="ident">name</span>.<span class="ident">to_string</span>(),
+            <span class="string">&quot;name&quot;</span>: <span class="ident">name</span>.<span class="ident">into</span>(),
             <span class="string">&quot;name_localizations&quot;</span>: <span class="ident">locales</span>
                 .<span class="ident">into_iter</span>()
-                .<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">locale</span>, <span class="ident">name</span>)<span class="op">|</span> (<span class="ident">locale</span>.<span class="ident">to_string</span>(), <span class="ident">name</span>.<span class="ident">to_string</span>()))
+                .<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">locale</span>, <span class="ident">name</span>)<span class="op">|</span> (<span class="ident">locale</span>.<span class="ident">into</span>(), <span class="ident">name</span>.<span class="ident">into</span>()))
                 .<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Value</span><span class="op">&gt;</span>(),
-            <span class="string">&quot;value&quot;</span>: <span class="ident">value</span>.<span class="ident">to_string</span>(),
+            <span class="string">&quot;value&quot;</span>: <span class="ident">value</span>.<span class="ident">into</span>(),
         });
         <span class="self">self</span>.<span class="ident">add_choice</span>(<span class="ident">choice</span>)
     }
@@ -625,17 +637,17 @@
     }
 
     <span class="doccomment">/// Adds a localized optional number-choice. See [`Self::add_number_choice`] for more info.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">add_number_choice_localized</span><span class="op">&lt;</span><span class="ident">L</span>: <span class="ident">ToString</span>, <span class="ident">D</span>: <span class="ident">ToString</span><span class="op">&gt;</span>(
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">add_number_choice_localized</span>(
         <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
-        <span class="ident">name</span>: <span class="ident">D</span>,
+        <span class="ident">name</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
         <span class="ident">value</span>: <span class="ident">f64</span>,
-        <span class="ident">locales</span>: <span class="kw">impl</span> <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> (<span class="ident">L</span>, <span class="ident">D</span>)<span class="op">&gt;</span>,
+        <span class="ident">locales</span>: <span class="kw">impl</span> <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> (<span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>, <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>)<span class="op">&gt;</span>,
     ) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
         <span class="kw">let</span> <span class="ident">choice</span> <span class="op">=</span> <span class="macro">json!</span>({
-            <span class="string">&quot;name&quot;</span>: <span class="ident">name</span>.<span class="ident">to_string</span>(),
+            <span class="string">&quot;name&quot;</span>: <span class="ident">name</span>.<span class="ident">into</span>(),
             <span class="string">&quot;name_localizations&quot;</span>: <span class="ident">locales</span>
                 .<span class="ident">into_iter</span>()
-                .<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">locale</span>, <span class="ident">name</span>)<span class="op">|</span> (<span class="ident">locale</span>.<span class="ident">to_string</span>(), <span class="ident">name</span>.<span class="ident">to_string</span>()))
+                .<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">locale</span>, <span class="ident">name</span>)<span class="op">|</span> (<span class="ident">locale</span>.<span class="ident">into</span>(), <span class="ident">name</span>.<span class="ident">into</span>()))
                 .<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Value</span><span class="op">&gt;</span>(),
             <span class="string">&quot;value&quot;</span> : <span class="ident">value</span>,
         });
@@ -759,13 +771,17 @@
     <span class="doccomment">/// # ;</span>
     <span class="doccomment">/// ```</span>
     <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::default_trait_access</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">name_localized</span><span class="op">&lt;</span><span class="ident">D</span>: <span class="ident">ToString</span>, <span class="ident">E</span>: <span class="ident">ToString</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">locale</span>: <span class="ident">E</span>, <span class="ident">name</span>: <span class="ident">D</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">name_localized</span>(
+        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
+        <span class="ident">locale</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
+        <span class="ident">name</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
+    ) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
         <span class="self">self</span>.<span class="number">0</span>
             .<span class="ident">entry</span>(<span class="string">&quot;name_localizations&quot;</span>)
             .<span class="ident">or_insert_with</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">Value::Object</span>(<span class="ident">Default::default</span>()))
             .<span class="ident">as_object_mut</span>()
             .<span class="ident">expect</span>(<span class="string">&quot;must be object&quot;</span>)
-            .<span class="ident">insert</span>(<span class="ident">locale</span>.<span class="ident">to_string</span>(), <span class="ident">Value::String</span>(<span class="ident">name</span>.<span class="ident">to_string</span>()));
+            .<span class="ident">insert</span>(<span class="ident">locale</span>.<span class="ident">into</span>(), <span class="ident">Value::String</span>(<span class="ident">name</span>.<span class="ident">into</span>()));
         <span class="self">self</span>
     }
 
@@ -806,17 +822,17 @@
     <span class="doccomment">/// # ;</span>
     <span class="doccomment">/// ```</span>
     <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::default_trait_access</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">description_localized</span><span class="op">&lt;</span><span class="ident">D</span>: <span class="ident">ToString</span>, <span class="ident">E</span>: <span class="ident">ToString</span><span class="op">&gt;</span>(
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">description_localized</span>(
         <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
-        <span class="ident">locale</span>: <span class="ident">E</span>,
-        <span class="ident">description</span>: <span class="ident">D</span>,
+        <span class="ident">locale</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
+        <span class="ident">description</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
     ) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
         <span class="self">self</span>.<span class="number">0</span>
             .<span class="ident">entry</span>(<span class="string">&quot;description_localizations&quot;</span>)
             .<span class="ident">or_insert_with</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">Value::Object</span>(<span class="ident">Default::default</span>()))
             .<span class="ident">as_object_mut</span>()
             .<span class="ident">expect</span>(<span class="string">&quot;must be object&quot;</span>)
-            .<span class="ident">insert</span>(<span class="ident">locale</span>.<span class="ident">to_string</span>(), <span class="ident">Value::String</span>(<span class="ident">description</span>.<span class="ident">to_string</span>()));
+            .<span class="ident">insert</span>(<span class="ident">locale</span>.<span class="ident">into</span>(), <span class="ident">Value::String</span>(<span class="ident">description</span>.<span class="ident">into</span>()));
         <span class="self">self</span>
     }
 
