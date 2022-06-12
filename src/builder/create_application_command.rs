@@ -41,13 +41,17 @@ impl CreateApplicationCommandOption {
     /// # ;
     /// ```
     #[allow(clippy::default_trait_access)]
-    pub fn name_localized<D: ToString, E: ToString>(&mut self, locale: E, name: D) -> &mut Self {
+    pub fn name_localized(
+        &mut self,
+        locale: impl Into<String>,
+        name: impl Into<String>,
+    ) -> &mut Self {
         self.0
             .entry("name_localizations")
             .or_insert_with(|| Value::Object(Default::default()))
             .as_object_mut()
             .expect("must be object")
-            .insert(locale.to_string(), Value::String(name.to_string()));
+            .insert(locale.into(), Value::String(name.into()));
         self
     }
 
@@ -68,17 +72,17 @@ impl CreateApplicationCommandOption {
     /// # ;
     /// ```
     #[allow(clippy::default_trait_access)]
-    pub fn description_localized<D: ToString, E: ToString>(
+    pub fn description_localized(
         &mut self,
-        locale: E,
-        description: D,
+        locale: impl Into<String>,
+        description: impl Into<String>,
     ) -> &mut Self {
         self.0
             .entry("description_localizations")
             .or_insert_with(|| Value::Object(Default::default()))
             .as_object_mut()
             .expect("must be object")
-            .insert(locale.to_string(), Value::String(description.to_string()));
+            .insert(locale.into(), Value::String(description.into()));
         self
     }
 
@@ -110,17 +114,17 @@ impl CreateApplicationCommandOption {
     }
 
     /// Adds a localized optional int-choice. See [`Self::add_int_choice`] for more info.
-    pub fn add_int_choice_localized<L: ToString, D: ToString>(
+    pub fn add_int_choice_localized(
         &mut self,
-        name: D,
+        name: impl Into<String>,
         value: i32,
-        locales: impl IntoIterator<Item = (L, D)>,
+        locales: impl IntoIterator<Item = (impl Into<String>, impl Into<String>)>,
     ) -> &mut Self {
         let choice = json!({
-            "name": name.to_string(),
+            "name": name.into(),
             "name_localizations": locales
                 .into_iter()
-                .map(|(locale, name)| (locale.to_string(), name.to_string()))
+                .map(|(locale, name)| (locale.into(), name.into()))
                 .collect::<Value>(),
             "value" : value,
         });
@@ -143,19 +147,19 @@ impl CreateApplicationCommandOption {
     }
 
     /// Adds a localized optional string-choice. See [`Self::add_string_choice`] for more info.
-    pub fn add_string_choice_localized<L: ToString, D: ToString, E: ToString>(
+    pub fn add_string_choice_localized(
         &mut self,
-        name: D,
-        value: E,
-        locales: impl IntoIterator<Item = (L, D)>,
+        name: impl Into<String>,
+        value: impl Into<String>,
+        locales: impl IntoIterator<Item = (impl Into<String>, impl Into<String>)>,
     ) -> &mut Self {
         let choice = json!({
-            "name": name.to_string(),
+            "name": name.into(),
             "name_localizations": locales
                 .into_iter()
-                .map(|(locale, name)| (locale.to_string(), name.to_string()))
+                .map(|(locale, name)| (locale.into(), name.into()))
                 .collect::<Value>(),
-            "value": value.to_string(),
+            "value": value.into(),
         });
         self.add_choice(choice)
     }
@@ -172,17 +176,17 @@ impl CreateApplicationCommandOption {
     }
 
     /// Adds a localized optional number-choice. See [`Self::add_number_choice`] for more info.
-    pub fn add_number_choice_localized<L: ToString, D: ToString>(
+    pub fn add_number_choice_localized(
         &mut self,
-        name: D,
+        name: impl Into<String>,
         value: f64,
-        locales: impl IntoIterator<Item = (L, D)>,
+        locales: impl IntoIterator<Item = (impl Into<String>, impl Into<String>)>,
     ) -> &mut Self {
         let choice = json!({
-            "name": name.to_string(),
+            "name": name.into(),
             "name_localizations": locales
                 .into_iter()
-                .map(|(locale, name)| (locale.to_string(), name.to_string()))
+                .map(|(locale, name)| (locale.into(), name.into()))
                 .collect::<Value>(),
             "value" : value,
         });
@@ -306,13 +310,17 @@ impl CreateApplicationCommand {
     /// # ;
     /// ```
     #[allow(clippy::default_trait_access)]
-    pub fn name_localized<D: ToString, E: ToString>(&mut self, locale: E, name: D) -> &mut Self {
+    pub fn name_localized(
+        &mut self,
+        locale: impl Into<String>,
+        name: impl Into<String>,
+    ) -> &mut Self {
         self.0
             .entry("name_localizations")
             .or_insert_with(|| Value::Object(Default::default()))
             .as_object_mut()
             .expect("must be object")
-            .insert(locale.to_string(), Value::String(name.to_string()));
+            .insert(locale.into(), Value::String(name.into()));
         self
     }
 
@@ -353,17 +361,17 @@ impl CreateApplicationCommand {
     /// # ;
     /// ```
     #[allow(clippy::default_trait_access)]
-    pub fn description_localized<D: ToString, E: ToString>(
+    pub fn description_localized(
         &mut self,
-        locale: E,
-        description: D,
+        locale: impl Into<String>,
+        description: impl Into<String>,
     ) -> &mut Self {
         self.0
             .entry("description_localizations")
             .or_insert_with(|| Value::Object(Default::default()))
             .as_object_mut()
             .expect("must be object")
-            .insert(locale.to_string(), Value::String(description.to_string()));
+            .insert(locale.into(), Value::String(description.into()));
         self
     }
 
