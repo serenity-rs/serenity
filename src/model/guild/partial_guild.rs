@@ -31,11 +31,17 @@ use crate::collector::{
 #[cfg(feature = "model")]
 use crate::http::{CacheHttp, Http};
 use crate::json::prelude::*;
-use crate::json::{from_number, from_value};
 #[cfg(feature = "model")]
 use crate::model::application::command::{Command, CommandPermission};
 use crate::model::prelude::*;
-use crate::model::utils::{emojis, roles, stickers};
+use crate::model::utils::{
+    add_guild_id_to_map,
+    emojis,
+    remove_from_map,
+    remove_from_map_opt,
+    roles,
+    stickers,
+};
 
 /// Partial information about a [`Guild`]. This does not include information
 /// like member data.
@@ -1562,88 +1568,22 @@ impl<'de> Deserialize<'de> for PartialGuild {
     fn deserialize<D: Deserializer<'de>>(deserializer: D) -> StdResult<Self, D::Error> {
         let mut map = JsonMap::deserialize(deserializer)?;
 
-        let id = map.get("id").and_then(Value::as_str).and_then(|x| x.parse::<u64>().ok());
+        let id = remove_from_map(&mut map, "id")?;
 
-        if let Some(guild_id) = id {
-            if let Some(array) = map.get_mut("roles").and_then(Value::as_array_mut) {
-                for value in array {
-                    if let Some(role) = value.as_object_mut() {
-                        role.insert("guild_id".to_string(), from_number(guild_id));
-                    }
-                }
-            }
-        }
+        add_guild_id_to_map(&mut map, "roles", id);
 
-        let afk_channel_id = match map.remove("afk_channel_id") {
-            Some(v) => from_value::<Option<ChannelId>>(v).map_err(DeError::custom)?,
-            None => None,
-        };
-        let afk_timeout = map
-            .remove("afk_timeout")
-            .ok_or_else(|| DeError::custom("expected guild afk_timeout"))
-            .and_then(u64::deserialize)
-            .map_err(DeError::custom)?;
-        let default_message_notifications = map
-            .remove("default_message_notifications")
-            .ok_or_else(|| DeError::custom("expected guild default_message_notifications"))
-            .and_then(DefaultMessageNotificationLevel::deserialize)
-            .map_err(DeError::custom)?;
         let emojis = map
             .remove("emojis")
             .ok_or_else(|| DeError::custom("expected guild emojis"))
             .and_then(emojis::deserialize)
             .map_err(DeError::custom)?;
-        let features = map
-            .remove("features")
-            .ok_or(Error::Other("expected guild features"))
-            .and_then(from_value::<Vec<String>>)
-            .map_err(DeError::custom)?;
-        let icon = match map.remove("icon") {
-            Some(v) => Option::<String>::deserialize(v).map_err(DeError::custom)?,
-            None => None,
-        };
-        let id = map
-            .remove("id")
-            .ok_or_else(|| DeError::custom("expected guild id"))
-            .and_then(GuildId::deserialize)
-            .map_err(DeError::custom)?;
-        let mfa_level = map
-            .remove("mfa_level")
-            .ok_or_else(|| DeError::custom("expected guild mfa_level"))
-            .and_then(MfaLevel::deserialize)
-            .map_err(DeError::custom)?;
-        let name = map
-            .remove("name")
-            .ok_or_else(|| DeError::custom("expected guild name"))
-            .and_then(String::deserialize)
-            .map_err(DeError::custom)?;
-        let owner_id = map
-            .remove("owner_id")
-            .ok_or_else(|| DeError::custom("expected guild owner_id"))
-            .and_then(UserId::deserialize)
-            .map_err(DeError::custom)?;
+
         let roles = map
             .remove("roles")
             .ok_or_else(|| DeError::custom("expected guild roles"))
             .and_then(roles::deserialize)
             .map_err(DeError::custom)?;
-        let splash = match map.remove("splash") {
-            Some(v) => Option::<String>::deserialize(v).map_err(DeError::custom)?,
-            None => None,
-        };
-        let verification_level = map
-            .remove("verification_level")
-            .ok_or_else(|| DeError::custom("expected guild verification_level"))
-            .and_then(VerificationLevel::deserialize)
-            .map_err(DeError::custom)?;
-        let description = match map.remove("description") {
-            Some(v) => Option::<String>::deserialize(v).map_err(DeError::custom)?,
-            None => None,
-        };
-        let premium_tier = match map.remove("premium_tier") {
-            Some(v) => PremiumTier::deserialize(v).map_err(DeError::custom)?,
-            None => PremiumTier::default(),
-        };
+
         let premium_subscription_count = match map.remove("premium_subscription_count") {
             #[cfg(not(feature = "simd-json"))]
             Some(Value::Null) | None => 0,
@@ -1651,104 +1591,6 @@ impl<'de> Deserialize<'de> for PartialGuild {
             Some(Value::Static(StaticNode::Null)) | None => 0,
             Some(v) => u64::deserialize(v).map_err(DeError::custom)?,
         };
-        let banner = match map.remove("banner") {
-            Some(v) => Option::<String>::deserialize(v).map_err(DeError::custom)?,
-            None => None,
-        };
-        let vanity_url_code = match map.remove("vanity_url_code") {
-            Some(v) => Option::<String>::deserialize(v).map_err(DeError::custom)?,
-            None => None,
-        };
-        let system_channel_id = match map.remove("system_channel_id") {
-            Some(v) => Option::<ChannelId>::deserialize(v).map_err(DeError::custom)?,
-            None => None,
-        };
-
-        let approximate_member_count = map
-            .remove("approximate_member_count")
-            .map(u64::deserialize)
-            .transpose()
-            .map_err(DeError::custom)?;
-
-        let approximate_presence_count = map
-            .remove("approximate_presence_count")
-            .map(u64::deserialize)
-            .transpose()
-            .map_err(DeError::custom)?;
-
-        let owner = map
-            .remove("owner")
-            .map(bool::deserialize)
-            .transpose()
-            .map_err(DeError::custom)?
-            .unwrap_or_default();
-
-        let nsfw_level = map
-            .remove("nsfw_level")
-            .ok_or_else(|| DeError::custom("expected nsfw_level"))
-            .and_then(NsfwLevel::deserialize)
-            .map_err(DeError::custom)?;
-
-        let max_video_channel_users = map
-            .remove("max_video_channel_users")
-            .map(u64::deserialize)
-            .transpose()
-            .map_err(DeError::custom)?;
-
-        let max_presences = match map.remove("max_presences") {
-            Some(v) => Option::<u64>::deserialize(v).map_err(DeError::custom)?,
-            None => None,
-        };
-
-        let max_members =
-            map.remove("max_members").map(u64::deserialize).transpose().map_err(DeError::custom)?;
-
-        let discovery_splash = match map.remove("discovery_splash") {
-            Some(v) => Option::<String>::deserialize(v).map_err(DeError::custom)?,
-            None => None,
-        };
-
-        let application_id = match map.remove("application_id") {
-            Some(v) => Option::<ApplicationId>::deserialize(v).map_err(DeError::custom)?,
-            None => None,
-        };
-
-        let public_updates_channel_id = match map.remove("public_updates_channel_id") {
-            Some(v) => Option::<ChannelId>::deserialize(v).map_err(DeError::custom)?,
-            None => None,
-        };
-
-        let system_channel_flags = map
-            .remove("system_channel_flags")
-            .ok_or_else(|| DeError::custom("expected system_channel_flags"))
-            .and_then(SystemChannelFlags::deserialize)
-            .map_err(DeError::custom)?;
-
-        let rules_channel_id = match map.remove("rules_channel_id") {
-            Some(v) => Option::<ChannelId>::deserialize(v).map_err(DeError::custom)?,
-            None => None,
-        };
-
-        let widget_enabled = match map.remove("widget_enabled") {
-            Some(v) => Option::<bool>::deserialize(v).map_err(DeError::custom)?,
-            None => None,
-        };
-
-        let widget_channel_id = match map.remove("widget_channel_id") {
-            Some(v) => Option::<ChannelId>::deserialize(v).map_err(DeError::custom)?,
-            None => None,
-        };
-
-        let permissions = match map.remove("permissions") {
-            Some(v) => Option::<String>::deserialize(v).map_err(DeError::custom)?,
-            None => None,
-        };
-
-        let welcome_screen = map
-            .remove("welcome_screen")
-            .map(GuildWelcomeScreen::deserialize)
-            .transpose()
-            .map_err(DeError::custom)?;
 
         let stickers = map
             .remove("stickers")
@@ -1757,42 +1599,49 @@ impl<'de> Deserialize<'de> for PartialGuild {
             .map_err(DeError::custom)?;
 
         Ok(Self {
-            application_id,
             id,
-            afk_channel_id,
-            afk_timeout,
-            default_message_notifications,
-            widget_enabled,
-            widget_channel_id,
             emojis,
-            features,
-            icon,
-            mfa_level,
-            name,
-            owner_id,
-            owner,
             roles,
-            splash,
-            discovery_splash,
-            system_channel_id,
-            system_channel_flags,
-            rules_channel_id,
-            public_updates_channel_id,
-            verification_level,
-            description,
-            premium_tier,
             premium_subscription_count,
-            banner,
-            vanity_url_code,
-            welcome_screen,
-            approximate_member_count,
-            approximate_presence_count,
-            nsfw_level,
-            max_video_channel_users,
-            max_presences,
-            max_members,
-            permissions,
             stickers,
+            afk_channel_id: remove_from_map_opt(&mut map, "afk_channel_id")?.flatten(),
+            afk_timeout: remove_from_map(&mut map, "afk_timeout")?,
+            application_id: remove_from_map_opt(&mut map, "application_id")?.flatten(),
+            default_message_notifications: remove_from_map(
+                &mut map,
+                "default_message_notifications",
+            )?,
+            features: remove_from_map(&mut map, "features")?,
+            widget_enabled: remove_from_map_opt(&mut map, "widget_enabled")?.flatten(),
+            widget_channel_id: remove_from_map_opt(&mut map, "widget_channel_id")?.flatten(),
+            icon: remove_from_map_opt(&mut map, "icon")?.flatten(),
+            mfa_level: remove_from_map(&mut map, "mfa_level")?,
+            name: remove_from_map(&mut map, "name")?,
+            owner_id: remove_from_map(&mut map, "owner_id")?,
+            owner: remove_from_map_opt(&mut map, "owner")?.unwrap_or_default(),
+            splash: remove_from_map_opt(&mut map, "splash")?.flatten(),
+            discovery_splash: remove_from_map_opt(&mut map, "discovery_splash")?.flatten(),
+            system_channel_id: remove_from_map_opt(&mut map, "system_channel_id")?.flatten(),
+            system_channel_flags: remove_from_map(&mut map, "system_channel_flags")?,
+            rules_channel_id: remove_from_map_opt(&mut map, "rules_channel_id")?.flatten(),
+            public_updates_channel_id: remove_from_map_opt(&mut map, "public_updates_channel_id")?
+                .flatten(),
+            verification_level: remove_from_map(&mut map, "verification_level")?,
+            description: remove_from_map_opt(&mut map, "description")?.flatten(),
+            premium_tier: remove_from_map_opt(&mut map, "premium_tier")?.unwrap_or_default(),
+            banner: remove_from_map_opt(&mut map, "banner")?.flatten(),
+            vanity_url_code: remove_from_map_opt(&mut map, "vanity_url_code")?.flatten(),
+            welcome_screen: remove_from_map_opt(&mut map, "welcome_screen")?,
+            approximate_member_count: remove_from_map_opt(&mut map, "approximate_member_count")?,
+            approximate_presence_count: remove_from_map_opt(
+                &mut map,
+                "approximate_presence_count",
+            )?,
+            nsfw_level: remove_from_map(&mut map, "nsfw_level")?,
+            max_video_channel_users: remove_from_map(&mut map, "max_video_channel_users")?,
+            max_presences: remove_from_map_opt(&mut map, "max_presences")?.flatten(),
+            max_members: remove_from_map_opt(&mut map, "max_members")?.flatten(),
+            permissions: remove_from_map_opt(&mut map, "permissions")?.unwrap_or_default(),
         })
     }
 }
