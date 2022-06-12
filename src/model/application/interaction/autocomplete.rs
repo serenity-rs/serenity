@@ -11,11 +11,12 @@ use crate::http::Http;
 use crate::internal::prelude::*;
 #[cfg(feature = "http")]
 use crate::json;
+#[cfg(feature = "http")]
 use crate::json::prelude::*;
 use crate::model::application::command::{CommandOptionType, CommandType};
 #[cfg(feature = "http")]
 use crate::model::application::interaction::InteractionResponseType;
-use crate::model::application::interaction::InteractionType;
+use crate::model::application::interaction::{add_guild_id_to_resolved, InteractionType};
 use crate::model::guild::Member;
 use crate::model::id::{
     ApplicationId,
@@ -29,6 +30,7 @@ use crate::model::id::{
     UserId,
 };
 use crate::model::user::User;
+use crate::model::utils::{deserialize_val, remove_from_map, remove_from_map_opt};
 
 /// An interaction received when the user fills in an autocomplete option
 ///
@@ -97,112 +99,30 @@ impl<'de> Deserialize<'de> for AutocompleteInteraction {
     fn deserialize<D: Deserializer<'de>>(deserializer: D) -> StdResult<Self, D::Error> {
         let mut map = JsonMap::deserialize(deserializer)?;
 
-        let id = map.get("guild_id").and_then(Value::as_str).and_then(|x| x.parse::<u64>().ok());
+        let guild_id = remove_from_map_opt(&mut map, "guild_id")?;
 
-        if let Some(guild_id) = id {
-            if let Some(member) = map.get_mut("member").and_then(Value::as_object_mut) {
-                member.insert("guild_id".to_string(), from_number(guild_id));
-            }
-
-            if let Some(data) = map.get_mut("data") {
-                if let Some(resolved) = data.get_mut("resolved") {
-                    if let Some(roles) = resolved.get_mut("roles") {
-                        if let Some(values) = roles.as_object_mut() {
-                            for value in values.values_mut() {
-                                value.as_object_mut().expect("couldn't deserialize").insert(
-                                    "guild_id".to_string(),
-                                    Value::from(guild_id.to_string()),
-                                );
-                            }
-                        }
-                    }
-                }
-            }
+        if let Some(guild_id) = guild_id {
+            add_guild_id_to_resolved(&mut map, guild_id);
         }
 
-        let id = map
-            .remove("id")
-            .ok_or_else(|| DeError::custom("expected id"))
-            .and_then(InteractionId::deserialize)
-            .map_err(DeError::custom)?;
-
-        let application_id = map
-            .remove("application_id")
-            .ok_or_else(|| DeError::custom("expected application id"))
-            .and_then(ApplicationId::deserialize)
-            .map_err(DeError::custom)?;
-
-        let kind = map
-            .remove("type")
-            .ok_or_else(|| DeError::custom("expected type"))
-            .and_then(InteractionType::deserialize)
-            .map_err(DeError::custom)?;
-
-        let data = map
-            .remove("data")
-            .ok_or_else(|| DeError::custom("expected data"))
-            .and_then(AutocompleteData::deserialize)
-            .map_err(DeError::custom)?;
-
-        let guild_id = map
-            .remove("guild_id")
-            .map(GuildId::deserialize)
-            .transpose()
-            .map_err(DeError::custom)?;
-
-        let channel_id = map
-            .remove("channel_id")
-            .ok_or_else(|| DeError::custom("expected channel_id"))
-            .and_then(ChannelId::deserialize)
-            .map_err(DeError::custom)?;
-
-        let member =
-            map.remove("member").map(Member::deserialize).transpose().map_err(DeError::custom)?;
-
-        let user =
-            map.remove("user").map(User::deserialize).transpose().map_err(DeError::custom)?;
-
-        let user = user
+        let member = remove_from_map_opt::<Member, _>(&mut map, "member")?;
+        let user = remove_from_map_opt(&mut map, "user")?
             .or_else(|| member.as_ref().map(|m| m.user.clone()))
             .ok_or_else(|| DeError::custom("expected user or member"))?;
 
-        let token = map
-            .remove("token")
-            .ok_or_else(|| DeError::custom("expected token"))
-            .and_then(String::deserialize)
-            .map_err(DeError::custom)?;
-
-        let version = map
-            .remove("version")
-            .ok_or_else(|| DeError::custom("expected version"))
-            .and_then(u8::deserialize)
-            .map_err(DeError::custom)?;
-
-        let guild_locale = map
-            .remove("guild_locale")
-            .map(String::deserialize)
-            .transpose()
-            .map_err(DeError::custom)?;
-
-        let locale = map
-            .remove("locale")
-            .ok_or_else(|| DeError::custom("expected locale"))
-            .and_then(String::deserialize)
-            .map_err(DeError::custom)?;
-
         Ok(Self {
-            id,
-            application_id,
-            kind,
-            data,
             guild_id,
-            channel_id,
             member,
             user,
-            token,
-            version,
-            locale,
-            guild_locale,
+            id: remove_from_map(&mut map, "id")?,
+            application_id: remove_from_map(&mut map, "application_id")?,
+            kind: remove_from_map(&mut map, "type")?,
+            data: remove_from_map(&mut map, "data")?,
+            channel_id: remove_from_map(&mut map, "channel_id")?,
+            token: remove_from_map(&mut map, "token")?,
+            version: remove_from_map(&mut map, "version")?,
+            locale: remove_from_map(&mut map, "locale")?,
+            guild_locale: remove_from_map_opt(&mut map, "guild_locale")?,
         })
     }
 }
@@ -335,7 +255,7 @@ impl<'de> Deserialize<'de> for CommandDataOption {
                             if value.is_some() {
                                 return Err(DeError::duplicate_field("value"));
                             }
-                            value = Some(map.next_value::<serde_value::Value>()?);
+                            value = Some(map.next_value::<Value>()?);
                         },
                         Field::Options => {
                             if options.is_some() {
@@ -371,60 +291,41 @@ impl<'de> Deserialize<'de> for CommandDataOption {
                     });
                 }
 
+                let value = || value.ok_or_else(|| DeError::missing_field("value"));
+                let options = || options.ok_or_else(|| DeError::missing_field("options"));
+
                 let value = match kind {
-                    CommandOptionType::Boolean => {
-                        let value = value.ok_or_else(|| DeError::missing_field("value"))?;
-                        let value = bool::deserialize(value).map_err(DeError::custom)?;
-                        CommandDataOptionValue::Boolean(value)
-                    },
-                    CommandOptionType::Integer => {
-                        let value = value.ok_or_else(|| DeError::missing_field("value"))?;
-                        let value = i64::deserialize(value).map_err(DeError::custom)?;
-                        CommandDataOptionValue::Integer(value)
-                    },
-                    CommandOptionType::Number => {
-                        let value = value.ok_or_else(|| DeError::missing_field("value"))?;
-                        let value = f64::deserialize(value).map_err(DeError::custom)?;
-                        CommandDataOptionValue::Number(value)
-                    },
-                    CommandOptionType::String => {
-                        let value = value.ok_or_else(|| DeError::missing_field("value"))?;
-                        let value = String::deserialize(value).map_err(DeError::custom)?;
-                        CommandDataOptionValue::String(value)
-                    },
-                    CommandOptionType::SubCommand => {
-                        let options = options.ok_or_else(|| DeError::missing_field("options"))?;
-                        CommandDataOptionValue::SubCommand(options)
-                    },
-                    CommandOptionType::SubCommandGroup => {
-                        let options = options.ok_or_else(|| DeError::missing_field("options"))?;
-                        CommandDataOptionValue::SubCommandGroup(options)
-                    },
-                    CommandOptionType::Attachment => {
-                        let value = value.ok_or_else(|| DeError::missing_field("value"))?;
-                        let value = AttachmentId::deserialize(value).map_err(DeError::custom)?;
-                        CommandDataOptionValue::Attachment(value)
-                    },
-                    CommandOptionType::Channel => {
-                        let value = value.ok_or_else(|| DeError::missing_field("value"))?;
-                        let value = ChannelId::deserialize(value).map_err(DeError::custom)?;
-                        CommandDataOptionValue::Channel(value)
-                    },
-                    CommandOptionType::Mentionable => {
-                        let value = value.ok_or_else(|| DeError::missing_field("value"))?;
-                        let value = GenericId::deserialize(value).map_err(DeError::custom)?;
-                        CommandDataOptionValue::Mentionable(value)
+                    CommandOptionType::User => {
+                        CommandDataOptionValue::User(deserialize_val(value()?)?)
                     },
                     CommandOptionType::Role => {
-                        let value = value.ok_or_else(|| DeError::missing_field("value"))?;
-                        let value = RoleId::deserialize(value).map_err(DeError::custom)?;
-                        CommandDataOptionValue::Role(value)
+                        CommandDataOptionValue::Role(deserialize_val(value()?)?)
                     },
-                    CommandOptionType::User => {
-                        let value = value.ok_or_else(|| DeError::missing_field("value"))?;
-                        let value = UserId::deserialize(value).map_err(DeError::custom)?;
-                        CommandDataOptionValue::User(value)
+                    CommandOptionType::Number => {
+                        CommandDataOptionValue::Number(deserialize_val(value()?)?)
                     },
+                    CommandOptionType::String => {
+                        CommandDataOptionValue::String(deserialize_val(value()?)?)
+                    },
+                    CommandOptionType::Boolean => {
+                        CommandDataOptionValue::Boolean(deserialize_val(value()?)?)
+                    },
+                    CommandOptionType::Integer => {
+                        CommandDataOptionValue::Integer(deserialize_val(value()?)?)
+                    },
+                    CommandOptionType::Channel => {
+                        CommandDataOptionValue::Channel(deserialize_val(value()?)?)
+                    },
+                    CommandOptionType::Attachment => {
+                        CommandDataOptionValue::Attachment(deserialize_val(value()?)?)
+                    },
+                    CommandOptionType::Mentionable => {
+                        CommandDataOptionValue::Mentionable(deserialize_val(value()?)?)
+                    },
+                    CommandOptionType::SubCommandGroup => {
+                        CommandDataOptionValue::SubCommandGroup(options()?)
+                    },
+                    CommandOptionType::SubCommand => CommandDataOptionValue::SubCommand(options()?),
                     CommandOptionType::Unknown => CommandDataOptionValue::Unknown,
                 };
 
@@ -473,10 +374,10 @@ impl Serialize for CommandDataOption {
             CommandDataOptionValue::Mentionable(v) => s.serialize_field("value", v)?,
             CommandDataOptionValue::Role(v) => s.serialize_field("value", v)?,
             CommandDataOptionValue::User(v) => s.serialize_field("value", v)?,
-            CommandDataOptionValue::SubCommand(o) | CommandDataOptionValue::SubCommandGroup(o) => {
-                if !o.is_empty() {
-                    s.serialize_field("options", o)?;
-                }
+            CommandDataOptionValue::SubCommand(o) | CommandDataOptionValue::SubCommandGroup(o)
+                if !o.is_empty() =>
+            {
+                s.serialize_field("options", o)?;
             },
             _ => {},
         }

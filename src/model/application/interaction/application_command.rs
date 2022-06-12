@@ -14,11 +14,10 @@ use crate::http::Http;
 use crate::internal::prelude::*;
 #[cfg(feature = "http")]
 use crate::json;
-use crate::json::prelude::*;
 use crate::model::application::command::{CommandOptionType, CommandType};
 #[cfg(feature = "http")]
 use crate::model::application::interaction::InteractionResponseType;
-use crate::model::application::interaction::InteractionType;
+use crate::model::application::interaction::{add_guild_id_to_resolved, InteractionType};
 use crate::model::channel::{Attachment, Message, PartialChannel};
 use crate::model::guild::{Member, PartialMember, Role};
 use crate::model::id::{
@@ -34,7 +33,11 @@ use crate::model::id::{
     UserId,
 };
 use crate::model::user::User;
-use crate::model::utils::deserialize_options_with_resolved;
+use crate::model::utils::{
+    deserialize_options_with_resolved,
+    remove_from_map,
+    remove_from_map_opt,
+};
 
 /// An interaction when a user invokes a slash command.
 ///
@@ -331,112 +334,30 @@ impl<'de> Deserialize<'de> for ApplicationCommandInteraction {
     fn deserialize<D: Deserializer<'de>>(deserializer: D) -> StdResult<Self, D::Error> {
         let mut map = JsonMap::deserialize(deserializer)?;
 
-        let id = map.get("guild_id").and_then(Value::as_str).and_then(|x| x.parse::<u64>().ok());
+        let guild_id = remove_from_map_opt::<GuildId, _>(&mut map, "guild_id")?;
 
-        if let Some(guild_id) = id {
-            if let Some(member) = map.get_mut("member").and_then(Value::as_object_mut) {
-                member.insert("guild_id".to_string(), from_number(guild_id));
-            }
-
-            if let Some(data) = map.get_mut("data") {
-                if let Some(resolved) = data.get_mut("resolved") {
-                    if let Some(roles) = resolved.get_mut("roles") {
-                        if let Some(values) = roles.as_object_mut() {
-                            for value in values.values_mut() {
-                                value.as_object_mut().expect("couldn't deserialize").insert(
-                                    "guild_id".to_string(),
-                                    Value::from(guild_id.to_string()),
-                                );
-                            }
-                        }
-                    }
-                }
-            }
+        if let Some(guild_id) = guild_id {
+            add_guild_id_to_resolved(&mut map, guild_id);
         }
 
-        let id = map
-            .remove("id")
-            .ok_or_else(|| DeError::custom("expected id"))
-            .and_then(InteractionId::deserialize)
-            .map_err(DeError::custom)?;
-
-        let application_id = map
-            .remove("application_id")
-            .ok_or_else(|| DeError::custom("expected application id"))
-            .and_then(ApplicationId::deserialize)
-            .map_err(DeError::custom)?;
-
-        let kind = map
-            .remove("type")
-            .ok_or_else(|| DeError::custom("expected type"))
-            .and_then(InteractionType::deserialize)
-            .map_err(DeError::custom)?;
-
-        let data = map
-            .remove("data")
-            .ok_or_else(|| DeError::custom("expected data"))
-            .and_then(CommandData::deserialize)
-            .map_err(DeError::custom)?;
-
-        let guild_id = map
-            .remove("guild_id")
-            .map(GuildId::deserialize)
-            .transpose()
-            .map_err(DeError::custom)?;
-
-        let channel_id = map
-            .remove("channel_id")
-            .ok_or_else(|| DeError::custom("expected channel_id"))
-            .and_then(ChannelId::deserialize)
-            .map_err(DeError::custom)?;
-
-        let member =
-            map.remove("member").map(Member::deserialize).transpose().map_err(DeError::custom)?;
-
-        let user =
-            map.remove("user").map(User::deserialize).transpose().map_err(DeError::custom)?;
-
-        let user = user
+        let member = remove_from_map_opt::<Member, _>(&mut map, "member")?;
+        let user = remove_from_map_opt(&mut map, "user")?
             .or_else(|| member.as_ref().map(|m| m.user.clone()))
             .ok_or_else(|| DeError::custom("expected user or member"))?;
 
-        let token = map
-            .remove("token")
-            .ok_or_else(|| DeError::custom("expected token"))
-            .and_then(String::deserialize)
-            .map_err(DeError::custom)?;
-
-        let version = map
-            .remove("version")
-            .ok_or_else(|| DeError::custom("expected version"))
-            .and_then(u8::deserialize)
-            .map_err(DeError::custom)?;
-
-        let guild_locale = map
-            .remove("guild_locale")
-            .map(String::deserialize)
-            .transpose()
-            .map_err(DeError::custom)?;
-
-        let locale = map
-            .remove("locale")
-            .ok_or_else(|| DeError::custom("expected locale"))
-            .and_then(String::deserialize)
-            .map_err(DeError::custom)?;
-
         Ok(Self {
-            id,
-            application_id,
-            kind,
-            data,
             guild_id,
-            channel_id,
             member,
             user,
-            token,
-            version,
-            locale,
-            guild_locale,
+            id: remove_from_map(&mut map, "id")?,
+            application_id: remove_from_map(&mut map, "application_id")?,
+            kind: remove_from_map(&mut map, "type")?,
+            data: remove_from_map(&mut map, "data")?,
+            channel_id: remove_from_map(&mut map, "channel_id")?,
+            token: remove_from_map(&mut map, "token")?,
+            version: remove_from_map(&mut map, "version")?,
+            locale: remove_from_map(&mut map, "locale")?,
+            guild_locale: remove_from_map_opt(&mut map, "guild_locale")?,
         })
     }
 }
@@ -504,24 +425,7 @@ impl<'de> Deserialize<'de> for CommandData {
     fn deserialize<D: Deserializer<'de>>(deserializer: D) -> StdResult<Self, D::Error> {
         let mut map = JsonMap::deserialize(deserializer)?;
 
-        let name = map
-            .remove("name")
-            .ok_or_else(|| DeError::custom("expected value"))
-            .and_then(String::deserialize)
-            .map_err(DeError::custom)?;
-
-        let id = map
-            .remove("id")
-            .ok_or_else(|| DeError::custom("expected value"))
-            .and_then(CommandId::deserialize)
-            .map_err(DeError::custom)?;
-
-        let resolved = map
-            .remove("resolved")
-            .map(CommandDataResolved::deserialize)
-            .transpose()
-            .map_err(DeError::custom)?
-            .unwrap_or_default();
+        let resolved = remove_from_map_opt(&mut map, "resolved")?.unwrap_or_default();
 
         let options = map
             .remove("options")
@@ -530,30 +434,14 @@ impl<'de> Deserialize<'de> for CommandData {
             .map_err(DeError::custom)?
             .unwrap_or_default();
 
-        let kind = map
-            .remove("type")
-            .ok_or_else(|| DeError::custom("expected type"))
-            .and_then(CommandType::deserialize)
-            .map_err(DeError::custom)?;
-
-        let guild_id = match map.remove("guild_id") {
-            Some(id) => Option::<GuildId>::deserialize(id).map_err(DeError::custom)?,
-            None => None,
-        };
-
-        let target_id = match map.remove("target_id") {
-            Some(id) => Option::<TargetId>::deserialize(id).map_err(DeError::custom)?,
-            None => None,
-        };
-
         Ok(Self {
-            id,
-            name,
-            kind,
-            resolved,
             options,
-            guild_id,
-            target_id,
+            resolved,
+            id: remove_from_map(&mut map, "id")?,
+            name: remove_from_map(&mut map, "name")?,
+            kind: remove_from_map(&mut map, "type")?,
+            guild_id: remove_from_map_opt(&mut map, "guild_id")?.flatten(),
+            target_id: remove_from_map_opt(&mut map, "target_id")?.flatten(),
         })
     }
 }
@@ -602,7 +490,7 @@ pub struct CommandDataResolved {
 /// Their resolved objects can be found on [`CommandData::resolved`].
 ///
 /// [Discord docs](https://discord.com/developers/docs/interactions/application-commands#application-command-object-application-command-interaction-data-option-structure).
-#[derive(Clone, Debug, Serialize)]
+#[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 pub struct CommandDataOption {
     /// The name of the parameter.
@@ -621,41 +509,6 @@ pub struct CommandDataOption {
     /// The resolved object of the given `value`, if there is one.
     #[serde(default)]
     pub resolved: Option<CommandDataOptionValue>,
-}
-
-impl<'de> Deserialize<'de> for CommandDataOption {
-    fn deserialize<D: Deserializer<'de>>(deserializer: D) -> StdResult<Self, D::Error> {
-        let mut map = JsonMap::deserialize(deserializer)?;
-
-        let name = map
-            .remove("name")
-            .ok_or_else(|| DeError::custom("expected value"))
-            .and_then(String::deserialize)
-            .map_err(DeError::custom)?;
-
-        let value = map.remove("value");
-
-        let kind = map
-            .remove("type")
-            .ok_or_else(|| DeError::custom("expected type"))
-            .and_then(CommandOptionType::deserialize)
-            .map_err(DeError::custom)?;
-
-        let options = map
-            .remove("options")
-            .map(Vec::deserialize)
-            .transpose()
-            .map_err(DeError::custom)?
-            .unwrap_or_default();
-
-        Ok(Self {
-            name,
-            value,
-            kind,
-            options,
-            resolved: None,
-        })
-    }
 }
 
 /// The resolved value of an [`CommandDataOption`].

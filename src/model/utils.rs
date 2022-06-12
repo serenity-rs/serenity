@@ -12,6 +12,7 @@ use super::prelude::*;
 use crate::cache::Cache;
 #[cfg(feature = "cache")]
 use crate::internal::prelude::*;
+use crate::json::from_number;
 use crate::model::application::command::CommandOptionType;
 use crate::model::application::interaction::application_command::{
     CommandDataOption,
@@ -56,6 +57,16 @@ where
     E: serde::de::Error,
 {
     remove_from_map_opt(map, key)?.ok_or_else(|| serde::de::Error::missing_field(key))
+}
+
+pub fn add_guild_id_to_map(map: &mut JsonMap, key: &str, id: GuildId) {
+    if let Some(array) = map.get_mut(key).and_then(Value::as_array_mut) {
+        for value in array {
+            if let Some(item) = value.as_object_mut() {
+                item.insert("guild_id".to_string(), from_number(id.0));
+            }
+        }
+    }
 }
 
 /// Used with `#[serde(with = "emojis")]`

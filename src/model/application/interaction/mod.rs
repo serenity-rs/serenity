@@ -12,9 +12,11 @@ use self::autocomplete::AutocompleteInteraction;
 use self::message_component::MessageComponentInteraction;
 use self::modal::ModalSubmitInteraction;
 use self::ping::PingInteraction;
-use crate::json::{from_value, JsonMap, Value};
-use crate::model::id::{ApplicationId, InteractionId};
+use crate::internal::prelude::*;
+use crate::json::{from_number, from_value};
+use crate::model::id::{ApplicationId, GuildId, InteractionId};
 use crate::model::user::User;
+use crate::model::utils::deserialize_val;
 
 /// [Discord docs](https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-object)
 #[derive(Clone, Debug)]
@@ -134,50 +136,35 @@ impl Interaction {
 }
 
 impl<'de> Deserialize<'de> for Interaction {
-    fn deserialize<D: Deserializer<'de>>(deserializer: D) -> Result<Self, D::Error> {
-        let map = JsonMap::deserialize(deserializer)?;
+    fn deserialize<D: Deserializer<'de>>(deserializer: D) -> std::result::Result<Self, D::Error> {
+        let value = Value::deserialize(deserializer)?;
+        let map = value.as_object().ok_or_else(|| DeError::custom("expected JsonMap"))?;
 
-        let kind = map
-            .get("type")
-            .ok_or_else(|| DeError::custom("expected type"))
-            .and_then(InteractionType::deserialize)
-            .map_err(DeError::custom)?;
-
-        match kind {
-            InteractionType::Ping => from_value::<PingInteraction>(Value::from(map))
-                .map(Interaction::Ping)
-                .map_err(DeError::custom),
+        let raw_kind = map.get("type").ok_or_else(|| DeError::missing_field("type"))?;
+        match deserialize_val(raw_kind.clone())? {
             InteractionType::ApplicationCommand => {
-                from_value::<ApplicationCommandInteraction>(Value::from(map))
-                    .map(Interaction::ApplicationCommand)
-                    .map_err(DeError::custom)
+                from_value(value).map(Interaction::ApplicationCommand)
             },
             InteractionType::MessageComponent => {
-                from_value::<MessageComponentInteraction>(Value::from(map))
-                    .map(Interaction::MessageComponent)
-                    .map_err(DeError::custom)
+                from_value(value).map(Interaction::MessageComponent)
             },
-            InteractionType::Autocomplete => {
-                from_value::<AutocompleteInteraction>(Value::from(map))
-                    .map(Interaction::Autocomplete)
-                    .map_err(DeError::custom)
-            },
-            InteractionType::ModalSubmit => from_value::<ModalSubmitInteraction>(Value::from(map))
-                .map(Interaction::ModalSubmit)
-                .map_err(DeError::custom),
-            InteractionType::Unknown => Err(DeError::custom("Unknown interaction type")),
+            InteractionType::Autocomplete => from_value(value).map(Interaction::Autocomplete),
+            InteractionType::ModalSubmit => from_value(value).map(Interaction::ModalSubmit),
+            InteractionType::Ping => from_value(value).map(Interaction::Ping),
+            InteractionType::Unknown => return Err(DeError::custom("Unknown interaction type")),
         }
+        .map_err(DeError::custom)
     }
 }
 
 impl Serialize for Interaction {
-    fn serialize<S: Serializer>(&self, serializer: S) -> Result<S::Ok, S::Error> {
+    fn serialize<S: Serializer>(&self, serializer: S) -> std::result::Result<S::Ok, S::Error> {
         match self {
-            Self::Ping(i) => PingInteraction::serialize(i, serializer),
-            Self::ApplicationCommand(i) => ApplicationCommandInteraction::serialize(i, serializer),
-            Self::MessageComponent(i) => MessageComponentInteraction::serialize(i, serializer),
-            Self::Autocomplete(i) => AutocompleteInteraction::serialize(i, serializer),
-            Self::ModalSubmit(i) => ModalSubmitInteraction::serialize(i, serializer),
+            Self::Ping(i) => i.serialize(serializer),
+            Self::ApplicationCommand(i) => i.serialize(serializer),
+            Self::MessageComponent(i) => i.serialize(serializer),
+            Self::Autocomplete(i) => i.serialize(serializer),
+            Self::ModalSubmit(i) => i.serialize(serializer),
         }
     }
 }
@@ -254,4 +241,24 @@ pub enum InteractionResponseType {
     UpdateMessage = 7,
     Autocomplete = 8,
     Modal = 9,
+}
+
+fn add_guild_id_to_resolved(map: &mut JsonMap, guild_id: GuildId) {
+    if let Some(member) = map.get_mut("member").and_then(Value::as_object_mut) {
+        member.insert("guild_id".to_string(), from_number(guild_id.0));
+    }
+
+    if let Some(data) = map.get_mut("data") {
+        if let Some(resolved) = data.get_mut("resolved") {
+            if let Some(roles) = resolved.get_mut("roles") {
+                if let Some(values) = roles.as_object_mut() {
+                    for value in values.values_mut() {
+                        if let Some(role) = value.as_object_mut() {
+                            role.insert("guild_id".to_string(), from_number(guild_id.0));
+                        };
+                    }
+                }
+            }
+        }
+    }
 }
