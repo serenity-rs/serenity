@@ -2003,7 +2003,7 @@ impl Http {
     /// let map = value.as_object().unwrap();
     ///
     /// // Edit state for another user
-    /// http.edit_voice_state(guild_id, user_id, &map).await?;
+    /// http.edit_voice_state(guild_id, user_id, to_vec(&map)).await?;
     /// #     Ok(())
     /// # }
     /// ```
@@ -2051,7 +2051,7 @@ impl Http {
     /// let map = value.as_object().unwrap();
     ///
     /// // Edit state for current user
-    /// http.edit_voice_state_me(guild_id, &map).await?;
+    /// http.edit_voice_state_me(guild_id, to_vec(&map)).await?;
     /// #     Ok(())
     /// # }
     /// ```
