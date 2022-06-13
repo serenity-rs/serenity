@@ -15,7 +15,6 @@ use crate::json;
 use crate::model::application::component::ActionRow;
 #[cfg(feature = "http")]
 use crate::model::application::interaction::InteractionResponseType;
-use crate::model::application::interaction::InteractionType;
 use crate::model::channel::Message;
 use crate::model::guild::Member;
 #[cfg(feature = "http")]
@@ -34,9 +33,6 @@ pub struct ModalSubmitInteraction {
     pub id: InteractionId,
     /// Id of the application this interaction is for.
     pub application_id: ApplicationId,
-    /// The type of interaction.
-    #[serde(rename = "type")]
-    pub kind: InteractionType,
     /// The data of the interaction which was triggered.
     pub data: ModalSubmitInteractionData,
     /// The guild Id this interaction was sent from, if there is one.
@@ -294,7 +290,6 @@ impl<'de> Deserialize<'de> for ModalSubmitInteraction {
             id: remove_from_map(&mut map, "id")?,
             guild_id: remove_from_map_opt(&mut map, "guild_id")?,
             application_id: remove_from_map(&mut map, "application_id")?,
-            kind: remove_from_map(&mut map, "type")?,
             data: remove_from_map(&mut map, "data")?,
             channel_id: remove_from_map(&mut map, "channel_id")?,
             token: remove_from_map(&mut map, "token")?,
