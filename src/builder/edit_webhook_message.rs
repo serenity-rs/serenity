@@ -1,15 +1,19 @@
-use std::collections::HashMap;
-
-use super::CreateAllowedMentions;
-use crate::builder::CreateComponents;
-use crate::internal::prelude::*;
-use crate::json::to_value;
+use super::{CreateAllowedMentions, CreateComponents, CreateEmbed};
 
 /// A builder to specify the fields to edit in an existing [`Webhook`]'s message.
 ///
 /// [`Webhook`]: crate::model::webhook::Webhook
-#[derive(Clone, Debug, Default)]
-pub struct EditWebhookMessage(pub HashMap<&'static str, Value>);
+#[derive(Clone, Debug, Default, Serialize)]
+pub struct EditWebhookMessage {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    content: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    embeds: Option<Vec<CreateEmbed>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    allowed_mentions: Option<CreateAllowedMentions>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    components: Option<CreateComponents>,
+}
 
 impl EditWebhookMessage {
     /// Set the content of the message.
@@ -17,25 +21,21 @@ impl EditWebhookMessage {
     /// **Note**: Message contents must be under 2000 unicode code points.
     #[inline]
     pub fn content(&mut self, content: impl Into<String>) -> &mut Self {
-        self.0.insert("content", Value::String(content.into()));
+        self.content = Some(content.into());
         self
     }
 
     /// Set the embeds associated with the message.
-    ///
-    /// This should be used in combination with [`Embed::fake`], creating one
-    /// or more fake embeds to send to the API.
     ///
     /// # Examples
     ///
     /// Refer to [struct-level documentation of `ExecuteWebhook`] for an example
     /// on how to use embeds.
     ///
-    /// [`Embed::fake`]: crate::model::channel::Embed::fake
     /// [struct-level documentation of `ExecuteWebhook`]: crate::builder::ExecuteWebhook#examples
     #[inline]
-    pub fn embeds(&mut self, embeds: Vec<Value>) -> &mut Self {
-        self.0.insert("embeds", Value::from(embeds));
+    pub fn embeds(&mut self, embeds: Vec<CreateEmbed>) -> &mut Self {
+        self.embeds = Some(embeds);
         self
     }
 
@@ -46,9 +46,8 @@ impl EditWebhookMessage {
     {
         let mut allowed_mentions = CreateAllowedMentions::default();
         f(&mut allowed_mentions);
-        let map = to_value(allowed_mentions).expect("AllowedMentions builder should not fail!");
 
-        self.0.insert("allowed_mentions", map);
+        self.allowed_mentions = Some(allowed_mentions);
         self
     }
 
@@ -64,9 +63,8 @@ impl EditWebhookMessage {
     {
         let mut components = CreateComponents::default();
         f(&mut components);
-        let map = to_value(components).expect("CreateComponents builder should not fail!");
 
-        self.0.insert("components", map);
+        self.components = Some(components);
         self
     }
 }

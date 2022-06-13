@@ -559,12 +559,10 @@ impl Webhook {
         F: FnOnce(&mut EditWebhookMessage) -> &mut EditWebhookMessage,
     {
         let token = self.token.as_ref().ok_or(ModelError::NoTokenSet)?;
-        let mut edit_webhook_message = EditWebhookMessage::default();
-        f(&mut edit_webhook_message);
+        let mut builder = EditWebhookMessage::default();
+        f(&mut builder);
 
-        let map = json::hashmap_to_json_map(edit_webhook_message.0);
-
-        http.as_ref().edit_webhook_message(self.id.0, token, message_id.0, &map).await
+        http.as_ref().edit_webhook_message(self.id.0, token, message_id.0, &builder).await
     }
 
     /// Deletes a webhook message.

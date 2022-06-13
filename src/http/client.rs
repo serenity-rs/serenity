@@ -2316,7 +2316,7 @@ impl Http {
         webhook_id: u64,
         token: &str,
         message_id: u64,
-        map: &JsonMap,
+        map: &impl serde::Serialize,
     ) -> Result<Message> {
         let body = to_vec(map)?;
 
