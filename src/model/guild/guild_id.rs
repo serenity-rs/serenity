@@ -367,16 +367,11 @@ impl GuildId {
     {
         let mut create_sticker = CreateSticker::default();
         f(&mut create_sticker);
-        let map = json::hashmap_to_json_map(create_sticker.0);
 
-        let file = match create_sticker.1 {
-            Some(f) => f,
-            None => return Err(Error::Model(ModelError::NoStickerFileSet)),
-        };
+        let (map, file) =
+            create_sticker.build().ok_or(Error::Model(ModelError::NoStickerFileSet))?;
 
-        let sticker = http.as_ref().create_sticker(self.0, map, file, None).await?;
-
-        Ok(sticker)
+        http.as_ref().create_sticker(self.0, map, file, None).await
     }
 
     /// Deletes the current guild if the current account is the owner of the
@@ -691,9 +686,8 @@ impl GuildId {
     {
         let mut edit_sticker = EditSticker::default();
         f(&mut edit_sticker);
-        let map = json::hashmap_to_json_map(edit_sticker.0);
 
-        http.as_ref().edit_sticker(self.0, sticker_id.into().0, &map, None).await
+        http.as_ref().edit_sticker(self.0, sticker_id.into().0, &edit_sticker, None).await
     }
 
     /// Edits the order of [`Role`]s

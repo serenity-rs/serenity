@@ -862,7 +862,7 @@ impl Http {
     pub async fn create_sticker<'a>(
         &self,
         guild_id: u64,
-        map: JsonMap,
+        map: Vec<(Cow<'static, str>, Cow<'static, str>)>,
         file: impl Into<AttachmentType<'a>>,
         audit_log_reason: Option<&str>,
     ) -> Result<Sticker> {
@@ -870,19 +870,7 @@ impl Http {
             body: None,
             multipart: Some(Multipart {
                 files: vec![file.into()],
-                fields: map
-                    .into_iter()
-                    .map(|(name, value)| {
-                        (
-                            name.into(),
-                            value
-                                .as_str()
-                                .expect("Create_sticker map must be strings")
-                                .to_string()
-                                .into(),
-                        )
-                    })
-                    .collect(),
+                fields: map,
                 payload_json: None,
             }),
             headers: audit_log_reason.map(reason_into_header),
@@ -1939,7 +1927,7 @@ impl Http {
         &self,
         guild_id: u64,
         sticker_id: u64,
-        map: &JsonMap,
+        map: &impl serde::Serialize,
         audit_log_reason: Option<&str>,
     ) -> Result<Sticker> {
         let body = to_vec(&map)?;
