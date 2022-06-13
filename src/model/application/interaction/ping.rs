@@ -1,6 +1,5 @@
 use serde::{Deserialize, Serialize};
 
-use crate::model::application::interaction::InteractionType;
 use crate::model::id::{ApplicationId, InteractionId};
 
 /// A ping interaction, which can only be received through an endpoint url.
@@ -13,9 +12,6 @@ pub struct PingInteraction {
     pub id: InteractionId,
     /// Id of the application this interaction is for.
     pub application_id: ApplicationId,
-    /// The type of interaction.
-    #[serde(rename = "type")]
-    pub kind: InteractionType,
     /// A continuation token for responding to the interaction.
     pub token: String,
     /// Always `1`.
