@@ -156,11 +156,11 @@ default_no_backend = [
     "cache",
     "chrono",
     "client",
-#    "framework",
+    "framework",
     "gateway",
     "model",
     "http",
-#    "standard_framework",
+    "standard_framework",
     "utils",
 ]
 
