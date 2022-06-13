@@ -14,9 +14,9 @@ use crate::json;
 #[cfg(feature = "http")]
 use crate::json::prelude::*;
 use crate::model::application::command::{CommandOptionType, CommandType};
+use crate::model::application::interaction::add_guild_id_to_resolved;
 #[cfg(feature = "http")]
 use crate::model::application::interaction::InteractionResponseType;
-use crate::model::application::interaction::{add_guild_id_to_resolved, InteractionType};
 use crate::model::guild::Member;
 use crate::model::id::{
     ApplicationId,
@@ -42,9 +42,6 @@ pub struct AutocompleteInteraction {
     pub id: InteractionId,
     /// Id of the application this interaction is for.
     pub application_id: ApplicationId,
-    /// The type of interaction.
-    #[serde(rename = "type")]
-    pub kind: InteractionType,
     /// The data of the interaction which was triggered.
     pub data: AutocompleteData,
     /// The guild Id this interaction was sent from, if there is one.
@@ -116,7 +113,6 @@ impl<'de> Deserialize<'de> for AutocompleteInteraction {
             user,
             id: remove_from_map(&mut map, "id")?,
             application_id: remove_from_map(&mut map, "application_id")?,
-            kind: remove_from_map(&mut map, "type")?,
             data: remove_from_map(&mut map, "data")?,
             channel_id: remove_from_map(&mut map, "channel_id")?,
             token: remove_from_map(&mut map, "token")?,
