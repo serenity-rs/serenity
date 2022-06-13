@@ -475,7 +475,7 @@ impl Http {
     pub async fn create_followup_message(
         &self,
         interaction_token: &str,
-        map: &Value,
+        map: &impl serde::Serialize,
     ) -> Result<Message> {
         self.fire(Request {
             body: Some(to_vec(map)?),
@@ -495,14 +495,14 @@ impl Http {
     pub async fn create_followup_message_with_files(
         &self,
         interaction_token: &str,
-        map: &Value,
+        map: &impl serde::Serialize,
         files: impl IntoIterator<Item = AttachmentType<'_>>,
     ) -> Result<Message> {
         self.fire(Request {
             body: None,
             multipart: Some(Multipart {
                 files: files.into_iter().map(Into::into).collect(),
-                payload_json: Some(map.clone()),
+                payload_json: Some(to_string(map)?),
                 fields: vec![],
             }),
             headers: None,
@@ -696,14 +696,14 @@ impl Http {
         &self,
         interaction_id: u64,
         interaction_token: &str,
-        map: &Value,
+        map: &impl serde::Serialize,
         files: impl IntoIterator<Item = AttachmentType<'_>>,
     ) -> Result<()> {
         self.wind(204, Request {
             body: None,
             multipart: Some(Multipart {
                 files: files.into_iter().map(Into::into).collect(),
-                payload_json: Some(to_value(map)?),
+                payload_json: Some(to_string(map)?),
                 fields: vec![],
             }),
             headers: None,
@@ -1392,7 +1392,7 @@ impl Http {
         &self,
         interaction_token: &str,
         message_id: u64,
-        map: &Value,
+        map: &impl serde::Serialize,
     ) -> Result<Message> {
         self.fire(Request {
             body: Some(to_vec(map)?),
@@ -1416,14 +1416,14 @@ impl Http {
         &self,
         interaction_token: &str,
         message_id: u64,
-        map: &Value,
+        map: &impl serde::Serialize,
         new_attachments: impl IntoIterator<Item = AttachmentType<'_>>,
     ) -> Result<Message> {
         self.fire(Request {
             body: None,
             multipart: Some(Multipart {
                 files: new_attachments.into_iter().map(Into::into).collect(),
-                payload_json: Some(map.clone()),
+                payload_json: Some(to_string(map)?),
                 fields: vec![],
             }),
             headers: None,
@@ -1689,14 +1689,14 @@ impl Http {
         &self,
         channel_id: u64,
         message_id: u64,
-        map: &Value,
+        map: &impl serde::Serialize,
         new_attachments: impl IntoIterator<Item = AttachmentType<'_>>,
     ) -> Result<Message> {
         self.fire(Request {
             body: None,
             multipart: Some(Multipart {
                 files: new_attachments.into_iter().map(Into::into).collect(),
-                payload_json: Some(map.clone()),
+                payload_json: Some(to_string(map)?),
                 fields: vec![],
             }),
             headers: None,
@@ -2260,23 +2260,20 @@ impl Http {
     /// Returns an
     /// [`HttpError::UnsuccessfulRequest(ErrorResponse)`][`HttpError::UnsuccessfulRequest`]
     /// if the files are too large to send.
-    pub async fn execute_webhook_with_files<'a, T, It: IntoIterator<Item = T>>(
+    pub async fn execute_webhook_with_files<'a>(
         &self,
         webhook_id: u64,
         thread_id: Option<u64>,
         token: &str,
         wait: bool,
-        files: It,
-        map: &JsonMap,
-    ) -> Result<Option<Message>>
-    where
-        T: Into<AttachmentType<'a>>,
-    {
+        files: impl IntoIterator<Item = impl Into<AttachmentType<'a>>>,
+        map: &impl serde::Serialize,
+    ) -> Result<Option<Message>> {
         self.fire(Request {
             body: None,
             multipart: Some(Multipart {
                 files: files.into_iter().map(Into::into).collect(),
-                payload_json: Some(to_value(map)?),
+                payload_json: Some(to_string(map)?),
                 fields: vec![],
             }),
             headers: None,
@@ -3638,20 +3635,17 @@ impl Http {
     /// Returns an
     /// [`HttpError::UnsuccessfulRequest(ErrorResponse)`][`HttpError::UnsuccessfulRequest`]
     /// if the files are too large to send.
-    pub async fn send_files<'a, T, It: IntoIterator<Item = T>>(
+    pub async fn send_files(
         &self,
         channel_id: u64,
-        files: It,
+        files: impl IntoIterator<Item = impl Into<AttachmentType<'_>>>,
         map: &impl serde::Serialize,
-    ) -> Result<Message>
-    where
-        T: Into<AttachmentType<'a>>,
-    {
+    ) -> Result<Message> {
         self.fire(Request {
             body: None,
             multipart: Some(Multipart {
                 files: files.into_iter().map(Into::into).collect(),
-                payload_json: Some(to_value(map)?),
+                payload_json: Some(to_string(map)?),
                 fields: vec![],
             }),
             headers: None,

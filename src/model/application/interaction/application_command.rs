@@ -213,22 +213,14 @@ impl ApplicationCommandInteraction {
     async fn _create_followup_message<'a>(
         &self,
         http: &Http,
-        interaction_response: CreateInteractionResponseFollowup<'a>,
+        mut interaction_response: CreateInteractionResponseFollowup<'a>,
     ) -> Result<Message> {
-        let map = json::hashmap_to_json_map(interaction_response.0);
+        let files = std::mem::take(&mut interaction_response.files);
 
-        Message::check_lengths(&map)?;
-
-        if interaction_response.1.is_empty() {
-            http.as_ref().create_followup_message(&self.token, &Value::from(map)).await
+        if files.is_empty() {
+            http.create_followup_message(&self.token, &interaction_response).await
         } else {
-            http.as_ref()
-                .create_followup_message_with_files(
-                    &self.token,
-                    &Value::from(map),
-                    interaction_response.1,
-                )
-                .await
+            http.create_followup_message_with_files(&self.token, &interaction_response, files).await
         }
     }
 
@@ -256,25 +248,17 @@ impl ApplicationCommandInteraction {
             &'b mut CreateInteractionResponseFollowup<'a>,
         ) -> &'b mut CreateInteractionResponseFollowup<'a>,
     {
-        let mut interaction_response = CreateInteractionResponseFollowup::default();
-        f(&mut interaction_response);
+        let mut builder = CreateInteractionResponseFollowup::default();
+        f(&mut builder);
 
-        let map = json::hashmap_to_json_map(interaction_response.0);
-
-        Message::check_lengths(&map)?;
-
+        let http = http.as_ref();
         let message_id = message_id.into().into();
+        let files = std::mem::take(&mut builder.files);
 
-        if interaction_response.1.is_empty() {
-            http.as_ref().edit_followup_message(&self.token, message_id, &Value::from(map)).await
+        if files.is_empty() {
+            http.edit_followup_message(&self.token, message_id, &builder).await
         } else {
-            http.as_ref()
-                .edit_followup_message_and_attachments(
-                    &self.token,
-                    message_id,
-                    &Value::from(map),
-                    interaction_response.1,
-                )
+            http.edit_followup_message_and_attachments(&self.token, message_id, &builder, files)
                 .await
         }
     }

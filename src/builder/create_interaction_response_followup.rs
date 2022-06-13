@@ -1,20 +1,35 @@
-use std::collections::HashMap;
 #[cfg(not(feature = "model"))]
 use std::marker::PhantomData;
 
-use super::{CreateAllowedMentions, CreateEmbed};
-use crate::builder::CreateComponents;
-use crate::json::prelude::*;
+use super::{CreateAllowedMentions, CreateComponents, CreateEmbed};
 use crate::model::application::interaction::MessageFlags;
 #[cfg(feature = "model")]
 use crate::model::channel::AttachmentType;
 
-#[derive(Clone, Debug, Default)]
-pub struct CreateInteractionResponseFollowup<'a>(
-    pub HashMap<&'static str, Value>,
-    #[cfg(feature = "model")] pub Vec<AttachmentType<'a>>,
-    #[cfg(not(feature = "model"))] PhantomData<&'a ()>,
-);
+#[derive(Clone, Debug, Default, Serialize)]
+pub struct CreateInteractionResponseFollowup<'a> {
+    embeds: Vec<CreateEmbed>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    content: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    username: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    avatar_url: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    tts: Option<bool>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    allowed_mentions: Option<CreateAllowedMentions>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    flags: Option<MessageFlags>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    components: Option<CreateComponents>,
+
+    #[serde(skip)]
+    #[cfg(feature = "model")]
+    pub(crate) files: Vec<AttachmentType<'a>>,
+    #[cfg(not(feature = "model"))]
+    pub(crate) files: PhantomData<&'a ()>,
+}
 
 impl<'a> CreateInteractionResponseFollowup<'a> {
     /// Set the content of the message.
@@ -22,49 +37,38 @@ impl<'a> CreateInteractionResponseFollowup<'a> {
     /// **Note**: Message contents must be under 2000 unicode code points.
     #[inline]
     pub fn content(&mut self, content: impl Into<String>) -> &mut Self {
-        self._content(content.into())
-    }
-
-    fn _content(&mut self, content: String) -> &mut Self {
-        self.0.insert("content", Value::String(content));
+        self.content = Some(content.into());
         self
     }
 
     /// Override the default username of the webhook
     #[inline]
     pub fn username(&mut self, username: impl Into<String>) -> &mut Self {
-        self._username(username.into())
-    }
-
-    fn _username(&mut self, username: String) -> &mut Self {
-        self.0.insert("username", Value::String(username));
+        self.username = Some(username.into());
         self
     }
 
     /// Override the default avatar of the webhook
     #[inline]
     pub fn avatar(&mut self, avatar_url: impl Into<String>) -> &mut Self {
-        self._avatar(avatar_url.into())
-    }
-
-    fn _avatar(&mut self, avatar_url: String) -> &mut Self {
-        self.0.insert("avatar_url", Value::String(avatar_url));
+        self.avatar_url = Some(avatar_url.into());
         self
     }
+
     /// Set whether the message is text-to-speech.
     ///
     /// Think carefully before setting this to `true`.
     ///
     /// Defaults to `false`.
     pub fn tts(&mut self, tts: bool) -> &mut Self {
-        self.0.insert("tts", Value::from(tts));
+        self.tts = Some(tts);
         self
     }
 
     /// Appends a file to the message.
     #[cfg(feature = "model")]
     pub fn add_file<T: Into<AttachmentType<'a>>>(&mut self, file: T) -> &mut Self {
-        self.1.push(file.into());
+        self.add_files(vec![file]);
         self
     }
 
@@ -74,7 +78,7 @@ impl<'a> CreateInteractionResponseFollowup<'a> {
         &mut self,
         files: It,
     ) -> &mut Self {
-        self.1.extend(files.into_iter().map(Into::into));
+        self.files.extend(files.into_iter().map(Into::into));
         self
     }
 
@@ -87,7 +91,7 @@ impl<'a> CreateInteractionResponseFollowup<'a> {
         &mut self,
         files: It,
     ) -> &mut Self {
-        self.1 = files.into_iter().map(Into::into).collect();
+        self.files = files.into_iter().map(Into::into).collect();
         self
     }
 
@@ -103,24 +107,13 @@ impl<'a> CreateInteractionResponseFollowup<'a> {
 
     /// Adds an embed to the message.
     pub fn add_embed(&mut self, embed: CreateEmbed) -> &mut Self {
-        let embed = to_value(embed).expect("CreateEmbed builder should not fail!");
-
-        self.0
-            .entry("embeds")
-            .or_insert_with(|| Value::from(Vec::<Value>::new()))
-            .as_array_mut()
-            .expect("couldn't add embed")
-            .push(embed);
-
+        self.embeds.push(embed);
         self
     }
 
     /// Adds multiple embeds to the message.
     pub fn add_embeds(&mut self, embeds: Vec<CreateEmbed>) -> &mut Self {
-        for embed in embeds {
-            self.add_embed(embed);
-        }
-
+        self.embeds.extend(embeds);
         self
     }
 
@@ -129,9 +122,7 @@ impl<'a> CreateInteractionResponseFollowup<'a> {
     /// Calling this will overwrite the embed list.
     /// To append embeds, call [`Self::add_embed`] instead.
     pub fn set_embed(&mut self, embed: CreateEmbed) -> &mut Self {
-        let embed = to_value(embed).expect("CreateEmbed builder should not fail!");
-        self.0.insert("embeds", Value::from(vec![embed]));
-
+        self.set_embeds(vec![embed]);
         self
     }
 
@@ -140,12 +131,7 @@ impl<'a> CreateInteractionResponseFollowup<'a> {
     /// Calling this multiple times will overwrite the embed list.
     /// To append embeds, call [`Self::add_embed`] instead.
     pub fn set_embeds(&mut self, embeds: impl IntoIterator<Item = CreateEmbed>) -> &mut Self {
-        let embeds = embeds
-            .into_iter()
-            .map(|embed| to_value(embed).expect("CreateEmbed builder should not fail!"))
-            .collect::<Vec<Value>>();
-
-        self.0.insert("embeds", Value::from(embeds));
+        self.embeds = embeds.into_iter().collect();
         self
     }
 
@@ -156,33 +142,28 @@ impl<'a> CreateInteractionResponseFollowup<'a> {
     {
         let mut allowed_mentions = CreateAllowedMentions::default();
         f(&mut allowed_mentions);
-        let map = to_value(allowed_mentions).expect("AllowedMentions builder should not fail!");
 
-        self.0.insert("allowed_mentions", map);
+        self.allowed_mentions = Some(allowed_mentions);
         self
     }
 
     /// Sets the flags for the response.
     pub fn flags(&mut self, flags: MessageFlags) -> &mut Self {
-        self.0.insert("flags", from_number(flags.bits()));
+        self.flags = Some(flags);
         self
     }
 
     /// Adds or removes the ephemeral flag
     pub fn ephemeral(&mut self, ephemeral: bool) -> &mut Self {
-        let flags = self
-            .0
-            .get("flags")
-            .map_or(0, |f| f.as_u64().expect("Interaction response flag was not a number"));
+        let flags = self.flags.unwrap_or_else(MessageFlags::empty);
 
         let flags = if ephemeral {
-            flags | MessageFlags::EPHEMERAL.bits()
+            flags | MessageFlags::EPHEMERAL
         } else {
-            flags & !MessageFlags::EPHEMERAL.bits()
+            flags & !MessageFlags::EPHEMERAL
         };
 
-        self.0.insert("flags", from_number(flags));
-
+        self.flags = Some(flags);
         self
     }
 
@@ -193,17 +174,13 @@ impl<'a> CreateInteractionResponseFollowup<'a> {
     {
         let mut components = CreateComponents::default();
         f(&mut components);
-        let map = to_value(components).expect("CreateComponents builder should not fail!");
 
-        self.0.insert("components", map);
-        self
+        self.set_components(components)
     }
 
     /// Sets the components of this message.
     pub fn set_components(&mut self, components: CreateComponents) -> &mut Self {
-        let map = to_value(components).expect("CreateComponents builder should not fail!");
-        self.0.insert("components", map);
-
+        self.components = Some(components);
         self
     }
 }

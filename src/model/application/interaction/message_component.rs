@@ -193,12 +193,7 @@ impl MessageComponentInteraction {
         let mut interaction_response = CreateInteractionResponseFollowup::default();
         f(&mut interaction_response);
 
-        let map = json::hashmap_to_json_map(interaction_response.0);
-
-        Message::check_content_length(&map)?;
-        Message::check_embed_length(&map)?;
-
-        http.as_ref().create_followup_message(&self.token, &Value::from(map)).await
+        http.as_ref().create_followup_message(&self.token, &interaction_response).await
     }
 
     /// Edits a followup response to the response sent.
@@ -228,13 +223,8 @@ impl MessageComponentInteraction {
         let mut interaction_response = CreateInteractionResponseFollowup::default();
         f(&mut interaction_response);
 
-        let map = json::hashmap_to_json_map(interaction_response.0);
-
-        Message::check_content_length(&map)?;
-        Message::check_embed_length(&map)?;
-
         http.as_ref()
-            .edit_followup_message(&self.token, message_id.into().into(), &Value::from(map))
+            .edit_followup_message(&self.token, message_id.into().into(), &interaction_response)
             .await
     }
 
