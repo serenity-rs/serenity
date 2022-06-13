@@ -2,7 +2,6 @@ use std::collections::HashMap;
 
 use super::{CreateAllowedMentions, CreateEmbed};
 use crate::builder::CreateComponents;
-use crate::json;
 use crate::json::prelude::*;
 
 #[derive(Clone, Debug, Default)]
@@ -36,8 +35,7 @@ impl EditInteractionResponse {
 
     /// Adds an embed for the message.
     pub fn add_embed(&mut self, embed: CreateEmbed) -> &mut Self {
-        let map = json::hashmap_to_json_map(embed.0);
-        let embed = Value::from(map);
+        let embed = to_value(embed).expect("CreateEmbed builder should not fail!");
 
         let embeds = self.0.entry("embeds").or_insert_with(|| Value::from(Vec::<Value>::new()));
 
@@ -62,8 +60,8 @@ impl EditInteractionResponse {
     /// Calling this will overwrite the embed list.
     /// To append embeds, call [`Self::add_embed`] instead.
     pub fn set_embed(&mut self, embed: CreateEmbed) -> &mut Self {
-        let map = json::hashmap_to_json_map(embed.0);
-        let embed = Value::from(map);
+        let embed = to_value(embed).expect("CreateEmbed builder should not fail!");
+
         self.0.insert("embeds", Value::from(vec![embed]));
 
         self

@@ -5,7 +5,7 @@ use std::marker::PhantomData;
 use super::{CreateAllowedMentions, CreateEmbed};
 use crate::builder::CreateComponents;
 use crate::internal::prelude::*;
-use crate::json::{self, from_number, to_value};
+use crate::json::{from_number, to_value};
 #[cfg(feature = "model")]
 use crate::model::channel::AttachmentType;
 use crate::model::channel::{MessageFlags, MessageReference, ReactionType};
@@ -72,8 +72,7 @@ impl<'a> CreateMessage<'a> {
     }
 
     fn _add_embed(&mut self, embed: CreateEmbed) -> &mut Self {
-        let map = json::hashmap_to_json_map(embed.0);
-        let embed = Value::from(map);
+        let embed = to_value(embed).expect("CreateEmbed builder should not fail!");
 
         let embeds = self.0.entry("embeds").or_insert_with(|| Value::from(Vec::<Value>::new()));
         let embeds_array = embeds.as_array_mut().expect("Embeds must be an array");

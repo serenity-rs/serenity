@@ -117,8 +117,7 @@ impl<'a> CreateInteractionResponseData<'a> {
 
     /// Adds an embed to the message.
     pub fn add_embed(&mut self, embed: CreateEmbed) -> &mut Self {
-        let map = json::hashmap_to_json_map(embed.0);
-        let embed = Value::from(map);
+        let embed = to_value(embed).expect("CreateEmbed builder should not fail!");
 
         let embeds = self.0.entry("embeds").or_insert_with(|| Value::from(Vec::<Value>::new()));
 
@@ -143,8 +142,8 @@ impl<'a> CreateInteractionResponseData<'a> {
     /// Calling this will overwrite the embed list.
     /// To append embeds, call [`Self::add_embed`] instead.
     pub fn set_embed(&mut self, embed: CreateEmbed) -> &mut Self {
-        let map = json::hashmap_to_json_map(embed.0);
-        let embed = Value::from(map);
+        let embed = to_value(embed).expect("CreateEmbed builder should not fail!");
+
         self.0.insert("embeds", Value::from(vec![embed]));
 
         self
@@ -157,7 +156,7 @@ impl<'a> CreateInteractionResponseData<'a> {
     pub fn set_embeds(&mut self, embeds: impl IntoIterator<Item = CreateEmbed>) -> &mut Self {
         let embeds = embeds
             .into_iter()
-            .map(|embed| json::hashmap_to_json_map(embed.0).into())
+            .map(|embed| to_value(embed).expect("CreateEmbed builder should not fail!"))
             .collect::<Vec<Value>>();
 
         self.0.insert("embeds", Value::from(embeds));

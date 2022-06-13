@@ -44,8 +44,7 @@ impl<'a> EditMessage<'a> {
     }
 
     fn _add_embed(&mut self, embed: CreateEmbed) -> &mut Self {
-        let map = json::hashmap_to_json_map(embed.0);
-        let embed = Value::from(map);
+        let embed = to_value(embed).expect("CreateEmbed builder should not fail!");
 
         let embeds = self.0.entry("embeds").or_insert_with(|| Value::from(Vec::<Value>::new()));
         let embeds_array = embeds.as_array_mut().expect("Embeds must be an array");

@@ -45,13 +45,12 @@ impl CreateComponents {
     }
 }
 
-
 #[derive(Clone, Debug, Serialize)]
 #[serde(untagged)]
 enum ComponentBuilder {
     Button(CreateButton),
     SelectMenu(CreateSelectMenu),
-    InputText(CreateInputText)
+    InputText(CreateInputText),
 }
 
 /// A builder for creating an [`ActionRow`].
@@ -59,7 +58,7 @@ enum ComponentBuilder {
 /// [`ActionRow`]: crate::model::application::component::ActionRow
 #[derive(Clone, Debug, Serialize)]
 pub struct CreateActionRow {
-    components: Vec<ComponentBuilder>, 
+    components: Vec<ComponentBuilder>,
     kind: u8,
 }
 
@@ -246,7 +245,7 @@ pub struct CreateSelectMenu {
     #[serde(skip_serializing_if = "Option::is_none")]
     options: Option<CreateSelectMenuOptions>,
 
-    #[serde(rename="type")]
+    #[serde(rename = "type")]
     kind: u8,
 }
 
@@ -259,7 +258,7 @@ impl Default for CreateSelectMenu {
             custom_id: None,
             disabled: None,
             options: None,
-            kind: 3
+            kind: 3,
         }
     }
 }
@@ -445,7 +444,7 @@ pub struct CreateInputText {
     required: Option<bool>,
 
     #[serde(rename = "type")]
-    kind: u8
+    kind: u8,
 }
 
 impl Default for CreateInputText {

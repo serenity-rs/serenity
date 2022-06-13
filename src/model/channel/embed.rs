@@ -96,9 +96,8 @@ impl Embed {
     {
         let mut create_embed = CreateEmbed::default();
         f(&mut create_embed);
-        let map = json::hashmap_to_json_map(create_embed.0);
 
-        Value::from(map)
+        json::to_value(create_embed).expect("CreateEmbed builder should never fail!")
     }
 }
 
@@ -148,7 +147,7 @@ impl EmbedField {
         Self::_new(name.into(), value.into(), inline)
     }
 
-    fn _new(name: String, value: String, inline: bool) -> Self {
+    pub(crate) fn _new(name: String, value: String, inline: bool) -> Self {
         Self {
             name,
             value,
