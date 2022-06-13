@@ -173,7 +173,7 @@ impl Ratelimiter {
     #[instrument]
     pub async fn perform(&self, req: RatelimitedRequest<'_>) -> Result<Response> {
         let RatelimitedRequest {
-            mut req,
+            req,
         } = req;
 
         loop {
@@ -204,7 +204,7 @@ impl Ratelimiter {
 
             bucket.lock().await.pre_hook(&req.route, &self.ratelimit_callback).await;
 
-            let request = req.build(&self.client, &self.token, None).await?.build()?;
+            let request = req.clone().build(&self.client, &self.token, None).await?.build()?;
 
             let response = self.client.execute(request).await?;
 
