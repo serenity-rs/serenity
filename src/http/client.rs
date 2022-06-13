@@ -268,7 +268,7 @@ impl Http {
         &self,
         guild_id: u64,
         user_id: u64,
-        map: &JsonMap,
+        map: &impl serde::Serialize,
     ) -> Result<Option<Member>> {
         let body = to_vec(map)?;
 

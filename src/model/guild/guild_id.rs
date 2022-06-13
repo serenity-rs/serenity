@@ -70,9 +70,7 @@ impl GuildId {
         let mut builder = AddMember::default();
         f(&mut builder);
 
-        let map = json::hashmap_to_json_map(builder.0);
-
-        http.as_ref().add_guild_member(self.0, user_id.into().0, &map).await
+        http.as_ref().add_guild_member(self.0, user_id.into().0, &builder).await
     }
 
     /// Ban a [`User`] from the guild, deleting a number of
