@@ -68,8 +68,8 @@ impl EditGuild {
     /// ```
     ///
     /// [`utils::read_image`]: crate::utils::read_image
-    pub fn icon(&mut self, icon: Option<impl Into<String>>) -> &mut Self {
-        self.0.insert("icon", icon.map(Into::into).map_or(NULL, Value::String));
+    pub fn icon(&mut self, icon: Option<String>) -> &mut Self {
+        self.0.insert("icon", icon.map_or(NULL, Value::String));
         self
     }
 
@@ -131,8 +131,8 @@ impl EditGuild {
     /// You can check this through a guild's [`features`] list.
     ///
     /// [`features`]: crate::model::guild::Guild::features
-    pub fn splash(&mut self, splash: Option<impl Into<String>>) -> &mut Self {
-        let splash = splash.map(Into::into).map_or(NULL, Value::String);
+    pub fn splash(&mut self, splash: Option<String>) -> &mut Self {
+        let splash = splash.map_or(NULL, Value::String);
         self.0.insert("splash", splash);
         self
     }
@@ -145,8 +145,8 @@ impl EditGuild {
     /// You can check this through a guild's [`features`] list.
     ///
     /// [`features`]: crate::model::guild::Guild::features
-    pub fn discovery_splash(&mut self, splash: Option<impl Into<String>>) -> &mut Self {
-        let splash = splash.map(Into::into).map_or(NULL, Value::String);
+    pub fn discovery_splash(&mut self, splash: Option<String>) -> &mut Self {
+        let splash = splash.map_or(NULL, Value::String);
         self.0.insert("discovery_splash", splash);
         self
     }
@@ -159,8 +159,8 @@ impl EditGuild {
     /// You can check this through a guild's [`features`] list.
     ///
     /// [`features`]: crate::model::guild::Guild::features
-    pub fn banner(&mut self, banner: Option<impl Into<String>>) -> &mut Self {
-        let banner = banner.map(Into::into).map_or(NULL, Value::String);
+    pub fn banner(&mut self, banner: Option<String>) -> &mut Self {
+        let banner = banner.map_or(NULL, Value::String);
         self.0.insert("banner", banner);
         self
     }
@@ -201,8 +201,8 @@ impl EditGuild {
     ///
     /// **Note**:
     /// This feature is for Community guilds only.
-    pub fn preferred_locale(&mut self, locale: Option<impl Into<String>>) -> &mut Self {
-        let locale = locale.map(Into::into).map_or(NULL, Value::String);
+    pub fn preferred_locale(&mut self, locale: Option<String>) -> &mut Self {
+        let locale = locale.map_or(NULL, Value::String);
         self.0.insert("preferred_locale", locale);
         self
     }

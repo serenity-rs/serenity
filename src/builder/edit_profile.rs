@@ -46,8 +46,8 @@ impl EditProfile {
     /// ```
     ///
     /// [`utils::read_image`]: crate::utils::read_image
-    pub fn avatar(&mut self, avatar: Option<impl Into<String>>) -> &mut Self {
-        let avatar = avatar.map(Into::into).map_or(NULL, Value::String);
+    pub fn avatar(&mut self, avatar: Option<String>) -> &mut Self {
+        let avatar = avatar.map_or(NULL, Value::String);
         self.0.insert("avatar", avatar);
         self
     }
