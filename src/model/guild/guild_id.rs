@@ -347,9 +347,7 @@ impl GuildId {
         let mut builder = CreateScheduledEvent::default();
         f(&mut builder);
 
-        let map = json::hashmap_to_json_map(builder.0);
-
-        http.as_ref().create_scheduled_event(self.0, &map, None).await
+        http.as_ref().create_scheduled_event(self.0, &builder, None).await
     }
 
     /// Creates a new sticker in the guild with the data set, if any.
