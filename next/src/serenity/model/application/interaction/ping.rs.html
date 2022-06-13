@@ -22,13 +22,8 @@
 <span id="17">17</span>
 <span id="18">18</span>
 <span id="19">19</span>
-<span id="20">20</span>
-<span id="21">21</span>
-<span id="22">22</span>
-<span id="23">23</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">serde</span>::{<span class="ident">Deserialize</span>, <span class="ident">Serialize</span>};
 
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::application::interaction::InteractionType</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::id</span>::{<span class="ident">ApplicationId</span>, <span class="ident">InteractionId</span>};
 
 <span class="doccomment">/// A ping interaction, which can only be received through an endpoint url.</span>
@@ -39,9 +34,6 @@
     <span class="kw">pub</span> <span class="ident">id</span>: <span class="ident">InteractionId</span>,
     <span class="doccomment">/// Id of the application this interaction is for.</span>
     <span class="kw">pub</span> <span class="ident">application_id</span>: <span class="ident">ApplicationId</span>,
-    <span class="doccomment">/// The type of interaction.</span>
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename</span> <span class="op">=</span> <span class="string">&quot;type&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">kind</span>: <span class="ident">InteractionType</span>,
     <span class="doccomment">/// A continuation token for responding to the interaction.</span>
     <span class="kw">pub</span> <span class="ident">token</span>: <span class="ident">String</span>,
     <span class="doccomment">/// Always `1`.</span>

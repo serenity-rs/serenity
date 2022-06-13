@@ -312,11 +312,6 @@
 <span id="307">307</span>
 <span id="308">308</span>
 <span id="309">309</span>
-<span id="310">310</span>
-<span id="311">311</span>
-<span id="312">312</span>
-<span id="313">313</span>
-<span id="314">314</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">serde::de</span>::{<span class="ident">Deserialize</span>, <span class="ident">Deserializer</span>, <span class="ident">Error</span> <span class="kw">as</span> <span class="ident">DeError</span>};
 <span class="kw">use</span> <span class="ident">serde::Serialize</span>;
 
@@ -334,7 +329,6 @@
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::application::component::ActionRow</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http&quot;</span>)]</span>
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::application::interaction::InteractionResponseType</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::application::interaction::InteractionType</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::channel::Message</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::guild::Member</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http&quot;</span>)]</span>
@@ -351,9 +345,6 @@
     <span class="kw">pub</span> <span class="ident">id</span>: <span class="ident">InteractionId</span>,
     <span class="doccomment">/// Id of the application this interaction is for.</span>
     <span class="kw">pub</span> <span class="ident">application_id</span>: <span class="ident">ApplicationId</span>,
-    <span class="doccomment">/// The type of interaction.</span>
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename</span> <span class="op">=</span> <span class="string">&quot;type&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">kind</span>: <span class="ident">InteractionType</span>,
     <span class="doccomment">/// The data of the interaction which was triggered.</span>
     <span class="kw">pub</span> <span class="ident">data</span>: <span class="ident">ModalSubmitInteractionData</span>,
     <span class="doccomment">/// The message this interaction was triggered by</span>
@@ -610,7 +601,6 @@
             <span class="ident">id</span>: <span class="ident">remove_from_map</span>(<span class="kw-2">&amp;mut</span> <span class="ident">map</span>, <span class="string">&quot;id&quot;</span>)<span class="question-mark">?</span>,
             <span class="ident">guild_id</span>: <span class="ident">remove_from_map_opt</span>(<span class="kw-2">&amp;mut</span> <span class="ident">map</span>, <span class="string">&quot;guild_id&quot;</span>)<span class="question-mark">?</span>,
             <span class="ident">application_id</span>: <span class="ident">remove_from_map</span>(<span class="kw-2">&amp;mut</span> <span class="ident">map</span>, <span class="string">&quot;application_id&quot;</span>)<span class="question-mark">?</span>,
-            <span class="ident">kind</span>: <span class="ident">remove_from_map</span>(<span class="kw-2">&amp;mut</span> <span class="ident">map</span>, <span class="string">&quot;type&quot;</span>)<span class="question-mark">?</span>,
             <span class="ident">data</span>: <span class="ident">remove_from_map</span>(<span class="kw-2">&amp;mut</span> <span class="ident">map</span>, <span class="string">&quot;data&quot;</span>)<span class="question-mark">?</span>,
             <span class="ident">message</span>: <span class="ident">remove_from_map</span>(<span class="kw-2">&amp;mut</span> <span class="ident">map</span>, <span class="string">&quot;message&quot;</span>)<span class="question-mark">?</span>,
             <span class="ident">channel_id</span>: <span class="ident">remove_from_map</span>(<span class="kw-2">&amp;mut</span> <span class="ident">map</span>, <span class="string">&quot;channel_id&quot;</span>)<span class="question-mark">?</span>,

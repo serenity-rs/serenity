@@ -568,10 +568,6 @@
 <span id="563">563</span>
 <span id="564">564</span>
 <span id="565">565</span>
-<span id="566">566</span>
-<span id="567">567</span>
-<span id="568">568</span>
-<span id="569">569</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::collections::HashMap</span>;
 
 <span class="kw">use</span> <span class="ident">serde::de::Error</span> <span class="kw">as</span> <span class="ident">DeError</span>;
@@ -589,9 +585,9 @@
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http&quot;</span>)]</span>
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::json</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::application::command</span>::{<span class="ident">CommandOptionType</span>, <span class="ident">CommandType</span>};
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::application::interaction::add_guild_id_to_resolved</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http&quot;</span>)]</span>
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::application::interaction::InteractionResponseType</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::application::interaction</span>::{<span class="ident">add_guild_id_to_resolved</span>, <span class="ident">InteractionType</span>};
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::channel</span>::{<span class="ident">Attachment</span>, <span class="ident">Message</span>, <span class="ident">PartialChannel</span>};
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::guild</span>::{<span class="ident">Member</span>, <span class="ident">PartialMember</span>, <span class="ident">Role</span>};
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::id</span>::{
@@ -621,9 +617,6 @@
     <span class="kw">pub</span> <span class="ident">id</span>: <span class="ident">InteractionId</span>,
     <span class="doccomment">/// Id of the application this interaction is for.</span>
     <span class="kw">pub</span> <span class="ident">application_id</span>: <span class="ident">ApplicationId</span>,
-    <span class="doccomment">/// The type of interaction.</span>
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename</span> <span class="op">=</span> <span class="string">&quot;type&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">kind</span>: <span class="ident">InteractionType</span>,
     <span class="doccomment">/// The data of the interaction which was triggered.</span>
     <span class="kw">pub</span> <span class="ident">data</span>: <span class="ident">CommandData</span>,
     <span class="doccomment">/// The guild Id this interaction was sent from, if there is one.</span>
@@ -923,7 +916,6 @@
             <span class="ident">user</span>,
             <span class="ident">id</span>: <span class="ident">remove_from_map</span>(<span class="kw-2">&amp;mut</span> <span class="ident">map</span>, <span class="string">&quot;id&quot;</span>)<span class="question-mark">?</span>,
             <span class="ident">application_id</span>: <span class="ident">remove_from_map</span>(<span class="kw-2">&amp;mut</span> <span class="ident">map</span>, <span class="string">&quot;application_id&quot;</span>)<span class="question-mark">?</span>,
-            <span class="ident">kind</span>: <span class="ident">remove_from_map</span>(<span class="kw-2">&amp;mut</span> <span class="ident">map</span>, <span class="string">&quot;type&quot;</span>)<span class="question-mark">?</span>,
             <span class="ident">data</span>: <span class="ident">remove_from_map</span>(<span class="kw-2">&amp;mut</span> <span class="ident">map</span>, <span class="string">&quot;data&quot;</span>)<span class="question-mark">?</span>,
             <span class="ident">channel_id</span>: <span class="ident">remove_from_map</span>(<span class="kw-2">&amp;mut</span> <span class="ident">map</span>, <span class="string">&quot;channel_id&quot;</span>)<span class="question-mark">?</span>,
             <span class="ident">token</span>: <span class="ident">remove_from_map</span>(<span class="kw-2">&amp;mut</span> <span class="ident">map</span>, <span class="string">&quot;token&quot;</span>)<span class="question-mark">?</span>,
