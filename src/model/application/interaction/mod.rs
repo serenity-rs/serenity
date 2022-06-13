@@ -13,7 +13,6 @@ use self::message_component::MessageComponentInteraction;
 use self::modal::ModalSubmitInteraction;
 use self::ping::PingInteraction;
 use crate::json::{from_value, JsonMap, Value};
-use crate::model::guild::PartialMember;
 use crate::model::id::{ApplicationId, InteractionId};
 use crate::model::user::User;
 
@@ -243,8 +242,6 @@ pub struct MessageInteraction {
     pub name: String,
     /// The user who invoked the interaction.
     pub user: User,
-    /// If in a guild, the member who invoked the interaction.
-    pub member: Option<PartialMember>,
 }
 
 /// The available responses types for an interaction response.

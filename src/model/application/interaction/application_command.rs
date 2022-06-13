@@ -608,7 +608,6 @@ pub struct CommandDataOption {
     /// The name of the parameter.
     pub name: String,
     /// The given value.
-    // TODO: Why does this field exist? Why a raw json Value when CommandDataOptionValue exists
     pub value: Option<Value>,
     /// The value type.
     #[serde(rename = "type")]
