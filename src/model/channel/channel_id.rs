@@ -89,9 +89,7 @@ impl ChannelId {
         let mut invite = CreateInvite::default();
         f(&mut invite);
 
-        let map = json::hashmap_to_json_map(invite.0);
-
-        http.as_ref().create_invite(self.0, &map, None).await
+        http.as_ref().create_invite(self.0, &invite, None).await
     }
 
     /// Creates a [permission overwrite][`PermissionOverwrite`] for either a
