@@ -544,7 +544,7 @@ deserialize the response into a <a href="../../model/channel/struct.Message.html
 <span class="kw">let</span> <span class="ident">route_info</span> <span class="op">=</span> <span class="ident">RouteInfo::CreateMessage</span> { <span class="ident">channel_id</span> };
 
 <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">request</span> <span class="op">=</span> <span class="ident">RequestBuilder::new</span>(<span class="ident">route_info</span>);
-<span class="ident">request</span>.<span class="ident">body</span>(<span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="ident">bytes</span>));
+<span class="ident">request</span>.<span class="ident">body</span>(<span class="prelude-val">Some</span>(<span class="ident">bytes</span>));
 
 <span class="kw">let</span> <span class="ident">message</span> <span class="op">=</span> <span class="ident">http</span>.<span class="ident">fire</span>::<span class="op">&lt;</span><span class="ident">Message</span><span class="op">&gt;</span>(<span class="ident">request</span>.<span class="ident">build</span>()).<span class="kw">await</span><span class="question-mark">?</span>;
 
@@ -569,7 +569,7 @@ into some type.</p>
 <span class="kw">let</span> <span class="ident">route_info</span> <span class="op">=</span> <span class="ident">RouteInfo::CreateMessage</span> { <span class="ident">channel_id</span> };
 
 <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">request</span> <span class="op">=</span> <span class="ident">RequestBuilder::new</span>(<span class="ident">route_info</span>);
-<span class="ident">request</span>.<span class="ident">body</span>(<span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="ident">bytes</span>));
+<span class="ident">request</span>.<span class="ident">body</span>(<span class="prelude-val">Some</span>(<span class="ident">bytes</span>));
 
 <span class="kw">let</span> <span class="ident">response</span> <span class="op">=</span> <span class="ident">http</span>.<span class="ident">request</span>(<span class="ident">request</span>.<span class="ident">build</span>()).<span class="kw">await</span><span class="question-mark">?</span>;
 
