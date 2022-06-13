@@ -13,9 +13,9 @@ use crate::internal::prelude::*;
 #[cfg(feature = "http")]
 use crate::json;
 use crate::model::application::component::ComponentType;
+use crate::model::application::interaction::add_guild_id_to_resolved;
 #[cfg(feature = "http")]
 use crate::model::application::interaction::InteractionResponseType;
-use crate::model::application::interaction::{add_guild_id_to_resolved, InteractionType};
 use crate::model::channel::Message;
 use crate::model::guild::Member;
 #[cfg(feature = "http")]
@@ -32,9 +32,6 @@ pub struct MessageComponentInteraction {
     pub id: InteractionId,
     /// Id of the application this interaction is for.
     pub application_id: ApplicationId,
-    /// The type of interaction.
-    #[serde(rename = "type")]
-    pub kind: InteractionType,
     /// The data of the interaction which was triggered.
     pub data: MessageComponentInteractionData,
     /// The message this interaction was triggered by, if
@@ -310,7 +307,6 @@ impl<'de> Deserialize<'de> for MessageComponentInteraction {
             user,
             id: remove_from_map(&mut map, "id")?,
             application_id: remove_from_map(&mut map, "application_id")?,
-            kind: remove_from_map(&mut map, "type")?,
             data: remove_from_map(&mut map, "data")?,
             message: remove_from_map(&mut map, "message")?,
             channel_id: remove_from_map(&mut map, "channel_id")?,
