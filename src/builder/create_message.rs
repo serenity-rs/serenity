@@ -1,11 +1,8 @@
-use std::collections::HashMap;
 #[cfg(not(feature = "model"))]
 use std::marker::PhantomData;
 
 use super::{CreateAllowedMentions, CreateEmbed};
 use crate::builder::CreateComponents;
-use crate::internal::prelude::*;
-use crate::json::{from_number, to_value};
 #[cfg(feature = "model")]
 use crate::model::channel::AttachmentType;
 use crate::model::channel::{MessageFlags, MessageReference, ReactionType};
@@ -49,13 +46,33 @@ use crate::model::id::StickerId;
 /// [`ChannelId::say`]: crate::model::id::ChannelId::say
 /// [`ChannelId::send_message`]: crate::model::id::ChannelId::send_message
 /// [`Http::send_message`]: crate::http::client::Http::send_message
-#[derive(Clone, Debug)]
-pub struct CreateMessage<'a>(
-    pub HashMap<&'static str, Value>,
-    pub Option<Vec<ReactionType>>,
-    #[cfg(feature = "model")] pub Vec<AttachmentType<'a>>,
-    #[cfg(not(feature = "model"))] PhantomData<&'a ()>,
-);
+#[derive(Clone, Debug, Default, Serialize)]
+pub struct CreateMessage<'a> {
+    tts: bool,
+    embeds: Vec<CreateEmbed>,
+    sticker_ids: Vec<StickerId>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    content: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    allowed_mentions: Option<CreateAllowedMentions>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    message_reference: Option<MessageReference>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    components: Option<CreateComponents>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    flags: Option<MessageFlags>,
+
+    // Following fields are not sent to discord, and are
+    // instead handled seperately.
+    #[serde(skip)]
+    #[cfg(feature = "model")]
+    pub(crate) files: Vec<AttachmentType<'a>>,
+    #[cfg(not(feature = "model"))]
+    pub(crate) files: PhantomData<&'a ()>,
+
+    #[serde(skip)]
+    pub(crate) reactions: Vec<ReactionType>,
+}
 
 impl<'a> CreateMessage<'a> {
     /// Set the content of the message.
@@ -63,22 +80,12 @@ impl<'a> CreateMessage<'a> {
     /// **Note**: Message contents must be under 2000 unicode code points.
     #[inline]
     pub fn content(&mut self, content: impl Into<String>) -> &mut Self {
-        self._content(content.into())
-    }
-
-    fn _content(&mut self, content: String) -> &mut Self {
-        self.0.insert("content", Value::String(content));
+        self.content = Some(content.into());
         self
     }
 
     fn _add_embed(&mut self, embed: CreateEmbed) -> &mut Self {
-        let embed = to_value(embed).expect("CreateEmbed builder should not fail!");
-
-        let embeds = self.0.entry("embeds").or_insert_with(|| Value::from(Vec::<Value>::new()));
-        let embeds_array = embeds.as_array_mut().expect("Embeds must be an array");
-
-        embeds_array.push(embed);
-
+        self.embeds.push(embed);
         self
     }
 
@@ -100,10 +107,7 @@ impl<'a> CreateMessage<'a> {
     /// **Note**: This will keep all existing embeds. Use [`Self::set_embeds()`] to replace existing
     /// embeds.
     pub fn add_embeds(&mut self, embeds: Vec<CreateEmbed>) -> &mut Self {
-        for embed in embeds {
-            self._add_embed(embed);
-        }
-
+        self.embeds.extend(embeds);
         self
     }
 
@@ -119,8 +123,8 @@ impl<'a> CreateMessage<'a> {
     {
         let mut embed = CreateEmbed::default();
         f(&mut embed);
-        self.0.insert("embeds", Value::from(Vec::<Value>::new()));
-        self._add_embed(embed)
+
+        self.set_embed(embed)
     }
 
     /// Set an embed for the message.
@@ -130,8 +134,7 @@ impl<'a> CreateMessage<'a> {
     /// **Note**: This will replace all existing embeds.
     /// Use [`Self::add_embed()`] to add an additional embed.
     pub fn set_embed(&mut self, embed: CreateEmbed) -> &mut Self {
-        self.0.insert("embeds", Value::from(Vec::<Value>::new()));
-        self._add_embed(embed)
+        self.set_embeds(vec![embed])
     }
 
     /// Set multiple embeds for the message.
@@ -139,11 +142,7 @@ impl<'a> CreateMessage<'a> {
     /// **Note**: This will replace all existing embeds. Use [`Self::add_embeds()`] to keep existing
     /// embeds.
     pub fn set_embeds(&mut self, embeds: Vec<CreateEmbed>) -> &mut Self {
-        self.0.insert("embeds", Value::from(Vec::<Value>::new()));
-        for embed in embeds {
-            self._add_embed(embed);
-        }
-
+        self.embeds = embeds;
         self
     }
 
@@ -153,7 +152,7 @@ impl<'a> CreateMessage<'a> {
     ///
     /// Defaults to `false`.
     pub fn tts(&mut self, tts: bool) -> &mut Self {
-        self.0.insert("tts", Value::from(tts));
+        self.tts = tts;
         self
     }
 
@@ -163,18 +162,14 @@ impl<'a> CreateMessage<'a> {
         &mut self,
         reactions: It,
     ) -> &mut Self {
-        self._reactions(reactions.into_iter().map(Into::into).collect());
+        self.reactions = reactions.into_iter().map(Into::into).collect();
         self
-    }
-
-    fn _reactions(&mut self, reactions: Vec<ReactionType>) {
-        self.1 = Some(reactions);
     }
 
     /// Appends a file to the message.
     #[cfg(feature = "model")]
     pub fn add_file<T: Into<AttachmentType<'a>>>(&mut self, file: T) -> &mut Self {
-        self.2.push(file.into());
+        self.files.push(file.into());
         self
     }
 
@@ -184,7 +179,7 @@ impl<'a> CreateMessage<'a> {
         &mut self,
         files: It,
     ) -> &mut Self {
-        self.2.extend(files.into_iter().map(Into::into));
+        self.files.extend(files.into_iter().map(Into::into));
         self
     }
 
@@ -197,7 +192,7 @@ impl<'a> CreateMessage<'a> {
         &mut self,
         files: It,
     ) -> &mut Self {
-        self.2 = files.into_iter().map(Into::into).collect();
+        self.files = files.into_iter().map(Into::into).collect();
         self
     }
 
@@ -208,16 +203,15 @@ impl<'a> CreateMessage<'a> {
     {
         let mut allowed_mentions = CreateAllowedMentions::default();
         f(&mut allowed_mentions);
-        let map = to_value(allowed_mentions).expect("AllowedMentions builder should not fail!");
 
-        self.0.insert("allowed_mentions", map);
+        self.allowed_mentions = Some(allowed_mentions);
         self
     }
 
     /// Set the reference message this message is a reply to.
     #[allow(clippy::unwrap_used)] // allowing unwrap here because serializing MessageReference should never error
     pub fn reference_message(&mut self, reference: impl Into<MessageReference>) -> &mut Self {
-        self.0.insert("message_reference", to_value(reference.into()).unwrap());
+        self.message_reference = Some(reference.into());
         self
     }
 
@@ -234,15 +228,13 @@ impl<'a> CreateMessage<'a> {
 
     /// Sets the components of this message.
     pub fn set_components(&mut self, components: CreateComponents) -> &mut Self {
-        let map = to_value(components).expect("CreateComponents builder should not fail!");
-        self.0.insert("components", map);
-
+        self.components = Some(components);
         self
     }
 
     /// Sets the flags for the message.
     pub fn flags(&mut self, flags: MessageFlags) -> &mut Self {
-        self.0.insert("flags", from_number(flags.bits()));
+        self.flags = Some(flags);
         self
     }
 
@@ -251,8 +243,7 @@ impl<'a> CreateMessage<'a> {
     /// **Note**: This will replace all existing stickers. Use
     /// [`Self::add_sticker_id()`] to add an additional sticker.
     pub fn sticker_id(&mut self, sticker_id: impl Into<StickerId>) -> &mut Self {
-        self.0.insert("sticker_ids", Value::from(Vec::<Value>::new()));
-        self.add_sticker_id(sticker_id)
+        self.set_sticker_ids(vec![sticker_id.into()])
     }
 
     /// Add a sticker ID for the message.
@@ -262,12 +253,7 @@ impl<'a> CreateMessage<'a> {
     /// **Note**: This will keep all existing stickers. Use
     /// [`Self::set_sticker_ids()`] to replace existing stickers.
     pub fn add_sticker_id(&mut self, sticker_id: impl Into<StickerId>) -> &mut Self {
-        let sticker_ids =
-            self.0.entry("sticker_ids").or_insert_with(|| Value::from(Vec::<Value>::new()));
-        let sticker_ids_array = sticker_ids.as_array_mut().expect("Sticker_ids must be an array");
-
-        sticker_ids_array.push(Value::from(sticker_id.into().0));
-
+        self.sticker_ids.push(sticker_id.into());
         self
     }
 
@@ -299,22 +285,7 @@ impl<'a> CreateMessage<'a> {
         &mut self,
         sticker_ids: It,
     ) -> &mut Self {
-        self.0.insert("sticker_ids", Value::from(Vec::<Value>::new()));
-        self.add_sticker_ids(sticker_ids)
-    }
-}
-
-impl<'a> Default for CreateMessage<'a> {
-    /// Creates a map for sending a [`Message`], setting [`Self::tts`] to `false` by
-    /// default.
-    ///
-    /// [`Message`]: crate::model::channel::Message
-    fn default() -> CreateMessage<'a> {
-        let mut map = HashMap::new();
-        map.insert("tts", Value::from(false));
-
-        // Necessary because the type of the third field is different without model feature
-        #[allow(clippy::default_trait_access)]
-        CreateMessage(map, None, Default::default())
+        self.sticker_ids = sticker_ids.into_iter().map(Into::into).collect();
+        self
     }
 }

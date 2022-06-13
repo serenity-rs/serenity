@@ -3642,7 +3642,7 @@ impl Http {
         &self,
         channel_id: u64,
         files: It,
-        map: &JsonMap,
+        map: &impl serde::Serialize,
     ) -> Result<Message>
     where
         T: Into<AttachmentType<'a>>,
@@ -3663,7 +3663,11 @@ impl Http {
     }
 
     /// Sends a message to a channel.
-    pub async fn send_message(&self, channel_id: u64, map: &Value) -> Result<Message> {
+    pub async fn send_message(
+        &self,
+        channel_id: u64,
+        map: &impl serde::Serialize,
+    ) -> Result<Message> {
         let body = to_vec(map)?;
 
         self.fire(Request {

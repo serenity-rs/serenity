@@ -744,14 +744,8 @@ impl ChannelId {
         T: Into<AttachmentType<'a>>,
         It: IntoIterator<Item = T>,
     {
-        let mut create_message = CreateMessage::default();
-        let msg = f(&mut create_message);
-
-        let map = json::hashmap_to_json_map(msg.0.clone());
-
-        Message::check_lengths(&map)?;
-
-        http.as_ref().send_files(self.0, files, &map).await
+        let mut builder = CreateMessage::default();
+        http.as_ref().send_files(self.0, files, f(&mut builder)).await
     }
 
     /// Sends a message to the channel.
@@ -782,21 +776,17 @@ impl ChannelId {
         self._send_message(http.as_ref(), create_message).await
     }
 
-    async fn _send_message<'a>(self, http: &Http, msg: CreateMessage<'a>) -> Result<Message> {
-        let map = json::hashmap_to_json_map(msg.0);
+    async fn _send_message<'a>(self, http: &Http, mut msg: CreateMessage<'a>) -> Result<Message> {
+        let files = std::mem::take(&mut msg.files);
 
-        Message::check_lengths(&map)?;
-
-        let message = if msg.2.is_empty() {
-            http.as_ref().send_message(self.0, &Value::from(map)).await?
+        let message = if files.is_empty() {
+            http.as_ref().send_message(self.0, &msg).await?
         } else {
-            http.as_ref().send_files(self.0, msg.2, &map).await?
+            http.as_ref().send_files(self.0, files, &msg).await?
         };
 
-        if let Some(reactions) = msg.1 {
-            for reaction in reactions {
-                self.create_reaction(&http, message.id, reaction).await?;
-            }
+        for reaction in msg.reactions {
+            self.create_reaction(&http, message.id, reaction).await?;
         }
 
         Ok(message)
