@@ -1540,7 +1540,7 @@ impl Http {
         &self,
         guild_id: u64,
         command_id: u64,
-        map: &Value,
+        map: &impl serde::Serialize,
     ) -> Result<CommandPermission> {
         self.fire(Request {
             body: Some(to_vec(map)?),
@@ -1565,7 +1565,7 @@ impl Http {
     pub async fn edit_guild_application_commands_permissions(
         &self,
         guild_id: u64,
-        map: &Value,
+        map: &impl serde::Serialize,
     ) -> Result<Vec<CommandPermission>> {
         self.fire(Request {
             body: Some(to_vec(map)?),

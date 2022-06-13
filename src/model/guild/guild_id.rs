@@ -1468,11 +1468,7 @@ impl GuildId {
         f(&mut map);
 
         http.as_ref()
-            .edit_guild_application_command_permissions(
-                self.0,
-                command_id.into(),
-                &Value::from(json::hashmap_to_json_map(map.0)),
-            )
+            .edit_guild_application_command_permissions(self.0, command_id.into(), &map)
             .await
     }
 
@@ -1497,7 +1493,7 @@ impl GuildId {
         let mut map = CreateApplicationCommandsPermissions::default();
         f(&mut map);
 
-        http.as_ref().edit_guild_application_commands_permissions(self.0, &Value::from(map.0)).await
+        http.as_ref().edit_guild_application_commands_permissions(self.0, &map).await
     }
 
     /// Get all guild application commands.
