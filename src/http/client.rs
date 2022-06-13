@@ -276,7 +276,7 @@ impl Http {
 
         let response = self
             .request(Request {
-                body: Some(&body),
+                body: Some(body),
                 multipart: None,
                 headers: None,
                 route: RouteInfo::AddGuildMember {
@@ -384,7 +384,7 @@ impl Http {
         let body = to_vec(map)?;
 
         self.fire(Request {
-            body: Some(&body),
+            body: Some(body),
             multipart: None,
             headers: audit_log_reason.map(reason_into_header),
             route: RouteInfo::CreateChannel {
@@ -397,7 +397,7 @@ impl Http {
     /// Creates a stage instance.
     pub async fn create_stage_instance(&self, map: &Value) -> Result<StageInstance> {
         self.fire(Request {
-            body: Some(to_string(map)?.as_bytes()),
+            body: Some(to_vec(map)?),
             multipart: None,
             headers: None,
             route: RouteInfo::CreateStageInstance,
@@ -416,7 +416,7 @@ impl Http {
         let body = to_vec(map)?;
 
         self.fire(Request {
-            body: Some(&body),
+            body: Some(body),
             multipart: None,
             headers: None,
             route: RouteInfo::CreatePublicThread {
@@ -436,7 +436,7 @@ impl Http {
         let body = to_vec(map)?;
 
         self.fire(Request {
-            body: Some(&body),
+            body: Some(body),
             multipart: None,
             headers: None,
             route: RouteInfo::CreatePrivateThread {
@@ -461,7 +461,7 @@ impl Http {
         audit_log_reason: Option<&str>,
     ) -> Result<Emoji> {
         self.fire(Request {
-            body: Some(to_string(map)?.as_bytes()),
+            body: Some(to_vec(map)?),
             multipart: None,
             headers: audit_log_reason.map(reason_into_header),
             route: RouteInfo::CreateEmoji {
@@ -480,7 +480,7 @@ impl Http {
         map: &Value,
     ) -> Result<Message> {
         self.fire(Request {
-            body: Some(to_string(map)?.as_bytes()),
+            body: Some(to_vec(map)?),
             multipart: None,
             headers: None,
             route: RouteInfo::CreateFollowupMessage {
@@ -529,7 +529,7 @@ impl Http {
     /// [docs]: https://discord.com/developers/docs/interactions/slash-commands#create-global-application-command
     pub async fn create_global_application_command(&self, map: &Value) -> Result<Command> {
         self.fire(Request {
-            body: Some(to_string(map)?.as_bytes()),
+            body: Some(to_vec(map)?),
             multipart: None,
             headers: None,
             route: RouteInfo::CreateGlobalApplicationCommand {
@@ -542,7 +542,7 @@ impl Http {
     /// Creates new global application commands.
     pub async fn create_global_application_commands(&self, map: &Value) -> Result<Vec<Command>> {
         self.fire(Request {
-            body: Some(to_string(map)?.as_bytes()),
+            body: Some(to_vec(map)?),
             multipart: None,
             headers: None,
             route: RouteInfo::CreateGlobalApplicationCommands {
@@ -559,7 +559,7 @@ impl Http {
         map: &Value,
     ) -> Result<Vec<Command>> {
         self.fire(Request {
-            body: Some(to_string(map)?.as_bytes()),
+            body: Some(to_vec(map)?),
             multipart: None,
             headers: None,
             route: RouteInfo::CreateGuildApplicationCommands {
@@ -605,7 +605,7 @@ impl Http {
     /// [whitelist]: https://discord.com/developers/docs/resources/guild#create-guild
     pub async fn create_guild(&self, map: &Value) -> Result<PartialGuild> {
         self.fire(Request {
-            body: Some(to_string(map)?.as_bytes()),
+            body: Some(to_vec(map)?),
             multipart: None,
             headers: None,
             route: RouteInfo::CreateGuild,
@@ -626,7 +626,7 @@ impl Http {
         map: &Value,
     ) -> Result<Command> {
         self.fire(Request {
-            body: Some(to_string(map)?.as_bytes()),
+            body: Some(to_vec(map)?),
             multipart: None,
             headers: None,
             route: RouteInfo::CreateGuildApplicationCommand {
@@ -653,7 +653,7 @@ impl Http {
         audit_log_reason: Option<&str>,
     ) -> Result<()> {
         self.wind(204, Request {
-            body: Some(to_string(map)?.as_bytes()),
+            body: Some(to_vec(map)?),
             multipart: None,
             headers: audit_log_reason.map(reason_into_header),
             route: RouteInfo::CreateGuildIntegration {
@@ -677,7 +677,7 @@ impl Http {
         map: &Value,
     ) -> Result<()> {
         self.wind(204, Request {
-            body: Some(to_string(map)?.as_bytes()),
+            body: Some(to_vec(map)?),
             multipart: None,
             headers: None,
             route: RouteInfo::CreateInteractionResponse {
@@ -736,7 +736,7 @@ impl Http {
         let body = to_vec(map)?;
 
         self.fire(Request {
-            body: Some(&body),
+            body: Some(body),
             multipart: None,
             headers: audit_log_reason.map(reason_into_header),
             route: RouteInfo::CreateInvite {
@@ -756,7 +756,7 @@ impl Http {
         let body = to_vec(map)?;
 
         self.wind(204, Request {
-            body: Some(&body),
+            body: Some(body),
             multipart: None,
             headers: None,
             route: RouteInfo::CreatePermission {
@@ -772,7 +772,7 @@ impl Http {
         let body = to_vec(map)?;
 
         self.fire(Request {
-            body: Some(&body),
+            body: Some(body),
             multipart: None,
             headers: None,
             route: RouteInfo::CreatePrivateChannel,
@@ -810,7 +810,7 @@ impl Http {
         let body = to_vec(map)?;
         let mut value = self
             .request(Request {
-                body: Some(&body),
+                body: Some(body),
                 multipart: None,
                 headers: audit_log_reason.map(reason_into_header),
                 route: RouteInfo::CreateRole {
@@ -843,7 +843,7 @@ impl Http {
     ) -> Result<ScheduledEvent> {
         let body = to_vec(map)?;
         self.fire(Request {
-            body: Some(&body),
+            body: Some(body),
             multipart: None,
             headers: audit_log_reason.map(reason_into_header),
             route: RouteInfo::CreateScheduledEvent {
@@ -930,7 +930,7 @@ impl Http {
         let body = to_vec(map)?;
 
         self.fire(Request {
-            body: Some(&body),
+            body: Some(body),
             multipart: None,
             headers: audit_log_reason.map(reason_into_header),
             route: RouteInfo::CreateWebhook {
@@ -1090,7 +1090,7 @@ impl Http {
     /// Deletes a bunch of messages, only works for bots.
     pub async fn delete_messages(&self, channel_id: u64, map: &Value) -> Result<()> {
         self.wind(204, Request {
-            body: Some(to_string(map)?.as_bytes()),
+            body: Some(to_vec(map)?),
             multipart: None,
             headers: None,
             route: RouteInfo::DeleteMessages {
@@ -1339,7 +1339,7 @@ impl Http {
         let body = to_vec(map)?;
 
         self.fire(Request {
-            body: Some(&body),
+            body: Some(body),
             multipart: None,
             headers: audit_log_reason.map(reason_into_header),
             route: RouteInfo::EditChannel {
@@ -1352,7 +1352,7 @@ impl Http {
     /// Edits a stage instance.
     pub async fn edit_stage_instance(&self, channel_id: u64, map: &Value) -> Result<StageInstance> {
         self.fire(Request {
-            body: Some(to_string(map)?.as_bytes()),
+            body: Some(to_vec(map)?),
             multipart: None,
             headers: None,
             route: RouteInfo::EditStageInstance {
@@ -1373,7 +1373,7 @@ impl Http {
         let body = to_vec(map)?;
 
         self.fire(Request {
-            body: Some(&body),
+            body: Some(body),
             multipart: None,
             headers: audit_log_reason.map(reason_into_header),
             route: RouteInfo::EditEmoji {
@@ -1396,7 +1396,7 @@ impl Http {
         map: &Value,
     ) -> Result<Message> {
         self.fire(Request {
-            body: Some(to_string(map)?.as_bytes()),
+            body: Some(to_vec(map)?),
             multipart: None,
             headers: None,
             route: RouteInfo::EditFollowupMessage {
@@ -1473,7 +1473,7 @@ impl Http {
         map: &Value,
     ) -> Result<Command> {
         self.fire(Request {
-            body: Some(to_string(map)?.as_bytes()),
+            body: Some(to_vec(map)?),
             multipart: None,
             headers: None,
             route: RouteInfo::EditGlobalApplicationCommand {
@@ -1494,7 +1494,7 @@ impl Http {
         let body = to_vec(map)?;
 
         self.fire(Request {
-            body: Some(&body),
+            body: Some(body),
             multipart: None,
             headers: audit_log_reason.map(reason_into_header),
             route: RouteInfo::EditGuild {
@@ -1518,7 +1518,7 @@ impl Http {
         map: &Value,
     ) -> Result<Command> {
         self.fire(Request {
-            body: Some(to_string(map)?.as_bytes()),
+            body: Some(to_vec(map)?),
             multipart: None,
             headers: None,
             route: RouteInfo::EditGuildApplicationCommand {
@@ -1544,7 +1544,7 @@ impl Http {
         map: &Value,
     ) -> Result<CommandPermission> {
         self.fire(Request {
-            body: Some(to_string(map)?.as_bytes()),
+            body: Some(to_vec(map)?),
             multipart: None,
             headers: None,
             route: RouteInfo::EditGuildApplicationCommandPermission {
@@ -1569,7 +1569,7 @@ impl Http {
         map: &Value,
     ) -> Result<Vec<CommandPermission>> {
         self.fire(Request {
-            body: Some(to_string(map)?.as_bytes()),
+            body: Some(to_vec(map)?),
             multipart: None,
             headers: None,
             route: RouteInfo::EditGuildApplicationCommandsPermissions {
@@ -1585,7 +1585,7 @@ impl Http {
         let body = to_vec(value)?;
 
         self.wind(204, Request {
-            body: Some(&body),
+            body: Some(body),
             multipart: None,
             headers: None,
             route: RouteInfo::EditGuildChannels {
@@ -1600,7 +1600,7 @@ impl Http {
         let body = to_vec(map)?;
 
         self.fire(Request {
-            body: Some(&body),
+            body: Some(body),
             multipart: None,
             headers: None,
             route: RouteInfo::EditGuildWidget {
@@ -1619,7 +1619,7 @@ impl Http {
         let body = to_vec(map)?;
 
         self.fire(Request {
-            body: Some(&body),
+            body: Some(body),
             multipart: None,
             headers: None,
             route: RouteInfo::EditGuildWelcomeScreen {
@@ -1641,7 +1641,7 @@ impl Http {
 
         let mut value = self
             .request(Request {
-                body: Some(&body),
+                body: Some(body),
                 multipart: None,
                 headers: audit_log_reason.map(reason_into_header),
                 route: RouteInfo::EditMember {
@@ -1672,7 +1672,7 @@ impl Http {
         let body = to_vec(map)?;
 
         self.fire(Request {
-            body: Some(&body),
+            body: Some(body),
             multipart: None,
             headers: None,
             route: RouteInfo::EditMessage {
@@ -1730,7 +1730,7 @@ impl Http {
         let body = to_vec(map)?;
 
         self.fire(Request {
-            body: Some(&body),
+            body: Some(body),
             multipart: None,
             headers: None,
             route: RouteInfo::EditMemberMe {
@@ -1748,7 +1748,7 @@ impl Http {
         let body = to_vec(&map)?;
 
         self.wind(200, Request {
-            body: Some(&body),
+            body: Some(body),
             multipart: None,
             headers: None,
             route: RouteInfo::EditMemberMe {
@@ -1768,7 +1768,7 @@ impl Http {
         let body = to_vec(&map)?;
 
         self.fire(Request {
-            body: Some(&body),
+            body: Some(body),
             multipart: None,
             headers: None,
             route: RouteInfo::FollowNewsChannel {
@@ -1806,7 +1806,7 @@ impl Http {
         map: &Value,
     ) -> Result<Message> {
         self.fire(Request {
-            body: Some(to_string(map)?.as_bytes()),
+            body: Some(to_vec(map)?),
             multipart: None,
             headers: None,
             route: RouteInfo::EditOriginalInteractionResponse {
@@ -1823,7 +1823,7 @@ impl Http {
 
         let request = self
             .request(Request {
-                body: Some(&body),
+                body: Some(body),
                 multipart: None,
                 headers: None,
                 route: RouteInfo::EditProfile,
@@ -1844,7 +1844,7 @@ impl Http {
         let body = to_vec(&map)?;
         let mut value = self
             .request(Request {
-                body: Some(&body),
+                body: Some(body),
                 multipart: None,
                 headers: audit_log_reason.map(reason_into_header),
                 route: RouteInfo::EditRole {
@@ -1878,7 +1878,7 @@ impl Http {
 
         let mut value = self
             .request(Request {
-                body: Some(&body),
+                body: Some(body),
                 multipart: None,
                 headers: audit_log_reason.map(reason_into_header),
                 route: RouteInfo::EditRolePosition {
@@ -1914,7 +1914,7 @@ impl Http {
     ) -> Result<ScheduledEvent> {
         let body = to_vec(map)?;
         self.fire(Request {
-            body: Some(&body),
+            body: Some(body),
             multipart: None,
             headers: audit_log_reason.map(reason_into_header),
             route: RouteInfo::EditScheduledEvent {
@@ -1940,7 +1940,7 @@ impl Http {
         let body = to_vec(&map)?;
         let mut value = self
             .request(Request {
-                body: Some(&body),
+                body: Some(body),
                 multipart: None,
                 headers: audit_log_reason.map(reason_into_header),
                 route: RouteInfo::EditSticker {
@@ -1964,7 +1964,7 @@ impl Http {
         let body = to_vec(map)?;
 
         self.fire(Request {
-            body: Some(&body),
+            body: Some(body),
             multipart: None,
             headers: None,
             route: RouteInfo::EditThread {
@@ -2011,7 +2011,7 @@ impl Http {
         let body = to_vec(map)?;
 
         self.wind(204, Request {
-            body: Some(&body),
+            body: Some(body),
             multipart: None,
             headers: None,
             route: RouteInfo::EditVoiceState {
@@ -2061,7 +2061,7 @@ impl Http {
         let body = to_vec(map)?;
 
         self.wind(204, Request {
-            body: Some(&body),
+            body: Some(body),
             multipart: None,
             headers: None,
             route: RouteInfo::EditVoiceStateMe {
@@ -2112,7 +2112,7 @@ impl Http {
         audit_log_reason: Option<&str>,
     ) -> Result<Webhook> {
         self.fire(Request {
-            body: Some(to_string(map)?.as_bytes()),
+            body: Some(to_vec(map)?),
             multipart: None,
             headers: audit_log_reason.map(reason_into_header),
             route: RouteInfo::EditWebhook {
@@ -2156,7 +2156,7 @@ impl Http {
         let body = to_vec(map)?;
 
         self.fire(Request {
-            body: Some(&body),
+            body: Some(body),
             multipart: None,
             headers: None,
             route: RouteInfo::EditWebhookWithToken {
@@ -2233,7 +2233,7 @@ impl Http {
 
         let response = self
             .request(Request {
-                body: Some(&body),
+                body: Some(body),
                 multipart: None,
                 headers: Some(headers),
                 route: RouteInfo::ExecuteWebhook {
@@ -2320,7 +2320,7 @@ impl Http {
         let body = to_vec(map)?;
 
         self.fire(Request {
-            body: Some(&body),
+            body: Some(body),
             multipart: None,
             headers: None,
             route: RouteInfo::EditWebhookMessage {
@@ -2450,7 +2450,7 @@ impl Http {
         let body = to_vec(&map)?;
 
         self.fire(Request {
-            body: Some(&body),
+            body: Some(body),
             multipart: None,
             headers: None,
             route: RouteInfo::CreateAutoModRule {
@@ -2472,7 +2472,7 @@ impl Http {
         let body = to_vec(&map)?;
 
         self.fire(Request {
-            body: Some(&body),
+            body: Some(body),
             multipart: None,
             headers: None,
             route: RouteInfo::EditAutoModRule {
@@ -3755,7 +3755,7 @@ impl Http {
         let body = to_vec(map)?;
 
         self.fire(Request {
-            body: Some(&body),
+            body: Some(body),
             multipart: None,
             headers: None,
             route: RouteInfo::CreateMessage {
@@ -3985,7 +3985,7 @@ impl Http {
     /// let route_info = RouteInfo::CreateMessage { channel_id };
     ///
     /// let mut request = RequestBuilder::new(route_info);
-    /// request.body(Some(&bytes));
+    /// request.body(Some(bytes));
     ///
     /// let message = http.fire::<Message>(request.build()).await?;
     ///
@@ -4030,7 +4030,7 @@ impl Http {
     /// let route_info = RouteInfo::CreateMessage { channel_id };
     ///
     /// let mut request = RequestBuilder::new(route_info);
-    /// request.body(Some(&bytes));
+    /// request.body(Some(bytes));
     ///
     /// let response = http.request(request.build()).await?;
     ///
@@ -4040,7 +4040,7 @@ impl Http {
     /// # }
     /// ```
     #[instrument]
-    pub async fn request(&self, mut req: Request<'_>) -> Result<ReqwestResponse> {
+    pub async fn request(&self, req: Request<'_>) -> Result<ReqwestResponse> {
         let response = if self.ratelimiter_disabled {
             let request =
                 req.build(&self.client, &self.token, self.proxy.as_ref()).await?.build()?;
