@@ -91,10 +91,9 @@ impl EditInteractionResponse {
     {
         let mut allowed_mentions = CreateAllowedMentions::default();
         f(&mut allowed_mentions);
-        let map = json::hashmap_to_json_map(allowed_mentions.0);
-        let allowed_mentions = Value::from(map);
+        let map = to_value(allowed_mentions).expect("AllowedMentions builder should not fail!");
 
-        self.0.insert("allowed_mentions", allowed_mentions);
+        self.0.insert("allowed_mentions", map);
         self
     }
 
