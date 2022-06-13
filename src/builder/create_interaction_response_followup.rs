@@ -196,14 +196,17 @@ impl<'a> CreateInteractionResponseFollowup<'a> {
     {
         let mut components = CreateComponents::default();
         f(&mut components);
+        let map = to_value(components).expect("CreateComponents builder should not fail!");
 
-        self.0.insert("components", Value::from(components.0));
+        self.0.insert("components", map);
         self
     }
 
     /// Sets the components of this message.
     pub fn set_components(&mut self, components: CreateComponents) -> &mut Self {
-        self.0.insert("components", Value::from(components.0));
+        let map = to_value(components).expect("CreateComponents builder should not fail!");
+        self.0.insert("components", map);
+
         self
     }
 }

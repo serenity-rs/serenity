@@ -1,15 +1,13 @@
-use std::collections::HashMap;
-
 use crate::internal::prelude::*;
-use crate::json::{self, from_number, Value};
+use crate::json::Value;
 use crate::model::application::component::{ButtonStyle, InputTextStyle};
 use crate::model::channel::ReactionType;
 
 /// A builder for creating several [`ActionRow`]s.
 ///
 /// [`ActionRow`]: crate::model::application::component::ActionRow
-#[derive(Clone, Debug, Default)]
-pub struct CreateComponents(pub Vec<Value>);
+#[derive(Clone, Debug, Default, Serialize)]
+pub struct CreateComponents(pub Vec<CreateActionRow>);
 
 impl CreateComponents {
     /// Creates an action row.
@@ -26,37 +24,53 @@ impl CreateComponents {
     }
 
     /// Adds an action row.
-    pub fn add_action_row(&mut self, mut row: CreateActionRow) -> &mut Self {
-        self.0.push(row.build());
+    pub fn add_action_row(&mut self, row: CreateActionRow) -> &mut Self {
+        self.0.push(row);
 
         self
     }
 
     /// Set a single action row.
     /// Calling this will overwrite all action rows.
-    pub fn set_action_row(&mut self, mut row: CreateActionRow) -> &mut Self {
-        self.0 = vec![row.build()];
+    pub fn set_action_row(&mut self, row: CreateActionRow) -> &mut Self {
+        self.0 = vec![row];
 
         self
     }
 
     /// Sets all the action rows.
     pub fn set_action_rows(&mut self, rows: Vec<CreateActionRow>) -> &mut Self {
-        let new_rows = rows.into_iter().map(|mut f| f.build());
-
-        for row in new_rows {
-            self.0.push(row);
-        }
-
+        self.0.extend(rows);
         self
     }
+}
+
+
+#[derive(Clone, Debug, Serialize)]
+#[serde(untagged)]
+enum ComponentBuilder {
+    Button(CreateButton),
+    SelectMenu(CreateSelectMenu),
+    InputText(CreateInputText)
 }
 
 /// A builder for creating an [`ActionRow`].
 ///
 /// [`ActionRow`]: crate::model::application::component::ActionRow
-#[derive(Clone, Debug, Default)]
-pub struct CreateActionRow(pub HashMap<&'static str, Value>);
+#[derive(Clone, Debug, Serialize)]
+pub struct CreateActionRow {
+    components: Vec<ComponentBuilder>, 
+    kind: u8,
+}
+
+impl Default for CreateActionRow {
+    fn default() -> Self {
+        CreateActionRow {
+            components: Vec::new(),
+            kind: 1,
+        }
+    }
+}
 
 impl CreateActionRow {
     /// Creates a button.
@@ -74,12 +88,7 @@ impl CreateActionRow {
 
     /// Adds a button.
     pub fn add_button(&mut self, button: CreateButton) -> &mut Self {
-        let components =
-            self.0.entry("components").or_insert_with(|| Value::from(Vec::<Value>::new()));
-        let components_array = components.as_array_mut().expect("Must be an array");
-
-        components_array.push(button.build());
-
+        self.components.push(ComponentBuilder::Button(button));
         self
     }
 
@@ -98,12 +107,7 @@ impl CreateActionRow {
 
     /// Adds a select menu.
     pub fn add_select_menu(&mut self, menu: CreateSelectMenu) -> &mut Self {
-        let components =
-            self.0.entry("components").or_insert_with(|| Value::from(Vec::<Value>::new()));
-        let components_array = components.as_array_mut().expect("Must be an array");
-
-        components_array.push(menu.build());
-
+        self.components.push(ComponentBuilder::SelectMenu(menu));
         self
     }
 
@@ -122,59 +126,68 @@ impl CreateActionRow {
 
     /// Adds an input text.
     pub fn add_input_text(&mut self, input_text: CreateInputText) -> &mut Self {
-        let components =
-            self.0.entry("components").or_insert_with(|| Value::from(Vec::<Value>::new()));
-        let components_array = components.as_array_mut().expect("Must be an array");
-
-        components_array.push(input_text.build());
-
+        self.components.push(ComponentBuilder::InputText(input_text));
         self
-    }
-
-    pub fn build(&mut self) -> Value {
-        self.0.insert("type", from_number(1_u8));
-
-        json::hashmap_to_json_map(self.0.clone()).into()
     }
 }
 
 /// A builder for creating a [`Button`].
 ///
 /// [`Button`]: crate::model::application::component::Button
-#[derive(Clone, Debug)]
-pub struct CreateButton(pub HashMap<&'static str, Value>);
+#[derive(Clone, Debug, Serialize)]
+pub struct CreateButton {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    label: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    custom_id: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    url: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    emoji: Option<JsonMap>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    disabled: Option<bool>,
+
+    style: ButtonStyle,
+    kind: u8,
+}
 
 impl Default for CreateButton {
     /// Creates a primary button.
     fn default() -> Self {
-        let mut btn = Self(HashMap::new());
-        btn.style(ButtonStyle::Primary);
-        btn
+        Self {
+            style: ButtonStyle::Primary,
+            custom_id: None,
+            disabled: None,
+            label: None,
+            emoji: None,
+            url: None,
+            kind: 2,
+        }
     }
 }
 
 impl CreateButton {
     /// Sets the style of the button.
     pub fn style(&mut self, kind: ButtonStyle) -> &mut Self {
-        self.0.insert("style", from_number(kind as u8));
+        self.style = kind;
         self
     }
 
     /// The label of the button.
     pub fn label(&mut self, label: impl Into<String>) -> &mut Self {
-        self.0.insert("label", Value::String(label.into()));
+        self.label = Some(label.into());
         self
     }
 
     /// Sets the custom id of the button, a developer-defined identifier.
     pub fn custom_id(&mut self, id: impl Into<String>) -> &mut Self {
-        self.0.insert("custom_id", Value::String(id.into()));
+        self.custom_id = Some(id.into());
         self
     }
 
     /// The url for url style button.
     pub fn url(&mut self, url: impl Into<String>) -> &mut Self {
-        self.0.insert("url", Value::String(url.into()));
+        self.url = Some(url.into());
         self
     }
 
@@ -204,58 +217,81 @@ impl CreateButton {
             },
         };
 
-        self.0.insert("emoji", Value::from(map));
+        self.emoji = Some(map);
         self
     }
 
     /// Sets the disabled state for the button.
     pub fn disabled(&mut self, disabled: bool) -> &mut Self {
-        self.0.insert("disabled", Value::from(disabled));
+        self.disabled = Some(disabled);
         self
-    }
-
-    #[must_use]
-    pub fn build(mut self) -> Value {
-        self.0.insert("type", from_number(2_u8));
-
-        json::hashmap_to_json_map(self.0.clone()).into()
     }
 }
 
 /// A builder for creating a [`SelectMenu`].
 ///
 /// [`SelectMenu`]: crate::model::application::component::SelectMenu
-#[derive(Clone, Debug, Default)]
-pub struct CreateSelectMenu(pub HashMap<&'static str, Value>);
+#[derive(Clone, Debug, Serialize)]
+pub struct CreateSelectMenu {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    placeholder: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    custom_id: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    min_values: Option<u64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    max_values: Option<u64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    disabled: Option<bool>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    options: Option<CreateSelectMenuOptions>,
+
+    #[serde(rename="type")]
+    kind: u8,
+}
+
+impl Default for CreateSelectMenu {
+    fn default() -> Self {
+        Self {
+            placeholder: None,
+            min_values: None,
+            max_values: None,
+            custom_id: None,
+            disabled: None,
+            options: None,
+            kind: 3
+        }
+    }
+}
 
 impl CreateSelectMenu {
     /// The placeholder of the select menu.
     pub fn placeholder(&mut self, label: impl Into<String>) -> &mut Self {
-        self.0.insert("placeholder", Value::String(label.into()));
+        self.placeholder = Some(label.into());
         self
     }
 
     /// Sets the custom id of the select menu, a developer-defined identifier.
     pub fn custom_id(&mut self, id: impl Into<String>) -> &mut Self {
-        self.0.insert("custom_id", Value::String(id.into()));
+        self.custom_id = Some(id.into());
         self
     }
 
     /// Sets the minimum values for the user to select.
     pub fn min_values(&mut self, min: u64) -> &mut Self {
-        self.0.insert("min_values", from_number(min));
+        self.min_values = Some(min);
         self
     }
 
     /// Sets the maximum values for the user to select.
     pub fn max_values(&mut self, max: u64) -> &mut Self {
-        self.0.insert("max_values", from_number(max));
+        self.max_values = Some(max);
         self
     }
 
     /// Sets the disabled state for the button.
     pub fn disabled(&mut self, disabled: bool) -> &mut Self {
-        self.0.insert("disabled", Value::from(disabled));
+        self.disabled = Some(disabled);
         self
     }
 
@@ -263,27 +299,19 @@ impl CreateSelectMenu {
     where
         F: FnOnce(&mut CreateSelectMenuOptions) -> &mut CreateSelectMenuOptions,
     {
-        let mut data = CreateSelectMenuOptions::default();
-        f(&mut data);
+        let mut options = CreateSelectMenuOptions::default();
+        f(&mut options);
 
-        self.0.insert("options", Value::from(data.0));
-
+        self.options = Some(options);
         self
-    }
-
-    #[must_use]
-    pub fn build(mut self) -> Value {
-        self.0.insert("type", from_number(3_u8));
-
-        json::hashmap_to_json_map(self.0.clone()).into()
     }
 }
 
 /// A builder for creating several [`SelectMenuOption`].
 ///
 /// [`SelectMenuOption`]: crate::model::application::component::SelectMenuOption
-#[derive(Clone, Debug, Default)]
-pub struct CreateSelectMenuOptions(pub Vec<Value>);
+#[derive(Clone, Debug, Default, Serialize)]
+pub struct CreateSelectMenuOptions(pub Vec<CreateSelectMenuOption>);
 
 impl CreateSelectMenuOptions {
     /// Creates an option.
@@ -301,21 +329,14 @@ impl CreateSelectMenuOptions {
 
     /// Adds an option.
     pub fn add_option(&mut self, option: CreateSelectMenuOption) -> &mut Self {
-        let data = json::hashmap_to_json_map(option.0);
-
-        self.0.push(data.into());
+        self.0.push(option);
 
         self
     }
 
     /// Sets all the options.
     pub fn set_options(&mut self, options: Vec<CreateSelectMenuOption>) -> &mut Self {
-        let new_options =
-            options.into_iter().map(|option| json::hashmap_to_json_map(option.0).into());
-
-        for option in new_options {
-            self.0.push(option);
-        }
+        self.0.extend(options);
 
         self
     }
@@ -324,8 +345,19 @@ impl CreateSelectMenuOptions {
 /// A builder for creating a [`SelectMenuOption`].
 ///
 /// [`SelectMenuOption`]: crate::model::application::component::SelectMenuOption
-#[derive(Clone, Debug, Default)]
-pub struct CreateSelectMenuOption(pub HashMap<&'static str, Value>);
+#[derive(Clone, Debug, Default, Serialize)]
+pub struct CreateSelectMenuOption {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    label: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    value: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    description: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    emoji: Option<JsonMap>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    default: Option<bool>,
+}
 
 impl CreateSelectMenuOption {
     /// Creates an option.
@@ -337,19 +369,19 @@ impl CreateSelectMenuOption {
 
     /// Sets the label of this option.
     pub fn label(&mut self, label: impl Into<String>) -> &mut Self {
-        self.0.insert("label", Value::String(label.into()));
+        self.label = Some(label.into());
         self
     }
 
     /// Sets the value of this option.
     pub fn value(&mut self, value: impl Into<String>) -> &mut Self {
-        self.0.insert("value", Value::String(value.into()));
+        self.value = Some(value.into());
         self
     }
 
     /// Sets the description shown on this option.
     pub fn description(&mut self, description: impl Into<String>) -> &mut Self {
-        self.0.insert("description", Value::String(description.into()));
+        self.description = Some(description.into());
         self
     }
 
@@ -379,13 +411,13 @@ impl CreateSelectMenuOption {
             },
         };
 
-        self.0.insert("emoji", Value::from(map));
+        self.emoji = Some(map);
         self
     }
 
     /// Sets this option as selected by default.
     pub fn default_selection(&mut self, disabled: bool) -> &mut Self {
-        self.0.insert("default", Value::from(disabled));
+        self.default = Some(disabled);
         self
     }
 }
@@ -393,62 +425,91 @@ impl CreateSelectMenuOption {
 /// A builder for creating an [`InputText`].
 ///
 /// [`InputText`]: crate::model::application::component::InputText
-#[derive(Clone, Debug, Default)]
-pub struct CreateInputText(pub HashMap<&'static str, Value>);
+#[derive(Clone, Debug, Serialize)]
+pub struct CreateInputText {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    custom_id: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    style: Option<InputTextStyle>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    label: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    placeholder: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    min_length: Option<u64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    max_length: Option<u64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    value: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    required: Option<bool>,
+
+    #[serde(rename = "type")]
+    kind: u8
+}
+
+impl Default for CreateInputText {
+    fn default() -> Self {
+        Self {
+            value: None,
+            style: None,
+            label: None,
+            required: None,
+            custom_id: None,
+            placeholder: None,
+            min_length: None,
+            max_length: None,
+            kind: 4_u8,
+        }
+    }
+}
 
 impl CreateInputText {
     /// Sets the custom id of the input text, a developer-defined identifier.
     pub fn custom_id(&mut self, id: impl Into<String>) -> &mut Self {
-        self.0.insert("custom_id", Value::from(id.into()));
+        self.custom_id = Some(id.into());
         self
     }
 
     /// Sets the style of this input text
     pub fn style(&mut self, kind: InputTextStyle) -> &mut Self {
-        self.0.insert("style", from_number(kind as u8));
+        self.style = Some(kind);
         self
     }
 
     /// Sets the label of this input text.
     pub fn label(&mut self, label: impl Into<String>) -> &mut Self {
-        self.0.insert("label", Value::String(label.into()));
+        self.label = Some(label.into());
         self
     }
 
     /// Sets the placeholder of this input text.
     pub fn placeholder(&mut self, label: impl Into<String>) -> &mut Self {
-        self.0.insert("placeholder", Value::String(label.into()));
+        self.placeholder = Some(label.into());
         self
     }
 
     /// Sets the minimum length required for the input text
     pub fn min_length(&mut self, min: u64) -> &mut Self {
-        self.0.insert("min_length", from_number(min));
+        self.min_length = Some(min);
         self
     }
 
     /// Sets the maximum length required for the input text
     pub fn max_length(&mut self, max: u64) -> &mut Self {
-        self.0.insert("max_length", from_number(max));
+        self.max_length = Some(max);
         self
     }
 
     /// Sets the value of this input text.
     pub fn value(&mut self, value: impl Into<String>) -> &mut Self {
-        self.0.insert("value", Value::String(value.into()));
+        self.value = Some(value.into());
         self
     }
 
     /// Sets if the input text is required
     pub fn required(&mut self, required: bool) -> &mut Self {
-        self.0.insert("required", Value::from(required));
+        self.required = Some(required);
         self
-    }
-
-    #[must_use]
-    pub fn build(mut self) -> Value {
-        self.0.insert("type", from_number(4_u8));
-
-        json::hashmap_to_json_map(self.0.clone()).into()
     }
 }

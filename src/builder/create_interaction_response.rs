@@ -209,13 +209,14 @@ impl<'a> CreateInteractionResponseData<'a> {
         let mut components = CreateComponents::default();
         f(&mut components);
 
-        self.0.insert("components", Value::from(components.0));
-        self
+        self.set_components(components)
     }
 
     /// Sets the components of this message.
     pub fn set_components(&mut self, components: CreateComponents) -> &mut Self {
-        self.0.insert("components", Value::Array(components.0));
+        let map = to_value(components).expect("CreateComponents builder should not fail!");
+        self.0.insert("components", map);
+
         self
     }
 

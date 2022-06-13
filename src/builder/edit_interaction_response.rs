@@ -104,8 +104,9 @@ impl EditInteractionResponse {
     {
         let mut components = CreateComponents::default();
         f(&mut components);
+        let map = to_value(components).expect("CreateComponents builder should not fail!");
 
-        self.0.insert("components", Value::from(components.0));
+        self.0.insert("components", map);
         self
     }
 }
