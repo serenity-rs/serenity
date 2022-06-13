@@ -961,9 +961,7 @@ impl ChannelId {
         let mut instance = CreateStageInstance::default();
         f(&mut instance);
 
-        let map = json::hashmap_to_json_map(instance.0);
-
-        http.as_ref().create_stage_instance(&Value::from(map)).await
+        http.as_ref().create_stage_instance(&instance).await
     }
 
     /// Edits a stage instance.
@@ -983,9 +981,7 @@ impl ChannelId {
         let mut instance = EditStageInstance::default();
         f(&mut instance);
 
-        let map = json::hashmap_to_json_map(instance.0);
-
-        http.as_ref().edit_stage_instance(self.0, &Value::from(map)).await
+        http.as_ref().edit_stage_instance(self.0, &instance).await
     }
 
     /// Edits a thread.

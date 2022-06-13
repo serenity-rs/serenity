@@ -393,7 +393,10 @@ impl Http {
     }
 
     /// Creates a stage instance.
-    pub async fn create_stage_instance(&self, map: &Value) -> Result<StageInstance> {
+    pub async fn create_stage_instance(
+        &self,
+        map: &impl serde::Serialize,
+    ) -> Result<StageInstance> {
         self.fire(Request {
             body: Some(to_vec(map)?),
             multipart: None,
@@ -1349,7 +1352,11 @@ impl Http {
     }
 
     /// Edits a stage instance.
-    pub async fn edit_stage_instance(&self, channel_id: u64, map: &Value) -> Result<StageInstance> {
+    pub async fn edit_stage_instance(
+        &self,
+        channel_id: u64,
+        map: &impl serde::Serialize,
+    ) -> Result<StageInstance> {
         self.fire(Request {
             body: Some(to_vec(map)?),
             multipart: None,
