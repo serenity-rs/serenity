@@ -803,12 +803,12 @@ impl Http {
     pub async fn create_role(
         &self,
         guild_id: u64,
-        body: Vec<u8>,
+        body: &impl serde::Serialize,
         audit_log_reason: Option<&str>,
     ) -> Result<Role> {
         let mut value = self
             .request(Request {
-                body: Some(body),
+                body: Some(to_vec(body)?),
                 multipart: None,
                 headers: audit_log_reason.map(reason_into_header),
                 route: RouteInfo::CreateRole {
@@ -1837,12 +1837,12 @@ impl Http {
         &self,
         guild_id: u64,
         role_id: u64,
-        body: Vec<u8>,
+        map: &impl serde::Serialize,
         audit_log_reason: Option<&str>,
     ) -> Result<Role> {
         let mut value = self
             .request(Request {
-                body: Some(body),
+                body: Some(to_vec(map)?),
                 multipart: None,
                 headers: audit_log_reason.map(reason_into_header),
                 route: RouteInfo::EditRole {
@@ -1958,9 +1958,13 @@ impl Http {
     }
 
     /// Edits a thread channel in the [`GuildChannel`] given its Id.
-    pub async fn edit_thread(&self, channel_id: u64, body: Vec<u8>) -> Result<GuildChannel> {
+    pub async fn edit_thread(
+        &self,
+        channel_id: u64,
+        map: &impl serde::Serialize,
+    ) -> Result<GuildChannel> {
         self.fire(Request {
-            body: Some(body),
+            body: Some(to_vec(map)?),
             multipart: None,
             headers: None,
             route: RouteInfo::EditThread {
@@ -1991,21 +1995,24 @@ impl Http {
     /// #     let http = Http::new("token");
     /// let guild_id = 187450744427773963;
     /// let user_id = 150443906511667200;
-    /// let value = json!({
+    /// let map = json!({
     ///     "channel_id": "826929611849334784",
     ///     "suppress": true,
     /// });
     ///
-    /// let map = value.as_object().unwrap();
-    ///
     /// // Edit state for another user
-    /// http.edit_voice_state(guild_id, user_id, to_vec(&map)).await?;
+    /// http.edit_voice_state(guild_id, user_id, &map).await?;
     /// #     Ok(())
     /// # }
     /// ```
-    pub async fn edit_voice_state(&self, guild_id: u64, user_id: u64, body: Vec<u8>) -> Result<()> {
+    pub async fn edit_voice_state(
+        &self,
+        guild_id: u64,
+        user_id: u64,
+        map: &impl serde::Serialize,
+    ) -> Result<()> {
         self.wind(204, Request {
-            body: Some(body),
+            body: Some(to_vec(map)?),
             multipart: None,
             headers: None,
             route: RouteInfo::EditVoiceState {
@@ -2038,22 +2045,24 @@ impl Http {
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// #     let http = Http::new("token");
     /// let guild_id = 187450744427773963;
-    /// let value = json!({
+    /// let map = json!({
     ///     "channel_id": "826929611849334784",
     ///     "suppress": false,
     ///     "request_to_speak_timestamp": "2021-03-31T18:45:31.297561+00:00"
     /// });
     ///
-    /// let map = value.as_object().unwrap();
-    ///
     /// // Edit state for current user
-    /// http.edit_voice_state_me(guild_id, to_vec(&map)).await?;
+    /// http.edit_voice_state_me(guild_id, &map).await?;
     /// #     Ok(())
     /// # }
     /// ```
-    pub async fn edit_voice_state_me(&self, guild_id: u64, body: Vec<u8>) -> Result<()> {
+    pub async fn edit_voice_state_me(
+        &self,
+        guild_id: u64,
+        map: &impl serde::Serialize,
+    ) -> Result<()> {
         self.wind(204, Request {
-            body: Some(body),
+            body: Some(to_vec(map)?),
             multipart: None,
             headers: None,
             route: RouteInfo::EditVoiceStateMe {

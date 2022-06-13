@@ -594,12 +594,10 @@ impl GuildChannel {
 
         voice_state.channel_id = Some(self.id);
 
-        let body = json::prelude::to_vec(&voice_state)?;
-
         if let Some(id) = user_id {
-            http.as_ref().edit_voice_state(self.guild_id.0, id.into().0, body).await
+            http.as_ref().edit_voice_state(self.guild_id.0, id.into().0, &voice_state).await
         } else {
-            http.as_ref().edit_voice_state_me(self.guild_id.0, body).await
+            http.as_ref().edit_voice_state_me(self.guild_id.0, &voice_state).await
         }
     }
 

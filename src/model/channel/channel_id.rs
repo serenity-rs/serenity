@@ -33,7 +33,7 @@ use crate::collector::{
 #[cfg(feature = "model")]
 use crate::http::{CacheHttp, Http, Typing};
 #[cfg(feature = "model")]
-use crate::json::{self, json, prelude::to_vec};
+use crate::json::{self, json};
 #[cfg(feature = "model")]
 use crate::model::channel::AttachmentType;
 use crate::model::prelude::*;
@@ -1012,8 +1012,7 @@ impl ChannelId {
         let mut instance = EditThread::default();
         f(&mut instance);
 
-        let body = to_vec(&instance)?;
-        http.as_ref().edit_thread(self.0, body).await
+        http.as_ref().edit_thread(self.0, &instance).await
     }
 
     /// Deletes a stage instance.

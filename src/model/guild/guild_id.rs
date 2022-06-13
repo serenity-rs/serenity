@@ -322,8 +322,7 @@ impl GuildId {
         let mut edit_role = EditRole::default();
         f(&mut edit_role);
 
-        let body = to_vec(&edit_role)?;
-        let role = http.as_ref().create_role(self.0, body, None).await?;
+        let role = http.as_ref().create_role(self.0, &edit_role, None).await?;
 
         if let Some(position) = edit_role.position {
             self.edit_role_position(&http, role.id, position as u64).await?;
@@ -640,8 +639,7 @@ impl GuildId {
         let mut edit_role = EditRole::default();
         f(&mut edit_role);
 
-        let body = to_vec(&edit_role)?;
-        http.as_ref().edit_role(self.0, role_id.into().0, body, None).await
+        http.as_ref().edit_role(self.0, role_id.into().0, &edit_role, None).await
     }
 
     /// Modifies a scheduled event in the guild with the data set, if any.
