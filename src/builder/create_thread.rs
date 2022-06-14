@@ -11,7 +11,7 @@ pub struct CreateThread {
 
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "type")]
-    kind: Option<ChannelType>
+    kind: Option<ChannelType>,
 }
 
 impl CreateThread {
