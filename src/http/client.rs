@@ -186,7 +186,8 @@ fn reason_into_header(reason: &str) -> Headers {
     let header_value = match Cow::from(utf8_percent_encode(reason, NON_ALPHANUMERIC)) {
         Cow::Borrowed(value) => HeaderValue::from_str(value),
         Cow::Owned(value) => HeaderValue::try_from(value),
-    }.expect("Invalid header value even after percent encode");
+    }
+    .expect("Invalid header value even after percent encode");
 
     headers.insert("X-Audit-Log-Reason", header_value);
     headers
