@@ -859,12 +859,12 @@ impl Http {
     /// **Note**: Requires the [Manage Emojis and Stickers] permission.
     ///
     /// [Manage Emojis and Stickers]: Permissions::MANAGE_EMOJIS_AND_STICKERS
-    pub async fn create_sticker<'a>(
-        &self,
+    pub async fn create_sticker<'a, 'b, 'c>(
+        &'a self,
         guild_id: u64,
         map: Vec<(Cow<'static, str>, Cow<'static, str>)>,
-        file: impl Into<AttachmentType<'a>>,
-        audit_log_reason: Option<&str>,
+        file: impl Into<AttachmentType<'b>>,
+        audit_log_reason: Option<&'c str>,
     ) -> Result<Sticker> {
         self.fire(Request {
             body: None,
