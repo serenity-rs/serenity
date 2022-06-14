@@ -1026,9 +1026,7 @@ impl ChannelId {
         let mut instance = CreateThread::default();
         f(&mut instance);
 
-        let map = json::hashmap_to_json_map(instance.0);
-
-        http.as_ref().create_public_thread(self.0, message_id.into().0, &map).await
+        http.as_ref().create_public_thread(self.0, message_id.into().0, &instance).await
     }
 
     /// Creates a private thread.
@@ -1048,9 +1046,7 @@ impl ChannelId {
         instance.kind(ChannelType::PrivateThread);
         f(&mut instance);
 
-        let map = json::hashmap_to_json_map(instance.0);
-
-        http.as_ref().create_private_thread(self.0, &map).await
+        http.as_ref().create_private_thread(self.0, &instance).await
     }
 
     /// Gets the thread members, if this channel is a thread.

@@ -1,17 +1,25 @@
-use std::collections::HashMap;
-
-use crate::json::{from_number, Value};
 use crate::model::channel::ChannelType;
 
-#[derive(Debug, Clone, Default)]
-pub struct CreateThread(pub HashMap<&'static str, Value>);
+#[derive(Debug, Clone, Default, Serialize)]
+pub struct CreateThread {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    name: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    auto_archive_duration: Option<u16>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    rate_limit_per_user: Option<u16>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "type")]
+    kind: Option<ChannelType>
+}
 
 impl CreateThread {
     /// The name of the thread.
     ///
     /// **Note**: Must be between 2 and 100 characters long.
     pub fn name(&mut self, name: impl Into<String>) -> &mut Self {
-        self.0.insert("name", Value::String(name.into()));
+        self.name = Some(name.into());
 
         self
     }
@@ -20,7 +28,7 @@ impl CreateThread {
     ///
     /// **Note**: Can only be set to 60, 1440, 4320, 10080 currently.
     pub fn auto_archive_duration(&mut self, duration: u16) -> &mut Self {
-        self.0.insert("auto_archive_duration", from_number(duration));
+        self.auto_archive_duration = Some(duration);
 
         self
     }
@@ -35,8 +43,8 @@ impl CreateThread {
     /// [`MANAGE_MESSAGES`]: crate::model::permissions::Permissions::MANAGE_MESSAGES
     /// [`MANAGE_CHANNELS`]: crate::model::permissions::Permissions::MANAGE_CHANNELS
     #[doc(alias = "slowmode")]
-    pub fn rate_limit_per_user(&mut self, seconds: u64) -> &mut Self {
-        self.0.insert("rate_limit_per_user", from_number(seconds));
+    pub fn rate_limit_per_user(&mut self, seconds: u16) -> &mut Self {
+        self.rate_limit_per_user = Some(seconds);
 
         self
     }
@@ -48,7 +56,7 @@ impl CreateThread {
     /// and thus is highly likely to change in the future, so it is recommended to always
     /// explicitly setting it to avoid any breaking change.
     pub fn kind(&mut self, kind: ChannelType) -> &mut Self {
-        self.0.insert("type", from_number(kind as u8));
+        self.kind = Some(kind);
 
         self
     }

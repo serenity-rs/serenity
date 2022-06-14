@@ -412,7 +412,7 @@ impl Http {
         &self,
         channel_id: u64,
         message_id: u64,
-        map: &JsonMap,
+        map: &impl serde::Serialize,
     ) -> Result<GuildChannel> {
         let body = to_vec(map)?;
 
@@ -432,7 +432,7 @@ impl Http {
     pub async fn create_private_thread(
         &self,
         channel_id: u64,
-        map: &JsonMap,
+        map: &impl serde::Serialize,
     ) -> Result<GuildChannel> {
         let body = to_vec(map)?;
 
