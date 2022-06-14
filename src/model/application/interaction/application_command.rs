@@ -435,8 +435,8 @@ impl<'de> Deserialize<'de> for ApplicationCommandInteraction {
             user,
             token,
             version,
-            guild_locale,
             locale,
+            guild_locale,
         })
     }
 }
@@ -550,8 +550,8 @@ impl<'de> Deserialize<'de> for CommandData {
             id,
             name,
             kind,
-            options,
             resolved,
+            options,
             guild_id,
             target_id,
         })

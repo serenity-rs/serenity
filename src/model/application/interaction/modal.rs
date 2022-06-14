@@ -387,15 +387,15 @@ impl<'de> Deserialize<'de> for ModalSubmitInteraction {
             application_id,
             kind,
             data,
-            message,
             guild_id,
             channel_id,
             member,
             user,
             token,
             version,
-            guild_locale,
+            message,
             locale,
+            guild_locale,
         })
     }
 }

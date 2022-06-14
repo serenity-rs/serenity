@@ -188,8 +188,8 @@ impl<'de> Deserialize<'de> for AutocompleteInteraction {
             user,
             token,
             version,
-            guild_locale,
             locale,
+            guild_locale,
         })
     }
 }
