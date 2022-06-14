@@ -2,6 +2,8 @@ use std::borrow::Cow;
 
 use crate::model::channel::AttachmentType;
 
+type Field = (Cow<'static, str>, Cow<'static, str>);
+
 /// A builder to create or edit a [`Sticker`] for use via a number of model methods.
 ///
 /// These are:
@@ -56,9 +58,7 @@ impl<'a> CreateSticker<'a> {
         self
     }
 
-    pub(crate) fn build(
-        self,
-    ) -> Option<(Vec<(Cow<'static, str>, Cow<'static, str>)>, AttachmentType<'a>)> {
+    pub(crate) fn build(self) -> Option<(Vec<Field>, AttachmentType<'a>)> {
         let file = self.file?;
         let mut buf = Vec::with_capacity(3);
 
