@@ -58,7 +58,8 @@ impl<'a> CreateSticker<'a> {
         self
     }
 
-    pub(crate) fn build(self) -> Option<(Vec<Field>, AttachmentType<'a>)> {
+    #[must_use]
+    pub fn build(self) -> Option<(Vec<Field>, AttachmentType<'a>)> {
         let file = self.file?;
         let mut buf = Vec::with_capacity(3);
 
