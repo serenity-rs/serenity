@@ -528,7 +528,10 @@ impl Http {
     /// application will overwrite the old command.
     ///
     /// [docs]: https://discord.com/developers/docs/interactions/slash-commands#create-global-application-command
-    pub async fn create_global_application_command(&self, map: &Value) -> Result<Command> {
+    pub async fn create_global_application_command(
+        &self,
+        map: &impl serde::Serialize,
+    ) -> Result<Command> {
         self.fire(Request {
             body: Some(to_vec(map)?),
             multipart: None,
@@ -541,7 +544,10 @@ impl Http {
     }
 
     /// Creates new global application commands.
-    pub async fn create_global_application_commands(&self, map: &Value) -> Result<Vec<Command>> {
+    pub async fn create_global_application_commands(
+        &self,
+        map: &impl serde::Serialize,
+    ) -> Result<Vec<Command>> {
         self.fire(Request {
             body: Some(to_vec(map)?),
             multipart: None,
@@ -557,7 +563,7 @@ impl Http {
     pub async fn create_guild_application_commands(
         &self,
         guild_id: u64,
-        map: &Value,
+        map: &impl serde::Serialize,
     ) -> Result<Vec<Command>> {
         self.fire(Request {
             body: Some(to_vec(map)?),
@@ -624,7 +630,7 @@ impl Http {
     pub async fn create_guild_application_command(
         &self,
         guild_id: u64,
-        map: &Value,
+        map: &impl serde::Serialize,
     ) -> Result<Command> {
         self.fire(Request {
             body: Some(to_vec(map)?),
@@ -1464,7 +1470,7 @@ impl Http {
     pub async fn edit_global_application_command(
         &self,
         command_id: u64,
-        map: &Value,
+        map: &impl serde::Serialize,
     ) -> Result<Command> {
         self.fire(Request {
             body: Some(to_vec(map)?),
@@ -1509,7 +1515,7 @@ impl Http {
         &self,
         guild_id: u64,
         command_id: u64,
-        map: &Value,
+        map: &impl serde::Serialize,
     ) -> Result<Command> {
         self.fire(Request {
             body: Some(to_vec(map)?),

@@ -1408,7 +1408,7 @@ impl GuildId {
         F: FnOnce(&mut CreateApplicationCommand) -> &mut CreateApplicationCommand,
     {
         let map = Command::build_application_command(f);
-        http.as_ref().create_guild_application_command(self.0, &Value::from(map)).await
+        http.as_ref().create_guild_application_command(self.0, &map).await
     }
 
     /// Overrides all guild application commands.
@@ -1430,7 +1430,7 @@ impl GuildId {
 
         f(&mut array);
 
-        http.as_ref().create_guild_application_commands(self.0, &Value::from(array.0)).await
+        http.as_ref().create_guild_application_commands(self.0, &array).await
     }
 
     /// Creates a guild specific [`CommandPermission`].
@@ -1532,9 +1532,7 @@ impl GuildId {
         F: FnOnce(&mut CreateApplicationCommand) -> &mut CreateApplicationCommand,
     {
         let map = Command::build_application_command(f);
-        http.as_ref()
-            .edit_guild_application_command(self.0, command_id.into(), &Value::from(map))
-            .await
+        http.as_ref().edit_guild_application_command(self.0, command_id.into(), &map).await
     }
 
     /// Delete guild application command by its Id.

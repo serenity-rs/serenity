@@ -1,10 +1,23 @@
 use std::collections::HashMap;
 
-use crate::json;
 use crate::json::prelude::*;
 use crate::model::application::command::{CommandOptionType, CommandType};
 use crate::model::channel::ChannelType;
 use crate::model::Permissions;
+
+#[derive(Clone, Debug, Serialize)]
+pub struct CommandOptionChoice {
+    name: String,
+    value: Value,
+    name_localizations: HashMap<String, String>,
+}
+
+#[derive(Clone, Debug, Serialize)]
+#[serde(untagged)]
+enum Number {
+    Float(f64),
+    Integer(u64),
+}
 
 /// A builder for creating a new [`CommandOption`].
 ///
@@ -14,13 +27,37 @@ use crate::model::Permissions;
 /// [`kind`]: Self::kind
 /// [`name`]: Self::name
 /// [`description`]: Self::description
-#[derive(Clone, Debug, Default)]
-pub struct CreateApplicationCommandOption(pub HashMap<&'static str, Value>);
+#[derive(Clone, Debug, Default, Serialize)]
+pub struct CreateApplicationCommandOption {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "type")]
+    kind: Option<CommandOptionType>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    name: Option<String>,
+    name_localizations: HashMap<String, String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    description: Option<String>,
+    description_localizations: HashMap<String, String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    default: Option<bool>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    required: Option<bool>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    autocomplete: Option<bool>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    min_value: Option<Number>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    max_value: Option<Number>,
+
+    channel_types: Vec<ChannelType>,
+    choices: Vec<CommandOptionChoice>,
+    options: Vec<CreateApplicationCommandOption>,
+}
 
 impl CreateApplicationCommandOption {
     /// Sets the `CommandOptionType`.
     pub fn kind(&mut self, kind: CommandOptionType) -> &mut Self {
-        self.0.insert("type", from_number(kind as u8));
+        self.kind = Some(kind);
         self
     }
 
@@ -28,7 +65,7 @@ impl CreateApplicationCommandOption {
     ///
     /// **Note**: Must be between 1 and 32 lowercase characters, matching `r"^[\w-]{1,32}$"`.
     pub fn name(&mut self, name: impl Into<String>) -> &mut Self {
-        self.0.insert("name", Value::String(name.into()));
+        self.name = Some(name.into());
         self
     }
 
@@ -40,18 +77,12 @@ impl CreateApplicationCommandOption {
     /// .name_localized("zh-CN", "岁数")
     /// # ;
     /// ```
-    #[allow(clippy::default_trait_access)]
     pub fn name_localized(
         &mut self,
         locale: impl Into<String>,
         name: impl Into<String>,
     ) -> &mut Self {
-        self.0
-            .entry("name_localizations")
-            .or_insert_with(|| Value::Object(Default::default()))
-            .as_object_mut()
-            .expect("must be object")
-            .insert(locale.into(), Value::String(name.into()));
+        self.name_localizations.insert(locale.into(), name.into());
         self
     }
 
@@ -59,7 +90,7 @@ impl CreateApplicationCommandOption {
     ///
     /// **Note**: Must be between 1 and 100 characters.
     pub fn description(&mut self, description: impl Into<String>) -> &mut Self {
-        self.0.insert("description", Value::String(description.into()));
+        self.description = Some(description.into());
         self
     }
 
@@ -71,18 +102,12 @@ impl CreateApplicationCommandOption {
     /// .description_localized("zh-CN", "祝你朋友生日快乐")
     /// # ;
     /// ```
-    #[allow(clippy::default_trait_access)]
     pub fn description_localized(
         &mut self,
         locale: impl Into<String>,
         description: impl Into<String>,
     ) -> &mut Self {
-        self.0
-            .entry("description_localizations")
-            .or_insert_with(|| Value::Object(Default::default()))
-            .as_object_mut()
-            .expect("must be object")
-            .insert(locale.into(), Value::String(description.into()));
+        self.description_localizations.insert(locale.into(), description.into());
         self
     }
 
@@ -90,7 +115,7 @@ impl CreateApplicationCommandOption {
     ///
     /// **Note**: Only one option can be `default`.
     pub fn default_option(&mut self, default: bool) -> &mut Self {
-        self.0.insert("default", Value::from(default));
+        self.default = Some(default);
         self
     }
 
@@ -98,7 +123,7 @@ impl CreateApplicationCommandOption {
     ///
     /// **Note**: This defaults to `false`.
     pub fn required(&mut self, required: bool) -> &mut Self {
-        self.0.insert("required", Value::from(required));
+        self.required = Some(required);
         self
     }
 
@@ -106,11 +131,11 @@ impl CreateApplicationCommandOption {
     ///
     /// **Note**: There can be no more than 25 choices set. Name must be between 1 and 100 characters. Value must be between -2^53 and 2^53.
     pub fn add_int_choice(&mut self, name: impl Into<String>, value: i32) -> &mut Self {
-        let choice = json!({
-            "name": name.into(),
-            "value" : value
-        });
-        self.add_choice(choice)
+        self.add_choice(CommandOptionChoice {
+            name: name.into(),
+            value: Value::from(value),
+            name_localizations: HashMap::new(),
+        })
     }
 
     /// Adds a localized optional int-choice. See [`Self::add_int_choice`] for more info.
@@ -120,15 +145,11 @@ impl CreateApplicationCommandOption {
         value: i32,
         locales: impl IntoIterator<Item = (impl Into<String>, impl Into<String>)>,
     ) -> &mut Self {
-        let choice = json!({
-            "name": name.into(),
-            "name_localizations": locales
-                .into_iter()
-                .map(|(locale, name)| (locale.into(), name.into()))
-                .collect::<Value>(),
-            "value" : value,
-        });
-        self.add_choice(choice)
+        self.add_choice(CommandOptionChoice {
+            name: name.into(),
+            value: Value::from(value),
+            name_localizations: locales.into_iter().map(|(l, n)| (l.into(), n.into())).collect(),
+        })
     }
 
     /// Adds an optional string-choice.
@@ -139,11 +160,11 @@ impl CreateApplicationCommandOption {
         name: impl Into<String>,
         value: impl Into<String>,
     ) -> &mut Self {
-        let choice = json!({
-            "name": name.into(),
-            "value": value.into()
-        });
-        self.add_choice(choice)
+        self.add_choice(CommandOptionChoice {
+            name: name.into(),
+            value: Value::String(value.into()),
+            name_localizations: HashMap::new(),
+        })
     }
 
     /// Adds a localized optional string-choice. See [`Self::add_string_choice`] for more info.
@@ -153,26 +174,22 @@ impl CreateApplicationCommandOption {
         value: impl Into<String>,
         locales: impl IntoIterator<Item = (impl Into<String>, impl Into<String>)>,
     ) -> &mut Self {
-        let choice = json!({
-            "name": name.into(),
-            "name_localizations": locales
-                .into_iter()
-                .map(|(locale, name)| (locale.into(), name.into()))
-                .collect::<Value>(),
-            "value": value.into(),
-        });
-        self.add_choice(choice)
+        self.add_choice(CommandOptionChoice {
+            name: name.into(),
+            value: Value::String(value.into()),
+            name_localizations: locales.into_iter().map(|(l, n)| (l.into(), n.into())).collect(),
+        })
     }
 
     /// Adds an optional number-choice.
     ///
     /// **Note**: There can be no more than 25 choices set. Name must be between 1 and 100 characters. Value must be between -2^53 and 2^53.
     pub fn add_number_choice(&mut self, name: impl Into<String>, value: f64) -> &mut Self {
-        let choice = json!({
-            "name": name.into(),
-            "value" : value
-        });
-        self.add_choice(choice)
+        self.add_choice(CommandOptionChoice {
+            name: name.into(),
+            value: Value::from(value),
+            name_localizations: HashMap::new(),
+        })
     }
 
     /// Adds a localized optional number-choice. See [`Self::add_number_choice`] for more info.
@@ -182,22 +199,15 @@ impl CreateApplicationCommandOption {
         value: f64,
         locales: impl IntoIterator<Item = (impl Into<String>, impl Into<String>)>,
     ) -> &mut Self {
-        let choice = json!({
-            "name": name.into(),
-            "name_localizations": locales
-                .into_iter()
-                .map(|(locale, name)| (locale.into(), name.into()))
-                .collect::<Value>(),
-            "value" : value,
-        });
-        self.add_choice(choice)
+        self.add_choice(CommandOptionChoice {
+            name: name.into(),
+            value: Value::from(value),
+            name_localizations: locales.into_iter().map(|(l, n)| (l.into(), n.into())).collect(),
+        })
     }
 
-    fn add_choice(&mut self, value: Value) -> &mut Self {
-        let choices = self.0.entry("choices").or_insert_with(|| Value::from(Vec::<Value>::new()));
-        let choices_arr = choices.as_array_mut().expect("Must be an array");
-        choices_arr.push(value);
-
+    fn add_choice(&mut self, value: CommandOptionChoice) -> &mut Self {
+        self.choices.push(value);
         self
     }
 
@@ -207,7 +217,7 @@ impl CreateApplicationCommandOption {
     /// - May not be set to `true` if `choices` are set
     /// - Options using `autocomplete` are not confined to only use given choices
     pub fn set_autocomplete(&mut self, value: bool) -> &mut Self {
-        self.0.insert("autocomplete", Value::from(value));
+        self.autocomplete = Some(value);
 
         self
     }
@@ -234,10 +244,7 @@ impl CreateApplicationCommandOption {
     /// [`SubCommandGroup`]: crate::model::application::command::CommandOptionType::SubCommandGroup
     /// [`SubCommand`]: crate::model::application::command::CommandOptionType::SubCommand
     pub fn add_sub_option(&mut self, sub_option: CreateApplicationCommandOption) -> &mut Self {
-        let new_option = json::hashmap_to_json_map(sub_option.0);
-        let options = self.0.entry("options").or_insert_with(|| Value::from(Vec::<Value>::new()));
-        let opt_arr = options.as_array_mut().expect("Must be an array");
-        opt_arr.push(Value::from(new_option));
+        self.options.push(sub_option);
 
         self
     }
@@ -245,39 +252,36 @@ impl CreateApplicationCommandOption {
     /// If the option is a [`Channel`], it will only be able to show these types.
     ///
     /// [`Channel`]: crate::model::application::command::CommandOptionType::Channel
-    pub fn channel_types(&mut self, channel_types: &[ChannelType]) -> &mut Self {
-        self.0.insert(
-            "channel_types",
-            Value::from(channel_types.iter().map(|i| from_number(*i as u8)).collect::<Vec<_>>()),
-        );
+    pub fn channel_types(&mut self, channel_types: Vec<ChannelType>) -> &mut Self {
+        self.channel_types = channel_types;
 
         self
     }
 
     /// Sets the minimum permitted value for this integer option
-    pub fn min_int_value(&mut self, value: impl ToNumber) -> &mut Self {
-        self.0.insert("min_value", value.to_number());
+    pub fn min_int_value(&mut self, value: u64) -> &mut Self {
+        self.min_value = Some(Number::Integer(value));
 
         self
     }
 
     /// Sets the maximum permitted value for this integer option
-    pub fn max_int_value(&mut self, value: impl ToNumber) -> &mut Self {
-        self.0.insert("max_value", value.to_number());
+    pub fn max_int_value(&mut self, value: u64) -> &mut Self {
+        self.max_value = Some(Number::Integer(value));
 
         self
     }
 
     /// Sets the minimum permitted value for this number option
     pub fn min_number_value(&mut self, value: f64) -> &mut Self {
-        self.0.insert("min_value", Value::from(value));
+        self.min_value = Some(Number::Float(value));
 
         self
     }
 
     /// Sets the maximum permitted value for this number option
     pub fn max_number_value(&mut self, value: f64) -> &mut Self {
-        self.0.insert("max_value", Value::from(value));
+        self.max_value = Some(Number::Float(value));
 
         self
     }
@@ -288,15 +292,32 @@ impl CreateApplicationCommandOption {
 /// [`Self::name`] and [`Self::description`] are required fields.
 ///
 /// [`Command`]: crate::model::application::command::Command
-#[derive(Clone, Debug, Default)]
-pub struct CreateApplicationCommand(pub HashMap<&'static str, Value>);
+#[derive(Clone, Debug, Default, Serialize)]
+pub struct CreateApplicationCommand {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "type")]
+    kind: Option<CommandType>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    name: Option<String>,
+    name_localizations: HashMap<String, String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    description: Option<String>,
+    description_localizations: HashMap<String, String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    default_member_permissions: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    dm_permission: Option<bool>,
+
+    options: Vec<CreateApplicationCommandOption>,
+}
 
 impl CreateApplicationCommand {
     /// Specifies the name of the application command.
     ///
     /// **Note**: Must be between 1 and 32 lowercase characters, matching `r"^[\w-]{1,32}$"`. Two global commands of the same app cannot have the same name. Two guild-specific commands of the same app cannot have the same name.
     pub fn name(&mut self, name: impl Into<String>) -> &mut Self {
-        self.0.insert("name", Value::String(name.into()));
+        self.name = Some(name.into());
         self
     }
 
@@ -309,37 +330,30 @@ impl CreateApplicationCommand {
     /// .name_localized("el", "γενέθλια")
     /// # ;
     /// ```
-    #[allow(clippy::default_trait_access)]
     pub fn name_localized(
         &mut self,
         locale: impl Into<String>,
         name: impl Into<String>,
     ) -> &mut Self {
-        self.0
-            .entry("name_localizations")
-            .or_insert_with(|| Value::Object(Default::default()))
-            .as_object_mut()
-            .expect("must be object")
-            .insert(locale.into(), Value::String(name.into()));
+        self.name_localizations.insert(locale.into(), name.into());
         self
     }
 
     /// Specifies the type of the application command.
     pub fn kind(&mut self, kind: CommandType) -> &mut Self {
-        self.0.insert("type", from_number(kind as u8));
+        self.kind = Some(kind);
         self
     }
 
     /// Specifies the default permissions required to execute the command.
     pub fn default_member_permissions(&mut self, permissions: Permissions) -> &mut Self {
-        self.0.insert("default_member_permissions", Value::String(permissions.bits().to_string()));
-
+        self.default_member_permissions = Some(permissions.bits().to_string());
         self
     }
 
     /// Specifies if the command is available in DMs.
     pub fn dm_permission(&mut self, enabled: bool) -> &mut Self {
-        self.0.insert("dm_permission", Value::from(enabled));
+        self.dm_permission = Some(enabled);
 
         self
     }
@@ -348,7 +362,7 @@ impl CreateApplicationCommand {
     ///
     /// **Note**: Must be between 1 and 100 characters long.
     pub fn description(&mut self, description: impl Into<String>) -> &mut Self {
-        self.0.insert("description", Value::String(description.into()));
+        self.description = Some(description.into());
         self
     }
 
@@ -360,18 +374,12 @@ impl CreateApplicationCommand {
     /// .description_localized("zh-CN", "祝你朋友生日快乐")
     /// # ;
     /// ```
-    #[allow(clippy::default_trait_access)]
     pub fn description_localized(
         &mut self,
         locale: impl Into<String>,
         description: impl Into<String>,
     ) -> &mut Self {
-        self.0
-            .entry("description_localizations")
-            .or_insert_with(|| Value::Object(Default::default()))
-            .as_object_mut()
-            .expect("must be object")
-            .insert(locale.into(), Value::String(description.into()));
+        self.description_localizations.insert(locale.into(), description.into());
         self
     }
 
@@ -391,10 +399,7 @@ impl CreateApplicationCommand {
     ///
     /// **Note**: Application commands can have up to 25 options.
     pub fn add_option(&mut self, option: CreateApplicationCommandOption) -> &mut Self {
-        let new_option = json::hashmap_to_json_map(option.0);
-        let options = self.0.entry("options").or_insert_with(|| Value::from(Vec::<Value>::new()));
-        let opt_arr = options.as_array_mut().expect("Must be an array");
-        opt_arr.push(Value::from(new_option));
+        self.options.push(option);
 
         self
     }
@@ -403,18 +408,13 @@ impl CreateApplicationCommand {
     ///
     /// **Note**: Application commands can have up to 25 options.
     pub fn set_options(&mut self, options: Vec<CreateApplicationCommandOption>) -> &mut Self {
-        let new_options = options
-            .into_iter()
-            .map(|f| Value::from(json::hashmap_to_json_map(f.0)))
-            .collect::<Vec<Value>>();
-
-        self.0.insert("options", Value::from(new_options));
+        self.options = options;
         self
     }
 }
 
-#[derive(Clone, Debug, Default)]
-pub struct CreateApplicationCommands(pub Vec<Value>);
+#[derive(Clone, Debug, Default, Serialize)]
+pub struct CreateApplicationCommands(pub Vec<CreateApplicationCommand>);
 
 impl CreateApplicationCommands {
     /// Creates a new application command.
@@ -432,9 +432,7 @@ impl CreateApplicationCommands {
 
     /// Adds a new application command.
     pub fn add_application_command(&mut self, command: CreateApplicationCommand) -> &mut Self {
-        let new_data = Value::from(json::hashmap_to_json_map(command.0));
-
-        self.0.push(new_data);
+        self.0.push(command);
 
         self
     }
@@ -444,12 +442,7 @@ impl CreateApplicationCommands {
         &mut self,
         commands: Vec<CreateApplicationCommand>,
     ) -> &mut Self {
-        let new_application_command =
-            commands.into_iter().map(|f| Value::from(json::hashmap_to_json_map(f.0)));
-
-        for application_command in new_application_command {
-            self.0.push(application_command);
-        }
+        self.0.extend(commands);
 
         self
     }
