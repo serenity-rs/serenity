@@ -6,7 +6,7 @@ use serenity::model::gateway::Ready;
 use serenity::prelude::*;
 
 // Serenity implements transparent sharding in a way that you do not need to
-// manually handle separate processes or connections manually.
+// handle separate processes or connections manually.
 //
 // Transparent sharding is useful for a shared cache. Instead of having caches
 // with duplicated data, a shared cache means all your data can be easily
