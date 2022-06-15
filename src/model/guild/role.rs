@@ -274,8 +274,8 @@ pub enum RoleParseError {
 impl fmt::Display for RoleParseError {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
-            RoleParseError::NotPresentInCache => f.write_str("not present in cache"),
-            RoleParseError::InvalidRole => f.write_str("invalid role"),
+            Self::NotPresentInCache => f.write_str("not present in cache"),
+            Self::InvalidRole => f.write_str("invalid role"),
         }
     }
 }

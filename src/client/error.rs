@@ -23,8 +23,8 @@ pub enum Error {
 impl fmt::Display for Error {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
-            Error::ShardBootFailure => f.write_str("Failed to (re-)boot a shard"),
-            Error::Shutdown => f.write_str("The clients shards shutdown"),
+            Self::ShardBootFailure => f.write_str("Failed to (re-)boot a shard"),
+            Self::Shutdown => f.write_str("The clients shards shutdown"),
         }
     }
 }

@@ -170,26 +170,26 @@ impl From<ReqwestError> for Error {
 impl fmt::Display for Error {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
-            Error::Decode(msg, _) | Error::Other(msg) => f.write_str(msg),
-            Error::ExceededLimit(..) => f.write_str("Input exceeded a limit"),
-            Error::NotInRange(..) => f.write_str("Input is not in the specified range"),
-            Error::Format(inner) => fmt::Display::fmt(&inner, f),
-            Error::Io(inner) => fmt::Display::fmt(&inner, f),
-            Error::Json(inner) => fmt::Display::fmt(&inner, f),
-            Error::Model(inner) => fmt::Display::fmt(&inner, f),
-            Error::Url(msg) => f.write_str(msg),
+            Self::Decode(msg, _) | Self::Other(msg) => f.write_str(msg),
+            Self::ExceededLimit(..) => f.write_str("Input exceeded a limit"),
+            Self::NotInRange(..) => f.write_str("Input is not in the specified range"),
+            Self::Format(inner) => fmt::Display::fmt(&inner, f),
+            Self::Io(inner) => fmt::Display::fmt(&inner, f),
+            Self::Json(inner) => fmt::Display::fmt(&inner, f),
+            Self::Model(inner) => fmt::Display::fmt(&inner, f),
+            Self::Url(msg) => f.write_str(msg),
             #[cfg(feature = "simd-json")]
             Error::SimdJson(inner) => fmt::Display::fmt(&inner, f),
             #[cfg(feature = "client")]
-            Error::Client(inner) => fmt::Display::fmt(&inner, f),
+            Self::Client(inner) => fmt::Display::fmt(&inner, f),
             #[cfg(feature = "collector")]
-            Error::Collector(inner) => fmt::Display::fmt(&inner, f),
+            Self::Collector(inner) => fmt::Display::fmt(&inner, f),
             #[cfg(feature = "gateway")]
-            Error::Gateway(inner) => fmt::Display::fmt(&inner, f),
+            Self::Gateway(inner) => fmt::Display::fmt(&inner, f),
             #[cfg(feature = "http")]
-            Error::Http(inner) => fmt::Display::fmt(&inner, f),
+            Self::Http(inner) => fmt::Display::fmt(&inner, f),
             #[cfg(feature = "gateway")]
-            Error::Tungstenite(inner) => fmt::Display::fmt(&inner, f),
+            Self::Tungstenite(inner) => fmt::Display::fmt(&inner, f),
         }
     }
 }
@@ -198,20 +198,20 @@ impl StdError for Error {
     #[instrument]
     fn source(&self) -> Option<&(dyn StdError + 'static)> {
         match self {
-            Error::Format(inner) => Some(inner),
-            Error::Io(inner) => Some(inner),
-            Error::Json(inner) => Some(inner),
-            Error::Model(inner) => Some(inner),
+            Self::Format(inner) => Some(inner),
+            Self::Io(inner) => Some(inner),
+            Self::Json(inner) => Some(inner),
+            Self::Model(inner) => Some(inner),
             #[cfg(feature = "client")]
-            Error::Client(inner) => Some(inner),
+            Self::Client(inner) => Some(inner),
             #[cfg(feature = "collector")]
-            Error::Collector(inner) => Some(inner),
+            Self::Collector(inner) => Some(inner),
             #[cfg(feature = "gateway")]
-            Error::Gateway(inner) => Some(inner),
+            Self::Gateway(inner) => Some(inner),
             #[cfg(feature = "http")]
-            Error::Http(inner) => Some(inner),
+            Self::Http(inner) => Some(inner),
             #[cfg(feature = "gateway")]
-            Error::Tungstenite(inner) => Some(inner),
+            Self::Tungstenite(inner) => Some(inner),
             _ => None,
         }
     }

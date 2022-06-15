@@ -1412,9 +1412,9 @@ impl<T> RelatedId<T> {
         T: std::cmp::PartialEq,
     {
         match self {
-            RelatedId::Never | RelatedId::None => false,
-            RelatedId::Some(id) => id == value,
-            RelatedId::Multiple(ids) => ids.contains(value),
+            Self::Never | RelatedId::None => false,
+            Self::Some(id) => id == value,
+            Self::Multiple(ids) => ids.contains(value),
         }
     }
 }

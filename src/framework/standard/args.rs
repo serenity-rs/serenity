@@ -46,8 +46,8 @@ impl Delimiter {
     #[inline]
     fn to_str(&self) -> Cow<'_, str> {
         match self {
-            Delimiter::Single(c) => Cow::Owned(c.to_string()),
-            Delimiter::Multiple(s) => Cow::Borrowed(s),
+            Self::Single(c) => Cow::Owned(c.to_string()),
+            Self::Multiple(s) => Cow::Borrowed(s),
         }
     }
 }
@@ -127,8 +127,8 @@ impl QuoteKind {
 
     fn is_ending_quote(self, c: char) -> bool {
         match self {
-            QuoteKind::Ascii => c == '"',
-            QuoteKind::Apple => c == '\u{201D}',
+            Self::Ascii => c == '"',
+            Self::Apple => c == '\u{201D}',
         }
     }
 }

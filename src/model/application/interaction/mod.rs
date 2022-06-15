@@ -30,11 +30,11 @@ impl Interaction {
     #[must_use]
     pub fn id(&self) -> InteractionId {
         match self {
-            Interaction::Ping(i) => i.id,
-            Interaction::ApplicationCommand(i) => i.id,
-            Interaction::MessageComponent(i) => i.id,
-            Interaction::Autocomplete(i) => i.id,
-            Interaction::ModalSubmit(i) => i.id,
+            Self::Ping(i) => i.id,
+            Self::ApplicationCommand(i) => i.id,
+            Self::MessageComponent(i) => i.id,
+            Self::Autocomplete(i) => i.id,
+            Self::ModalSubmit(i) => i.id,
         }
     }
 
@@ -42,11 +42,11 @@ impl Interaction {
     #[must_use]
     pub fn kind(&self) -> InteractionType {
         match self {
-            Interaction::Ping(_) => InteractionType::Ping,
-            Interaction::ApplicationCommand(_) => InteractionType::ApplicationCommand,
-            Interaction::MessageComponent(_) => InteractionType::MessageComponent,
-            Interaction::Autocomplete(_) => InteractionType::Autocomplete,
-            Interaction::ModalSubmit(_) => InteractionType::ModalSubmit,
+            Self::Ping(_) => InteractionType::Ping,
+            Self::ApplicationCommand(_) => InteractionType::ApplicationCommand,
+            Self::MessageComponent(_) => InteractionType::MessageComponent,
+            Self::Autocomplete(_) => InteractionType::Autocomplete,
+            Self::ModalSubmit(_) => InteractionType::ModalSubmit,
         }
     }
 
@@ -54,11 +54,11 @@ impl Interaction {
     #[must_use]
     pub fn application_id(&self) -> ApplicationId {
         match self {
-            Interaction::Ping(i) => i.application_id,
-            Interaction::ApplicationCommand(i) => i.application_id,
-            Interaction::MessageComponent(i) => i.application_id,
-            Interaction::Autocomplete(i) => i.application_id,
-            Interaction::ModalSubmit(i) => i.application_id,
+            Self::Ping(i) => i.application_id,
+            Self::ApplicationCommand(i) => i.application_id,
+            Self::MessageComponent(i) => i.application_id,
+            Self::Autocomplete(i) => i.application_id,
+            Self::ModalSubmit(i) => i.application_id,
         }
     }
 
@@ -66,11 +66,11 @@ impl Interaction {
     #[must_use]
     pub fn token(&self) -> &str {
         match self {
-            Interaction::Ping(ref i) => i.token.as_str(),
-            Interaction::ApplicationCommand(i) => i.token.as_str(),
-            Interaction::MessageComponent(i) => i.token.as_str(),
-            Interaction::Autocomplete(i) => i.token.as_str(),
-            Interaction::ModalSubmit(i) => i.token.as_str(),
+            Self::Ping(ref i) => i.token.as_str(),
+            Self::ApplicationCommand(i) => i.token.as_str(),
+            Self::MessageComponent(i) => i.token.as_str(),
+            Self::Autocomplete(i) => i.token.as_str(),
+            Self::ModalSubmit(i) => i.token.as_str(),
         }
     }
 
@@ -78,11 +78,11 @@ impl Interaction {
     #[must_use]
     pub fn guild_locale(&self) -> Option<&str> {
         match self {
-            Interaction::Ping(i) => i.guild_locale.as_deref(),
-            Interaction::ApplicationCommand(i) => i.guild_locale.as_deref(),
-            Interaction::MessageComponent(i) => i.guild_locale.as_deref(),
-            Interaction::Autocomplete(i) => i.guild_locale.as_deref(),
-            Interaction::ModalSubmit(i) => i.guild_locale.as_deref(),
+            Self::Ping(i) => i.guild_locale.as_deref(),
+            Self::ApplicationCommand(i) => i.guild_locale.as_deref(),
+            Self::MessageComponent(i) => i.guild_locale.as_deref(),
+            Self::Autocomplete(i) => i.guild_locale.as_deref(),
+            Self::ModalSubmit(i) => i.guild_locale.as_deref(),
         }
     }
 
@@ -90,7 +90,7 @@ impl Interaction {
     #[must_use]
     pub fn ping(self) -> Option<PingInteraction> {
         match self {
-            Interaction::Ping(i) => Some(i),
+            Self::Ping(i) => Some(i),
             _ => None,
         }
     }
@@ -99,7 +99,7 @@ impl Interaction {
     #[must_use]
     pub fn application_command(self) -> Option<ApplicationCommandInteraction> {
         match self {
-            Interaction::ApplicationCommand(i) => Some(i),
+            Self::ApplicationCommand(i) => Some(i),
             _ => None,
         }
     }
@@ -108,7 +108,7 @@ impl Interaction {
     #[must_use]
     pub fn message_component(self) -> Option<MessageComponentInteraction> {
         match self {
-            Interaction::MessageComponent(i) => Some(i),
+            Self::MessageComponent(i) => Some(i),
             _ => None,
         }
     }
@@ -117,7 +117,7 @@ impl Interaction {
     #[must_use]
     pub fn autocomplete(self) -> Option<AutocompleteInteraction> {
         match self {
-            Interaction::Autocomplete(i) => Some(i),
+            Self::Autocomplete(i) => Some(i),
             _ => None,
         }
     }
@@ -126,7 +126,7 @@ impl Interaction {
     #[must_use]
     pub fn modal_submit(self) -> Option<ModalSubmitInteraction> {
         match self {
-            Interaction::ModalSubmit(i) => Some(i),
+            Self::ModalSubmit(i) => Some(i),
             _ => None,
         }
     }
@@ -172,15 +172,11 @@ impl<'de> Deserialize<'de> for Interaction {
 impl Serialize for Interaction {
     fn serialize<S: Serializer>(&self, serializer: S) -> Result<S::Ok, S::Error> {
         match self {
-            Interaction::Ping(i) => PingInteraction::serialize(i, serializer),
-            Interaction::ApplicationCommand(i) => {
-                ApplicationCommandInteraction::serialize(i, serializer)
-            },
-            Interaction::MessageComponent(i) => {
-                MessageComponentInteraction::serialize(i, serializer)
-            },
-            Interaction::Autocomplete(i) => AutocompleteInteraction::serialize(i, serializer),
-            Interaction::ModalSubmit(i) => ModalSubmitInteraction::serialize(i, serializer),
+            Self::Ping(i) => PingInteraction::serialize(i, serializer),
+            Self::ApplicationCommand(i) => ApplicationCommandInteraction::serialize(i, serializer),
+            Self::MessageComponent(i) => MessageComponentInteraction::serialize(i, serializer),
+            Self::Autocomplete(i) => AutocompleteInteraction::serialize(i, serializer),
+            Self::ModalSubmit(i) => ModalSubmitInteraction::serialize(i, serializer),
         }
     }
 }

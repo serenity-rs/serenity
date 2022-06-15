@@ -402,8 +402,8 @@ impl Change {
         macro_rules! variant_keys {
             ($($Variant:ident: $key:literal,)*) => {
                 match self {
-                    $(Change::$Variant { .. } => Cow::from($key),)*
-                    Change::Other { name, .. } => Cow::from(name),
+                    $(Self::$Variant { .. } => Cow::from($key),)*
+                    Self::Other { name, .. } => Cow::from(name),
                 }
             }
         }
@@ -505,10 +505,10 @@ impl Serialize for Change {
             }};
             ($($Variant:ident: $key:literal,)*) => {
                 match self {
-                    $(Change::$Variant { old, new } => {
+                    $(Self::$Variant { old, new } => {
                         serialize_variants!(__impl $key, old, new)
                     },)*
-                    Change::Other { name, old, new } => {
+                    Self::Other { name, old, new } => {
                         serialize_variants!(__impl name, old, new)
                     },
                 }

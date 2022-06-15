@@ -58,20 +58,20 @@ pub enum Error {
 impl fmt::Display for Error {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
-            Error::BuildingUrl => f.write_str("Error building url"),
-            Error::Closed(_) => f.write_str("Connection closed"),
-            Error::ExpectedHello => f.write_str("Expected a Hello"),
-            Error::HeartbeatFailed => f.write_str("Failed sending a heartbeat"),
-            Error::InvalidAuthentication => f.write_str("Sent invalid authentication"),
-            Error::InvalidHandshake => f.write_str("Expected a valid Handshake"),
-            Error::InvalidOpCode => f.write_str("Invalid OpCode"),
-            Error::InvalidShardData => f.write_str("Sent invalid shard data"),
-            Error::NoAuthentication => f.write_str("Sent no authentication"),
-            Error::NoSessionId => f.write_str("No Session Id present when required"),
-            Error::OverloadedShard => f.write_str("Shard has too many guilds"),
-            Error::ReconnectFailure => f.write_str("Failed to Reconnect"),
-            Error::InvalidGatewayIntents => f.write_str("Invalid gateway intents were provided"),
-            Error::DisallowedGatewayIntents => {
+            Self::BuildingUrl => f.write_str("Error building url"),
+            Self::Closed(_) => f.write_str("Connection closed"),
+            Self::ExpectedHello => f.write_str("Expected a Hello"),
+            Self::HeartbeatFailed => f.write_str("Failed sending a heartbeat"),
+            Self::InvalidAuthentication => f.write_str("Sent invalid authentication"),
+            Self::InvalidHandshake => f.write_str("Expected a valid Handshake"),
+            Self::InvalidOpCode => f.write_str("Invalid OpCode"),
+            Self::InvalidShardData => f.write_str("Sent invalid shard data"),
+            Self::NoAuthentication => f.write_str("Sent no authentication"),
+            Self::NoSessionId => f.write_str("No Session Id present when required"),
+            Self::OverloadedShard => f.write_str("Shard has too many guilds"),
+            Self::ReconnectFailure => f.write_str("Failed to Reconnect"),
+            Self::InvalidGatewayIntents => f.write_str("Invalid gateway intents were provided"),
+            Self::DisallowedGatewayIntents => {
                 f.write_str("Disallowed gateway intents were provided")
             },
         }

@@ -174,11 +174,11 @@ impl LightMethod {
     #[must_use]
     pub fn reqwest_method(self) -> Method {
         match self {
-            LightMethod::Delete => Method::DELETE,
-            LightMethod::Get => Method::GET,
-            LightMethod::Patch => Method::PATCH,
-            LightMethod::Post => Method::POST,
-            LightMethod::Put => Method::PUT,
+            Self::Delete => Method::DELETE,
+            Self::Get => Method::GET,
+            Self::Patch => Method::PATCH,
+            Self::Post => Method::POST,
+            Self::Put => Method::PUT,
         }
     }
 }

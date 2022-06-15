@@ -32,23 +32,23 @@ pub enum AttachmentType<'a> {
 impl<'a> AttachmentType<'a> {
     pub(crate) async fn data(&self, client: &Client) -> Result<Vec<u8>> {
         let data = match self {
-            AttachmentType::Bytes {
+            Self::Bytes {
                 data, ..
             } => data.clone().into_owned(),
-            AttachmentType::File {
+            Self::File {
                 file, ..
             } => {
                 let mut buf = Vec::new();
                 file.try_clone().await?.read_to_end(&mut buf).await?;
                 buf
             },
-            AttachmentType::Path(path) => {
+            Self::Path(path) => {
                 let mut file = File::open(path).await?;
                 let mut buf = Vec::new();
                 file.read_to_end(&mut buf).await?;
                 buf
             },
-            AttachmentType::Image(url) => {
+            Self::Image(url) => {
                 let response = client.get(url.clone()).send().await?;
                 response.bytes().await?.to_vec()
             },
@@ -58,16 +58,16 @@ impl<'a> AttachmentType<'a> {
 
     pub(crate) fn filename(&self) -> Result<Option<String>> {
         match self {
-            AttachmentType::Bytes {
+            Self::Bytes {
                 filename, ..
             }
-            | AttachmentType::File {
+            | Self::File {
                 filename, ..
             } => Ok(Some(filename.to_string())),
-            AttachmentType::Path(path) => {
+            Self::Path(path) => {
                 Ok(path.file_name().map(|filename| filename.to_string_lossy().to_string()))
             },
-            AttachmentType::Image(url) => match url.path_segments().and_then(Iterator::last) {
+            Self::Image(url) => match url.path_segments().and_then(Iterator::last) {
                 Some(filename) => Ok(Some(filename.to_string())),
                 None => Err(Error::Url(url.to_string())),
             },

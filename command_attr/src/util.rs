@@ -30,10 +30,10 @@ pub trait LitExt {
 impl LitExt for Lit {
     fn to_str(&self) -> String {
         match self {
-            Lit::Str(s) => s.value(),
-            Lit::ByteStr(s) => unsafe { String::from_utf8_unchecked(s.value()) },
-            Lit::Char(c) => c.value().to_string(),
-            Lit::Byte(b) => (b.value() as char).to_string(),
+            Self::Str(s) => s.value(),
+            Self::ByteStr(s) => unsafe { String::from_utf8_unchecked(s.value()) },
+            Self::Char(c) => c.value().to_string(),
+            Self::Byte(b) => (b.value() as char).to_string(),
             _ => panic!("values must be a (byte)string or a char"),
         }
     }
