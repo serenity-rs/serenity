@@ -1,24 +1,22 @@
-use std::collections::HashMap;
-
-use super::{CreateAllowedMentions, CreateEmbed};
-use crate::builder::CreateComponents;
-use crate::json;
+use super::{CreateAllowedMentions, CreateComponents, CreateEmbed};
 use crate::json::prelude::*;
 use crate::model::application::interaction::{InteractionResponseType, MessageFlags};
 use crate::model::channel::AttachmentType;
 
-#[derive(Clone, Debug)]
-pub struct CreateInteractionResponse<'a>(
-    pub HashMap<&'static str, Value>,
-    pub Vec<AttachmentType<'a>>,
-);
+#[derive(Clone, Debug, Serialize)]
+pub struct CreateInteractionResponse<'a> {
+    #[serde(rename = "type")]
+    kind: InteractionResponseType,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub(crate) data: Option<CreateInteractionResponseData<'a>>,
+}
 
 impl<'a> CreateInteractionResponse<'a> {
     /// Sets the InteractionResponseType of the message.
     ///
     /// Defaults to `ChannelMessageWithSource`.
     pub fn kind(&mut self, kind: InteractionResponseType) -> &mut Self {
-        self.0.insert("type", from_number(kind as u8));
+        self.kind = kind;
         self
     }
 
@@ -31,28 +29,42 @@ impl<'a> CreateInteractionResponse<'a> {
     {
         let mut data = CreateInteractionResponseData::default();
         f(&mut data);
-        let map = json::hashmap_to_json_map(data.0);
 
-        self.0.insert("data", Value::from(map));
-        self.1 = data.1;
+        self.data = Some(data);
         self
     }
 }
 
 impl<'a> Default for CreateInteractionResponse<'a> {
     fn default() -> CreateInteractionResponse<'a> {
-        let mut map = HashMap::new();
-        map.insert("type", from_number(4));
-
-        CreateInteractionResponse(map, Vec::new())
+        Self {
+            kind: InteractionResponseType::ChannelMessageWithSource,
+            data: None,
+        }
     }
 }
 
-#[derive(Clone, Debug, Default)]
-pub struct CreateInteractionResponseData<'a>(
-    pub HashMap<&'static str, Value>,
-    pub Vec<AttachmentType<'a>>,
-);
+#[derive(Clone, Debug, Default, Serialize)]
+pub struct CreateInteractionResponseData<'a> {
+    embeds: Vec<CreateEmbed>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    tts: Option<bool>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    content: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    allowed_mentions: Option<CreateAllowedMentions>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    flags: Option<MessageFlags>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    components: Option<CreateComponents>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    custom_id: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    title: Option<String>,
+
+    #[serde(skip)]
+    pub(crate) files: Vec<AttachmentType<'a>>,
+}
 
 impl<'a> CreateInteractionResponseData<'a> {
     /// Set whether the message is text-to-speech.
@@ -61,13 +73,13 @@ impl<'a> CreateInteractionResponseData<'a> {
     ///
     /// Defaults to `false`.
     pub fn tts(&mut self, tts: bool) -> &mut Self {
-        self.0.insert("tts", Value::from(tts));
+        self.tts = Some(tts);
         self
     }
 
     /// Appends a file to the message.
     pub fn add_file<T: Into<AttachmentType<'a>>>(&mut self, file: T) -> &mut Self {
-        self.1.push(file.into());
+        self.files.push(file.into());
         self
     }
 
@@ -76,7 +88,7 @@ impl<'a> CreateInteractionResponseData<'a> {
         &mut self,
         files: It,
     ) -> &mut Self {
-        self.1.extend(files.into_iter().map(Into::into));
+        self.files.extend(files.into_iter().map(Into::into));
         self
     }
 
@@ -88,7 +100,7 @@ impl<'a> CreateInteractionResponseData<'a> {
         &mut self,
         files: It,
     ) -> &mut Self {
-        self.1 = files.into_iter().map(Into::into).collect();
+        self.files = files.into_iter().map(Into::into).collect();
         self
     }
 
@@ -97,11 +109,7 @@ impl<'a> CreateInteractionResponseData<'a> {
     /// **Note**: Message contents must be under 2000 unicode code points.
     #[inline]
     pub fn content(&mut self, content: impl Into<String>) -> &mut Self {
-        self._content(content.into())
-    }
-
-    fn _content(&mut self, content: String) -> &mut Self {
-        self.0.insert("content", Value::from(content));
+        self.content = Some(content.into());
         self
     }
 
@@ -117,23 +125,13 @@ impl<'a> CreateInteractionResponseData<'a> {
 
     /// Adds an embed to the message.
     pub fn add_embed(&mut self, embed: CreateEmbed) -> &mut Self {
-        let embed = to_value(embed).expect("CreateEmbed builder should not fail!");
-
-        let embeds = self.0.entry("embeds").or_insert_with(|| Value::from(Vec::<Value>::new()));
-
-        if let Some(embeds) = embeds.as_array_mut() {
-            embeds.push(embed);
-        }
-
+        self.embeds.push(embed);
         self
     }
 
     /// Adds multiple embeds for the message.
     pub fn add_embeds(&mut self, embeds: Vec<CreateEmbed>) -> &mut Self {
-        for embed in embeds {
-            self.add_embed(embed);
-        }
-
+        self.embeds.extend(embeds);
         self
     }
 
@@ -142,10 +140,7 @@ impl<'a> CreateInteractionResponseData<'a> {
     /// Calling this will overwrite the embed list.
     /// To append embeds, call [`Self::add_embed`] instead.
     pub fn set_embed(&mut self, embed: CreateEmbed) -> &mut Self {
-        let embed = to_value(embed).expect("CreateEmbed builder should not fail!");
-
-        self.0.insert("embeds", Value::from(vec![embed]));
-
+        self.set_embeds(vec![embed]);
         self
     }
 
@@ -153,13 +148,8 @@ impl<'a> CreateInteractionResponseData<'a> {
     ///
     /// Calling this multiple times will overwrite the embed list.
     /// To append embeds, call [`Self::add_embed`] instead.
-    pub fn set_embeds(&mut self, embeds: impl IntoIterator<Item = CreateEmbed>) -> &mut Self {
-        let embeds = embeds
-            .into_iter()
-            .map(|embed| to_value(embed).expect("CreateEmbed builder should not fail!"))
-            .collect::<Vec<Value>>();
-
-        self.0.insert("embeds", Value::from(embeds));
+    pub fn set_embeds(&mut self, embeds: Vec<CreateEmbed>) -> &mut Self {
+        self.embeds = embeds.into_iter().collect();
         self
     }
 
@@ -170,33 +160,28 @@ impl<'a> CreateInteractionResponseData<'a> {
     {
         let mut allowed_mentions = CreateAllowedMentions::default();
         f(&mut allowed_mentions);
-        let map = to_value(allowed_mentions).expect("AllowedMentions builder should not fail!");
 
-        self.0.insert("allowed_mentions", map);
+        self.allowed_mentions = Some(allowed_mentions);
         self
     }
 
     /// Sets the flags for the message.
     pub fn flags(&mut self, flags: MessageFlags) -> &mut Self {
-        self.0.insert("flags", from_number(flags.bits()));
+        self.flags = Some(flags);
         self
     }
 
     /// Adds or removes the ephemeral flag
     pub fn ephemeral(&mut self, ephemeral: bool) -> &mut Self {
-        let flags = self
-            .0
-            .get("flags")
-            .map_or(0, |f| f.as_u64().expect("Interaction response flag was not a number"));
+        let flags = self.flags.unwrap_or_else(MessageFlags::empty);
 
         let flags = if ephemeral {
-            flags | MessageFlags::EPHEMERAL.bits()
+            flags | MessageFlags::EPHEMERAL
         } else {
-            flags & !MessageFlags::EPHEMERAL.bits()
+            flags & !MessageFlags::EPHEMERAL
         };
 
-        self.0.insert("flags", from_number(flags));
-
+        self.flags = Some(flags);
         self
     }
 
@@ -213,34 +198,33 @@ impl<'a> CreateInteractionResponseData<'a> {
 
     /// Sets the components of this message.
     pub fn set_components(&mut self, components: CreateComponents) -> &mut Self {
-        let map = to_value(components).expect("CreateComponents builder should not fail!");
-        self.0.insert("components", map);
-
+        self.components = Some(components);
         self
     }
 
     /// Sets the custom id for modal interactions
     pub fn custom_id(&mut self, id: impl Into<String>) -> &mut Self {
-        self.0.insert("custom_id", Value::String(id.into()));
+        self.custom_id = Some(id.into());
         self
     }
 
     /// Sets the title for modal interactions
     pub fn title(&mut self, title: impl Into<String>) -> &mut Self {
-        self.0.insert("title", Value::String(title.into()));
+        self.title = Some(title.into());
         self
     }
 }
 
-#[derive(Clone, Debug)]
-pub struct CreateAutocompleteResponse(pub HashMap<&'static str, Value>);
+#[non_exhaustive]
+#[derive(Clone, Default, Debug, Serialize)]
+pub struct AutocompleteChoice {
+    pub name: String,
+    pub value: Value,
+}
 
-impl Default for CreateAutocompleteResponse {
-    fn default() -> CreateAutocompleteResponse {
-        let mut map = HashMap::new();
-        map.insert("choices", Value::Array(vec![]));
-        CreateAutocompleteResponse(map)
-    }
+#[derive(Clone, Default, Debug, Serialize)]
+pub struct CreateAutocompleteResponse {
+    choices: Vec<AutocompleteChoice>,
 }
 
 impl CreateAutocompleteResponse {
@@ -249,8 +233,8 @@ impl CreateAutocompleteResponse {
     /// See the official docs on [`Application Command Option Choices`] for more information.
     ///
     /// [`Application Command Option Choices`]: https://discord.com/developers/docs/interactions/application-commands#application-command-object-application-command-option-choice-structure
-    pub fn set_choices(&mut self, choices: Value) -> &mut Self {
-        self.0.insert("choices", choices);
+    pub fn set_choices(&mut self, choices: Vec<AutocompleteChoice>) -> &mut Self {
+        self.choices = choices;
         self
     }
 
@@ -258,11 +242,10 @@ impl CreateAutocompleteResponse {
     ///
     /// **Note**: There can be no more than 25 choices set. Name must be between 1 and 100 characters. Value must be between -2^53 and 2^53.
     pub fn add_int_choice(&mut self, name: impl Into<String>, value: i64) -> &mut Self {
-        let choice = json!({
-            "name": name.into(),
-            "value" : value
-        });
-        self.add_choice(choice)
+        self.add_choice(AutocompleteChoice {
+            name: name.into(),
+            value: Value::from(value),
+        })
     }
 
     /// Adds a string autocomplete choice.
@@ -273,29 +256,24 @@ impl CreateAutocompleteResponse {
         name: impl Into<String>,
         value: impl Into<String>,
     ) -> &mut Self {
-        let choice = json!({
-            "name": name.into(),
-            "value": value.into()
-        });
-        self.add_choice(choice)
+        self.add_choice(AutocompleteChoice {
+            name: name.into(),
+            value: Value::String(value.into()),
+        })
     }
 
     /// Adds a number autocomplete choice.
     ///
     /// **Note**: There can be no more than 25 choices set. Name must be between 1 and 100 characters. Value must be between -2^53 and 2^53.
     pub fn add_number_choice(&mut self, name: impl Into<String>, value: f64) -> &mut Self {
-        let choice = json!({
-            "name": name.into(),
-            "value" : value
-        });
-        self.add_choice(choice)
+        self.add_choice(AutocompleteChoice {
+            name: name.into(),
+            value: Value::from(value),
+        })
     }
 
-    fn add_choice(&mut self, value: Value) -> &mut Self {
-        let choices = self.0.entry("choices").or_insert_with(|| Value::Array(vec![]));
-        let choices_arr = choices.as_array_mut().expect("Must be an array");
-        choices_arr.push(value);
-
+    fn add_choice(&mut self, value: AutocompleteChoice) -> &mut Self {
+        self.choices.push(value);
         self
     }
 }

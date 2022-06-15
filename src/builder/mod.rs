@@ -71,6 +71,7 @@ pub use self::create_components::{
 };
 pub use self::create_embed::{CreateEmbed, CreateEmbedAuthor, CreateEmbedFooter};
 pub use self::create_interaction_response::{
+    AutocompleteChoice,
     CreateAutocompleteResponse,
     CreateInteractionResponse,
     CreateInteractionResponseData,

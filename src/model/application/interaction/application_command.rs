@@ -115,25 +115,23 @@ impl ApplicationCommandInteraction {
     async fn _create_interaction_response<'a>(
         &self,
         http: &Http,
-        interaction_response: CreateInteractionResponse<'a>,
+        mut interaction_response: CreateInteractionResponse<'a>,
     ) -> Result<()> {
-        let map = json::hashmap_to_json_map(interaction_response.0);
+        let files = interaction_response
+            .data
+            .as_mut()
+            .map_or_else(Vec::new, |d| std::mem::take(&mut d.files));
 
-        Message::check_lengths(&map)?;
-
-        if interaction_response.1.is_empty() {
-            http.as_ref()
-                .create_interaction_response(self.id.0, &self.token, &Value::from(map))
-                .await
+        if files.is_empty() {
+            http.create_interaction_response(self.id.0, &self.token, &interaction_response).await
         } else {
-            http.as_ref()
-                .create_interaction_response_with_files(
-                    self.id.0,
-                    &self.token,
-                    &Value::from(map),
-                    interaction_response.1,
-                )
-                .await
+            http.create_interaction_response_with_files(
+                self.id.0,
+                &self.token,
+                &interaction_response,
+                files,
+            )
+            .await
         }
     }
 

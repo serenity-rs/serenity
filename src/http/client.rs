@@ -681,7 +681,7 @@ impl Http {
         &self,
         interaction_id: u64,
         interaction_token: &str,
-        map: &Value,
+        map: &impl serde::Serialize,
     ) -> Result<()> {
         self.wind(204, Request {
             body: Some(to_vec(map)?),

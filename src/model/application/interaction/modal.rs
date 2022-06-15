@@ -99,24 +99,22 @@ impl ModalSubmitInteraction {
         let mut interaction_response = CreateInteractionResponse::default();
         f(&mut interaction_response);
 
-        let map = json::hashmap_to_json_map(interaction_response.0);
+        let http = http.as_ref();
+        let files = interaction_response
+            .data
+            .as_mut()
+            .map_or_else(Vec::new, |d| std::mem::take(&mut d.files));
 
-        Message::check_content_length(&map)?;
-        Message::check_embed_length(&map)?;
-
-        if interaction_response.1.is_empty() {
-            http.as_ref()
-                .create_interaction_response(self.id.0, &self.token, &Value::from(map))
-                .await
+        if files.is_empty() {
+            http.create_interaction_response(self.id.0, &self.token, &interaction_response).await
         } else {
-            http.as_ref()
-                .create_interaction_response_with_files(
-                    self.id.0,
-                    &self.token,
-                    &Value::from(map),
-                    interaction_response.1,
-                )
-                .await
+            http.create_interaction_response_with_files(
+                self.id.0,
+                &self.token,
+                &interaction_response,
+                files,
+            )
+            .await
         }
     }
 

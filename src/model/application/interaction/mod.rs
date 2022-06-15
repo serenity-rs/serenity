@@ -233,6 +233,15 @@ pub enum InteractionResponseType {
     Modal = 9,
 }
 
+impl serde::Serialize for InteractionResponseType {
+    fn serialize<S>(&self, serializer: S) -> std::result::Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        serializer.serialize_u8(*self as u8)
+    }
+}
+
 fn add_guild_id_to_resolved(map: &mut JsonMap, guild_id: GuildId) {
     if let Some(member) = map.get_mut("member").and_then(Value::as_object_mut) {
         member.insert("guild_id".to_string(), from_number(guild_id.0));
