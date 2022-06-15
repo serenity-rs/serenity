@@ -306,6 +306,7 @@ pub struct CommandOption {
     /// The option description.
     pub description: String,
     /// Localizations of the option description with locale as the key
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub description_localizations: Option<std::collections::HashMap<String, String>>,
     /// Whether the parameter is optional or required.
     #[serde(default)]
