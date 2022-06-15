@@ -566,8 +566,6 @@
 <span id="561">561</span>
 <span id="562">562</span>
 <span id="563">563</span>
-<span id="564">564</span>
-<span id="565">565</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::collections::HashMap</span>;
 
 <span class="kw">use</span> <span class="ident">serde::de::Error</span> <span class="kw">as</span> <span class="ident">DeError</span>;
@@ -1011,7 +1009,6 @@
 <span class="doccomment">/// The resolved value of a [`CommandData::target_id`].</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>)]</span>
 <span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">u8</span>)]</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">ResolvedTarget</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
     <span class="ident">User</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">User</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">PartialMember</span><span class="op">&gt;</span>),
     <span class="ident">Message</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">Message</span>),
@@ -1072,7 +1069,6 @@
 <span class="doccomment">/// The resolved value of an [`CommandDataOption`].</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Serialize</span>, <span class="ident">Deserialize</span>)]</span>
 <span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">u8</span>)]</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">CommandDataOptionValue</span> {
     <span class="ident">String</span>(<span class="ident">String</span>),
     <span class="ident">Integer</span>(<span class="ident">i64</span>),
