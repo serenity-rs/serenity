@@ -445,7 +445,6 @@ impl<'de> Deserialize<'de> for CommandData {
 /// The resolved value of a [`CommandData::target_id`].
 #[derive(Clone, Debug)]
 #[non_exhaustive]
-#[repr(u8)]
 pub enum ResolvedTarget<'a> {
     User(&'a User, Option<&'a PartialMember>),
     Message(&'a Message),
@@ -510,7 +509,6 @@ pub struct CommandDataOption {
 /// The resolved value of an [`CommandDataOption`].
 #[derive(Clone, Debug, Serialize, Deserialize)]
 #[non_exhaustive]
-#[repr(u8)]
 pub enum CommandDataOptionValue {
     String(String),
     Integer(i64),
