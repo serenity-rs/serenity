@@ -46,9 +46,9 @@ impl ToTokens for OnlyIn {
     fn to_tokens(&self, stream: &mut TokenStream2) {
         let only_in_path = quote!(serenity::framework::standard::OnlyIn);
         match self {
-            OnlyIn::Dm => stream.extend(quote!(#only_in_path::Dm)),
-            OnlyIn::Guild => stream.extend(quote!(#only_in_path::Guild)),
-            OnlyIn::None => stream.extend(quote!(#only_in_path::None)),
+            Self::Dm => stream.extend(quote!(#only_in_path::Dm)),
+            Self::Guild => stream.extend(quote!(#only_in_path::Guild)),
+            Self::None => stream.extend(quote!(#only_in_path::None)),
         }
     }
 }
@@ -492,9 +492,9 @@ impl ToTokens for HelpBehaviour {
     fn to_tokens(&self, stream: &mut TokenStream2) {
         let help_behaviour_path = quote!(serenity::framework::standard::HelpBehaviour);
         match self {
-            HelpBehaviour::Strike => stream.extend(quote!(#help_behaviour_path::Strike)),
-            HelpBehaviour::Hide => stream.extend(quote!(#help_behaviour_path::Hide)),
-            HelpBehaviour::Nothing => stream.extend(quote!(#help_behaviour_path::Nothing)),
+            Self::Strike => stream.extend(quote!(#help_behaviour_path::Strike)),
+            Self::Hide => stream.extend(quote!(#help_behaviour_path::Hide)),
+            Self::Nothing => stream.extend(quote!(#help_behaviour_path::Nothing)),
         }
     }
 }

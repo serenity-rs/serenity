@@ -87,7 +87,7 @@ impl Channel {
     #[must_use]
     pub fn guild(self) -> Option<GuildChannel> {
         match self {
-            Channel::Guild(lock) => Some(lock),
+            Self::Guild(lock) => Some(lock),
             _ => None,
         }
     }
@@ -119,7 +119,7 @@ impl Channel {
     #[must_use]
     pub fn private(self) -> Option<PrivateChannel> {
         match self {
-            Channel::Private(lock) => Some(lock),
+            Self::Private(lock) => Some(lock),
             _ => None,
         }
     }
@@ -151,7 +151,7 @@ impl Channel {
     #[must_use]
     pub fn category(self) -> Option<ChannelCategory> {
         match self {
-            Channel::Category(lock) => Some(lock),
+            Self::Category(lock) => Some(lock),
             _ => None,
         }
     }
@@ -168,13 +168,13 @@ impl Channel {
     #[cfg(feature = "http")]
     pub async fn delete(&self, cache_http: impl CacheHttp) -> Result<()> {
         match self {
-            Channel::Guild(public_channel) => {
+            Self::Guild(public_channel) => {
                 public_channel.delete(cache_http).await?;
             },
-            Channel::Private(private_channel) => {
+            Self::Private(private_channel) => {
                 private_channel.delete(cache_http.http()).await?;
             },
-            Channel::Category(category) => {
+            Self::Category(category) => {
                 category.delete(cache_http).await?;
             },
         }
@@ -188,9 +188,9 @@ impl Channel {
     #[cfg(feature = "model")]
     pub fn is_nsfw(&self) -> bool {
         match self {
-            Channel::Guild(channel) => channel.is_nsfw(),
-            Channel::Category(category) => category.is_nsfw(),
-            Channel::Private(_) => false,
+            Self::Guild(channel) => channel.is_nsfw(),
+            Self::Category(category) => category.is_nsfw(),
+            Self::Private(_) => false,
         }
     }
 
@@ -200,9 +200,9 @@ impl Channel {
     #[must_use]
     pub fn id(&self) -> ChannelId {
         match self {
-            Channel::Guild(ch) => ch.id,
-            Channel::Private(ch) => ch.id,
-            Channel::Category(ch) => ch.id,
+            Self::Guild(ch) => ch.id,
+            Self::Private(ch) => ch.id,
+            Self::Category(ch) => ch.id,
         }
     }
 
@@ -214,8 +214,8 @@ impl Channel {
     #[must_use]
     pub fn position(&self) -> Option<i64> {
         match self {
-            Channel::Guild(channel) => Some(channel.position),
-            Channel::Category(category) => Some(category.position),
+            Self::Guild(channel) => Some(channel.position),
+            Self::Category(category) => Some(category.position),
             _ => None,
         }
     }
@@ -259,9 +259,9 @@ impl Serialize for Channel {
         S: Serializer,
     {
         match self {
-            Channel::Category(c) => ChannelCategory::serialize(c, serializer),
-            Channel::Guild(c) => GuildChannel::serialize(c, serializer),
-            Channel::Private(c) => PrivateChannel::serialize(c, serializer),
+            Self::Category(c) => ChannelCategory::serialize(c, serializer),
+            Self::Guild(c) => GuildChannel::serialize(c, serializer),
+            Self::Private(c) => PrivateChannel::serialize(c, serializer),
         }
     }
 }
@@ -276,9 +276,9 @@ impl fmt::Display for Channel {
     /// see the channel can click on.
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
-            Channel::Guild(ch) => fmt::Display::fmt(&ch.id.mention(), f),
-            Channel::Private(ch) => fmt::Display::fmt(&ch.recipient.name, f),
-            Channel::Category(ch) => fmt::Display::fmt(&ch.name, f),
+            Self::Guild(ch) => fmt::Display::fmt(&ch.id.mention(), f),
+            Self::Private(ch) => fmt::Display::fmt(&ch.recipient.name, f),
+            Self::Category(ch) => fmt::Display::fmt(&ch.name, f),
         }
     }
 }
@@ -339,19 +339,19 @@ impl ChannelType {
     #[must_use]
     pub fn name(&self) -> &str {
         match *self {
-            ChannelType::Private => "private",
-            ChannelType::Text => "text",
-            ChannelType::Voice => "voice",
-            ChannelType::Category => "category",
-            ChannelType::News => "news",
-            ChannelType::NewsThread => "news_thread",
-            ChannelType::PublicThread => "public_thread",
-            ChannelType::PrivateThread => "private_thread",
-            ChannelType::Stage => "stage",
-            ChannelType::Directory => "directory",
+            Self::Private => "private",
+            Self::Text => "text",
+            Self::Voice => "voice",
+            Self::Category => "category",
+            Self::News => "news",
+            Self::NewsThread => "news_thread",
+            Self::PublicThread => "public_thread",
+            Self::PrivateThread => "private_thread",
+            Self::Stage => "stage",
+            Self::Directory => "directory",
             #[cfg(feature = "unstable_discord_api")]
-            ChannelType::Forum => "forum",
-            ChannelType::Unknown => "unknown",
+            Self::Forum => "forum",
+            Self::Unknown => "unknown",
         }
     }
 }
@@ -590,8 +590,8 @@ pub enum ChannelParseError {
 impl fmt::Display for ChannelParseError {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
-            ChannelParseError::NotPresentInCache => f.write_str("not present in cache"),
-            ChannelParseError::InvalidChannel => f.write_str("invalid channel"),
+            Self::NotPresentInCache => f.write_str("not present in cache"),
+            Self::InvalidChannel => f.write_str("invalid channel"),
         }
     }
 }

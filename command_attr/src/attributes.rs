@@ -26,10 +26,10 @@ pub enum ValueKind {
 impl fmt::Display for ValueKind {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
-            ValueKind::Name => f.pad("`#[<name>]`"),
-            ValueKind::Equals => f.pad("`#[<name> = <value>]`"),
-            ValueKind::List => f.pad("`#[<name>([<value>, <value>, <value>, ...])]`"),
-            ValueKind::SingleList => f.pad("`#[<name>(<value>)]`"),
+            Self::Name => f.pad("`#[<name>]`"),
+            Self::Equals => f.pad("`#[<name> = <value>]`"),
+            Self::List => f.pad("`#[<name>([<value>, <value>, <value>, ...])]`"),
+            Self::SingleList => f.pad("`#[<name>(<value>)]`"),
         }
     }
 }

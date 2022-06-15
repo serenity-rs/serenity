@@ -74,9 +74,9 @@ impl Serialize for ActionRowComponent {
         S: Serializer,
     {
         match self {
-            ActionRowComponent::Button(c) => Button::serialize(c, serializer),
-            ActionRowComponent::SelectMenu(c) => SelectMenu::serialize(c, serializer),
-            ActionRowComponent::InputText(c) => InputText::serialize(c, serializer),
+            Self::Button(c) => Button::serialize(c, serializer),
+            Self::SelectMenu(c) => SelectMenu::serialize(c, serializer),
+            Self::InputText(c) => InputText::serialize(c, serializer),
         }
     }
 }

@@ -1827,11 +1827,11 @@ pub enum GuildWidgetStyle {
 impl fmt::Display for GuildWidgetStyle {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
-            GuildWidgetStyle::Shield => f.write_str("shield"),
-            GuildWidgetStyle::Banner1 => f.write_str("banner1"),
-            GuildWidgetStyle::Banner2 => f.write_str("banner2"),
-            GuildWidgetStyle::Banner3 => f.write_str("banner3"),
-            GuildWidgetStyle::Banner4 => f.write_str("banner4"),
+            Self::Shield => f.write_str("shield"),
+            Self::Banner1 => f.write_str("banner1"),
+            Self::Banner2 => f.write_str("banner2"),
+            Self::Banner3 => f.write_str("banner3"),
+            Self::Banner4 => f.write_str("banner4"),
         }
     }
 }

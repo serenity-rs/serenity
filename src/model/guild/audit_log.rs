@@ -38,20 +38,20 @@ impl Action {
     #[must_use]
     pub fn num(self) -> u8 {
         match self {
-            Action::GuildUpdate => 1,
-            Action::Channel(x) => x as u8,
-            Action::ChannelOverwrite(x) => x as u8,
-            Action::Member(x) => x as u8,
-            Action::Role(x) => x as u8,
-            Action::Invite(x) => x as u8,
-            Action::Webhook(x) => x as u8,
-            Action::Emoji(x) => x as u8,
-            Action::Message(x) => x as u8,
-            Action::Integration(x) => x as u8,
-            Action::StageInstance(x) => x as u8,
-            Action::Sticker(x) => x as u8,
-            Action::Thread(x) => x as u8,
-            Action::Unknown(x) => x,
+            Self::GuildUpdate => 1,
+            Self::Channel(x) => x as u8,
+            Self::ChannelOverwrite(x) => x as u8,
+            Self::Member(x) => x as u8,
+            Self::Role(x) => x as u8,
+            Self::Invite(x) => x as u8,
+            Self::Webhook(x) => x as u8,
+            Self::Emoji(x) => x as u8,
+            Self::Message(x) => x as u8,
+            Self::Integration(x) => x as u8,
+            Self::StageInstance(x) => x as u8,
+            Self::Sticker(x) => x as u8,
+            Self::Thread(x) => x as u8,
+            Self::Unknown(x) => x,
         }
     }
 

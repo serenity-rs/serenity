@@ -144,7 +144,7 @@ impl From<InvalidHeaderValue> for Error {
 impl fmt::Display for Error {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
-            Error::UnsuccessfulRequest(e) => {
+            Self::UnsuccessfulRequest(e) => {
                 f.write_str(&e.error.message)?;
 
                 // Put Discord's human readable error explanations in parentheses
@@ -165,15 +165,15 @@ impl fmt::Display for Error {
 
                 Ok(())
             },
-            Error::RateLimitI64F64 => f.write_str("Error decoding a header into an i64 or f64"),
-            Error::RateLimitUtf8 => f.write_str("Error decoding a header from UTF-8"),
-            Error::Url(_) => f.write_str("Provided URL is incorrect."),
-            Error::InvalidWebhook => f.write_str("Provided URL is not a valid webhook."),
-            Error::InvalidHeader(_) => f.write_str("Provided value is an invalid header value."),
-            Error::Request(_) => f.write_str("Error while sending HTTP request."),
-            Error::InvalidScheme => f.write_str("Invalid Url scheme."),
-            Error::InvalidPort => f.write_str("Invalid port."),
-            Error::ApplicationIdMissing => f.write_str("Application id was expected but missing."),
+            Self::RateLimitI64F64 => f.write_str("Error decoding a header into an i64 or f64"),
+            Self::RateLimitUtf8 => f.write_str("Error decoding a header from UTF-8"),
+            Self::Url(_) => f.write_str("Provided URL is incorrect."),
+            Self::InvalidWebhook => f.write_str("Provided URL is not a valid webhook."),
+            Self::InvalidHeader(_) => f.write_str("Provided value is an invalid header value."),
+            Self::Request(_) => f.write_str("Error while sending HTTP request."),
+            Self::InvalidScheme => f.write_str("Invalid Url scheme."),
+            Self::InvalidPort => f.write_str("Invalid port."),
+            Self::ApplicationIdMissing => f.write_str("Application id was expected but missing."),
         }
     }
 }
@@ -181,8 +181,8 @@ impl fmt::Display for Error {
 impl StdError for Error {
     fn source(&self) -> Option<&(dyn StdError + 'static)> {
         match self {
-            Error::Url(inner) => Some(inner),
-            Error::Request(inner) => Some(inner),
+            Self::Url(inner) => Some(inner),
+            Self::Request(inner) => Some(inner),
             _ => None,
         }
     }

@@ -23,10 +23,8 @@ pub enum RoleParseError {
 impl std::error::Error for RoleParseError {
     fn source(&self) -> Option<&(dyn std::error::Error + 'static)> {
         match self {
-            RoleParseError::Http(e) => Some(e),
-            RoleParseError::NotFoundOrMalformed
-            | RoleParseError::NotInGuild
-            | RoleParseError::NotInCache => None,
+            Self::Http(e) => Some(e),
+            Self::NotFoundOrMalformed | Self::NotInGuild | Self::NotInCache => None,
         }
     }
 }
