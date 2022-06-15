@@ -4,6 +4,8 @@ use crate::model::application::interaction::InteractionType;
 use crate::model::id::{ApplicationId, InteractionId};
 
 /// A ping interaction, which can only be received through an endpoint url.
+///
+/// [Discord docs](https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-object-interaction-structure).
 #[derive(Clone, Debug, Serialize, Deserialize)]
 #[non_exhaustive]
 pub struct PingInteraction {

@@ -18,6 +18,8 @@ use crate::model::id::{ApplicationId, ChannelId, GuildId, InteractionId};
 use crate::model::user::User;
 
 /// An interaction received when the user fills in an autocomplete option
+///
+/// [Discord docs](https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-object).
 #[derive(Clone, Debug, Serialize)]
 #[non_exhaustive]
 pub struct AutocompleteInteraction {
@@ -46,10 +48,10 @@ pub struct AutocompleteInteraction {
     pub token: String,
     /// Always `1`.
     pub version: u8,
-    /// The guild's preferred locale.
-    pub guild_locale: Option<String>,
     /// The selected language of the invoking user.
     pub locale: String,
+    /// The guild's preferred locale.
+    pub guild_locale: Option<String>,
 }
 
 #[cfg(feature = "http")]
@@ -186,8 +188,8 @@ impl<'de> Deserialize<'de> for AutocompleteInteraction {
             user,
             token,
             version,
-            guild_locale,
             locale,
+            guild_locale,
         })
     }
 }

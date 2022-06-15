@@ -16,6 +16,7 @@ use crate::json::{from_value, JsonMap, Value};
 use crate::model::id::{ApplicationId, InteractionId};
 use crate::model::user::User;
 
+/// [Discord docs](https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-object)
 #[derive(Clone, Debug)]
 pub enum Interaction {
     Ping(PingInteraction),
@@ -186,6 +187,8 @@ impl Serialize for Interaction {
 }
 
 /// The type of an Interaction.
+///
+/// [Discord docs](https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-object-interaction-type).
 #[derive(Copy, Clone, Debug, Hash, Eq, PartialEq, PartialOrd, Ord)]
 #[non_exhaustive]
 #[repr(u8)]
@@ -208,6 +211,9 @@ enum_number!(InteractionType {
 
 bitflags! {
     /// The flags for an interaction response message.
+    ///
+    /// [Discord docs](https://discord.com/developers/docs/resources/channel#message-object-message-flags)
+    /// ([only some are valid in this context](https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-response-object-messages))
     #[derive(Default)]
     pub struct MessageFlags: u64 {
         /// Do not include any embeds when serializing this message.
@@ -221,6 +227,8 @@ bitflags! {
 /// Sent when a [`Message`] is a response to an [`Interaction`].
 ///
 /// [`Message`]: crate::model::channel::Message
+///
+/// [Discord docs](https://discord.com/developers/docs/interactions/receiving-and-responding#message-interaction-object).
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct MessageInteraction {
     /// The id of the interaction.
@@ -237,6 +245,8 @@ pub struct MessageInteraction {
 }
 
 /// The available responses types for an interaction response.
+///
+/// [Discord docs](https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-response-object-interaction-callback-type).
 #[derive(Copy, Clone, Debug, Hash, Eq, PartialEq, PartialOrd, Ord)]
 #[non_exhaustive]
 #[repr(u8)]

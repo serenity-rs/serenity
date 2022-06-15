@@ -25,6 +25,8 @@ use crate::model::id::{ApplicationId, ChannelId, GuildId, InteractionId};
 use crate::model::user::User;
 
 /// An interaction triggered by a modal submit.
+///
+/// [Discord docs](https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-object).
 #[derive(Clone, Debug, Serialize)]
 #[non_exhaustive]
 pub struct ModalSubmitInteraction {
@@ -37,11 +39,6 @@ pub struct ModalSubmitInteraction {
     pub kind: InteractionType,
     /// The data of the interaction which was triggered.
     pub data: ModalSubmitInteractionData,
-    /// The message this interaction was triggered by
-    /// **Note**: Does not exist if the modal interaction originates from
-    /// an application command interaction
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub message: Option<Message>,
     /// The guild Id this interaction was sent from, if there is one.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub guild_id: Option<GuildId>,
@@ -58,10 +55,16 @@ pub struct ModalSubmitInteraction {
     pub token: String,
     /// Always `1`.
     pub version: u8,
-    /// The guild's preferred locale.
-    pub guild_locale: Option<String>,
+    /// The message this interaction was triggered by
+    ///
+    /// **Note**: Does not exist if the modal interaction originates from
+    /// an application command interaction
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub message: Option<Message>,
     /// The selected language of the invoking user.
     pub locale: String,
+    /// The guild's preferred locale.
+    pub guild_locale: Option<String>,
 }
 
 #[cfg(feature = "model")]
@@ -384,20 +387,22 @@ impl<'de> Deserialize<'de> for ModalSubmitInteraction {
             application_id,
             kind,
             data,
-            message,
             guild_id,
             channel_id,
             member,
             user,
             token,
             version,
-            guild_locale,
+            message,
             locale,
+            guild_locale,
         })
     }
 }
 
 /// A modal submit interaction data, provided by [`ModalSubmitInteraction::data`]
+///
+/// [Discord docs](https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-object-interaction-data-structure).
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 pub struct ModalSubmitInteractionData {

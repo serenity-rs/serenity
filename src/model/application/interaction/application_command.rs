@@ -37,6 +37,8 @@ use crate::model::user::User;
 use crate::model::utils::deserialize_options_with_resolved;
 
 /// An interaction when a user invokes a slash command.
+///
+/// [Discord docs](https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-object).
 #[derive(Clone, Debug, Serialize)]
 #[non_exhaustive]
 pub struct ApplicationCommandInteraction {
@@ -65,10 +67,10 @@ pub struct ApplicationCommandInteraction {
     pub token: String,
     /// Always `1`.
     pub version: u8,
-    /// The guild's preferred locale.
-    pub guild_locale: Option<String>,
     /// The selected language of the invoking user.
     pub locale: String,
+    /// The guild's preferred locale.
+    pub guild_locale: Option<String>,
 }
 
 #[cfg(feature = "http")]
@@ -433,13 +435,15 @@ impl<'de> Deserialize<'de> for ApplicationCommandInteraction {
             user,
             token,
             version,
-            guild_locale,
             locale,
+            guild_locale,
         })
     }
 }
 
 /// The command data payload.
+///
+/// [Discord docs](https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-object-interaction-data-structure).
 #[derive(Clone, Debug, Serialize)]
 #[non_exhaustive]
 pub struct CommandData {
@@ -451,11 +455,11 @@ pub struct CommandData {
     #[serde(rename = "type")]
     pub kind: CommandType,
     /// The parameters and the given values.
-    #[serde(default)]
-    pub options: Vec<CommandDataOption>,
     /// The converted objects from the given options.
     #[serde(default)]
     pub resolved: CommandDataResolved,
+    #[serde(default)]
+    pub options: Vec<CommandDataOption>,
     /// The Id of the guild the command is registered to.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub guild_id: Option<GuildId>,
@@ -546,8 +550,8 @@ impl<'de> Deserialize<'de> for CommandData {
             id,
             name,
             kind,
-            options,
             resolved,
+            options,
             guild_id,
             target_id,
         })
@@ -565,6 +569,8 @@ pub enum ResolvedTarget {
 
 /// The resolved data of a command data interaction payload.
 /// It contains the objects of [`CommandDataOption`]s.
+///
+/// [Discord docs](https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-object-resolved-data-structure).
 #[derive(Clone, Debug, Default, Deserialize, Serialize)]
 #[non_exhaustive]
 pub struct CommandDataResolved {
@@ -594,6 +600,8 @@ pub struct CommandDataResolved {
 /// top-level key and another vector of `options`.
 ///
 /// Their resolved objects can be found on [`CommandData::resolved`].
+///
+/// [Discord docs](https://discord.com/developers/docs/interactions/application-commands#application-command-object-application-command-interaction-data-option-structure).
 #[derive(Clone, Debug, Serialize)]
 #[non_exhaustive]
 pub struct CommandDataOption {
