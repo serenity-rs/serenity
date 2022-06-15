@@ -14,6 +14,7 @@ use self::modal::ModalSubmitInteraction;
 use self::ping::PingInteraction;
 use crate::internal::prelude::*;
 use crate::json::{from_number, from_value};
+use crate::model::guild::PartialMember;
 use crate::model::id::{ApplicationId, GuildId, InteractionId};
 use crate::model::user::User;
 use crate::model::utils::deserialize_val;
@@ -213,6 +214,7 @@ bitflags! {
 ///
 /// [Discord docs](https://discord.com/developers/docs/interactions/receiving-and-responding#message-interaction-object).
 #[derive(Clone, Debug, Serialize, Deserialize)]
+#[non_exhaustive]
 pub struct MessageInteraction {
     /// The id of the interaction.
     pub id: InteractionId,
@@ -225,6 +227,9 @@ pub struct MessageInteraction {
     pub name: String,
     /// The user who invoked the interaction.
     pub user: User,
+    /// The member who invoked the interaction in the guild.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub member: Option<PartialMember>,
 }
 
 /// The available responses types for an interaction response.
