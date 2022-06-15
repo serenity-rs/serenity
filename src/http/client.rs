@@ -1,6 +1,7 @@
 #![allow(clippy::missing_errors_doc)]
 
 use std::borrow::Cow;
+use std::convert::TryFrom;
 use std::fmt;
 use std::str::FromStr;
 use std::sync::atomic::{AtomicU64, Ordering};
@@ -181,11 +182,14 @@ fn parse_token(token: impl AsRef<str>) -> String {
 
 fn reason_into_header(reason: &str) -> Headers {
     let mut headers = Headers::new();
-    headers.insert(
-        "X-Audit-Log-Reason",
-        HeaderValue::from_str(&Cow::from(utf8_percent_encode(reason, NON_ALPHANUMERIC)))
-            .expect("Invalid header value even after percent encode"),
-    );
+
+    let header_value = match Cow::from(utf8_percent_encode(reason, NON_ALPHANUMERIC)) {
+        Cow::Borrowed(value) => HeaderValue::from_str(value),
+        Cow::Owned(value) => HeaderValue::try_from(value),
+    }
+    .expect("Invalid header value even after percent encode");
+
+    headers.insert("X-Audit-Log-Reason", header_value);
     headers
 }
 
