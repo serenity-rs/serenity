@@ -1614,7 +1614,7 @@ impl Http {
     pub async fn edit_guild_welcome_screen(
         &self,
         guild_id: u64,
-        map: &Value,
+        map: &impl serde::Serialize,
     ) -> Result<GuildWelcomeScreen> {
         let body = to_vec(map)?;
 

@@ -736,9 +736,7 @@ impl GuildId {
         let mut map = EditGuildWelcomeScreen::default();
         f(&mut map);
 
-        http.as_ref()
-            .edit_guild_welcome_screen(self.0, &Value::from(json::hashmap_to_json_map(map.0)))
-            .await
+        http.as_ref().edit_guild_welcome_screen(self.0, &map).await
     }
 
     /// Edits the [`GuildWidget`].
