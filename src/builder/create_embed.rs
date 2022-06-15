@@ -16,7 +16,7 @@
 
 use std::collections::HashMap;
 
-use crate::json::{self, from_number, json, Value};
+use crate::json::{self, from_number, JsonMap, Value};
 use crate::model::channel::Embed;
 use crate::model::Timestamp;
 #[cfg(feature = "utils")]
@@ -113,15 +113,19 @@ impl CreateEmbed {
     /// **Note**: Maximum amount of characters you can put is 256 in a field
     /// name and 1024 in a field value.
     #[inline]
-    pub fn field(&mut self, name: &str, value: &str, inline: bool) -> &mut Self {
+    pub fn field<N, V>(&mut self, name: N, value: V, inline: bool) -> &mut Self
+    where
+        N: Into<String>,
+        V: Into<String>,
+    {
         let entry = self.0.entry("fields").or_insert_with(|| Value::from(Vec::<Value>::new()));
 
         if let Value::Array(ref mut inner) = *entry {
-            inner.push(json!({
-                "inline": inline,
-                "name": name,
-                "value": value,
-            }));
+            let mut field = JsonMap::with_capacity(3);
+            field.insert("name".to_string(), Value::String(name.into()));
+            field.insert("value".to_string(), Value::String(value.into()));
+            field.insert("inline".to_string(), Value::from(inline));
+            inner.push(Value::from(field));
         }
 
         self
@@ -130,9 +134,10 @@ impl CreateEmbed {
     /// Adds multiple fields at once.
     ///
     /// This is sugar to reduce the need of calling [`Self::field`] manually multiple times.
-    pub fn fields<'a, 'b, It>(&mut self, fields: It) -> &mut Self
+    pub fn fields<N, V>(&mut self, fields: impl IntoIterator<Item = (N, V, bool)>) -> &mut Self
     where
-        It: IntoIterator<Item = (&'a str, &'b str, bool)>,
+        N: Into<String>,
+        V: Into<String>,
     {
         for (name, value, inline) in fields {
             self.field(name, value, inline);
@@ -163,27 +168,26 @@ impl CreateEmbed {
         self
     }
 
-    fn url_object(&mut self, name: &'static str, url: &str) -> &mut Self {
-        let obj = json!({
-            "url": url,
-        });
+    fn url_object(&mut self, name: &'static str, url: String) -> &mut Self {
+        let mut map = JsonMap::with_capacity(1);
+        map.insert("url".to_string(), Value::String(url));
 
-        self.0.insert(name, obj);
+        self.0.insert(name, Value::from(map));
         self
     }
 
     /// Set the image associated with the embed. This only supports HTTP(S).
     #[inline]
-    pub fn image(&mut self, url: &str) -> &mut Self {
-        self.url_object("image", url);
+    pub fn image(&mut self, url: impl Into<String>) -> &mut Self {
+        self.url_object("image", url.into());
 
         self
     }
 
     /// Set the thumbnail of the embed. This only supports HTTP(S).
     #[inline]
-    pub fn thumbnail(&mut self, url: &str) -> &mut Self {
-        self.url_object("thumbnail", url);
+    pub fn thumbnail(&mut self, url: impl Into<String>) -> &mut Self {
+        self.url_object("thumbnail", url.into());
         self
     }
 
@@ -316,7 +320,7 @@ impl CreateEmbed {
     pub fn attachment(&mut self, filename: impl Into<String>) -> &mut Self {
         let mut filename = filename.into();
         filename.insert_str(0, "attachment://");
-        self.url_object("image", &filename);
+        self.url_object("image", filename);
 
         self
     }
@@ -345,14 +349,14 @@ impl From<Embed> for CreateEmbed {
 
         if let Some(author) = embed.author {
             b.author(move |a| {
-                a.name(&author.name);
+                a.name(author.name);
 
                 if let Some(icon_url) = author.icon_url {
-                    a.icon_url(&icon_url);
+                    a.icon_url(icon_url);
                 }
 
                 if let Some(url) = author.url {
-                    a.url(&url);
+                    a.url(url);
                 }
 
                 a
@@ -360,15 +364,15 @@ impl From<Embed> for CreateEmbed {
         }
 
         if let Some(description) = embed.description {
-            b.description(&description);
+            b.description(description);
         }
 
         for field in embed.fields {
-            b.field(&field.name, &field.value, field.inline);
+            b.field(field.name, field.value, field.inline);
         }
 
         if let Some(image) = embed.image {
-            b.image(&image.url);
+            b.image(image.url);
         }
 
         if let Some(timestamp) = embed.timestamp {
@@ -376,23 +380,23 @@ impl From<Embed> for CreateEmbed {
         }
 
         if let Some(thumbnail) = embed.thumbnail {
-            b.thumbnail(&thumbnail.url);
+            b.thumbnail(thumbnail.url);
         }
 
         if let Some(url) = embed.url {
-            b.url(&url);
+            b.url(url);
         }
 
         if let Some(title) = embed.title {
-            b.title(&title);
+            b.title(title);
         }
 
         if let Some(footer) = embed.footer {
             b.footer(move |f| {
                 if let Some(icon_url) = footer.icon_url {
-                    f.icon_url(&icon_url);
+                    f.icon_url(icon_url);
                 }
-                f.text(&footer.text)
+                f.text(footer.text)
             });
         }
 
