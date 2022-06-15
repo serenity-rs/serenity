@@ -2,8 +2,6 @@
 use crate::builder::EditChannel;
 #[cfg(feature = "model")]
 use crate::http::{CacheHttp, Http};
-#[cfg(feature = "model")]
-use crate::json;
 use crate::model::prelude::*;
 
 /// A category of [`GuildChannel`]s.
@@ -124,9 +122,8 @@ impl ChannelCategory {
     {
         let mut edit_channel = EditChannel::default();
         f(&mut edit_channel);
-        let map = json::hashmap_to_json_map(edit_channel.0);
 
-        cache_http.http().edit_channel(self.id.0, &map, None).await.map(|channel| {
+        cache_http.http().edit_channel(self.id.0, &edit_channel, None).await.map(|channel| {
             let GuildChannel {
                 id,
                 guild_id,

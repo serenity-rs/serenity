@@ -32,8 +32,6 @@ use crate::http::{CacheHttp, Http, Typing};
 #[cfg(all(feature = "cache", feature = "model"))]
 use crate::internal::prelude::*;
 #[cfg(feature = "model")]
-use crate::json;
-#[cfg(feature = "model")]
 use crate::model::channel::AttachmentType;
 use crate::model::prelude::*;
 use crate::model::Timestamp;
@@ -427,9 +425,8 @@ impl GuildChannel {
 
         let mut edit_channel = EditChannel::default();
         f(&mut edit_channel);
-        let edited = json::hashmap_to_json_map(edit_channel.0);
 
-        *self = cache_http.http().edit_channel(self.id.0, &edited, None).await?;
+        *self = cache_http.http().edit_channel(self.id.0, &edit_channel, None).await?;
 
         Ok(())
     }

@@ -1329,7 +1329,7 @@ impl Http {
     pub async fn edit_channel(
         &self,
         channel_id: u64,
-        map: &JsonMap,
+        map: &impl serde::Serialize,
         audit_log_reason: Option<&str>,
     ) -> Result<GuildChannel> {
         let body = to_vec(map)?;

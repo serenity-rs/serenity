@@ -334,9 +334,7 @@ impl ChannelId {
         let mut channel = EditChannel::default();
         f(&mut channel);
 
-        let map = json::hashmap_to_json_map(channel.0);
-
-        http.as_ref().edit_channel(self.0, &map, None).await
+        http.as_ref().edit_channel(self.0, &channel, None).await
     }
 
     /// Edits a [`Message`] in the channel given its Id.
