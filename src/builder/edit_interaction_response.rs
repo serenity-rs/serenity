@@ -1,11 +1,16 @@
-use std::collections::HashMap;
+use super::{CreateAllowedMentions, CreateComponents, CreateEmbed};
 
-use super::{CreateAllowedMentions, CreateEmbed};
-use crate::builder::CreateComponents;
-use crate::json::prelude::*;
-
-#[derive(Clone, Debug, Default)]
-pub struct EditInteractionResponse(pub HashMap<&'static str, Value>);
+#[derive(Clone, Debug, Default, Serialize)]
+pub struct EditInteractionResponse {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    content: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    embeds: Option<Vec<CreateEmbed>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    allowed_mentions: Option<CreateAllowedMentions>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    components: Option<CreateComponents>,
+}
 
 impl EditInteractionResponse {
     /// Sets the `InteractionApplicationCommandCallbackData` for the message.
@@ -15,11 +20,7 @@ impl EditInteractionResponse {
     /// **Note**: Message contents must be under 2000 unicode code points.
     #[inline]
     pub fn content(&mut self, content: impl Into<String>) -> &mut Self {
-        self._content(content.into())
-    }
-
-    fn _content(&mut self, content: String) -> &mut Self {
-        self.0.insert("content", Value::String(content));
+        self.content = Some(content.into());
         self
     }
 
@@ -33,25 +34,19 @@ impl EditInteractionResponse {
         self.add_embed(embed)
     }
 
+    fn embeds(&mut self) -> &mut Vec<CreateEmbed> {
+        self.embeds.get_or_insert_with(Vec::new)
+    }
+
     /// Adds an embed for the message.
     pub fn add_embed(&mut self, embed: CreateEmbed) -> &mut Self {
-        let embed = to_value(embed).expect("CreateEmbed builder should not fail!");
-
-        let embeds = self.0.entry("embeds").or_insert_with(|| Value::from(Vec::<Value>::new()));
-
-        if let Some(embeds) = embeds.as_array_mut() {
-            embeds.push(embed);
-        }
-
+        self.embeds().push(embed);
         self
     }
 
     /// Adds multiple embeds to the message.
     pub fn add_embeds(&mut self, embeds: Vec<CreateEmbed>) -> &mut Self {
-        for embed in embeds {
-            self.add_embed(embed);
-        }
-
+        self.embeds().extend(embeds);
         self
     }
 
@@ -60,10 +55,7 @@ impl EditInteractionResponse {
     /// Calling this will overwrite the embed list.
     /// To append embeds, call [`Self::add_embed`] instead.
     pub fn set_embed(&mut self, embed: CreateEmbed) -> &mut Self {
-        let embed = to_value(embed).expect("CreateEmbed builder should not fail!");
-
-        self.0.insert("embeds", Value::from(vec![embed]));
-
+        self.set_embeds(vec![embed]);
         self
     }
 
@@ -71,14 +63,7 @@ impl EditInteractionResponse {
     ///
     /// **Note**: You can only have up to 10 embeds per message.
     pub fn set_embeds(&mut self, embeds: Vec<CreateEmbed>) -> &mut Self {
-        if self.0.contains_key("embeds") {
-            self.0.remove_entry("embeds");
-        }
-
-        for embed in embeds {
-            self.add_embed(embed);
-        }
-
+        self.embeds = Some(embeds);
         self
     }
 
@@ -89,9 +74,8 @@ impl EditInteractionResponse {
     {
         let mut allowed_mentions = CreateAllowedMentions::default();
         f(&mut allowed_mentions);
-        let map = to_value(allowed_mentions).expect("AllowedMentions builder should not fail!");
 
-        self.0.insert("allowed_mentions", map);
+        self.allowed_mentions = Some(allowed_mentions);
         self
     }
 
@@ -102,9 +86,8 @@ impl EditInteractionResponse {
     {
         let mut components = CreateComponents::default();
         f(&mut components);
-        let map = to_value(components).expect("CreateComponents builder should not fail!");
 
-        self.0.insert("components", map);
+        self.components = Some(components);
         self
     }
 }

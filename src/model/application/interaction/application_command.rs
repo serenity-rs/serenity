@@ -12,8 +12,6 @@ use crate::builder::{
 #[cfg(feature = "http")]
 use crate::http::Http;
 use crate::internal::prelude::*;
-#[cfg(feature = "http")]
-use crate::json;
 use crate::model::application::command::{CommandOptionType, CommandType};
 use crate::model::application::interaction::add_guild_id_to_resolved;
 #[cfg(feature = "http")]
@@ -163,11 +161,7 @@ impl ApplicationCommandInteraction {
         let mut interaction_response = EditInteractionResponse::default();
         f(&mut interaction_response);
 
-        let map = json::hashmap_to_json_map(interaction_response.0);
-
-        Message::check_lengths(&map)?;
-
-        http.as_ref().edit_original_interaction_response(&self.token, &Value::from(map)).await
+        http.as_ref().edit_original_interaction_response(&self.token, &interaction_response).await
     }
 
     /// Deletes the initial interaction response.

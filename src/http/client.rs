@@ -1807,7 +1807,7 @@ impl Http {
     pub async fn edit_original_interaction_response(
         &self,
         interaction_token: &str,
-        map: &Value,
+        map: &impl serde::Serialize,
     ) -> Result<Message> {
         self.fire(Request {
             body: Some(to_vec(map)?),
