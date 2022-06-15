@@ -248,7 +248,7 @@ impl CurrentUser {
     /// #     let mut user = CurrentUser::default();
     /// let avatar = serenity::utils::read_image("./avatar.png")?;
     ///
-    /// user.edit(&http, |p| p.avatar(Some(&avatar))).await;
+    /// user.edit(&http, |p| p.avatar(Some(avatar))).await;
     /// #     Ok(())
     /// # }
     /// ```
