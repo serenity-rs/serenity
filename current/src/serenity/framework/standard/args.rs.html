@@ -1049,8 +1049,8 @@
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">fn</span> <span class="ident">to_str</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">str</span><span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">Delimiter::Single</span>(<span class="ident">c</span>) =&gt; <span class="ident">Cow::Owned</span>(<span class="ident">c</span>.<span class="ident">to_string</span>()),
-            <span class="ident">Delimiter::Multiple</span>(<span class="ident">s</span>) =&gt; <span class="ident">Cow::Borrowed</span>(<span class="ident">s</span>),
+            <span class="ident"><span class="self">Self</span>::Single</span>(<span class="ident">c</span>) =&gt; <span class="ident">Cow::Owned</span>(<span class="ident">c</span>.<span class="ident">to_string</span>()),
+            <span class="ident"><span class="self">Self</span>::Multiple</span>(<span class="ident">s</span>) =&gt; <span class="ident">Cow::Borrowed</span>(<span class="ident">s</span>),
         }
     }
 }
@@ -1130,8 +1130,8 @@
 
     <span class="kw">fn</span> <span class="ident">is_ending_quote</span>(<span class="self">self</span>, <span class="ident">c</span>: <span class="ident">char</span>) -&gt; <span class="ident">bool</span> {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">QuoteKind::Ascii</span> =&gt; <span class="ident">c</span> <span class="op">==</span> <span class="string">&#39;&quot;&#39;</span>,
-            <span class="ident">QuoteKind::Apple</span> =&gt; <span class="ident">c</span> <span class="op">==</span> <span class="string">&#39;\u{201D}&#39;</span>,
+            <span class="ident"><span class="self">Self</span>::Ascii</span> =&gt; <span class="ident">c</span> <span class="op">==</span> <span class="string">&#39;&quot;&#39;</span>,
+            <span class="ident"><span class="self">Self</span>::Apple</span> =&gt; <span class="ident">c</span> <span class="op">==</span> <span class="string">&#39;\u{201D}&#39;</span>,
         }
     }
 }

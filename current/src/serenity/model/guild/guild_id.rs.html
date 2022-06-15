@@ -3669,11 +3669,11 @@
 <span class="kw">impl</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">GuildWidgetStyle</span> {
     <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">GuildWidgetStyle::Shield</span> =&gt; <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;shield&quot;</span>),
-            <span class="ident">GuildWidgetStyle::Banner1</span> =&gt; <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;banner1&quot;</span>),
-            <span class="ident">GuildWidgetStyle::Banner2</span> =&gt; <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;banner2&quot;</span>),
-            <span class="ident">GuildWidgetStyle::Banner3</span> =&gt; <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;banner3&quot;</span>),
-            <span class="ident">GuildWidgetStyle::Banner4</span> =&gt; <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;banner4&quot;</span>),
+            <span class="ident"><span class="self">Self</span>::Shield</span> =&gt; <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;shield&quot;</span>),
+            <span class="ident"><span class="self">Self</span>::Banner1</span> =&gt; <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;banner1&quot;</span>),
+            <span class="ident"><span class="self">Self</span>::Banner2</span> =&gt; <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;banner2&quot;</span>),
+            <span class="ident"><span class="self">Self</span>::Banner3</span> =&gt; <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;banner3&quot;</span>),
+            <span class="ident"><span class="self">Self</span>::Banner4</span> =&gt; <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;banner4&quot;</span>),
         }
     }
 }

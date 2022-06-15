@@ -386,11 +386,11 @@
     <span class="attribute">#[<span class="ident">must_use</span>]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">reqwest_method</span>(<span class="self">self</span>) -&gt; <span class="ident">Method</span> {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">LightMethod::Delete</span> =&gt; <span class="ident">Method::DELETE</span>,
-            <span class="ident">LightMethod::Get</span> =&gt; <span class="ident">Method::GET</span>,
-            <span class="ident">LightMethod::Patch</span> =&gt; <span class="ident">Method::PATCH</span>,
-            <span class="ident">LightMethod::Post</span> =&gt; <span class="ident">Method::POST</span>,
-            <span class="ident">LightMethod::Put</span> =&gt; <span class="ident">Method::PUT</span>,
+            <span class="ident"><span class="self">Self</span>::Delete</span> =&gt; <span class="ident">Method::DELETE</span>,
+            <span class="ident"><span class="self">Self</span>::Get</span> =&gt; <span class="ident">Method::GET</span>,
+            <span class="ident"><span class="self">Self</span>::Patch</span> =&gt; <span class="ident">Method::PATCH</span>,
+            <span class="ident"><span class="self">Self</span>::Post</span> =&gt; <span class="ident">Method::POST</span>,
+            <span class="ident"><span class="self">Self</span>::Put</span> =&gt; <span class="ident">Method::PUT</span>,
         }
     }
 }

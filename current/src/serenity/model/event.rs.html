@@ -3481,9 +3481,9 @@
         <span class="ident">T</span>: <span class="ident">std::cmp::PartialEq</span>,
     {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">RelatedId::Never</span> <span class="op">|</span> <span class="ident">RelatedId::None</span> =&gt; <span class="bool-val">false</span>,
-            <span class="ident">RelatedId::Some</span>(<span class="ident">id</span>) =&gt; <span class="ident">id</span> <span class="op">==</span> <span class="ident">value</span>,
-            <span class="ident">RelatedId::Multiple</span>(<span class="ident">ids</span>) =&gt; <span class="ident">ids</span>.<span class="ident">contains</span>(<span class="ident">value</span>),
+            <span class="ident"><span class="self">Self</span>::Never</span> <span class="op">|</span> <span class="ident">RelatedId::None</span> =&gt; <span class="bool-val">false</span>,
+            <span class="ident"><span class="self">Self</span>::Some</span>(<span class="ident">id</span>) =&gt; <span class="ident">id</span> <span class="op">==</span> <span class="ident">value</span>,
+            <span class="ident"><span class="self">Self</span>::Multiple</span>(<span class="ident">ids</span>) =&gt; <span class="ident">ids</span>.<span class="ident">contains</span>(<span class="ident">value</span>),
         }
     }
 }

@@ -638,10 +638,10 @@
     <span class="attribute">#[<span class="ident">must_use</span>]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">str</span> {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">WebhookType::Incoming</span> =&gt; <span class="string">&quot;incoming&quot;</span>,
-            <span class="ident">WebhookType::ChannelFollower</span> =&gt; <span class="string">&quot;channel follower&quot;</span>,
-            <span class="ident">WebhookType::Application</span> =&gt; <span class="string">&quot;application&quot;</span>,
-            <span class="ident">WebhookType::Unknown</span> =&gt; <span class="string">&quot;unknown&quot;</span>,
+            <span class="ident"><span class="self">Self</span>::Incoming</span> =&gt; <span class="string">&quot;incoming&quot;</span>,
+            <span class="ident"><span class="self">Self</span>::ChannelFollower</span> =&gt; <span class="string">&quot;channel follower&quot;</span>,
+            <span class="ident"><span class="self">Self</span>::Application</span> =&gt; <span class="string">&quot;application&quot;</span>,
+            <span class="ident"><span class="self">Self</span>::Unknown</span> =&gt; <span class="string">&quot;unknown&quot;</span>,
         }
     }
 }
