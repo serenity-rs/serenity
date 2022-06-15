@@ -432,6 +432,10 @@
 <span id="427">427</span>
 <span id="428">428</span>
 <span id="429">429</span>
+<span id="430">430</span>
+<span id="431">431</span>
+<span id="432">432</span>
+<span id="433">433</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">serde::de</span>::{<span class="ident">Deserialize</span>, <span class="ident">Deserializer</span>, <span class="ident">Error</span> <span class="kw">as</span> <span class="ident">DeError</span>};
 <span class="kw">use</span> <span class="ident">serde::Serialize</span>;
 
@@ -459,6 +463,8 @@
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::user::User</span>;
 
 <span class="doccomment">/// An interaction triggered by a message component.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-object-interaction-structure).</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Serialize</span>)]</span>
 <span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">MessageComponentInteraction</span> {
@@ -471,9 +477,6 @@
     <span class="kw">pub</span> <span class="ident">kind</span>: <span class="ident">InteractionType</span>,
     <span class="doccomment">/// The data of the interaction which was triggered.</span>
     <span class="kw">pub</span> <span class="ident">data</span>: <span class="ident">MessageComponentInteractionData</span>,
-    <span class="doccomment">/// The message this interaction was triggered by, if</span>
-    <span class="doccomment">/// it is a component.</span>
-    <span class="kw">pub</span> <span class="ident">message</span>: <span class="ident">Message</span>,
     <span class="doccomment">/// The guild Id this interaction was sent from, if there is one.</span>
     <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;Option::is_none&quot;</span>)]</span>
     <span class="kw">pub</span> <span class="ident">guild_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">GuildId</span><span class="op">&gt;</span>,
@@ -490,10 +493,13 @@
     <span class="kw">pub</span> <span class="ident">token</span>: <span class="ident">String</span>,
     <span class="doccomment">/// Always `1`.</span>
     <span class="kw">pub</span> <span class="ident">version</span>: <span class="ident">u8</span>,
-    <span class="doccomment">/// The guild&#39;s preferred locale.</span>
-    <span class="kw">pub</span> <span class="ident">guild_locale</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// The message this interaction was triggered by, if</span>
+    <span class="doccomment">/// it is a component.</span>
+    <span class="kw">pub</span> <span class="ident">message</span>: <span class="ident">Message</span>,
     <span class="doccomment">/// The selected language of the invoking user.</span>
     <span class="kw">pub</span> <span class="ident">locale</span>: <span class="ident">String</span>,
+    <span class="doccomment">/// The guild&#39;s preferred locale.</span>
+    <span class="kw">pub</span> <span class="ident">guild_locale</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
 }
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http&quot;</span>)]</span>
@@ -834,20 +840,22 @@
             <span class="ident">application_id</span>,
             <span class="ident">kind</span>,
             <span class="ident">data</span>,
-            <span class="ident">message</span>,
             <span class="ident">guild_id</span>,
             <span class="ident">channel_id</span>,
             <span class="ident">member</span>,
             <span class="ident">user</span>,
             <span class="ident">token</span>,
             <span class="ident">version</span>,
-            <span class="ident">guild_locale</span>,
+            <span class="ident">message</span>,
             <span class="ident">locale</span>,
+            <span class="ident">guild_locale</span>,
         })
     }
 }
 
 <span class="doccomment">/// A message component interaction data, provided by [`MessageComponentInteraction::data`]</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-object-interaction-data-structure).</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
 <span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">MessageComponentInteractionData</span> {
