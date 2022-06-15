@@ -506,9 +506,8 @@ impl GuildId {
     {
         let mut edit_guild = EditGuild::default();
         f(&mut edit_guild);
-        let map = json::hashmap_to_json_map(edit_guild.0);
 
-        http.as_ref().edit_guild(self.0, &map, None).await
+        http.as_ref().edit_guild(self.0, &edit_guild, None).await
     }
 
     /// Edits an [`Emoji`]'s name in the guild.

@@ -1488,7 +1488,7 @@ impl Http {
     pub async fn edit_guild(
         &self,
         guild_id: u64,
-        map: &JsonMap,
+        map: &impl serde::Serialize,
         audit_log_reason: Option<&str>,
     ) -> Result<PartialGuild> {
         let body = to_vec(map)?;

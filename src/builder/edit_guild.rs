@@ -1,7 +1,3 @@
-use std::collections::HashMap;
-
-use crate::internal::prelude::*;
-use crate::json::{from_number, NULL};
 use crate::model::prelude::*;
 
 /// A builder to optionally edit certain fields of a [`Guild`]. This is meant
@@ -13,8 +9,44 @@ use crate::model::prelude::*;
 /// [`Guild::edit`]: crate::model::guild::Guild::edit
 /// [`Guild`]: crate::model::guild::Guild
 /// [Manage Guild]: crate::model::permissions::Permissions::MANAGE_GUILD
-#[derive(Clone, Debug, Default)]
-pub struct EditGuild(pub HashMap<&'static str, Value>);
+#[derive(Clone, Debug, Default, Serialize)]
+pub struct EditGuild {
+    features: Vec<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    afk_channel_id: Option<ChannelId>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    afk_timeout: Option<u64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    icon: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    name: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    description: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    owner_id: Option<UserId>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    splash: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    discovery_splash: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    banner: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    system_channel_id: Option<ChannelId>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    rules_channel_id: Option<ChannelId>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    public_updates_channel_id: Option<ChannelId>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    preferred_locale: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    explicit_content_filter: Option<ExplicitContentFilter>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    default_message_notifications: Option<DefaultMessageNotificationLevel>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    verification_level: Option<VerificationLevel>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    system_channel_flags: Option<SystemChannelFlags>,
+}
 
 impl EditGuild {
     /// Set the "AFK voice channel" that users are to move to if they have been
@@ -25,21 +57,14 @@ impl EditGuild {
     /// valid.
     #[inline]
     pub fn afk_channel<C: Into<ChannelId>>(&mut self, channel: Option<C>) -> &mut Self {
-        self._afk_channel(channel.map(Into::into));
+        self.afk_channel_id = channel.map(Into::into);
         self
-    }
-
-    fn _afk_channel(&mut self, channel: Option<ChannelId>) {
-        self.0.insert("afk_channel_id", match channel {
-            Some(channel) => from_number(channel.0),
-            None => NULL,
-        });
     }
 
     /// Set the amount of time a user is to be moved to the AFK channel -
     /// configured via [`Self::afk_channel`] - after being AFK.
     pub fn afk_timeout(&mut self, timeout: u64) -> &mut Self {
-        self.0.insert("afk_timeout", from_number(timeout));
+        self.afk_timeout = Some(timeout);
         self
     }
 
@@ -69,7 +94,7 @@ impl EditGuild {
     ///
     /// [`utils::read_image`]: crate::utils::read_image
     pub fn icon(&mut self, icon: Option<String>) -> &mut Self {
-        self.0.insert("icon", icon.map_or(NULL, Value::String));
+        self.icon = icon;
         self
     }
 
@@ -77,7 +102,7 @@ impl EditGuild {
     ///
     /// **Note**: Must be between (and including) 2-100 characters.
     pub fn name(&mut self, name: impl Into<String>) -> &mut Self {
-        self.0.insert("name", Value::String(name.into()));
+        self.name = Some(name.into());
         self
     }
 
@@ -88,7 +113,7 @@ impl EditGuild {
     ///
     /// [`features`]: crate::model::guild::Guild::features
     pub fn description(&mut self, name: impl Into<String>) -> &mut Self {
-        self.0.insert("name", Value::String(name.into()));
+        self.description = Some(name.into());
         self
     }
 
@@ -99,13 +124,7 @@ impl EditGuild {
     ///
     /// [`features`]: crate::model::guild::Guild::features
     pub fn features(&mut self, features: Vec<String>) -> &mut Self {
-        let mut values: Vec<Value> = vec![];
-
-        for value in features {
-            values.push(Value::from(value));
-        }
-
-        self.0.insert("features", Value::from(values));
+        self.features = features;
         self
     }
 
@@ -114,13 +133,8 @@ impl EditGuild {
     /// **Note**: The current user must be the owner of the guild.
     #[inline]
     pub fn owner<U: Into<UserId>>(&mut self, user_id: U) -> &mut Self {
-        self._owner(user_id.into());
+        self.owner_id = Some(user_id.into());
         self
-    }
-
-    fn _owner(&mut self, user_id: UserId) {
-        let id = from_number(user_id.0);
-        self.0.insert("owner_id", id);
     }
 
     /// Set the splash image of the guild on the invitation page.
@@ -132,8 +146,7 @@ impl EditGuild {
     ///
     /// [`features`]: crate::model::guild::Guild::features
     pub fn splash(&mut self, splash: Option<String>) -> &mut Self {
-        let splash = splash.map_or(NULL, Value::String);
-        self.0.insert("splash", splash);
+        self.splash = splash;
         self
     }
 
@@ -146,8 +159,7 @@ impl EditGuild {
     ///
     /// [`features`]: crate::model::guild::Guild::features
     pub fn discovery_splash(&mut self, splash: Option<String>) -> &mut Self {
-        let splash = splash.map_or(NULL, Value::String);
-        self.0.insert("discovery_splash", splash);
+        self.discovery_splash = splash;
         self
     }
 
@@ -160,16 +172,14 @@ impl EditGuild {
     ///
     /// [`features`]: crate::model::guild::Guild::features
     pub fn banner(&mut self, banner: Option<String>) -> &mut Self {
-        let banner = banner.map_or(NULL, Value::String);
-        self.0.insert("banner", banner);
+        self.banner = banner;
         self
     }
 
     /// Set the channel ID where welcome messages and boost events will be
     /// posted.
     pub fn system_channel_id(&mut self, channel_id: Option<ChannelId>) -> &mut Self {
-        let channel_id = channel_id.map_or(NULL, |x| Value::from(x.0));
-        self.0.insert("system_channel_id", channel_id);
+        self.system_channel_id = channel_id;
         self
     }
 
@@ -178,8 +188,7 @@ impl EditGuild {
     /// **Note**:
     /// This feature is for Community guilds only.
     pub fn rules_channel_id(&mut self, channel_id: Option<ChannelId>) -> &mut Self {
-        let channel_id = channel_id.map_or(NULL, |x| Value::from(x.0));
-        self.0.insert("rules_channel_id", channel_id);
+        self.rules_channel_id = channel_id;
         self
     }
 
@@ -189,8 +198,7 @@ impl EditGuild {
     /// **Note**:
     /// This feature is for Community guilds only.
     pub fn public_updates_channel_id(&mut self, channel_id: Option<ChannelId>) -> &mut Self {
-        let channel_id = channel_id.map_or(NULL, |x| Value::from(x.0));
-        self.0.insert("public_updates_channel_id", channel_id);
+        self.public_updates_channel_id = channel_id;
         self
     }
 
@@ -202,15 +210,13 @@ impl EditGuild {
     /// **Note**:
     /// This feature is for Community guilds only.
     pub fn preferred_locale(&mut self, locale: Option<String>) -> &mut Self {
-        let locale = locale.map_or(NULL, Value::String);
-        self.0.insert("preferred_locale", locale);
+        self.preferred_locale = locale;
         self
     }
 
     /// Set the content filter level.
     pub fn explicit_content_filter(&mut self, level: Option<ExplicitContentFilter>) -> &mut Self {
-        let level = level.map_or(NULL, |x| Value::from(x as u8));
-        self.0.insert("explicit_content_filter", level);
+        self.explicit_content_filter = level;
         self
     }
 
@@ -219,8 +225,7 @@ impl EditGuild {
         &mut self,
         level: Option<DefaultMessageNotificationLevel>,
     ) -> &mut Self {
-        let level = level.map_or(NULL, |x| Value::from(x as u8));
-        self.0.insert("default_message_notifications", level);
+        self.default_message_notifications = level;
         self
     }
 
@@ -258,13 +263,8 @@ impl EditGuild {
     where
         V: Into<VerificationLevel>,
     {
-        self._verification_level(verification_level.into());
+        self.verification_level = Some(verification_level.into());
         self
-    }
-
-    fn _verification_level(&mut self, verification_level: VerificationLevel) {
-        let num = from_number(verification_level.num());
-        self.0.insert("verification_level", num);
     }
 
     /// Modifies the notifications that are sent by discord to the configured system channel.
@@ -295,7 +295,7 @@ impl EditGuild {
     /// # }
     /// ```
     pub fn system_channel_flags(&mut self, system_channel_flags: SystemChannelFlags) -> &mut Self {
-        self.0.insert("system_channel_flags", system_channel_flags.bits().into());
+        self.system_channel_flags = Some(system_channel_flags);
         self
     }
 }
