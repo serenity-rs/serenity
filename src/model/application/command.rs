@@ -302,6 +302,7 @@ pub struct CommandOption {
     /// The option name.
     pub name: String,
     /// Localizations of the option name with locale as the key
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub name_localizations: Option<std::collections::HashMap<String, String>>,
     /// The option description.
     pub description: String,
