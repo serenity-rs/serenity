@@ -754,9 +754,7 @@ impl GuildId {
         let mut map = EditGuildWidget::default();
         f(&mut map);
 
-        http.as_ref()
-            .edit_guild_widget(self.0, &Value::from(json::hashmap_to_json_map(map.0)))
-            .await
+        http.as_ref().edit_guild_widget(self.0, &map).await
     }
 
     /// Gets all of the guild's roles over the REST API.

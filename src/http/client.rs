@@ -1596,7 +1596,11 @@ impl Http {
     }
 
     /// Edits a [`Guild`]'s widget.
-    pub async fn edit_guild_widget(&self, guild_id: u64, map: &Value) -> Result<GuildWidget> {
+    pub async fn edit_guild_widget(
+        &self,
+        guild_id: u64,
+        map: &impl serde::Serialize,
+    ) -> Result<GuildWidget> {
         let body = to_vec(map)?;
 
         self.fire(Request {
