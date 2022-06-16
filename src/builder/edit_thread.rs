@@ -1,16 +1,23 @@
-use std::collections::HashMap;
-
-use crate::json::{from_number, Value};
-
-#[derive(Debug, Clone, Default)]
-pub struct EditThread(pub HashMap<&'static str, Value>);
+#[derive(Debug, Clone, Default, Serialize)]
+pub struct EditThread {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    name: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    auto_archive_duration: Option<u16>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    archived: Option<bool>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    locked: Option<bool>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    invitable: Option<bool>,
+}
 
 impl EditThread {
     /// The name of the thread.
     ///
     /// **Note**: Must be between 2 and 100 characters long.
     pub fn name(&mut self, name: impl Into<String>) -> &mut Self {
-        self.0.insert("name", Value::String(name.into()));
+        self.name = Some(name.into());
 
         self
     }
@@ -19,7 +26,7 @@ impl EditThread {
     ///
     /// **Note**: Can only be set to 60, 1440, 4320, 10080 currently.
     pub fn auto_archive_duration(&mut self, duration: u16) -> &mut Self {
-        self.0.insert("auto_archive_duration", from_number(duration));
+        self.auto_archive_duration = Some(duration);
 
         self
     }
@@ -28,14 +35,14 @@ impl EditThread {
     ///
     /// **Note**: A thread that is `locked` can only be unarchived if the user has the `MANAGE_THREADS` permission.
     pub fn archived(&mut self, archived: bool) -> &mut Self {
-        self.0.insert("archived", Value::from(archived));
+        self.archived = Some(archived);
 
         self
     }
 
     /// The lock status of the thread.
     pub fn locked(&mut self, lock: bool) -> &mut Self {
-        self.0.insert("locked", Value::from(lock));
+        self.locked = Some(lock);
 
         self
     }
@@ -44,7 +51,7 @@ impl EditThread {
     ///
     /// **Note**: Only available on private threads.
     pub fn invitable(&mut self, invitable: bool) -> &mut Self {
-        self.0.insert("invitable", Value::from(invitable));
+        self.invitable = Some(invitable);
 
         self
     }
