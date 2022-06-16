@@ -1,9 +1,5 @@
 #[cfg(feature = "model")]
 use crate::builder::CreateEmbed;
-#[cfg(feature = "model")]
-use crate::internal::prelude::*;
-#[cfg(feature = "model")]
-use crate::json;
 #[cfg(feature = "utils")]
 use crate::utils::Colour;
 
@@ -90,14 +86,13 @@ impl Embed {
     /// });
     /// ```
     #[inline]
-    pub fn fake<F>(f: F) -> Value
+    pub fn fake<F>(f: F) -> CreateEmbed
     where
         F: FnOnce(&mut CreateEmbed) -> &mut CreateEmbed,
     {
         let mut create_embed = CreateEmbed::default();
         f(&mut create_embed);
-
-        json::to_value(create_embed).expect("CreateEmbed builder should never fail!")
+        create_embed
     }
 }
 
