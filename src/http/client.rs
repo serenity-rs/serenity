@@ -1912,7 +1912,7 @@ impl Http {
         &self,
         guild_id: u64,
         event_id: u64,
-        map: &JsonMap,
+        map: &impl serde::Serialize,
         audit_log_reason: Option<&str>,
     ) -> Result<ScheduledEvent> {
         let body = to_vec(map)?;

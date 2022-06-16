@@ -41,8 +41,6 @@ use crate::http::{CacheHttp, Http, UserPagination};
 #[cfg(feature = "model")]
 use crate::internal::prelude::*;
 #[cfg(feature = "model")]
-use crate::json;
-#[cfg(feature = "model")]
 use crate::json::json;
 #[cfg(feature = "model")]
 use crate::json::prelude::*;
@@ -649,9 +647,8 @@ impl GuildId {
     {
         let mut edit_scheduled_event = EditScheduledEvent::default();
         f(&mut edit_scheduled_event);
-        let map = json::hashmap_to_json_map(edit_scheduled_event.0);
 
-        http.as_ref().edit_scheduled_event(self.0, event_id.into().0, &map, None).await
+        http.as_ref().edit_scheduled_event(self.0, event_id.into().0, &edit_scheduled_event, None).await
     }
 
     /// Edits a [`Sticker`], optionally setting its fields.
