@@ -16,6 +16,6 @@ pub use enum_primitive::FromPrimitive;
 
 pub use self::close_code::CloseCode;
 pub use self::event::Event;
-pub use self::opcode::OpCode;
+pub use self::opcode::Opcode;
 pub use self::protocol_data::ProtocolData;
 pub use self::speaking_state::SpeakingState;

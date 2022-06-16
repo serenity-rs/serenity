@@ -31,18 +31,20 @@ pub const USER_AGENT: &str = concat!(
     ")"
 );
 
-/// Enum to map gateway opcodes.
+/// An enum representing the [gateway opcodes].
+///
+/// [gateway opcodes]: https://discord.com/developers/docs/topics/opcodes-and-status-codes#gateway
 #[derive(Clone, Copy, Debug, Eq, Hash, PartialEq, PartialOrd, Ord)]
 #[non_exhaustive]
-pub enum OpCode {
+pub enum Opcode {
     /// Dispatches an event.
-    Event = 0,
+    Dispatch = 0,
     /// Used for ping checking.
     Heartbeat = 1,
     /// Used for client handshake.
     Identify = 2,
     /// Used to update the client status.
-    StatusUpdate = 3,
+    PresenceUpdate = 3,
     /// Used to join/move/leave voice channels.
     VoiceStateUpdate = 4,
     /// Used for voice ping checking.
@@ -52,7 +54,7 @@ pub enum OpCode {
     /// Used to tell clients to reconnect to the gateway.
     Reconnect = 7,
     /// Used to request guild members.
-    GetGuildMembers = 8,
+    RequestGuildMembers = 8,
     /// Used to notify clients that they have an invalid session Id.
     InvalidSession = 9,
     /// Sent immediately after connection, contains heartbeat + server info.
@@ -63,16 +65,16 @@ pub enum OpCode {
     Unknown = !0,
 }
 
-enum_number!(OpCode {
-    Event,
+enum_number!(Opcode {
+    Dispatch,
     Heartbeat,
     Identify,
-    StatusUpdate,
+    PresenceUpdate,
     VoiceStateUpdate,
     VoiceServerPing,
     Resume,
     Reconnect,
-    GetGuildMembers,
+    RequestGuildMembers,
     InvalidSession,
     Hello,
     HeartbeatAck,
