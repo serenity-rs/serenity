@@ -1,6 +1,7 @@
 //! Models relating to guilds and types that it owns.
 
 pub mod audit_log;
+pub mod automod;
 mod emoji;
 mod guild_id;
 mod guild_preview;
