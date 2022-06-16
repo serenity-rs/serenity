@@ -32,8 +32,8 @@ pub enum Error {
 impl fmt::Display for Error {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
-            Error::NoEventTypes => f.write_str("No event types provided"),
-            Error::InvalidEventIdFilters => {
+            Self::NoEventTypes => f.write_str("No event types provided"),
+            Self::InvalidEventIdFilters => {
                 f.write_str("Invalid event type + id filters, would never match any events")
             },
         }
