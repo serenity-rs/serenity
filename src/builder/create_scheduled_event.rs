@@ -135,26 +135,13 @@ impl CreateScheduledEvent {
     ///
     /// # Errors
     ///
-    /// Returns [`Error::Http`] if the current user lacks permission, or if invalid data is given.
-    ///
-    /// [Manage Events]: Permissions::MANAGE_EVENTS
-    pub async fn execute(self, http: impl AsRef<Http>) -> Result<ScheduledEvent> {
-        http.as_ref().create_scheduled_event(self.id.into(), &self.fields, None).await
-    }
-
-    /// Creates a new scheduled event in the guild with the data set, if any.
-    ///
-    /// **Note**: Requres the [Manage Events] permission.
-    ///
-    /// # Errors
-    ///
     /// If the `cache` is enabled, returns a [`ModelError::InvalidPermissions`] if the current user
     /// does not have permission to manage scheduled events.
     ///
     /// Otherwise will return [`Error::Http`] if the current user does not have permission.
     ///
     /// [Manage Events]: Permissions::MANAGE_EVENTS
-    pub async fn execute_with_cache(self, cache_http: impl CacheHttp) -> Result<ScheduledEvent> {
+    pub async fn execute(self, cache_http: impl CacheHttp) -> Result<ScheduledEvent> {
         #[cfg(feature = "cache")]
         {
             if let Some(cache) = cache_http.cache() {
@@ -168,7 +155,11 @@ impl CreateScheduledEvent {
             }
         }
 
-        self.execute(cache_http.http()).await
+        self._execute(cache_http.http()).await
+    }
+
+    async fn _execute(self, http: impl AsRef<Http>) -> Result<ScheduledEvent> {
+        http.as_ref().create_scheduled_event(self.id.into(), &self.fields, None).await
     }
 }
 

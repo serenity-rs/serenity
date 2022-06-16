@@ -79,16 +79,35 @@ impl<'a> CreateSticker<'a> {
         self
     }
 
-    /// Executes the request to create a new sticker in the guild with the data set, if any.
+    /// Creates a new sticker in the guild with the data set, if any.
     ///
     /// **Note**: Requires the [Manage Emojis and Stickers] permission.
     ///
     /// # Errors
     ///
-    /// Returns [`Error::Http`] if the current user lacks permission, or if invalid data is given.
+    /// If the `cache` is enabled, returns a [`ModelError::InvalidPermissions`] if the current user
+    /// lacks permission. Otherwise, returns [`Error::Http`] - see [`Self::execute`].
     ///
     /// [Manage Emojis and Stickers]: crate::model::permissions::Permissions::MANAGE_EMOJIS_AND_STICKERS
-    pub async fn execute(self, http: impl AsRef<Http>) -> Result<Sticker> {
+    #[inline]
+    pub async fn execute(self, cache_http: impl CacheHttp) -> Result<Sticker> {
+        #[cfg(feature = "cache")]
+        {
+            if let Some(cache) = cache_http.cache() {
+                if let Some(guild) = cache.guild(self.id) {
+                    let req = Permissions::MANAGE_EMOJIS_AND_STICKERS;
+
+                    if !guild.has_perms(&cache_http, req).await {
+                        return Err(Error::Model(ModelError::InvalidPermissions(req)));
+                    }
+                }
+            }
+        }
+
+        self._execute(cache_http.http()).await
+    }
+
+    async fn _execute(self, http: impl AsRef<Http>) -> Result<Sticker> {
         let file = self.file.ok_or(Error::Model(ModelError::NoStickerFileSet))?;
 
         let mut map = Vec::with_capacity(3);
@@ -103,32 +122,5 @@ impl<'a> CreateSticker<'a> {
         }
 
         http.as_ref().create_sticker(self.id.into(), map, file, None).await
-    }
-
-    /// Executes the request to create a new sticker in the guild with the data set, if any.
-    ///
-    /// **Note**: Requires the [Manage Emojis and Stickers] permission.
-    ///
-    /// # Errors
-    ///
-    /// If the `cache` is enabled, returns a [`ModelError::InvalidPermissions`] if the current user
-    /// lacks permission. Otherwise, returns [`Error::Http`] - see [`Self::execute`].
-    ///
-    /// [Manage Emojis and Stickers]: crate::model::permissions::Permissions::MANAGE_EMOJIS_AND_STICKERS
-    pub async fn execute_with_cache(self, cache_http: impl CacheHttp) -> Result<Sticker> {
-        #[cfg(feature = "cache")]
-        {
-            if let Some(cache) = cache_http.cache() {
-                if let Some(guild) = cache.guild(self.id) {
-                    let req = Permissions::MANAGE_EMOJIS_AND_STICKERS;
-
-                    if !guild.has_perms(&cache_http, req).await {
-                        return Err(Error::Model(ModelError::InvalidPermissions(req)));
-                    }
-                }
-            }
-        }
-
-        self.execute(cache_http.http()).await
     }
 }
