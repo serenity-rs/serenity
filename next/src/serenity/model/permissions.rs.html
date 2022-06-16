@@ -828,6 +828,7 @@
 <span id="823">823</span>
 <span id="824">824</span>
 <span id="825">825</span>
+<span id="826">826</span>
 </pre><pre class="rust"><code><span class="doccomment">//! A set of permissions for a role or user. These can be assigned directly</span>
 <span class="doccomment">//! to a role or as a channel&#39;s permission overrides.</span>
 <span class="doccomment">//!</span>
@@ -1163,8 +1164,9 @@
         <span class="doccomment">///</span>
         <span class="doccomment">/// [`Integration`]: super::guild::Integration</span>
         <span class="kw">const</span> <span class="ident">MANAGE_EMOJIS_AND_STICKERS</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">30</span>;
-        <span class="doccomment">/// Allows using slash commands.</span>
-        <span class="kw">const</span> <span class="ident">USE_SLASH_COMMANDS</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">31</span>;
+        <span class="doccomment">/// Allows members to use application commands, including slash commands and context menu</span>
+        <span class="doccomment">/// commands.</span>
+        <span class="kw">const</span> <span class="ident">USE_APPLICATION_COMMANDS</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">31</span>;
         <span class="doccomment">/// Allows for requesting to speak in stage channels.</span>
         <span class="kw">const</span> <span class="ident">REQUEST_TO_SPEAK</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">32</span>;
         <span class="doccomment">/// Allows for creating, editing, and deleting scheduled events</span>
@@ -1222,10 +1224,10 @@
     <span class="ident">send_tts_messages</span>: <span class="string">&quot;Send TTS Messages&quot;</span>,
     <span class="ident">speak</span>: <span class="string">&quot;Speak&quot;</span>,
     <span class="ident">stream</span>: <span class="string">&quot;Stream&quot;</span>,
+    <span class="ident">use_application_commands</span>: <span class="string">&quot;Use Application Commands&quot;</span>,
     <span class="ident">use_embedded_activities</span>: <span class="string">&quot;Use Embedded Activities&quot;</span>,
     <span class="ident">use_external_emojis</span>: <span class="string">&quot;Use External Emojis&quot;</span>,
     <span class="ident">use_external_stickers</span>: <span class="string">&quot;Use External Stickers&quot;</span>,
-    <span class="ident">use_slash_commands</span>: <span class="string">&quot;Use Slash Commands&quot;</span>,
     <span class="ident">use_vad</span>: <span class="string">&quot;Use Voice Activity&quot;</span>,
     <span class="ident">view_audit_log</span>: <span class="string">&quot;View Audit Log&quot;</span>,
     <span class="ident">view_channel</span>: <span class="string">&quot;View Channel&quot;</span>,
@@ -1586,12 +1588,12 @@
     }
 
     <span class="doccomment">/// Shorthand for checking that the set of permissions contains the</span>
-    <span class="doccomment">/// [Use Slash Commands] permission.</span>
+    <span class="doccomment">/// [Use Application Commands] permission.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [Use Slash Commands]: Self::USE_SLASH_COMMANDS</span>
+    <span class="doccomment">/// [Use Application Commands]: Self::USE_APPLICATION_COMMANDS</span>
     <span class="attribute">#[<span class="ident">must_use</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">use_slash_commands</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">contains</span>(<span class="ident"><span class="self">Self</span>::USE_SLASH_COMMANDS</span>)
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">use_application_commands</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
+        <span class="self">self</span>.<span class="ident">contains</span>(<span class="ident"><span class="self">Self</span>::USE_APPLICATION_COMMANDS</span>)
     }
 
     <span class="doccomment">/// Shorthand for checking that the set of permissions contains the</span>
