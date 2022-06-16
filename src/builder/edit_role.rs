@@ -8,6 +8,8 @@ use crate::json::from_number;
 use crate::model::channel::AttachmentType;
 use crate::model::guild::Role;
 use crate::model::Permissions;
+#[cfg(feature = "model")]
+use crate::utils::encode_image;
 
 /// A builder to create or edit a [`Role`] for use via a number of model methods.
 ///
@@ -139,9 +141,9 @@ impl EditRole {
         icon: impl Into<AttachmentType<'a>>,
     ) -> Result<&mut Self> {
         let icon_data = icon.into().data(&http.as_ref().client).await?;
-        let icon_string = format!("data:image/png;base64,{}", base64::encode(icon_data));
+
         self.0.remove("unicode_emoji");
-        self.0.insert("icon", Value::from(icon_string));
+        self.0.insert("icon", Value::from(encode_image(&icon_data)));
 
         Ok(self)
     }

@@ -18,6 +18,8 @@ use crate::json::{self, NULL};
 use crate::model::prelude::*;
 #[cfg(feature = "model")]
 use crate::model::ModelError;
+#[cfg(feature = "model")]
+use crate::utils::encode_image;
 
 /// A representation of a type of webhook.
 #[derive(Clone, Copy, Debug, Eq, Hash, PartialEq, PartialOrd, Ord)]
@@ -309,10 +311,7 @@ impl Webhook {
         let token = self.token.as_ref().ok_or(ModelError::NoTokenSet)?;
         let data = avatar.into().data(&http.client).await?;
         let mut map = JsonMap::new();
-        map.insert(
-            "avatar".to_string(),
-            Value::from(format!("data:image/png;base64,{}", base64::encode(data))),
-        );
+        map.insert("avatar".to_string(), Value::from(encode_image(&data)));
         *self = http.edit_webhook_with_token(self.id.0, token, &map).await?;
         Ok(())
     }

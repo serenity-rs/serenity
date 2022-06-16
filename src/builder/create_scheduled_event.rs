@@ -10,6 +10,8 @@ use crate::model::channel::AttachmentType;
 use crate::model::guild::ScheduledEventType;
 use crate::model::id::ChannelId;
 use crate::model::Timestamp;
+#[cfg(feature = "model")]
+use crate::utils::encode_image;
 
 #[derive(Clone, Debug)]
 pub struct CreateScheduledEvent(pub HashMap<&'static str, Value>);
@@ -92,8 +94,7 @@ impl CreateScheduledEvent {
         image: impl Into<AttachmentType<'a>>,
     ) -> Result<&mut Self> {
         let image_data = image.into().data(&http.as_ref().client).await?;
-        let image_string = format!("data:image/png;base64,{}", base64::encode(image_data));
-        self.0.insert("image", Value::from(image_string));
+        self.0.insert("image", Value::from(encode_image(&image_data)));
         Ok(self)
     }
 }
