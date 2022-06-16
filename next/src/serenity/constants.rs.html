@@ -133,6 +133,8 @@
 <span id="128">128</span>
 <span id="129">129</span>
 <span id="130">130</span>
+<span id="131">131</span>
+<span id="132">132</span>
 </pre><pre class="rust"><code><span class="doccomment">//! A set of constants used by the library.</span>
 
 <span class="doccomment">/// The maximum length of the textual size of an embed.</span>
@@ -166,18 +168,20 @@
     <span class="string">&quot;)&quot;</span>
 );
 
-<span class="doccomment">/// Enum to map gateway opcodes.</span>
+<span class="doccomment">/// An enum representing the [gateway opcodes].</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// [gateway opcodes]: https://discord.com/developers/docs/topics/opcodes-and-status-codes#gateway</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>, <span class="ident">PartialEq</span>, <span class="ident">PartialOrd</span>, <span class="ident">Ord</span>)]</span>
 <span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">OpCode</span> {
+<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">Opcode</span> {
     <span class="doccomment">/// Dispatches an event.</span>
-    <span class="ident">Event</span> <span class="op">=</span> <span class="number">0</span>,
+    <span class="ident">Dispatch</span> <span class="op">=</span> <span class="number">0</span>,
     <span class="doccomment">/// Used for ping checking.</span>
     <span class="ident">Heartbeat</span> <span class="op">=</span> <span class="number">1</span>,
     <span class="doccomment">/// Used for client handshake.</span>
     <span class="ident">Identify</span> <span class="op">=</span> <span class="number">2</span>,
     <span class="doccomment">/// Used to update the client status.</span>
-    <span class="ident">StatusUpdate</span> <span class="op">=</span> <span class="number">3</span>,
+    <span class="ident">PresenceUpdate</span> <span class="op">=</span> <span class="number">3</span>,
     <span class="doccomment">/// Used to join/move/leave voice channels.</span>
     <span class="ident">VoiceStateUpdate</span> <span class="op">=</span> <span class="number">4</span>,
     <span class="doccomment">/// Used for voice ping checking.</span>
@@ -187,7 +191,7 @@
     <span class="doccomment">/// Used to tell clients to reconnect to the gateway.</span>
     <span class="ident">Reconnect</span> <span class="op">=</span> <span class="number">7</span>,
     <span class="doccomment">/// Used to request guild members.</span>
-    <span class="ident">GetGuildMembers</span> <span class="op">=</span> <span class="number">8</span>,
+    <span class="ident">RequestGuildMembers</span> <span class="op">=</span> <span class="number">8</span>,
     <span class="doccomment">/// Used to notify clients that they have an invalid session Id.</span>
     <span class="ident">InvalidSession</span> <span class="op">=</span> <span class="number">9</span>,
     <span class="doccomment">/// Sent immediately after connection, contains heartbeat + server info.</span>
@@ -198,16 +202,16 @@
     <span class="ident">Unknown</span> <span class="op">=</span> <span class="op">!</span><span class="number">0</span>,
 }
 
-<span class="macro">enum_number!</span>(<span class="ident">OpCode</span> {
-    <span class="ident">Event</span>,
+<span class="macro">enum_number!</span>(<span class="ident">Opcode</span> {
+    <span class="ident">Dispatch</span>,
     <span class="ident">Heartbeat</span>,
     <span class="ident">Identify</span>,
-    <span class="ident">StatusUpdate</span>,
+    <span class="ident">PresenceUpdate</span>,
     <span class="ident">VoiceStateUpdate</span>,
     <span class="ident">VoiceServerPing</span>,
     <span class="ident">Resume</span>,
     <span class="ident">Reconnect</span>,
-    <span class="ident">GetGuildMembers</span>,
+    <span class="ident">RequestGuildMembers</span>,
     <span class="ident">InvalidSession</span>,
     <span class="ident">Hello</span>,
     <span class="ident">HeartbeatAck</span>,

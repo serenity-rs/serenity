@@ -81,9 +81,6 @@
 <span id="76">76</span>
 <span id="77">77</span>
 <span id="78">78</span>
-<span id="79">79</span>
-<span id="80">80</span>
-<span id="81">81</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::error::Error</span> <span class="kw">as</span> <span class="ident">StdError</span>;
 <span class="kw">use</span> <span class="ident">std::fmt</span>;
 
@@ -108,8 +105,6 @@
     <span class="ident">InvalidAuthentication</span>,
     <span class="doccomment">/// Expected a Ready or an InvalidateSession</span>
     <span class="ident">InvalidHandshake</span>,
-    <span class="doccomment">/// An indicator that an unknown opcode was received from the gateway.</span>
-    <span class="ident">InvalidOpCode</span>,
     <span class="doccomment">/// When invalid sharding data was sent in the IDENTIFY.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// # Examples</span>
@@ -150,7 +145,6 @@
             <span class="ident">Error::HeartbeatFailed</span> =&gt; <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;Failed sending a heartbeat&quot;</span>),
             <span class="ident">Error::InvalidAuthentication</span> =&gt; <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;Sent invalid authentication&quot;</span>),
             <span class="ident">Error::InvalidHandshake</span> =&gt; <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;Expected a valid Handshake&quot;</span>),
-            <span class="ident">Error::InvalidOpCode</span> =&gt; <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;Invalid OpCode&quot;</span>),
             <span class="ident">Error::InvalidShardData</span> =&gt; <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;Sent invalid shard data&quot;</span>),
             <span class="ident">Error::NoAuthentication</span> =&gt; <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;Sent no authentication&quot;</span>),
             <span class="ident">Error::NoSessionId</span> =&gt; <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;No Session Id present when required&quot;</span>),

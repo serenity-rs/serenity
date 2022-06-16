@@ -242,7 +242,7 @@
 <span class="kw">use</span> <span class="ident">url::Url</span>;
 
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::client::bridge::gateway::ChunkGuildFilter</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::constants</span>::{<span class="self">self</span>, <span class="ident">OpCode</span>};
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::constants</span>::{<span class="self">self</span>, <span class="ident">Opcode</span>};
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::gateway</span>::{<span class="ident">CurrentPresence</span>, <span class="ident">GatewayError</span>};
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::json</span>::{<span class="ident">from_str</span>, <span class="ident">json</span>, <span class="ident">to_string</span>, <span class="ident">Value</span>};
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::event::GatewayEvent</span>;
@@ -342,7 +342,7 @@
         <span class="macro">debug!</span>(<span class="string">&quot;[Shard {:?}] Requesting member chunks&quot;</span>, <span class="ident">shard_info</span>);
 
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">payload</span> <span class="op">=</span> <span class="macro">json!</span>({
-            <span class="string">&quot;op&quot;</span>: <span class="ident">OpCode::GetGuildMembers</span>.<span class="ident">num</span>(),
+            <span class="string">&quot;op&quot;</span>: <span class="ident">Opcode::RequestGuildMembers</span>,
             <span class="string">&quot;d&quot;</span>: {
                 <span class="string">&quot;guild_id&quot;</span>: <span class="ident">guild_id</span>.<span class="ident">as_ref</span>().<span class="number">0</span>.<span class="ident">to_string</span>(),
                 <span class="string">&quot;limit&quot;</span>: <span class="ident">limit</span>.<span class="ident">unwrap_or</span>(<span class="number">0</span>),
@@ -367,8 +367,8 @@
         <span class="macro">trace!</span>(<span class="string">&quot;[Shard {:?}] Sending heartbeat d: {:?}&quot;</span>, <span class="ident">shard_info</span>, <span class="ident">seq</span>);
 
         <span class="self">self</span>.<span class="ident">send_json</span>(<span class="kw-2">&amp;</span><span class="macro">json!</span>({
+            <span class="string">&quot;op&quot;</span>: <span class="ident">Opcode::Heartbeat</span>,
             <span class="string">&quot;d&quot;</span>: <span class="ident">seq</span>,
-            <span class="string">&quot;op&quot;</span>: <span class="ident">OpCode::Heartbeat</span>.<span class="ident">num</span>(),
         }))
         .<span class="kw">await</span>
         .<span class="ident">map_err</span>(<span class="ident">From::from</span>)
@@ -384,7 +384,7 @@
         <span class="macro">debug!</span>(<span class="string">&quot;[Shard {:?}] Identifying&quot;</span>, <span class="ident">shard_info</span>);
 
         <span class="self">self</span>.<span class="ident">send_json</span>(<span class="kw-2">&amp;</span><span class="macro">json!</span>({
-            <span class="string">&quot;op&quot;</span>: <span class="ident">OpCode::Identify</span>.<span class="ident">num</span>(),
+            <span class="string">&quot;op&quot;</span>: <span class="ident">Opcode::Identify</span>,
             <span class="string">&quot;d&quot;</span>: {
                 <span class="string">&quot;compress&quot;</span>: <span class="bool-val">true</span>,
                 <span class="string">&quot;large_threshold&quot;</span>: <span class="ident">constants::LARGE_THRESHOLD</span>,
@@ -414,7 +414,7 @@
         <span class="macro">debug!</span>(<span class="string">&quot;[Shard {:?}] Sending presence update&quot;</span>, <span class="ident">shard_info</span>);
 
         <span class="self">self</span>.<span class="ident">send_json</span>(<span class="kw-2">&amp;</span><span class="macro">json!</span>({
-            <span class="string">&quot;op&quot;</span>: <span class="ident">OpCode::StatusUpdate</span>.<span class="ident">num</span>(),
+            <span class="string">&quot;op&quot;</span>: <span class="ident">Opcode::PresenceUpdate</span>,
             <span class="string">&quot;d&quot;</span>: {
                 <span class="string">&quot;afk&quot;</span>: <span class="bool-val">false</span>,
                 <span class="string">&quot;since&quot;</span>: <span class="ident">now</span>,
@@ -440,7 +440,7 @@
         <span class="macro">debug!</span>(<span class="string">&quot;[Shard {:?}] Sending resume; seq: {}&quot;</span>, <span class="ident">shard_info</span>, <span class="ident">seq</span>);
 
         <span class="self">self</span>.<span class="ident">send_json</span>(<span class="kw-2">&amp;</span><span class="macro">json!</span>({
-            <span class="string">&quot;op&quot;</span>: <span class="ident">OpCode::Resume</span>.<span class="ident">num</span>(),
+            <span class="string">&quot;op&quot;</span>: <span class="ident">Opcode::Resume</span>,
             <span class="string">&quot;d&quot;</span>: {
                 <span class="string">&quot;session_id&quot;</span>: <span class="ident">session_id</span>,
                 <span class="string">&quot;seq&quot;</span>: <span class="ident">seq</span>,
