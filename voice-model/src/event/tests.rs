@@ -4,7 +4,7 @@ use serde_test::{Configure, Token};
 
 use super::Event;
 use crate::id::*;
-use crate::opcode::OpCode;
+use crate::opcode::Opcode;
 use crate::payload::*;
 use crate::protocol_data::ProtocolData;
 use crate::speaking_state::SpeakingState;
@@ -277,7 +277,7 @@ fn serialize_identify() {
             len: 2,
         },
         Token::Str("op"),
-        Token::U8(OpCode::Identify as u8),
+        Token::U8(Opcode::Identify as u8),
         Token::Str("d"),
         Token::Struct {
             name: "Identify",
@@ -320,7 +320,7 @@ fn serialize_select_protocol() {
             len: 2,
         },
         Token::Str("op"),
-        Token::U8(OpCode::SelectProtocol as u8),
+        Token::U8(Opcode::SelectProtocol as u8),
         Token::Str("d"),
         Token::Struct {
             name: "SelectProtocol",
@@ -365,7 +365,7 @@ fn serialize_ready() {
             len: 2,
         },
         Token::Str("op"),
-        Token::U8(OpCode::Ready as u8),
+        Token::U8(Opcode::Ready as u8),
         Token::Str("d"),
         Token::Struct {
             name: "Ready",
@@ -403,7 +403,7 @@ fn serialize_heartbeat() {
             len: 2,
         },
         Token::Str("op"),
-        Token::U8(OpCode::Heartbeat as u8),
+        Token::U8(Opcode::Heartbeat as u8),
         Token::Str("d"),
         Token::Str("1234567890"),
         Token::StructEnd,
@@ -424,7 +424,7 @@ fn serialize_session_description() {
             len: 2,
         },
         Token::Str("op"),
-        Token::U8(OpCode::SessionDescription as u8),
+        Token::U8(Opcode::SessionDescription as u8),
         Token::Str("d"),
         Token::Struct {
             name: "SessionDescription",
@@ -463,7 +463,7 @@ fn serialize_speaking() {
             len: 2,
         },
         Token::Str("op"),
-        Token::U8(OpCode::Speaking as u8),
+        Token::U8(Opcode::Speaking as u8),
         Token::Str("d"),
         Token::Struct {
             name: "Speaking",
@@ -496,7 +496,7 @@ fn serialize_heartbeat_ack() {
             len: 2,
         },
         Token::Str("op"),
-        Token::U8(OpCode::HeartbeatAck as u8),
+        Token::U8(Opcode::HeartbeatAck as u8),
         Token::Str("d"),
         Token::Str("1234567890"),
         Token::StructEnd,
@@ -518,7 +518,7 @@ fn serialize_resume() {
             len: 2,
         },
         Token::Str("op"),
-        Token::U8(OpCode::Resume as u8),
+        Token::U8(Opcode::Resume as u8),
         Token::Str("d"),
         Token::Struct {
             name: "Resume",
@@ -551,7 +551,7 @@ fn serialize_hello() {
             len: 2,
         },
         Token::Str("op"),
-        Token::U8(OpCode::Hello as u8),
+        Token::U8(Opcode::Hello as u8),
         Token::Str("d"),
         Token::Struct {
             name: "Hello",
@@ -574,7 +574,7 @@ fn serialize_resumed() {
             len: 2,
         },
         Token::Str("op"),
-        Token::U8(OpCode::Resumed as u8),
+        Token::U8(Opcode::Resumed as u8),
         Token::Str("d"),
         Token::None,
         Token::StructEnd,
@@ -596,7 +596,7 @@ fn serialize_client_connect() {
             len: 2,
         },
         Token::Str("op"),
-        Token::U8(OpCode::ClientConnect as u8),
+        Token::U8(Opcode::ClientConnect as u8),
         Token::Str("d"),
         Token::Struct {
             name: "ClientConnect",
@@ -629,7 +629,7 @@ fn serialize_client_disconnect() {
             len: 2,
         },
         Token::Str("op"),
-        Token::U8(OpCode::ClientDisconnect as u8),
+        Token::U8(Opcode::ClientDisconnect as u8),
         Token::Str("d"),
         Token::Struct {
             name: "ClientDisconnect",

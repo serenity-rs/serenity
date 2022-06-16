@@ -22,8 +22,6 @@ pub enum Error {
     InvalidAuthentication,
     /// Expected a Ready or an InvalidateSession
     InvalidHandshake,
-    /// An indicator that an unknown opcode was received from the gateway.
-    InvalidOpCode,
     /// When invalid sharding data was sent in the IDENTIFY.
     ///
     /// # Examples
@@ -64,7 +62,6 @@ impl fmt::Display for Error {
             Error::HeartbeatFailed => f.write_str("Failed sending a heartbeat"),
             Error::InvalidAuthentication => f.write_str("Sent invalid authentication"),
             Error::InvalidHandshake => f.write_str("Expected a valid Handshake"),
-            Error::InvalidOpCode => f.write_str("Invalid OpCode"),
             Error::InvalidShardData => f.write_str("Sent invalid shard data"),
             Error::NoAuthentication => f.write_str("Sent no authentication"),
             Error::NoSessionId => f.write_str("No Session Id present when required"),
