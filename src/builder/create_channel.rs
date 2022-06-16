@@ -1,6 +1,3 @@
-use std::collections::HashMap;
-
-use crate::json::{from_number, json, Value};
 use crate::model::prelude::*;
 
 /// A builder for creating a new [`GuildChannel`] in a [`Guild`].
@@ -9,28 +6,47 @@ use crate::model::prelude::*;
 ///
 /// [`GuildChannel`]: crate::model::channel::GuildChannel
 /// [`Guild`]: crate::model::guild::Guild
-#[derive(Debug, Clone)]
-pub struct CreateChannel(pub HashMap<&'static str, Value>);
+#[derive(Debug, Clone, Serialize)]
+pub struct CreateChannel {
+    kind: ChannelType,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    name: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    parent_id: Option<ChannelId>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    topic: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    nsfw: Option<bool>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    bitrate: Option<u32>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    user_limit: Option<u32>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    rate_limit_per_user: Option<u64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    position: Option<u32>,
+    permission_overwrites: Vec<PermissionOverwriteData>,
+}
 
 impl CreateChannel {
     /// Specify how to call this new channel.
     ///
     /// **Note**: Must be between 2 and 100 characters long.
     pub fn name(&mut self, name: impl Into<String>) -> &mut Self {
-        self.0.insert("name", Value::String(name.into()));
+        self.name = Some(name.into());
 
         self
     }
     /// Specify what type the channel is, whether it's a text, voice, category or news channel.
     pub fn kind(&mut self, kind: ChannelType) -> &mut Self {
-        self.0.insert("type", from_number(kind as u8));
+        self.kind = kind;
 
         self
     }
 
     /// Specify the category, the "parent" of this channel.
     pub fn category<I: Into<ChannelId>>(&mut self, id: I) -> &mut Self {
-        self.0.insert("parent_id", from_number(id.into().0));
+        self.parent_id = Some(id.into());
 
         self
     }
@@ -39,28 +55,28 @@ impl CreateChannel {
     ///
     /// **Note**: Must be between 0 and 1000 characters long.
     pub fn topic(&mut self, topic: impl Into<String>) -> &mut Self {
-        self.0.insert("topic", Value::String(topic.into()));
+        self.topic = Some(topic.into());
 
         self
     }
 
     /// Specify if this channel will be inappropriate to browse while at work.
     pub fn nsfw(&mut self, b: bool) -> &mut Self {
-        self.0.insert("nsfw", Value::from(b));
+        self.nsfw = Some(b);
 
         self
     }
 
     /// [Voice-only] Specify the bitrate at which sound plays in the voice channel.
     pub fn bitrate(&mut self, rate: u32) -> &mut Self {
-        self.0.insert("bitrate", from_number(rate));
+        self.bitrate = Some(rate);
 
         self
     }
 
     /// [Voice-only] Set how many users may occupy this voice channel.
     pub fn user_limit(&mut self, limit: u32) -> &mut Self {
-        self.0.insert("user_limit", from_number(limit));
+        self.user_limit = Some(limit);
 
         self
     }
@@ -76,14 +92,14 @@ impl CreateChannel {
     /// [`MANAGE_CHANNELS`]: crate::model::permissions::Permissions::MANAGE_CHANNELS
     #[doc(alias = "slowmode")]
     pub fn rate_limit_per_user(&mut self, seconds: u64) -> &mut Self {
-        self.0.insert("rate_limit_per_user", from_number(seconds));
+        self.rate_limit_per_user = Some(seconds);
 
         self
     }
 
     /// Specify where the channel should be located.
     pub fn position(&mut self, pos: u32) -> &mut Self {
-        self.0.insert("position", from_number(pos));
+        self.position = Some(pos);
 
         self
     }
@@ -121,24 +137,7 @@ impl CreateChannel {
     where
         I: IntoIterator<Item = PermissionOverwrite>,
     {
-        let overwrites = perms
-            .into_iter()
-            .map(|perm| {
-                let (id, kind) = match perm.kind {
-                    PermissionOverwriteType::Role(id) => (id.0, 0),
-                    PermissionOverwriteType::Member(id) => (id.0, 1),
-                };
-
-                json!({
-                    "allow": perm.allow.bits(),
-                    "deny": perm.deny.bits(),
-                    "id": id,
-                    "type": kind,
-                })
-            })
-            .collect::<Vec<_>>();
-
-        self.0.insert("permission_overwrites", Value::from(overwrites));
+        self.permission_overwrites = perms.into_iter().map(Into::into).collect();
 
         self
     }
@@ -157,9 +156,17 @@ impl Default for CreateChannel {
     /// let channel_builder = CreateChannel::default();
     /// ```
     fn default() -> Self {
-        let mut builder = CreateChannel(HashMap::new());
-        builder.kind(ChannelType::Text);
-
-        builder
+        CreateChannel {
+            name: None,
+            nsfw: None,
+            topic: None,
+            bitrate: None,
+            position: None,
+            parent_id: None,
+            user_limit: None,
+            rate_limit_per_user: None,
+            kind: ChannelType::Text,
+            permission_overwrites: Vec::new(),
+        }
     }
 }

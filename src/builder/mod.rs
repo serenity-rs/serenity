@@ -5,6 +5,10 @@
 //! optional, and/or sane default values for required parameters can be applied
 //! by a builder.
 
+// Option<Option<T>> is required for fields that are
+// #[serde(skip_serializing_if = "Option::is_none")]
+#![allow(clippy::option_option)]
+
 mod create_channel;
 mod create_embed;
 
@@ -68,6 +72,7 @@ pub use self::create_components::{
 };
 pub use self::create_embed::{CreateEmbed, CreateEmbedAuthor, CreateEmbedFooter};
 pub use self::create_interaction_response::{
+    AutocompleteChoice,
     CreateAutocompleteResponse,
     CreateInteractionResponse,
     CreateInteractionResponseData,

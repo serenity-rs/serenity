@@ -11,8 +11,6 @@ use crate::cache::Cache;
 use crate::http::{CacheHttp, Http};
 #[cfg(feature = "model")]
 use crate::internal::prelude::*;
-#[cfg(feature = "model")]
-use crate::json;
 use crate::model::Timestamp;
 
 /// Information about an invite code.
@@ -102,9 +100,9 @@ impl Invite {
             }
         }
 
-        let map = json::hashmap_to_json_map(f(CreateInvite::default()).0);
+        let builder = f(CreateInvite::default());
 
-        cache_http.http().create_invite(channel_id.0, &map, None).await
+        cache_http.http().create_invite(channel_id.0, &builder, None).await
     }
 
     /// Deletes the invite.
