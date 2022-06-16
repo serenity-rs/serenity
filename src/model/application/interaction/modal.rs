@@ -10,8 +10,6 @@ use crate::builder::{
 #[cfg(feature = "model")]
 use crate::http::Http;
 use crate::internal::prelude::*;
-#[cfg(feature = "model")]
-use crate::json;
 use crate::model::application::component::ActionRow;
 #[cfg(feature = "http")]
 use crate::model::application::interaction::InteractionResponseType;
@@ -99,24 +97,22 @@ impl ModalSubmitInteraction {
         let mut interaction_response = CreateInteractionResponse::default();
         f(&mut interaction_response);
 
-        let map = json::hashmap_to_json_map(interaction_response.0);
+        let http = http.as_ref();
+        let files = interaction_response
+            .data
+            .as_mut()
+            .map_or_else(Vec::new, |d| std::mem::take(&mut d.files));
 
-        Message::check_content_length(&map)?;
-        Message::check_embed_length(&map)?;
-
-        if interaction_response.1.is_empty() {
-            http.as_ref()
-                .create_interaction_response(self.id.0, &self.token, &Value::from(map))
-                .await
+        if files.is_empty() {
+            http.create_interaction_response(self.id.0, &self.token, &interaction_response).await
         } else {
-            http.as_ref()
-                .create_interaction_response_with_files(
-                    self.id.0,
-                    &self.token,
-                    &Value::from(map),
-                    interaction_response.1,
-                )
-                .await
+            http.create_interaction_response_with_files(
+                self.id.0,
+                &self.token,
+                &interaction_response,
+                files,
+            )
+            .await
         }
     }
 
@@ -146,12 +142,7 @@ impl ModalSubmitInteraction {
         let mut interaction_response = EditInteractionResponse::default();
         f(&mut interaction_response);
 
-        let map = json::hashmap_to_json_map(interaction_response.0);
-
-        Message::check_content_length(&map)?;
-        Message::check_embed_length(&map)?;
-
-        http.as_ref().edit_original_interaction_response(&self.token, &Value::from(map)).await
+        http.as_ref().edit_original_interaction_response(&self.token, &interaction_response).await
     }
 
     /// Deletes the initial interaction response.
@@ -193,22 +184,14 @@ impl ModalSubmitInteraction {
     async fn _create_followup_message<'a>(
         &self,
         http: &Http,
-        interaction_response: CreateInteractionResponseFollowup<'a>,
+        mut interaction_response: CreateInteractionResponseFollowup<'a>,
     ) -> Result<Message> {
-        let map = json::hashmap_to_json_map(interaction_response.0);
+        let files = std::mem::take(&mut interaction_response.files);
 
-        Message::check_lengths(&map)?;
-
-        if interaction_response.1.is_empty() {
-            http.as_ref().create_followup_message(&self.token, &Value::from(map)).await
+        if files.is_empty() {
+            http.create_followup_message(&self.token, &interaction_response).await
         } else {
-            http.as_ref()
-                .create_followup_message_with_files(
-                    &self.token,
-                    &Value::from(map),
-                    interaction_response.1,
-                )
-                .await
+            http.create_followup_message_with_files(&self.token, &interaction_response, files).await
         }
     }
 
@@ -232,25 +215,17 @@ impl ModalSubmitInteraction {
             &'b mut CreateInteractionResponseFollowup<'a>,
         ) -> &'b mut CreateInteractionResponseFollowup<'a>,
     {
-        let mut interaction_response = CreateInteractionResponseFollowup::default();
-        f(&mut interaction_response);
+        let mut builder = CreateInteractionResponseFollowup::default();
+        f(&mut builder);
 
-        let map = json::hashmap_to_json_map(interaction_response.0);
-
-        Message::check_lengths(&map)?;
-
+        let http = http.as_ref();
         let message_id = message_id.into().into();
+        let files = std::mem::take(&mut builder.files);
 
-        if interaction_response.1.is_empty() {
-            http.as_ref().edit_followup_message(&self.token, message_id, &Value::from(map)).await
+        if files.is_empty() {
+            http.edit_followup_message(&self.token, message_id, &builder).await
         } else {
-            http.as_ref()
-                .edit_followup_message_and_attachments(
-                    &self.token,
-                    message_id,
-                    &Value::from(map),
-                    interaction_response.1,
-                )
+            http.edit_followup_message_and_attachments(&self.token, message_id, &builder, files)
                 .await
         }
     }
