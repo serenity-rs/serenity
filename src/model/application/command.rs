@@ -9,8 +9,6 @@ use crate::http::Http;
 #[cfg(feature = "http")]
 use crate::internal::prelude::*;
 use crate::json::Value;
-#[cfg(feature = "http")]
-use crate::json::{self, JsonMap};
 use crate::model::channel::ChannelType;
 use crate::model::id::{
     ApplicationId,
@@ -157,7 +155,7 @@ impl Command {
         F: FnOnce(&mut CreateApplicationCommand) -> &mut CreateApplicationCommand,
     {
         let map = Command::build_application_command(f);
-        http.as_ref().create_global_application_command(&Value::from(map)).await
+        http.as_ref().create_global_application_command(&map).await
     }
 
     /// Overrides all global application commands.
@@ -178,7 +176,7 @@ impl Command {
 
         f(&mut array);
 
-        http.as_ref().create_global_application_commands(&Value::from(array.0)).await
+        http.as_ref().create_global_application_commands(&array).await
     }
 
     /// Edits a global command by its Id.
@@ -195,7 +193,7 @@ impl Command {
         F: FnOnce(&mut CreateApplicationCommand) -> &mut CreateApplicationCommand,
     {
         let map = Command::build_application_command(f);
-        http.as_ref().edit_global_application_command(command_id.into(), &Value::from(map)).await
+        http.as_ref().edit_global_application_command(command_id.into(), &map).await
     }
 
     /// Gets all global commands.
@@ -246,13 +244,13 @@ impl Command {
 #[cfg(feature = "http")]
 impl Command {
     #[inline]
-    pub(crate) fn build_application_command<F>(f: F) -> JsonMap
+    pub(crate) fn build_application_command<F>(f: F) -> CreateApplicationCommand
     where
         F: FnOnce(&mut CreateApplicationCommand) -> &mut CreateApplicationCommand,
     {
         let mut create_application_command = CreateApplicationCommand::default();
         f(&mut create_application_command);
-        json::hashmap_to_json_map(create_application_command.0)
+        create_application_command
     }
 }
 
