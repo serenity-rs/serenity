@@ -7,7 +7,7 @@ use std::sync::atomic::{AtomicU64, Ordering};
 use std::sync::Arc;
 
 use percent_encoding::{utf8_percent_encode, NON_ALPHANUMERIC};
-use reqwest::header::{HeaderMap as Headers, HeaderValue, CONTENT_TYPE};
+use reqwest::header::{HeaderMap as Headers, HeaderValue};
 use reqwest::{Client, ClientBuilder, Response as ReqwestResponse, StatusCode, Url};
 use serde::de::DeserializeOwned;
 use tracing::{debug, instrument, trace};
@@ -2230,18 +2230,15 @@ impl Http {
         thread_id: Option<u64>,
         token: &str,
         wait: bool,
-        map: &JsonMap,
+        map: &impl serde::Serialize,
     ) -> Result<Option<Message>> {
         let body = to_vec(map)?;
-
-        let mut headers = Headers::new();
-        headers.insert(CONTENT_TYPE, HeaderValue::from_static("application/json"));
 
         let response = self
             .request(Request {
                 body: Some(body),
                 multipart: None,
-                headers: Some(headers),
+                headers: None,
                 route: RouteInfo::ExecuteWebhook {
                     token,
                     wait,

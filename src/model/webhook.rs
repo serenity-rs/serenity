@@ -13,7 +13,7 @@ use crate::http::Http;
 #[cfg(feature = "model")]
 use crate::internal::prelude::*;
 #[cfg(feature = "model")]
-use crate::json::{self, NULL};
+use crate::json::NULL;
 #[cfg(feature = "model")]
 use crate::model::prelude::*;
 #[cfg(feature = "model")]
@@ -495,18 +495,17 @@ impl Webhook {
         for<'b> F: FnOnce(&'b mut ExecuteWebhook<'a>) -> &'b mut ExecuteWebhook<'a>,
     {
         let token = self.token.as_ref().ok_or(ModelError::NoTokenSet)?;
-        let mut execute_webhook = ExecuteWebhook::default();
-        f(&mut execute_webhook);
+        let mut builder = ExecuteWebhook::default();
+        f(&mut builder);
 
-        let map = json::hashmap_to_json_map(execute_webhook.0);
+        let http = http.as_ref();
         let thread_id = thread_id.map(|id| id.0);
+        let files = std::mem::take(&mut builder.files);
 
-        if execute_webhook.1.is_empty() {
-            http.as_ref().execute_webhook(self.id.0, thread_id, token, wait, &map).await
+        if files.is_empty() {
+            http.execute_webhook(self.id.0, thread_id, token, wait, &builder).await
         } else {
-            let files = execute_webhook.1.clone();
-            http.as_ref()
-                .execute_webhook_with_files(self.id.0, thread_id, token, wait, files, &map)
+            http.execute_webhook_with_files(self.id.0, thread_id, token, wait, files, &builder)
                 .await
         }
     }

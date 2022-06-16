@@ -648,7 +648,9 @@ impl GuildId {
         let mut edit_scheduled_event = EditScheduledEvent::default();
         f(&mut edit_scheduled_event);
 
-        http.as_ref().edit_scheduled_event(self.0, event_id.into().0, &edit_scheduled_event, None).await
+        http.as_ref()
+            .edit_scheduled_event(self.0, event_id.into().0, &edit_scheduled_event, None)
+            .await
     }
 
     /// Edits a [`Sticker`], optionally setting its fields.

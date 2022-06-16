@@ -4,7 +4,7 @@ use crate::http::Http;
 use crate::internal::prelude::*;
 #[cfg(feature = "model")]
 use crate::model::channel::AttachmentType;
-use crate::model::guild::{ScheduledEventStatus, ScheduledEventType, ScheduledEventMetadata};
+use crate::model::guild::{ScheduledEventMetadata, ScheduledEventStatus, ScheduledEventType};
 use crate::model::id::ChannelId;
 use crate::model::Timestamp;
 
@@ -130,7 +130,7 @@ impl EditScheduledEvent {
     /// [`External`]: ScheduledEventType::External
     pub fn location(&mut self, location: impl Into<String>) -> &mut Self {
         self.entity_metadata = Some(Some(ScheduledEventMetadata {
-            location: location.into()
+            location: location.into(),
         }));
         self
     }
