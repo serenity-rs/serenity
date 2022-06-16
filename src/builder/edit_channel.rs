@@ -1,7 +1,4 @@
-use std::collections::HashMap;
-
-use crate::json::{from_number, json, Value, NULL};
-use crate::model::channel::{PermissionOverwrite, PermissionOverwriteType, VideoQualityMode};
+use crate::model::channel::{PermissionOverwrite, PermissionOverwriteData, VideoQualityMode};
 use crate::model::id::ChannelId;
 
 /// A builder to edit a [`GuildChannel`] for use via [`GuildChannel::edit`]
@@ -28,8 +25,31 @@ use crate::model::id::ChannelId;
 ///
 /// [`GuildChannel`]: crate::model::channel::GuildChannel
 /// [`GuildChannel::edit`]: crate::model::channel::GuildChannel::edit
-#[derive(Clone, Debug, Default)]
-pub struct EditChannel(pub HashMap<&'static str, Value>);
+#[derive(Clone, Debug, Default, Serialize)]
+pub struct EditChannel {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    bitrate: Option<u32>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    video_quality_mode: Option<VideoQualityMode>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    rtc_region: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    name: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    position: Option<u32>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    topic: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    nsfw: Option<bool>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    user_limit: Option<u32>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    parent_id: Option<ChannelId>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    rate_limit_per_user: Option<u64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    permission_overwrites: Option<Vec<PermissionOverwriteData>>,
+}
 
 impl EditChannel {
     /// The bitrate of the channel in bits.
@@ -37,8 +57,8 @@ impl EditChannel {
     /// This is for [voice] channels only.
     ///
     /// [voice]: crate::model::channel::ChannelType::Voice
-    pub fn bitrate(&mut self, bitrate: u64) -> &mut Self {
-        self.0.insert("bitrate", from_number(bitrate));
+    pub fn bitrate(&mut self, bitrate: u32) -> &mut Self {
+        self.bitrate = Some(bitrate);
         self
     }
 
@@ -48,7 +68,7 @@ impl EditChannel {
     ///
     /// [voice]: crate::model::channel::ChannelType::Voice
     pub fn video_quality_mode(&mut self, quality: VideoQualityMode) -> &mut Self {
-        self.0.insert("video_quality_mode", from_number(quality as u8));
+        self.video_quality_mode = Some(quality);
         self
     }
 
@@ -59,10 +79,7 @@ impl EditChannel {
     ///
     /// [voice]: crate::model::channel::ChannelType::Voice
     pub fn voice_region(&mut self, id: Option<String>) -> &mut Self {
-        self.0.insert("rtc_region", match id {
-            Some(region) => Value::from(region),
-            None => NULL,
-        });
+        self.rtc_region = id;
         self
     }
 
@@ -70,13 +87,13 @@ impl EditChannel {
     ///
     /// Must be between 2 and 100 characters long.
     pub fn name(&mut self, name: impl Into<String>) -> &mut Self {
-        self.0.insert("name", Value::String(name.into()));
+        self.name = Some(name.into());
         self
     }
 
     /// The position of the channel in the channel list.
-    pub fn position(&mut self, position: u64) -> &mut Self {
-        self.0.insert("position", from_number(position));
+    pub fn position(&mut self, position: u32) -> &mut Self {
+        self.position = Some(position);
         self
     }
 
@@ -88,7 +105,7 @@ impl EditChannel {
     ///
     /// [text]: crate::model::channel::ChannelType::Text
     pub fn topic(&mut self, topic: impl Into<String>) -> &mut Self {
-        self.0.insert("topic", Value::String(topic.into()));
+        self.topic = Some(topic.into());
         self
     }
 
@@ -98,8 +115,7 @@ impl EditChannel {
     ///
     /// [text]: crate::model::channel::ChannelType::Text
     pub fn nsfw(&mut self, nsfw: bool) -> &mut Self {
-        self.0.insert("nsfw", Value::from(nsfw));
-
+        self.nsfw = Some(nsfw);
         self
     }
 
@@ -108,8 +124,8 @@ impl EditChannel {
     /// This is for [voice] channels only.
     ///
     /// [voice]: crate::model::channel::ChannelType::Voice
-    pub fn user_limit(&mut self, user_limit: u64) -> &mut Self {
-        self.0.insert("user_limit", from_number(user_limit));
+    pub fn user_limit(&mut self, user_limit: u32) -> &mut Self {
+        self.user_limit = Some(user_limit);
         self
     }
 
@@ -121,15 +137,8 @@ impl EditChannel {
     /// [voice]: crate::model::channel::ChannelType::Voice
     #[inline]
     pub fn category<C: Into<Option<ChannelId>>>(&mut self, category: C) -> &mut Self {
-        self._category(category.into());
+        self.parent_id = category.into();
         self
-    }
-
-    fn _category(&mut self, category: Option<ChannelId>) {
-        self.0.insert("parent_id", match category {
-            Some(c) => Value::from(c.0),
-            None => NULL,
-        });
     }
 
     /// How many seconds must a user wait before sending another message.
@@ -143,7 +152,7 @@ impl EditChannel {
     /// [`MANAGE_CHANNELS`]: crate::model::permissions::Permissions::MANAGE_CHANNELS
     #[doc(alias = "slowmode")]
     pub fn rate_limit_per_user(&mut self, seconds: u64) -> &mut Self {
-        self.0.insert("rate_limit_per_user", from_number(seconds));
+        self.rate_limit_per_user = Some(seconds);
 
         self
     }
@@ -181,25 +190,9 @@ impl EditChannel {
     where
         I: IntoIterator<Item = PermissionOverwrite>,
     {
-        let overwrites = perms
-            .into_iter()
-            .map(|perm| {
-                let (id, kind) = match perm.kind {
-                    PermissionOverwriteType::Member(id) => (id.0, "member"),
-                    PermissionOverwriteType::Role(id) => (id.0, "role"),
-                };
+        let overwrites = perms.into_iter().map(Into::into).collect::<Vec<_>>();
 
-                json!({
-                    "allow": perm.allow.bits(),
-                    "deny": perm.deny.bits(),
-                    "id": id,
-                    "type": kind,
-                })
-            })
-            .collect::<Vec<_>>();
-
-        self.0.insert("permission_overwrites", Value::from(overwrites));
-
+        self.permission_overwrites = Some(overwrites);
         self
     }
 }

@@ -1,9 +1,4 @@
-use std::collections::HashMap;
-
-use super::{CreateAllowedMentions, CreateEmbed};
-use crate::builder::CreateComponents;
-use crate::internal::prelude::*;
-use crate::json::{self, from_number};
+use super::{CreateAllowedMentions, CreateComponents, CreateEmbed};
 use crate::model::channel::{AttachmentType, MessageFlags};
 use crate::model::id::AttachmentId;
 
@@ -30,8 +25,24 @@ use crate::model::id::AttachmentId;
 /// ```
 ///
 /// [`Message`]: crate::model::channel::Message
-#[derive(Clone, Debug, Default)]
-pub struct EditMessage<'a>(pub HashMap<&'static str, Value>, pub Vec<AttachmentType<'a>>);
+#[derive(Clone, Debug, Default, Serialize)]
+pub struct EditMessage<'a> {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub(crate) content: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    embeds: Option<Vec<CreateEmbed>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    flags: Option<MessageFlags>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    allowed_mentions: Option<CreateAllowedMentions>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    components: Option<CreateComponents>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    attachments: Option<Vec<AttachmentId>>,
+
+    #[serde(skip)]
+    pub(crate) files: Vec<AttachmentType<'a>>,
+}
 
 impl<'a> EditMessage<'a> {
     /// Set the content of the message.
@@ -39,18 +50,16 @@ impl<'a> EditMessage<'a> {
     /// **Note**: Message contents must be under 2000 unicode code points.
     #[inline]
     pub fn content(&mut self, content: impl Into<String>) -> &mut Self {
-        self.0.insert("content", Value::String(content.into()));
+        self.content = Some(content.into());
         self
     }
 
+    fn embeds(&mut self) -> &mut Vec<CreateEmbed> {
+        self.embeds.get_or_insert_with(Vec::new)
+    }
+
     fn _add_embed(&mut self, embed: CreateEmbed) -> &mut Self {
-        let map = json::hashmap_to_json_map(embed.0);
-        let embed = Value::from(map);
-
-        let embeds = self.0.entry("embeds").or_insert_with(|| Value::from(Vec::<Value>::new()));
-        let embeds_array = embeds.as_array_mut().expect("Embeds must be an array");
-
-        embeds_array.push(embed);
+        self.embeds().push(embed);
 
         self
     }
@@ -73,10 +82,7 @@ impl<'a> EditMessage<'a> {
     /// **Note**: This will keep all existing embeds. Use [`Self::set_embeds()`] to replace existing
     /// embeds.
     pub fn add_embeds(&mut self, embeds: Vec<CreateEmbed>) -> &mut Self {
-        for embed in embeds {
-            self._add_embed(embed);
-        }
-
+        self.embeds().extend(embeds);
         self
     }
 
@@ -92,8 +98,7 @@ impl<'a> EditMessage<'a> {
     {
         let mut embed = CreateEmbed::default();
         f(&mut embed);
-        self.0.insert("embeds", Value::from(Vec::<Value>::new()));
-        self._add_embed(embed)
+        self.set_embed(embed)
     }
 
     /// Set an embed for the message.
@@ -103,8 +108,7 @@ impl<'a> EditMessage<'a> {
     /// **Note**: This will replace all existing embeds.
     /// Use [`Self::add_embed()`] to add an additional embed.
     pub fn set_embed(&mut self, embed: CreateEmbed) -> &mut Self {
-        self.0.insert("embeds", Value::from(Vec::<Value>::new()));
-        self._add_embed(embed)
+        self.set_embeds(vec![embed])
     }
 
     /// Set multiple embeds for the message.
@@ -112,11 +116,7 @@ impl<'a> EditMessage<'a> {
     /// **Note**: This will replace all existing embeds. Use [`Self::add_embeds()`] to keep existing
     /// embeds.
     pub fn set_embeds(&mut self, embeds: Vec<CreateEmbed>) -> &mut Self {
-        self.0.insert("embeds", Value::from(Vec::<Value>::new()));
-        for embed in embeds {
-            self._add_embed(embed);
-        }
-
+        self.embeds = Some(embeds);
         self
     }
 
@@ -125,9 +125,10 @@ impl<'a> EditMessage<'a> {
     pub fn suppress_embeds(&mut self, suppress: bool) -> &mut Self {
         // `1 << 2` is defined by the API to be the SUPPRESS_EMBEDS flag.
         // At the time of writing, the only accepted value in "flags" is `SUPPRESS_EMBEDS` for editing messages.
-        let flags = if suppress { 1 << 2 } else { 0 };
-        self.0.insert("flags", from_number(flags));
+        let flags =
+            suppress.then(|| MessageFlags::SUPPRESS_EMBEDS).unwrap_or_else(MessageFlags::empty);
 
+        self.flags = Some(flags);
         self
     }
 
@@ -138,10 +139,8 @@ impl<'a> EditMessage<'a> {
     {
         let mut allowed_mentions = CreateAllowedMentions::default();
         f(&mut allowed_mentions);
-        let map = json::hashmap_to_json_map(allowed_mentions.0);
-        let allowed_mentions = Value::from(map);
 
-        self.0.insert("allowed_mentions", allowed_mentions);
+        self.allowed_mentions = Some(allowed_mentions);
         self
     }
 
@@ -153,19 +152,18 @@ impl<'a> EditMessage<'a> {
         let mut components = CreateComponents::default();
         f(&mut components);
 
-        self.0.insert("components", Value::from(components.0));
-        self
+        self.set_components(components)
     }
 
     /// Sets the components of this message.
     pub fn set_components(&mut self, components: CreateComponents) -> &mut Self {
-        self.0.insert("components", Value::from(components.0));
+        self.components = Some(components);
         self
     }
 
     /// Sets the flags for the message.
     pub fn flags(&mut self, flags: MessageFlags) -> &mut Self {
-        self.0.insert("flags", from_number(flags.bits()));
+        self.flags = Some(flags);
         self
     }
 
@@ -173,44 +171,26 @@ impl<'a> EditMessage<'a> {
     ///
     /// This can be called multiple times.
     pub fn attachment(&mut self, attachment: impl Into<AttachmentType<'a>>) -> &mut Self {
-        self.1.push(attachment.into());
+        self.files.push(attachment.into());
         self
+    }
+
+    fn attachments(&mut self) -> &mut Vec<AttachmentId> {
+        self.attachments.get_or_insert_with(Vec::new)
     }
 
     /// Add an existing attachment by id.
     pub fn add_existing_attachment(&mut self, attachment: AttachmentId) -> &mut Self {
-        let attachments =
-            self.0.entry("attachments").or_insert_with(|| Value::from(Vec::<Value>::new()));
-        let attachments_array = attachments.as_array_mut().expect("Attachments must be an array");
-        let mut map = HashMap::new();
-        map.insert("id", Value::from(attachment.to_string()));
-        attachments_array.push(Value::from(json::hashmap_to_json_map(map)));
-
+        self.attachments().push(attachment);
         self
     }
 
     /// Remove an existing attachment by id.
     pub fn remove_existing_attachment(&mut self, attachment: AttachmentId) -> &mut Self {
-        let attachments =
-            self.0.entry("attachments").or_insert_with(|| Value::from(Vec::<Value>::new()));
-        let attachments_array = attachments.as_array_mut().expect("Attachments must be an array");
-        let attachment_string = attachment.to_string();
-        let mut found_at = None;
-        for (index, value) in attachments_array.iter().enumerate() {
-            if attachment_string
-                == value
-                    .as_object()
-                    .expect("Attachments must be an array of objects")
-                    .get("id")
-                    .expect("Attachments must be an array of objects containing ids")
-                    .as_str()
-                    .expect("Attachments must be an array of objects containing string ids")
-            {
-                found_at = Some(index);
-            }
-        }
-        if let Some(index) = found_at {
-            attachments_array.remove(index);
+        if let Some(attachments) = &mut self.attachments {
+            if let Some(attachment_index) = attachments.iter().position(|a| *a == attachment) {
+                attachments.remove(attachment_index);
+            };
         }
 
         self

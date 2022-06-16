@@ -1,9 +1,7 @@
-use std::collections::HashMap;
-
 #[cfg(feature = "model")]
 use crate::http::Http;
+#[cfg(feature = "model")]
 use crate::internal::prelude::*;
-use crate::json::from_number;
 #[cfg(feature = "model")]
 use crate::model::channel::AttachmentType;
 use crate::model::guild::Role;
@@ -45,85 +43,99 @@ use crate::utils::encode_image;
 /// [`Guild::edit_role`]: crate::model::guild::Guild::edit_role
 /// [`GuildId::create_role`]: crate::model::id::GuildId::create_role
 /// [`GuildId::edit_role`]: crate::model::id::GuildId::edit_role
-#[derive(Clone, Debug, Default)]
-pub struct EditRole(pub HashMap<&'static str, Value>);
+#[derive(Clone, Debug, Default, Serialize)]
+pub struct EditRole {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "color")]
+    colour: Option<u32>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    hoist: Option<bool>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    mentionable: Option<bool>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    name: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    permissions: Option<u64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub(crate) position: Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    unicode_emoji: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    icon: Option<String>,
+}
 
 impl EditRole {
     /// Creates a new builder with the values of the given [`Role`].
     #[must_use]
     pub fn new(role: &Role) -> Self {
-        let mut map = HashMap::with_capacity(9);
+        let colour;
 
         #[cfg(feature = "utils")]
         {
-            map.insert("color", from_number(role.colour.0));
+            colour = role.colour.0;
         }
 
         #[cfg(not(feature = "utils"))]
         {
-            map.insert("color", from_number(role.colour));
+            colour = role.colour;
         }
 
-        map.insert("hoist", Value::from(role.hoist));
-        map.insert("managed", Value::from(role.managed));
-        map.insert("mentionable", Value::from(role.mentionable));
-        map.insert("name", Value::from(role.name.clone()));
-        map.insert("permissions", from_number(role.permissions.bits()));
-        map.insert("position", from_number(role.position));
-
-        if let Some(unicode_emoji) = &role.unicode_emoji {
-            map.insert("unicode_emoji", Value::String(unicode_emoji.clone()));
+        EditRole {
+            hoist: Some(role.hoist),
+            mentionable: Some(role.mentionable),
+            name: Some(role.name.clone()),
+            permissions: Some(role.permissions.bits()),
+            position: Some(role.position),
+            colour: Some(colour),
+            unicode_emoji: role.unicode_emoji.clone(),
+            icon: role.icon.clone(),
         }
-
-        if let Some(icon) = &role.icon {
-            map.insert("icon", Value::String(icon.clone()));
-        }
-
-        EditRole(map)
     }
 
     /// Sets the colour of the role.
-    pub fn colour(&mut self, colour: u64) -> &mut Self {
-        self.0.insert("color", from_number(colour));
+    pub fn colour(&mut self, colour: u32) -> &mut Self {
+        self.colour = Some(colour);
+
         self
     }
 
     /// Whether or not to hoist the role above lower-positioned role in the user
     /// list.
     pub fn hoist(&mut self, hoist: bool) -> &mut Self {
-        self.0.insert("hoist", Value::from(hoist));
+        self.hoist = Some(hoist);
+
         self
     }
 
     /// Whether or not to make the role mentionable, notifying its users.
     pub fn mentionable(&mut self, mentionable: bool) -> &mut Self {
-        self.0.insert("mentionable", Value::from(mentionable));
+        self.mentionable = Some(mentionable);
         self
     }
 
     /// The name of the role to set.
     pub fn name(&mut self, name: impl Into<String>) -> &mut Self {
-        self.0.insert("name", Value::String(name.into()));
+        self.name = Some(name.into());
         self
     }
 
     /// The set of permissions to assign the role.
     pub fn permissions(&mut self, permissions: Permissions) -> &mut Self {
-        self.0.insert("permissions", from_number(permissions.bits()));
+        self.permissions = Some(permissions.bits());
         self
     }
 
     /// The position to assign the role in the role list. This correlates to the
     /// role's position in the user list.
-    pub fn position(&mut self, position: u8) -> &mut Self {
-        self.0.insert("position", from_number(position));
+    pub fn position(&mut self, position: i64) -> &mut Self {
+        self.position = Some(position);
         self
     }
 
     /// The unicode emoji to set as the role image.
     pub fn unicode_emoji(&mut self, unicode_emoji: impl Into<String>) -> &mut Self {
-        self.0.remove("icon");
-        self.0.insert("unicode_emoji", Value::String(unicode_emoji.into()));
+        self.unicode_emoji = Some(unicode_emoji.into());
+        self.icon = None;
 
         self
     }
@@ -142,8 +154,8 @@ impl EditRole {
     ) -> Result<&mut Self> {
         let icon_data = icon.into().data(&http.as_ref().client).await?;
 
-        self.0.remove("unicode_emoji");
-        self.0.insert("icon", Value::from(encode_image(&icon_data)));
+        self.icon = Some(encode_image(&icon_data));
+        self.unicode_emoji = None;
 
         Ok(self)
     }
