@@ -50,7 +50,7 @@ impl ChannelCategory {
     pub async fn create_permission(
         &self,
         http: impl AsRef<Http>,
-        target: &PermissionOverwrite,
+        target: PermissionOverwrite,
     ) -> Result<()> {
         self.id.create_permission(&http, target).await
     }

@@ -109,21 +109,10 @@ impl ChannelId {
     pub async fn create_permission(
         self,
         http: impl AsRef<Http>,
-        target: &PermissionOverwrite,
+        target: PermissionOverwrite,
     ) -> Result<()> {
-        let (id, kind) = match target.kind {
-            PermissionOverwriteType::Member(id) => (id.0, "member"),
-            PermissionOverwriteType::Role(id) => (id.0, "role"),
-        };
-
-        let map = json!({
-            "allow": target.allow.bits(),
-            "deny": target.deny.bits(),
-            "id": id,
-            "type": kind,
-        });
-
-        http.as_ref().create_permission(self.0, id, &map).await
+        let data: PermissionOverwriteData = target.into();
+        http.as_ref().create_permission(self.0, data.id, &data).await
     }
 
     /// React to a [`Message`] with a custom [`Emoji`] or unicode character.
