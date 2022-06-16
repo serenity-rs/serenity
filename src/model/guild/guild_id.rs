@@ -38,8 +38,6 @@ use crate::http::{CacheHttp, Http, UserPagination};
 #[cfg(feature = "model")]
 use crate::internal::prelude::*;
 #[cfg(feature = "model")]
-use crate::json;
-#[cfg(feature = "model")]
 use crate::json::json;
 #[cfg(feature = "model")]
 use crate::json::prelude::*;
@@ -192,9 +190,7 @@ impl GuildId {
         let mut builder = AddMember::default();
         f(&mut builder);
 
-        let map = json::hashmap_to_json_map(builder.0);
-
-        http.as_ref().add_guild_member(self.0, user_id.into().0, &map).await
+        http.as_ref().add_guild_member(self.0, user_id.into().0, &builder).await
     }
 
     /// Ban a [`User`] from the guild, deleting a number of
@@ -359,9 +355,7 @@ impl GuildId {
         let mut builder = CreateChannel::default();
         f(&mut builder);
 
-        let map = json::hashmap_to_json_map(builder.0);
-
-        http.as_ref().create_channel(self.0, &map, None).await
+        http.as_ref().create_channel(self.0, &builder, None).await
     }
 
     /// Creates an emoji in the guild with a name and base64-encoded image.
@@ -443,12 +437,11 @@ impl GuildId {
     {
         let mut edit_role = EditRole::default();
         f(&mut edit_role);
-        let map = json::hashmap_to_json_map(edit_role.0);
 
-        let role = http.as_ref().create_role(self.0, &map, None).await?;
+        let role = http.as_ref().create_role(self.0, &edit_role, None).await?;
 
-        if let Some(position) = map.get("position").and_then(Value::as_u64) {
-            self.edit_role_position(&http, role.id, position).await?;
+        if let Some(position) = edit_role.position {
+            self.edit_role_position(&http, role.id, position as u64).await?;
         }
 
         Ok(role)
@@ -474,9 +467,7 @@ impl GuildId {
         let mut builder = CreateScheduledEvent::default();
         f(&mut builder);
 
-        let map = json::hashmap_to_json_map(builder.0);
-
-        http.as_ref().create_scheduled_event(self.0, &map, None).await
+        http.as_ref().create_scheduled_event(self.0, &builder, None).await
     }
 
     /// Creates a new sticker in the guild with the data set, if any.
@@ -496,16 +487,11 @@ impl GuildId {
     {
         let mut create_sticker = CreateSticker::default();
         f(&mut create_sticker);
-        let map = json::hashmap_to_json_map(create_sticker.0);
 
-        let file = match create_sticker.1 {
-            Some(f) => f,
-            None => return Err(Error::Model(ModelError::NoStickerFileSet)),
-        };
+        let (map, file) =
+            create_sticker.build().ok_or(Error::Model(ModelError::NoStickerFileSet))?;
 
-        let sticker = http.as_ref().create_sticker(self.0, map, file, None).await?;
-
-        Ok(sticker)
+        http.as_ref().create_sticker(self.0, map, file, None).await
     }
 
     /// Deletes the current guild if the current account is the owner of the
@@ -640,9 +626,8 @@ impl GuildId {
     {
         let mut edit_guild = EditGuild::default();
         f(&mut edit_guild);
-        let map = json::hashmap_to_json_map(edit_guild.0);
 
-        http.as_ref().edit_guild(self.0, &map, None).await
+        http.as_ref().edit_guild(self.0, &edit_guild, None).await
     }
 
     /// Edits an [`Emoji`]'s name in the guild.
@@ -700,9 +685,8 @@ impl GuildId {
     {
         let mut edit_member = EditMember::default();
         f(&mut edit_member);
-        let map = json::hashmap_to_json_map(edit_member.0);
 
-        http.as_ref().edit_member(self.0, user_id.into().0, &map, None).await
+        http.as_ref().edit_member(self.0, user_id.into().0, &edit_member, None).await
     }
 
     /// Edits the current user's nickname for the guild.
@@ -756,9 +740,8 @@ impl GuildId {
     {
         let mut edit_role = EditRole::default();
         f(&mut edit_role);
-        let map = json::hashmap_to_json_map(edit_role.0);
 
-        http.as_ref().edit_role(self.0, role_id.into().0, &map, None).await
+        http.as_ref().edit_role(self.0, role_id.into().0, &edit_role, None).await
     }
 
     /// Modifies a scheduled event in the guild with the data set, if any.
@@ -781,9 +764,10 @@ impl GuildId {
     {
         let mut edit_scheduled_event = EditScheduledEvent::default();
         f(&mut edit_scheduled_event);
-        let map = json::hashmap_to_json_map(edit_scheduled_event.0);
 
-        http.as_ref().edit_scheduled_event(self.0, event_id.into().0, &map, None).await
+        http.as_ref()
+            .edit_scheduled_event(self.0, event_id.into().0, &edit_scheduled_event, None)
+            .await
     }
 
     /// Edits a [`Sticker`], optionally setting its fields.
@@ -815,9 +799,8 @@ impl GuildId {
     {
         let mut edit_sticker = EditSticker::default();
         f(&mut edit_sticker);
-        let map = json::hashmap_to_json_map(edit_sticker.0);
 
-        http.as_ref().edit_sticker(self.0, sticker_id.into().0, &map, None).await
+        http.as_ref().edit_sticker(self.0, sticker_id.into().0, &edit_sticker, None).await
     }
 
     /// Edits the order of [`Role`]s
@@ -863,9 +846,7 @@ impl GuildId {
         let mut map = EditGuildWelcomeScreen::default();
         f(&mut map);
 
-        http.as_ref()
-            .edit_guild_welcome_screen(self.0, &Value::from(json::hashmap_to_json_map(map.0)))
-            .await
+        http.as_ref().edit_guild_welcome_screen(self.0, &map).await
     }
 
     /// Edits the [`GuildWidget`].
@@ -881,9 +862,7 @@ impl GuildId {
         let mut map = EditGuildWidget::default();
         f(&mut map);
 
-        http.as_ref()
-            .edit_guild_widget(self.0, &Value::from(json::hashmap_to_json_map(map.0)))
-            .await
+        http.as_ref().edit_guild_widget(self.0, &map).await
     }
 
     /// Gets all of the guild's roles over the REST API.
@@ -1504,7 +1483,7 @@ impl GuildId {
         F: FnOnce(&mut CreateApplicationCommand) -> &mut CreateApplicationCommand,
     {
         let map = Command::build_application_command(f);
-        http.as_ref().create_guild_application_command(self.0, &Value::from(map)).await
+        http.as_ref().create_guild_application_command(self.0, &map).await
     }
 
     /// Overrides all guild application commands.
@@ -1526,7 +1505,7 @@ impl GuildId {
 
         f(&mut array);
 
-        http.as_ref().create_guild_application_commands(self.0, &Value::from(array.0)).await
+        http.as_ref().create_guild_application_commands(self.0, &array).await
     }
 
     /// Creates a guild specific [`CommandPermission`].
@@ -1551,11 +1530,7 @@ impl GuildId {
         f(&mut map);
 
         http.as_ref()
-            .edit_guild_application_command_permissions(
-                self.0,
-                command_id.into(),
-                &Value::from(json::hashmap_to_json_map(map.0)),
-            )
+            .edit_guild_application_command_permissions(self.0, command_id.into(), &map)
             .await
     }
 
@@ -1577,7 +1552,7 @@ impl GuildId {
         let mut map = CreateApplicationCommandsPermissions::default();
         f(&mut map);
 
-        http.as_ref().edit_guild_application_commands_permissions(self.0, &Value::from(map.0)).await
+        http.as_ref().edit_guild_application_commands_permissions(self.0, &map).await
     }
 
     /// Get all guild application commands.
@@ -1617,9 +1592,7 @@ impl GuildId {
         F: FnOnce(&mut CreateApplicationCommand) -> &mut CreateApplicationCommand,
     {
         let map = Command::build_application_command(f);
-        http.as_ref()
-            .edit_guild_application_command(self.0, command_id.into(), &Value::from(map))
-            .await
+        http.as_ref().edit_guild_application_command(self.0, command_id.into(), &map).await
     }
 
     /// Delete guild application command by its Id.

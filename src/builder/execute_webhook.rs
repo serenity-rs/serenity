@@ -1,10 +1,7 @@
-use std::collections::HashMap;
 #[cfg(not(feature = "model"))]
 use std::marker::PhantomData;
 
-use super::CreateAllowedMentions;
-use crate::builder::CreateComponents;
-use crate::json::{self, from_number, Value};
+use super::{CreateAllowedMentions, CreateComponents, CreateEmbed};
 #[cfg(feature = "model")]
 use crate::model::channel::AttachmentType;
 use crate::model::channel::MessageFlags;
@@ -59,12 +56,29 @@ use crate::model::channel::MessageFlags;
 /// [`Webhook`]: crate::model::webhook::Webhook
 /// [`Webhook::execute`]: crate::model::webhook::Webhook::execute
 /// [`execute_webhook`]: crate::http::client::Http::execute_webhook
-#[derive(Clone, Debug)]
-pub struct ExecuteWebhook<'a>(
-    pub HashMap<&'static str, Value>,
-    #[cfg(feature = "model")] pub Vec<AttachmentType<'a>>,
-    #[cfg(not(feature = "model"))] PhantomData<&'a ()>,
-);
+#[derive(Clone, Debug, Default, Serialize)]
+pub struct ExecuteWebhook<'a> {
+    tts: bool,
+    embeds: Vec<CreateEmbed>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    avatar_url: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    content: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    allowed_mentions: Option<CreateAllowedMentions>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    components: Option<CreateComponents>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    username: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    flags: Option<MessageFlags>,
+
+    #[serde(skip)]
+    #[cfg(feature = "model")]
+    pub(crate) files: Vec<AttachmentType<'a>>,
+    #[cfg(not(feature = "model"))]
+    files: PhantomData<&'a ()>,
+}
 
 impl<'a> ExecuteWebhook<'a> {
     /// Override the default avatar of the webhook with an image URL.
@@ -88,7 +102,7 @@ impl<'a> ExecuteWebhook<'a> {
     /// # }
     /// ```
     pub fn avatar_url(&mut self, avatar_url: impl Into<String>) -> &mut Self {
-        self.0.insert("avatar_url", Value::String(avatar_url.into()));
+        self.avatar_url = Some(avatar_url.into());
         self
     }
 
@@ -118,14 +132,14 @@ impl<'a> ExecuteWebhook<'a> {
     /// # }
     /// ```
     pub fn content(&mut self, content: impl Into<String>) -> &mut Self {
-        self.0.insert("content", Value::String(content.into()));
+        self.content = Some(content.into());
         self
     }
 
     /// Appends a file to the webhook message.
     #[cfg(feature = "model")]
     pub fn add_file<T: Into<AttachmentType<'a>>>(&mut self, file: T) -> &mut Self {
-        self.1.push(file.into());
+        self.files.push(file.into());
         self
     }
 
@@ -135,7 +149,7 @@ impl<'a> ExecuteWebhook<'a> {
         &mut self,
         files: It,
     ) -> &mut Self {
-        self.1.extend(files.into_iter().map(Into::into));
+        self.files.extend(files.into_iter().map(Into::into));
         self
     }
 
@@ -148,7 +162,7 @@ impl<'a> ExecuteWebhook<'a> {
         &mut self,
         files: It,
     ) -> &mut Self {
-        self.1 = files.into_iter().map(Into::into).collect();
+        self.files = files.into_iter().map(Into::into).collect();
         self
     }
 
@@ -159,10 +173,8 @@ impl<'a> ExecuteWebhook<'a> {
     {
         let mut allowed_mentions = CreateAllowedMentions::default();
         f(&mut allowed_mentions);
-        let map = json::hashmap_to_json_map(allowed_mentions.0);
-        let allowed_mentions = Value::from(map);
 
-        self.0.insert("allowed_mentions", allowed_mentions);
+        self.allowed_mentions = Some(allowed_mentions);
         self
     }
 
@@ -179,8 +191,7 @@ impl<'a> ExecuteWebhook<'a> {
         let mut components = CreateComponents::default();
         f(&mut components);
 
-        self.0.insert("components", Value::from(components.0));
-        self
+        self.set_components(components)
     }
 
     /// Sets the components of this message. Requires an application-owned webhook. See
@@ -188,25 +199,20 @@ impl<'a> ExecuteWebhook<'a> {
     ///
     /// [`components`]: crate::builder::ExecuteWebhook::components
     pub fn set_components(&mut self, components: CreateComponents) -> &mut Self {
-        self.0.insert("components", Value::Array(components.0));
+        self.components = Some(components);
         self
     }
 
     /// Set the embeds associated with the message.
-    ///
-    /// This should be used in combination with [`Embed::fake`], creating one
-    /// or more fake embeds to send to the API.
     ///
     /// # Examples
     ///
     /// Refer to the [struct-level documentation] for an example on how to use
     /// embeds.
     ///
-    /// [`Embed::fake`]: crate::model::channel::Embed::fake
-    /// [`Webhook::execute`]: crate::model::webhook::Webhook::execute
     /// [struct-level documentation]: #examples
-    pub fn embeds(&mut self, embeds: Vec<Value>) -> &mut Self {
-        self.0.insert("embeds", Value::from(embeds));
+    pub fn embeds(&mut self, embeds: Vec<CreateEmbed>) -> &mut Self {
+        self.embeds = embeds;
         self
     }
 
@@ -233,7 +239,7 @@ impl<'a> ExecuteWebhook<'a> {
     /// # }
     /// ```
     pub fn tts(&mut self, tts: bool) -> &mut Self {
-        self.0.insert("tts", Value::from(tts));
+        self.tts = tts;
         self
     }
 
@@ -260,7 +266,7 @@ impl<'a> ExecuteWebhook<'a> {
     /// # }
     /// ```
     pub fn username(&mut self, username: impl Into<String>) -> &mut Self {
-        self.0.insert("username", Value::String(username.into()));
+        self.username = Some(username.into());
         self
     }
 
@@ -293,33 +299,7 @@ impl<'a> ExecuteWebhook<'a> {
     /// # }
     /// ```
     pub fn flags(&mut self, flags: MessageFlags) -> &mut Self {
-        self.0.insert("flags", from_number(flags.bits()));
+        self.flags = Some(flags);
         self
-    }
-}
-
-impl<'a> Default for ExecuteWebhook<'a> {
-    /// Returns a default set of values for a [`Webhook`] execution.
-    ///
-    /// The only default value is [`Self::tts`] being set to `false`.
-    ///
-    /// # Examples
-    ///
-    /// Creating an [`ExecuteWebhook`] builder:
-    ///
-    /// ```rust
-    /// use serenity::builder::ExecuteWebhook;
-    ///
-    /// let executor = ExecuteWebhook::default();
-    /// ```
-    ///
-    /// [`Webhook`]: crate::model::webhook::Webhook
-    fn default() -> ExecuteWebhook<'a> {
-        let mut map = HashMap::new();
-        map.insert("tts", Value::from(false));
-
-        // Necessary because the type of the second field is different without model feature
-        #[allow(clippy::default_trait_access)]
-        ExecuteWebhook(map, Default::default())
     }
 }

@@ -11,12 +11,13 @@ mod partial_channel;
 mod private_channel;
 mod reaction;
 
+use std::convert::{TryFrom, TryInto};
 #[cfg(all(feature = "cache", feature = "model", feature = "utils"))]
 use std::error::Error as StdError;
 use std::fmt;
 
 use serde::de::{Error as DeError, Unexpected};
-use serde::ser::{Serialize, SerializeStruct, Serializer};
+use serde::ser::{Serialize, Serializer};
 
 pub use self::attachment::*;
 pub use self::attachment_type::*;
@@ -349,14 +350,50 @@ impl ChannelType {
     }
 }
 
-#[derive(Deserialize, Serialize)]
-struct PermissionOverwriteData {
+#[derive(Debug, Clone, Deserialize, Serialize)]
+pub(crate) struct PermissionOverwriteData {
     allow: Permissions,
     deny: Permissions,
     #[serde(with = "snowflake")]
     id: u64,
     #[serde(rename = "type")]
     kind: u8,
+}
+
+pub(crate) struct InvalidPermissionOverwriteType(u8);
+
+impl TryFrom<PermissionOverwriteData> for PermissionOverwrite {
+    type Error = InvalidPermissionOverwriteType;
+
+    fn try_from(data: PermissionOverwriteData) -> StdResult<Self, Self::Error> {
+        let kind = match data.kind {
+            0 => PermissionOverwriteType::Role(RoleId(data.id)),
+            1 => PermissionOverwriteType::Member(UserId(data.id)),
+            raw => return Err(InvalidPermissionOverwriteType(raw)),
+        };
+
+        Ok(PermissionOverwrite {
+            allow: data.allow,
+            deny: data.deny,
+            kind,
+        })
+    }
+}
+
+impl From<PermissionOverwrite> for PermissionOverwriteData {
+    fn from(data: PermissionOverwrite) -> Self {
+        let (kind, id) = match data.kind {
+            PermissionOverwriteType::Role(id) => (0, id.0),
+            PermissionOverwriteType::Member(id) => (1, id.0),
+        };
+
+        PermissionOverwriteData {
+            allow: data.allow,
+            deny: data.deny,
+            kind,
+            id,
+        }
+    }
 }
 
 /// A channel-specific permission overwrite for a member or role.
@@ -372,38 +409,14 @@ impl<'de> Deserialize<'de> for PermissionOverwrite {
         deserializer: D,
     ) -> StdResult<PermissionOverwrite, D::Error> {
         let data = PermissionOverwriteData::deserialize(deserializer)?;
-
-        let kind = match &data.kind {
-            0 => PermissionOverwriteType::Role(RoleId(data.id)),
-            1 => PermissionOverwriteType::Member(UserId(data.id)),
-            _ => return Err(DeError::custom("Unknown PermissionOverwriteType")),
-        };
-
-        Ok(PermissionOverwrite {
-            allow: data.allow,
-            deny: data.deny,
-            kind,
-        })
+        data.try_into().map_err(|_| DeError::custom("Unknown PermissionOverwriteType"))
     }
 }
 
 impl Serialize for PermissionOverwrite {
-    fn serialize<S>(&self, serializer: S) -> StdResult<S::Ok, S::Error>
-    where
-        S: Serializer,
-    {
-        let (id, kind) = match self.kind {
-            PermissionOverwriteType::Role(id) => (GenericId(id.0), 0),
-            PermissionOverwriteType::Member(id) => (GenericId(id.0), 1),
-        };
-
-        let mut state = serializer.serialize_struct("PermissionOverwrite", 4)?;
-        state.serialize_field("allow", &self.allow)?;
-        state.serialize_field("deny", &self.deny)?;
-        state.serialize_field("id", &id)?;
-        state.serialize_field("type", &kind)?;
-
-        state.end()
+    fn serialize<S: Serializer>(&self, serializer: S) -> StdResult<S::Ok, S::Error> {
+        let data: PermissionOverwriteData = self.clone().into();
+        data.serialize(serializer)
     }
 }
 
