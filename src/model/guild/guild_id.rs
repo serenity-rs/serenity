@@ -568,9 +568,8 @@ impl GuildId {
     {
         let mut edit_member = EditMember::default();
         f(&mut edit_member);
-        let map = json::hashmap_to_json_map(edit_member.0);
 
-        http.as_ref().edit_member(self.0, user_id.into().0, &map, None).await
+        http.as_ref().edit_member(self.0, user_id.into().0, &edit_member, None).await
     }
 
     /// Edits the current user's nickname for the guild.
