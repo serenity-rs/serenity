@@ -333,8 +333,9 @@ bitflags::bitflags! {
         ///
         /// [`Integration`]: super::guild::Integration
         const MANAGE_EMOJIS_AND_STICKERS = 1 << 30;
-        /// Allows using slash commands.
-        const USE_SLASH_COMMANDS = 1 << 31;
+        /// Allows members to use application commands, including slash commands and context menu
+        /// commands.
+        const USE_APPLICATION_COMMANDS = 1 << 31;
         /// Allows for requesting to speak in stage channels.
         const REQUEST_TO_SPEAK = 1 << 32;
         /// Allows for creating, editing, and deleting scheduled events
@@ -392,10 +393,10 @@ generate_get_permission_names! {
     send_tts_messages: "Send TTS Messages",
     speak: "Speak",
     stream: "Stream",
+    use_application_commands: "Use Application Commands",
     use_embedded_activities: "Use Embedded Activities",
     use_external_emojis: "Use External Emojis",
     use_external_stickers: "Use External Stickers",
-    use_slash_commands: "Use Slash Commands",
     use_vad: "Use Voice Activity",
     view_audit_log: "View Audit Log",
     view_channel: "View Channel",
@@ -756,12 +757,12 @@ impl Permissions {
     }
 
     /// Shorthand for checking that the set of permissions contains the
-    /// [Use Slash Commands] permission.
+    /// [Use Application Commands] permission.
     ///
-    /// [Use Slash Commands]: Self::USE_SLASH_COMMANDS
+    /// [Use Application Commands]: Self::USE_APPLICATION_COMMANDS
     #[must_use]
-    pub fn use_slash_commands(self) -> bool {
-        self.contains(Self::USE_SLASH_COMMANDS)
+    pub fn use_application_commands(self) -> bool {
+        self.contains(Self::USE_APPLICATION_COMMANDS)
     }
 
     /// Shorthand for checking that the set of permissions contains the
