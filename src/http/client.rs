@@ -1671,7 +1671,7 @@ impl Http {
         &self,
         channel_id: u64,
         message_id: u64,
-        map: &Value,
+        map: &impl serde::Serialize,
     ) -> Result<Message> {
         let body = to_vec(map)?;
 

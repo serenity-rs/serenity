@@ -22,8 +22,6 @@ use crate::collector::{
 };
 #[cfg(feature = "model")]
 use crate::http::{CacheHttp, Http};
-#[cfg(feature = "model")]
-use crate::json;
 use crate::json::prelude::*;
 use crate::model::application::component::ActionRow;
 use crate::model::application::interaction::MessageInteraction;
@@ -355,16 +353,11 @@ impl Message {
         builder
     }
 
-    async fn _send_edit<'a>(&mut self, http: &Http, builder: EditMessage<'a>) -> Result<()> {
-        let map = json::hashmap_to_json_map(builder.0);
+    async fn _send_edit<'a>(&mut self, http: &Http, mut builder: EditMessage<'a>) -> Result<()> {
+        let files = std::mem::take(&mut builder.files);
 
         *self = http
-            .edit_message_and_attachments(
-                self.channel_id.0,
-                self.id.0,
-                &Value::from(map),
-                builder.1,
-            )
+            .edit_message_and_attachments(self.channel_id.0, self.id.0, &builder, files)
             .await?;
         Ok(())
     }
@@ -730,10 +723,7 @@ impl Message {
         let mut suppress = EditMessage::default();
         suppress.suppress_embeds(true);
 
-        let map = json::hashmap_to_json_map(suppress.0);
-
-        *self =
-            cache_http.http().edit_message(self.channel_id.0, self.id.0, &Value::from(map)).await?;
+        *self = cache_http.http().edit_message(self.channel_id.0, self.id.0, &suppress).await?;
 
         Ok(())
     }

@@ -33,7 +33,7 @@ use crate::collector::{
 #[cfg(feature = "model")]
 use crate::http::{CacheHttp, Http, Typing};
 #[cfg(feature = "model")]
-use crate::json::{self, json};
+use crate::json::json;
 #[cfg(feature = "model")]
 use crate::model::channel::AttachmentType;
 use crate::model::prelude::*;
@@ -366,17 +366,14 @@ impl ChannelId {
         let mut msg = EditMessage::default();
         f(&mut msg);
 
-        if let Some(Value::String(content)) = msg.0.get("content") {
+        if let Some(content) = &msg.content {
             if let Some(length_over) = Message::overflow_length(content) {
                 return Err(Error::Model(ModelError::MessageTooLong(length_over)));
             }
         }
 
-        let map = json::hashmap_to_json_map(msg.0);
-
-        http.as_ref()
-            .edit_message_and_attachments(self.0, message_id.into().0, &Value::from(map), msg.1)
-            .await
+        let files = std::mem::take(&mut msg.files);
+        http.as_ref().edit_message_and_attachments(self.0, message_id.into().0, &msg, files).await
     }
 
     /// Follows the News Channel
