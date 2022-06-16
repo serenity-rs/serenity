@@ -1,17 +1,14 @@
+use crate::http::CacheHttp;
 #[cfg(feature = "model")]
 use crate::http::Http;
 #[cfg(feature = "model")]
 use crate::internal::prelude::*;
-#[cfg(feature = "model")]
-use crate::model::channel::AttachmentType;
-use crate::model::guild::{ScheduledEventMetadata, ScheduledEventType};
-use crate::model::id::ChannelId;
-use crate::model::Timestamp;
+use crate::model::prelude::*;
 #[cfg(feature = "model")]
 use crate::utils::encode_image;
 
 #[derive(Clone, Debug, Serialize)]
-pub struct CreateScheduledEvent {
+pub struct CreateScheduledEventFields {
     #[serde(skip_serializing_if = "Option::is_none")]
     channel_id: Option<ChannelId>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -32,34 +29,54 @@ pub struct CreateScheduledEvent {
     privacy_level: u8,
 }
 
+#[derive(Clone, Debug)]
+pub struct CreateScheduledEvent {
+    id: GuildId,
+    fields: CreateScheduledEventFields,
+}
+
 impl CreateScheduledEvent {
+    /// Creates a builder with default values, setting the `privacy_level` to `GUILD_ONLY`. As this
+    /// is the only possible value of this field, it's only used at event creation, and we don't
+    /// even parse it into the `ScheduledEvent` struct.
+    pub(crate) fn new(id: GuildId) -> Self {
+        Self {
+            id,
+            fields: CreateScheduledEventFields::default(),
+        }
+    }
+
     /// Sets the channel id of the scheduled event. Required if the [`kind`] of the event is
     /// [`StageInstance`] or [`Voice`].
     ///
     /// [`kind`]: CreateScheduledEvent::kind
     /// [`StageInstance`]: ScheduledEventType::StageInstance
     /// [`Voice`]: ScheduledEventType::Voice
-    pub fn channel_id<C: Into<ChannelId>>(&mut self, channel_id: C) -> &mut Self {
-        self.channel_id = Some(channel_id.into());
+    #[must_use]
+    pub fn channel_id<C: Into<ChannelId>>(mut self, channel_id: C) -> Self {
+        self.fields.channel_id = Some(channel_id.into());
         self
     }
 
     /// Sets the name of the scheduled event. Required to be set for event creation.
-    pub fn name(&mut self, name: impl Into<String>) -> &mut Self {
-        self.name = Some(name.into());
+    #[must_use]
+    pub fn name(mut self, name: impl Into<String>) -> Self {
+        self.fields.name = Some(name.into());
         self
     }
 
     /// Sets the description of the scheduled event.
-    pub fn description(&mut self, description: impl Into<String>) -> &mut Self {
-        self.description = Some(description.into());
+    #[must_use]
+    pub fn description(mut self, description: impl Into<String>) -> Self {
+        self.fields.description = Some(description.into());
         self
     }
 
     /// Sets the start time of the scheduled event. Required to be set for event creation.
     #[inline]
-    pub fn start_time<T: Into<Timestamp>>(&mut self, timestamp: T) -> &mut Self {
-        self.scheduled_start_time = Some(timestamp.into().to_string());
+    #[must_use]
+    pub fn start_time<T: Into<Timestamp>>(mut self, timestamp: T) -> Self {
+        self.fields.scheduled_start_time = Some(timestamp.into().to_string());
         self
     }
 
@@ -69,14 +86,16 @@ impl CreateScheduledEvent {
     /// [`kind`]: CreateScheduledEvent::kind
     /// [`External`]: ScheduledEventType::External
     #[inline]
-    pub fn end_time<T: Into<Timestamp>>(&mut self, timestamp: T) -> &mut Self {
-        self.scheduled_end_time = Some(timestamp.into().to_string());
+    #[must_use]
+    pub fn end_time<T: Into<Timestamp>>(mut self, timestamp: T) -> Self {
+        self.fields.scheduled_end_time = Some(timestamp.into().to_string());
         self
     }
 
     /// Sets the entity type of the scheduled event. Required to be set for event creation.
-    pub fn kind(&mut self, kind: ScheduledEventType) -> &mut Self {
-        self.entity_type = Some(kind);
+    #[must_use]
+    pub fn kind(mut self, kind: ScheduledEventType) -> Self {
+        self.fields.entity_type = Some(kind);
         self
     }
 
@@ -85,11 +104,11 @@ impl CreateScheduledEvent {
     ///
     /// [`kind`]: CreateScheduledEvent::kind
     /// [`External`]: ScheduledEventType::External
-    pub fn location(&mut self, location: impl Into<String>) -> &mut Self {
-        self.entity_metadata = Some(ScheduledEventMetadata {
+    #[must_use]
+    pub fn location(mut self, location: impl Into<String>) -> Self {
+        self.fields.entity_metadata = Some(ScheduledEventMetadata {
             location: location.into(),
         });
-
         self
     }
 
@@ -101,17 +120,59 @@ impl CreateScheduledEvent {
     /// on a path that doesn't exist.
     #[cfg(feature = "model")]
     pub async fn image<'a>(
-        &mut self,
+        mut self,
         http: impl AsRef<Http>,
         image: impl Into<AttachmentType<'a>>,
-    ) -> Result<&mut Self> {
+    ) -> Result<Self> {
         let image_data = image.into().data(&http.as_ref().client).await?;
-        self.image = Some(encode_image(&image_data));
+        self.fields.image = Some(encode_image(&image_data));
         Ok(self)
+    }
+
+    /// Creates a new scheduled event in the guild with the data set, if any.
+    ///
+    /// **Note**: Requres the [Manage Events] permission.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`Error::Http`] if the current user lacks permission, or if invalid data is given.
+    ///
+    /// [Manage Events]: Permissions::MANAGE_EVENTS
+    pub async fn execute(self, http: impl AsRef<Http>) -> Result<ScheduledEvent> {
+        http.as_ref().create_scheduled_event(self.id.into(), &self.fields, None).await
+    }
+
+    /// Creates a new scheduled event in the guild with the data set, if any.
+    ///
+    /// **Note**: Requres the [Manage Events] permission.
+    ///
+    /// # Errors
+    ///
+    /// If the `cache` is enabled, returns a [`ModelError::InvalidPermissions`] if the current user
+    /// does not have permission to manage scheduled events.
+    ///
+    /// Otherwise will return [`Error::Http`] if the current user does not have permission.
+    ///
+    /// [Manage Events]: Permissions::MANAGE_EVENTS
+    pub async fn execute_with_cache(self, cache_http: impl CacheHttp) -> Result<ScheduledEvent> {
+        #[cfg(feature = "cache")]
+        {
+            if let Some(cache) = cache_http.cache() {
+                if let Some(guild) = cache.guild(self.id) {
+                    let req = Permissions::MANAGE_EVENTS;
+
+                    if !guild.has_perms(&cache_http, req).await {
+                        return Err(Error::Model(ModelError::InvalidPermissions(req)));
+                    }
+                }
+            }
+        }
+
+        self.execute(cache_http.http()).await
     }
 }
 
-impl Default for CreateScheduledEvent {
+impl Default for CreateScheduledEventFields {
     /// Creates a builder with default values, setting the `privacy_level` to `GUILD_ONLY`. As this
     /// is the only possible value of this field, it's only used at event creation, and we don't
     /// even parse it into the `ScheduledEvent` struct.

@@ -874,38 +874,14 @@ impl Guild {
         self.id.create_role(cache_http.http(), f).await
     }
 
-    /// Creates a new scheduled event in the guild with the data set, if any.
+    /// Returns a request builder that, when executed, will create a new scheduled event in the
+    /// guild.
     ///
     /// **Note**: Requires the [Manage Events] permission.
     ///
-    /// # Errors
-    ///
-    /// If the `cache` is enabled, returns a [`ModelError::InvalidPermissions`] if the current user
-    /// does not have permission to manage scheduled events.
-    ///
-    /// Otherwise will return [`Error::Http`] if the current user does not have permission.
-    ///
     /// [Manage Events]: Permissions::MANAGE_EVENTS
-    pub async fn create_scheduled_event<F>(
-        &self,
-        cache_http: impl CacheHttp,
-        f: F,
-    ) -> Result<ScheduledEvent>
-    where
-        F: FnOnce(&mut CreateScheduledEvent) -> &mut CreateScheduledEvent,
-    {
-        #[cfg(feature = "cache")]
-        {
-            if cache_http.cache().is_some() {
-                let req = Permissions::MANAGE_EVENTS;
-
-                if !self.has_perms(&cache_http, req).await {
-                    return Err(Error::Model(ModelError::InvalidPermissions(req)));
-                }
-            }
-        }
-
-        self.id.create_scheduled_event(cache_http.http(), f).await
+    pub async fn create_scheduled_event(&self) -> CreateScheduledEvent {
+        CreateScheduledEvent::new(self.id)
     }
 
     /// Returns a request builder that, when executed, will create a new sticker in the guild.

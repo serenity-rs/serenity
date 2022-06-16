@@ -329,27 +329,14 @@ impl GuildId {
         Ok(role)
     }
 
-    /// Creates a new scheduled event in the guild with the data set, if any.
+    /// Returns a request builder that, when executed, will create a new scheduled event in the
+    /// guild.
     ///
     /// **Note**: Requires the [Manage Events] permission.
     ///
-    /// # Errors
-    ///
-    /// Returns [`Error::Http`] if the current user lacks permission, or if invalid data is given.
-    ///
     /// [Manage Events]: Permissions::MANAGE_EVENTS
-    pub async fn create_scheduled_event<F>(
-        &self,
-        http: impl AsRef<Http>,
-        f: F,
-    ) -> Result<ScheduledEvent>
-    where
-        F: FnOnce(&mut CreateScheduledEvent) -> &mut CreateScheduledEvent,
-    {
-        let mut builder = CreateScheduledEvent::default();
-        f(&mut builder);
-
-        http.as_ref().create_scheduled_event(self.get(), &builder, None).await
+    pub async fn create_scheduled_event(&self) -> CreateScheduledEvent {
+        CreateScheduledEvent::new(*self)
     }
 
     /// Returns a request builder that, when executed, will create a new sticker in the guild.
