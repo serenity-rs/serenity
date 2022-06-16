@@ -93,7 +93,7 @@ where
     Ok(simd_json::serde::from_owned_value(v)?)
 }
 
-#[cfg(all(any(feature = "builder", feature = "http"), not(feature = "simd-json")))]
+#[cfg(all(any(feature = "builder", feature = "http"), not(feature = "simd-json"), test))]
 pub(crate) fn to_value<T>(value: T) -> Result<Value>
 where
     T: Serialize,
@@ -101,7 +101,7 @@ where
     Ok(serde_json::to_value(value)?)
 }
 
-#[cfg(all(any(feature = "builder", feature = "http"), feature = "simd-json"))]
+#[cfg(all(any(feature = "builder", feature = "http"), feature = "simd-json", test))]
 pub(crate) fn to_value<T>(value: T) -> Result<Value>
 where
     T: Serialize,

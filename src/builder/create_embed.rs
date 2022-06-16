@@ -14,13 +14,23 @@
 //! [`ExecuteWebhook::embeds`]: crate::builder::ExecuteWebhook::embeds
 //! [here]: https://discord.com/developers/docs/resources/channel#embed-object
 
-use std::collections::HashMap;
-
-use crate::json::{self, from_number, JsonMap, Value};
-use crate::model::channel::Embed;
+use crate::model::channel::{Embed, EmbedField};
 use crate::model::Timestamp;
 #[cfg(feature = "utils")]
 use crate::utils::Colour;
+
+#[derive(Clone, Debug, Serialize)]
+struct HoldsUrl {
+    url: String,
+}
+
+impl HoldsUrl {
+    fn new(url: String) -> Self {
+        Self {
+            url,
+        }
+    }
+}
 
 /// A builder to create a fake [`Embed`] object, for use with the
 /// [`ChannelId::send_message`] and [`ExecuteWebhook::embeds`] methods.
@@ -33,8 +43,32 @@ use crate::utils::Colour;
 /// [`ChannelId::send_message`]: crate::model::id::ChannelId::send_message
 /// [`Embed`]: crate::model::channel::Embed
 /// [`ExecuteWebhook::embeds`]: crate::builder::ExecuteWebhook::embeds
-#[derive(Clone, Debug)]
-pub struct CreateEmbed(pub HashMap<&'static str, Value>);
+#[derive(Clone, Debug, Serialize)]
+pub struct CreateEmbed {
+    fields: Vec<EmbedField>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    author: Option<CreateEmbedAuthor>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    description: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    footer: Option<CreateEmbedFooter>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    image: Option<HoldsUrl>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    thumbnail: Option<HoldsUrl>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    timestamp: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    title: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    url: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "color")]
+    colour: Option<u32>,
+
+    #[serde(rename = "type")]
+    kind: &'static str,
+}
 
 impl CreateEmbed {
     /// Build the author of the embed.
@@ -52,9 +86,7 @@ impl CreateEmbed {
 
     /// Set the author of the embed.
     pub fn set_author(&mut self, author: CreateEmbedAuthor) -> &mut Self {
-        let map = json::hashmap_to_json_map(author.0);
-
-        self.0.insert("author", Value::from(map));
+        self.author = Some(author);
         self
     }
 
@@ -78,7 +110,7 @@ impl CreateEmbed {
 
     #[cfg(feature = "utils")]
     fn _colour(&mut self, colour: Colour) {
-        self.0.insert("color", from_number(u64::from(colour.0)));
+        self.colour = Some(colour.0);
     }
 
     /// Set the colour of the left-hand side of the embed.
@@ -94,7 +126,7 @@ impl CreateEmbed {
     /// Set the colour of the left-hand side of the embed.
     #[cfg(not(feature = "utils"))]
     pub fn colour(&mut self, colour: u32) -> &mut Self {
-        self.0.insert("color", from_number(colour));
+        self.colour = Some(colour);
         self
     }
 
@@ -103,7 +135,7 @@ impl CreateEmbed {
     /// **Note**: This can't be longer than 4096 characters.
     #[inline]
     pub fn description(&mut self, description: impl Into<String>) -> &mut Self {
-        self.0.insert("description", Value::String(description.into()));
+        self.description = Some(description.into());
         self
     }
 
@@ -113,20 +145,13 @@ impl CreateEmbed {
     /// **Note**: Maximum amount of characters you can put is 256 in a field
     /// name and 1024 in a field value.
     #[inline]
-    pub fn field<N, V>(&mut self, name: N, value: V, inline: bool) -> &mut Self
-    where
-        N: Into<String>,
-        V: Into<String>,
-    {
-        let entry = self.0.entry("fields").or_insert_with(|| Value::from(Vec::<Value>::new()));
-
-        if let Value::Array(ref mut inner) = *entry {
-            let mut field = JsonMap::with_capacity(3);
-            field.insert("name".to_string(), Value::String(name.into()));
-            field.insert("value".to_string(), Value::String(value.into()));
-            field.insert("inline".to_string(), Value::from(inline));
-            inner.push(Value::from(field));
-        }
+    pub fn field(
+        &mut self,
+        name: impl Into<String>,
+        value: impl Into<String>,
+        inline: bool,
+    ) -> &mut Self {
+        self.fields.push(EmbedField::new(name, value, inline));
 
         self
     }
@@ -139,9 +164,9 @@ impl CreateEmbed {
         N: Into<String>,
         V: Into<String>,
     {
-        for (name, value, inline) in fields {
-            self.field(name, value, inline);
-        }
+        let fields =
+            fields.into_iter().map(|(name, value, inline)| EmbedField::new(name, value, inline));
+        self.fields.extend(fields);
 
         self
     }
@@ -161,33 +186,21 @@ impl CreateEmbed {
 
     /// Set the footer of the embed.
     pub fn set_footer(&mut self, create_embed_footer: CreateEmbedFooter) -> &mut Self {
-        let footer = create_embed_footer.0;
-        let map = json::hashmap_to_json_map(footer);
-
-        self.0.insert("footer", Value::from(map));
-        self
-    }
-
-    fn url_object(&mut self, name: &'static str, url: String) -> &mut Self {
-        let mut map = JsonMap::with_capacity(1);
-        map.insert("url".to_string(), Value::String(url));
-
-        self.0.insert(name, Value::from(map));
+        self.footer = Some(create_embed_footer);
         self
     }
 
     /// Set the image associated with the embed. This only supports HTTP(S).
     #[inline]
     pub fn image(&mut self, url: impl Into<String>) -> &mut Self {
-        self.url_object("image", url.into());
-
+        self.image = Some(HoldsUrl::new(url.into()));
         self
     }
 
     /// Set the thumbnail of the embed. This only supports HTTP(S).
     #[inline]
     pub fn thumbnail(&mut self, url: impl Into<String>) -> &mut Self {
-        self.url_object("thumbnail", url.into());
+        self.thumbnail = Some(HoldsUrl::new(url.into()));
         self
     }
 
@@ -288,25 +301,21 @@ impl CreateEmbed {
     /// ```
     #[inline]
     pub fn timestamp<T: Into<Timestamp>>(&mut self, timestamp: T) -> &mut Self {
-        self._timestamp(timestamp.into());
+        self.timestamp = Some(timestamp.into().to_string());
         self
-    }
-
-    fn _timestamp(&mut self, timestamp: Timestamp) {
-        self.0.insert("timestamp", Value::String(timestamp.to_string()));
     }
 
     /// Set the title of the embed.
     #[inline]
     pub fn title(&mut self, title: impl Into<String>) -> &mut Self {
-        self.0.insert("title", Value::String(title.into()));
+        self.title = Some(title.into());
         self
     }
 
     /// Set the URL to direct to when clicking on the title.
     #[inline]
     pub fn url(&mut self, url: impl Into<String>) -> &mut Self {
-        self.0.insert("url", Value::String(url.into()));
+        self.url = Some(url.into());
         self
     }
 
@@ -320,19 +329,28 @@ impl CreateEmbed {
     pub fn attachment(&mut self, filename: impl Into<String>) -> &mut Self {
         let mut filename = filename.into();
         filename.insert_str(0, "attachment://");
-        self.url_object("image", filename);
 
+        self.image = Some(HoldsUrl::new(filename));
         self
     }
 }
 
 impl Default for CreateEmbed {
     /// Creates a builder with default values, setting the `type` to `rich`.
-    fn default() -> CreateEmbed {
-        let mut map = HashMap::new();
-        map.insert("type", Value::String("rich".into()));
-
-        CreateEmbed(map)
+    fn default() -> Self {
+        Self {
+            fields: Vec::new(),
+            description: None,
+            thumbnail: None,
+            timestamp: None,
+            kind: "rich",
+            author: None,
+            colour: None,
+            footer: None,
+            image: None,
+            title: None,
+            url: None,
+        }
     }
 }
 
@@ -410,25 +428,32 @@ impl From<Embed> for CreateEmbed {
 /// Requires that you specify a [`Self::name`].
 ///
 /// [`Embed`]: crate::model::channel::Embed
-#[derive(Clone, Debug, Default)]
-pub struct CreateEmbedAuthor(pub HashMap<&'static str, Value>);
+#[derive(Clone, Debug, Default, Serialize)]
+pub struct CreateEmbedAuthor {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    icon_url: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    name: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    url: Option<String>,
+}
 
 impl CreateEmbedAuthor {
     /// Set the URL of the author's icon.
     pub fn icon_url(&mut self, icon_url: impl Into<String>) -> &mut Self {
-        self.0.insert("icon_url", Value::String(icon_url.into()));
+        self.icon_url = Some(icon_url.into());
         self
     }
 
     /// Set the author's name.
     pub fn name(&mut self, name: impl Into<String>) -> &mut Self {
-        self.0.insert("name", Value::String(name.into()));
+        self.name = Some(name.into());
         self
     }
 
     /// Set the author's URL.
     pub fn url(&mut self, url: impl Into<String>) -> &mut Self {
-        self.0.insert("url", Value::String(url.into()));
+        self.url = Some(url.into());
         self
     }
 }
@@ -439,19 +464,24 @@ impl CreateEmbedAuthor {
 /// This does not require any field be set.
 ///
 /// [`Embed`]: crate::model::channel::Embed
-#[derive(Clone, Debug, Default)]
-pub struct CreateEmbedFooter(pub HashMap<&'static str, Value>);
+#[derive(Clone, Debug, Default, Serialize)]
+pub struct CreateEmbedFooter {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    icon_url: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    text: Option<String>,
+}
 
 impl CreateEmbedFooter {
     /// Set the icon URL's value. This only supports HTTP(S).
     pub fn icon_url(&mut self, icon_url: impl Into<String>) -> &mut Self {
-        self.0.insert("icon_url", Value::String(icon_url.into()));
+        self.icon_url = Some(icon_url.into());
         self
     }
 
     /// Set the footer's text.
     pub fn text(&mut self, text: impl Into<String>) -> &mut Self {
-        self.0.insert("text", Value::String(text.into()));
+        self.text = Some(text.into());
         self
     }
 }
@@ -459,7 +489,7 @@ impl CreateEmbedFooter {
 #[cfg(test)]
 mod test {
     use super::CreateEmbed;
-    use crate::json::{self, json, Value};
+    use crate::json::{json, to_value};
     use crate::model::channel::{Embed, EmbedField, EmbedFooter, EmbedImage, EmbedVideo};
     use crate::utils::Colour;
 
@@ -513,7 +543,7 @@ mod test {
         builder.title("still a hakase");
         builder.url("https://i.imgur.com/XfWpfCV.gif");
 
-        let built = Value::from(json::hashmap_to_json_map(builder.0));
+        let built = to_value(builder).unwrap();
 
         let obj = json!({
             "color": 0xFF0011,

@@ -9,10 +9,6 @@ use crate::builder::CreateAutocompleteResponse;
 #[cfg(feature = "http")]
 use crate::http::Http;
 use crate::internal::prelude::*;
-#[cfg(feature = "http")]
-use crate::json;
-#[cfg(feature = "http")]
-use crate::json::prelude::*;
 use crate::model::application::command::{CommandOptionType, CommandType};
 use crate::model::application::interaction::add_guild_id_to_resolved;
 #[cfg(feature = "http")]
@@ -79,14 +75,20 @@ impl AutocompleteInteraction {
     where
         F: FnOnce(&mut CreateAutocompleteResponse) -> &mut CreateAutocompleteResponse,
     {
+        #[derive(Serialize)]
+        struct AutocompleteResponse {
+            data: CreateAutocompleteResponse,
+            #[serde(rename = "type")]
+            kind: InteractionResponseType,
+        }
+
         let mut response = CreateAutocompleteResponse::default();
         f(&mut response);
-        let data = json::hashmap_to_json_map(response.0);
 
-        let map = json!({
-            "type": InteractionResponseType::Autocomplete as u8,
-            "data": data,
-        });
+        let map = AutocompleteResponse {
+            data: response,
+            kind: InteractionResponseType::Autocomplete,
+        };
 
         http.as_ref().create_interaction_response(self.id.0, &self.token, &map).await
     }

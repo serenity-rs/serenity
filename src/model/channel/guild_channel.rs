@@ -32,8 +32,6 @@ use crate::http::{CacheHttp, Http, Typing};
 #[cfg(all(feature = "cache", feature = "model"))]
 use crate::internal::prelude::*;
 #[cfg(feature = "model")]
-use crate::json;
-#[cfg(feature = "model")]
 use crate::model::channel::AttachmentType;
 use crate::model::prelude::*;
 use crate::model::Timestamp;
@@ -240,7 +238,7 @@ impl GuildChannel {
     /// // assuming the cache has been unlocked
     /// let channel = cache.guild_channel(channel_id).ok_or(ModelError::ItemMissing)?;
     ///
-    /// channel.create_permission(&http, &overwrite).await?;
+    /// channel.create_permission(&http, overwrite).await?;
     /// #   Ok(())
     /// # }
     /// ```
@@ -273,7 +271,7 @@ impl GuildChannel {
     ///
     /// let channel = cache.guild_channel(channel_id).ok_or(ModelError::ItemMissing)?;
     ///
-    /// channel.create_permission(&http, &overwrite).await?;
+    /// channel.create_permission(&http, overwrite).await?;
     /// #     Ok(())
     /// # }
     /// ```
@@ -291,7 +289,7 @@ impl GuildChannel {
     pub async fn create_permission(
         &self,
         http: impl AsRef<Http>,
-        target: &PermissionOverwrite,
+        target: PermissionOverwrite,
     ) -> Result<()> {
         self.id.create_permission(&http, target).await
     }
@@ -427,9 +425,8 @@ impl GuildChannel {
 
         let mut edit_channel = EditChannel::default();
         f(&mut edit_channel);
-        let edited = json::hashmap_to_json_map(edit_channel.0);
 
-        *self = cache_http.http().edit_channel(self.id.0, &edited, None).await?;
+        *self = cache_http.http().edit_channel(self.id.0, &edit_channel, None).await?;
 
         Ok(())
     }
@@ -592,14 +589,12 @@ impl GuildChannel {
         let mut voice_state = EditVoiceState::default();
         f(&mut voice_state);
 
-        voice_state.0.insert("channel_id", Value::from(self.id.0.to_string()));
-
-        let map = json::hashmap_to_json_map(voice_state.0);
+        voice_state.channel_id = Some(self.id);
 
         if let Some(id) = user_id {
-            http.as_ref().edit_voice_state(self.guild_id.0, id.into().0, &map).await
+            http.as_ref().edit_voice_state(self.guild_id.0, id.into().0, &voice_state).await
         } else {
-            http.as_ref().edit_voice_state_me(self.guild_id.0, &map).await
+            http.as_ref().edit_voice_state_me(self.guild_id.0, &voice_state).await
         }
     }
 

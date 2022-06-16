@@ -10,8 +10,6 @@ use crate::builder::{
 #[cfg(feature = "model")]
 use crate::http::Http;
 use crate::internal::prelude::*;
-#[cfg(feature = "model")]
-use crate::json;
 use crate::model::application::component::ActionRow;
 #[cfg(feature = "http")]
 use crate::model::application::interaction::InteractionResponseType;
@@ -102,24 +100,22 @@ impl ModalSubmitInteraction {
         let mut interaction_response = CreateInteractionResponse::default();
         f(&mut interaction_response);
 
-        let map = json::hashmap_to_json_map(interaction_response.0);
+        let http = http.as_ref();
+        let files = interaction_response
+            .data
+            .as_mut()
+            .map_or_else(Vec::new, |d| std::mem::take(&mut d.files));
 
-        Message::check_content_length(&map)?;
-        Message::check_embed_length(&map)?;
-
-        if interaction_response.1.is_empty() {
-            http.as_ref()
-                .create_interaction_response(self.id.0, &self.token, &Value::from(map))
-                .await
+        if files.is_empty() {
+            http.create_interaction_response(self.id.0, &self.token, &interaction_response).await
         } else {
-            http.as_ref()
-                .create_interaction_response_with_files(
-                    self.id.0,
-                    &self.token,
-                    &Value::from(map),
-                    interaction_response.1,
-                )
-                .await
+            http.create_interaction_response_with_files(
+                self.id.0,
+                &self.token,
+                &interaction_response,
+                files,
+            )
+            .await
         }
     }
 
@@ -153,12 +149,7 @@ impl ModalSubmitInteraction {
         let mut interaction_response = EditInteractionResponse::default();
         f(&mut interaction_response);
 
-        let map = json::hashmap_to_json_map(interaction_response.0);
-
-        Message::check_content_length(&map)?;
-        Message::check_embed_length(&map)?;
-
-        http.as_ref().edit_original_interaction_response(&self.token, &Value::from(map)).await
+        http.as_ref().edit_original_interaction_response(&self.token, &interaction_response).await
     }
 
     /// Deletes the initial interaction response.
@@ -197,12 +188,7 @@ impl ModalSubmitInteraction {
         let mut interaction_response = CreateInteractionResponseFollowup::default();
         f(&mut interaction_response);
 
-        let map = json::hashmap_to_json_map(interaction_response.0);
-
-        Message::check_content_length(&map)?;
-        Message::check_embed_length(&map)?;
-
-        http.as_ref().create_followup_message(&self.token, &Value::from(map)).await
+        http.as_ref().create_followup_message(&self.token, &interaction_response).await
     }
 
     /// Edits a followup response to the response sent.
@@ -232,13 +218,8 @@ impl ModalSubmitInteraction {
         let mut interaction_response = CreateInteractionResponseFollowup::default();
         f(&mut interaction_response);
 
-        let map = json::hashmap_to_json_map(interaction_response.0);
-
-        Message::check_content_length(&map)?;
-        Message::check_embed_length(&map)?;
-
         http.as_ref()
-            .edit_followup_message(&self.token, message_id.into().into(), &Value::from(map))
+            .edit_followup_message(&self.token, message_id.into().into(), &interaction_response)
             .await
     }
 

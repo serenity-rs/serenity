@@ -1,6 +1,3 @@
-use std::collections::HashMap;
-
-use crate::json::{from_number, Value, NULL};
 use crate::model::id::{ApplicationId, UserId};
 use crate::model::invite::InviteTargetType;
 
@@ -68,8 +65,23 @@ use crate::model::invite::InviteTargetType;
 ///
 /// [`GuildChannel::create_invite`]: crate::model::channel::GuildChannel::create_invite
 /// [`RichInvite`]: crate::model::invite::RichInvite
-#[derive(Clone, Debug)]
-pub struct CreateInvite(pub HashMap<&'static str, Value>);
+#[derive(Clone, Debug, Default, Serialize)]
+pub struct CreateInvite {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    max_age: Option<u64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    max_uses: Option<u64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    temporary: Option<bool>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    unique: Option<bool>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    target_type: Option<InviteTargetType>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    target_user_id: Option<UserId>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    target_application_id: Option<ApplicationId>,
+}
 
 impl CreateInvite {
     /// The duration that the invite will be valid for.
@@ -99,7 +111,7 @@ impl CreateInvite {
     /// # }
     /// ```
     pub fn max_age(&mut self, max_age: u64) -> &mut Self {
-        self.0.insert("max_age", from_number(max_age));
+        self.max_age = Some(max_age);
         self
     }
 
@@ -130,7 +142,7 @@ impl CreateInvite {
     /// # }
     /// ```
     pub fn max_uses(&mut self, max_uses: u64) -> &mut Self {
-        self.0.insert("max_uses", from_number(max_uses));
+        self.max_uses = Some(max_uses);
         self
     }
 
@@ -161,7 +173,7 @@ impl CreateInvite {
     /// # fn main() {}
     /// ```
     pub fn temporary(&mut self, temporary: bool) -> &mut Self {
-        self.0.insert("temporary", Value::from(temporary));
+        self.temporary = Some(temporary);
         self
     }
 
@@ -190,13 +202,13 @@ impl CreateInvite {
     /// # }
     /// ```
     pub fn unique(&mut self, unique: bool) -> &mut Self {
-        self.0.insert("unique", Value::from(unique));
+        self.unique = Some(unique);
         self
     }
 
     /// The type of target for this voice channel invite.
     pub fn target_type(&mut self, target_type: InviteTargetType) -> &mut Self {
-        self.0.insert("target_type", from_number(target_type as u8));
+        self.target_type = Some(target_type);
         self
     }
 
@@ -204,7 +216,7 @@ impl CreateInvite {
     /// `Stream`
     /// The user must be streaming in the channel.
     pub fn target_user_id(&mut self, target_user_id: UserId) -> &mut Self {
-        self.0.insert("target_user_id", from_number(target_user_id.0));
+        self.target_user_id = Some(target_user_id);
         self
     }
 
@@ -223,27 +235,7 @@ impl CreateInvite {
     /// poker: `755827207812677713`
     /// chess: `832012774040141894`
     pub fn target_application_id(&mut self, target_application_id: ApplicationId) -> &mut Self {
-        self.0.insert("target_application_id", from_number(target_application_id.0));
+        self.target_application_id = Some(target_application_id);
         self
-    }
-}
-
-impl Default for CreateInvite {
-    /// Creates a builder with default values, setting `validate` to `null`.
-    ///
-    /// # Examples
-    ///
-    /// Create a default [`CreateInvite`] builder:
-    ///
-    /// ```rust
-    /// use serenity::builder::CreateInvite;
-    ///
-    /// let invite_builder = CreateInvite::default();
-    /// ```
-    fn default() -> CreateInvite {
-        let mut map = HashMap::new();
-        map.insert("validate", NULL);
-
-        CreateInvite(map)
     }
 }

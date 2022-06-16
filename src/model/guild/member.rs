@@ -12,8 +12,6 @@ use crate::cache::Cache;
 use crate::http::{CacheHttp, Http};
 #[cfg(all(feature = "cache", feature = "model"))]
 use crate::internal::prelude::*;
-#[cfg(feature = "model")]
-use crate::json;
 use crate::model::permissions::Permissions;
 use crate::model::prelude::*;
 use crate::model::Timestamp;
@@ -157,9 +155,8 @@ impl Member {
 
         let mut builder = EditMember::default();
         builder.roles(&self.roles);
-        let map = json::hashmap_to_json_map(builder.0);
 
-        match http.as_ref().edit_member(self.guild_id.0, self.user.id.0, &map, None).await {
+        match http.as_ref().edit_member(self.guild_id.0, self.user.id.0, &builder, None).await {
             Ok(member) => Ok(member.roles),
             Err(why) => {
                 self.roles.retain(|r| !role_ids.contains(r));
@@ -301,11 +298,7 @@ impl Member {
     where
         F: FnOnce(&mut EditMember) -> &mut EditMember,
     {
-        let mut edit_member = EditMember::default();
-        f(&mut edit_member);
-        let map = json::hashmap_to_json_map(edit_member.0);
-
-        http.as_ref().edit_member(self.guild_id.0, self.user.id.0, &map, None).await
+        self.guild_id.edit_member(http, self.user.id, f).await
     }
 
     /// Allow a user to communicate, removing their timeout, if there is one.
@@ -563,9 +556,8 @@ impl Member {
 
         let mut builder = EditMember::default();
         builder.roles(&self.roles);
-        let map = json::hashmap_to_json_map(builder.0);
 
-        match http.as_ref().edit_member(self.guild_id.0, self.user.id.0, &map, None).await {
+        match http.as_ref().edit_member(self.guild_id.0, self.user.id.0, &builder, None).await {
             Ok(member) => Ok(member.roles),
             Err(why) => {
                 self.roles.extend_from_slice(role_ids);

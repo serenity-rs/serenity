@@ -1,9 +1,5 @@
 #[cfg(feature = "model")]
 use crate::builder::CreateEmbed;
-#[cfg(feature = "model")]
-use crate::internal::prelude::*;
-#[cfg(feature = "model")]
-use crate::json;
 #[cfg(feature = "utils")]
 use crate::utils::Colour;
 
@@ -90,15 +86,13 @@ impl Embed {
     /// });
     /// ```
     #[inline]
-    pub fn fake<F>(f: F) -> Value
+    pub fn fake<F>(f: F) -> CreateEmbed
     where
         F: FnOnce(&mut CreateEmbed) -> &mut CreateEmbed,
     {
         let mut create_embed = CreateEmbed::default();
         f(&mut create_embed);
-        let map = json::hashmap_to_json_map(create_embed.0);
-
-        Value::from(map)
+        create_embed
     }
 }
 
@@ -148,7 +142,7 @@ impl EmbedField {
         Self::_new(name.into(), value.into(), inline)
     }
 
-    fn _new(name: String, value: String, inline: bool) -> Self {
+    pub(crate) fn _new(name: String, value: String, inline: bool) -> Self {
         Self {
             name,
             value,
