@@ -30,6 +30,7 @@ pub enum Action {
     Integration(IntegrationAction),
     StageInstance(StageInstanceAction),
     Sticker(StickerAction),
+    ScheduledEvent(ScheduledEventAction),
     Thread(ThreadAction),
     Unknown(u8),
 }
@@ -50,6 +51,7 @@ impl Action {
             Self::Integration(x) => x as u8,
             Self::StageInstance(x) => x as u8,
             Self::Sticker(x) => x as u8,
+            Self::ScheduledEvent(x) => x as u8,
             Self::Thread(x) => x as u8,
             Self::Unknown(x) => x,
         }
@@ -72,6 +74,7 @@ impl Action {
             80..=82 => Action::Integration(unsafe { transmute(value) }),
             83..=85 => Action::StageInstance(unsafe { transmute(value) }),
             90..=92 => Action::Sticker(unsafe { transmute(value) }),
+            100..=102 => Action::ScheduledEvent(unsafe { transmute(value) }),
             110..=112 => Action::Thread(unsafe { transmute(value) }),
             _ => return None,
         };
@@ -232,6 +235,15 @@ pub enum StickerAction {
     Delete = 92,
 }
 
+#[derive(Copy, Clone, Debug)]
+#[non_exhaustive]
+#[repr(u8)]
+pub enum ScheduledEventAction {
+    Create = 100,
+    Update = 101,
+    Delete = 102,
+}
+
 #[deprecated(note = "use `ThreadAction`")]
 pub type ActionThread = ThreadAction;
 
@@ -360,6 +372,9 @@ mod tests {
         assert_action!(Action::Sticker(StickerAction::Create), 90);
         assert_action!(Action::Sticker(StickerAction::Update), 91);
         assert_action!(Action::Sticker(StickerAction::Delete), 92);
+        assert_action!(Action::ScheduledEvent(ScheduledEventAction::Create), 100);
+        assert_action!(Action::ScheduledEvent(ScheduledEventAction::Update), 101);
+        assert_action!(Action::ScheduledEvent(ScheduledEventAction::Delete), 102);
         assert_action!(Action::Thread(ThreadAction::Create), 110);
         assert_action!(Action::Thread(ThreadAction::Update), 111);
         assert_action!(Action::Thread(ThreadAction::Delete), 112);
