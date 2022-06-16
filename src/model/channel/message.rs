@@ -881,6 +881,7 @@ impl Message {
         cache.as_ref().channel_category_id(self.channel_id)
     }
 
+    #[allow(dead_code)] // Temporary, will be added back or removed in future
     pub(crate) fn check_lengths(map: &JsonMap) -> Result<()> {
         Self::check_content_length(map)?;
         Self::check_embed_length(map)?;
@@ -889,6 +890,7 @@ impl Message {
         Ok(())
     }
 
+    #[allow(dead_code)] // Temporary, will be added back or removed in future
     pub(crate) fn check_content_length(map: &JsonMap) -> Result<()> {
         if let Some(Value::String(content)) = map.get("content") {
             if let Some(length_over) = Message::overflow_length(content) {
@@ -899,6 +901,7 @@ impl Message {
         Ok(())
     }
 
+    #[allow(dead_code)] // Temporary, will be added back or removed in future
     pub(crate) fn check_embed_length(map: &JsonMap) -> Result<()> {
         let embeds = match map.get("embeds") {
             Some(&Value::Array(ref value)) => value,
@@ -955,6 +958,7 @@ impl Message {
         Ok(())
     }
 
+    #[allow(dead_code)] // Temporary, will be added back or removed in future
     pub(crate) fn check_sticker_ids_length(map: &JsonMap) -> Result<()> {
         if let Some(Value::Array(sticker_ids)) = map.get("sticker_ids") {
             if sticker_ids.len() > constants::STICKER_MAX_COUNT {
