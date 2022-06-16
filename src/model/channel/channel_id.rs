@@ -33,7 +33,7 @@ use crate::collector::{
 #[cfg(feature = "model")]
 use crate::http::{CacheHttp, Http, Typing};
 #[cfg(feature = "model")]
-use crate::json::{self, json};
+use crate::json::json;
 #[cfg(feature = "model")]
 use crate::model::channel::AttachmentType;
 use crate::model::prelude::*;
@@ -91,9 +91,7 @@ impl ChannelId {
         let mut invite = CreateInvite::default();
         f(&mut invite);
 
-        let map = json::hashmap_to_json_map(invite.0);
-
-        http.as_ref().create_invite(self.0, &map, None).await
+        http.as_ref().create_invite(self.0, &invite, None).await
     }
 
     /// Creates a [permission overwrite][`PermissionOverwrite`] for either a
@@ -113,21 +111,10 @@ impl ChannelId {
     pub async fn create_permission(
         self,
         http: impl AsRef<Http>,
-        target: &PermissionOverwrite,
+        target: PermissionOverwrite,
     ) -> Result<()> {
-        let (id, kind) = match target.kind {
-            PermissionOverwriteType::Member(id) => (id.0, "member"),
-            PermissionOverwriteType::Role(id) => (id.0, "role"),
-        };
-
-        let map = json!({
-            "allow": target.allow.bits(),
-            "deny": target.deny.bits(),
-            "id": id,
-            "type": kind,
-        });
-
-        http.as_ref().create_permission(self.0, id, &map).await
+        let data: PermissionOverwriteData = target.into();
+        http.as_ref().create_permission(self.0, data.id, &data).await
     }
 
     /// React to a [`Message`] with a custom [`Emoji`] or unicode character.
@@ -338,9 +325,7 @@ impl ChannelId {
         let mut channel = EditChannel::default();
         f(&mut channel);
 
-        let map = json::hashmap_to_json_map(channel.0);
-
-        http.as_ref().edit_channel(self.0, &map, None).await
+        http.as_ref().edit_channel(self.0, &channel, None).await
     }
 
     /// Edits a [`Message`] in the channel given its Id.
@@ -372,17 +357,14 @@ impl ChannelId {
         let mut msg = EditMessage::default();
         f(&mut msg);
 
-        if let Some(Value::String(content)) = msg.0.get("content") {
+        if let Some(content) = &msg.content {
             if let Some(length_over) = Message::overflow_length(content) {
                 return Err(Error::Model(ModelError::MessageTooLong(length_over)));
             }
         }
 
-        let map = json::hashmap_to_json_map(msg.0);
-
-        http.as_ref()
-            .edit_message_and_attachments(self.0, message_id.into().0, &Value::from(map), msg.1)
-            .await
+        let files = std::mem::take(&mut msg.files);
+        http.as_ref().edit_message_and_attachments(self.0, message_id.into().0, &msg, files).await
     }
 
     /// Follows the News Channel
@@ -746,14 +728,8 @@ impl ChannelId {
         T: Into<AttachmentType<'a>>,
         It: IntoIterator<Item = T>,
     {
-        let mut create_message = CreateMessage::default();
-        let msg = f(&mut create_message);
-
-        let map = json::hashmap_to_json_map(msg.0.clone());
-
-        Message::check_lengths(&map)?;
-
-        http.as_ref().send_files(self.0, files, &map).await
+        let mut builder = CreateMessage::default();
+        http.as_ref().send_files(self.0, files, f(&mut builder)).await
     }
 
     /// Sends a message to the channel.
@@ -784,21 +760,17 @@ impl ChannelId {
         self._send_message(http.as_ref(), create_message).await
     }
 
-    async fn _send_message<'a>(self, http: &Http, msg: CreateMessage<'a>) -> Result<Message> {
-        let map = json::hashmap_to_json_map(msg.0);
+    async fn _send_message<'a>(self, http: &Http, mut msg: CreateMessage<'a>) -> Result<Message> {
+        let files = std::mem::take(&mut msg.files);
 
-        Message::check_lengths(&map)?;
-
-        let message = if msg.2.is_empty() {
-            http.as_ref().send_message(self.0, &Value::from(map)).await?
+        let message = if files.is_empty() {
+            http.as_ref().send_message(self.0, &msg).await?
         } else {
-            http.as_ref().send_files(self.0, msg.2, &map).await?
+            http.as_ref().send_files(self.0, files, &msg).await?
         };
 
-        if let Some(reactions) = msg.1 {
-            for reaction in reactions {
-                self.create_reaction(&http, message.id, reaction).await?;
-            }
+        for reaction in msg.reactions {
+            self.create_reaction(&http, message.id, reaction).await?;
         }
 
         Ok(message)
@@ -975,9 +947,7 @@ impl ChannelId {
         let mut instance = CreateStageInstance::default();
         f(&mut instance);
 
-        let map = json::hashmap_to_json_map(instance.0);
-
-        http.as_ref().create_stage_instance(&Value::from(map)).await
+        http.as_ref().create_stage_instance(&instance).await
     }
 
     /// Edits a stage instance.
@@ -997,9 +967,7 @@ impl ChannelId {
         let mut instance = EditStageInstance::default();
         f(&mut instance);
 
-        let map = json::hashmap_to_json_map(instance.0);
-
-        http.as_ref().edit_stage_instance(self.0, &Value::from(map)).await
+        http.as_ref().edit_stage_instance(self.0, &instance).await
     }
 
     /// Edits a thread.
@@ -1014,9 +982,7 @@ impl ChannelId {
         let mut instance = EditThread::default();
         f(&mut instance);
 
-        let map = json::hashmap_to_json_map(instance.0);
-
-        http.as_ref().edit_thread(self.0, &map).await
+        http.as_ref().edit_thread(self.0, &instance).await
     }
 
     /// Deletes a stage instance.
@@ -1046,9 +1012,7 @@ impl ChannelId {
         let mut instance = CreateThread::default();
         f(&mut instance);
 
-        let map = json::hashmap_to_json_map(instance.0);
-
-        http.as_ref().create_public_thread(self.0, message_id.into().0, &map).await
+        http.as_ref().create_public_thread(self.0, message_id.into().0, &instance).await
     }
 
     /// Creates a private thread.
@@ -1068,9 +1032,7 @@ impl ChannelId {
         instance.kind(ChannelType::PrivateThread);
         f(&mut instance);
 
-        let map = json::hashmap_to_json_map(instance.0);
-
-        http.as_ref().create_private_thread(self.0, &map).await
+        http.as_ref().create_private_thread(self.0, &instance).await
     }
 
     /// Gets the thread members, if this channel is a thread.
