@@ -5,7 +5,6 @@ use reqwest::Client;
 
 use super::AttachmentType;
 use crate::internal::prelude::*;
-use crate::json;
 
 /// Holder for multipart body. Contains files, multipart fields, and
 /// payload_json for creating requests with attachments.
@@ -16,9 +15,8 @@ pub struct Multipart<'a> {
     /// fields. If a certain endpoint does not support passing JSON body via
     /// `payload_json`, this must be used instead.
     pub fields: Vec<(Cow<'static, str>, Cow<'static, str>)>,
-    /// JSON body that will be stringified and set as the form value as
-    /// `payload_json`.
-    pub payload_json: Option<Value>,
+    /// JSON body that will set as the form value as `payload_json`.
+    pub payload_json: Option<String>,
 }
 
 impl<'a> Multipart<'a> {
@@ -56,8 +54,8 @@ impl<'a> Multipart<'a> {
             multipart = multipart.text(name.clone(), value.clone());
         }
 
-        if let Some(ref payload_json) = self.payload_json {
-            multipart = multipart.text("payload_json", json::to_string(payload_json)?);
+        if let Some(payload_json) = self.payload_json.clone() {
+            multipart = multipart.text("payload_json", payload_json);
         }
 
         Ok(multipart)

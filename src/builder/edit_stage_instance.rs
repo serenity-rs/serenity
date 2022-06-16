@@ -1,18 +1,16 @@
-use std::collections::HashMap;
-
-use crate::json::Value;
-
 /// Edits a [`StageInstance`].
 ///
 /// [`StageInstance`]: crate::model::channel::StageInstance
-#[derive(Clone, Debug, Default)]
-pub struct EditStageInstance(pub HashMap<&'static str, Value>);
+#[derive(Clone, Debug, Default, Serialize)]
+pub struct EditStageInstance {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    topic: Option<String>,
+}
 
 impl EditStageInstance {
     /// Sets the topic of the stage channel instance.
     pub fn topic(&mut self, topic: impl Into<String>) -> &mut Self {
-        self.0.insert("topic", Value::String(topic.into()));
-
+        self.topic = Some(topic.into());
         self
     }
 }

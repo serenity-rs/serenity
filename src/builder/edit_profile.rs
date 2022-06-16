@@ -1,14 +1,14 @@
-use std::collections::HashMap;
-
-use crate::internal::prelude::*;
-use crate::json::NULL;
-
 /// A builder to edit the current user's settings, to be used in conjunction
 /// with [`CurrentUser::edit`].
 ///
 /// [`CurrentUser::edit`]: crate::model::user::CurrentUser::edit
-#[derive(Clone, Debug, Default)]
-pub struct EditProfile(pub HashMap<&'static str, Value>);
+#[derive(Clone, Debug, Default, Serialize)]
+pub struct EditProfile {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    avatar: Option<Option<String>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    username: Option<String>,
+}
 
 impl EditProfile {
     /// Sets the avatar of the current user. [`None`] can be passed to remove an
@@ -47,8 +47,7 @@ impl EditProfile {
     ///
     /// [`utils::read_image`]: crate::utils::read_image
     pub fn avatar(&mut self, avatar: Option<String>) -> &mut Self {
-        let avatar = avatar.map_or(NULL, Value::String);
-        self.0.insert("avatar", avatar);
+        self.avatar = Some(avatar);
         self
     }
 
@@ -59,7 +58,7 @@ impl EditProfile {
     /// If there are no available discriminators with the requested username,
     /// an error will occur.
     pub fn username(&mut self, username: impl Into<String>) -> &mut Self {
-        self.0.insert("username", Value::from(username.into()));
+        self.username = Some(username.into());
         self
     }
 }
