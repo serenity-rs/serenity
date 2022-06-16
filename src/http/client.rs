@@ -1822,7 +1822,7 @@ impl Http {
     }
 
     /// Edits the current user's profile settings.
-    pub async fn edit_profile(&self, map: &JsonMap) -> Result<CurrentUser> {
+    pub async fn edit_profile(&self, map: &impl serde::Serialize) -> Result<CurrentUser> {
         let body = to_vec(map)?;
 
         let request = self

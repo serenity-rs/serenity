@@ -26,8 +26,6 @@ use crate::http::GuildPagination;
 use crate::http::{CacheHttp, Http};
 use crate::internal::prelude::*;
 #[cfg(feature = "model")]
-use crate::json;
-#[cfg(feature = "model")]
 use crate::json::json;
 use crate::json::to_string;
 #[cfg(feature = "model")]
@@ -265,18 +263,11 @@ impl CurrentUser {
     where
         F: FnOnce(&mut EditProfile) -> &mut EditProfile,
     {
-        let mut map = HashMap::new();
-        map.insert("username", Value::from(self.name.clone()));
-
-        if let Some(email) = self.email.as_ref() {
-            map.insert("email", Value::from(email.clone()));
-        }
-
-        let mut edit_profile = EditProfile(map);
+        let mut edit_profile = EditProfile::default();
+        edit_profile.username(self.name.clone());
         f(&mut edit_profile);
-        let map = json::hashmap_to_json_map(edit_profile.0);
 
-        *self = http.as_ref().edit_profile(&map).await?;
+        *self = http.as_ref().edit_profile(&edit_profile).await?;
 
         Ok(())
     }
