@@ -36,6 +36,8 @@ use crate::json::{self, json};
 #[cfg(feature = "model")]
 use crate::model::channel::AttachmentType;
 use crate::model::prelude::*;
+#[cfg(feature = "model")]
+use crate::utils::encode_image;
 
 #[cfg(feature = "model")]
 impl ChannelId {
@@ -914,7 +916,7 @@ impl ChannelId {
         let data = avatar.into().data(&http.client).await?;
         let map = json!({
             "name": name.to_string(),
-            "avatar": format!("data:image/png;base64,{}", base64::encode(data)),
+            "avatar": encode_image(&data),
         });
 
         http.create_webhook(self.0, &map, None).await
