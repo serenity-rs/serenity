@@ -1,17 +1,12 @@
-use std::collections::HashMap;
-
 use serde::{Deserialize, Serialize};
 
-use crate::json::prelude::*;
 use crate::model::id::{RoleId, UserId};
 
 #[derive(Debug, Clone, Copy, Serialize, Deserialize)]
+#[serde(rename_all = "lowercase")]
 pub enum ParseValue {
-    #[serde(rename = "everyone")]
     Everyone,
-    #[serde(rename = "users")]
     Users,
-    #[serde(rename = "roles")]
     Roles,
 }
 
@@ -47,8 +42,14 @@ pub enum ParseValue {
 ///
 /// [`ChannelId::send_message`]: crate::model::id::ChannelId::send_message
 /// [`ChannelId::edit_message`]: crate::model::id::ChannelId::edit_message
-#[derive(Clone, Debug)]
-pub struct CreateAllowedMentions(pub HashMap<&'static str, Value>);
+#[derive(Clone, Debug, Default, Serialize)]
+pub struct CreateAllowedMentions {
+    parse: Vec<ParseValue>,
+    users: Vec<UserId>,
+    roles: Vec<RoleId>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    replied_user: Option<bool>,
+}
 
 impl CreateAllowedMentions {
     /// Add a value that's allowed to be mentioned.
@@ -57,11 +58,7 @@ impl CreateAllowedMentions {
     /// If you use either, do not specify it's same type here.
     #[inline]
     pub fn parse(&mut self, value: ParseValue) -> &mut Self {
-        let val = self.0.entry("parse").or_insert_with(|| Value::from(Vec::<Value>::new()));
-
-        let arr = val.as_array_mut().expect("Must be an array");
-        arr.push(json![value]);
-
+        self.parse.push(value);
         self
     }
 
@@ -71,72 +68,42 @@ impl CreateAllowedMentions {
     /// [`Self::users`] or [`Self::roles`].
     #[inline]
     pub fn empty_parse(&mut self) -> &mut Self {
-        let val = self.0.entry("parse").or_insert_with(|| Value::from(Vec::<Value>::new()));
-
-        let arr = val.as_array_mut().expect("Must be an array");
-        arr.clear();
-
+        self.parse.clear();
         self
     }
 
     /// Sets the users that will be allowed to be mentioned.
     #[inline]
-    pub fn users<U: Into<UserId>>(&mut self, users: impl IntoIterator<Item = U>) -> &mut Self {
-        self.0.insert(
-            "users",
-            Value::from({
-                users.into_iter().map(|i| json!(i.into().to_string())).collect::<Vec<_>>()
-            }),
-        );
+    pub fn users(&mut self, users: impl IntoIterator<Item = impl Into<UserId>>) -> &mut Self {
+        self.users = users.into_iter().map(Into::into).collect();
         self
     }
 
     /// Makes users unable to be mentioned.
     #[inline]
     pub fn empty_users(&mut self) -> &mut Self {
-        let val = self.0.entry("users").or_insert_with(|| Value::from(Vec::<Value>::new()));
-
-        let arr = val.as_array_mut().expect("Must be an array");
-        arr.clear();
-
+        self.users.clear();
         self
     }
 
     /// Sets the roles that will be allowed to be mentioned.
     #[inline]
-    pub fn roles<R: Into<RoleId>>(&mut self, users: impl IntoIterator<Item = R>) -> &mut Self {
-        self.0.insert(
-            "roles",
-            Value::from({
-                users.into_iter().map(|i| json!(i.into().to_string())).collect::<Vec<_>>()
-            }),
-        );
+    pub fn roles(&mut self, roles: impl IntoIterator<Item = impl Into<RoleId>>) -> &mut Self {
+        self.roles = roles.into_iter().map(Into::into).collect();
         self
     }
 
     /// Makes roles unable to be mentioned.
     #[inline]
     pub fn empty_roles(&mut self) -> &mut Self {
-        let val = self.0.entry("roles").or_insert_with(|| Value::from(Vec::<Value>::new()));
-
-        let arr = val.as_array_mut().expect("Must be an array");
-        arr.clear();
-
+        self.roles.clear();
         self
     }
 
     /// Makes the reply mention/ping the user.
     #[inline]
     pub fn replied_user(&mut self, mention_user: bool) -> &mut Self {
-        self.0.insert("replied_user", Value::from(mention_user));
-
+        self.replied_user = Some(mention_user);
         self
-    }
-}
-
-impl Default for CreateAllowedMentions {
-    fn default() -> CreateAllowedMentions {
-        let map = HashMap::new();
-        CreateAllowedMentions(map)
     }
 }
