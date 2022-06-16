@@ -3,7 +3,8 @@ use std::marker::PhantomData;
 
 use super::{CreateAllowedMentions, CreateComponents, CreateEmbed};
 #[cfg(feature = "model")]
-use crate::model::channel::{AttachmentType, MessageFlags};
+use crate::model::channel::AttachmentType;
+use crate::model::channel::MessageFlags;
 
 /// A builder to create the inner content of a [`Webhook`]'s execution.
 ///
