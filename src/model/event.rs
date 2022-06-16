@@ -17,7 +17,7 @@ use super::utils::{
     roles,
     stickers,
 };
-use crate::constants::OpCode;
+use crate::constants::Opcode;
 use crate::internal::prelude::*;
 use crate::model::application::command::CommandPermission;
 use crate::model::application::interaction::Interaction;
@@ -662,15 +662,15 @@ impl<'de> Deserialize<'de> for GatewayEvent {
         let seq = remove_from_map_opt(map, "s")?.flatten();
 
         Ok(match remove_from_map(map, "op")? {
-            OpCode::Event => Self::Dispatch(
+            Opcode::Dispatch => Self::Dispatch(
                 seq.ok_or_else(|| DeError::missing_field("s"))?,
                 deserialize_val(value)?,
             ),
-            OpCode::Heartbeat => {
+            Opcode::Heartbeat => {
                 GatewayEvent::Heartbeat(seq.ok_or_else(|| DeError::missing_field("s"))?)
             },
-            OpCode::InvalidSession => GatewayEvent::InvalidateSession(remove_from_map(map, "d")?),
-            OpCode::Hello => {
+            Opcode::InvalidSession => GatewayEvent::InvalidateSession(remove_from_map(map, "d")?),
+            Opcode::Hello => {
                 #[derive(Deserialize)]
                 struct HelloPayload {
                     heartbeat_interval: u64,
@@ -679,8 +679,8 @@ impl<'de> Deserialize<'de> for GatewayEvent {
                 let inner: HelloPayload = remove_from_map(map, "d")?;
                 GatewayEvent::Hello(inner.heartbeat_interval)
             },
-            OpCode::Reconnect => GatewayEvent::Reconnect,
-            OpCode::HeartbeatAck => GatewayEvent::HeartbeatAck,
+            Opcode::Reconnect => GatewayEvent::Reconnect,
+            Opcode::HeartbeatAck => GatewayEvent::HeartbeatAck,
             _ => return Err(DeError::custom("invalid opcode")),
         })
     }

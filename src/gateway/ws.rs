@@ -13,7 +13,7 @@ use tracing::{debug, instrument, trace, warn};
 use url::Url;
 
 use crate::client::bridge::gateway::ChunkGuildFilter;
-use crate::constants::{self, OpCode};
+use crate::constants::{self, Opcode};
 use crate::gateway::{CurrentPresence, GatewayError};
 use crate::json::{from_str, json, to_string, Value};
 use crate::model::event::GatewayEvent;
@@ -113,7 +113,7 @@ impl WsClient {
         debug!("[Shard {:?}] Requesting member chunks", shard_info);
 
         let mut payload = json!({
-            "op": OpCode::GetGuildMembers.num(),
+            "op": Opcode::RequestGuildMembers,
             "d": {
                 "guild_id": guild_id.as_ref().0.to_string(),
                 "limit": limit.unwrap_or(0),
@@ -138,8 +138,8 @@ impl WsClient {
         trace!("[Shard {:?}] Sending heartbeat d: {:?}", shard_info, seq);
 
         self.send_json(&json!({
+            "op": Opcode::Heartbeat,
             "d": seq,
-            "op": OpCode::Heartbeat.num(),
         }))
         .await
         .map_err(From::from)
@@ -155,7 +155,7 @@ impl WsClient {
         debug!("[Shard {:?}] Identifying", shard_info);
 
         self.send_json(&json!({
-            "op": OpCode::Identify.num(),
+            "op": Opcode::Identify,
             "d": {
                 "compress": true,
                 "large_threshold": constants::LARGE_THRESHOLD,
@@ -185,7 +185,7 @@ impl WsClient {
         debug!("[Shard {:?}] Sending presence update", shard_info);
 
         self.send_json(&json!({
-            "op": OpCode::StatusUpdate.num(),
+            "op": Opcode::PresenceUpdate,
             "d": {
                 "afk": false,
                 "since": now,
@@ -211,7 +211,7 @@ impl WsClient {
         debug!("[Shard {:?}] Sending resume; seq: {}", shard_info, seq);
 
         self.send_json(&json!({
-            "op": OpCode::Resume.num(),
+            "op": Opcode::Resume,
             "d": {
                 "session_id": session_id,
                 "seq": seq,
