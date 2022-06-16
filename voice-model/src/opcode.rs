@@ -1,12 +1,14 @@
 use serde_repr::{Deserialize_repr, Serialize_repr};
 
-/// Enum to map voice opcodes.
+/// An enum representing the [voice opcodes].
+///
+/// [voice opcodes]: https://discord.com/developers/docs/topics/opcodes-and-status-codes#voice
 #[derive(
     Clone, Copy, Debug, Deserialize_repr, Eq, Hash, PartialEq, PartialOrd, Ord, Serialize_repr,
 )]
 #[non_exhaustive]
 #[repr(u8)]
-pub enum OpCode {
+pub enum Opcode {
     /// Used to begin a voice websocket connection.
     Identify = 0,
     /// Used to select the voice protocol.
