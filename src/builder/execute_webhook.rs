@@ -1,7 +1,7 @@
 #[cfg(not(feature = "model"))]
 use std::marker::PhantomData;
 
-use super::{CreateAllowedMentions, CreateComponents};
+use super::{CreateAllowedMentions, CreateComponents, CreateEmbed};
 #[cfg(feature = "model")]
 use crate::model::channel::{AttachmentType, MessageFlags};
 
@@ -238,7 +238,7 @@ impl<'a> ExecuteWebhook<'a> {
     /// # }
     /// ```
     pub fn tts(&mut self, tts: bool) -> &mut Self {
-        self.tts = Some(tts);
+        self.tts = tts;
         self
     }
 
@@ -265,7 +265,7 @@ impl<'a> ExecuteWebhook<'a> {
     /// # }
     /// ```
     pub fn username(&mut self, username: impl Into<String>) -> &mut Self {
-        self.username = SOme(username.into());
+        self.username = Some(username.into());
         self
     }
 

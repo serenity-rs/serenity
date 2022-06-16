@@ -238,7 +238,7 @@ impl GuildChannel {
     /// // assuming the cache has been unlocked
     /// let channel = cache.guild_channel(channel_id).ok_or(ModelError::ItemMissing)?;
     ///
-    /// channel.create_permission(&http, &overwrite).await?;
+    /// channel.create_permission(&http, overwrite).await?;
     /// #   Ok(())
     /// # }
     /// ```
@@ -271,7 +271,7 @@ impl GuildChannel {
     ///
     /// let channel = cache.guild_channel(channel_id).ok_or(ModelError::ItemMissing)?;
     ///
-    /// channel.create_permission(&http, &overwrite).await?;
+    /// channel.create_permission(&http, overwrite).await?;
     /// #     Ok(())
     /// # }
     /// ```
