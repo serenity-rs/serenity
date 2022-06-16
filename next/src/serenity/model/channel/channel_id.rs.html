@@ -1289,44 +1289,6 @@
 <span id="1284">1284</span>
 <span id="1285">1285</span>
 <span id="1286">1286</span>
-<span id="1287">1287</span>
-<span id="1288">1288</span>
-<span id="1289">1289</span>
-<span id="1290">1290</span>
-<span id="1291">1291</span>
-<span id="1292">1292</span>
-<span id="1293">1293</span>
-<span id="1294">1294</span>
-<span id="1295">1295</span>
-<span id="1296">1296</span>
-<span id="1297">1297</span>
-<span id="1298">1298</span>
-<span id="1299">1299</span>
-<span id="1300">1300</span>
-<span id="1301">1301</span>
-<span id="1302">1302</span>
-<span id="1303">1303</span>
-<span id="1304">1304</span>
-<span id="1305">1305</span>
-<span id="1306">1306</span>
-<span id="1307">1307</span>
-<span id="1308">1308</span>
-<span id="1309">1309</span>
-<span id="1310">1310</span>
-<span id="1311">1311</span>
-<span id="1312">1312</span>
-<span id="1313">1313</span>
-<span id="1314">1314</span>
-<span id="1315">1315</span>
-<span id="1316">1316</span>
-<span id="1317">1317</span>
-<span id="1318">1318</span>
-<span id="1319">1319</span>
-<span id="1320">1320</span>
-<span id="1321">1321</span>
-<span id="1322">1322</span>
-<span id="1323">1323</span>
-<span id="1324">1324</span>
 </pre><pre class="rust"><code><span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
 <span class="kw">use</span> <span class="ident">std::fmt::Write</span> <span class="kw">as</span> <span class="kw">_</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
@@ -1362,7 +1324,7 @@
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::http</span>::{<span class="ident">CacheHttp</span>, <span class="ident">Http</span>, <span class="ident">Typing</span>};
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::json</span>::{<span class="self">self</span>, <span class="ident">json</span>};
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::json::json</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::channel::AttachmentType</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::prelude</span>::<span class="kw-2">*</span>;
@@ -1418,9 +1380,7 @@
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">invite</span> <span class="op">=</span> <span class="ident">CreateInvite::default</span>();
         <span class="ident">f</span>(<span class="kw-2">&amp;mut</span> <span class="ident">invite</span>);
 
-        <span class="kw">let</span> <span class="ident">map</span> <span class="op">=</span> <span class="ident">json::hashmap_to_json_map</span>(<span class="ident">invite</span>.<span class="number">0</span>);
-
-        <span class="ident">http</span>.<span class="ident">as_ref</span>().<span class="ident">create_invite</span>(<span class="self">self</span>.<span class="number">0</span>, <span class="kw-2">&amp;</span><span class="ident">map</span>, <span class="prelude-val">None</span>).<span class="kw">await</span>
+        <span class="ident">http</span>.<span class="ident">as_ref</span>().<span class="ident">create_invite</span>(<span class="self">self</span>.<span class="number">0</span>, <span class="kw-2">&amp;</span><span class="ident">invite</span>, <span class="prelude-val">None</span>).<span class="kw">await</span>
     }
 
     <span class="doccomment">/// Creates a [permission overwrite][`PermissionOverwrite`] for either a</span>
@@ -1440,21 +1400,10 @@
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">create_permission</span>(
         <span class="self">self</span>,
         <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>,
-        <span class="ident">target</span>: <span class="kw-2">&amp;</span><span class="ident">PermissionOverwrite</span>,
+        <span class="ident">target</span>: <span class="ident">PermissionOverwrite</span>,
     ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="kw">let</span> (<span class="ident">id</span>, <span class="ident">kind</span>) <span class="op">=</span> <span class="kw">match</span> <span class="ident">target</span>.<span class="ident">kind</span> {
-            <span class="ident">PermissionOverwriteType::Member</span>(<span class="ident">id</span>) =&gt; (<span class="ident">id</span>.<span class="number">0</span>, <span class="string">&quot;member&quot;</span>),
-            <span class="ident">PermissionOverwriteType::Role</span>(<span class="ident">id</span>) =&gt; (<span class="ident">id</span>.<span class="number">0</span>, <span class="string">&quot;role&quot;</span>),
-        };
-
-        <span class="kw">let</span> <span class="ident">map</span> <span class="op">=</span> <span class="macro">json!</span>({
-            <span class="string">&quot;allow&quot;</span>: <span class="ident">target</span>.<span class="ident">allow</span>.<span class="ident">bits</span>(),
-            <span class="string">&quot;deny&quot;</span>: <span class="ident">target</span>.<span class="ident">deny</span>.<span class="ident">bits</span>(),
-            <span class="string">&quot;id&quot;</span>: <span class="ident">id</span>,
-            <span class="string">&quot;type&quot;</span>: <span class="ident">kind</span>,
-        });
-
-        <span class="ident">http</span>.<span class="ident">as_ref</span>().<span class="ident">create_permission</span>(<span class="self">self</span>.<span class="number">0</span>, <span class="ident">id</span>, <span class="kw-2">&amp;</span><span class="ident">map</span>).<span class="kw">await</span>
+        <span class="kw">let</span> <span class="ident">data</span>: <span class="ident">PermissionOverwriteData</span> <span class="op">=</span> <span class="ident">target</span>.<span class="ident">into</span>();
+        <span class="ident">http</span>.<span class="ident">as_ref</span>().<span class="ident">create_permission</span>(<span class="self">self</span>.<span class="number">0</span>, <span class="ident">data</span>.<span class="ident">id</span>, <span class="kw-2">&amp;</span><span class="ident">data</span>).<span class="kw">await</span>
     }
 
     <span class="doccomment">/// React to a [`Message`] with a custom [`Emoji`] or unicode character.</span>
@@ -1665,9 +1614,7 @@
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">channel</span> <span class="op">=</span> <span class="ident">EditChannel::default</span>();
         <span class="ident">f</span>(<span class="kw-2">&amp;mut</span> <span class="ident">channel</span>);
 
-        <span class="kw">let</span> <span class="ident">map</span> <span class="op">=</span> <span class="ident">json::hashmap_to_json_map</span>(<span class="ident">channel</span>.<span class="number">0</span>);
-
-        <span class="ident">http</span>.<span class="ident">as_ref</span>().<span class="ident">edit_channel</span>(<span class="self">self</span>.<span class="number">0</span>, <span class="kw-2">&amp;</span><span class="ident">map</span>, <span class="prelude-val">None</span>).<span class="kw">await</span>
+        <span class="ident">http</span>.<span class="ident">as_ref</span>().<span class="ident">edit_channel</span>(<span class="self">self</span>.<span class="number">0</span>, <span class="kw-2">&amp;</span><span class="ident">channel</span>, <span class="prelude-val">None</span>).<span class="kw">await</span>
     }
 
     <span class="doccomment">/// Edits a [`Message`] in the channel given its Id.</span>
@@ -1699,17 +1646,14 @@
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">msg</span> <span class="op">=</span> <span class="ident">EditMessage::default</span>();
         <span class="ident">f</span>(<span class="kw-2">&amp;mut</span> <span class="ident">msg</span>);
 
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">Value::String</span>(<span class="ident">content</span>)) <span class="op">=</span> <span class="ident">msg</span>.<span class="number">0</span>.<span class="ident">get</span>(<span class="string">&quot;content&quot;</span>) {
+        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">content</span>) <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">msg</span>.<span class="ident">content</span> {
             <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">length_over</span>) <span class="op">=</span> <span class="ident">Message::overflow_length</span>(<span class="ident">content</span>) {
                 <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::Model</span>(<span class="ident">ModelError::MessageTooLong</span>(<span class="ident">length_over</span>)));
             }
         }
 
-        <span class="kw">let</span> <span class="ident">map</span> <span class="op">=</span> <span class="ident">json::hashmap_to_json_map</span>(<span class="ident">msg</span>.<span class="number">0</span>);
-
-        <span class="ident">http</span>.<span class="ident">as_ref</span>()
-            .<span class="ident">edit_message_and_attachments</span>(<span class="self">self</span>.<span class="number">0</span>, <span class="ident">message_id</span>.<span class="ident">into</span>().<span class="number">0</span>, <span class="kw-2">&amp;</span><span class="ident">Value::from</span>(<span class="ident">map</span>), <span class="ident">msg</span>.<span class="number">1</span>)
-            .<span class="kw">await</span>
+        <span class="kw">let</span> <span class="ident">files</span> <span class="op">=</span> <span class="ident">std::mem::take</span>(<span class="kw-2">&amp;mut</span> <span class="ident">msg</span>.<span class="ident">files</span>);
+        <span class="ident">http</span>.<span class="ident">as_ref</span>().<span class="ident">edit_message_and_attachments</span>(<span class="self">self</span>.<span class="number">0</span>, <span class="ident">message_id</span>.<span class="ident">into</span>().<span class="number">0</span>, <span class="kw-2">&amp;</span><span class="ident">msg</span>, <span class="ident">files</span>).<span class="kw">await</span>
     }
 
     <span class="doccomment">/// Follows the News Channel</span>
@@ -2073,14 +2017,8 @@
         <span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">AttachmentType</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>,
         <span class="ident">It</span>: <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">T</span><span class="op">&gt;</span>,
     {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">create_message</span> <span class="op">=</span> <span class="ident">CreateMessage::default</span>();
-        <span class="kw">let</span> <span class="ident">msg</span> <span class="op">=</span> <span class="ident">f</span>(<span class="kw-2">&amp;mut</span> <span class="ident">create_message</span>);
-
-        <span class="kw">let</span> <span class="ident">map</span> <span class="op">=</span> <span class="ident">json::hashmap_to_json_map</span>(<span class="ident">msg</span>.<span class="number">0</span>.<span class="ident">clone</span>());
-
-        <span class="ident">Message::check_lengths</span>(<span class="kw-2">&amp;</span><span class="ident">map</span>)<span class="question-mark">?</span>;
-
-        <span class="ident">http</span>.<span class="ident">as_ref</span>().<span class="ident">send_files</span>(<span class="self">self</span>.<span class="number">0</span>, <span class="ident">files</span>, <span class="kw-2">&amp;</span><span class="ident">map</span>).<span class="kw">await</span>
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">builder</span> <span class="op">=</span> <span class="ident">CreateMessage::default</span>();
+        <span class="ident">http</span>.<span class="ident">as_ref</span>().<span class="ident">send_files</span>(<span class="self">self</span>.<span class="number">0</span>, <span class="ident">files</span>, <span class="ident">f</span>(<span class="kw-2">&amp;mut</span> <span class="ident">builder</span>)).<span class="kw">await</span>
     }
 
     <span class="doccomment">/// Sends a message to the channel.</span>
@@ -2111,21 +2049,17 @@
         <span class="self">self</span>.<span class="ident">_send_message</span>(<span class="ident">http</span>.<span class="ident">as_ref</span>(), <span class="ident">create_message</span>).<span class="kw">await</span>
     }
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">_send_message</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">http</span>: <span class="kw-2">&amp;</span><span class="ident">Http</span>, <span class="ident">msg</span>: <span class="ident">CreateMessage</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Message</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">map</span> <span class="op">=</span> <span class="ident">json::hashmap_to_json_map</span>(<span class="ident">msg</span>.<span class="number">0</span>);
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">_send_message</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">http</span>: <span class="kw-2">&amp;</span><span class="ident">Http</span>, <span class="kw-2">mut</span> <span class="ident">msg</span>: <span class="ident">CreateMessage</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Message</span><span class="op">&gt;</span> {
+        <span class="kw">let</span> <span class="ident">files</span> <span class="op">=</span> <span class="ident">std::mem::take</span>(<span class="kw-2">&amp;mut</span> <span class="ident">msg</span>.<span class="ident">files</span>);
 
-        <span class="ident">Message::check_lengths</span>(<span class="kw-2">&amp;</span><span class="ident">map</span>)<span class="question-mark">?</span>;
-
-        <span class="kw">let</span> <span class="ident">message</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">msg</span>.<span class="number">2</span>.<span class="ident">is_empty</span>() {
-            <span class="ident">http</span>.<span class="ident">as_ref</span>().<span class="ident">send_message</span>(<span class="self">self</span>.<span class="number">0</span>, <span class="kw-2">&amp;</span><span class="ident">Value::from</span>(<span class="ident">map</span>)).<span class="kw">await</span><span class="question-mark">?</span>
+        <span class="kw">let</span> <span class="ident">message</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">files</span>.<span class="ident">is_empty</span>() {
+            <span class="ident">http</span>.<span class="ident">as_ref</span>().<span class="ident">send_message</span>(<span class="self">self</span>.<span class="number">0</span>, <span class="kw-2">&amp;</span><span class="ident">msg</span>).<span class="kw">await</span><span class="question-mark">?</span>
         } <span class="kw">else</span> {
-            <span class="ident">http</span>.<span class="ident">as_ref</span>().<span class="ident">send_files</span>(<span class="self">self</span>.<span class="number">0</span>, <span class="ident">msg</span>.<span class="number">2</span>, <span class="kw-2">&amp;</span><span class="ident">map</span>).<span class="kw">await</span><span class="question-mark">?</span>
+            <span class="ident">http</span>.<span class="ident">as_ref</span>().<span class="ident">send_files</span>(<span class="self">self</span>.<span class="number">0</span>, <span class="ident">files</span>, <span class="kw-2">&amp;</span><span class="ident">msg</span>).<span class="kw">await</span><span class="question-mark">?</span>
         };
 
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">reactions</span>) <span class="op">=</span> <span class="ident">msg</span>.<span class="number">1</span> {
-            <span class="kw">for</span> <span class="ident">reaction</span> <span class="kw">in</span> <span class="ident">reactions</span> {
-                <span class="self">self</span>.<span class="ident">create_reaction</span>(<span class="kw-2">&amp;</span><span class="ident">http</span>, <span class="ident">message</span>.<span class="ident">id</span>, <span class="ident">reaction</span>).<span class="kw">await</span><span class="question-mark">?</span>;
-            }
+        <span class="kw">for</span> <span class="ident">reaction</span> <span class="kw">in</span> <span class="ident">msg</span>.<span class="ident">reactions</span> {
+            <span class="self">self</span>.<span class="ident">create_reaction</span>(<span class="kw-2">&amp;</span><span class="ident">http</span>, <span class="ident">message</span>.<span class="ident">id</span>, <span class="ident">reaction</span>).<span class="kw">await</span><span class="question-mark">?</span>;
         }
 
         <span class="prelude-val">Ok</span>(<span class="ident">message</span>)
@@ -2302,9 +2236,7 @@
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">instance</span> <span class="op">=</span> <span class="ident">CreateStageInstance::default</span>();
         <span class="ident">f</span>(<span class="kw-2">&amp;mut</span> <span class="ident">instance</span>);
 
-        <span class="kw">let</span> <span class="ident">map</span> <span class="op">=</span> <span class="ident">json::hashmap_to_json_map</span>(<span class="ident">instance</span>.<span class="number">0</span>);
-
-        <span class="ident">http</span>.<span class="ident">as_ref</span>().<span class="ident">create_stage_instance</span>(<span class="kw-2">&amp;</span><span class="ident">Value::from</span>(<span class="ident">map</span>)).<span class="kw">await</span>
+        <span class="ident">http</span>.<span class="ident">as_ref</span>().<span class="ident">create_stage_instance</span>(<span class="kw-2">&amp;</span><span class="ident">instance</span>).<span class="kw">await</span>
     }
 
     <span class="doccomment">/// Edits a stage instance.</span>
@@ -2324,9 +2256,7 @@
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">instance</span> <span class="op">=</span> <span class="ident">EditStageInstance::default</span>();
         <span class="ident">f</span>(<span class="kw-2">&amp;mut</span> <span class="ident">instance</span>);
 
-        <span class="kw">let</span> <span class="ident">map</span> <span class="op">=</span> <span class="ident">json::hashmap_to_json_map</span>(<span class="ident">instance</span>.<span class="number">0</span>);
-
-        <span class="ident">http</span>.<span class="ident">as_ref</span>().<span class="ident">edit_stage_instance</span>(<span class="self">self</span>.<span class="number">0</span>, <span class="kw-2">&amp;</span><span class="ident">Value::from</span>(<span class="ident">map</span>)).<span class="kw">await</span>
+        <span class="ident">http</span>.<span class="ident">as_ref</span>().<span class="ident">edit_stage_instance</span>(<span class="self">self</span>.<span class="number">0</span>, <span class="kw-2">&amp;</span><span class="ident">instance</span>).<span class="kw">await</span>
     }
 
     <span class="doccomment">/// Edits a thread.</span>
@@ -2341,9 +2271,7 @@
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">instance</span> <span class="op">=</span> <span class="ident">EditThread::default</span>();
         <span class="ident">f</span>(<span class="kw-2">&amp;mut</span> <span class="ident">instance</span>);
 
-        <span class="kw">let</span> <span class="ident">map</span> <span class="op">=</span> <span class="ident">json::hashmap_to_json_map</span>(<span class="ident">instance</span>.<span class="number">0</span>);
-
-        <span class="ident">http</span>.<span class="ident">as_ref</span>().<span class="ident">edit_thread</span>(<span class="self">self</span>.<span class="number">0</span>, <span class="kw-2">&amp;</span><span class="ident">map</span>).<span class="kw">await</span>
+        <span class="ident">http</span>.<span class="ident">as_ref</span>().<span class="ident">edit_thread</span>(<span class="self">self</span>.<span class="number">0</span>, <span class="kw-2">&amp;</span><span class="ident">instance</span>).<span class="kw">await</span>
     }
 
     <span class="doccomment">/// Deletes a stage instance.</span>
@@ -2373,9 +2301,7 @@
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">instance</span> <span class="op">=</span> <span class="ident">CreateThread::default</span>();
         <span class="ident">f</span>(<span class="kw-2">&amp;mut</span> <span class="ident">instance</span>);
 
-        <span class="kw">let</span> <span class="ident">map</span> <span class="op">=</span> <span class="ident">json::hashmap_to_json_map</span>(<span class="ident">instance</span>.<span class="number">0</span>);
-
-        <span class="ident">http</span>.<span class="ident">as_ref</span>().<span class="ident">create_public_thread</span>(<span class="self">self</span>.<span class="number">0</span>, <span class="ident">message_id</span>.<span class="ident">into</span>().<span class="number">0</span>, <span class="kw-2">&amp;</span><span class="ident">map</span>).<span class="kw">await</span>
+        <span class="ident">http</span>.<span class="ident">as_ref</span>().<span class="ident">create_public_thread</span>(<span class="self">self</span>.<span class="number">0</span>, <span class="ident">message_id</span>.<span class="ident">into</span>().<span class="number">0</span>, <span class="kw-2">&amp;</span><span class="ident">instance</span>).<span class="kw">await</span>
     }
 
     <span class="doccomment">/// Creates a private thread.</span>
@@ -2395,9 +2321,7 @@
         <span class="ident">instance</span>.<span class="ident">kind</span>(<span class="ident">ChannelType::PrivateThread</span>);
         <span class="ident">f</span>(<span class="kw-2">&amp;mut</span> <span class="ident">instance</span>);
 
-        <span class="kw">let</span> <span class="ident">map</span> <span class="op">=</span> <span class="ident">json::hashmap_to_json_map</span>(<span class="ident">instance</span>.<span class="number">0</span>);
-
-        <span class="ident">http</span>.<span class="ident">as_ref</span>().<span class="ident">create_private_thread</span>(<span class="self">self</span>.<span class="number">0</span>, <span class="kw-2">&amp;</span><span class="ident">map</span>).<span class="kw">await</span>
+        <span class="ident">http</span>.<span class="ident">as_ref</span>().<span class="ident">create_private_thread</span>(<span class="self">self</span>.<span class="number">0</span>, <span class="kw-2">&amp;</span><span class="ident">instance</span>).<span class="kw">await</span>
     }
 
     <span class="doccomment">/// Gets the thread members, if this channel is a thread.</span>

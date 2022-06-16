@@ -308,33 +308,10 @@
 <span id="303">303</span>
 <span id="304">304</span>
 <span id="305">305</span>
-<span id="306">306</span>
-<span id="307">307</span>
-<span id="308">308</span>
-<span id="309">309</span>
-<span id="310">310</span>
-<span id="311">311</span>
-<span id="312">312</span>
-<span id="313">313</span>
-<span id="314">314</span>
-<span id="315">315</span>
-<span id="316">316</span>
-<span id="317">317</span>
-<span id="318">318</span>
-<span id="319">319</span>
-<span id="320">320</span>
-<span id="321">321</span>
-<span id="322">322</span>
-<span id="323">323</span>
-<span id="324">324</span>
-<span id="325">325</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::collections::HashMap</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>))]</span>
+</pre><pre class="rust"><code><span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>))]</span>
 <span class="kw">use</span> <span class="ident">std::marker::PhantomData</span>;
 
-<span class="kw">use</span> <span class="ident"><span class="kw">super</span>::CreateAllowedMentions</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::builder::CreateComponents</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::json</span>::{<span class="self">self</span>, <span class="ident">from_number</span>, <span class="ident">Value</span>};
+<span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">CreateAllowedMentions</span>, <span class="ident">CreateComponents</span>, <span class="ident">CreateEmbed</span>};
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::channel::AttachmentType</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::channel::MessageFlags</span>;
@@ -389,12 +366,29 @@
 <span class="doccomment">/// [`Webhook`]: crate::model::webhook::Webhook</span>
 <span class="doccomment">/// [`Webhook::execute`]: crate::model::webhook::Webhook::execute</span>
 <span class="doccomment">/// [`execute_webhook`]: crate::http::client::Http::execute_webhook</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ExecuteWebhook</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(
-    <span class="kw">pub</span> <span class="ident">HashMap</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>, <span class="ident">Value</span><span class="op">&gt;</span>,
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span> <span class="kw">pub</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">AttachmentType</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>))]</span> <span class="ident">PhantomData</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> ()<span class="op">&gt;</span>,
-);
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Default</span>, <span class="ident">Serialize</span>)]</span>
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ExecuteWebhook</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
+    <span class="ident">tts</span>: <span class="ident">bool</span>,
+    <span class="ident">embeds</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">CreateEmbed</span><span class="op">&gt;</span>,
+    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;Option::is_none&quot;</span>)]</span>
+    <span class="ident">avatar_url</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
+    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;Option::is_none&quot;</span>)]</span>
+    <span class="ident">content</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
+    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;Option::is_none&quot;</span>)]</span>
+    <span class="ident">allowed_mentions</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">CreateAllowedMentions</span><span class="op">&gt;</span>,
+    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;Option::is_none&quot;</span>)]</span>
+    <span class="ident">components</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">CreateComponents</span><span class="op">&gt;</span>,
+    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;Option::is_none&quot;</span>)]</span>
+    <span class="ident">username</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
+    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;Option::is_none&quot;</span>)]</span>
+    <span class="ident">flags</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">MessageFlags</span><span class="op">&gt;</span>,
+
+    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip</span>)]</span>
+    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">files</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">AttachmentType</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>))]</span>
+    <span class="ident">files</span>: <span class="ident">PhantomData</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> ()<span class="op">&gt;</span>,
+}
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">ExecuteWebhook</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
     <span class="doccomment">/// Override the default avatar of the webhook with an image URL.</span>
@@ -418,7 +412,7 @@
     <span class="doccomment">/// # }</span>
     <span class="doccomment">/// ```</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">avatar_url</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">avatar_url</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;avatar_url&quot;</span>, <span class="ident">Value::String</span>(<span class="ident">avatar_url</span>.<span class="ident">into</span>()));
+        <span class="self">self</span>.<span class="ident">avatar_url</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">avatar_url</span>.<span class="ident">into</span>());
         <span class="self">self</span>
     }
 
@@ -448,14 +442,14 @@
     <span class="doccomment">/// # }</span>
     <span class="doccomment">/// ```</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">content</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">content</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;content&quot;</span>, <span class="ident">Value::String</span>(<span class="ident">content</span>.<span class="ident">into</span>()));
+        <span class="self">self</span>.<span class="ident">content</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">content</span>.<span class="ident">into</span>());
         <span class="self">self</span>
     }
 
     <span class="doccomment">/// Appends a file to the webhook message.</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">add_file</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">AttachmentType</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">file</span>: <span class="ident">T</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="number">1</span>.<span class="ident">push</span>(<span class="ident">file</span>.<span class="ident">into</span>());
+        <span class="self">self</span>.<span class="ident">files</span>.<span class="ident">push</span>(<span class="ident">file</span>.<span class="ident">into</span>());
         <span class="self">self</span>
     }
 
@@ -465,7 +459,7 @@
         <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
         <span class="ident">files</span>: <span class="ident">It</span>,
     ) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="number">1</span>.<span class="ident">extend</span>(<span class="ident">files</span>.<span class="ident">into_iter</span>().<span class="ident">map</span>(<span class="ident">Into::into</span>));
+        <span class="self">self</span>.<span class="ident">files</span>.<span class="ident">extend</span>(<span class="ident">files</span>.<span class="ident">into_iter</span>().<span class="ident">map</span>(<span class="ident">Into::into</span>));
         <span class="self">self</span>
     }
 
@@ -478,7 +472,7 @@
         <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
         <span class="ident">files</span>: <span class="ident">It</span>,
     ) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="number">1</span> <span class="op">=</span> <span class="ident">files</span>.<span class="ident">into_iter</span>().<span class="ident">map</span>(<span class="ident">Into::into</span>).<span class="ident">collect</span>();
+        <span class="self">self</span>.<span class="ident">files</span> <span class="op">=</span> <span class="ident">files</span>.<span class="ident">into_iter</span>().<span class="ident">map</span>(<span class="ident">Into::into</span>).<span class="ident">collect</span>();
         <span class="self">self</span>
     }
 
@@ -489,10 +483,8 @@
     {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">allowed_mentions</span> <span class="op">=</span> <span class="ident">CreateAllowedMentions::default</span>();
         <span class="ident">f</span>(<span class="kw-2">&amp;mut</span> <span class="ident">allowed_mentions</span>);
-        <span class="kw">let</span> <span class="ident">map</span> <span class="op">=</span> <span class="ident">json::hashmap_to_json_map</span>(<span class="ident">allowed_mentions</span>.<span class="number">0</span>);
-        <span class="kw">let</span> <span class="ident">allowed_mentions</span> <span class="op">=</span> <span class="ident">Value::from</span>(<span class="ident">map</span>);
 
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;allowed_mentions&quot;</span>, <span class="ident">allowed_mentions</span>);
+        <span class="self">self</span>.<span class="ident">allowed_mentions</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">allowed_mentions</span>);
         <span class="self">self</span>
     }
 
@@ -509,8 +501,7 @@
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">components</span> <span class="op">=</span> <span class="ident">CreateComponents::default</span>();
         <span class="ident">f</span>(<span class="kw-2">&amp;mut</span> <span class="ident">components</span>);
 
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;components&quot;</span>, <span class="ident">Value::from</span>(<span class="ident">components</span>.<span class="number">0</span>));
-        <span class="self">self</span>
+        <span class="self">self</span>.<span class="ident">set_components</span>(<span class="ident">components</span>)
     }
 
     <span class="doccomment">/// Sets the components of this message. Requires an application-owned webhook. See</span>
@@ -518,25 +509,20 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// [`components`]: crate::builder::ExecuteWebhook::components</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_components</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">components</span>: <span class="ident">CreateComponents</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;components&quot;</span>, <span class="ident">Value::Array</span>(<span class="ident">components</span>.<span class="number">0</span>));
+        <span class="self">self</span>.<span class="ident">components</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">components</span>);
         <span class="self">self</span>
     }
 
     <span class="doccomment">/// Set the embeds associated with the message.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This should be used in combination with [`Embed::fake`], creating one</span>
-    <span class="doccomment">/// or more fake embeds to send to the API.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// # Examples</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// Refer to the [struct-level documentation] for an example on how to use</span>
     <span class="doccomment">/// embeds.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [`Embed::fake`]: crate::model::channel::Embed::fake</span>
-    <span class="doccomment">/// [`Webhook::execute`]: crate::model::webhook::Webhook::execute</span>
     <span class="doccomment">/// [struct-level documentation]: #examples</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">embeds</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">embeds</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Value</span><span class="op">&gt;</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;embeds&quot;</span>, <span class="ident">Value::from</span>(<span class="ident">embeds</span>));
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">embeds</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">embeds</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">CreateEmbed</span><span class="op">&gt;</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
+        <span class="self">self</span>.<span class="ident">embeds</span> <span class="op">=</span> <span class="ident">embeds</span>;
         <span class="self">self</span>
     }
 
@@ -563,7 +549,7 @@
     <span class="doccomment">/// # }</span>
     <span class="doccomment">/// ```</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">tts</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">tts</span>: <span class="ident">bool</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;tts&quot;</span>, <span class="ident">Value::from</span>(<span class="ident">tts</span>));
+        <span class="self">self</span>.<span class="ident">tts</span> <span class="op">=</span> <span class="ident">tts</span>;
         <span class="self">self</span>
     }
 
@@ -590,7 +576,7 @@
     <span class="doccomment">/// # }</span>
     <span class="doccomment">/// ```</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">username</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">username</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;username&quot;</span>, <span class="ident">Value::String</span>(<span class="ident">username</span>.<span class="ident">into</span>()));
+        <span class="self">self</span>.<span class="ident">username</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">username</span>.<span class="ident">into</span>());
         <span class="self">self</span>
     }
 
@@ -623,34 +609,8 @@
     <span class="doccomment">/// # }</span>
     <span class="doccomment">/// ```</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">flags</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">flags</span>: <span class="ident">MessageFlags</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;flags&quot;</span>, <span class="ident">from_number</span>(<span class="ident">flags</span>.<span class="ident">bits</span>()));
+        <span class="self">self</span>.<span class="ident">flags</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">flags</span>);
         <span class="self">self</span>
-    }
-}
-
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">ExecuteWebhook</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Returns a default set of values for a [`Webhook`] execution.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The only default value is [`Self::tts`] being set to `false`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Creating an [`ExecuteWebhook`] builder:</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// use serenity::builder::ExecuteWebhook;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let executor = ExecuteWebhook::default();</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`Webhook`]: crate::model::webhook::Webhook</span>
-    <span class="kw">fn</span> <span class="ident">default</span>() -&gt; <span class="ident">ExecuteWebhook</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">map</span> <span class="op">=</span> <span class="ident">HashMap::new</span>();
-        <span class="ident">map</span>.<span class="ident">insert</span>(<span class="string">&quot;tts&quot;</span>, <span class="ident">Value::from</span>(<span class="bool-val">false</span>));
-
-        <span class="comment">// Necessary because the type of the second field is different without model feature</span>
-        <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::default_trait_access</span>)]</span>
-        <span class="ident">ExecuteWebhook</span>(<span class="ident">map</span>, <span class="ident">Default::default</span>())
     }
 }
 </code></pre></div>

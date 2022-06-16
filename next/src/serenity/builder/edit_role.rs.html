@@ -151,12 +151,23 @@
 <span id="146">146</span>
 <span id="147">147</span>
 <span id="148">148</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::collections::HashMap</span>;
-
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
+<span id="149">149</span>
+<span id="150">150</span>
+<span id="151">151</span>
+<span id="152">152</span>
+<span id="153">153</span>
+<span id="154">154</span>
+<span id="155">155</span>
+<span id="156">156</span>
+<span id="157">157</span>
+<span id="158">158</span>
+<span id="159">159</span>
+<span id="160">160</span>
+<span id="161">161</span>
+</pre><pre class="rust"><code><span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::http::Http</span>;
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::internal::prelude</span>::<span class="kw-2">*</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::json::from_number</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::channel::AttachmentType</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::guild::Role</span>;
@@ -196,85 +207,99 @@
 <span class="doccomment">/// [`Guild::edit_role`]: crate::model::guild::Guild::edit_role</span>
 <span class="doccomment">/// [`GuildId::create_role`]: crate::model::id::GuildId::create_role</span>
 <span class="doccomment">/// [`GuildId::edit_role`]: crate::model::id::GuildId::edit_role</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Default</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">EditRole</span>(<span class="kw">pub</span> <span class="ident">HashMap</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>, <span class="ident">Value</span><span class="op">&gt;</span>);
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Default</span>, <span class="ident">Serialize</span>)]</span>
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">EditRole</span> {
+    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;Option::is_none&quot;</span>)]</span>
+    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename</span> <span class="op">=</span> <span class="string">&quot;color&quot;</span>)]</span>
+    <span class="ident">colour</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
+    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;Option::is_none&quot;</span>)]</span>
+    <span class="ident">hoist</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span>,
+    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;Option::is_none&quot;</span>)]</span>
+    <span class="ident">mentionable</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span>,
+    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;Option::is_none&quot;</span>)]</span>
+    <span class="ident">name</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
+    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;Option::is_none&quot;</span>)]</span>
+    <span class="ident">permissions</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span>,
+    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;Option::is_none&quot;</span>)]</span>
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">position</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">i64</span><span class="op">&gt;</span>,
+    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;Option::is_none&quot;</span>)]</span>
+    <span class="ident">unicode_emoji</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
+    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;Option::is_none&quot;</span>)]</span>
+    <span class="ident">icon</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
+}
 
 <span class="kw">impl</span> <span class="ident">EditRole</span> {
     <span class="doccomment">/// Creates a new builder with the values of the given [`Role`].</span>
     <span class="attribute">#[<span class="ident">must_use</span>]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">role</span>: <span class="kw-2">&amp;</span><span class="ident">Role</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">map</span> <span class="op">=</span> <span class="ident">HashMap::with_capacity</span>(<span class="number">9</span>);
+        <span class="kw">let</span> <span class="ident">colour</span>;
 
         <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;utils&quot;</span>)]</span>
         {
-            <span class="ident">map</span>.<span class="ident">insert</span>(<span class="string">&quot;color&quot;</span>, <span class="ident">from_number</span>(<span class="ident">role</span>.<span class="ident">colour</span>.<span class="number">0</span>));
+            <span class="ident">colour</span> <span class="op">=</span> <span class="ident">role</span>.<span class="ident">colour</span>.<span class="number">0</span>;
         }
 
         <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;utils&quot;</span>))]</span>
         {
-            <span class="ident">map</span>.<span class="ident">insert</span>(<span class="string">&quot;color&quot;</span>, <span class="ident">from_number</span>(<span class="ident">role</span>.<span class="ident">colour</span>));
+            <span class="ident">colour</span> <span class="op">=</span> <span class="ident">role</span>.<span class="ident">colour</span>;
         }
 
-        <span class="ident">map</span>.<span class="ident">insert</span>(<span class="string">&quot;hoist&quot;</span>, <span class="ident">Value::from</span>(<span class="ident">role</span>.<span class="ident">hoist</span>));
-        <span class="ident">map</span>.<span class="ident">insert</span>(<span class="string">&quot;managed&quot;</span>, <span class="ident">Value::from</span>(<span class="ident">role</span>.<span class="ident">managed</span>));
-        <span class="ident">map</span>.<span class="ident">insert</span>(<span class="string">&quot;mentionable&quot;</span>, <span class="ident">Value::from</span>(<span class="ident">role</span>.<span class="ident">mentionable</span>));
-        <span class="ident">map</span>.<span class="ident">insert</span>(<span class="string">&quot;name&quot;</span>, <span class="ident">Value::from</span>(<span class="ident">role</span>.<span class="ident">name</span>.<span class="ident">clone</span>()));
-        <span class="ident">map</span>.<span class="ident">insert</span>(<span class="string">&quot;permissions&quot;</span>, <span class="ident">from_number</span>(<span class="ident">role</span>.<span class="ident">permissions</span>.<span class="ident">bits</span>()));
-        <span class="ident">map</span>.<span class="ident">insert</span>(<span class="string">&quot;position&quot;</span>, <span class="ident">from_number</span>(<span class="ident">role</span>.<span class="ident">position</span>));
-
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">unicode_emoji</span>) <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">role</span>.<span class="ident">unicode_emoji</span> {
-            <span class="ident">map</span>.<span class="ident">insert</span>(<span class="string">&quot;unicode_emoji&quot;</span>, <span class="ident">Value::String</span>(<span class="ident">unicode_emoji</span>.<span class="ident">clone</span>()));
+        <span class="ident">EditRole</span> {
+            <span class="ident">hoist</span>: <span class="prelude-val">Some</span>(<span class="ident">role</span>.<span class="ident">hoist</span>),
+            <span class="ident">mentionable</span>: <span class="prelude-val">Some</span>(<span class="ident">role</span>.<span class="ident">mentionable</span>),
+            <span class="ident">name</span>: <span class="prelude-val">Some</span>(<span class="ident">role</span>.<span class="ident">name</span>.<span class="ident">clone</span>()),
+            <span class="ident">permissions</span>: <span class="prelude-val">Some</span>(<span class="ident">role</span>.<span class="ident">permissions</span>.<span class="ident">bits</span>()),
+            <span class="ident">position</span>: <span class="prelude-val">Some</span>(<span class="ident">role</span>.<span class="ident">position</span>),
+            <span class="ident">colour</span>: <span class="prelude-val">Some</span>(<span class="ident">colour</span>),
+            <span class="ident">unicode_emoji</span>: <span class="ident">role</span>.<span class="ident">unicode_emoji</span>.<span class="ident">clone</span>(),
+            <span class="ident">icon</span>: <span class="ident">role</span>.<span class="ident">icon</span>.<span class="ident">clone</span>(),
         }
-
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">icon</span>) <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">role</span>.<span class="ident">icon</span> {
-            <span class="ident">map</span>.<span class="ident">insert</span>(<span class="string">&quot;icon&quot;</span>, <span class="ident">Value::String</span>(<span class="ident">icon</span>.<span class="ident">clone</span>()));
-        }
-
-        <span class="ident">EditRole</span>(<span class="ident">map</span>)
     }
 
     <span class="doccomment">/// Sets the colour of the role.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">colour</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">colour</span>: <span class="ident">u64</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;color&quot;</span>, <span class="ident">from_number</span>(<span class="ident">colour</span>));
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">colour</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">colour</span>: <span class="ident">u32</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
+        <span class="self">self</span>.<span class="ident">colour</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">colour</span>);
+
         <span class="self">self</span>
     }
 
     <span class="doccomment">/// Whether or not to hoist the role above lower-positioned role in the user</span>
     <span class="doccomment">/// list.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">hoist</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">hoist</span>: <span class="ident">bool</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;hoist&quot;</span>, <span class="ident">Value::from</span>(<span class="ident">hoist</span>));
+        <span class="self">self</span>.<span class="ident">hoist</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">hoist</span>);
+
         <span class="self">self</span>
     }
 
     <span class="doccomment">/// Whether or not to make the role mentionable, notifying its users.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">mentionable</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">mentionable</span>: <span class="ident">bool</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;mentionable&quot;</span>, <span class="ident">Value::from</span>(<span class="ident">mentionable</span>));
+        <span class="self">self</span>.<span class="ident">mentionable</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">mentionable</span>);
         <span class="self">self</span>
     }
 
     <span class="doccomment">/// The name of the role to set.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">name</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">name</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;name&quot;</span>, <span class="ident">Value::String</span>(<span class="ident">name</span>.<span class="ident">into</span>()));
+        <span class="self">self</span>.<span class="ident">name</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">name</span>.<span class="ident">into</span>());
         <span class="self">self</span>
     }
 
     <span class="doccomment">/// The set of permissions to assign the role.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">permissions</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">permissions</span>: <span class="ident">Permissions</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;permissions&quot;</span>, <span class="ident">from_number</span>(<span class="ident">permissions</span>.<span class="ident">bits</span>()));
+        <span class="self">self</span>.<span class="ident">permissions</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">permissions</span>.<span class="ident">bits</span>());
         <span class="self">self</span>
     }
 
     <span class="doccomment">/// The position to assign the role in the role list. This correlates to the</span>
     <span class="doccomment">/// role&#39;s position in the user list.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">position</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">position</span>: <span class="ident">u8</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;position&quot;</span>, <span class="ident">from_number</span>(<span class="ident">position</span>));
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">position</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">position</span>: <span class="ident">i64</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
+        <span class="self">self</span>.<span class="ident">position</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">position</span>);
         <span class="self">self</span>
     }
 
     <span class="doccomment">/// The unicode emoji to set as the role image.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">unicode_emoji</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">unicode_emoji</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">remove</span>(<span class="string">&quot;icon&quot;</span>);
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;unicode_emoji&quot;</span>, <span class="ident">Value::String</span>(<span class="ident">unicode_emoji</span>.<span class="ident">into</span>()));
+        <span class="self">self</span>.<span class="ident">unicode_emoji</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">unicode_emoji</span>.<span class="ident">into</span>());
+        <span class="self">self</span>.<span class="ident">icon</span> <span class="op">=</span> <span class="prelude-val">None</span>;
 
         <span class="self">self</span>
     }
@@ -293,8 +318,9 @@
     ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="self">Self</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">icon_data</span> <span class="op">=</span> <span class="ident">icon</span>.<span class="ident">into</span>().<span class="ident">data</span>(<span class="kw-2">&amp;</span><span class="ident">http</span>.<span class="ident">as_ref</span>().<span class="ident">client</span>).<span class="kw">await</span><span class="question-mark">?</span>;
         <span class="kw">let</span> <span class="ident">icon_string</span> <span class="op">=</span> <span class="macro">format!</span>(<span class="string">&quot;data:image/png;base64,{}&quot;</span>, <span class="ident">base64::encode</span>(<span class="ident">icon_data</span>));
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">remove</span>(<span class="string">&quot;unicode_emoji&quot;</span>);
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;icon&quot;</span>, <span class="ident">Value::from</span>(<span class="ident">icon_string</span>));
+
+        <span class="self">self</span>.<span class="ident">icon</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">icon_string</span>);
+        <span class="self">self</span>.<span class="ident">unicode_emoji</span> <span class="op">=</span> <span class="prelude-val">None</span>;
 
         <span class="prelude-val">Ok</span>(<span class="self">self</span>)
     }

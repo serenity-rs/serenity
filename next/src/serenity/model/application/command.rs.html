@@ -459,8 +459,6 @@
 <span id="454">454</span>
 <span id="455">455</span>
 <span id="456">456</span>
-<span id="457">457</span>
-<span id="458">458</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::collections::HashMap</span>;
 
 <span class="kw">use</span> <span class="ident">serde</span>::{<span class="ident">Deserialize</span>, <span class="ident">Serialize</span>};
@@ -472,8 +470,6 @@
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http&quot;</span>)]</span>
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::http::Http</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::json::Value</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::json</span>::{<span class="self">self</span>, <span class="ident">JsonMap</span>};
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::channel::ChannelType</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::id</span>::{
     <span class="ident">ApplicationId</span>,
@@ -620,7 +616,7 @@
         <span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="kw-2">&amp;mut</span> <span class="ident">CreateApplicationCommand</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="ident">CreateApplicationCommand</span>,
     {
         <span class="kw">let</span> <span class="ident">map</span> <span class="op">=</span> <span class="ident">Command::build_application_command</span>(<span class="ident">f</span>);
-        <span class="ident">http</span>.<span class="ident">as_ref</span>().<span class="ident">create_global_application_command</span>(<span class="kw-2">&amp;</span><span class="ident">Value::from</span>(<span class="ident">map</span>)).<span class="kw">await</span>
+        <span class="ident">http</span>.<span class="ident">as_ref</span>().<span class="ident">create_global_application_command</span>(<span class="kw-2">&amp;</span><span class="ident">map</span>).<span class="kw">await</span>
     }
 
     <span class="doccomment">/// Overrides all global application commands.</span>
@@ -644,7 +640,7 @@
 
         <span class="ident">f</span>(<span class="kw-2">&amp;mut</span> <span class="ident">array</span>);
 
-        <span class="ident">http</span>.<span class="ident">as_ref</span>().<span class="ident">create_global_application_commands</span>(<span class="kw-2">&amp;</span><span class="ident">Value::from</span>(<span class="ident">array</span>.<span class="number">0</span>)).<span class="kw">await</span>
+        <span class="ident">http</span>.<span class="ident">as_ref</span>().<span class="ident">create_global_application_commands</span>(<span class="kw-2">&amp;</span><span class="ident">array</span>).<span class="kw">await</span>
     }
 
     <span class="doccomment">/// Edits a global command by its Id.</span>
@@ -664,7 +660,7 @@
         <span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="kw-2">&amp;mut</span> <span class="ident">CreateApplicationCommand</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="ident">CreateApplicationCommand</span>,
     {
         <span class="kw">let</span> <span class="ident">map</span> <span class="op">=</span> <span class="ident">Command::build_application_command</span>(<span class="ident">f</span>);
-        <span class="ident">http</span>.<span class="ident">as_ref</span>().<span class="ident">edit_global_application_command</span>(<span class="ident">command_id</span>.<span class="ident">into</span>(), <span class="kw-2">&amp;</span><span class="ident">Value::from</span>(<span class="ident">map</span>)).<span class="kw">await</span>
+        <span class="ident">http</span>.<span class="ident">as_ref</span>().<span class="ident">edit_global_application_command</span>(<span class="ident">command_id</span>.<span class="ident">into</span>(), <span class="kw-2">&amp;</span><span class="ident">map</span>).<span class="kw">await</span>
     }
 
     <span class="doccomment">/// Gets all global commands.</span>
@@ -713,13 +709,13 @@
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http&quot;</span>)]</span>
 <span class="kw">impl</span> <span class="ident">Command</span> {
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">build_application_command</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="ident">f</span>: <span class="ident">F</span>) -&gt; <span class="ident">JsonMap</span>
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">build_application_command</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="ident">f</span>: <span class="ident">F</span>) -&gt; <span class="ident">CreateApplicationCommand</span>
     <span class="kw">where</span>
         <span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="kw-2">&amp;mut</span> <span class="ident">CreateApplicationCommand</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="ident">CreateApplicationCommand</span>,
     {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">create_application_command</span> <span class="op">=</span> <span class="ident">CreateApplicationCommand::default</span>();
         <span class="ident">f</span>(<span class="kw-2">&amp;mut</span> <span class="ident">create_application_command</span>);
-        <span class="ident">json::hashmap_to_json_map</span>(<span class="ident">create_application_command</span>.<span class="number">0</span>)
+        <span class="ident">create_application_command</span>
     }
 }
 

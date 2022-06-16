@@ -515,6 +515,8 @@
 <span id="510">510</span>
 <span id="511">511</span>
 <span id="512">512</span>
+<span id="513">513</span>
+<span id="514">514</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::fmt</span>;
 
 <span class="kw">use</span> <span class="ident">serde::de</span>::{<span class="ident">Deserializer</span>, <span class="ident">Error</span> <span class="kw">as</span> <span class="ident">DeError</span>, <span class="ident">IgnoredAny</span>, <span class="ident">MapAccess</span>};
@@ -526,10 +528,6 @@
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http&quot;</span>)]</span>
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::http::Http</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::internal::prelude</span>::<span class="kw-2">*</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::json</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::json::prelude</span>::<span class="kw-2">*</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::application::command</span>::{<span class="ident">CommandOptionType</span>, <span class="ident">CommandType</span>};
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::application::interaction::add_guild_id_to_resolved</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http&quot;</span>)]</span>
@@ -594,14 +592,20 @@
     <span class="kw">where</span>
         <span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="kw-2">&amp;mut</span> <span class="ident">CreateAutocompleteResponse</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="ident">CreateAutocompleteResponse</span>,
     {
+        <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Serialize</span>)]</span>
+        <span class="kw">struct</span> <span class="ident">AutocompleteResponse</span> {
+            <span class="ident">data</span>: <span class="ident">CreateAutocompleteResponse</span>,
+            <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename</span> <span class="op">=</span> <span class="string">&quot;type&quot;</span>)]</span>
+            <span class="ident">kind</span>: <span class="ident">InteractionResponseType</span>,
+        }
+
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">response</span> <span class="op">=</span> <span class="ident">CreateAutocompleteResponse::default</span>();
         <span class="ident">f</span>(<span class="kw-2">&amp;mut</span> <span class="ident">response</span>);
-        <span class="kw">let</span> <span class="ident">data</span> <span class="op">=</span> <span class="ident">json::hashmap_to_json_map</span>(<span class="ident">response</span>.<span class="number">0</span>);
 
-        <span class="kw">let</span> <span class="ident">map</span> <span class="op">=</span> <span class="macro">json!</span>({
-            <span class="string">&quot;type&quot;</span>: <span class="ident">InteractionResponseType::Autocomplete</span> <span class="kw">as</span> <span class="ident">u8</span>,
-            <span class="string">&quot;data&quot;</span>: <span class="ident">data</span>,
-        });
+        <span class="kw">let</span> <span class="ident">map</span> <span class="op">=</span> <span class="ident">AutocompleteResponse</span> {
+            <span class="ident">data</span>: <span class="ident">response</span>,
+            <span class="ident">kind</span>: <span class="ident">InteractionResponseType::Autocomplete</span>,
+        };
 
         <span class="ident">http</span>.<span class="ident">as_ref</span>().<span class="ident">create_interaction_response</span>(<span class="self">self</span>.<span class="ident">id</span>.<span class="number">0</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">token</span>, <span class="kw-2">&amp;</span><span class="ident">map</span>).<span class="kw">await</span>
     }

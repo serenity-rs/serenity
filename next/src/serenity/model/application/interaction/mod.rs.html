@@ -262,6 +262,15 @@
 <span id="257">257</span>
 <span id="258">258</span>
 <span id="259">259</span>
+<span id="260">260</span>
+<span id="261">261</span>
+<span id="262">262</span>
+<span id="263">263</span>
+<span id="264">264</span>
+<span id="265">265</span>
+<span id="266">266</span>
+<span id="267">267</span>
+<span id="268">268</span>
 </pre><pre class="rust"><code><span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">application_command</span>;
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">autocomplete</span>;
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">message_component</span>;
@@ -500,6 +509,15 @@
     <span class="ident">UpdateMessage</span> <span class="op">=</span> <span class="number">7</span>,
     <span class="ident">Autocomplete</span> <span class="op">=</span> <span class="number">8</span>,
     <span class="ident">Modal</span> <span class="op">=</span> <span class="number">9</span>,
+}
+
+<span class="kw">impl</span> <span class="ident">serde::Serialize</span> <span class="kw">for</span> <span class="ident">InteractionResponseType</span> {
+    <span class="kw">fn</span> <span class="ident">serialize</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">serializer</span>: <span class="ident">S</span>) -&gt; <span class="ident">std::result::Result</span><span class="op">&lt;</span><span class="ident">S::Ok</span>, <span class="ident">S::Error</span><span class="op">&gt;</span>
+    <span class="kw">where</span>
+        <span class="ident">S</span>: <span class="ident">serde::Serializer</span>,
+    {
+        <span class="ident">serializer</span>.<span class="ident">serialize_u8</span>(<span class="kw-2">*</span><span class="self">self</span> <span class="kw">as</span> <span class="ident">u8</span>)
+    }
 }
 
 <span class="kw">fn</span> <span class="ident">add_guild_id_to_resolved</span>(<span class="ident">map</span>: <span class="kw-2">&amp;mut</span> <span class="ident">JsonMap</span>, <span class="ident">guild_id</span>: <span class="ident">GuildId</span>) {

@@ -49,11 +49,10 @@
 <span id="44">44</span>
 <span id="45">45</span>
 <span id="46">46</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::collections::HashMap</span>;
-
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::internal::prelude</span>::<span class="kw-2">*</span>;
-
-<span class="doccomment">/// A builder to create or edit a [`Sticker`] for use via a number of model methods.</span>
+<span id="47">47</span>
+<span id="48">48</span>
+<span id="49">49</span>
+</pre><pre class="rust"><code><span class="doccomment">/// A builder to create or edit a [`Sticker`] for use via a number of model methods.</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// These are:</span>
 <span class="doccomment">///</span>
@@ -67,15 +66,22 @@
 <span class="doccomment">/// [`Guild::edit_sticker`]: crate::model::guild::Guild::edit_sticker</span>
 <span class="doccomment">/// [`GuildId::edit_sticker`]: crate::model::id::GuildId::edit_sticker</span>
 <span class="doccomment">/// [`Sticker::edit`]: crate::model::sticker::Sticker::edit</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Default</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">EditSticker</span>(<span class="kw">pub</span> <span class="ident">HashMap</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>, <span class="ident">Value</span><span class="op">&gt;</span>);
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Default</span>, <span class="ident">Serialize</span>)]</span>
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">EditSticker</span> {
+    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;Option::is_none&quot;</span>)]</span>
+    <span class="ident">name</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
+    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;Option::is_none&quot;</span>)]</span>
+    <span class="ident">description</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
+    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;Option::is_none&quot;</span>)]</span>
+    <span class="ident">tags</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
+}
 
 <span class="kw">impl</span> <span class="ident">EditSticker</span> {
     <span class="doccomment">/// The name of the sticker to set.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// **Note**: Must be between 2 and 30 characters long.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">name</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">name</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;name&quot;</span>, <span class="ident">Value::String</span>(<span class="ident">name</span>.<span class="ident">into</span>()));
+        <span class="self">self</span>.<span class="ident">name</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">name</span>.<span class="ident">into</span>());
         <span class="self">self</span>
     }
 
@@ -83,7 +89,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// **Note**: If not empty, must be between 2 and 100 characters long.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">description</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">description</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;description&quot;</span>, <span class="ident">Value::String</span>(<span class="ident">description</span>.<span class="ident">into</span>()));
+        <span class="self">self</span>.<span class="ident">description</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">description</span>.<span class="ident">into</span>());
         <span class="self">self</span>
     }
 
@@ -91,7 +97,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// **Note**: Must be between 2 and 200 characters long.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">tags</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">tags</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;tags&quot;</span>, <span class="ident">Value::String</span>(<span class="ident">tags</span>.<span class="ident">into</span>()));
+        <span class="self">self</span>.<span class="ident">tags</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">tags</span>.<span class="ident">into</span>());
         <span class="self">self</span>
     }
 }

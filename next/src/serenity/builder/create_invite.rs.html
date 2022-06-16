@@ -244,18 +244,7 @@
 <span id="239">239</span>
 <span id="240">240</span>
 <span id="241">241</span>
-<span id="242">242</span>
-<span id="243">243</span>
-<span id="244">244</span>
-<span id="245">245</span>
-<span id="246">246</span>
-<span id="247">247</span>
-<span id="248">248</span>
-<span id="249">249</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::collections::HashMap</span>;
-
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::json</span>::{<span class="ident">from_number</span>, <span class="ident">Value</span>, <span class="ident">NULL</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::id</span>::{<span class="ident">ApplicationId</span>, <span class="ident">UserId</span>};
+</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::id</span>::{<span class="ident">ApplicationId</span>, <span class="ident">UserId</span>};
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::invite::InviteTargetType</span>;
 
 <span class="doccomment">/// A builder to create a [`RichInvite`] for use via [`GuildChannel::create_invite`].</span>
@@ -322,8 +311,23 @@
 <span class="doccomment">///</span>
 <span class="doccomment">/// [`GuildChannel::create_invite`]: crate::model::channel::GuildChannel::create_invite</span>
 <span class="doccomment">/// [`RichInvite`]: crate::model::invite::RichInvite</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">CreateInvite</span>(<span class="kw">pub</span> <span class="ident">HashMap</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>, <span class="ident">Value</span><span class="op">&gt;</span>);
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Default</span>, <span class="ident">Serialize</span>)]</span>
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">CreateInvite</span> {
+    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;Option::is_none&quot;</span>)]</span>
+    <span class="ident">max_age</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span>,
+    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;Option::is_none&quot;</span>)]</span>
+    <span class="ident">max_uses</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span>,
+    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;Option::is_none&quot;</span>)]</span>
+    <span class="ident">temporary</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span>,
+    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;Option::is_none&quot;</span>)]</span>
+    <span class="ident">unique</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span>,
+    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;Option::is_none&quot;</span>)]</span>
+    <span class="ident">target_type</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">InviteTargetType</span><span class="op">&gt;</span>,
+    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;Option::is_none&quot;</span>)]</span>
+    <span class="ident">target_user_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">UserId</span><span class="op">&gt;</span>,
+    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;Option::is_none&quot;</span>)]</span>
+    <span class="ident">target_application_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ApplicationId</span><span class="op">&gt;</span>,
+}
 
 <span class="kw">impl</span> <span class="ident">CreateInvite</span> {
     <span class="doccomment">/// The duration that the invite will be valid for.</span>
@@ -353,7 +357,7 @@
     <span class="doccomment">/// # }</span>
     <span class="doccomment">/// ```</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">max_age</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">max_age</span>: <span class="ident">u64</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;max_age&quot;</span>, <span class="ident">from_number</span>(<span class="ident">max_age</span>));
+        <span class="self">self</span>.<span class="ident">max_age</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">max_age</span>);
         <span class="self">self</span>
     }
 
@@ -384,7 +388,7 @@
     <span class="doccomment">/// # }</span>
     <span class="doccomment">/// ```</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">max_uses</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">max_uses</span>: <span class="ident">u64</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;max_uses&quot;</span>, <span class="ident">from_number</span>(<span class="ident">max_uses</span>));
+        <span class="self">self</span>.<span class="ident">max_uses</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">max_uses</span>);
         <span class="self">self</span>
     }
 
@@ -415,7 +419,7 @@
     <span class="doccomment">/// # fn main() {}</span>
     <span class="doccomment">/// ```</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">temporary</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">temporary</span>: <span class="ident">bool</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;temporary&quot;</span>, <span class="ident">Value::from</span>(<span class="ident">temporary</span>));
+        <span class="self">self</span>.<span class="ident">temporary</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">temporary</span>);
         <span class="self">self</span>
     }
 
@@ -444,13 +448,13 @@
     <span class="doccomment">/// # }</span>
     <span class="doccomment">/// ```</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">unique</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">unique</span>: <span class="ident">bool</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;unique&quot;</span>, <span class="ident">Value::from</span>(<span class="ident">unique</span>));
+        <span class="self">self</span>.<span class="ident">unique</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">unique</span>);
         <span class="self">self</span>
     }
 
     <span class="doccomment">/// The type of target for this voice channel invite.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">target_type</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">target_type</span>: <span class="ident">InviteTargetType</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;target_type&quot;</span>, <span class="ident">from_number</span>(<span class="ident">target_type</span> <span class="kw">as</span> <span class="ident">u8</span>));
+        <span class="self">self</span>.<span class="ident">target_type</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">target_type</span>);
         <span class="self">self</span>
     }
 
@@ -458,7 +462,7 @@
     <span class="doccomment">/// `Stream`</span>
     <span class="doccomment">/// The user must be streaming in the channel.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">target_user_id</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">target_user_id</span>: <span class="ident">UserId</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;target_user_id&quot;</span>, <span class="ident">from_number</span>(<span class="ident">target_user_id</span>.<span class="number">0</span>));
+        <span class="self">self</span>.<span class="ident">target_user_id</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">target_user_id</span>);
         <span class="self">self</span>
     }
 
@@ -477,28 +481,8 @@
     <span class="doccomment">/// poker: `755827207812677713`</span>
     <span class="doccomment">/// chess: `832012774040141894`</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">target_application_id</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">target_application_id</span>: <span class="ident">ApplicationId</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;target_application_id&quot;</span>, <span class="ident">from_number</span>(<span class="ident">target_application_id</span>.<span class="number">0</span>));
+        <span class="self">self</span>.<span class="ident">target_application_id</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">target_application_id</span>);
         <span class="self">self</span>
-    }
-}
-
-<span class="kw">impl</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">CreateInvite</span> {
-    <span class="doccomment">/// Creates a builder with default values, setting `validate` to `null`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Create a default [`CreateInvite`] builder:</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// use serenity::builder::CreateInvite;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let invite_builder = CreateInvite::default();</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">fn</span> <span class="ident">default</span>() -&gt; <span class="ident">CreateInvite</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">map</span> <span class="op">=</span> <span class="ident">HashMap::new</span>();
-        <span class="ident">map</span>.<span class="ident">insert</span>(<span class="string">&quot;validate&quot;</span>, <span class="ident">NULL</span>);
-
-        <span class="ident">CreateInvite</span>(<span class="ident">map</span>)
     }
 }
 </code></pre></div>

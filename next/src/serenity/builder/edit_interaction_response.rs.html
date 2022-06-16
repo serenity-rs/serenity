@@ -96,34 +96,19 @@
 <span id="91">91</span>
 <span id="92">92</span>
 <span id="93">93</span>
-<span id="94">94</span>
-<span id="95">95</span>
-<span id="96">96</span>
-<span id="97">97</span>
-<span id="98">98</span>
-<span id="99">99</span>
-<span id="100">100</span>
-<span id="101">101</span>
-<span id="102">102</span>
-<span id="103">103</span>
-<span id="104">104</span>
-<span id="105">105</span>
-<span id="106">106</span>
-<span id="107">107</span>
-<span id="108">108</span>
-<span id="109">109</span>
-<span id="110">110</span>
-<span id="111">111</span>
-<span id="112">112</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::collections::HashMap</span>;
+</pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">CreateAllowedMentions</span>, <span class="ident">CreateComponents</span>, <span class="ident">CreateEmbed</span>};
 
-<span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">CreateAllowedMentions</span>, <span class="ident">CreateEmbed</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::builder::CreateComponents</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::json</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::json::prelude</span>::<span class="kw-2">*</span>;
-
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Default</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">EditInteractionResponse</span>(<span class="kw">pub</span> <span class="ident">HashMap</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>, <span class="ident">Value</span><span class="op">&gt;</span>);
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Default</span>, <span class="ident">Serialize</span>)]</span>
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">EditInteractionResponse</span> {
+    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;Option::is_none&quot;</span>)]</span>
+    <span class="ident">content</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
+    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;Option::is_none&quot;</span>)]</span>
+    <span class="ident">embeds</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">CreateEmbed</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;Option::is_none&quot;</span>)]</span>
+    <span class="ident">allowed_mentions</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">CreateAllowedMentions</span><span class="op">&gt;</span>,
+    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;Option::is_none&quot;</span>)]</span>
+    <span class="ident">components</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">CreateComponents</span><span class="op">&gt;</span>,
+}
 
 <span class="kw">impl</span> <span class="ident">EditInteractionResponse</span> {
     <span class="doccomment">/// Sets the `InteractionApplicationCommandCallbackData` for the message.</span>
@@ -133,11 +118,7 @@
     <span class="doccomment">/// **Note**: Message contents must be under 2000 unicode code points.</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">content</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">content</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">_content</span>(<span class="ident">content</span>.<span class="ident">into</span>())
-    }
-
-    <span class="kw">fn</span> <span class="ident">_content</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">content</span>: <span class="ident">String</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;content&quot;</span>, <span class="ident">Value::String</span>(<span class="ident">content</span>));
+        <span class="self">self</span>.<span class="ident">content</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">content</span>.<span class="ident">into</span>());
         <span class="self">self</span>
     }
 
@@ -151,26 +132,19 @@
         <span class="self">self</span>.<span class="ident">add_embed</span>(<span class="ident">embed</span>)
     }
 
+    <span class="kw">fn</span> <span class="ident">embeds</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">CreateEmbed</span><span class="op">&gt;</span> {
+        <span class="self">self</span>.<span class="ident">embeds</span>.<span class="ident">get_or_insert_with</span>(<span class="ident">Vec::new</span>)
+    }
+
     <span class="doccomment">/// Adds an embed for the message.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">add_embed</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">embed</span>: <span class="ident">CreateEmbed</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
-        <span class="kw">let</span> <span class="ident">map</span> <span class="op">=</span> <span class="ident">json::hashmap_to_json_map</span>(<span class="ident">embed</span>.<span class="number">0</span>);
-        <span class="kw">let</span> <span class="ident">embed</span> <span class="op">=</span> <span class="ident">Value::from</span>(<span class="ident">map</span>);
-
-        <span class="kw">let</span> <span class="ident">embeds</span> <span class="op">=</span> <span class="self">self</span>.<span class="number">0</span>.<span class="ident">entry</span>(<span class="string">&quot;embeds&quot;</span>).<span class="ident">or_insert_with</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">Value::from</span>(<span class="ident">Vec</span>::<span class="op">&lt;</span><span class="ident">Value</span><span class="op">&gt;</span><span class="ident">::new</span>()));
-
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">embeds</span>) <span class="op">=</span> <span class="ident">embeds</span>.<span class="ident">as_array_mut</span>() {
-            <span class="ident">embeds</span>.<span class="ident">push</span>(<span class="ident">embed</span>);
-        }
-
+        <span class="self">self</span>.<span class="ident">embeds</span>().<span class="ident">push</span>(<span class="ident">embed</span>);
         <span class="self">self</span>
     }
 
     <span class="doccomment">/// Adds multiple embeds to the message.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">add_embeds</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">embeds</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">CreateEmbed</span><span class="op">&gt;</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
-        <span class="kw">for</span> <span class="ident">embed</span> <span class="kw">in</span> <span class="ident">embeds</span> {
-            <span class="self">self</span>.<span class="ident">add_embed</span>(<span class="ident">embed</span>);
-        }
-
+        <span class="self">self</span>.<span class="ident">embeds</span>().<span class="ident">extend</span>(<span class="ident">embeds</span>);
         <span class="self">self</span>
     }
 
@@ -179,10 +153,7 @@
     <span class="doccomment">/// Calling this will overwrite the embed list.</span>
     <span class="doccomment">/// To append embeds, call [`Self::add_embed`] instead.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_embed</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">embed</span>: <span class="ident">CreateEmbed</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
-        <span class="kw">let</span> <span class="ident">map</span> <span class="op">=</span> <span class="ident">json::hashmap_to_json_map</span>(<span class="ident">embed</span>.<span class="number">0</span>);
-        <span class="kw">let</span> <span class="ident">embed</span> <span class="op">=</span> <span class="ident">Value::from</span>(<span class="ident">map</span>);
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;embeds&quot;</span>, <span class="ident">Value::from</span>(<span class="macro">vec!</span>[<span class="ident">embed</span>]));
-
+        <span class="self">self</span>.<span class="ident">set_embeds</span>(<span class="macro">vec!</span>[<span class="ident">embed</span>]);
         <span class="self">self</span>
     }
 
@@ -190,14 +161,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// **Note**: You can only have up to 10 embeds per message.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_embeds</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">embeds</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">CreateEmbed</span><span class="op">&gt;</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
-        <span class="kw">if</span> <span class="self">self</span>.<span class="number">0</span>.<span class="ident">contains_key</span>(<span class="string">&quot;embeds&quot;</span>) {
-            <span class="self">self</span>.<span class="number">0</span>.<span class="ident">remove_entry</span>(<span class="string">&quot;embeds&quot;</span>);
-        }
-
-        <span class="kw">for</span> <span class="ident">embed</span> <span class="kw">in</span> <span class="ident">embeds</span> {
-            <span class="self">self</span>.<span class="ident">add_embed</span>(<span class="ident">embed</span>);
-        }
-
+        <span class="self">self</span>.<span class="ident">embeds</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">embeds</span>);
         <span class="self">self</span>
     }
 
@@ -208,10 +172,8 @@
     {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">allowed_mentions</span> <span class="op">=</span> <span class="ident">CreateAllowedMentions::default</span>();
         <span class="ident">f</span>(<span class="kw-2">&amp;mut</span> <span class="ident">allowed_mentions</span>);
-        <span class="kw">let</span> <span class="ident">map</span> <span class="op">=</span> <span class="ident">json::hashmap_to_json_map</span>(<span class="ident">allowed_mentions</span>.<span class="number">0</span>);
-        <span class="kw">let</span> <span class="ident">allowed_mentions</span> <span class="op">=</span> <span class="ident">Value::from</span>(<span class="ident">map</span>);
 
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;allowed_mentions&quot;</span>, <span class="ident">allowed_mentions</span>);
+        <span class="self">self</span>.<span class="ident">allowed_mentions</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">allowed_mentions</span>);
         <span class="self">self</span>
     }
 
@@ -223,7 +185,7 @@
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">components</span> <span class="op">=</span> <span class="ident">CreateComponents::default</span>();
         <span class="ident">f</span>(<span class="kw-2">&amp;mut</span> <span class="ident">components</span>);
 
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;components&quot;</span>, <span class="ident">Value::from</span>(<span class="ident">components</span>.<span class="number">0</span>));
+        <span class="self">self</span>.<span class="ident">components</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">components</span>);
         <span class="self">self</span>
     }
 }

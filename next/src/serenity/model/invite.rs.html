@@ -438,8 +438,6 @@
 <span id="433">433</span>
 <span id="434">434</span>
 <span id="435">435</span>
-<span id="436">436</span>
-<span id="437">437</span>
 </pre><pre class="rust"><code><span class="doccomment">//! Models for server and channel invites.</span>
 
 <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::prelude</span>::<span class="kw-2">*</span>;
@@ -453,8 +451,6 @@
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::http</span>::{<span class="ident">CacheHttp</span>, <span class="ident">Http</span>};
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::internal::prelude</span>::<span class="kw-2">*</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::json</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::Timestamp</span>;
 
 <span class="doccomment">/// Information about an invite code.</span>
@@ -544,9 +540,9 @@
             }
         }
 
-        <span class="kw">let</span> <span class="ident">map</span> <span class="op">=</span> <span class="ident">json::hashmap_to_json_map</span>(<span class="ident">f</span>(<span class="ident">CreateInvite::default</span>()).<span class="number">0</span>);
+        <span class="kw">let</span> <span class="ident">builder</span> <span class="op">=</span> <span class="ident">f</span>(<span class="ident">CreateInvite::default</span>());
 
-        <span class="ident">cache_http</span>.<span class="ident">http</span>().<span class="ident">create_invite</span>(<span class="ident">channel_id</span>.<span class="number">0</span>, <span class="kw-2">&amp;</span><span class="ident">map</span>, <span class="prelude-val">None</span>).<span class="kw">await</span>
+        <span class="ident">cache_http</span>.<span class="ident">http</span>().<span class="ident">create_invite</span>(<span class="ident">channel_id</span>.<span class="number">0</span>, <span class="kw-2">&amp;</span><span class="ident">builder</span>, <span class="prelude-val">None</span>).<span class="kw">await</span>
     }
 
     <span class="doccomment">/// Deletes the invite.</span>

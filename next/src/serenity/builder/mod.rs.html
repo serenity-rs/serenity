@@ -100,12 +100,21 @@
 <span id="95">95</span>
 <span id="96">96</span>
 <span id="97">97</span>
+<span id="98">98</span>
+<span id="99">99</span>
+<span id="100">100</span>
+<span id="101">101</span>
+<span id="102">102</span>
 </pre><pre class="rust"><code><span class="doccomment">//! A set of builders used to make using methods on certain structs simpler to</span>
 <span class="doccomment">//! use.</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! These are used when not all parameters are required, all parameters are</span>
 <span class="doccomment">//! optional, and/or sane default values for required parameters can be applied</span>
 <span class="doccomment">//! by a builder.</span>
+
+<span class="comment">// Option&lt;Option&lt;T&gt;&gt; is required for fields that are</span>
+<span class="comment">// #[serde(skip_serializing_if = &quot;Option::is_none&quot;)]</span>
+<span class="attribute">#![<span class="ident">allow</span>(<span class="ident">clippy::option_option</span>)]</span>
 
 <span class="kw">mod</span> <span class="ident">create_channel</span>;
 <span class="kw">mod</span> <span class="ident">create_embed</span>;
@@ -169,6 +178,7 @@
 };
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="self">self</span>::create_embed</span>::{<span class="ident">CreateEmbed</span>, <span class="ident">CreateEmbedAuthor</span>, <span class="ident">CreateEmbedFooter</span>};
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="self">self</span>::create_interaction_response</span>::{
+    <span class="ident">AutocompleteChoice</span>,
     <span class="ident">CreateAutocompleteResponse</span>,
     <span class="ident">CreateInteractionResponse</span>,
     <span class="ident">CreateInteractionResponseData</span>,

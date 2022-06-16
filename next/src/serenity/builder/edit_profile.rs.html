@@ -67,18 +67,17 @@
 <span id="62">62</span>
 <span id="63">63</span>
 <span id="64">64</span>
-<span id="65">65</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::collections::HashMap</span>;
-
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::internal::prelude</span>::<span class="kw-2">*</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::json::NULL</span>;
-
-<span class="doccomment">/// A builder to edit the current user&#39;s settings, to be used in conjunction</span>
+</pre><pre class="rust"><code><span class="doccomment">/// A builder to edit the current user&#39;s settings, to be used in conjunction</span>
 <span class="doccomment">/// with [`CurrentUser::edit`].</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// [`CurrentUser::edit`]: crate::model::user::CurrentUser::edit</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Default</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">EditProfile</span>(<span class="kw">pub</span> <span class="ident">HashMap</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>, <span class="ident">Value</span><span class="op">&gt;</span>);
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Default</span>, <span class="ident">Serialize</span>)]</span>
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">EditProfile</span> {
+    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;Option::is_none&quot;</span>)]</span>
+    <span class="ident">avatar</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;Option::is_none&quot;</span>)]</span>
+    <span class="ident">username</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
+}
 
 <span class="kw">impl</span> <span class="ident">EditProfile</span> {
     <span class="doccomment">/// Sets the avatar of the current user. [`None`] can be passed to remove an</span>
@@ -117,8 +116,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// [`utils::read_image`]: crate::utils::read_image</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">avatar</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">avatar</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
-        <span class="kw">let</span> <span class="ident">avatar</span> <span class="op">=</span> <span class="ident">avatar</span>.<span class="ident">map_or</span>(<span class="ident">NULL</span>, <span class="ident">Value::String</span>);
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;avatar&quot;</span>, <span class="ident">avatar</span>);
+        <span class="self">self</span>.<span class="ident">avatar</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">avatar</span>);
         <span class="self">self</span>
     }
 
@@ -129,7 +127,7 @@
     <span class="doccomment">/// If there are no available discriminators with the requested username,</span>
     <span class="doccomment">/// an error will occur.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">username</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">username</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;username&quot;</span>, <span class="ident">Value::from</span>(<span class="ident">username</span>.<span class="ident">into</span>()));
+        <span class="self">self</span>.<span class="ident">username</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">username</span>.<span class="ident">into</span>());
         <span class="self">self</span>
     }
 }

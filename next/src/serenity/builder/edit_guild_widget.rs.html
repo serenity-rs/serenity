@@ -28,27 +28,33 @@
 <span id="23">23</span>
 <span id="24">24</span>
 <span id="25">25</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::collections::HashMap</span>;
-
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::internal::prelude</span>::<span class="kw-2">*</span>;
+<span id="26">26</span>
+<span id="27">27</span>
+<span id="28">28</span>
+</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::id::ChannelId</span>;
 
 <span class="doccomment">/// A builder to specify the fields to edit in a [`GuildWidget`].</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// [`GuildWidget`]: crate::model::guild::GuildWidget</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Default</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">EditGuildWidget</span>(<span class="kw">pub</span> <span class="ident">HashMap</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>, <span class="ident">Value</span><span class="op">&gt;</span>);
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Default</span>, <span class="ident">Serialize</span>)]</span>
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">EditGuildWidget</span> {
+    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;Option::is_none&quot;</span>)]</span>
+    <span class="kw">pub</span> <span class="ident">enabled</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span>,
+    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;Option::is_none&quot;</span>)]</span>
+    <span class="kw">pub</span> <span class="ident">channel_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ChannelId</span><span class="op">&gt;</span>,
+}
 
 <span class="kw">impl</span> <span class="ident">EditGuildWidget</span> {
     <span class="doccomment">/// Whether the widget is enabled or not.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">enabled</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">enabled</span>: <span class="ident">bool</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;enabled&quot;</span>, <span class="ident">Value::from</span>(<span class="ident">enabled</span>));
+        <span class="self">self</span>.<span class="ident">enabled</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">enabled</span>);
 
         <span class="self">self</span>
     }
 
     <span class="doccomment">/// The server description shown in the welcome screen.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">channel_id</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">id</span>: <span class="ident">u64</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;channel_id&quot;</span>, <span class="ident">Value::from</span>(<span class="ident">id</span>.<span class="ident">to_string</span>()));
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">channel_id</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">id</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">ChannelId</span><span class="op">&gt;</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
+        <span class="self">self</span>.<span class="ident">channel_id</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">id</span>.<span class="ident">into</span>());
 
         <span class="self">self</span>
     }

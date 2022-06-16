@@ -77,8 +77,6 @@
 <span id="72">72</span>
 <span id="73">73</span>
 <span id="74">74</span>
-<span id="75">75</span>
-<span id="76">76</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::borrow::Cow</span>;
 
 <span class="kw">use</span> <span class="ident">reqwest::multipart</span>::{<span class="ident">Form</span>, <span class="ident">Part</span>};
@@ -86,7 +84,6 @@
 
 <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::AttachmentType</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::internal::prelude</span>::<span class="kw-2">*</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::json</span>;
 
 <span class="doccomment">/// Holder for multipart body. Contains files, multipart fields, and</span>
 <span class="doccomment">/// payload_json for creating requests with attachments.</span>
@@ -97,9 +94,8 @@
     <span class="doccomment">/// fields. If a certain endpoint does not support passing JSON body via</span>
     <span class="doccomment">/// `payload_json`, this must be used instead.</span>
     <span class="kw">pub</span> <span class="ident">fields</span>: <span class="ident">Vec</span><span class="op">&lt;</span>(<span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span>, <span class="ident">str</span><span class="op">&gt;</span>, <span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span>, <span class="ident">str</span><span class="op">&gt;</span>)<span class="op">&gt;</span>,
-    <span class="doccomment">/// JSON body that will be stringified and set as the form value as</span>
-    <span class="doccomment">/// `payload_json`.</span>
-    <span class="kw">pub</span> <span class="ident">payload_json</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Value</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// JSON body that will set as the form value as `payload_json`.</span>
+    <span class="kw">pub</span> <span class="ident">payload_json</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">Multipart</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
@@ -137,8 +133,8 @@
             <span class="ident">multipart</span> <span class="op">=</span> <span class="ident">multipart</span>.<span class="ident">text</span>(<span class="ident">name</span>.<span class="ident">clone</span>(), <span class="ident">value</span>.<span class="ident">clone</span>());
         }
 
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">payload_json</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">payload_json</span> {
-            <span class="ident">multipart</span> <span class="op">=</span> <span class="ident">multipart</span>.<span class="ident">text</span>(<span class="string">&quot;payload_json&quot;</span>, <span class="ident">json::to_string</span>(<span class="ident">payload_json</span>)<span class="question-mark">?</span>);
+        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">payload_json</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">payload_json</span>.<span class="ident">clone</span>() {
+            <span class="ident">multipart</span> <span class="op">=</span> <span class="ident">multipart</span>.<span class="ident">text</span>(<span class="string">&quot;payload_json&quot;</span>, <span class="ident">payload_json</span>);
         }
 
         <span class="prelude-val">Ok</span>(<span class="ident">multipart</span>)

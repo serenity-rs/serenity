@@ -168,10 +168,14 @@
 <span id="163">163</span>
 <span id="164">164</span>
 <span id="165">165</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::collections::HashMap</span>;
-
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::json</span>::{<span class="ident">from_number</span>, <span class="ident">json</span>, <span class="ident">Value</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::prelude</span>::<span class="kw-2">*</span>;
+<span id="166">166</span>
+<span id="167">167</span>
+<span id="168">168</span>
+<span id="169">169</span>
+<span id="170">170</span>
+<span id="171">171</span>
+<span id="172">172</span>
+</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::prelude</span>::<span class="kw-2">*</span>;
 
 <span class="doccomment">/// A builder for creating a new [`GuildChannel`] in a [`Guild`].</span>
 <span class="doccomment">///</span>
@@ -179,28 +183,47 @@
 <span class="doccomment">///</span>
 <span class="doccomment">/// [`GuildChannel`]: crate::model::channel::GuildChannel</span>
 <span class="doccomment">/// [`Guild`]: crate::model::guild::Guild</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">CreateChannel</span>(<span class="kw">pub</span> <span class="ident">HashMap</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>, <span class="ident">Value</span><span class="op">&gt;</span>);
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Serialize</span>)]</span>
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">CreateChannel</span> {
+    <span class="ident">kind</span>: <span class="ident">ChannelType</span>,
+    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;Option::is_none&quot;</span>)]</span>
+    <span class="ident">name</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
+    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;Option::is_none&quot;</span>)]</span>
+    <span class="ident">parent_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ChannelId</span><span class="op">&gt;</span>,
+    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;Option::is_none&quot;</span>)]</span>
+    <span class="ident">topic</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
+    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;Option::is_none&quot;</span>)]</span>
+    <span class="ident">nsfw</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span>,
+    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;Option::is_none&quot;</span>)]</span>
+    <span class="ident">bitrate</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
+    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;Option::is_none&quot;</span>)]</span>
+    <span class="ident">user_limit</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
+    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;Option::is_none&quot;</span>)]</span>
+    <span class="ident">rate_limit_per_user</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span>,
+    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;Option::is_none&quot;</span>)]</span>
+    <span class="ident">position</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
+    <span class="ident">permission_overwrites</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">PermissionOverwriteData</span><span class="op">&gt;</span>,
+}
 
 <span class="kw">impl</span> <span class="ident">CreateChannel</span> {
     <span class="doccomment">/// Specify how to call this new channel.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// **Note**: Must be between 2 and 100 characters long.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">name</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">name</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;name&quot;</span>, <span class="ident">Value::String</span>(<span class="ident">name</span>.<span class="ident">into</span>()));
+        <span class="self">self</span>.<span class="ident">name</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">name</span>.<span class="ident">into</span>());
 
         <span class="self">self</span>
     }
     <span class="doccomment">/// Specify what type the channel is, whether it&#39;s a text, voice, category or news channel.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">kind</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">kind</span>: <span class="ident">ChannelType</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;type&quot;</span>, <span class="ident">from_number</span>(<span class="ident">kind</span> <span class="kw">as</span> <span class="ident">u8</span>));
+        <span class="self">self</span>.<span class="ident">kind</span> <span class="op">=</span> <span class="ident">kind</span>;
 
         <span class="self">self</span>
     }
 
     <span class="doccomment">/// Specify the category, the &quot;parent&quot; of this channel.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">category</span><span class="op">&lt;</span><span class="ident">I</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">ChannelId</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">id</span>: <span class="ident">I</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;parent_id&quot;</span>, <span class="ident">from_number</span>(<span class="ident">id</span>.<span class="ident">into</span>().<span class="number">0</span>));
+        <span class="self">self</span>.<span class="ident">parent_id</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">id</span>.<span class="ident">into</span>());
 
         <span class="self">self</span>
     }
@@ -209,28 +232,28 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// **Note**: Must be between 0 and 1000 characters long.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">topic</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">topic</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;topic&quot;</span>, <span class="ident">Value::String</span>(<span class="ident">topic</span>.<span class="ident">into</span>()));
+        <span class="self">self</span>.<span class="ident">topic</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">topic</span>.<span class="ident">into</span>());
 
         <span class="self">self</span>
     }
 
     <span class="doccomment">/// Specify if this channel will be inappropriate to browse while at work.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">nsfw</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">b</span>: <span class="ident">bool</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;nsfw&quot;</span>, <span class="ident">Value::from</span>(<span class="ident">b</span>));
+        <span class="self">self</span>.<span class="ident">nsfw</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">b</span>);
 
         <span class="self">self</span>
     }
 
     <span class="doccomment">/// [Voice-only] Specify the bitrate at which sound plays in the voice channel.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">bitrate</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">rate</span>: <span class="ident">u32</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;bitrate&quot;</span>, <span class="ident">from_number</span>(<span class="ident">rate</span>));
+        <span class="self">self</span>.<span class="ident">bitrate</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">rate</span>);
 
         <span class="self">self</span>
     }
 
     <span class="doccomment">/// [Voice-only] Set how many users may occupy this voice channel.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">user_limit</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">limit</span>: <span class="ident">u32</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;user_limit&quot;</span>, <span class="ident">from_number</span>(<span class="ident">limit</span>));
+        <span class="self">self</span>.<span class="ident">user_limit</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">limit</span>);
 
         <span class="self">self</span>
     }
@@ -246,14 +269,14 @@
     <span class="doccomment">/// [`MANAGE_CHANNELS`]: crate::model::permissions::Permissions::MANAGE_CHANNELS</span>
     <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">alias</span> <span class="op">=</span> <span class="string">&quot;slowmode&quot;</span>)]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">rate_limit_per_user</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">seconds</span>: <span class="ident">u64</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;rate_limit_per_user&quot;</span>, <span class="ident">from_number</span>(<span class="ident">seconds</span>));
+        <span class="self">self</span>.<span class="ident">rate_limit_per_user</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">seconds</span>);
 
         <span class="self">self</span>
     }
 
     <span class="doccomment">/// Specify where the channel should be located.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">position</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">pos</span>: <span class="ident">u32</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;position&quot;</span>, <span class="ident">from_number</span>(<span class="ident">pos</span>));
+        <span class="self">self</span>.<span class="ident">position</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">pos</span>);
 
         <span class="self">self</span>
     }
@@ -291,24 +314,7 @@
     <span class="kw">where</span>
         <span class="ident">I</span>: <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">PermissionOverwrite</span><span class="op">&gt;</span>,
     {
-        <span class="kw">let</span> <span class="ident">overwrites</span> <span class="op">=</span> <span class="ident">perms</span>
-            .<span class="ident">into_iter</span>()
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">perm</span><span class="op">|</span> {
-                <span class="kw">let</span> (<span class="ident">id</span>, <span class="ident">kind</span>) <span class="op">=</span> <span class="kw">match</span> <span class="ident">perm</span>.<span class="ident">kind</span> {
-                    <span class="ident">PermissionOverwriteType::Role</span>(<span class="ident">id</span>) =&gt; (<span class="ident">id</span>.<span class="number">0</span>, <span class="number">0</span>),
-                    <span class="ident">PermissionOverwriteType::Member</span>(<span class="ident">id</span>) =&gt; (<span class="ident">id</span>.<span class="number">0</span>, <span class="number">1</span>),
-                };
-
-                <span class="macro">json!</span>({
-                    <span class="string">&quot;allow&quot;</span>: <span class="ident">perm</span>.<span class="ident">allow</span>.<span class="ident">bits</span>(),
-                    <span class="string">&quot;deny&quot;</span>: <span class="ident">perm</span>.<span class="ident">deny</span>.<span class="ident">bits</span>(),
-                    <span class="string">&quot;id&quot;</span>: <span class="ident">id</span>,
-                    <span class="string">&quot;type&quot;</span>: <span class="ident">kind</span>,
-                })
-            })
-            .<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>();
-
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;permission_overwrites&quot;</span>, <span class="ident">Value::from</span>(<span class="ident">overwrites</span>));
+        <span class="self">self</span>.<span class="ident">permission_overwrites</span> <span class="op">=</span> <span class="ident">perms</span>.<span class="ident">into_iter</span>().<span class="ident">map</span>(<span class="ident">Into::into</span>).<span class="ident">collect</span>();
 
         <span class="self">self</span>
     }
@@ -327,10 +333,18 @@
     <span class="doccomment">/// let channel_builder = CreateChannel::default();</span>
     <span class="doccomment">/// ```</span>
     <span class="kw">fn</span> <span class="ident">default</span>() -&gt; <span class="self">Self</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">builder</span> <span class="op">=</span> <span class="ident">CreateChannel</span>(<span class="ident">HashMap::new</span>());
-        <span class="ident">builder</span>.<span class="ident">kind</span>(<span class="ident">ChannelType::Text</span>);
-
-        <span class="ident">builder</span>
+        <span class="ident">CreateChannel</span> {
+            <span class="ident">name</span>: <span class="prelude-val">None</span>,
+            <span class="ident">nsfw</span>: <span class="prelude-val">None</span>,
+            <span class="ident">topic</span>: <span class="prelude-val">None</span>,
+            <span class="ident">bitrate</span>: <span class="prelude-val">None</span>,
+            <span class="ident">position</span>: <span class="prelude-val">None</span>,
+            <span class="ident">parent_id</span>: <span class="prelude-val">None</span>,
+            <span class="ident">user_limit</span>: <span class="prelude-val">None</span>,
+            <span class="ident">rate_limit_per_user</span>: <span class="prelude-val">None</span>,
+            <span class="ident">kind</span>: <span class="ident">ChannelType::Text</span>,
+            <span class="ident">permission_overwrites</span>: <span class="ident">Vec::new</span>(),
+        }
     }
 }
 </code></pre></div>
