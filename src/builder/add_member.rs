@@ -1,20 +1,28 @@
-use std::collections::HashMap;
-
-use crate::json::{from_number, Value};
 use crate::model::id::RoleId;
 
 /// A builder to add parameters when using [`GuildId::add_member`].
 ///
 /// [`GuildId::add_member`]: crate::model::id::GuildId::add_member
-#[derive(Clone, Debug, Default)]
-pub struct AddMember(pub HashMap<&'static str, Value>);
+#[derive(Clone, Debug, Default, Serialize)]
+pub struct AddMember {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    access_token: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    nick: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    roles: Option<Vec<RoleId>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    mute: Option<bool>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    deaf: Option<bool>,
+}
 
 impl AddMember {
     /// Sets the OAuth2 access token for this request.
     ///
     /// Requires the access token to have the `guilds.join` scope granted.
     pub fn access_token(&mut self, access_token: impl Into<String>) -> &mut Self {
-        self.0.insert("access_token", Value::String(access_token.into()));
+        self.access_token = Some(access_token.into());
         self
     }
 
@@ -24,7 +32,7 @@ impl AddMember {
     ///
     /// [Manage Nicknames]: crate::model::permissions::Permissions::MANAGE_NICKNAMES
     pub fn nickname(&mut self, nickname: impl Into<String>) -> &mut Self {
-        self.0.insert("nick", Value::String(nickname.into()));
+        self.nick = Some(nickname.into());
         self
     }
 
@@ -33,10 +41,8 @@ impl AddMember {
     /// Requires the [Manage Roles] permission.
     ///
     /// [Manage Roles]: crate::model::permissions::Permissions::MANAGE_ROLES
-    pub fn roles(&mut self, roles: impl IntoIterator<Item = impl AsRef<RoleId>>) -> &mut Self {
-        let roles = roles.into_iter().map(|x| from_number(x.as_ref().0)).collect::<Vec<Value>>();
-
-        self.0.insert("roles", Value::from(roles));
+    pub fn roles(&mut self, roles: impl IntoIterator<Item = impl Into<RoleId>>) -> &mut Self {
+        self.roles = Some(roles.into_iter().map(Into::into).collect());
         self
     }
 
@@ -46,7 +52,7 @@ impl AddMember {
     ///
     /// [Mute Members]: crate::model::permissions::Permissions::MUTE_MEMBERS
     pub fn mute(&mut self, mute: bool) -> &mut Self {
-        self.0.insert("mute", Value::from(mute));
+        self.mute = Some(mute);
         self
     }
 
@@ -56,7 +62,7 @@ impl AddMember {
     ///
     /// [Deafen Members]: crate::model::permissions::Permissions::DEAFEN_MEMBERS
     pub fn deafen(&mut self, deafen: bool) -> &mut Self {
-        self.0.insert("deaf", Value::from(deafen));
+        self.deaf = Some(deafen);
         self
     }
 }
