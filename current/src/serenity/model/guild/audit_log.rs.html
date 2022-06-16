@@ -392,6 +392,21 @@
 <span id="387">387</span>
 <span id="388">388</span>
 <span id="389">389</span>
+<span id="390">390</span>
+<span id="391">391</span>
+<span id="392">392</span>
+<span id="393">393</span>
+<span id="394">394</span>
+<span id="395">395</span>
+<span id="396">396</span>
+<span id="397">397</span>
+<span id="398">398</span>
+<span id="399">399</span>
+<span id="400">400</span>
+<span id="401">401</span>
+<span id="402">402</span>
+<span id="403">403</span>
+<span id="404">404</span>
 </pre><pre class="rust"><code><span class="doccomment">//! Audit log types for administrative actions within guilds.</span>
 
 <span class="kw">use</span> <span class="ident">std::collections::HashMap</span>;
@@ -424,6 +439,7 @@
     <span class="ident">Integration</span>(<span class="ident">IntegrationAction</span>),
     <span class="ident">StageInstance</span>(<span class="ident">StageInstanceAction</span>),
     <span class="ident">Sticker</span>(<span class="ident">StickerAction</span>),
+    <span class="ident">ScheduledEvent</span>(<span class="ident">ScheduledEventAction</span>),
     <span class="ident">Thread</span>(<span class="ident">ThreadAction</span>),
     <span class="ident">Unknown</span>(<span class="ident">u8</span>),
 }
@@ -444,6 +460,7 @@
             <span class="ident"><span class="self">Self</span>::Integration</span>(<span class="ident">x</span>) =&gt; <span class="ident">x</span> <span class="kw">as</span> <span class="ident">u8</span>,
             <span class="ident"><span class="self">Self</span>::StageInstance</span>(<span class="ident">x</span>) =&gt; <span class="ident">x</span> <span class="kw">as</span> <span class="ident">u8</span>,
             <span class="ident"><span class="self">Self</span>::Sticker</span>(<span class="ident">x</span>) =&gt; <span class="ident">x</span> <span class="kw">as</span> <span class="ident">u8</span>,
+            <span class="ident"><span class="self">Self</span>::ScheduledEvent</span>(<span class="ident">x</span>) =&gt; <span class="ident">x</span> <span class="kw">as</span> <span class="ident">u8</span>,
             <span class="ident"><span class="self">Self</span>::Thread</span>(<span class="ident">x</span>) =&gt; <span class="ident">x</span> <span class="kw">as</span> <span class="ident">u8</span>,
             <span class="ident"><span class="self">Self</span>::Unknown</span>(<span class="ident">x</span>) =&gt; <span class="ident">x</span>,
         }
@@ -466,6 +483,7 @@
             <span class="number">80</span>..<span class="op">=</span><span class="number">82</span> =&gt; <span class="ident">Action::Integration</span>(<span class="kw">unsafe</span> { <span class="ident">transmute</span>(<span class="ident">value</span>) }),
             <span class="number">83</span>..<span class="op">=</span><span class="number">85</span> =&gt; <span class="ident">Action::StageInstance</span>(<span class="kw">unsafe</span> { <span class="ident">transmute</span>(<span class="ident">value</span>) }),
             <span class="number">90</span>..<span class="op">=</span><span class="number">92</span> =&gt; <span class="ident">Action::Sticker</span>(<span class="kw">unsafe</span> { <span class="ident">transmute</span>(<span class="ident">value</span>) }),
+            <span class="number">100</span>..<span class="op">=</span><span class="number">102</span> =&gt; <span class="ident">Action::ScheduledEvent</span>(<span class="kw">unsafe</span> { <span class="ident">transmute</span>(<span class="ident">value</span>) }),
             <span class="number">110</span>..<span class="op">=</span><span class="number">112</span> =&gt; <span class="ident">Action::Thread</span>(<span class="kw">unsafe</span> { <span class="ident">transmute</span>(<span class="ident">value</span>) }),
             <span class="kw">_</span> =&gt; <span class="kw">return</span> <span class="prelude-val">None</span>,
         };
@@ -626,6 +644,15 @@
     <span class="ident">Delete</span> <span class="op">=</span> <span class="number">92</span>,
 }
 
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">Debug</span>)]</span>
+<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
+<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">u8</span>)]</span>
+<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">ScheduledEventAction</span> {
+    <span class="ident">Create</span> <span class="op">=</span> <span class="number">100</span>,
+    <span class="ident">Update</span> <span class="op">=</span> <span class="number">101</span>,
+    <span class="ident">Delete</span> <span class="op">=</span> <span class="number">102</span>,
+}
+
 <span class="attribute">#[<span class="ident">deprecated</span>(<span class="ident">note</span> <span class="op">=</span> <span class="string">&quot;use `ThreadAction`&quot;</span>)]</span>
 <span class="kw">pub</span> <span class="kw">type</span> <span class="ident">ActionThread</span> <span class="op">=</span> <span class="ident">ThreadAction</span>;
 
@@ -754,6 +781,9 @@
         <span class="macro">assert_action!</span>(<span class="ident">Action::Sticker</span>(<span class="ident">StickerAction::Create</span>), <span class="number">90</span>);
         <span class="macro">assert_action!</span>(<span class="ident">Action::Sticker</span>(<span class="ident">StickerAction::Update</span>), <span class="number">91</span>);
         <span class="macro">assert_action!</span>(<span class="ident">Action::Sticker</span>(<span class="ident">StickerAction::Delete</span>), <span class="number">92</span>);
+        <span class="macro">assert_action!</span>(<span class="ident">Action::ScheduledEvent</span>(<span class="ident">ScheduledEventAction::Create</span>), <span class="number">100</span>);
+        <span class="macro">assert_action!</span>(<span class="ident">Action::ScheduledEvent</span>(<span class="ident">ScheduledEventAction::Update</span>), <span class="number">101</span>);
+        <span class="macro">assert_action!</span>(<span class="ident">Action::ScheduledEvent</span>(<span class="ident">ScheduledEventAction::Delete</span>), <span class="number">102</span>);
         <span class="macro">assert_action!</span>(<span class="ident">Action::Thread</span>(<span class="ident">ThreadAction::Create</span>), <span class="number">110</span>);
         <span class="macro">assert_action!</span>(<span class="ident">Action::Thread</span>(<span class="ident">ThreadAction::Update</span>), <span class="number">111</span>);
         <span class="macro">assert_action!</span>(<span class="ident">Action::Thread</span>(<span class="ident">ThreadAction::Delete</span>), <span class="number">112</span>);
