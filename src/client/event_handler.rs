@@ -7,6 +7,7 @@ use crate::client::bridge::gateway::event::*;
 use crate::json::Value;
 use crate::model::application::command::CommandPermission;
 use crate::model::application::interaction::Interaction;
+use crate::model::guild::automod::Rule;
 use crate::model::prelude::*;
 
 /// The core trait for handling events by serenity.
@@ -21,6 +22,21 @@ pub trait EventHandler: Send + Sync {
         _permission: CommandPermission,
     ) {
     }
+
+    /// Dispatched when an auto moderation rule was created.
+    ///
+    /// Provides said rule's data.
+    async fn auto_moderation_rule_create(&self, _ctx: Context, _rule: Rule) {}
+
+    /// Dispatched when an auto moderation rule was updated.
+    ///
+    /// Provides said rule's data.
+    async fn auto_moderation_rule_update(&self, _ctx: Context, _rule: Rule) {}
+
+    /// Dispatched when an auto moderation rule was deleted.
+    ///
+    /// Provides said rule's data.
+    async fn auto_moderation_rule_delete(&self, _ctx: Context, _rule: Rule) {}
 
     /// Dispatched when the cache has received and inserted all data from
     /// guilds.
