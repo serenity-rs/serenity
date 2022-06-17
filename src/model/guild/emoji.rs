@@ -74,7 +74,7 @@ impl Emoji {
     /// # #[command]
     /// # async fn example(ctx: &Context) -> CommandResult {
     /// #     let mut emoji = from_value::<Emoji>(json!({
-    /// #         "id": EmojiId(7),
+    /// #         "id": EmojiId::new(7),
     /// #         "name": "blobface",
     /// #     }))?;
     /// #
@@ -98,7 +98,7 @@ impl Emoji {
     #[inline]
     pub async fn delete(&self, cache_http: impl CacheHttp) -> Result<()> {
         let guild_id = self.try_find_guild_id(&cache_http)?;
-        cache_http.http().delete_emoji(guild_id.0, self.id.0).await
+        cache_http.http().delete_emoji(guild_id.get(), self.id.get()).await
     }
 
     /// Edits the emoji by updating it with a new name.
@@ -117,7 +117,7 @@ impl Emoji {
         let guild_id = self.try_find_guild_id(&cache_http)?;
         let map = json!({ "name": name });
 
-        *self = cache_http.http().edit_emoji(guild_id.0, self.id.0, &map, None).await?;
+        *self = cache_http.http().edit_emoji(guild_id.get(), self.id.get(), &map, None).await?;
 
         Ok(())
     }

@@ -355,7 +355,7 @@ impl PrivateChannel {
     /// # fn long_process() {}
     /// # let http = Arc::new(Http::new("token"));
     /// # let cache = Cache::default();
-    /// # let channel = cache.private_channel(ChannelId(7))
+    /// # let channel = cache.private_channel(ChannelId::new(7))
     /// #    .ok_or(ModelError::ItemMissing)?
     /// #    .clone();
     /// // Initiate typing (assuming http is `Arc<Http>` and `channel` is bound)
@@ -376,7 +376,7 @@ impl PrivateChannel {
     /// May return [`Error::Http`] if the current user cannot send a direct message
     /// to this user.
     pub fn start_typing(self, http: &Arc<Http>) -> Result<Typing> {
-        http.start_typing(self.id.0)
+        http.start_typing(self.id.get())
     }
 
     /// Unpins a [`Message`] in the channel given by its Id.

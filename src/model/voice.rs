@@ -90,7 +90,7 @@ impl<'de> Deserialize<'de> for VoiceState {
         let mut state = InterimVoiceState::deserialize(deserializer)?;
 
         if let (Some(guild_id), Some(member)) = (state.guild_id, state.member.as_mut()) {
-            member.guild_id = guild_id;
+            member.guild_id = Some(guild_id);
         }
 
         Ok(VoiceState {

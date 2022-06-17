@@ -102,7 +102,7 @@ impl Invite {
 
         let builder = f(CreateInvite::default());
 
-        cache_http.http().create_invite(channel_id.0, &builder, None).await
+        cache_http.http().create_invite(channel_id.get(), &builder, None).await
     }
 
     /// Deletes the invite.
@@ -188,12 +188,12 @@ impl Invite {
     /// #     "approximate_presence_count": Some(717),
     /// #     "code": "WxZumR",
     /// #     "channel": {
-    /// #         "id": ChannelId(1),
+    /// #         "id": ChannelId::new(1),
     /// #         "name": "foo",
     /// #         "type": ChannelType::Text,
     /// #     },
     /// #     "guild": {
-    /// #         "id": GuildId(2),
+    /// #         "id": GuildId::new(2),
     /// #         "icon": None::<String>,
     /// #         "name": "bar",
     /// #         "splash_hash": None::<String>,
@@ -201,7 +201,7 @@ impl Invite {
     /// #         "voice_channel_count": 3,
     /// #     },
     /// #     "inviter": {
-    /// #         "id": UserId(3),
+    /// #         "id": UserId::new(3),
     /// #         "username": "foo",
     /// #         "discriminator": "1234",
     /// #         "avatar": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
@@ -370,13 +370,13 @@ impl RichInvite {
     /// # let invite = from_value::<RichInvite>(json!({
     /// #     "code": "WxZumR",
     /// #     "channel": {
-    /// #         "id": ChannelId(1),
+    /// #         "id": ChannelId::new(1),
     /// #         "name": "foo",
     /// #         "type": ChannelType::Text,
     /// #     },
     /// #     "created_at": "2017-01-29T15:35:17.136000+00:00",
     /// #     "guild": {
-    /// #         "id": GuildId(2),
+    /// #         "id": GuildId::new(2),
     /// #         "icon": None::<String>,
     /// #         "name": "baz",
     /// #         "splash_hash": None::<String>,
@@ -387,7 +387,7 @@ impl RichInvite {
     /// #         "avatar": None::<String>,
     /// #         "bot": false,
     /// #         "discriminator": 3,
-    /// #         "id": UserId(4),
+    /// #         "id": UserId::new(4),
     /// #         "username": "qux",
     /// #         "public_flags": None::<UserPublicFlags>,
     /// #     },

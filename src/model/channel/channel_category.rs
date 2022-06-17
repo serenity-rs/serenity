@@ -104,7 +104,7 @@ impl ChannelCategory {
     /// #     use serenity::http::Http;
     /// #     use serenity::model::id::ChannelId;
     /// #     let http = Http::new("token");
-    /// #     let category = ChannelId(1234);
+    /// #     let category = ChannelId::new(1234);
     /// category.edit(&http, |c| c.name("test").bitrate(86400)).await;
     /// # }
     /// ```
@@ -123,7 +123,7 @@ impl ChannelCategory {
         let mut edit_channel = EditChannel::default();
         f(&mut edit_channel);
 
-        cache_http.http().edit_channel(self.id.0, &edit_channel, None).await.map(|channel| {
+        cache_http.http().edit_channel(self.id.get(), &edit_channel, None).await.map(|channel| {
             let GuildChannel {
                 id,
                 guild_id,

@@ -1,4 +1,5 @@
 use std::future::Future;
+use std::num::NonZeroU64;
 use std::pin::Pin;
 use std::sync::Arc;
 use std::task::{Context as FutContext, Poll};
@@ -49,7 +50,7 @@ macro_rules! impl_message_collector {
                 /// If a message does not meet this ID, it won't be received.
                 #[must_use]
                 pub fn author_id(mut self, author_id: impl Into<u64>) -> Self {
-                    self.filter.as_mut().unwrap().author_id = Some(author_id.into());
+                    self.filter.as_mut().unwrap().author_id = NonZeroU64::new(author_id.into());
 
                     self
                 }
@@ -58,7 +59,7 @@ macro_rules! impl_message_collector {
                 /// If a message does not meet this ID, it won't be received.
                 #[must_use]
                 pub fn channel_id(mut self, channel_id: impl Into<u64>) -> Self {
-                    self.filter.as_mut().unwrap().channel_id = Some(channel_id.into());
+                    self.filter.as_mut().unwrap().channel_id = NonZeroU64::new(channel_id.into());
 
                     self
                 }
@@ -67,7 +68,7 @@ macro_rules! impl_message_collector {
                 /// If a message does not meet this ID, it won't be received.
                 #[must_use]
                 pub fn guild_id(mut self, guild_id: impl Into<u64>) -> Self {
-                    self.filter.as_mut().unwrap().guild_id = Some(guild_id.into());
+                    self.filter.as_mut().unwrap().guild_id = NonZeroU64::new(guild_id.into());
 
                     self
                 }
@@ -150,9 +151,9 @@ struct FilterOptions {
     filter_limit: Option<u32>,
     collect_limit: Option<u32>,
     filter: Option<FilterFn<Message>>,
-    channel_id: Option<u64>,
-    guild_id: Option<u64>,
-    author_id: Option<u64>,
+    channel_id: Option<NonZeroU64>,
+    guild_id: Option<NonZeroU64>,
+    author_id: Option<NonZeroU64>,
 }
 
 // Implement the common setters for all message collector types.

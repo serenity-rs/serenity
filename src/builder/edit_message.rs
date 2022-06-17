@@ -18,7 +18,7 @@ use crate::model::id::AttachmentId;
 /// # #[cfg(all(feature = "model", feature = "utils", feature = "framework"))]
 /// # #[command]
 /// # async fn example(ctx: &Context) -> CommandResult {
-/// # let mut message = ChannelId(7).message(&ctx, MessageId(8)).await?;
+/// # let mut message = ChannelId::new(7).message(&ctx, MessageId::new(8)).await?;
 /// message.edit(ctx, |m| m.content("hello")).await?;
 /// # Ok(())
 /// # }

@@ -59,12 +59,11 @@ pub struct Member {
 
 /// Helper for deserialization without a `GuildId` but then later updated to the correct `GuildId`.
 ///
-/// The only difference to `Member` is `#[serde(default)]` on `guild_id`.
+/// The only difference to `Member` is `guild_id` is wrapped in `Option`.
 #[derive(Deserialize)]
 pub(crate) struct InterimMember {
     pub deaf: bool,
-    #[serde(default)]
-    pub guild_id: GuildId,
+    pub guild_id: Option<GuildId>,
     pub joined_at: Option<Timestamp>,
     pub mute: bool,
     pub nick: Option<String>,
@@ -82,7 +81,7 @@ impl From<InterimMember> for Member {
     fn from(m: InterimMember) -> Self {
         Self {
             deaf: m.deaf,
-            guild_id: m.guild_id,
+            guild_id: m.guild_id.expect("GuildID was not set on InterimMember"),
             joined_at: m.joined_at,
             mute: m.mute,
             nick: m.nick,
@@ -124,7 +123,10 @@ impl Member {
             return Ok(());
         }
 
-        match http.as_ref().add_member_role(self.guild_id.0, self.user.id.0, role_id.0, None).await
+        match http
+            .as_ref()
+            .add_member_role(self.guild_id.get(), self.user.id.get(), role_id.get(), None)
+            .await
         {
             Ok(()) => {
                 self.roles.push(role_id);
@@ -156,7 +158,11 @@ impl Member {
         let mut builder = EditMember::default();
         builder.roles(&self.roles);
 
-        match http.as_ref().edit_member(self.guild_id.0, self.user.id.0, &builder, None).await {
+        match http
+            .as_ref()
+            .edit_member(self.guild_id.get(), self.user.id.get(), &builder, None)
+            .await
+        {
             Ok(member) => Ok(member.roles),
             Err(why) => {
                 self.roles.retain(|r| !role_ids.contains(r));
@@ -524,7 +530,7 @@ impl Member {
 
         match http
             .as_ref()
-            .remove_member_role(self.guild_id.0, self.user.id.0, role_id.0, None)
+            .remove_member_role(self.guild_id.get(), self.user.id.get(), role_id.get(), None)
             .await
         {
             Ok(()) => {
@@ -557,7 +563,11 @@ impl Member {
         let mut builder = EditMember::default();
         builder.roles(&self.roles);
 
-        match http.as_ref().edit_member(self.guild_id.0, self.user.id.0, &builder, None).await {
+        match http
+            .as_ref()
+            .edit_member(self.guild_id.get(), self.user.id.get(), &builder, None)
+            .await
+        {
             Ok(member) => Ok(member.roles),
             Err(why) => {
                 self.roles.extend_from_slice(role_ids);
@@ -598,7 +608,7 @@ impl Member {
     /// [Ban Members]: Permissions::BAN_MEMBERS
     #[inline]
     pub async fn unban(&self, http: impl AsRef<Http>) -> Result<()> {
-        http.as_ref().remove_ban(self.guild_id.0, self.user.id.0, None).await
+        http.as_ref().remove_ban(self.guild_id.get(), self.user.id.get(), None).await
     }
 
     /// Returns the formatted URL of the member's per guild avatar, if one exists.
