@@ -9,7 +9,7 @@ use serde::ser::{SerializeStruct, Serializer};
 use serde::{Deserialize, Serialize};
 use serde_value::{DeserializerError, Value};
 
-use crate::model::id::{ChannelId, GuildId, RoleId, RuleId, UserId};
+use crate::model::id::{ChannelId, GuildId, MessageId, RoleId, RuleId, UserId};
 
 /// Configured auto moderation rule.
 #[derive(Clone, Debug, PartialEq)]
@@ -418,6 +418,49 @@ pub enum Action {
     /// [`Permissions::MODERATE_MEMBERS`]: crate::model::Permissions::MODERATE_MEMBERS
     Timeout(u64),
     Unknown(u8),
+}
+
+/// Gateway event payload sent when a rule is triggered and an action is executed (e.g. message is
+/// blocked).
+///
+/// [Discord docs](https://discord.com/developers/docs/topics/gateway#auto-moderation-action-execution)
+#[derive(Clone, Debug, Deserialize, Serialize)]
+pub struct ActionExecution {
+    /// ID of the guild in which the action was executed.
+    pub guild_id: GuildId,
+    /// Action which was executed.
+    pub action: Action,
+    /// ID of the rule which action belongs to.
+    pub rule_id: RuleId,
+    /// Trigger type of rule which was triggered.
+    #[serde(rename = "rule_trigger_type")]
+    pub trigger_type: TriggerType,
+    /// ID of the user which generated the content which triggered the rule.
+    pub user_id: UserId,
+    /// ID of the channel in which user content was posted.
+    pub channel_id: Option<ChannelId>,
+    /// ID of any user message which content belongs to.
+    ///
+    /// Will be `None` if message was blocked by automod or content was not part of any message.
+    pub message_id: Option<MessageId>,
+    /// ID of any system auto moderation messages posted as a result of this action.
+    ///
+    /// Will be `None` if this event does not correspond to an action with type [`Action::Alert`].
+    pub alert_system_message_id: Option<MessageId>,
+    /// User generated text content.
+    ///
+    /// Requires [`GatewayIntents::MESSAGE_CONTENT`] to receive non-empty values.
+    ///
+    /// [`GatewayIntents::MESSAGE_CONTENT`]: crate::model::gateway::GatewayIntents::MESSAGE_CONTENT
+    pub content: String,
+    /// Word or phrase configured in the rule that triggered the rule.
+    pub matched_keyword: Option<String>,
+    /// Substring in content that triggered the rule.
+    ///
+    /// Requires [`GatewayIntents::MESSAGE_CONTENT`] to receive non-empty values.
+    ///
+    /// [`GatewayIntents::MESSAGE_CONTENT`]: crate::model::gateway::GatewayIntents::MESSAGE_CONTENT
+    pub matched_content: Option<String>,
 }
 
 #[derive(Deserialize, Serialize)]

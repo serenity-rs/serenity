@@ -388,6 +388,11 @@ async fn handle_event(
                 event_handler.auto_moderation_rule_delete(context, event.rule).await;
             });
         },
+        Event::AutoModerationActionExecution(event) => {
+            spawn_named("dispatch::event_handler::auto_moderation_action_execution", async move {
+                event_handler.auto_moderation_action_execution(context, event.execution).await;
+            });
+        },
         Event::ChannelCreate(mut event) => {
             update(&cache_and_http, &mut event);
             match event.channel {
