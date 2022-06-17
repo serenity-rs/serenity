@@ -453,8 +453,8 @@ pub fn parse_webhook(url: &Url) -> Option<(u64, &str)> {
 /// assert_eq!(utils::shard_id(81384788765712384 as u64, 17), 7);
 /// ```
 #[inline]
-pub fn shard_id(guild_id: impl Into<u64>, shard_count: u64) -> u64 {
-    (guild_id.into() >> 22) % shard_count
+pub fn shard_id(guild_id: impl Into<u64>, shard_count: u32) -> u32 {
+    (guild_id.into() >> 22) as u32 % shard_count
 }
 
 #[cfg(test)]

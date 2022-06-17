@@ -143,7 +143,7 @@ impl ShardRunner {
                 let e = ClientEvent::ShardStageUpdate(ShardStageUpdateEvent {
                     new: post,
                     old: pre,
-                    shard_id: ShardId(self.shard.shard_info()[0]),
+                    shard_id: ShardId(self.shard.shard_info().id),
                 });
 
                 self.dispatch(DispatchEvent::Client(e)).await;
@@ -297,7 +297,7 @@ impl ShardRunner {
     async fn checked_shutdown(&mut self, id: ShardId, close_code: u16) -> bool {
         // First verify the ID so we know for certain this runner is
         // to shutdown.
-        if id.0 != self.shard.shard_info()[0] {
+        if id.0 != self.shard.shard_info().id {
             // Not meant for this runner for some reason, don't
             // shutdown.
             return true;
@@ -353,7 +353,7 @@ impl ShardRunner {
             &self.event_handler,
             &self.raw_event_handler,
             &self.runner_tx,
-            self.shard.shard_info()[0],
+            self.shard.shard_info().id,
             Arc::clone(&self.cache_and_http),
         )
         .await;
@@ -649,7 +649,7 @@ impl ShardRunner {
         self.update_manager();
 
         debug!("[ShardRunner {:?}] Requesting restart", self.shard.shard_info(),);
-        let shard_id = ShardId(self.shard.shard_info()[0]);
+        let shard_id = ShardId(self.shard.shard_info().id);
         let msg = ShardManagerMessage::Restart(shard_id);
 
         if let Err(error) = self.manager_tx.unbounded_send(msg) {
@@ -667,7 +667,7 @@ impl ShardRunner {
     #[instrument(skip(self))]
     fn update_manager(&self) {
         drop(self.manager_tx.unbounded_send(ShardManagerMessage::ShardUpdate {
-            id: ShardId(self.shard.shard_info()[0]),
+            id: ShardId(self.shard.shard_info().id),
             latency: self.shard.latency(),
             stage: self.shard.stage(),
         }));

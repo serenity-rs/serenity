@@ -17,7 +17,7 @@ use crate::constants::{self, Opcode};
 use crate::gateway::{CurrentPresence, GatewayError};
 use crate::json::{from_str, json, to_string, Value};
 use crate::model::event::GatewayEvent;
-use crate::model::gateway::GatewayIntents;
+use crate::model::gateway::{GatewayIntents, ShardInfo};
 use crate::model::id::GuildId;
 use crate::{Error, Result};
 
@@ -105,7 +105,7 @@ impl WsClient {
     pub async fn send_chunk_guild(
         &mut self,
         guild_id: GuildId,
-        shard_info: &[u64; 2],
+        shard_info: &ShardInfo,
         limit: Option<u16>,
         filter: ChunkGuildFilter,
         nonce: Option<&str>,
@@ -134,7 +134,7 @@ impl WsClient {
     }
 
     #[instrument(skip(self))]
-    pub async fn send_heartbeat(&mut self, shard_info: &[u64; 2], seq: Option<u64>) -> Result<()> {
+    pub async fn send_heartbeat(&mut self, shard_info: &ShardInfo, seq: Option<u64>) -> Result<()> {
         trace!("[Shard {:?}] Sending heartbeat d: {:?}", shard_info, seq);
 
         self.send_json(&json!({
@@ -148,7 +148,7 @@ impl WsClient {
     #[instrument(skip(self, token))]
     pub async fn send_identify(
         &mut self,
-        shard_info: &[u64; 2],
+        shard_info: &ShardInfo,
         token: &str,
         intents: GatewayIntents,
     ) -> Result<()> {
@@ -176,7 +176,7 @@ impl WsClient {
     #[instrument(skip(self))]
     pub async fn send_presence_update(
         &mut self,
-        shard_info: &[u64; 2],
+        shard_info: &ShardInfo,
         current_presence: &CurrentPresence,
     ) -> Result<()> {
         let &(ref activity, ref status) = current_presence;
@@ -203,7 +203,7 @@ impl WsClient {
     #[instrument(skip(self, token))]
     pub async fn send_resume(
         &mut self,
-        shard_info: &[u64; 2],
+        shard_info: &ShardInfo,
         session_id: &str,
         seq: u64,
         token: &str,

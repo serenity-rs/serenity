@@ -13,7 +13,7 @@ use crate::constants::{self, close_codes};
 use crate::http::Http;
 use crate::internal::prelude::*;
 use crate::model::event::{Event, GatewayEvent};
-use crate::model::gateway::{Activity, GatewayIntents};
+use crate::model::gateway::{Activity, GatewayIntents, ShardInfo};
 use crate::model::id::GuildId;
 use crate::model::user::OnlineStatus;
 
@@ -70,7 +70,7 @@ pub struct Shard {
     last_heartbeat_acknowledged: bool,
     seq: u64,
     session_id: Option<String>,
-    shard_info: [u64; 2],
+    shard_info: ShardInfo,
     stage: ConnectionStage,
     /// Instant of when the shard was started.
     // This acts as a timeout to determine if the shard has - for some reason -
@@ -122,7 +122,7 @@ impl Shard {
     pub async fn new(
         ws_url: Arc<Mutex<String>>,
         token: &str,
-        shard_info: [u64; 2],
+        shard_info: ShardInfo,
         intents: GatewayIntents,
     ) -> Result<Shard> {
         let url = ws_url.lock().await.clone();
@@ -302,7 +302,7 @@ impl Shard {
     /// assert_eq!(shard.shard_info(), [1, 2]);
     /// # }
     /// ```
-    pub fn shard_info(&self) -> [u64; 2] {
+    pub fn shard_info(&self) -> ShardInfo {
         self.shard_info
     }
 

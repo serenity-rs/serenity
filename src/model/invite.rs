@@ -253,7 +253,7 @@ impl InviteGuild {
     /// [`utils::shard_id`]: crate::utils::shard_id
     #[cfg(all(feature = "cache", feature = "utils"))]
     #[inline]
-    pub fn shard_id(&self, cache: impl AsRef<Cache>) -> u64 {
+    pub fn shard_id(&self, cache: impl AsRef<Cache>) -> u32 {
         self.id.shard_id(&cache)
     }
 
