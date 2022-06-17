@@ -167,6 +167,10 @@ jobs:
       - name: Pin dashmap to 5.2.0
         run: cargo update -p dashmap --precise 5.2.0
 
+      # indexmap 1.9+ MSRV is 1.56
+      - name: Pin indexmap to 1.8.2
+        run: cargo update -p indexmap --precise 1.8.2
+
       - name: Check
         run: cargo check --features collector,unstable_discord_api
 
