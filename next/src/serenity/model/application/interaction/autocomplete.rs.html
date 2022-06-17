@@ -517,6 +517,8 @@
 <span id="512">512</span>
 <span id="513">513</span>
 <span id="514">514</span>
+<span id="515">515</span>
+<span id="516">516</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::fmt</span>;
 
 <span class="kw">use</span> <span class="ident">serde::de</span>::{<span class="ident">Deserializer</span>, <span class="ident">Error</span> <span class="kw">as</span> <span class="ident">DeError</span>, <span class="ident">IgnoredAny</span>, <span class="ident">MapAccess</span>};
@@ -548,6 +550,8 @@
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::utils</span>::{<span class="ident">deserialize_val</span>, <span class="ident">remove_from_map</span>, <span class="ident">remove_from_map_opt</span>};
 
 <span class="doccomment">/// An interaction received when the user fills in an autocomplete option</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-object).</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Serialize</span>)]</span>
 <span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">AutocompleteInteraction</span> {
@@ -573,10 +577,10 @@
     <span class="kw">pub</span> <span class="ident">token</span>: <span class="ident">String</span>,
     <span class="doccomment">/// Always `1`.</span>
     <span class="kw">pub</span> <span class="ident">version</span>: <span class="ident">u8</span>,
-    <span class="doccomment">/// The guild&#39;s preferred locale.</span>
-    <span class="kw">pub</span> <span class="ident">guild_locale</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
     <span class="doccomment">/// The selected language of the invoking user.</span>
     <span class="kw">pub</span> <span class="ident">locale</span>: <span class="ident">String</span>,
+    <span class="doccomment">/// The guild&#39;s preferred locale.</span>
+    <span class="kw">pub</span> <span class="ident">guild_locale</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
 }
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http&quot;</span>)]</span>
@@ -636,8 +640,8 @@
             <span class="ident">channel_id</span>: <span class="ident">remove_from_map</span>(<span class="kw-2">&amp;mut</span> <span class="ident">map</span>, <span class="string">&quot;channel_id&quot;</span>)<span class="question-mark">?</span>,
             <span class="ident">token</span>: <span class="ident">remove_from_map</span>(<span class="kw-2">&amp;mut</span> <span class="ident">map</span>, <span class="string">&quot;token&quot;</span>)<span class="question-mark">?</span>,
             <span class="ident">version</span>: <span class="ident">remove_from_map</span>(<span class="kw-2">&amp;mut</span> <span class="ident">map</span>, <span class="string">&quot;version&quot;</span>)<span class="question-mark">?</span>,
-            <span class="ident">guild_locale</span>: <span class="ident">remove_from_map_opt</span>(<span class="kw-2">&amp;mut</span> <span class="ident">map</span>, <span class="string">&quot;guild_locale&quot;</span>)<span class="question-mark">?</span>,
             <span class="ident">locale</span>: <span class="ident">remove_from_map</span>(<span class="kw-2">&amp;mut</span> <span class="ident">map</span>, <span class="string">&quot;locale&quot;</span>)<span class="question-mark">?</span>,
+            <span class="ident">guild_locale</span>: <span class="ident">remove_from_map_opt</span>(<span class="kw-2">&amp;mut</span> <span class="ident">map</span>, <span class="string">&quot;guild_locale&quot;</span>)<span class="question-mark">?</span>,
         })
     }
 }

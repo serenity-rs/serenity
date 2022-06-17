@@ -351,10 +351,10 @@
 <span class="kw">impl</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">ValueKind</span> {
     <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">ValueKind::Name</span> =&gt; <span class="ident">f</span>.<span class="ident">pad</span>(<span class="string">&quot;`#[&lt;name&gt;]`&quot;</span>),
-            <span class="ident">ValueKind::Equals</span> =&gt; <span class="ident">f</span>.<span class="ident">pad</span>(<span class="string">&quot;`#[&lt;name&gt; = &lt;value&gt;]`&quot;</span>),
-            <span class="ident">ValueKind::List</span> =&gt; <span class="ident">f</span>.<span class="ident">pad</span>(<span class="string">&quot;`#[&lt;name&gt;([&lt;value&gt;, &lt;value&gt;, &lt;value&gt;, ...])]`&quot;</span>),
-            <span class="ident">ValueKind::SingleList</span> =&gt; <span class="ident">f</span>.<span class="ident">pad</span>(<span class="string">&quot;`#[&lt;name&gt;(&lt;value&gt;)]`&quot;</span>),
+            <span class="ident"><span class="self">Self</span>::Name</span> =&gt; <span class="ident">f</span>.<span class="ident">pad</span>(<span class="string">&quot;`#[&lt;name&gt;]`&quot;</span>),
+            <span class="ident"><span class="self">Self</span>::Equals</span> =&gt; <span class="ident">f</span>.<span class="ident">pad</span>(<span class="string">&quot;`#[&lt;name&gt; = &lt;value&gt;]`&quot;</span>),
+            <span class="ident"><span class="self">Self</span>::List</span> =&gt; <span class="ident">f</span>.<span class="ident">pad</span>(<span class="string">&quot;`#[&lt;name&gt;([&lt;value&gt;, &lt;value&gt;, &lt;value&gt;, ...])]`&quot;</span>),
+            <span class="ident"><span class="self">Self</span>::SingleList</span> =&gt; <span class="ident">f</span>.<span class="ident">pad</span>(<span class="string">&quot;`#[&lt;name&gt;(&lt;value&gt;)]`&quot;</span>),
         }
     }
 }

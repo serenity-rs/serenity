@@ -304,6 +304,10 @@
 <span id="299">299</span>
 <span id="300">300</span>
 <span id="301">301</span>
+<span id="302">302</span>
+<span id="303">303</span>
+<span id="304">304</span>
+<span id="305">305</span>
 </pre><pre class="rust"><code><span class="doccomment">//! Utilities for parsing and formatting RFC 3339 timestamps.</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! The [`Timestamp`] newtype wraps `chrono::DateTime&lt;Utc&gt;` or `time::OffsetDateTime` if the `time`</span>
@@ -452,11 +456,14 @@
             }
 
             <span class="doccomment">/// Create a new `Timestamp` with the current date and time in UTC.</span>
+            <span class="attribute">#[<span class="ident">must_use</span>]</span>
             <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">now</span>() -&gt; <span class="self">Self</span> {
                 <span class="self">Self</span>(<span class="ident">OffsetDateTime::now_utc</span>())
             }
 
             <span class="doccomment">/// Create a new `Timestamp` from a UNIX timestamp.</span>
+            <span class="doccomment">///</span>
+            <span class="doccomment">/// # Errors</span>
             <span class="doccomment">///</span>
             <span class="doccomment">/// Returns `Err` if the value is invalid. The valid range of the value may vary depending on</span>
             <span class="doccomment">/// the feature flags enabled (`time` with `large-dates`).</span>
@@ -466,6 +473,7 @@
             }
 
             <span class="doccomment">/// Returns the number of non-leap seconds since January 1, 1970 0:00:00 UTC</span>
+            <span class="attribute">#[<span class="ident">must_use</span>]</span>
             <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">unix_timestamp</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">i64</span> {
                 <span class="self">self</span>.<span class="number">0</span>.<span class="ident">unix_timestamp</span>()
             }

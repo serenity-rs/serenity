@@ -258,9 +258,9 @@
 <span class="kw">impl</span> <span class="ident">Serialize</span> <span class="kw">for</span> <span class="ident">ActionRowComponent</span> {
     <span class="kw">fn</span> <span class="ident">serialize</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">Serializer</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">serializer</span>: <span class="ident">S</span>) -&gt; <span class="ident">std::result::Result</span><span class="op">&lt;</span><span class="ident">S::Ok</span>, <span class="ident">S::Error</span><span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">ActionRowComponent::Button</span>(<span class="ident">c</span>) =&gt; <span class="ident">c</span>.<span class="ident">serialize</span>(<span class="ident">serializer</span>),
-            <span class="ident">ActionRowComponent::InputText</span>(<span class="ident">c</span>) =&gt; <span class="ident">c</span>.<span class="ident">serialize</span>(<span class="ident">serializer</span>),
-            <span class="ident">ActionRowComponent::SelectMenu</span>(<span class="ident">c</span>) =&gt; <span class="ident">c</span>.<span class="ident">serialize</span>(<span class="ident">serializer</span>),
+            <span class="ident"><span class="self">Self</span>::Button</span>(<span class="ident">c</span>) =&gt; <span class="ident">c</span>.<span class="ident">serialize</span>(<span class="ident">serializer</span>),
+            <span class="ident"><span class="self">Self</span>::InputText</span>(<span class="ident">c</span>) =&gt; <span class="ident">c</span>.<span class="ident">serialize</span>(<span class="ident">serializer</span>),
+            <span class="ident"><span class="self">Self</span>::SelectMenu</span>(<span class="ident">c</span>) =&gt; <span class="ident">c</span>.<span class="ident">serialize</span>(<span class="ident">serializer</span>),
         }
     }
 }

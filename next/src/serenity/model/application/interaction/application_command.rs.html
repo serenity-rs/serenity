@@ -542,6 +542,14 @@
 <span id="537">537</span>
 <span id="538">538</span>
 <span id="539">539</span>
+<span id="540">540</span>
+<span id="541">541</span>
+<span id="542">542</span>
+<span id="543">543</span>
+<span id="544">544</span>
+<span id="545">545</span>
+<span id="546">546</span>
+<span id="547">547</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::collections::HashMap</span>;
 
 <span class="kw">use</span> <span class="ident">serde::de::Error</span> <span class="kw">as</span> <span class="ident">DeError</span>;
@@ -582,6 +590,8 @@
 };
 
 <span class="doccomment">/// An interaction when a user invokes a slash command.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-object).</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Serialize</span>)]</span>
 <span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ApplicationCommandInteraction</span> {
@@ -607,10 +617,10 @@
     <span class="kw">pub</span> <span class="ident">token</span>: <span class="ident">String</span>,
     <span class="doccomment">/// Always `1`.</span>
     <span class="kw">pub</span> <span class="ident">version</span>: <span class="ident">u8</span>,
-    <span class="doccomment">/// The guild&#39;s preferred locale.</span>
-    <span class="kw">pub</span> <span class="ident">guild_locale</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
     <span class="doccomment">/// The selected language of the invoking user.</span>
     <span class="kw">pub</span> <span class="ident">locale</span>: <span class="ident">String</span>,
+    <span class="doccomment">/// The guild&#39;s preferred locale.</span>
+    <span class="kw">pub</span> <span class="ident">guild_locale</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
 }
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http&quot;</span>)]</span>
@@ -870,13 +880,15 @@
             <span class="ident">channel_id</span>: <span class="ident">remove_from_map</span>(<span class="kw-2">&amp;mut</span> <span class="ident">map</span>, <span class="string">&quot;channel_id&quot;</span>)<span class="question-mark">?</span>,
             <span class="ident">token</span>: <span class="ident">remove_from_map</span>(<span class="kw-2">&amp;mut</span> <span class="ident">map</span>, <span class="string">&quot;token&quot;</span>)<span class="question-mark">?</span>,
             <span class="ident">version</span>: <span class="ident">remove_from_map</span>(<span class="kw-2">&amp;mut</span> <span class="ident">map</span>, <span class="string">&quot;version&quot;</span>)<span class="question-mark">?</span>,
-            <span class="ident">guild_locale</span>: <span class="ident">remove_from_map_opt</span>(<span class="kw-2">&amp;mut</span> <span class="ident">map</span>, <span class="string">&quot;guild_locale&quot;</span>)<span class="question-mark">?</span>,
             <span class="ident">locale</span>: <span class="ident">remove_from_map</span>(<span class="kw-2">&amp;mut</span> <span class="ident">map</span>, <span class="string">&quot;locale&quot;</span>)<span class="question-mark">?</span>,
+            <span class="ident">guild_locale</span>: <span class="ident">remove_from_map_opt</span>(<span class="kw-2">&amp;mut</span> <span class="ident">map</span>, <span class="string">&quot;guild_locale&quot;</span>)<span class="question-mark">?</span>,
         })
     }
 }
 
 <span class="doccomment">/// The command data payload.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-object-interaction-data-structure).</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Serialize</span>)]</span>
 <span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">CommandData</span> {
@@ -888,11 +900,11 @@
     <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename</span> <span class="op">=</span> <span class="string">&quot;type&quot;</span>)]</span>
     <span class="kw">pub</span> <span class="ident">kind</span>: <span class="ident">CommandType</span>,
     <span class="doccomment">/// The parameters and the given values.</span>
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">default</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">options</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">CommandDataOption</span><span class="op">&gt;</span>,
     <span class="doccomment">/// The converted objects from the given options.</span>
     <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">default</span>)]</span>
     <span class="kw">pub</span> <span class="ident">resolved</span>: <span class="ident">CommandDataResolved</span>,
+    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">default</span>)]</span>
+    <span class="kw">pub</span> <span class="ident">options</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">CommandDataOption</span><span class="op">&gt;</span>,
     <span class="doccomment">/// The Id of the guild the command is registered to.</span>
     <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;Option::is_none&quot;</span>)]</span>
     <span class="kw">pub</span> <span class="ident">guild_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">GuildId</span><span class="op">&gt;</span>,
@@ -968,6 +980,8 @@
 
 <span class="doccomment">/// The resolved data of a command data interaction payload.</span>
 <span class="doccomment">/// It contains the objects of [`CommandDataOption`]s.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-object-resolved-data-structure).</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Default</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
 <span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">CommandDataResolved</span> {
@@ -997,6 +1011,8 @@
 <span class="doccomment">/// top-level key and another vector of `options`.</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// Their resolved objects can be found on [`CommandData::resolved`].</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/interactions/application-commands#application-command-object-application-command-interaction-data-option-structure).</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
 <span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">CommandDataOption</span> {

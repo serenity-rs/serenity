@@ -696,9 +696,9 @@
     <span class="kw">fn</span> <span class="ident">to_tokens</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">stream</span>: <span class="kw-2">&amp;mut</span> <span class="ident">TokenStream2</span>) {
         <span class="kw">let</span> <span class="ident">only_in_path</span> <span class="op">=</span> <span class="macro">quote!</span>(<span class="ident">serenity::framework::standard::OnlyIn</span>);
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">OnlyIn::Dm</span> =&gt; <span class="ident">stream</span>.<span class="ident">extend</span>(<span class="macro">quote!</span>(#<span class="ident">only_in_path::Dm</span>)),
-            <span class="ident">OnlyIn::Guild</span> =&gt; <span class="ident">stream</span>.<span class="ident">extend</span>(<span class="macro">quote!</span>(#<span class="ident">only_in_path::Guild</span>)),
-            <span class="ident">OnlyIn::None</span> =&gt; <span class="ident">stream</span>.<span class="ident">extend</span>(<span class="macro">quote!</span>(#<span class="ident">only_in_path::None</span>)),
+            <span class="ident"><span class="self">Self</span>::Dm</span> =&gt; <span class="ident">stream</span>.<span class="ident">extend</span>(<span class="macro">quote!</span>(#<span class="ident">only_in_path::Dm</span>)),
+            <span class="ident"><span class="self">Self</span>::Guild</span> =&gt; <span class="ident">stream</span>.<span class="ident">extend</span>(<span class="macro">quote!</span>(#<span class="ident">only_in_path::Guild</span>)),
+            <span class="ident"><span class="self">Self</span>::None</span> =&gt; <span class="ident">stream</span>.<span class="ident">extend</span>(<span class="macro">quote!</span>(#<span class="ident">only_in_path::None</span>)),
         }
     }
 }
@@ -1142,9 +1142,9 @@
     <span class="kw">fn</span> <span class="ident">to_tokens</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">stream</span>: <span class="kw-2">&amp;mut</span> <span class="ident">TokenStream2</span>) {
         <span class="kw">let</span> <span class="ident">help_behaviour_path</span> <span class="op">=</span> <span class="macro">quote!</span>(<span class="ident">serenity::framework::standard::HelpBehaviour</span>);
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">HelpBehaviour::Strike</span> =&gt; <span class="ident">stream</span>.<span class="ident">extend</span>(<span class="macro">quote!</span>(#<span class="ident">help_behaviour_path::Strike</span>)),
-            <span class="ident">HelpBehaviour::Hide</span> =&gt; <span class="ident">stream</span>.<span class="ident">extend</span>(<span class="macro">quote!</span>(#<span class="ident">help_behaviour_path::Hide</span>)),
-            <span class="ident">HelpBehaviour::Nothing</span> =&gt; <span class="ident">stream</span>.<span class="ident">extend</span>(<span class="macro">quote!</span>(#<span class="ident">help_behaviour_path::Nothing</span>)),
+            <span class="ident"><span class="self">Self</span>::Strike</span> =&gt; <span class="ident">stream</span>.<span class="ident">extend</span>(<span class="macro">quote!</span>(#<span class="ident">help_behaviour_path::Strike</span>)),
+            <span class="ident"><span class="self">Self</span>::Hide</span> =&gt; <span class="ident">stream</span>.<span class="ident">extend</span>(<span class="macro">quote!</span>(#<span class="ident">help_behaviour_path::Hide</span>)),
+            <span class="ident"><span class="self">Self</span>::Nothing</span> =&gt; <span class="ident">stream</span>.<span class="ident">extend</span>(<span class="macro">quote!</span>(#<span class="ident">help_behaviour_path::Nothing</span>)),
         }
     }
 }

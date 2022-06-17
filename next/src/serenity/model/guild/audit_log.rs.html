@@ -350,6 +350,21 @@
 <span id="345">345</span>
 <span id="346">346</span>
 <span id="347">347</span>
+<span id="348">348</span>
+<span id="349">349</span>
+<span id="350">350</span>
+<span id="351">351</span>
+<span id="352">352</span>
+<span id="353">353</span>
+<span id="354">354</span>
+<span id="355">355</span>
+<span id="356">356</span>
+<span id="357">357</span>
+<span id="358">358</span>
+<span id="359">359</span>
+<span id="360">360</span>
+<span id="361">361</span>
+<span id="362">362</span>
 </pre><pre class="rust"><code><span class="doccomment">//! Audit log types for administrative actions within guilds.</span>
 
 <span class="kw">use</span> <span class="ident">std::collections::HashMap</span>;
@@ -382,6 +397,7 @@
     <span class="ident">Integration</span>(<span class="ident">IntegrationAction</span>),
     <span class="ident">StageInstance</span>(<span class="ident">StageInstanceAction</span>),
     <span class="ident">Sticker</span>(<span class="ident">StickerAction</span>),
+    <span class="ident">ScheduledEvent</span>(<span class="ident">ScheduledEventAction</span>),
     <span class="ident">Thread</span>(<span class="ident">ThreadAction</span>),
     <span class="ident">Unknown</span>(<span class="ident">u8</span>),
 }
@@ -390,20 +406,21 @@
     <span class="attribute">#[<span class="ident">must_use</span>]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">num</span>(<span class="self">self</span>) -&gt; <span class="ident">u8</span> {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">Action::GuildUpdate</span> =&gt; <span class="number">1</span>,
-            <span class="ident">Action::Channel</span>(<span class="ident">x</span>) =&gt; <span class="ident">x</span> <span class="kw">as</span> <span class="ident">u8</span>,
-            <span class="ident">Action::ChannelOverwrite</span>(<span class="ident">x</span>) =&gt; <span class="ident">x</span> <span class="kw">as</span> <span class="ident">u8</span>,
-            <span class="ident">Action::Member</span>(<span class="ident">x</span>) =&gt; <span class="ident">x</span> <span class="kw">as</span> <span class="ident">u8</span>,
-            <span class="ident">Action::Role</span>(<span class="ident">x</span>) =&gt; <span class="ident">x</span> <span class="kw">as</span> <span class="ident">u8</span>,
-            <span class="ident">Action::Invite</span>(<span class="ident">x</span>) =&gt; <span class="ident">x</span> <span class="kw">as</span> <span class="ident">u8</span>,
-            <span class="ident">Action::Webhook</span>(<span class="ident">x</span>) =&gt; <span class="ident">x</span> <span class="kw">as</span> <span class="ident">u8</span>,
-            <span class="ident">Action::Emoji</span>(<span class="ident">x</span>) =&gt; <span class="ident">x</span> <span class="kw">as</span> <span class="ident">u8</span>,
-            <span class="ident">Action::Message</span>(<span class="ident">x</span>) =&gt; <span class="ident">x</span> <span class="kw">as</span> <span class="ident">u8</span>,
-            <span class="ident">Action::Integration</span>(<span class="ident">x</span>) =&gt; <span class="ident">x</span> <span class="kw">as</span> <span class="ident">u8</span>,
-            <span class="ident">Action::StageInstance</span>(<span class="ident">x</span>) =&gt; <span class="ident">x</span> <span class="kw">as</span> <span class="ident">u8</span>,
-            <span class="ident">Action::Sticker</span>(<span class="ident">x</span>) =&gt; <span class="ident">x</span> <span class="kw">as</span> <span class="ident">u8</span>,
-            <span class="ident">Action::Thread</span>(<span class="ident">x</span>) =&gt; <span class="ident">x</span> <span class="kw">as</span> <span class="ident">u8</span>,
-            <span class="ident">Action::Unknown</span>(<span class="ident">x</span>) =&gt; <span class="ident">x</span>,
+            <span class="ident"><span class="self">Self</span>::GuildUpdate</span> =&gt; <span class="number">1</span>,
+            <span class="ident"><span class="self">Self</span>::Channel</span>(<span class="ident">x</span>) =&gt; <span class="ident">x</span> <span class="kw">as</span> <span class="ident">u8</span>,
+            <span class="ident"><span class="self">Self</span>::ChannelOverwrite</span>(<span class="ident">x</span>) =&gt; <span class="ident">x</span> <span class="kw">as</span> <span class="ident">u8</span>,
+            <span class="ident"><span class="self">Self</span>::Member</span>(<span class="ident">x</span>) =&gt; <span class="ident">x</span> <span class="kw">as</span> <span class="ident">u8</span>,
+            <span class="ident"><span class="self">Self</span>::Role</span>(<span class="ident">x</span>) =&gt; <span class="ident">x</span> <span class="kw">as</span> <span class="ident">u8</span>,
+            <span class="ident"><span class="self">Self</span>::Invite</span>(<span class="ident">x</span>) =&gt; <span class="ident">x</span> <span class="kw">as</span> <span class="ident">u8</span>,
+            <span class="ident"><span class="self">Self</span>::Webhook</span>(<span class="ident">x</span>) =&gt; <span class="ident">x</span> <span class="kw">as</span> <span class="ident">u8</span>,
+            <span class="ident"><span class="self">Self</span>::Emoji</span>(<span class="ident">x</span>) =&gt; <span class="ident">x</span> <span class="kw">as</span> <span class="ident">u8</span>,
+            <span class="ident"><span class="self">Self</span>::Message</span>(<span class="ident">x</span>) =&gt; <span class="ident">x</span> <span class="kw">as</span> <span class="ident">u8</span>,
+            <span class="ident"><span class="self">Self</span>::Integration</span>(<span class="ident">x</span>) =&gt; <span class="ident">x</span> <span class="kw">as</span> <span class="ident">u8</span>,
+            <span class="ident"><span class="self">Self</span>::StageInstance</span>(<span class="ident">x</span>) =&gt; <span class="ident">x</span> <span class="kw">as</span> <span class="ident">u8</span>,
+            <span class="ident"><span class="self">Self</span>::Sticker</span>(<span class="ident">x</span>) =&gt; <span class="ident">x</span> <span class="kw">as</span> <span class="ident">u8</span>,
+            <span class="ident"><span class="self">Self</span>::ScheduledEvent</span>(<span class="ident">x</span>) =&gt; <span class="ident">x</span> <span class="kw">as</span> <span class="ident">u8</span>,
+            <span class="ident"><span class="self">Self</span>::Thread</span>(<span class="ident">x</span>) =&gt; <span class="ident">x</span> <span class="kw">as</span> <span class="ident">u8</span>,
+            <span class="ident"><span class="self">Self</span>::Unknown</span>(<span class="ident">x</span>) =&gt; <span class="ident">x</span>,
         }
     }
 
@@ -422,6 +439,7 @@
             <span class="number">80</span>..<span class="op">=</span><span class="number">82</span> =&gt; <span class="ident">Action::Integration</span>(<span class="kw">unsafe</span> { <span class="ident">transmute</span>(<span class="ident">value</span>) }),
             <span class="number">83</span>..<span class="op">=</span><span class="number">85</span> =&gt; <span class="ident">Action::StageInstance</span>(<span class="kw">unsafe</span> { <span class="ident">transmute</span>(<span class="ident">value</span>) }),
             <span class="number">90</span>..<span class="op">=</span><span class="number">92</span> =&gt; <span class="ident">Action::Sticker</span>(<span class="kw">unsafe</span> { <span class="ident">transmute</span>(<span class="ident">value</span>) }),
+            <span class="number">100</span>..<span class="op">=</span><span class="number">102</span> =&gt; <span class="ident">Action::ScheduledEvent</span>(<span class="kw">unsafe</span> { <span class="ident">transmute</span>(<span class="ident">value</span>) }),
             <span class="number">110</span>..<span class="op">=</span><span class="number">112</span> =&gt; <span class="ident">Action::Thread</span>(<span class="kw">unsafe</span> { <span class="ident">transmute</span>(<span class="ident">value</span>) }),
             <span class="kw">_</span> =&gt; <span class="ident">Action::Unknown</span>(<span class="ident">value</span>),
         }
@@ -550,6 +568,15 @@
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">Debug</span>)]</span>
 <span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
 <span class="attribute">#[<span class="ident">repr</span>(<span class="ident">u8</span>)]</span>
+<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">ScheduledEventAction</span> {
+    <span class="ident">Create</span> <span class="op">=</span> <span class="number">100</span>,
+    <span class="ident">Update</span> <span class="op">=</span> <span class="number">101</span>,
+    <span class="ident">Delete</span> <span class="op">=</span> <span class="number">102</span>,
+}
+
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">Debug</span>)]</span>
+<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
+<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">u8</span>)]</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">ThreadAction</span> {
     <span class="ident">Create</span> <span class="op">=</span> <span class="number">110</span>,
     <span class="ident">Update</span> <span class="op">=</span> <span class="number">111</span>,
@@ -672,6 +699,9 @@
         <span class="macro">assert_action!</span>(<span class="ident">Action::Sticker</span>(<span class="ident">StickerAction::Create</span>), <span class="number">90</span>);
         <span class="macro">assert_action!</span>(<span class="ident">Action::Sticker</span>(<span class="ident">StickerAction::Update</span>), <span class="number">91</span>);
         <span class="macro">assert_action!</span>(<span class="ident">Action::Sticker</span>(<span class="ident">StickerAction::Delete</span>), <span class="number">92</span>);
+        <span class="macro">assert_action!</span>(<span class="ident">Action::ScheduledEvent</span>(<span class="ident">ScheduledEventAction::Create</span>), <span class="number">100</span>);
+        <span class="macro">assert_action!</span>(<span class="ident">Action::ScheduledEvent</span>(<span class="ident">ScheduledEventAction::Update</span>), <span class="number">101</span>);
+        <span class="macro">assert_action!</span>(<span class="ident">Action::ScheduledEvent</span>(<span class="ident">ScheduledEventAction::Delete</span>), <span class="number">102</span>);
         <span class="macro">assert_action!</span>(<span class="ident">Action::Thread</span>(<span class="ident">ThreadAction::Create</span>), <span class="number">110</span>);
         <span class="macro">assert_action!</span>(<span class="ident">Action::Thread</span>(<span class="ident">ThreadAction::Update</span>), <span class="number">111</span>);
         <span class="macro">assert_action!</span>(<span class="ident">Action::Thread</span>(<span class="ident">ThreadAction::Delete</span>), <span class="number">112</span>);

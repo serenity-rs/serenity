@@ -1839,8 +1839,6 @@
 <span id="1834">1834</span>
 <span id="1835">1835</span>
 <span id="1836">1836</span>
-<span id="1837">1837</span>
-<span id="1838">1838</span>
 </pre><pre class="rust"><code><span class="doccomment">//! All the events this library handles.</span>
 
 <span class="kw">use</span> <span class="ident">std::collections::HashMap</span>;
@@ -2117,7 +2115,6 @@
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="ident">Deserialize</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">GuildRoleCreateEvent</span> {
-    <span class="doccomment">/// Custom deserializer to pass entire payload to roles::deserialize_event, does not work using `deserialize_with`</span>
     <span class="kw">fn</span> <span class="ident">deserialize</span><span class="op">&lt;</span><span class="ident">D</span>: <span class="ident">Deserializer</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">deserializer</span>: <span class="ident">D</span>) -&gt; <span class="ident">StdResult</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">D::Error</span><span class="op">&gt;</span> {
         <span class="prelude-val">Ok</span>(<span class="self">Self</span> {
             <span class="ident">role</span>: <span class="ident">roles::deserialize_event</span>(<span class="ident">deserializer</span>)<span class="question-mark">?</span>,
@@ -2139,7 +2136,6 @@
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="ident">Deserialize</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">GuildRoleUpdateEvent</span> {
-    <span class="doccomment">/// Custom deserializer to pass entire payload to roles::deserialize_event, does not work using `deserialize_with`</span>
     <span class="kw">fn</span> <span class="ident">deserialize</span><span class="op">&lt;</span><span class="ident">D</span>: <span class="ident">Deserializer</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">deserializer</span>: <span class="ident">D</span>) -&gt; <span class="ident">StdResult</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">D::Error</span><span class="op">&gt;</span> {
         <span class="prelude-val">Ok</span>(<span class="self">Self</span> {
             <span class="ident">role</span>: <span class="ident">roles::deserialize_event</span>(<span class="ident">deserializer</span>)<span class="question-mark">?</span>,
@@ -3226,9 +3222,9 @@
         <span class="ident">T</span>: <span class="ident">std::cmp::PartialEq</span>,
     {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">RelatedId::Never</span> <span class="op">|</span> <span class="ident">RelatedId::None</span> =&gt; <span class="bool-val">false</span>,
-            <span class="ident">RelatedId::Some</span>(<span class="ident">id</span>) =&gt; <span class="ident">id</span> <span class="op">==</span> <span class="ident">value</span>,
-            <span class="ident">RelatedId::Multiple</span>(<span class="ident">ids</span>) =&gt; <span class="ident">ids</span>.<span class="ident">contains</span>(<span class="ident">value</span>),
+            <span class="ident"><span class="self">Self</span>::Never</span> <span class="op">|</span> <span class="ident">RelatedId::None</span> =&gt; <span class="bool-val">false</span>,
+            <span class="ident"><span class="self">Self</span>::Some</span>(<span class="ident">id</span>) =&gt; <span class="ident">id</span> <span class="op">==</span> <span class="ident">value</span>,
+            <span class="ident"><span class="self">Self</span>::Multiple</span>(<span class="ident">ids</span>) =&gt; <span class="ident">ids</span>.<span class="ident">contains</span>(<span class="ident">value</span>),
         }
     }
 }

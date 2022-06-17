@@ -373,7 +373,7 @@
 <span class="kw">impl</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">Error</span> {
     <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">Error::UnsuccessfulRequest</span>(<span class="ident">e</span>) =&gt; {
+            <span class="ident"><span class="self">Self</span>::UnsuccessfulRequest</span>(<span class="ident">e</span>) =&gt; {
                 <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="kw-2">&amp;</span><span class="ident">e</span>.<span class="ident">error</span>.<span class="ident">message</span>)<span class="question-mark">?</span>;
 
                 <span class="comment">// Put Discord&#39;s human readable error explanations in parentheses</span>
@@ -394,15 +394,15 @@
 
                 <span class="prelude-val">Ok</span>(())
             },
-            <span class="ident">Error::RateLimitI64F64</span> =&gt; <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;Error decoding a header into an i64 or f64&quot;</span>),
-            <span class="ident">Error::RateLimitUtf8</span> =&gt; <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;Error decoding a header from UTF-8&quot;</span>),
-            <span class="ident">Error::Url</span>(<span class="kw">_</span>) =&gt; <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;Provided URL is incorrect.&quot;</span>),
-            <span class="ident">Error::InvalidWebhook</span> =&gt; <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;Provided URL is not a valid webhook.&quot;</span>),
-            <span class="ident">Error::InvalidHeader</span>(<span class="kw">_</span>) =&gt; <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;Provided value is an invalid header value.&quot;</span>),
-            <span class="ident">Error::Request</span>(<span class="kw">_</span>) =&gt; <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;Error while sending HTTP request.&quot;</span>),
-            <span class="ident">Error::InvalidScheme</span> =&gt; <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;Invalid Url scheme.&quot;</span>),
-            <span class="ident">Error::InvalidPort</span> =&gt; <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;Invalid port.&quot;</span>),
-            <span class="ident">Error::ApplicationIdMissing</span> =&gt; <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;Application id was expected but missing.&quot;</span>),
+            <span class="ident"><span class="self">Self</span>::RateLimitI64F64</span> =&gt; <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;Error decoding a header into an i64 or f64&quot;</span>),
+            <span class="ident"><span class="self">Self</span>::RateLimitUtf8</span> =&gt; <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;Error decoding a header from UTF-8&quot;</span>),
+            <span class="ident"><span class="self">Self</span>::Url</span>(<span class="kw">_</span>) =&gt; <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;Provided URL is incorrect.&quot;</span>),
+            <span class="ident"><span class="self">Self</span>::InvalidWebhook</span> =&gt; <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;Provided URL is not a valid webhook.&quot;</span>),
+            <span class="ident"><span class="self">Self</span>::InvalidHeader</span>(<span class="kw">_</span>) =&gt; <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;Provided value is an invalid header value.&quot;</span>),
+            <span class="ident"><span class="self">Self</span>::Request</span>(<span class="kw">_</span>) =&gt; <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;Error while sending HTTP request.&quot;</span>),
+            <span class="ident"><span class="self">Self</span>::InvalidScheme</span> =&gt; <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;Invalid Url scheme.&quot;</span>),
+            <span class="ident"><span class="self">Self</span>::InvalidPort</span> =&gt; <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;Invalid port.&quot;</span>),
+            <span class="ident"><span class="self">Self</span>::ApplicationIdMissing</span> =&gt; <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;Application id was expected but missing.&quot;</span>),
         }
     }
 }
@@ -410,8 +410,8 @@
 <span class="kw">impl</span> <span class="ident">StdError</span> <span class="kw">for</span> <span class="ident">Error</span> {
     <span class="kw">fn</span> <span class="ident">source</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span>(<span class="kw">dyn</span> <span class="ident">StdError</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>)<span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">Error::Url</span>(<span class="ident">inner</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">inner</span>),
-            <span class="ident">Error::Request</span>(<span class="ident">inner</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">inner</span>),
+            <span class="ident"><span class="self">Self</span>::Url</span>(<span class="ident">inner</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">inner</span>),
+            <span class="ident"><span class="self">Self</span>::Request</span>(<span class="ident">inner</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">inner</span>),
             <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
         }
     }

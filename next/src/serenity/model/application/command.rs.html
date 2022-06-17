@@ -459,6 +459,33 @@
 <span id="454">454</span>
 <span id="455">455</span>
 <span id="456">456</span>
+<span id="457">457</span>
+<span id="458">458</span>
+<span id="459">459</span>
+<span id="460">460</span>
+<span id="461">461</span>
+<span id="462">462</span>
+<span id="463">463</span>
+<span id="464">464</span>
+<span id="465">465</span>
+<span id="466">466</span>
+<span id="467">467</span>
+<span id="468">468</span>
+<span id="469">469</span>
+<span id="470">470</span>
+<span id="471">471</span>
+<span id="472">472</span>
+<span id="473">473</span>
+<span id="474">474</span>
+<span id="475">475</span>
+<span id="476">476</span>
+<span id="477">477</span>
+<span id="478">478</span>
+<span id="479">479</span>
+<span id="480">480</span>
+<span id="481">481</span>
+<span id="482">482</span>
+<span id="483">483</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::collections::HashMap</span>;
 
 <span class="kw">use</span> <span class="ident">serde</span>::{<span class="ident">Deserialize</span>, <span class="ident">Serialize</span>};
@@ -483,6 +510,8 @@
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::Permissions</span>;
 
 <span class="doccomment">/// The base command model that belongs to an application.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/interactions/application-commands#application-command-object-application-command-structure).</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
 <span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Command</span> {
@@ -720,6 +749,8 @@
 }
 
 <span class="doccomment">/// The type of an application command.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/interactions/application-commands#application-command-object-application-command-types).</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Hash</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>, <span class="ident">PartialOrd</span>, <span class="ident">Ord</span>)]</span>
 <span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
 <span class="attribute">#[<span class="ident">repr</span>(<span class="ident">u8</span>)]</span>
@@ -737,6 +768,8 @@
 });
 
 <span class="doccomment">/// The parameters for an [`Command`].</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/interactions/application-commands#application-command-object-application-command-option-structure).</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
 <span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">CommandOption</span> {
@@ -745,8 +778,14 @@
     <span class="kw">pub</span> <span class="ident">kind</span>: <span class="ident">CommandOptionType</span>,
     <span class="doccomment">/// The option name.</span>
     <span class="kw">pub</span> <span class="ident">name</span>: <span class="ident">String</span>,
+    <span class="doccomment">/// Localizations of the option name with locale as the key</span>
+    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;Option::is_none&quot;</span>)]</span>
+    <span class="kw">pub</span> <span class="ident">name_localizations</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">std::collections::HashMap</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">String</span><span class="op">&gt;</span><span class="op">&gt;</span>,
     <span class="doccomment">/// The option description.</span>
     <span class="kw">pub</span> <span class="ident">description</span>: <span class="ident">String</span>,
+    <span class="doccomment">/// Localizations of the option description with locale as the key</span>
+    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;Option::is_none&quot;</span>)]</span>
+    <span class="kw">pub</span> <span class="ident">description_localizations</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">std::collections::HashMap</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">String</span><span class="op">&gt;</span><span class="op">&gt;</span>,
     <span class="doccomment">/// Whether the parameter is optional or required.</span>
     <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">default</span>)]</span>
     <span class="kw">pub</span> <span class="ident">required</span>: <span class="ident">bool</span>,
@@ -777,9 +816,13 @@
     <span class="doccomment">/// Maximum permitted value for Integer or Number options</span>
     <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">default</span>)]</span>
     <span class="kw">pub</span> <span class="ident">max_value</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">serde_json::Number</span><span class="op">&gt;</span>,
+    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">default</span>)]</span>
+    <span class="kw">pub</span> <span class="ident">autocomplete</span>: <span class="ident">bool</span>,
 }
 
 <span class="doccomment">/// The type of an [`CommandOption`].</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/interactions/application-commands#application-command-object-application-command-option-type).</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Hash</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>, <span class="ident">PartialOrd</span>, <span class="ident">Ord</span>)]</span>
 <span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
 <span class="attribute">#[<span class="ident">repr</span>(<span class="ident">u8</span>)]</span>
@@ -813,16 +856,23 @@
 });
 
 <span class="doccomment">/// The only valid values a user can pick in an [`CommandOption`].</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/interactions/application-commands#application-command-object-application-command-option-choice-structure).</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
 <span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">CommandOptionChoice</span> {
     <span class="doccomment">/// The choice name.</span>
     <span class="kw">pub</span> <span class="ident">name</span>: <span class="ident">String</span>,
+    <span class="doccomment">/// Localizations of the choice name, with locale as key</span>
+    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;Option::is_none&quot;</span>)]</span>
+    <span class="kw">pub</span> <span class="ident">name_localizations</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">std::collections::HashMap</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">String</span><span class="op">&gt;</span><span class="op">&gt;</span>,
     <span class="doccomment">/// The choice value.</span>
     <span class="kw">pub</span> <span class="ident">value</span>: <span class="ident">Value</span>,
 }
 
 <span class="doccomment">/// An [`Command`] permission.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/interactions/application-commands#application-command-permissions-object-guild-application-command-permissions-structure).</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
 <span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">CommandPermission</span> {
@@ -837,6 +887,8 @@
 }
 
 <span class="doccomment">/// The [`CommandPermission`] data.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/interactions/application-commands#application-command-permissions-object-application-command-permissions-structure).</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
 <span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">CommandPermissionData</span> {
@@ -850,6 +902,8 @@
 }
 
 <span class="doccomment">/// The type of an [`CommandPermissionData`].</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/interactions/application-commands#application-command-permissions-object-application-command-permission-type).</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Hash</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>, <span class="ident">PartialOrd</span>, <span class="ident">Ord</span>)]</span>
 <span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
 <span class="attribute">#[<span class="ident">repr</span>(<span class="ident">u8</span>)]</span>

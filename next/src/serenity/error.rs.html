@@ -393,26 +393,26 @@
 <span class="kw">impl</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">Error</span> {
     <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">Error::Decode</span>(<span class="ident">msg</span>, <span class="kw">_</span>) <span class="op">|</span> <span class="ident">Error::Other</span>(<span class="ident">msg</span>) =&gt; <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="ident">msg</span>),
-            <span class="ident">Error::ExceededLimit</span>(..) =&gt; <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;Input exceeded a limit&quot;</span>),
-            <span class="ident">Error::NotInRange</span>(..) =&gt; <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;Input is not in the specified range&quot;</span>),
-            <span class="ident">Error::Format</span>(<span class="ident">inner</span>) =&gt; <span class="ident">fmt::Display::fmt</span>(<span class="kw-2">&amp;</span><span class="ident">inner</span>, <span class="ident">f</span>),
-            <span class="ident">Error::Io</span>(<span class="ident">inner</span>) =&gt; <span class="ident">fmt::Display::fmt</span>(<span class="kw-2">&amp;</span><span class="ident">inner</span>, <span class="ident">f</span>),
-            <span class="ident">Error::Json</span>(<span class="ident">inner</span>) =&gt; <span class="ident">fmt::Display::fmt</span>(<span class="kw-2">&amp;</span><span class="ident">inner</span>, <span class="ident">f</span>),
-            <span class="ident">Error::Model</span>(<span class="ident">inner</span>) =&gt; <span class="ident">fmt::Display::fmt</span>(<span class="kw-2">&amp;</span><span class="ident">inner</span>, <span class="ident">f</span>),
-            <span class="ident">Error::Url</span>(<span class="ident">msg</span>) =&gt; <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="ident">msg</span>),
+            <span class="ident"><span class="self">Self</span>::Decode</span>(<span class="ident">msg</span>, <span class="kw">_</span>) <span class="op">|</span> <span class="ident"><span class="self">Self</span>::Other</span>(<span class="ident">msg</span>) =&gt; <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="ident">msg</span>),
+            <span class="ident"><span class="self">Self</span>::ExceededLimit</span>(..) =&gt; <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;Input exceeded a limit&quot;</span>),
+            <span class="ident"><span class="self">Self</span>::NotInRange</span>(..) =&gt; <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;Input is not in the specified range&quot;</span>),
+            <span class="ident"><span class="self">Self</span>::Format</span>(<span class="ident">inner</span>) =&gt; <span class="ident">fmt::Display::fmt</span>(<span class="kw-2">&amp;</span><span class="ident">inner</span>, <span class="ident">f</span>),
+            <span class="ident"><span class="self">Self</span>::Io</span>(<span class="ident">inner</span>) =&gt; <span class="ident">fmt::Display::fmt</span>(<span class="kw-2">&amp;</span><span class="ident">inner</span>, <span class="ident">f</span>),
+            <span class="ident"><span class="self">Self</span>::Json</span>(<span class="ident">inner</span>) =&gt; <span class="ident">fmt::Display::fmt</span>(<span class="kw-2">&amp;</span><span class="ident">inner</span>, <span class="ident">f</span>),
+            <span class="ident"><span class="self">Self</span>::Model</span>(<span class="ident">inner</span>) =&gt; <span class="ident">fmt::Display::fmt</span>(<span class="kw-2">&amp;</span><span class="ident">inner</span>, <span class="ident">f</span>),
+            <span class="ident"><span class="self">Self</span>::Url</span>(<span class="ident">msg</span>) =&gt; <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="ident">msg</span>),
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;simd-json&quot;</span>)]</span>
             <span class="ident">Error::SimdJson</span>(<span class="ident">inner</span>) =&gt; <span class="ident">fmt::Display::fmt</span>(<span class="kw-2">&amp;</span><span class="ident">inner</span>, <span class="ident">f</span>),
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;client&quot;</span>)]</span>
-            <span class="ident">Error::Client</span>(<span class="ident">inner</span>) =&gt; <span class="ident">fmt::Display::fmt</span>(<span class="kw-2">&amp;</span><span class="ident">inner</span>, <span class="ident">f</span>),
+            <span class="ident"><span class="self">Self</span>::Client</span>(<span class="ident">inner</span>) =&gt; <span class="ident">fmt::Display::fmt</span>(<span class="kw-2">&amp;</span><span class="ident">inner</span>, <span class="ident">f</span>),
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;collector&quot;</span>)]</span>
-            <span class="ident">Error::Collector</span>(<span class="ident">inner</span>) =&gt; <span class="ident">fmt::Display::fmt</span>(<span class="kw-2">&amp;</span><span class="ident">inner</span>, <span class="ident">f</span>),
+            <span class="ident"><span class="self">Self</span>::Collector</span>(<span class="ident">inner</span>) =&gt; <span class="ident">fmt::Display::fmt</span>(<span class="kw-2">&amp;</span><span class="ident">inner</span>, <span class="ident">f</span>),
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;gateway&quot;</span>)]</span>
-            <span class="ident">Error::Gateway</span>(<span class="ident">inner</span>) =&gt; <span class="ident">fmt::Display::fmt</span>(<span class="kw-2">&amp;</span><span class="ident">inner</span>, <span class="ident">f</span>),
+            <span class="ident"><span class="self">Self</span>::Gateway</span>(<span class="ident">inner</span>) =&gt; <span class="ident">fmt::Display::fmt</span>(<span class="kw-2">&amp;</span><span class="ident">inner</span>, <span class="ident">f</span>),
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http&quot;</span>)]</span>
-            <span class="ident">Error::Http</span>(<span class="ident">inner</span>) =&gt; <span class="ident">fmt::Display::fmt</span>(<span class="kw-2">&amp;</span><span class="ident">inner</span>, <span class="ident">f</span>),
+            <span class="ident"><span class="self">Self</span>::Http</span>(<span class="ident">inner</span>) =&gt; <span class="ident">fmt::Display::fmt</span>(<span class="kw-2">&amp;</span><span class="ident">inner</span>, <span class="ident">f</span>),
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;gateway&quot;</span>)]</span>
-            <span class="ident">Error::Tungstenite</span>(<span class="ident">inner</span>) =&gt; <span class="ident">fmt::Display::fmt</span>(<span class="kw-2">&amp;</span><span class="ident">inner</span>, <span class="ident">f</span>),
+            <span class="ident"><span class="self">Self</span>::Tungstenite</span>(<span class="ident">inner</span>) =&gt; <span class="ident">fmt::Display::fmt</span>(<span class="kw-2">&amp;</span><span class="ident">inner</span>, <span class="ident">f</span>),
         }
     }
 }
@@ -421,20 +421,20 @@
     <span class="attribute">#[<span class="ident">instrument</span>]</span>
     <span class="kw">fn</span> <span class="ident">source</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span>(<span class="kw">dyn</span> <span class="ident">StdError</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>)<span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">Error::Format</span>(<span class="ident">inner</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">inner</span>),
-            <span class="ident">Error::Io</span>(<span class="ident">inner</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">inner</span>),
-            <span class="ident">Error::Json</span>(<span class="ident">inner</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">inner</span>),
-            <span class="ident">Error::Model</span>(<span class="ident">inner</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">inner</span>),
+            <span class="ident"><span class="self">Self</span>::Format</span>(<span class="ident">inner</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">inner</span>),
+            <span class="ident"><span class="self">Self</span>::Io</span>(<span class="ident">inner</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">inner</span>),
+            <span class="ident"><span class="self">Self</span>::Json</span>(<span class="ident">inner</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">inner</span>),
+            <span class="ident"><span class="self">Self</span>::Model</span>(<span class="ident">inner</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">inner</span>),
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;client&quot;</span>)]</span>
-            <span class="ident">Error::Client</span>(<span class="ident">inner</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">inner</span>),
+            <span class="ident"><span class="self">Self</span>::Client</span>(<span class="ident">inner</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">inner</span>),
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;collector&quot;</span>)]</span>
-            <span class="ident">Error::Collector</span>(<span class="ident">inner</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">inner</span>),
+            <span class="ident"><span class="self">Self</span>::Collector</span>(<span class="ident">inner</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">inner</span>),
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;gateway&quot;</span>)]</span>
-            <span class="ident">Error::Gateway</span>(<span class="ident">inner</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">inner</span>),
+            <span class="ident"><span class="self">Self</span>::Gateway</span>(<span class="ident">inner</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">inner</span>),
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http&quot;</span>)]</span>
-            <span class="ident">Error::Http</span>(<span class="ident">inner</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">inner</span>),
+            <span class="ident"><span class="self">Self</span>::Http</span>(<span class="ident">inner</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">inner</span>),
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;gateway&quot;</span>)]</span>
-            <span class="ident">Error::Tungstenite</span>(<span class="ident">inner</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">inner</span>),
+            <span class="ident"><span class="self">Self</span>::Tungstenite</span>(<span class="ident">inner</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">inner</span>),
             <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
         }
     }

@@ -1358,8 +1358,8 @@
         <span class="macro">macro_rules!</span> <span class="ident">variant_keys</span> {
             ($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">Variant</span>:<span class="ident">ident</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">key</span>:<span class="ident">literal</span>,)<span class="kw-2">*</span>) =&gt; {
                 <span class="kw">match</span> <span class="self">self</span> {
-                    $(<span class="ident">Change</span>::<span class="macro-nonterminal">$</span><span class="macro-nonterminal">Variant</span> { .. } =&gt; <span class="ident">Cow::from</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">key</span>),)<span class="op">*</span>
-                    <span class="ident">Change::Other</span> { <span class="ident">name</span>, .. } =&gt; <span class="ident">Cow::from</span>(<span class="ident">name</span>),
+                    $(<span class="self">Self</span>::<span class="macro-nonterminal">$</span><span class="macro-nonterminal">Variant</span> { .. } =&gt; <span class="ident">Cow::from</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">key</span>),)<span class="op">*</span>
+                    <span class="ident"><span class="self">Self</span>::Other</span> { <span class="ident">name</span>, .. } =&gt; <span class="ident">Cow::from</span>(<span class="ident">name</span>),
                 }
             }
         }
@@ -1461,10 +1461,10 @@
             }};
             ($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">Variant</span>:<span class="ident">ident</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">key</span>:<span class="ident">literal</span>,)<span class="kw-2">*</span>) =&gt; {
                 <span class="kw">match</span> <span class="self">self</span> {
-                    $(<span class="ident">Change</span>::<span class="macro-nonterminal">$</span><span class="macro-nonterminal">Variant</span> { <span class="ident">old</span>, <span class="ident">new</span> } =&gt; {
+                    $(<span class="self">Self</span>::<span class="macro-nonterminal">$</span><span class="macro-nonterminal">Variant</span> { <span class="ident">old</span>, <span class="ident">new</span> } =&gt; {
                         <span class="macro">serialize_variants!</span>(<span class="ident">__impl</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">key</span>, <span class="ident">old</span>, <span class="ident">new</span>)
                     },)<span class="op">*</span>
-                    <span class="ident">Change::Other</span> { <span class="ident">name</span>, <span class="ident">old</span>, <span class="ident">new</span> } =&gt; {
+                    <span class="ident"><span class="self">Self</span>::Other</span> { <span class="ident">name</span>, <span class="ident">old</span>, <span class="ident">new</span> } =&gt; {
                         <span class="macro">serialize_variants!</span>(<span class="ident">__impl</span> <span class="ident">name</span>, <span class="ident">old</span>, <span class="ident">new</span>)
                     },
                 }
