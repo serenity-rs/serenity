@@ -6,6 +6,7 @@ use std::fmt;
 use std::sync::Arc;
 
 mod error;
+mod macros;
 pub use error::Error as CollectorError;
 
 pub mod component_interaction_collector;
