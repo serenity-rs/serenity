@@ -13,12 +13,34 @@ use crate::internal::prelude::*;
 use crate::json::prelude::*;
 use crate::model::application::command::CommandPermission;
 use crate::model::application::interaction::Interaction;
+use crate::model::guild::automod::Rule;
 
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[serde(transparent)]
 #[non_exhaustive]
 pub struct ApplicationCommandPermissionsUpdateEvent {
     pub permission: CommandPermission,
+}
+
+#[derive(Clone, Debug, Deserialize, Serialize)]
+#[serde(transparent)]
+#[non_exhaustive]
+pub struct AutoModerationRuleCreateEvent {
+    pub rule: Rule,
+}
+
+#[derive(Clone, Debug, Deserialize, Serialize)]
+#[serde(transparent)]
+#[non_exhaustive]
+pub struct AutoModerationRuleUpdateEvent {
+    pub rule: Rule,
+}
+
+#[derive(Clone, Debug, Deserialize, Serialize)]
+#[serde(transparent)]
+#[non_exhaustive]
+pub struct AutoModerationRuleDeleteEvent {
+    pub rule: Rule,
 }
 
 /// Event data for the channel creation event.
@@ -723,6 +745,27 @@ pub enum Event {
     /// [`Command`]: crate::model::application::command::Command
     /// [`EventHandler::application_command_permissions_update`]: crate::client::EventHandler::application_command_permissions_update
     ApplicationCommandPermissionsUpdate(ApplicationCommandPermissionsUpdateEvent),
+    /// A [`Rule`] was created.
+    ///
+    /// Fires the [`EventHandler::auto_moderation_rule_create`] event.
+    ///
+    /// [`EventHandler::auto_moderation_rule_create`]:
+    /// crate::client::EventHandler::auto_moderation_rule_create
+    AutoModerationRuleCreate(AutoModerationRuleCreateEvent),
+    /// A [`Rule`] has been updated.
+    ///
+    /// Fires the [`EventHandler::auto_moderation_rule_update`] event.
+    ///
+    /// [`EventHandler::auto_moderation_rule_update`]:
+    /// crate::client::EventHandler::auto_moderation_rule_update
+    AutoModerationRuleUpdate(AutoModerationRuleUpdateEvent),
+    /// A [`Rule`] was deleted.
+    ///
+    /// Fires the [`EventHandler::auto_moderation_rule_delete`] event.
+    ///
+    /// [`EventHandler::auto_moderation_rule_delete`]:
+    /// crate::client::EventHandler::auto_moderation_rule_delete
+    AutoModerationRuleDelete(AutoModerationRuleDeleteEvent),
     /// A [`Channel`] was created.
     ///
     /// Fires the [`EventHandler::channel_create`] event.
@@ -879,6 +922,24 @@ macro_rules! with_related_ids_for_event_types {
             Self::ApplicationCommandPermissionsUpdate, Self::ApplicationCommandPermissionsUpdate(e) => {
                 user_id: Never,
                 guild_id: Some(e.permission.guild_id),
+                channel_id: Never,
+                message_id: Never,
+            },
+            Self::AutoModerationRuleCreate, Self::AutoModerationRuleCreate(e) => {
+                user_id: Some(e.rule.creator_id),
+                guild_id: Some(e.rule.guild_id),
+                channel_id: Never,
+                message_id: Never,
+            },
+            Self::AutoModerationRuleUpdate, Self::AutoModerationRuleUpdate(e) => {
+                user_id: Some(e.rule.creator_id),
+                guild_id: Some(e.rule.guild_id),
+                channel_id: Never,
+                message_id: Never,
+            },
+            Self::AutoModerationRuleDelete, Self::AutoModerationRuleDelete(e) => {
+                user_id: Some(e.rule.creator_id),
+                guild_id: Some(e.rule.guild_id),
                 channel_id: Never,
                 message_id: Never,
             },
@@ -1329,6 +1390,9 @@ impl Event {
             Self::ApplicationCommandPermissionsUpdate(_) => {
                 EventType::ApplicationCommandPermissionsUpdate
             },
+            Self::AutoModerationRuleCreate(_) => EventType::AutoModerationRuleCreate,
+            Self::AutoModerationRuleUpdate(_) => EventType::AutoModerationRuleUpdate,
+            Self::AutoModerationRuleDelete(_) => EventType::AutoModerationRuleDelete,
             Self::ChannelCreate(_) => EventType::ChannelCreate,
             Self::ChannelDelete(_) => EventType::ChannelDelete,
             Self::ChannelPinsUpdate(_) => EventType::ChannelPinsUpdate,
@@ -1460,6 +1524,9 @@ pub fn deserialize_event_with_type(kind: EventType, v: Value) -> Result<Event> {
         EventType::ApplicationCommandPermissionsUpdate => {
             Event::ApplicationCommandPermissionsUpdate(from_value(v)?)
         },
+        EventType::AutoModerationRuleCreate => Event::AutoModerationRuleCreate(from_value(v)?),
+        EventType::AutoModerationRuleUpdate => Event::AutoModerationRuleUpdate(from_value(v)?),
+        EventType::AutoModerationRuleDelete => Event::AutoModerationRuleDelete(from_value(v)?),
         EventType::ChannelCreate => Event::ChannelCreate(from_value(v)?),
         EventType::ChannelDelete => Event::ChannelDelete(from_value(v)?),
         EventType::ChannelPinsUpdate => Event::ChannelPinsUpdate(from_value(v)?),
@@ -1553,6 +1620,18 @@ pub enum EventType {
     ///
     /// This maps to [`ApplicationCommandPermissionsUpdateEvent`].
     ApplicationCommandPermissionsUpdate,
+    /// Indicator that an auto moderation rule create payload was received.
+    ///
+    /// This maps to [`AutoModerationRuleCreateEvent`].
+    AutoModerationRuleCreate,
+    /// Indicator that an auto moderation rule update payload was received.
+    ///
+    /// This maps to [`AutoModerationRuleCreateEvent`].
+    AutoModerationRuleUpdate,
+    /// Indicator that an auto moderation rule delete payload was received.
+    ///
+    /// This maps to [`AutoModerationRuleDeleteEvent`].
+    AutoModerationRuleDelete,
     /// Indicator that a channel create payload was received.
     ///
     /// This maps to [`ChannelCreateEvent`].
@@ -1845,6 +1924,9 @@ macro_rules! define_related_ids_for_event_type {
 impl EventType {
     const APPLICATION_COMMAND_PERMISSIONS_UPDATE: &'static str =
         "APPLICATION_COMMAND_PERMISSIONS_UPDATE";
+    const AUTO_MODERATION_RULE_CREATE: &'static str = "AUTO_MODERATION_RULE_CREATE";
+    const AUTO_MODERATION_RULE_UPDATE: &'static str = "AUTO_MODERATION_RULE_UPDATE";
+    const AUTO_MODERATION_RULE_DELETE: &'static str = "AUTO_MODERATION_RULE_DELETE";
     const CHANNEL_CREATE: &'static str = "CHANNEL_CREATE";
     const CHANNEL_DELETE: &'static str = "CHANNEL_DELETE";
     const CHANNEL_PINS_UPDATE: &'static str = "CHANNEL_PINS_UPDATE";
@@ -1910,6 +1992,9 @@ impl EventType {
             Self::ApplicationCommandPermissionsUpdate => {
                 Some(Self::APPLICATION_COMMAND_PERMISSIONS_UPDATE)
             },
+            Self::AutoModerationRuleCreate => Some(Self::AUTO_MODERATION_RULE_CREATE),
+            Self::AutoModerationRuleUpdate => Some(Self::AUTO_MODERATION_RULE_UPDATE),
+            Self::AutoModerationRuleDelete => Some(Self::AUTO_MODERATION_RULE_DELETE),
             Self::ChannelCreate => Some(Self::CHANNEL_CREATE),
             Self::ChannelDelete => Some(Self::CHANNEL_DELETE),
             Self::ChannelPinsUpdate => Some(Self::CHANNEL_PINS_UPDATE),
@@ -1998,6 +2083,9 @@ impl<'de> Deserialize<'de> for EventType {
                     EventType::APPLICATION_COMMAND_PERMISSIONS_UPDATE => {
                         EventType::ApplicationCommandPermissionsUpdate
                     },
+                    EventType::AUTO_MODERATION_RULE_CREATE => EventType::AutoModerationRuleCreate,
+                    EventType::AUTO_MODERATION_RULE_UPDATE => EventType::AutoModerationRuleUpdate,
+                    EventType::AUTO_MODERATION_RULE_DELETE => EventType::AutoModerationRuleDelete,
                     EventType::CHANNEL_CREATE => EventType::ChannelCreate,
                     EventType::CHANNEL_DELETE => EventType::ChannelDelete,
                     EventType::CHANNEL_PINS_UPDATE => EventType::ChannelPinsUpdate,

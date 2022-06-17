@@ -373,6 +373,21 @@ async fn handle_event(
                 },
             );
         },
+        Event::AutoModerationRuleCreate(event) => {
+            spawn_named("dispatch::event_handler::auto_moderation_rule_create", async move {
+                event_handler.auto_moderation_rule_create(context, event.rule).await;
+            });
+        },
+        Event::AutoModerationRuleUpdate(event) => {
+            spawn_named("dispatch::event_handler::auto_moderation_rule_update", async move {
+                event_handler.auto_moderation_rule_update(context, event.rule).await;
+            });
+        },
+        Event::AutoModerationRuleDelete(event) => {
+            spawn_named("dispatch::event_handler::auto_moderation_rule_delete", async move {
+                event_handler.auto_moderation_rule_delete(context, event.rule).await;
+            });
+        },
         Event::ChannelCreate(mut event) => {
             update(&cache_and_http, &mut event);
             match event.channel {
