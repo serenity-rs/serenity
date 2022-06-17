@@ -284,7 +284,7 @@ impl Reaction {
 
         if limit > 100 {
             limit = 100;
-            warn!("Rection users limit clamped to 100! (API Restriction)");
+            warn!("Reaction users limit clamped to 100! (API Restriction)");
         }
 
         http.as_ref()

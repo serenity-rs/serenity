@@ -73,7 +73,7 @@ impl EventFilter {
     /// Sends a `event` to the consuming collector if the `event` conforms
     /// to the constraints and the limits are not reached yet.
     pub(crate) fn send_event(&mut self, event: &mut LazyArc<'_, Event>) -> bool {
-        // Only events with matching types count towwards the filtered limit.
+        // Only events with matching types count towards the filtered limit.
         if !self.is_matching_event_type(event) {
             return !self.sender.is_closed();
         }
@@ -98,7 +98,7 @@ impl EventFilter {
 
     /// Checks if the `event` passes set constraints.
     /// Constraints are optional, as it is possible to limit events to
-    /// be sent by a specific user or in a specifc guild.
+    /// be sent by a specific user or in a specific guild.
     #[allow(clippy::wrong_self_convention)]
     fn is_passing_constraints(&mut self, event: &mut LazyArc<'_, Event>) -> bool {
         fn empty_or_any<T, F>(slice: &[T], f: F) -> bool

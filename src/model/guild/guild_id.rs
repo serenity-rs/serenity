@@ -343,7 +343,7 @@ impl GuildId {
 
     /// Creates a new scheduled event in the guild with the data set, if any.
     ///
-    /// **Note**: Requres the [Manage Events] permission.
+    /// **Note**: Requires the [Manage Events] permission.
     ///
     /// # Errors
     ///
@@ -472,7 +472,7 @@ impl GuildId {
 
     /// Deletes a specified scheduled event in the guild.
     ///
-    /// **Note**: Requres the [Manage Events] permission.
+    /// **Note**: Requires the [Manage Events] permission.
     ///
     /// # Errors
     ///
@@ -655,7 +655,7 @@ impl GuildId {
 
     /// Modifies a scheduled event in the guild with the data set, if any.
     ///
-    /// **Note**: Requres the [Manage Events] permission.
+    /// **Note**: Requires the [Manage Events] permission.
     ///
     /// # Errors
     ///
@@ -1182,11 +1182,11 @@ impl GuildId {
         http.as_ref().search_guild_members(self.0, query, limit).await
     }
 
-    /// Fetches a specifified scheduled event in the guild, by Id. If `with_user_count` is set to
+    /// Fetches a specified scheduled event in the guild, by Id. If `with_user_count` is set to
     /// `true`, then the `user_count` field will be populated, indicating the number of users
     /// interested in the event.
     ///
-    /// **Note**: Requres the [Manage Events] permission.
+    /// **Note**: Requires the [Manage Events] permission.
     ///
     /// # Errors
     ///
@@ -1206,7 +1206,7 @@ impl GuildId {
     /// Fetches a list of all scheduled events in the guild. If `with_user_count` is set to `true`,
     /// then each event returned will have its `user_count` field populated.
     ///
-    /// **Note**: Requres the [Manage Events] permission.
+    /// **Note**: Requires the [Manage Events] permission.
     ///
     /// # Errors
     ///
