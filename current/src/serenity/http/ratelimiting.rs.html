@@ -773,8 +773,8 @@
         }
 
         <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;absolute_ratelimits&quot;</span>)]</span>
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">_reset</span>) <span class="op">=</span> <span class="ident">parse_header</span>::<span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>(<span class="ident">response</span>.<span class="ident">headers</span>(), <span class="string">&quot;x-ratelimit-reset&quot;</span>)<span class="question-mark">?</span> {
-            <span class="self">self</span>.<span class="ident">reset</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">std::time::UNIX_EPOCH</span> <span class="op">+</span> <span class="ident">Duration::from_secs_f64</span>(<span class="ident">_reset</span>));
+        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">reset</span>) <span class="op">=</span> <span class="ident">parse_header</span>::<span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>(<span class="ident">response</span>.<span class="ident">headers</span>(), <span class="string">&quot;x-ratelimit-reset&quot;</span>)<span class="question-mark">?</span> {
+            <span class="self">self</span>.<span class="ident">reset</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">std::time::UNIX_EPOCH</span> <span class="op">+</span> <span class="ident">Duration::from_secs_f64</span>(<span class="ident">reset</span>));
         }
 
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">reset_after</span>) <span class="op">=</span>
