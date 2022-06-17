@@ -154,8 +154,8 @@ impl CreateScheduledEvent {
     }
 
     #[cfg(feature = "model")]
-    async fn _execute(self, http: impl AsRef<Http>) -> Result<ScheduledEvent> {
-        http.as_ref().create_scheduled_event(self.id.into(), &self.fields, None).await
+    async fn _execute(self, http: &Http) -> Result<ScheduledEvent> {
+        http.create_scheduled_event(self.id.into(), &self.fields, None).await
     }
 }
 

@@ -106,7 +106,7 @@ impl<'a> CreateSticker<'a> {
     }
 
     #[cfg(feature = "model")]
-    async fn _execute(self, http: impl AsRef<Http>) -> Result<Sticker> {
+    async fn _execute(self, http: &Http) -> Result<Sticker> {
         let file = self.file.ok_or(Error::Model(ModelError::NoStickerFileSet))?;
 
         let mut map = Vec::with_capacity(3);
@@ -120,6 +120,6 @@ impl<'a> CreateSticker<'a> {
             map.push(("description", description));
         }
 
-        http.as_ref().create_sticker(self.id.into(), map, file, None).await
+        http.create_sticker(self.id.into(), map, file, None).await
     }
 }
