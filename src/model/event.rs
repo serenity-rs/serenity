@@ -13,7 +13,7 @@ use crate::internal::prelude::*;
 use crate::json::prelude::*;
 use crate::model::application::command::CommandPermission;
 use crate::model::application::interaction::Interaction;
-use crate::model::guild::automod::Rule;
+use crate::model::guild::automod::{ActionExecution, Rule};
 
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[serde(transparent)]
@@ -41,6 +41,13 @@ pub struct AutoModerationRuleUpdateEvent {
 #[non_exhaustive]
 pub struct AutoModerationRuleDeleteEvent {
     pub rule: Rule,
+}
+
+#[derive(Clone, Debug, Deserialize, Serialize)]
+#[serde(transparent)]
+#[non_exhaustive]
+pub struct AutoModerationActionExecutionEvent {
+    pub execution: ActionExecution,
 }
 
 /// Event data for the channel creation event.
@@ -766,6 +773,13 @@ pub enum Event {
     /// [`EventHandler::auto_moderation_rule_delete`]:
     /// crate::client::EventHandler::auto_moderation_rule_delete
     AutoModerationRuleDelete(AutoModerationRuleDeleteEvent),
+    /// A [`Rule`] was triggered and an action was executed.
+    ///
+    /// Fires the [`EventHandler::auto_moderation_action_execution`] event.
+    ///
+    /// [`EventHandler::auto_moderation_action_execution`]:
+    /// crate::client::EventHandler::auto_moderation_action_execution
+    AutoModerationActionExecution(AutoModerationActionExecutionEvent),
     /// A [`Channel`] was created.
     ///
     /// Fires the [`EventHandler::channel_create`] event.
@@ -942,6 +956,12 @@ macro_rules! with_related_ids_for_event_types {
                 guild_id: Some(e.rule.guild_id),
                 channel_id: Never,
                 message_id: Never,
+            },
+            Self::AutoModerationActionExecution, Self::AutoModerationActionExecution(e) => {
+                user_id: Some(e.execution.user_id),
+                guild_id: Some(e.execution.guild_id),
+                channel_id: e.execution.channel_id.into(),
+                message_id: e.execution.message_id.into(),
             },
             Self::ChannelCreate, Self::ChannelCreate(e) => {
                 user_id: Never,
@@ -1393,6 +1413,7 @@ impl Event {
             Self::AutoModerationRuleCreate(_) => EventType::AutoModerationRuleCreate,
             Self::AutoModerationRuleUpdate(_) => EventType::AutoModerationRuleUpdate,
             Self::AutoModerationRuleDelete(_) => EventType::AutoModerationRuleDelete,
+            Self::AutoModerationActionExecution(_) => EventType::AutoModerationActionExecution,
             Self::ChannelCreate(_) => EventType::ChannelCreate,
             Self::ChannelDelete(_) => EventType::ChannelDelete,
             Self::ChannelPinsUpdate(_) => EventType::ChannelPinsUpdate,
@@ -1527,6 +1548,9 @@ pub fn deserialize_event_with_type(kind: EventType, v: Value) -> Result<Event> {
         EventType::AutoModerationRuleCreate => Event::AutoModerationRuleCreate(from_value(v)?),
         EventType::AutoModerationRuleUpdate => Event::AutoModerationRuleUpdate(from_value(v)?),
         EventType::AutoModerationRuleDelete => Event::AutoModerationRuleDelete(from_value(v)?),
+        EventType::AutoModerationActionExecution => {
+            Event::AutoModerationActionExecution(from_value(v)?)
+        },
         EventType::ChannelCreate => Event::ChannelCreate(from_value(v)?),
         EventType::ChannelDelete => Event::ChannelDelete(from_value(v)?),
         EventType::ChannelPinsUpdate => Event::ChannelPinsUpdate(from_value(v)?),
@@ -1632,6 +1656,10 @@ pub enum EventType {
     ///
     /// This maps to [`AutoModerationRuleDeleteEvent`].
     AutoModerationRuleDelete,
+    /// Indicator that an auto moderation action execution payload was received.
+    ///
+    /// This maps to [`AutoModerationActionExecutionEvent`].
+    AutoModerationActionExecution,
     /// Indicator that a channel create payload was received.
     ///
     /// This maps to [`ChannelCreateEvent`].
@@ -1927,6 +1955,7 @@ impl EventType {
     const AUTO_MODERATION_RULE_CREATE: &'static str = "AUTO_MODERATION_RULE_CREATE";
     const AUTO_MODERATION_RULE_UPDATE: &'static str = "AUTO_MODERATION_RULE_UPDATE";
     const AUTO_MODERATION_RULE_DELETE: &'static str = "AUTO_MODERATION_RULE_DELETE";
+    const AUTO_MODERATION_ACTION_EXECUTION: &'static str = "AUTO_MODERATION_ACTION_EXECUTION";
     const CHANNEL_CREATE: &'static str = "CHANNEL_CREATE";
     const CHANNEL_DELETE: &'static str = "CHANNEL_DELETE";
     const CHANNEL_PINS_UPDATE: &'static str = "CHANNEL_PINS_UPDATE";
@@ -1995,6 +2024,7 @@ impl EventType {
             Self::AutoModerationRuleCreate => Some(Self::AUTO_MODERATION_RULE_CREATE),
             Self::AutoModerationRuleUpdate => Some(Self::AUTO_MODERATION_RULE_UPDATE),
             Self::AutoModerationRuleDelete => Some(Self::AUTO_MODERATION_RULE_DELETE),
+            Self::AutoModerationActionExecution => Some(Self::AUTO_MODERATION_ACTION_EXECUTION),
             Self::ChannelCreate => Some(Self::CHANNEL_CREATE),
             Self::ChannelDelete => Some(Self::CHANNEL_DELETE),
             Self::ChannelPinsUpdate => Some(Self::CHANNEL_PINS_UPDATE),
@@ -2086,6 +2116,9 @@ impl<'de> Deserialize<'de> for EventType {
                     EventType::AUTO_MODERATION_RULE_CREATE => EventType::AutoModerationRuleCreate,
                     EventType::AUTO_MODERATION_RULE_UPDATE => EventType::AutoModerationRuleUpdate,
                     EventType::AUTO_MODERATION_RULE_DELETE => EventType::AutoModerationRuleDelete,
+                    EventType::AUTO_MODERATION_ACTION_EXECUTION => {
+                        EventType::AutoModerationActionExecution
+                    },
                     EventType::CHANNEL_CREATE => EventType::ChannelCreate,
                     EventType::CHANNEL_DELETE => EventType::ChannelDelete,
                     EventType::CHANNEL_PINS_UPDATE => EventType::ChannelPinsUpdate,

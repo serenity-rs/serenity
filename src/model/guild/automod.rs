@@ -5,7 +5,7 @@ use serde::ser::{SerializeStruct, Serializer};
 use serde::{Deserialize, Serialize};
 use serde_value::{DeserializerError, Value};
 
-use crate::model::id::{ChannelId, GuildId, RoleId, RuleId, UserId};
+use crate::model::id::{ChannelId, GuildId, MessageId, RoleId, RuleId, UserId};
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct Rule {
@@ -377,6 +377,22 @@ pub enum Action {
     Alert(ChannelId),
     Timeout(u64),
     Unknown(u8),
+}
+
+#[derive(Clone, Debug, Deserialize, Serialize)]
+pub struct ActionExecution {
+    pub guild_id: GuildId,
+    pub action: Action,
+    pub rule_id: RuleId,
+    #[serde(rename = "rule_trigger_type")]
+    pub trigger_type: TriggerType,
+    pub user_id: UserId,
+    pub channel_id: Option<ChannelId>,
+    pub message_id: Option<MessageId>,
+    pub alert_system_message_id: Option<MessageId>,
+    pub content: String,
+    pub matched_keyword: Option<String>,
+    pub matched_content: Option<String>,
 }
 
 #[derive(Deserialize, Serialize)]

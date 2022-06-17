@@ -7,7 +7,7 @@ use crate::client::bridge::gateway::event::*;
 use crate::json::Value;
 use crate::model::application::command::CommandPermission;
 use crate::model::application::interaction::Interaction;
-use crate::model::guild::automod::Rule;
+use crate::model::guild::automod::{ActionExecution, Rule};
 use crate::model::prelude::*;
 
 /// The core trait for handling events by serenity.
@@ -37,6 +37,11 @@ pub trait EventHandler: Send + Sync {
     ///
     /// Provides said rule's data.
     async fn auto_moderation_rule_delete(&self, _ctx: Context, _rule: Rule) {}
+
+    /// Dispatched when an auto moderation rule was triggered and an action was executed.
+    ///
+    /// Provides said action execution's data.
+    async fn auto_moderation_action_execution(&self, _ctx: Context, _execution: ActionExecution) {}
 
     /// Dispatched when the cache has received and inserted all data from
     /// guilds.
