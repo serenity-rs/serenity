@@ -867,11 +867,13 @@ impl Http {
     /// **Note**: Requires the [Manage Emojis and Stickers] permission.
     ///
     /// [Manage Emojis and Stickers]: Permissions::MANAGE_EMOJIS_AND_STICKERS
-    // Manual async fn to decorate the lifetime manually, avoiding a compiler bug
+    // We take a `Vec<(String, String)>` rather than `Vec<(&'static str, String)>` to avoid a compiler
+    // bug around `async fn` and lifetime unification. TODO: change this back once MSRV is on 1.58.
+    // Relevant issue: https://github.com/rust-lang/rust/issues/63033
     pub async fn create_sticker<'a>(
         &self,
         guild_id: u64,
-        map: Vec<(&'static str, String)>,
+        map: Vec<(String, String)>,
         file: impl Into<AttachmentType<'a>>,
         audit_log_reason: Option<&str>,
     ) -> Result<Sticker> {

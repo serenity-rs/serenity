@@ -115,13 +115,13 @@ impl<'a> CreateSticker<'a> {
 
         let mut map = Vec::with_capacity(3);
         if let Some(name) = self.name {
-            map.push(("name", name));
+            map.push(("name".to_string(), name));
         }
         if let Some(tags) = self.tags {
-            map.push(("tags", tags));
+            map.push(("tags".to_string(), tags));
         }
         if let Some(description) = self.description {
-            map.push(("description", description));
+            map.push(("description".to_string(), description));
         }
 
         http.create_sticker(self.id.into(), map, file, None).await
