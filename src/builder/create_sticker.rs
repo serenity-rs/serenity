@@ -1,8 +1,9 @@
-#[cfg(feature = "model")]
+#[cfg(feature = "http")]
 use crate::http::{CacheHttp, Http};
-#[cfg(feature = "model")]
+#[cfg(feature = "http")]
 use crate::internal::prelude::*;
 use crate::model::channel::AttachmentType;
+#[cfg(feature = "http")]
 use crate::model::prelude::*;
 
 /// A builder to create a [`Sticker`] for use via a number of model methods.
@@ -17,29 +18,32 @@ use crate::model::prelude::*;
 /// [`PartialGuild::create_sticker`]: crate::model::guild::PartialGuild::create_sticker
 /// [`Guild::create_sticker`]: crate::model::guild::Guild::create_sticker
 /// [`GuildId::create_sticker`]: crate::model::id::GuildId::create_sticker
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, Serialize)]
 #[must_use]
 pub struct CreateSticker<'a> {
+    #[cfg(feature = "http")]
+    #[serde(skip)]
     id: GuildId,
-    fields: CreateStickerFields,
-    file: Option<AttachmentType<'a>>,
-}
 
-#[derive(Clone, Debug, Default, Serialize)]
-pub struct CreateStickerFields {
     #[serde(skip_serializing_if = "Option::is_none")]
     name: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
     tags: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
     description: Option<String>,
+
+    #[serde(skip)]
+    file: Option<AttachmentType<'a>>,
 }
 
 impl<'a> CreateSticker<'a> {
-    pub(crate) fn new(id: GuildId) -> Self {
+    pub fn new(#[cfg(feature = "http")] id: GuildId) -> Self {
         Self {
+            #[cfg(feature = "http")]
             id,
-            fields: CreateStickerFields::default(),
+            name: None,
+            tags: None,
+            description: None,
             file: None,
         }
     }
@@ -48,7 +52,7 @@ impl<'a> CreateSticker<'a> {
     ///
     /// **Note**: Must be between 2 and 30 characters long.
     pub fn name(mut self, name: impl Into<String>) -> Self {
-        self.fields.name = Some(name.into());
+        self.name = Some(name.into());
         self
     }
 
@@ -56,7 +60,7 @@ impl<'a> CreateSticker<'a> {
     ///
     /// **Note**: If not empty, must be between 2 and 100 characters long.
     pub fn description(mut self, description: impl Into<String>) -> Self {
-        self.fields.description = Some(description.into());
+        self.description = Some(description.into());
         self
     }
 
@@ -64,7 +68,7 @@ impl<'a> CreateSticker<'a> {
     ///
     /// **Note**: Must be between 2 and 200 characters long.
     pub fn tags(mut self, tags: impl Into<String>) -> Self {
-        self.fields.tags = Some(tags.into());
+        self.tags = Some(tags.into());
         self
     }
 
@@ -86,7 +90,7 @@ impl<'a> CreateSticker<'a> {
     /// lacks permission. Otherwise, returns [`Error::Http`] - see [`Self::execute`].
     ///
     /// [Manage Emojis and Stickers]: crate::model::permissions::Permissions::MANAGE_EMOJIS_AND_STICKERS
-    #[cfg(feature = "model")]
+    #[cfg(feature = "http")]
     #[inline]
     pub async fn execute(self, cache_http: impl CacheHttp) -> Result<Sticker> {
         #[cfg(feature = "cache")]
@@ -105,18 +109,18 @@ impl<'a> CreateSticker<'a> {
         self._execute(cache_http.http()).await
     }
 
-    #[cfg(feature = "model")]
+    #[cfg(feature = "http")]
     async fn _execute(self, http: &Http) -> Result<Sticker> {
         let file = self.file.ok_or(Error::Model(ModelError::NoStickerFileSet))?;
 
         let mut map = Vec::with_capacity(3);
-        if let Some(name) = self.fields.name {
+        if let Some(name) = self.name {
             map.push(("name", name));
         }
-        if let Some(tags) = self.fields.tags {
+        if let Some(tags) = self.tags {
             map.push(("tags", tags));
         }
-        if let Some(description) = self.fields.description {
+        if let Some(description) = self.description {
             map.push(("description", description));
         }
 

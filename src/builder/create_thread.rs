@@ -1,20 +1,21 @@
-#[cfg(feature = "model")]
+#[cfg(feature = "http")]
 use crate::http::Http;
-#[cfg(feature = "model")]
+#[cfg(feature = "http")]
 use crate::internal::prelude::*;
 use crate::model::channel::ChannelType;
+#[cfg(feature = "http")]
 use crate::model::prelude::*;
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, Serialize)]
 #[must_use]
 pub struct CreateThread {
+    #[cfg(feature = "http")]
+    #[serde(skip)]
     channel_id: ChannelId,
+    #[cfg(feature = "http")]
+    #[serde(skip)]
     message_id: Option<MessageId>,
-    fields: CreateThreadFields,
-}
 
-#[derive(Clone, Debug, Default, Serialize)]
-pub struct CreateThreadFields {
     #[serde(skip_serializing_if = "Option::is_none")]
     name: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -28,11 +29,19 @@ pub struct CreateThreadFields {
 }
 
 impl CreateThread {
-    pub(crate) fn new(channel_id: ChannelId, message_id: Option<MessageId>) -> Self {
+    pub fn new(
+        #[cfg(feature = "http")] channel_id: ChannelId,
+        #[cfg(feature = "http")] message_id: Option<MessageId>,
+    ) -> Self {
         Self {
+            #[cfg(feature = "http")]
             channel_id,
+            #[cfg(feature = "http")]
             message_id,
-            fields: CreateThreadFields::default(),
+            name: None,
+            auto_archive_duration: None,
+            rate_limit_per_user: None,
+            kind: None,
         }
     }
 
@@ -40,7 +49,7 @@ impl CreateThread {
     ///
     /// **Note**: Must be between 2 and 100 characters long.
     pub fn name(mut self, name: impl Into<String>) -> Self {
-        self.fields.name = Some(name.into());
+        self.name = Some(name.into());
         self
     }
 
@@ -48,7 +57,7 @@ impl CreateThread {
     ///
     /// **Note**: Can only be set to 60, 1440, 4320, 10080 currently.
     pub fn auto_archive_duration(mut self, duration: u16) -> Self {
-        self.fields.auto_archive_duration = Some(duration);
+        self.auto_archive_duration = Some(duration);
         self
     }
 
@@ -63,7 +72,7 @@ impl CreateThread {
     /// [`MANAGE_CHANNELS`]: crate::model::permissions::Permissions::MANAGE_CHANNELS
     #[doc(alias = "slowmode")]
     pub fn rate_limit_per_user(mut self, seconds: u16) -> Self {
-        self.fields.rate_limit_per_user = Some(seconds);
+        self.rate_limit_per_user = Some(seconds);
         self
     }
 
@@ -74,7 +83,7 @@ impl CreateThread {
     /// and thus is highly likely to change in the future, so it is recommended to always
     /// explicitly setting it to avoid any breaking change.
     pub fn kind(mut self, kind: ChannelType) -> Self {
-        self.fields.kind = Some(kind);
+        self.kind = Some(kind);
         self
     }
 
@@ -84,15 +93,15 @@ impl CreateThread {
     /// # Errors
     ///
     /// Returns [`Error::Http`] if the current user lacks permission.
-    #[cfg(feature = "model")]
+    #[cfg(feature = "http")]
     pub async fn execute(self, http: impl AsRef<Http>) -> Result<GuildChannel> {
         match self.message_id {
             Some(msg_id) => {
                 http.as_ref()
-                    .create_public_thread(self.channel_id.into(), msg_id.into(), &self.fields)
+                    .create_public_thread(self.channel_id.into(), msg_id.into(), &self)
                     .await
             },
-            None => http.as_ref().create_private_thread(self.channel_id.into(), &self.fields).await,
+            None => http.as_ref().create_private_thread(self.channel_id.into(), &self).await,
         }
     }
 }

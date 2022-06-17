@@ -1,20 +1,18 @@
-#[cfg(feature = "model")]
+#[cfg(feature = "http")]
 use crate::http::{CacheHttp, Http};
-#[cfg(feature = "model")]
+#[cfg(feature = "http")]
 use crate::internal::prelude::*;
 use crate::model::prelude::*;
-#[cfg(feature = "model")]
+#[cfg(feature = "http")]
 use crate::utils::encode_image;
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, Serialize)]
 #[must_use]
 pub struct CreateScheduledEvent {
+    #[cfg(feature = "http")]
+    #[serde(skip)]
     id: GuildId,
-    fields: CreateScheduledEventFields,
-}
 
-#[derive(Clone, Debug, Serialize)]
-pub struct CreateScheduledEventFields {
     #[serde(skip_serializing_if = "Option::is_none")]
     channel_id: Option<ChannelId>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -39,10 +37,23 @@ impl CreateScheduledEvent {
     /// Creates a builder with default values, setting the `privacy_level` to `GUILD_ONLY`. As this
     /// is the only possible value of this field, it's only used at event creation, and we don't
     /// even parse it into the `ScheduledEvent` struct.
-    pub(crate) fn new(id: GuildId) -> Self {
+    pub fn new(#[cfg(feature = "http")] id: GuildId) -> Self {
         Self {
+            #[cfg(feature = "http")]
             id,
-            fields: CreateScheduledEventFields::default(),
+
+            channel_id: None,
+            name: None,
+            description: None,
+            scheduled_start_time: None,
+            scheduled_end_time: None,
+            entity_type: None,
+            entity_metadata: None,
+            image: None,
+
+            // Set `privacy_level` to `GUILD_ONLY`. This is the only current possible value of this
+            // field, so it's only used here and not even parsed in the `ScheduledEvent` struct.
+            privacy_level: 2,
         }
     }
 
@@ -53,26 +64,26 @@ impl CreateScheduledEvent {
     /// [`StageInstance`]: ScheduledEventType::StageInstance
     /// [`Voice`]: ScheduledEventType::Voice
     pub fn channel_id<C: Into<ChannelId>>(mut self, channel_id: C) -> Self {
-        self.fields.channel_id = Some(channel_id.into());
+        self.channel_id = Some(channel_id.into());
         self
     }
 
     /// Sets the name of the scheduled event. Required to be set for event creation.
     pub fn name(mut self, name: impl Into<String>) -> Self {
-        self.fields.name = Some(name.into());
+        self.name = Some(name.into());
         self
     }
 
     /// Sets the description of the scheduled event.
     pub fn description(mut self, description: impl Into<String>) -> Self {
-        self.fields.description = Some(description.into());
+        self.description = Some(description.into());
         self
     }
 
     /// Sets the start time of the scheduled event. Required to be set for event creation.
     #[inline]
     pub fn start_time<T: Into<Timestamp>>(mut self, timestamp: T) -> Self {
-        self.fields.scheduled_start_time = Some(timestamp.into().to_string());
+        self.scheduled_start_time = Some(timestamp.into().to_string());
         self
     }
 
@@ -83,13 +94,13 @@ impl CreateScheduledEvent {
     /// [`External`]: ScheduledEventType::External
     #[inline]
     pub fn end_time<T: Into<Timestamp>>(mut self, timestamp: T) -> Self {
-        self.fields.scheduled_end_time = Some(timestamp.into().to_string());
+        self.scheduled_end_time = Some(timestamp.into().to_string());
         self
     }
 
     /// Sets the entity type of the scheduled event. Required to be set for event creation.
     pub fn kind(mut self, kind: ScheduledEventType) -> Self {
-        self.fields.entity_type = Some(kind);
+        self.entity_type = Some(kind);
         self
     }
 
@@ -99,7 +110,7 @@ impl CreateScheduledEvent {
     /// [`kind`]: CreateScheduledEvent::kind
     /// [`External`]: ScheduledEventType::External
     pub fn location(mut self, location: impl Into<String>) -> Self {
-        self.fields.entity_metadata = Some(ScheduledEventMetadata {
+        self.entity_metadata = Some(ScheduledEventMetadata {
             location: location.into(),
         });
         self
@@ -111,14 +122,14 @@ impl CreateScheduledEvent {
     ///
     /// May error if the icon is a URL and the HTTP request fails, or if the image is a file
     /// on a path that doesn't exist.
-    #[cfg(feature = "model")]
+    #[cfg(feature = "http")]
     pub async fn image<'a>(
         mut self,
         http: impl AsRef<Http>,
         image: impl Into<AttachmentType<'a>>,
     ) -> Result<Self> {
         let image_data = image.into().data(&http.as_ref().client).await?;
-        self.fields.image = Some(encode_image(&image_data));
+        self.image = Some(encode_image(&image_data));
         Ok(self)
     }
 
@@ -134,7 +145,7 @@ impl CreateScheduledEvent {
     /// Otherwise will return [`Error::Http`] if the current user does not have permission.
     ///
     /// [Manage Events]: Permissions::MANAGE_EVENTS
-    #[cfg(feature = "model")]
+    #[cfg(feature = "http")]
     #[inline]
     pub async fn execute(self, cache_http: impl CacheHttp) -> Result<ScheduledEvent> {
         #[cfg(feature = "cache")]
@@ -153,28 +164,8 @@ impl CreateScheduledEvent {
         self._execute(cache_http.http()).await
     }
 
-    #[cfg(feature = "model")]
+    #[cfg(feature = "http")]
     async fn _execute(self, http: &Http) -> Result<ScheduledEvent> {
-        http.create_scheduled_event(self.id.into(), &self.fields, None).await
-    }
-}
-
-impl Default for CreateScheduledEventFields {
-    /// Creates a builder with default values, setting the `privacy_level` to `GUILD_ONLY`. As this
-    /// is the only possible value of this field, it's only used at event creation, and we don't
-    /// even parse it into the `ScheduledEvent` struct.
-    fn default() -> Self {
-        Self {
-            privacy_level: 2,
-
-            name: None,
-            image: None,
-            channel_id: None,
-            description: None,
-            entity_type: None,
-            entity_metadata: None,
-            scheduled_end_time: None,
-            scheduled_start_time: None,
-        }
+        http.create_scheduled_event(self.id.into(), &self, None).await
     }
 }
