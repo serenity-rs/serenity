@@ -526,9 +526,9 @@ impl ShardInfo {
 
 impl<'de> serde::Deserialize<'de> for ShardInfo {
     fn deserialize<D: serde::Deserializer<'de>>(deserializer: D) -> StdResult<Self, D::Error> {
-        Deserialize::deserialize(deserializer).map(|raw: [u32; 2]| ShardInfo {
-            id: raw[0],
-            total: raw[1],
+        <(u32, u32)>::deserialize(deserializer).map(|(id, total)| ShardInfo {
+            id,
+            total,
         })
     }
 }
