@@ -345,7 +345,6 @@ impl GuildId {
     ///
     /// [Manage Emojis and Stickers]: crate::model::permissions::Permissions::MANAGE_EMOJIS_AND_STICKERS
     #[inline]
-    #[must_use]
     pub fn create_sticker<'a>(&self) -> CreateSticker<'a> {
         CreateSticker::new(*self)
     }

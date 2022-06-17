@@ -993,13 +993,11 @@ impl ChannelId {
 
     /// Returns a request builder that, when executed, will create a public thread that is
     /// connected to a message.
-    #[must_use]
     pub fn create_public_thread(&self, message_id: impl Into<MessageId>) -> CreateThread {
         CreateThread::new(*self, Some(message_id.into()))
     }
 
     /// Returns a request builder that will create a private thread on execution.
-    #[must_use]
     pub fn create_private_thread(&self) -> CreateThread {
         CreateThread::new(*self, None).kind(ChannelType::PrivateThread)
     }

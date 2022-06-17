@@ -1230,13 +1230,11 @@ impl GuildChannel {
 
     /// Returns a request builder that, when executed, will create a public thread that is
     /// connected to a message.
-    #[must_use]
     pub fn create_public_thread(&self, message_id: impl Into<MessageId>) -> CreateThread {
         self.id.create_public_thread(message_id)
     }
 
     /// Returns a request builder that will create a private thread on execution.
-    #[must_use]
     pub fn create_private_thread(&self) -> CreateThread {
         self.id.create_private_thread()
     }

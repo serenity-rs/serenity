@@ -1,6 +1,6 @@
-use crate::http::CacheHttp;
 #[cfg(feature = "model")]
-use crate::http::Http;
+use crate::http::{CacheHttp, Http};
+#[cfg(feature = "model")]
 use crate::internal::prelude::*;
 use crate::model::channel::AttachmentType;
 use crate::model::prelude::*;
@@ -18,6 +18,7 @@ use crate::model::prelude::*;
 /// [`Guild::create_sticker`]: crate::model::guild::Guild::create_sticker
 /// [`GuildId::create_sticker`]: crate::model::id::GuildId::create_sticker
 #[derive(Clone, Debug)]
+#[must_use]
 pub struct CreateSticker<'a> {
     id: GuildId,
     fields: CreateStickerFields,
@@ -46,7 +47,6 @@ impl<'a> CreateSticker<'a> {
     /// The name of the sticker to set.
     ///
     /// **Note**: Must be between 2 and 30 characters long.
-    #[must_use]
     pub fn name(mut self, name: impl Into<String>) -> Self {
         self.fields.name = Some(name.into());
         self
@@ -55,7 +55,6 @@ impl<'a> CreateSticker<'a> {
     /// The description of the sticker.
     ///
     /// **Note**: If not empty, must be between 2 and 100 characters long.
-    #[must_use]
     pub fn description(mut self, description: impl Into<String>) -> Self {
         self.fields.description = Some(description.into());
         self
@@ -64,7 +63,6 @@ impl<'a> CreateSticker<'a> {
     /// The Discord name of a unicode emoji representing the sticker's expression.
     ///
     /// **Note**: Must be between 2 and 200 characters long.
-    #[must_use]
     pub fn tags(mut self, tags: impl Into<String>) -> Self {
         self.fields.tags = Some(tags.into());
         self
@@ -73,7 +71,6 @@ impl<'a> CreateSticker<'a> {
     /// The sticker file.
     ///
     /// **Note**: Must be a PNG, APNG, or Lottie JSON file, max 500 KB.
-    #[must_use]
     pub fn file<T: Into<AttachmentType<'a>>>(mut self, file: T) -> Self {
         self.file = Some(file.into());
         self
@@ -89,6 +86,7 @@ impl<'a> CreateSticker<'a> {
     /// lacks permission. Otherwise, returns [`Error::Http`] - see [`Self::execute`].
     ///
     /// [Manage Emojis and Stickers]: crate::model::permissions::Permissions::MANAGE_EMOJIS_AND_STICKERS
+    #[cfg(feature = "model")]
     #[inline]
     pub async fn execute(self, cache_http: impl CacheHttp) -> Result<Sticker> {
         #[cfg(feature = "cache")]
@@ -107,6 +105,7 @@ impl<'a> CreateSticker<'a> {
         self._execute(cache_http.http()).await
     }
 
+    #[cfg(feature = "model")]
     async fn _execute(self, http: impl AsRef<Http>) -> Result<Sticker> {
         let file = self.file.ok_or(Error::Model(ModelError::NoStickerFileSet))?;
 
