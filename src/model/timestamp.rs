@@ -146,11 +146,14 @@ cfg_if::cfg_if! {
             }
 
             /// Create a new `Timestamp` with the current date and time in UTC.
+            #[must_use]
             pub fn now() -> Self {
                 Self(OffsetDateTime::now_utc())
             }
 
             /// Create a new `Timestamp` from a UNIX timestamp.
+            ///
+            /// # Errors
             ///
             /// Returns `Err` if the value is invalid. The valid range of the value may vary depending on
             /// the feature flags enabled (`time` with `large-dates`).
@@ -160,6 +163,7 @@ cfg_if::cfg_if! {
             }
 
             /// Returns the number of non-leap seconds since January 1, 1970 0:00:00 UTC
+            #[must_use]
             pub fn unix_timestamp(&self) -> i64 {
                 self.0.unix_timestamp()
             }
