@@ -39,7 +39,7 @@ impl EventHandler for Handler {
             // Note that array index 0 is 0-indexed, while index 1 is 1-indexed.
             //
             // This may seem unintuitive, but it models Discord's behaviour.
-            println!("{} is connected on shard {}/{}!", ready.user.name, shard[0], shard[1],);
+            println!("{} is connected on shard {}/{}!", ready.user.name, shard.id, shard.total,);
         }
     }
 }

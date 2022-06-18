@@ -491,7 +491,7 @@ impl ShardRunner {
             match *event {
                 Event::Ready(_) => {
                     voice_manager
-                        .register_shard(self.shard.shard_info()[0], self.runner_tx.clone())
+                        .register_shard(self.shard.shard_info().id, self.runner_tx.clone())
                         .await;
                 },
                 Event::VoiceServerUpdate(ref event) => {
