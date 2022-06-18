@@ -15,11 +15,69 @@ use url::Url;
 use crate::client::bridge::gateway::ChunkGuildFilter;
 use crate::constants::{self, Opcode};
 use crate::gateway::{CurrentPresence, GatewayError};
-use crate::json::{from_str, json, to_string, Value};
+use crate::json::{from_str, to_string};
 use crate::model::event::GatewayEvent;
-use crate::model::gateway::GatewayIntents;
-use crate::model::id::GuildId;
+use crate::model::gateway::{ActivityType, GatewayIntents};
+use crate::model::id::{GuildId, UserId};
 use crate::{Error, Result};
+
+#[derive(Serialize)]
+struct IdentifyProperties {
+    browser: &'static str,
+    device: &'static str,
+    os: &'static str,
+}
+
+#[derive(Serialize)]
+struct ActivityData<'a> {
+    #[serde(rename = "type")]
+    kind: ActivityType,
+    url: &'a Option<Url>,
+    name: &'a str,
+}
+
+#[derive(Serialize)]
+struct ChunkGuildMessage<'a> {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    user_ids: Option<Vec<UserId>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    query: Option<&'a str>,
+    guild_id: GuildId,
+    nonce: &'a str,
+    limit: u16,
+}
+
+#[derive(Serialize)]
+#[serde(untagged)]
+enum WebSocketMessageData<'a> {
+    Heartbeat(Option<u64>),
+    ChunkGuild(ChunkGuildMessage<'a>),
+    Identify {
+        compress: bool,
+        shard: &'a [u64; 2],
+        token: &'a str,
+        large_threshold: u8,
+        intents: GatewayIntents,
+        properties: IdentifyProperties,
+    },
+    PresenceUpdate {
+        afk: bool,
+        status: &'a str,
+        since: SystemTime,
+        game: Option<ActivityData<'a>>,
+    },
+    Resume {
+        session_id: &'a str,
+        token: &'a str,
+        seq: u64,
+    },
+}
+
+#[derive(Serialize)]
+struct WebSocketMessage<'a> {
+    op: Opcode,
+    d: WebSocketMessageData<'a>,
+}
 
 pub struct WsClient(WebSocketStream<ConnectStream>);
 
@@ -77,7 +135,7 @@ impl WsClient {
         Ok(Some(value))
     }
 
-    pub(crate) async fn send_json(&mut self, value: &Value) -> Result<()> {
+    pub(crate) async fn send_json(&mut self, value: &impl serde::Serialize) -> Result<()> {
         let message = to_string(value).map(Message::Text)?;
 
         self.0.send(message).await?;
@@ -112,65 +170,62 @@ impl WsClient {
     ) -> Result<()> {
         debug!("[Shard {:?}] Requesting member chunks", shard_info);
 
-        let mut payload = json!({
-            "op": Opcode::RequestGuildMembers,
-            "d": {
-                "guild_id": guild_id.as_ref().0.to_string(),
-                "limit": limit.unwrap_or(0),
-                "nonce": nonce.unwrap_or(""),
-            },
-        });
-
-        match filter {
-            ChunkGuildFilter::None => payload["d"]["query"] = json!(""),
-            ChunkGuildFilter::Query(query) => payload["d"]["query"] = json!(query),
-            ChunkGuildFilter::UserIds(user_ids) => {
-                let ids = user_ids.iter().map(|x| x.0).collect::<Vec<u64>>();
-                payload["d"]["user_ids"] = json!(ids);
-            },
+        let (query, user_ids) = match filter {
+            ChunkGuildFilter::None => (Some(String::new()), None),
+            ChunkGuildFilter::Query(query) => (Some(query), None),
+            ChunkGuildFilter::UserIds(user_ids) => (None, Some(user_ids)),
         };
 
-        self.send_json(&payload).await.map_err(From::from)
+        self.send_json(&WebSocketMessage {
+            op: Opcode::RequestGuildMembers,
+            d: WebSocketMessageData::ChunkGuild(ChunkGuildMessage {
+                guild_id,
+                user_ids,
+                query: query.as_deref(),
+                limit: limit.unwrap_or(0),
+                nonce: nonce.unwrap_or(""),
+            }),
+        })
+        .await
     }
 
     #[instrument(skip(self))]
     pub async fn send_heartbeat(&mut self, shard_info: &[u64; 2], seq: Option<u64>) -> Result<()> {
         trace!("[Shard {:?}] Sending heartbeat d: {:?}", shard_info, seq);
 
-        self.send_json(&json!({
-            "op": Opcode::Heartbeat,
-            "d": seq,
-        }))
+        self.send_json(&WebSocketMessage {
+            op: Opcode::Heartbeat,
+            d: WebSocketMessageData::Heartbeat(seq),
+        })
         .await
-        .map_err(From::from)
     }
 
     #[instrument(skip(self, token))]
     pub async fn send_identify(
         &mut self,
-        shard_info: &[u64; 2],
+        shard: &[u64; 2],
         token: &str,
         intents: GatewayIntents,
     ) -> Result<()> {
-        debug!("[Shard {:?}] Identifying", shard_info);
+        debug!("[Shard {:?}] Identifying", shard);
 
-        self.send_json(&json!({
-            "op": Opcode::Identify,
-            "d": {
-                "compress": true,
-                "large_threshold": constants::LARGE_THRESHOLD,
-                "shard": shard_info,
-                "token": token,
-                "intents": intents,
-                "v": constants::GATEWAY_VERSION,
-                "properties": {
-                    "$browser": "serenity",
-                    "$device": "serenity",
-                    "$os": consts::OS,
+        let msg = WebSocketMessage {
+            op: Opcode::Identify,
+            d: WebSocketMessageData::Identify {
+                token,
+                shard,
+                intents,
+                compress: true,
+                large_threshold: constants::LARGE_THRESHOLD,
+                properties: IdentifyProperties {
+                    browser: "serenity",
+                    device: "serenity",
+                    os: consts::OS,
                 },
             },
-        }))
-        .await
+        };
+
+        self.send_json(&msg).await
     }
 
     #[instrument(skip(self))]
@@ -184,19 +239,19 @@ impl WsClient {
 
         debug!("[Shard {:?}] Sending presence update", shard_info);
 
-        self.send_json(&json!({
-            "op": Opcode::PresenceUpdate,
-            "d": {
-                "afk": false,
-                "since": now,
-                "status": status.name(),
-                "game": activity.as_ref().map(|x| json!({
-                    "name": x.name,
-                    "type": x.kind,
-                    "url": x.url,
-                })),
+        self.send_json(&WebSocketMessage {
+            op: Opcode::PresenceUpdate,
+            d: WebSocketMessageData::PresenceUpdate {
+                afk: false,
+                since: now,
+                status: status.name(),
+                game: activity.as_ref().map(|x| ActivityData {
+                    name: &x.name,
+                    kind: x.kind,
+                    url: &x.url,
+                }),
             },
-        }))
+        })
         .await
     }
 
@@ -210,15 +265,14 @@ impl WsClient {
     ) -> Result<()> {
         debug!("[Shard {:?}] Sending resume; seq: {}", shard_info, seq);
 
-        self.send_json(&json!({
-            "op": Opcode::Resume,
-            "d": {
-                "session_id": session_id,
-                "seq": seq,
-                "token": token,
+        self.send_json(&WebSocketMessage {
+            op: Opcode::Resume,
+            d: WebSocketMessageData::Resume {
+                session_id,
+                token,
+                seq,
             },
-        }))
+        })
         .await
-        .map_err(From::from)
     }
 }
