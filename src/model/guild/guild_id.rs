@@ -1062,7 +1062,7 @@ impl GuildId {
         http: impl AsRef<Http>,
         user_id: impl Into<UserId>,
     ) -> Result<Member> {
-        self.edit_member(http, user_id, |m| m.disconnect_member()).await
+        self.edit_member(http, user_id, EditMember::disconnect_member).await
     }
 
     /// Gets the number of [`Member`]s that would be pruned with the given
