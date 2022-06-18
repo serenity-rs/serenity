@@ -517,6 +517,8 @@
 <span id="512">512</span>
 <span id="513">513</span>
 <span id="514">514</span>
+<span id="515">515</span>
+<span id="516">516</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::internal::prelude</span>::<span class="kw-2">*</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::json::Value</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::application::component</span>::{<span class="ident">ButtonStyle</span>, <span class="ident">InputTextStyle</span>};
@@ -578,6 +580,7 @@
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Serialize</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">CreateActionRow</span> {
     <span class="ident">components</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ComponentBuilder</span><span class="op">&gt;</span>,
+    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename</span> <span class="op">=</span> <span class="string">&quot;type&quot;</span>)]</span>
     <span class="ident">kind</span>: <span class="ident">u8</span>,
 }
 
@@ -664,8 +667,9 @@
     <span class="ident">emoji</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">JsonMap</span><span class="op">&gt;</span>,
     <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;Option::is_none&quot;</span>)]</span>
     <span class="ident">disabled</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span>,
-
     <span class="ident">style</span>: <span class="ident">ButtonStyle</span>,
+
+    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename</span> <span class="op">=</span> <span class="string">&quot;type&quot;</span>)]</span>
     <span class="ident">kind</span>: <span class="ident">u8</span>,
 }
 
