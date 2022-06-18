@@ -272,7 +272,7 @@ impl Webhook {
 
     /// Edits a webhook's avatar.
     ///
-    /// Refer to [`Http::edit_webhook`] for restrictions on wehbhook avatars.
+    /// Refer to [`Http::edit_webhook`] for restrictions on webhook avatars.
     ///
     /// Does not require authentication, as it calls [`Http::edit_webhook_with_token`] internally.
     /// # Examples

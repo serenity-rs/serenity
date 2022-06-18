@@ -48,7 +48,7 @@ pub enum Error {
     ReconnectFailure,
     /// When undocumented gateway intents are provided.
     InvalidGatewayIntents,
-    /// When disallowed gatewax intents are provided.
+    /// When disallowed gateway intents are provided.
     ///
     /// If an connection has been established but privileged gateway intents
     /// were provided without enabling them prior.

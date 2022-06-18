@@ -835,7 +835,7 @@ impl Http {
     ///
     /// Refer to Discord's docs for field information.
     ///
-    /// **Note**: Requres the [Manage Events] permission.
+    /// **Note**: Requires the [Manage Events] permission.
     ///
     /// [Manage Events]: Permissions::MANAGE_EVENTS
     pub async fn create_scheduled_event(
@@ -3042,7 +3042,7 @@ impl Http {
         .await
     }
 
-    /// Gets a list of all scheduled events for the coressponding guild.
+    /// Gets a list of all scheduled events for the corresponding guild.
     ///
     /// **Note**: Requires the [Manage Events] permission.
     ///

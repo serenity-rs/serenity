@@ -873,7 +873,7 @@ impl Guild {
 
     /// Creates a new scheduled event in the guild with the data set, if any.
     ///
-    /// **Note**: Requres the [Manage Events] permission.
+    /// **Note**: Requires the [Manage Events] permission.
     ///
     /// # Errors
     ///
@@ -1273,7 +1273,7 @@ impl Guild {
 
     /// Modifies a scheduled event in the guild with the data set, if any.
     ///
-    /// **Note**: Requres the [Manage Events] permission.
+    /// **Note**: Requires the [Manage Events] permission.
     ///
     /// # Errors
     ///
@@ -1478,7 +1478,7 @@ impl Guild {
     /// Returns an [`Error::Http`] if an emoji with that Id does not exist
     /// in the guild, or if the guild is unavailable.
     ///
-    /// May also return [`Error::Json`] if there is an error in deserialzing
+    /// May also return [`Error::Json`] if there is an error in deserializing
     /// the API response.
     ///
     /// [`Error::Http`]: crate::error::Error::Http
@@ -2283,11 +2283,11 @@ impl Guild {
         self.id.search_members(http, query, limit).await
     }
 
-    /// Fetches a specifified scheduled event in the guild, by Id. If `with_user_count` is set to
+    /// Fetches a specified scheduled event in the guild, by Id. If `with_user_count` is set to
     /// `true`, then the `user_count` field will be populated, indicating the number of users
     /// interested in the event.
     ///
-    /// **Note**: Requres the [Manage Events] permission.
+    /// **Note**: Requires the [Manage Events] permission.
     ///
     /// # Errors
     ///
@@ -2307,7 +2307,7 @@ impl Guild {
     /// Fetches a list of all scheduled events in the guild. If `with_user_count` is set to `true`,
     /// then each event returned will have its `user_count` field populated.
     ///
-    /// **Note**: Requres the [Manage Events] permission.
+    /// **Note**: Requires the [Manage Events] permission.
     ///
     /// # Errors
     ///

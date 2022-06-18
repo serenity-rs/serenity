@@ -16,6 +16,6 @@ pub struct Speaking {
     pub ssrc: u32,
     /// User ID of the speaker, included in messages *received from* the server.
     ///
-    /// Used alognside the SSRC to map individual packets to their sender.
+    /// Used alongside the SSRC to map individual packets to their sender.
     pub user_id: Option<UserId>,
 }
