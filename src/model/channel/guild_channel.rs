@@ -169,36 +169,18 @@ impl GuildChannel {
     /// Create an invite that can only be used 5 times:
     ///
     /// ```rust,ignore
-    /// let invite = channel.create_invite(&context, |i| i.max_uses(5)).await;
+    /// let invite = channel.create_invite().max_uses(5).execute(&context).await;
     /// ```
-    ///
-    /// # Errors
-    ///
-    /// If the `cache` is enabled, returns [`ModelError::InvalidPermissions`]
-    /// if the current user does not have permission to create invites.
-    ///
-    /// Otherwise returns [`Error::Http`] if the current user lacks permission.
     ///
     /// [Create Instant Invite]: Permissions::CREATE_INSTANT_INVITE
     #[inline]
     #[cfg(feature = "utils")]
-    pub async fn create_invite<F>(&self, cache_http: impl CacheHttp, f: F) -> Result<RichInvite>
-    where
-        F: FnOnce(&mut CreateInvite) -> &mut CreateInvite,
-    {
-        #[cfg(feature = "cache")]
-        {
-            if let Some(cache) = cache_http.cache() {
-                crate::utils::user_has_perms_cache(
-                    cache,
-                    self.id,
-                    Some(self.guild_id),
-                    Permissions::CREATE_INSTANT_INVITE,
-                )?;
-            }
-        }
-
-        self.id.create_invite(cache_http.http(), f).await
+    pub fn create_invite(&self) -> CreateInvite {
+        CreateInvite::new(
+            self.id,
+            #[cfg(feature = "cache")]
+            Some(self.guild_id),
+        )
     }
 
     /// Creates a [permission overwrite][`PermissionOverwrite`] for either a

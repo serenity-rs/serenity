@@ -70,39 +70,15 @@ impl Invite {
     ///
     /// Requires the [Create Instant Invite] permission.
     ///
-    /// # Errors
-    ///
-    /// If the `cache` is enabled, returns a [`ModelError::InvalidPermissions`]
-    /// if the current user does not have the required [permission].
-    ///
     /// [Create Instant Invite]: Permissions::CREATE_INSTANT_INVITE
     /// [permission]: super::permissions
     #[inline]
-    pub async fn create<F>(
-        cache_http: impl CacheHttp,
-        channel_id: impl Into<ChannelId>,
-        f: F,
-    ) -> Result<RichInvite>
-    where
-        F: FnOnce(CreateInvite) -> CreateInvite,
-    {
-        let channel_id = channel_id.into();
-
-        #[cfg(feature = "cache")]
-        {
-            if let Some(cache) = cache_http.cache() {
-                crate::utils::user_has_perms_cache(
-                    cache,
-                    channel_id,
-                    None,
-                    Permissions::CREATE_INSTANT_INVITE,
-                )?;
-            }
-        }
-
-        let builder = f(CreateInvite::default());
-
-        cache_http.http().create_invite(channel_id.get(), &builder, None).await
+    pub fn create(channel_id: impl Into<ChannelId>) -> CreateInvite {
+        CreateInvite::new(
+            channel_id.into(),
+            #[cfg(feature = "cache")]
+            None,
+        )
     }
 
     /// Deletes the invite.

@@ -78,19 +78,13 @@ impl ChannelId {
     ///
     /// **Note**: Requires the [Create Instant Invite] permission.
     ///
-    /// # Errors
-    ///
-    /// Returns [`Error::Http`] if the current user lacks permission.
-    ///
     /// [Create Instant Invite]: Permissions::CREATE_INSTANT_INVITE
-    pub async fn create_invite<F>(&self, http: impl AsRef<Http>, f: F) -> Result<RichInvite>
-    where
-        F: FnOnce(&mut CreateInvite) -> &mut CreateInvite,
-    {
-        let mut invite = CreateInvite::default();
-        f(&mut invite);
-
-        http.as_ref().create_invite(self.get(), &invite, None).await
+    pub fn create_invite(&self) -> CreateInvite {
+        CreateInvite::new(
+            *self,
+            #[cfg(feature = "cache")]
+            None,
+        )
     }
 
     /// Creates a [permission overwrite][`PermissionOverwrite`] for either a
