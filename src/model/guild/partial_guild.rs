@@ -274,36 +274,40 @@ impl PartialGuild {
         None
     }
 
-    /// Creates a [`GuildChannel`] in the guild.
+    /// Returns a request builder that will create a new [`GuildChannel`] in the guild when
+    /// executed.
     ///
     /// Refer to [`Http::create_channel`] for more information.
     ///
-    /// Requires the [Manage Channels] permission.
+    /// **Note**: Requires the [Manage Channels] permission.
     ///
     /// # Examples
     ///
     /// Create a voice channel in a guild with the name `test`:
     ///
-    /// ```rust,ignore
-    /// use serenity::model::ChannelType;
+    /// ```rust,no_run
+    /// # use serenity::http::Http;
+    /// # use serenity::model::guild::PartialGuild;
+    /// # use serenity::model::id::GuildId;
+    /// use serenity::model::channel::ChannelType;
     ///
-    /// guild.create_channel(|c| c.name("test").kind(ChannelType::Voice));
+    /// # async fn run() -> serenity::Result<()> {
+    /// # let http = Http::new("token");
+    /// # let guild = PartialGuild::get(&http, GuildId(7)).await?;
+    /// let channel = guild
+    ///     .create_channel()
+    ///     .name("my-test-channel")
+    ///     .kind(ChannelType::Voice)
+    ///     .execute(&http)
+    ///     .await?;
+    /// # Ok(())
+    /// # }
     /// ```
-    ///
-    /// # Errors
-    ///
-    /// Returns [`Error::Http`] if the current user lacks permission,
-    /// or if invalid data was given, such as the channel name being
-    /// too long.
     ///
     /// [Manage Channels]: Permissions::MANAGE_CHANNELS
     #[inline]
-    pub async fn create_channel(
-        &self,
-        http: impl AsRef<Http>,
-        f: impl FnOnce(&mut CreateChannel) -> &mut CreateChannel,
-    ) -> Result<GuildChannel> {
-        self.id.create_channel(&http, f).await
+    pub fn create_channel(&self) -> CreateChannel {
+        CreateChannel::new(self.id)
     }
 
     /// Creates an emoji in the guild with a name and base64-encoded image.

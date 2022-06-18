@@ -200,11 +200,12 @@ impl GuildId {
         Ok(channels.into_iter().map(|c| (c.id, c)).collect())
     }
 
-    /// Creates a [`GuildChannel`] in the the guild.
+    /// Returns a request builder that will create a new [`GuildChannel`] in the corresponding
+    /// guild when executed.
     ///
     /// Refer to [`Http::create_channel`] for more information.
     ///
-    /// Requires the [Manage Channels] permission.
+    /// **Note**: Requires the [Manage Channels] permission.
     ///
     /// # Examples
     ///
@@ -218,26 +219,14 @@ impl GuildId {
     /// # use serenity::http::Http;
     /// # let http = Http::new("token");
     /// let _channel =
-    ///     GuildId::new(7).create_channel(&http, |c| c.name("test").kind(ChannelType::Voice)).await;
+    ///     GuildId::new(7).create_channel().name("test").kind(ChannelType::Voice).execute(&http).await;
     /// # }
     /// ```
     ///
-    /// # Errors
-    ///
-    /// Returns [`Error::Http`] if the current user lacks permission,
-    /// or if invalid values are set.
-    ///
     /// [Manage Channels]: Permissions::MANAGE_CHANNELS
     #[inline]
-    pub async fn create_channel(
-        self,
-        http: impl AsRef<Http>,
-        f: impl FnOnce(&mut CreateChannel) -> &mut CreateChannel,
-    ) -> Result<GuildChannel> {
-        let mut builder = CreateChannel::default();
-        f(&mut builder);
-
-        http.as_ref().create_channel(self.get(), &builder, None).await
+    pub fn create_channel(&self) -> CreateChannel {
+        CreateChannel::new(*self)
     }
 
     /// Creates an emoji in the guild with a name and base64-encoded image.
