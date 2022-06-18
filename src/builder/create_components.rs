@@ -59,6 +59,7 @@ enum ComponentBuilder {
 #[derive(Clone, Debug, Serialize)]
 pub struct CreateActionRow {
     components: Vec<ComponentBuilder>,
+    #[serde(rename = "type")]
     kind: u8,
 }
 
@@ -145,8 +146,9 @@ pub struct CreateButton {
     emoji: Option<JsonMap>,
     #[serde(skip_serializing_if = "Option::is_none")]
     disabled: Option<bool>,
-
     style: ButtonStyle,
+
+    #[serde(rename = "type")]
     kind: u8,
 }
 
