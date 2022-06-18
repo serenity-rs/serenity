@@ -27,6 +27,8 @@ use crate::json::prelude::*;
 use crate::model::application::component::ActionRow;
 use crate::model::application::interaction::MessageInteraction;
 use crate::model::prelude::*;
+#[cfg(all(feature = "cache", feature = "model"))]
+use crate::utils;
 #[cfg(feature = "model")]
 use crate::{
     constants,

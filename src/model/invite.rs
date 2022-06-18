@@ -2,7 +2,8 @@
 
 use super::prelude::*;
 #[cfg(all(feature = "cache", feature = "model"))]
-use super::{utils as model_utils, Permissions};
+use super::Permissions;
+use super::Timestamp;
 #[cfg(feature = "model")]
 use crate::builder::CreateInvite;
 #[cfg(all(feature = "cache", feature = "model"))]
@@ -11,7 +12,6 @@ use crate::cache::Cache;
 use crate::http::{CacheHttp, Http};
 #[cfg(feature = "model")]
 use crate::internal::prelude::*;
-use crate::model::Timestamp;
 
 /// Information about an invite code.
 ///
@@ -91,7 +91,7 @@ impl Invite {
         #[cfg(feature = "cache")]
         {
             if let Some(cache) = cache_http.cache() {
-                model_utils::user_has_perms_cache(
+                crate::utils::user_has_perms_cache(
                     cache,
                     channel_id,
                     None,
@@ -125,7 +125,7 @@ impl Invite {
         {
             if let Some(cache) = cache_http.cache() {
                 let guild_id = self.guild.as_ref().map(|g| g.id);
-                model_utils::user_has_perms_cache(
+                crate::utils::user_has_perms_cache(
                     cache,
                     self.channel.id,
                     guild_id,
@@ -344,7 +344,7 @@ impl RichInvite {
             if let Some(cache) = cache_http.cache() {
                 let guild_id = self.guild.as_ref().map(|g| g.id);
 
-                model_utils::user_has_perms_cache(
+                crate::utils::user_has_perms_cache(
                     cache,
                     self.channel.id,
                     guild_id,

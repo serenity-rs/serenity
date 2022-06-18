@@ -5,13 +5,7 @@ use std::marker::PhantomData;
 
 use serde::ser::{Serialize, SerializeSeq, Serializer};
 
-#[cfg(all(feature = "cache", feature = "model"))]
-use super::permissions::Permissions;
 use super::prelude::*;
-#[cfg(all(feature = "cache", feature = "model"))]
-use crate::cache::Cache;
-#[cfg(feature = "cache")]
-use crate::internal::prelude::*;
 use crate::json::from_number;
 use crate::model::application::command::CommandOptionType;
 use crate::model::application::interaction::application_command::{
@@ -379,76 +373,6 @@ pub fn serialize_map_values<K, S: Serializer, V: Serialize>(
     }
 
     seq.end()
-}
-
-/// Tries to find a user's permissions using the cache.
-/// Unlike [`user_has_perms`], this function will return `true` even when
-/// the permissions are not in the cache.
-#[cfg(all(feature = "cache", feature = "model"))]
-#[inline]
-pub fn user_has_perms_cache(
-    cache: impl AsRef<Cache>,
-    channel_id: ChannelId,
-    guild_id: Option<GuildId>,
-    permissions: Permissions,
-) -> Result<()> {
-    if match user_has_perms(cache, channel_id, guild_id, permissions) {
-        Err(Error::Model(err)) => err.is_cache_err(),
-        result => result?,
-    } {
-        Ok(())
-    } else {
-        Err(Error::Model(ModelError::InvalidPermissions(permissions)))
-    }
-}
-
-#[cfg(all(feature = "cache", feature = "model"))]
-pub fn user_has_perms(
-    cache: impl AsRef<Cache>,
-    channel_id: ChannelId,
-    guild_id: Option<GuildId>,
-    mut permissions: Permissions,
-) -> Result<bool> {
-    let cache = cache.as_ref();
-
-    let channel = match cache.channel(channel_id) {
-        Some(channel) => channel,
-        None => return Err(Error::Model(ModelError::ChannelNotFound)),
-    };
-
-    // Both users in DMs, all users in groups, and maybe all channels in categories
-    // will have the same permissions.
-    //
-    // The only exception to this is when the current user is blocked by
-    // the recipient in a DM channel, preventing the current user
-    // from sending messages.
-    //
-    // Since serenity can't _reasonably_ check and keep track of these,
-    // just assume that all permissions are granted and return `true`.
-    let (guild_id, guild_channel) = match channel {
-        Channel::Guild(channel) => (channel.guild_id, channel),
-        Channel::Category(_) => return Ok(true),
-        Channel::Private(_) => match guild_id {
-            Some(_) => return Err(Error::Model(ModelError::InvalidChannelType)),
-            None => return Ok(true),
-        },
-    };
-
-    let guild = match cache.guild(guild_id) {
-        Some(guild) => guild,
-        None => return Err(Error::Model(ModelError::GuildNotFound)),
-    };
-
-    let member = match guild.members.get(&cache.current_user().id) {
-        Some(member) => member,
-        None => return Err(Error::Model(ModelError::MemberNotFound)),
-    };
-
-    let perms = guild.user_permissions_in(&guild_channel, member)?;
-
-    permissions.remove(perms);
-
-    Ok(permissions.is_empty())
 }
 
 /// Deserializes a sequence and builds a `HashMap` with the key extraction function.
