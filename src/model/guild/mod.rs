@@ -874,17 +874,17 @@ impl Guild {
         self.id.create_role(cache_http.http(), f).await
     }
 
-    /// Returns a request builder that, when executed, will create a new scheduled event in the
-    /// guild.
+    /// Returns a request builder that will create a new [`ScheduledEvent`] in the guild when
+    /// executed.
     ///
     /// **Note**: Requires the [Manage Events] permission.
     ///
     /// [Manage Events]: Permissions::MANAGE_EVENTS
-    pub async fn create_scheduled_event(&self) -> CreateScheduledEvent {
+    pub fn create_scheduled_event(&self) -> CreateScheduledEvent {
         CreateScheduledEvent::new(self.id)
     }
 
-    /// Returns a request builder that, when executed, will create a new sticker in the guild.
+    /// Returns a request builder that will create a new [`Sticker`] in the guild when executed.
     ///
     /// **Note**: Requires the [Manage Emojis and Stickers] permission.
     ///

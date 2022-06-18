@@ -559,7 +559,7 @@ impl PartialGuild {
         self.id.create_role(&http, f).await
     }
 
-    /// Returns a request builder that, when executed, will create a new sticker in the guild.
+    /// Returns a request builder that will create a new [`Sticker`] in the guild when executed.
     ///
     /// **Note**: Requires the [Manage Emojis and Stickers] permission.
     ///

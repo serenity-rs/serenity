@@ -329,17 +329,17 @@ impl GuildId {
         Ok(role)
     }
 
-    /// Returns a request builder that, when executed, will create a new scheduled event in the
-    /// guild.
+    /// Returns a request builder that will create a new [`ScheduledEvent`] in the guild when
+    /// executed.
     ///
     /// **Note**: Requires the [Manage Events] permission.
     ///
     /// [Manage Events]: Permissions::MANAGE_EVENTS
-    pub async fn create_scheduled_event(&self) -> CreateScheduledEvent {
+    pub fn create_scheduled_event(&self) -> CreateScheduledEvent {
         CreateScheduledEvent::new(*self)
     }
 
-    /// Returns a request builder that, when executed, will create a new sticker in the guild.
+    /// Returns a request builder that will create a new [`Sticker`] in the guild when executed.
     ///
     /// **Note**: Requires the [Manage Emojis and Stickers] permission.
     ///
