@@ -1,5 +1,3 @@
-use crate::internal::prelude::*;
-use crate::json::Value;
 use crate::model::application::component::{ButtonStyle, InputTextStyle};
 use crate::model::channel::ReactionType;
 
@@ -59,6 +57,7 @@ enum ComponentBuilder {
 #[derive(Clone, Debug, Serialize)]
 pub struct CreateActionRow {
     components: Vec<ComponentBuilder>,
+    #[serde(rename = "type")]
     kind: u8,
 }
 
@@ -142,11 +141,12 @@ pub struct CreateButton {
     #[serde(skip_serializing_if = "Option::is_none")]
     url: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    emoji: Option<JsonMap>,
+    emoji: Option<ReactionType>,
     #[serde(skip_serializing_if = "Option::is_none")]
     disabled: Option<bool>,
-
     style: ButtonStyle,
+
+    #[serde(rename = "type")]
     kind: u8,
 }
 
@@ -192,31 +192,7 @@ impl CreateButton {
 
     /// Sets emoji of the button.
     pub fn emoji<R: Into<ReactionType>>(&mut self, emoji: R) -> &mut Self {
-        self._emoji(emoji.into())
-    }
-
-    fn _emoji(&mut self, emoji: ReactionType) -> &mut Self {
-        let mut map = JsonMap::new();
-
-        match emoji {
-            ReactionType::Unicode(u) => {
-                map.insert("name".into(), Value::from(u));
-            },
-            ReactionType::Custom {
-                animated,
-                id,
-                name,
-            } => {
-                map.insert("animated".into(), Value::from(animated));
-                map.insert("id".into(), Value::String(id.to_string()));
-
-                if let Some(name) = name {
-                    map.insert("name".into(), Value::String(name));
-                }
-            },
-        };
-
-        self.emoji = Some(map);
+        self.emoji = Some(emoji.into());
         self
     }
 
@@ -353,7 +329,7 @@ pub struct CreateSelectMenuOption {
     #[serde(skip_serializing_if = "Option::is_none")]
     description: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    emoji: Option<JsonMap>,
+    emoji: Option<ReactionType>,
     #[serde(skip_serializing_if = "Option::is_none")]
     default: Option<bool>,
 }
@@ -386,31 +362,7 @@ impl CreateSelectMenuOption {
 
     /// Sets emoji of the option.
     pub fn emoji<R: Into<ReactionType>>(&mut self, emoji: R) -> &mut Self {
-        self._emoji(emoji.into())
-    }
-
-    fn _emoji(&mut self, emoji: ReactionType) -> &mut Self {
-        let mut map = JsonMap::new();
-
-        match emoji {
-            ReactionType::Unicode(u) => {
-                map.insert("name".into(), Value::String(u));
-            },
-            ReactionType::Custom {
-                animated,
-                id,
-                name,
-            } => {
-                map.insert("animated".into(), Value::from(animated));
-                map.insert("id".into(), Value::String(id.to_string()));
-
-                if let Some(name) = name {
-                    map.insert("name".into(), Value::from(name));
-                }
-            },
-        };
-
-        self.emoji = Some(map);
+        self.emoji = Some(emoji.into());
         self
     }
 
