@@ -22,6 +22,7 @@ use crate::collector::{
 };
 #[cfg(feature = "model")]
 use crate::http::{CacheHttp, Http};
+#[cfg(feature = "model")]
 use crate::json::prelude::*;
 use crate::model::application::component::ActionRow;
 use crate::model::application::interaction::MessageInteraction;
@@ -94,7 +95,7 @@ pub struct Message {
     pub reactions: Vec<MessageReaction>,
     /// Non-repeating number used for ensuring message order.
     #[serde(default)]
-    pub nonce: Value,
+    pub nonce: Option<Nonce>,
     /// Indicator of whether the message is pinned.
     pub pinned: bool,
     /// The Id of the webhook that sent this message, if one did.
@@ -1259,4 +1260,11 @@ impl MessageId {
 
         self.link(channel_id, guild_id)
     }
+}
+
+#[derive(Clone, Debug, Deserialize, Serialize)]
+#[serde(untagged)]
+pub enum Nonce {
+    String(String),
+    Number(u64),
 }
