@@ -902,7 +902,7 @@ impl Client {
     /// let mut client =
     ///     Client::builder(&token, GatewayIntents::default()).event_handler(Handler).await?;
     ///
-    /// if let Err(why) = client.start_shard_range([4, 7], 10).await {
+    /// if let Err(why) = client.start_shard_range(4..7, 10).await {
     ///     println!("Err with client: {:?}", why);
     /// }
     /// # Ok(())

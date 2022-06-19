@@ -59,7 +59,7 @@ impl ShardMessenger {
     ///
     /// ```rust,no_run
     /// # use tokio::sync::Mutex;
-    /// # use serenity::model::gateway::GatewayIntents;
+    /// # use serenity::model::gateway::{GatewayIntents, ShardInfo};
     /// # use serenity::client::bridge::gateway::ChunkGuildFilter;
     /// # use serenity::gateway::Shard;
     /// # use std::sync::Arc;
@@ -67,8 +67,11 @@ impl ShardMessenger {
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// #     let mutex = Arc::new(Mutex::new("".to_string()));
     /// #
-    /// #     let mut shard = Shard::new(mutex.clone(), "", [0u64, 1u64],
-    /// #                                GatewayIntents::all()).await?;
+    /// #     let shard_info = ShardInfo {
+    /// #         id: 0,
+    /// #         total: 1,
+    /// #     };
+    /// #     let mut shard = Shard::new(mutex.clone(), "", shard_info, GatewayIntents::all()).await?;
     /// #
     /// use serenity::model::id::GuildId;
     ///
@@ -82,7 +85,7 @@ impl ShardMessenger {
     ///
     /// ```rust,no_run
     /// # use tokio::sync::Mutex;
-    /// # use serenity::model::gateway::GatewayIntents;
+    /// # use serenity::model::gateway::{GatewayIntents, ShardInfo};
     /// # use serenity::client::bridge::gateway::ChunkGuildFilter;
     /// # use serenity::gateway::Shard;
     /// # use std::sync::Arc;
@@ -90,8 +93,12 @@ impl ShardMessenger {
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// #     let mutex = Arc::new(Mutex::new("".to_string()));
     /// #
-    /// #     let mut shard = Shard::new(mutex.clone(), "", [0u64, 1u64],
-    /// #                                GatewayIntents::all()).await?;
+    /// #     let shard_info = ShardInfo {
+    /// #         id: 0,
+    /// #         total: 1,
+    /// #     };
+    /// #
+    /// #     let mut shard = Shard::new(mutex.clone(), "", shard_info, GatewayIntents::all()).await?;;
     /// #
     /// use serenity::model::id::GuildId;
     ///
@@ -130,14 +137,18 @@ impl ShardMessenger {
     /// ```rust,no_run
     /// # use tokio::sync::Mutex;
     /// # use serenity::gateway::Shard;
-    /// # use serenity::model::gateway::GatewayIntents;
+    /// # use serenity::model::gateway::{GatewayIntents, ShardInfo};
     /// # use std::sync::Arc;
     /// #
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// #     let mutex = Arc::new(Mutex::new("".to_string()));
     /// #
-    /// #     let mut shard = Shard::new(mutex.clone(), "", [0u64, 1u64],
-    /// #                                GatewayIntents::all()).await?;
+    /// #     let shard_info = ShardInfo {
+    /// #         id: 0,
+    /// #         total: 1,
+    /// #     };
+    /// #
+    /// #     let mut shard = Shard::new(mutex.clone(), "", shard_info, GatewayIntents::all()).await?;
     /// use serenity::model::gateway::Activity;
     ///
     /// shard.set_activity(Some(Activity::playing("Heroes of the Storm")));
@@ -166,7 +177,12 @@ impl ShardMessenger {
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// #     let mutex = Arc::new(Mutex::new("".to_string()));
     /// #
-    /// #     let mut shard = Shard::new(mutex.clone(), "", [0u64, 1u64], None).await?;
+    /// #     let shard_info = ShardInfo {
+    /// #         id: 0,
+    /// #         total: 1,
+    /// #     };
+    /// #
+    /// #     let mut shard = Shard::new(mutex.clone(), "", shard_info, None).await?;
     /// #
     /// use serenity::model::gateway::Activity;
     /// use serenity::model::user::OnlineStatus;
@@ -198,14 +214,17 @@ impl ShardMessenger {
     /// ```rust,no_run
     /// # use tokio::sync::Mutex;
     /// # use serenity::gateway::Shard;
-    /// # use serenity::model::gateway::GatewayIntents;
+    /// # use serenity::model::gateway::{GatewayIntents, ShardInfo};
     /// # use std::sync::Arc;
     /// #
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// #     let mutex = Arc::new(Mutex::new("".to_string()));
+    /// #     let shard_info = ShardInfo {
+    /// #         id: 0,
+    /// #         total: 1,
+    /// #     };
     /// #
-    /// #     let mut shard = Shard::new(mutex.clone(), "", [0u64, 1u64],
-    /// #                                GatewayIntents::all()).await?;
+    /// #     let mut shard = Shard::new(mutex.clone(), "", shard_info, GatewayIntents::all()).await?;
     /// #
     /// use serenity::model::user::OnlineStatus;
     ///

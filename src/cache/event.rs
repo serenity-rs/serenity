@@ -30,8 +30,8 @@ use crate::model::event::{
     UserUpdateEvent,
     VoiceStateUpdateEvent,
 };
+use crate::model::gateway::ShardInfo;
 use crate::model::guild::{Guild, Member, Role};
-use crate::model::prelude::ShardInfo;
 use crate::model::user::{CurrentUser, OnlineStatus};
 use crate::model::voice::VoiceState;
 

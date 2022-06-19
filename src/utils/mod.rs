@@ -454,7 +454,7 @@ pub fn parse_webhook(url: &Url) -> Option<(u64, &str)> {
 /// ```
 #[inline]
 pub fn shard_id(guild_id: impl Into<u64>, shard_count: u32) -> u32 {
-    (guild_id.into() >> 22) as u32 % shard_count
+    ((guild_id.into() >> 22) % (shard_count as u64)) as u32
 }
 
 #[cfg(test)]
