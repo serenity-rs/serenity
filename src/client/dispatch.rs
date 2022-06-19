@@ -57,7 +57,7 @@ fn context(
 fn context(
     data: &Arc<RwLock<TypeMap>>,
     runner_tx: &Sender<InterMessage>,
-    shard_id: u64,
+    shard_id: u32,
     http: &Arc<Http>,
 ) -> Context {
     Context::new(Arc::clone(data), runner_tx.clone(), shard_id, Arc::clone(http))

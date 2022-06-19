@@ -1258,7 +1258,7 @@ impl GuildId {
     /// ```
     #[cfg(all(feature = "utils", not(feature = "cache")))]
     #[inline]
-    pub fn shard_id(self, shard_count: u64) -> u64 {
+    pub fn shard_id(self, shard_count: u32) -> u32 {
         crate::utils::shard_id(self.0, shard_count)
     }
 

@@ -65,7 +65,7 @@ impl Context {
     }
 
     #[cfg(all(not(feature = "cache"), not(feature = "gateway")))]
-    pub fn easy(data: Arc<RwLock<TypeMap>>, shard_id: u64, http: Arc<Http>) -> Context {
+    pub fn easy(data: Arc<RwLock<TypeMap>>, shard_id: u32, http: Arc<Http>) -> Context {
         Context {
             shard_id,
             data,
@@ -78,7 +78,7 @@ impl Context {
     pub(crate) fn new(
         data: Arc<RwLock<TypeMap>>,
         runner_tx: Sender<InterMessage>,
-        shard_id: u64,
+        shard_id: u32,
         http: Arc<Http>,
     ) -> Context {
         Context {
