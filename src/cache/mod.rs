@@ -996,7 +996,6 @@ mod test {
     use std::collections::HashMap;
 
     use crate::cache::{Cache, CacheUpdate, Settings};
-    use crate::json::from_number;
     use crate::model::prelude::*;
 
     #[test]
@@ -1032,7 +1031,7 @@ mod test {
                 mention_roles: vec![],
                 mention_channels: vec![],
                 mentions: vec![],
-                nonce: from_number(1),
+                nonce: Some(Nonce::Number(1)),
                 pinned: false,
                 reactions: vec![],
                 timestamp: datetime,
