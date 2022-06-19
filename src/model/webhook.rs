@@ -6,9 +6,8 @@ use std::fmt;
 use super::channel::Message;
 use super::id::{ChannelId, GuildId, WebhookId};
 use super::user::User;
-use crate::builder::EditWebhook;
 #[cfg(feature = "model")]
-use crate::builder::{EditWebhookMessage, ExecuteWebhook};
+use crate::builder::{EditWebhook, EditWebhookMessage, ExecuteWebhook};
 #[cfg(feature = "model")]
 use crate::http::Http;
 #[cfg(feature = "model")]
