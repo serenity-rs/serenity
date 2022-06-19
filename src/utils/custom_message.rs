@@ -1,4 +1,3 @@
-use crate::json::NULL;
 use crate::model::prelude::*;
 use crate::model::Timestamp;
 
@@ -263,7 +262,7 @@ fn dummy_message() -> Message {
         mention_roles: Vec::new(),
         mention_channels: Vec::new(),
         mentions: Vec::new(),
-        nonce: NULL,
+        nonce: None,
         pinned: false,
         reactions: Vec::new(),
         tts: false,

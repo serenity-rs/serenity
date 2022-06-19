@@ -367,24 +367,24 @@ impl Serialize for ReactionType {
     where
         S: Serializer,
     {
-        match *self {
+        match self {
             ReactionType::Custom {
                 animated,
                 id,
-                ref name,
+                name,
             } => {
                 let mut map = serializer.serialize_map(Some(3))?;
 
-                map.serialize_entry("animated", &animated)?;
-                map.serialize_entry("id", &id)?;
-                map.serialize_entry("name", &name)?;
+                map.serialize_entry("animated", animated)?;
+                map.serialize_entry("id", id)?;
+                map.serialize_entry("name", name)?;
 
                 map.end()
             },
-            ReactionType::Unicode(ref name) => {
+            ReactionType::Unicode(name) => {
                 let mut map = serializer.serialize_map(Some(1))?;
 
-                map.serialize_entry("name", &name)?;
+                map.serialize_entry("name", name)?;
 
                 map.end()
             },

@@ -43,8 +43,6 @@ use crate::internal::prelude::*;
 #[cfg(feature = "model")]
 use crate::json::json;
 #[cfg(feature = "model")]
-use crate::json::prelude::*;
-#[cfg(feature = "model")]
 use crate::model::application::command::{Command, CommandPermission};
 use crate::model::prelude::*;
 
@@ -1044,10 +1042,7 @@ impl GuildId {
         user_id: impl Into<UserId>,
         channel_id: impl Into<ChannelId>,
     ) -> Result<Member> {
-        let mut map = JsonMap::new();
-        map.insert("channel_id".to_string(), from_number(channel_id.into().get()));
-
-        http.as_ref().edit_member(self.get(), user_id.into().get(), &map, None).await
+        self.edit_member(http, user_id, |m| m.voice_channel(channel_id.into())).await
     }
 
     /// Returns the name of whatever guild this id holds.
@@ -1073,9 +1068,7 @@ impl GuildId {
         http: impl AsRef<Http>,
         user_id: impl Into<UserId>,
     ) -> Result<Member> {
-        let mut map = JsonMap::new();
-        map.insert("channel_id".to_string(), NULL);
-        http.as_ref().edit_member(self.get(), user_id.into().get(), &map, None).await
+        self.edit_member(http, user_id, EditMember::disconnect_member).await
     }
 
     /// Gets the number of [`Member`]s that would be pruned with the given
