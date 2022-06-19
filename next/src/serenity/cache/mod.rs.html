@@ -1185,7 +1185,6 @@
 <span id="1180">1180</span>
 <span id="1181">1181</span>
 <span id="1182">1182</span>
-<span id="1183">1183</span>
 </pre><pre class="rust"><code><span class="doccomment">//! A cache containing data received from [`Shard`]s.</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! Using the cache allows to avoid REST API requests via the [`http`] module</span>
@@ -2184,7 +2183,6 @@
     <span class="kw">use</span> <span class="ident">std::collections::HashMap</span>;
 
     <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::cache</span>::{<span class="ident">Cache</span>, <span class="ident">CacheUpdate</span>, <span class="ident">Settings</span>};
-    <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::json::from_number</span>;
     <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::prelude</span>::<span class="kw-2">*</span>;
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
@@ -2220,7 +2218,7 @@
                 <span class="ident">mention_roles</span>: <span class="macro">vec!</span>[],
                 <span class="ident">mention_channels</span>: <span class="macro">vec!</span>[],
                 <span class="ident">mentions</span>: <span class="macro">vec!</span>[],
-                <span class="ident">nonce</span>: <span class="ident">from_number</span>(<span class="number">1</span>),
+                <span class="ident">nonce</span>: <span class="prelude-val">Some</span>(<span class="ident">Nonce::Number</span>(<span class="number">1</span>)),
                 <span class="ident">pinned</span>: <span class="bool-val">false</span>,
                 <span class="ident">reactions</span>: <span class="macro">vec!</span>[],
                 <span class="ident">timestamp</span>: <span class="ident">datetime</span>,
