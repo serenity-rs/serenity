@@ -1,3 +1,6 @@
+// This example shows how you can use 'sqlite' to create a database for your bot!
+// This bot will store tasks that the user can send to the bot.
+
 use serenity::async_trait;
 use serenity::model::prelude::*;
 use serenity::prelude::*;
@@ -13,6 +16,8 @@ impl EventHandler for Bot {
 
         if let Some(task_description) = msg.content.strip_prefix("~todo add") {
             let task_description = task_description.trim();
+             // This is how we run sql commands, we are executing it at the specific database "database".
+            // We are inserting in the sql table "todo" the user_id and task_description.
             sqlx::query!(
                 "INSERT INTO todo (task, user_id) VALUES (?, ?)",
                 task_description,
@@ -27,6 +32,7 @@ impl EventHandler for Bot {
         } else if let Some(task_index) = msg.content.strip_prefix("~todo remove") {
             let task_index = task_index.trim().parse::<i64>().unwrap() - 1;
 
+            // Here, one row where user_id(sql) = user_id(rust) will return its rowid and task to entry.
             let entry = sqlx::query!(
                 "SELECT rowid, task FROM todo WHERE user_id = ? ORDER BY rowid LIMIT 1 OFFSET ?",
                 user_id,
@@ -36,6 +42,7 @@ impl EventHandler for Bot {
             .await
             .unwrap();
 
+            //  Here, all rows where rowid(sql) = entry.rowid(rust) will be deleted.
             sqlx::query!("DELETE FROM todo WHERE rowid = ?", entry.rowid)
                 .execute(&self.database)
                 .await
@@ -44,6 +51,7 @@ impl EventHandler for Bot {
             let response = format!("Successfully completed `{}`!", entry.task);
             msg.channel_id.say(&ctx, response).await.unwrap();
         } else if msg.content.trim() == "~todo list" {
+            // Here, all tasks in a row with user_id(sql) = user_id(rust) will be returned to "todos" as a vector.
             let todos =
                 sqlx::query!("SELECT task FROM todo WHERE user_id = ? ORDER BY rowid", user_id)
                     .fetch_all(&self.database)
