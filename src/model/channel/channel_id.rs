@@ -12,6 +12,7 @@ use crate::builder::{
     CreateMessage,
     CreateStageInstance,
     CreateThread,
+    CreateWebhook,
     EditChannel,
     EditMessage,
     EditStageInstance,
@@ -37,8 +38,6 @@ use crate::json::json;
 #[cfg(feature = "model")]
 use crate::model::channel::AttachmentType;
 use crate::model::prelude::*;
-#[cfg(feature = "model")]
-use crate::utils::encode_image;
 
 #[cfg(feature = "model")]
 impl ChannelId {
@@ -859,43 +858,32 @@ impl ChannelId {
         http.as_ref().get_channel_webhooks(self.get()).await
     }
 
-    /// Creates a webhook with only a name.
+    /// Creates a webhook
     ///
     /// # Errors
     ///
     /// Returns a [`Error::Http`] if the current user lacks permission.
-    pub async fn create_webhook(
-        &self,
-        http: impl AsRef<Http>,
-        name: impl std::fmt::Display,
-    ) -> Result<Webhook> {
-        let map = json!({
-            "name": name.to_string(),
-        });
+    /// Returns a [`ModelError::NameTooShort`] if the name of the webhook is
+    /// under the limit of 2 characters.
+    /// Returns a [`ModelError::NameTooLong`] if the name of the webhook is
+    /// over the limit of 100 characters.
+    /// Returns a [`ModelError::InvalidChannelType`] if the channel type is not text.
+    pub async fn create_webhook<F>(&self, http: impl AsRef<Http>, f: F) -> Result<Webhook>
+    where
+        F: FnOnce(&mut CreateWebhook) -> &mut CreateWebhook,
+    {
+        let mut builder = CreateWebhook::default();
+        f(&mut builder);
 
-        http.as_ref().create_webhook(self.get(), &map, None).await
-    }
+        if let Some(name) = &builder.name {
+            if name.len() < 2 {
+                return Err(Error::Model(ModelError::NameTooShort));
+            } else if name.len() > 100 {
+                return Err(Error::Model(ModelError::NameTooLong));
+            }
+        }
 
-    /// Creates a webhook with a name and an avatar.
-    ///
-    /// # Errors
-    ///
-    /// In addition to the reasons [`Self::create_webhook`] may return an [`Error::Http`],
-    /// if the image is too large.
-    pub async fn create_webhook_with_avatar<'a>(
-        &self,
-        http: impl AsRef<Http>,
-        name: impl std::fmt::Display,
-        avatar: impl Into<AttachmentType<'a>>,
-    ) -> Result<Webhook> {
-        let http = http.as_ref();
-        let data = avatar.into().data(&http.client).await?;
-        let map = json!({
-            "name": name.to_string(),
-            "avatar": encode_image(&data),
-        });
-
-        http.create_webhook(self.get(), &map, None).await
+        http.as_ref().create_webhook(self.get(), &builder, None).await
     }
 
     /// Returns a future that will await one message sent in this channel.
