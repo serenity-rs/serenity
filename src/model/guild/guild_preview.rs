@@ -3,10 +3,10 @@ use crate::model::id::GuildId;
 
 /// Preview [`Guild`] information.
 ///
-/// [`Guild`]: super::Guild
-///
 /// [Discord docs](https://discord.com/developers/docs/resources/guild#guild-preview-object).
-#[derive(Clone, Debug, Serialize, Deserialize)]
+///
+/// [`Guild`]: super::Guild
+#[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 pub struct GuildPreview {
     /// The guild Id.
