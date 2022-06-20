@@ -105,10 +105,11 @@ impl MessageComponentInteraction {
             .map_or_else(Vec::new, |d| std::mem::take(&mut d.files));
 
         if files.is_empty() {
-            http.create_interaction_response(self.id.0, &self.token, &interaction_response).await
+            http.create_interaction_response(self.id.get(), &self.token, &interaction_response)
+                .await
         } else {
             http.create_interaction_response_with_files(
-                self.id.0,
+                self.id.get(),
                 &self.token,
                 &interaction_response,
                 files,

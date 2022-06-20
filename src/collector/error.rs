@@ -20,7 +20,7 @@ pub enum Error {
     /// assert!(matches!(
     ///     EventCollectorBuilder::new(&ctx)
     ///         .add_event_type(EventType::GuildCreate)
-    ///         .add_user_id(UserId::default())
+    ///         .add_user_id(UserId::new(1))
     ///         .build(),
     ///     Err(SerenityError::Collector(CollectorError::InvalidEventIdFilters)),
     /// ));

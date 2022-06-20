@@ -752,7 +752,7 @@ impl PartialGuild {
     /// ```rust,ignore
     /// use serenity::model::GuildId;
     ///
-    /// GuildId(7).edit_member(user_id, |m| m.mute(true).roles(&vec![role_id])).await;
+    /// GuildId::new(7).edit_member(user_id, |m| m.mute(true).roles(&vec![role_id])).await;
     /// ```
     ///
     /// # Errors
@@ -801,7 +801,7 @@ impl PartialGuild {
     /// Make a role hoisted:
     ///
     /// ```rust,ignore
-    /// partial_guild.edit_role(&context, RoleId(7), |r| r.hoist(true));
+    /// partial_guild.edit_role(&context, RoleId::new(7), |r| r.hoist(true));
     /// ```
     ///
     /// # Errors
@@ -831,7 +831,7 @@ impl PartialGuild {
     ///
     /// ```rust,ignore
     /// use serenity::model::id::RoleId;
-    /// partial_guild.edit_role_position(&context, RoleId(8), 2);
+    /// partial_guild.edit_role_position(&context, RoleId::new(8), 2);
     /// ```
     ///
     /// # Errors
@@ -974,14 +974,14 @@ impl PartialGuild {
             .members
             .get(&lhs_id)?
             .highest_role_info(&cache)
-            .unwrap_or((RoleId(0), 0));
+            .unwrap_or((RoleId::new(1), 0));
         let rhs = cache
             .as_ref()
             .guild(self.id)?
             .members
             .get(&rhs_id)?
             .highest_role_info(&cache)
-            .unwrap_or((RoleId(0), 0));
+            .unwrap_or((RoleId::new(1), 0));
 
         // If LHS and RHS both have no top position or have the same role ID,
         // then no one wins.

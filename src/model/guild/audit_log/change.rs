@@ -835,8 +835,8 @@ mod tests {
     #[test]
     fn afk_channel_id_variant() {
         let value = Change::AfkChannelId {
-            old: Some(ChannelId(1)),
-            new: Some(ChannelId(2)),
+            old: Some(ChannelId::new(1)),
+            new: Some(ChannelId::new(2)),
         };
         assert_tokens(&value, &[
             Token::Struct {
@@ -865,7 +865,7 @@ mod tests {
     fn skip_serializing_if_none() {
         let value = Change::AfkChannelId {
             old: None,
-            new: Some(ChannelId(2)),
+            new: Some(ChannelId::new(2)),
         };
         assert_tokens(&value, &[
             Token::Struct {
@@ -883,7 +883,7 @@ mod tests {
             Token::StructEnd,
         ]);
         let value = Change::AfkChannelId {
-            old: Some(ChannelId(1)),
+            old: Some(ChannelId::new(1)),
             new: None,
         };
         assert_tokens(&value, &[

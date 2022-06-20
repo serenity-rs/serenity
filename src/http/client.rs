@@ -3,6 +3,7 @@
 use std::borrow::Cow;
 use std::convert::TryFrom;
 use std::fmt;
+use std::num::NonZeroU64;
 use std::str::FromStr;
 use std::sync::atomic::{AtomicU64, Ordering};
 use std::sync::Arc;
@@ -247,18 +248,15 @@ impl Http {
         http
     }
 
-    pub fn application_id(&self) -> Option<u64> {
+    pub fn application_id(&self) -> Option<NonZeroU64> {
         let application_id = self.application_id.load(Ordering::Relaxed);
-
-        if application_id == 0 {
-            None
-        } else {
-            Some(application_id)
-        }
+        NonZeroU64::new(application_id)
     }
 
     fn try_application_id(&self) -> Result<u64> {
-        self.application_id().ok_or_else(|| HttpError::ApplicationIdMissing.into())
+        self.application_id()
+            .map(NonZeroU64::get)
+            .ok_or_else(|| HttpError::ApplicationIdMissing.into())
     }
 
     pub fn set_application_id(&self, application_id: u64) {
@@ -1110,10 +1108,10 @@ impl Http {
     ///
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// # let http = Http::new("token");
-    /// let channel_id = ChannelId(7);
-    /// let message_id = MessageId(8);
+    /// let channel_id = ChannelId::new(7);
+    /// let message_id = MessageId::new(8);
     ///
-    /// http.delete_message_reactions(channel_id.0, message_id.0).await?;
+    /// http.delete_message_reactions(channel_id.get(), message_id.get()).await?;
     /// #     Ok(())
     /// # }
     /// ```
@@ -3089,8 +3087,8 @@ impl Http {
         let (after, before) = match target {
             None => (None, None),
             Some(p) => match p {
-                UserPagination::After(id) => (Some(id.0), None),
-                UserPagination::Before(id) => (None, Some(id.0)),
+                UserPagination::After(id) => (Some(id.get()), None),
+                UserPagination::Before(id) => (None, Some(id.get())),
             },
         };
 
@@ -3208,7 +3206,7 @@ impl Http {
     /// use serenity::http::GuildPagination;
     /// use serenity::model::id::GuildId;
     ///
-    /// let guild_id = GuildId(81384788765712384);
+    /// let guild_id = GuildId::new(81384788765712384);
     ///
     /// let guilds = http.get_guilds(Some(&GuildPagination::After(guild_id)), Some(10)).await?;
     /// #     Ok(())
@@ -3224,8 +3222,8 @@ impl Http {
         let (after, before) = match target {
             None => (None, None),
             Some(gp) => match gp {
-                GuildPagination::After(id) => (Some(id.0), None),
-                GuildPagination::Before(id) => (None, Some(id.0)),
+                GuildPagination::After(id) => (Some(id.get()), None),
+                GuildPagination::Before(id) => (None, Some(id.get())),
             },
         };
 

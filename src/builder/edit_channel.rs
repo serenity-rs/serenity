@@ -14,7 +14,7 @@ use crate::model::id::ChannelId;
 /// #
 /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
 /// #     let http = Http::new("token");
-/// #     let mut channel = ChannelId(0);
+/// #     let mut channel = ChannelId::new(1);
 /// // assuming a channel has already been bound
 /// if let Err(why) = channel.edit(&http, |c| c.name("new name").topic("a test topic")).await {
 ///     // properly handle the error
@@ -170,7 +170,7 @@ impl EditChannel {
     /// #
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// #     let http = Arc::new(Http::new("token"));
-    /// #     let mut channel = ChannelId(0);
+    /// #     let mut channel = ChannelId::new(1);
     /// use serenity::model::channel::{PermissionOverwrite, PermissionOverwriteType};
     /// use serenity::model::id::UserId;
     /// use serenity::model::permissions::Permissions;
@@ -179,7 +179,7 @@ impl EditChannel {
     /// let permissions = vec![PermissionOverwrite {
     ///     allow: Permissions::VIEW_CHANNEL,
     ///     deny: Permissions::SEND_TTS_MESSAGES,
-    ///     kind: PermissionOverwriteType::Member(UserId(1234)),
+    ///     kind: PermissionOverwriteType::Member(UserId::new(1234)),
     /// }];
     ///
     /// channel.edit(http, |c| c.name("my_edited_cool_channel").permissions(permissions)).await?;
