@@ -2,7 +2,6 @@ use std::future::Future;
 use std::pin::Pin;
 use std::sync::Arc;
 use std::task::{Context as FutContext, Poll};
-use std::time::Duration;
 
 use futures::stream::Stream;
 use tokio::sync::mpsc::{
@@ -10,9 +9,10 @@ use tokio::sync::mpsc::{
     UnboundedReceiver as Receiver,
     UnboundedSender as Sender,
 };
-use tokio::time::{sleep, Sleep};
+use tokio::time::Sleep;
 
 use crate::client::bridge::gateway::ShardMessenger;
+use crate::collector::macros::*;
 use crate::collector::{CollectorError, FilterFn, LazyArc};
 use crate::model::event::{Event, EventType, RelatedIdsForEventType};
 use crate::model::id::{ChannelId, GuildId, MessageId, UserId};
@@ -152,28 +152,6 @@ impl EventCollectorBuilder {
         }
     }
 
-    /// Limits how many events will attempt to be filtered.
-    ///
-    /// The filter checks whether the event has the right related guild, channel, user, and message.
-    /// Only events with types passed to [`Self::add_event_type`] as counted towards this limit.
-    #[allow(clippy::unwrap_used)]
-    pub fn filter_limit(mut self, limit: u32) -> Self {
-        self.filter.as_mut().unwrap().filter_limit = Some(limit);
-
-        self
-    }
-
-    /// Limits how many events can be collected.
-    ///
-    /// An event is considered *collected*, if the event
-    /// passes all the requirements.
-    #[allow(clippy::unwrap_used)]
-    pub fn collect_limit(mut self, limit: u32) -> Self {
-        self.filter.as_mut().unwrap().collect_limit = Some(limit);
-
-        self
-    }
-
     /// Sets a filter function where events passed to the `function` must
     /// return `true`, otherwise the event won't be collected and failed the filter
     /// process.
@@ -230,13 +208,9 @@ impl EventCollectorBuilder {
         self
     }
 
-    /// Sets a `duration` for how long the collector shall receive
-    /// events.
-    pub fn timeout(mut self, duration: Duration) -> Self {
-        self.timeout = Some(Box::pin(sleep(duration)));
-
-        self
-    }
+    impl_filter_limit!("Limits how many events will attempt to be filtered. The filter checks whether the event has the right related guild, channel, user, and message. Only events with types passed to [`Self::add_event_type`] as counted towards this limit.");
+    impl_collect_limit!("Limits how many events can be collected. An event is considered *collected*, if the event passes all the requirements.");
+    impl_timeout!("Sets a `duration` for how long the collector shall receive events.");
 
     /// Use the given configuration to build the [`EventCollector`].
     ///
