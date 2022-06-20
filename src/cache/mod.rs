@@ -61,7 +61,7 @@ struct NotSend;
 
 enum CacheRefInner<'a, K, V> {
     DashRef(Ref<'a, K, V>),
-    ReadGuard(parking_lot::RwLockReadGuard<'a, V>)
+    ReadGuard(parking_lot::RwLockReadGuard<'a, V>),
 }
 
 pub struct CacheRef<'a, K, V> {
@@ -73,7 +73,7 @@ impl<'a, K, V> CacheRef<'a, K, V> {
     fn new(inner: CacheRefInner<'a, K, V>) -> Self {
         Self {
             inner,
-            phantom: std::marker::PhantomData
+            phantom: std::marker::PhantomData,
         }
     }
 
