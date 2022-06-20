@@ -1451,6 +1451,10 @@
 <span id="1446">1446</span>
 <span id="1447">1447</span>
 <span id="1448">1448</span>
+<span id="1449">1449</span>
+<span id="1450">1450</span>
+<span id="1451">1451</span>
+<span id="1452">1452</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::fmt</span>::{<span class="self">self</span> <span class="kw">as</span> <span class="ident">fmt</span>, <span class="ident">Write</span>};
 <span class="kw">use</span> <span class="ident">std::ops::Add</span>;
 
@@ -1519,7 +1523,7 @@
     <span class="doccomment">/// use serenity::model::id::ChannelId;</span>
     <span class="doccomment">/// use serenity::utils::MessageBuilder;</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// let channel_id = ChannelId(81384788765712384);</span>
+    <span class="doccomment">/// let channel_id = ChannelId::new(81384788765712384);</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// let content = MessageBuilder::new().channel(channel_id).push(&quot;!&quot;).build();</span>
     <span class="doccomment">///</span>
@@ -1556,7 +1560,7 @@
     <span class="doccomment">/// use serenity::model::id::ChannelId;</span>
     <span class="doccomment">/// use serenity::utils::MessageBuilder;</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// let channel_id = ChannelId(81384788765712384);</span>
+    <span class="doccomment">/// let channel_id = ChannelId::new(81384788765712384);</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// let content = MessageBuilder::new().push(&quot;The channel is: &quot;).channel(channel_id).build();</span>
     <span class="doccomment">///</span>
@@ -1592,7 +1596,7 @@
     <span class="doccomment">/// # use serenity::utils::MessageBuilder;</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// # let emoji = from_value::&lt;Emoji&gt;(json!({</span>
-    <span class="doccomment">/// #     &quot;id&quot;: EmojiId(302516740095606785),</span>
+    <span class="doccomment">/// #     &quot;id&quot;: EmojiId::new(302516740095606785),</span>
     <span class="doccomment">/// #     &quot;name&quot;: &quot;smugAnimeFace&quot;,</span>
     <span class="doccomment">/// # })).unwrap();</span>
     <span class="doccomment">///</span>
@@ -2656,7 +2660,7 @@
             .<span class="ident">emoji</span>(<span class="kw-2">&amp;</span><span class="ident">Emoji</span> {
                 <span class="ident">animated</span>: <span class="bool-val">false</span>,
                 <span class="ident">available</span>: <span class="bool-val">true</span>,
-                <span class="ident">id</span>: <span class="ident">EmojiId</span>(<span class="number">32</span>),
+                <span class="ident">id</span>: <span class="ident">EmojiId::new</span>(<span class="number">32</span>),
                 <span class="ident">name</span>: <span class="string">&quot;Rohrkatze&quot;</span>.<span class="ident">to_string</span>(),
                 <span class="ident">managed</span>: <span class="bool-val">false</span>,
                 <span class="ident">require_colons</span>: <span class="bool-val">true</span>,
@@ -2664,8 +2668,12 @@
                 <span class="ident">user</span>: <span class="prelude-val">None</span>,
             })
             .<span class="ident">build</span>();
-        <span class="kw">let</span> <span class="ident">content_mentions</span> <span class="op">=</span>
-            <span class="ident">MessageBuilder::new</span>().<span class="ident">channel</span>(<span class="number">1</span>).<span class="ident">mention</span>(<span class="kw-2">&amp;</span><span class="ident">UserId</span>(<span class="number">2</span>)).<span class="ident">role</span>(<span class="number">3</span>).<span class="ident">user</span>(<span class="number">4</span>).<span class="ident">build</span>();
+        <span class="kw">let</span> <span class="ident">content_mentions</span> <span class="op">=</span> <span class="ident">MessageBuilder::new</span>()
+            .<span class="ident">channel</span>(<span class="ident">ChannelId::new</span>(<span class="number">1</span>))
+            .<span class="ident">mention</span>(<span class="kw-2">&amp;</span><span class="ident">UserId::new</span>(<span class="number">2</span>))
+            .<span class="ident">role</span>(<span class="ident">RoleId::new</span>(<span class="number">3</span>))
+            .<span class="ident">user</span>(<span class="ident">UserId::new</span>(<span class="number">4</span>))
+            .<span class="ident">build</span>();
         <span class="macro">assert_eq!</span>(<span class="ident">content_mentions</span>, <span class="string">&quot;&lt;#1&gt;&lt;@2&gt;&lt;@&amp;3&gt;&lt;@4&gt;&quot;</span>);
         <span class="macro">assert_eq!</span>(<span class="ident">content_emoji</span>, <span class="string">&quot;&lt;:Rohrkatze:32&gt;&quot;</span>);
     }

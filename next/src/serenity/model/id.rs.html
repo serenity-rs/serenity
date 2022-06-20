@@ -372,23 +372,10 @@
 <span id="367">367</span>
 <span id="368">368</span>
 <span id="369">369</span>
-<span id="370">370</span>
-<span id="371">371</span>
-<span id="372">372</span>
-<span id="373">373</span>
-<span id="374">374</span>
-<span id="375">375</span>
-<span id="376">376</span>
-<span id="377">377</span>
-<span id="378">378</span>
-<span id="379">379</span>
-<span id="380">380</span>
-<span id="381">381</span>
-<span id="382">382</span>
-<span id="383">383</span>
 </pre><pre class="rust"><code><span class="doccomment">//! A collection of newtypes defining type-strong IDs.</span>
 
 <span class="kw">use</span> <span class="ident">std::fmt</span>;
+<span class="kw">use</span> <span class="ident">std::num</span>::{<span class="ident">NonZeroI64</span>, <span class="ident">NonZeroU64</span>};
 
 <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::Timestamp</span>;
 
@@ -396,24 +383,34 @@
     ($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>:<span class="ident">ident</span>;)<span class="kw-2">*</span>) =&gt; {
         $(
             <span class="kw">impl</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span> {
+                <span class="doccomment">/// Creates a new Id from a u64</span>
+                <span class="doccomment">///</span>
+                <span class="doccomment">/// # Panics</span>
+                <span class="doccomment">/// Panics if the id is zero.</span>
+                <span class="attribute">#[<span class="ident">inline</span>]</span>
+                <span class="attribute">#[<span class="ident">must_use</span>]</span>
+                <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">id</span>: <span class="ident">u64</span>) -&gt; <span class="self">Self</span> {
+                    <span class="self">Self</span>(<span class="ident">NonZeroU64::new</span>(<span class="ident">id</span>).<span class="ident">unwrap</span>())
+                }
+
+                <span class="doccomment">/// Retrieves the inner ID as u64</span>
+                <span class="attribute">#[<span class="ident">inline</span>]</span>
+                <span class="attribute">#[<span class="ident">must_use</span>]</span>
+                <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">get</span>(<span class="self">self</span>) -&gt; <span class="ident">u64</span> {
+                    <span class="self">self</span>.<span class="number">0</span>.<span class="ident">get</span>()
+                }
+
                 <span class="doccomment">/// Retrieves the time that the Id was created at.</span>
                 <span class="attribute">#[<span class="ident">must_use</span>]</span>
                 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">created_at</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Timestamp</span> {
-                    <span class="ident">Timestamp::from_discord_id</span>(<span class="self">self</span>.<span class="number">0</span>)
+                    <span class="ident">Timestamp::from_discord_id</span>(<span class="self">self</span>.<span class="ident">get</span>())
                 }
 
                 <span class="doccomment">/// Immutably borrow inner Id.</span>
                 <span class="attribute">#[<span class="ident">inline</span>]</span>
                 <span class="attribute">#[<span class="ident">must_use</span>]</span>
-                <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_u64</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">u64</span> {
+                <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">as_inner</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">NonZeroU64</span> {
                     <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span>
-                }
-
-                <span class="doccomment">/// Mutably borrow inner Id.</span>
-                <span class="attribute">#[<span class="ident">inline</span>]</span>
-                <span class="attribute">#[<span class="ident">must_use</span>]</span>
-                <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_mut_u64</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="ident">u64</span> {
-                    <span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="number">0</span>
                 }
             }
 
@@ -433,14 +430,20 @@
             }
 
             <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span> {
-                <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">id_as_u64</span>: <span class="ident">u64</span>) -&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span> {
-                    <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>(<span class="ident">id_as_u64</span>)
+                <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">id</span>: <span class="ident">u64</span>) -&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span> {
+                    <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name::new</span>(<span class="ident">id</span>)
+                }
+            }
+
+            <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">NonZeroU64</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span> {
+                <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">id</span>: <span class="ident">NonZeroU64</span>) -&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span> {
+                    <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>(<span class="ident">id</span>)
                 }
             }
 
             <span class="kw">impl</span> <span class="ident">PartialEq</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span> {
                 <span class="kw">fn</span> <span class="ident">eq</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">u</span>: <span class="kw-2">&amp;</span><span class="ident">u64</span>) -&gt; <span class="ident">bool</span> {
-                    <span class="self">self</span>.<span class="number">0</span> <span class="op">==</span> <span class="kw-2">*</span><span class="ident">u</span>
+                    <span class="self">self</span>.<span class="ident">get</span>() <span class="op">==</span> <span class="kw-2">*</span><span class="ident">u</span>
                 }
             }
 
@@ -450,15 +453,27 @@
                 }
             }
 
+            <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">NonZeroU64</span> {
+                <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">id</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>) -&gt; <span class="ident">NonZeroU64</span> {
+                    <span class="ident">id</span>.<span class="number">0</span>
+                }
+            }
+
+            <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">NonZeroI64</span> {
+                <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">id</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>) -&gt; <span class="ident">NonZeroI64</span> {
+                    <span class="kw">unsafe</span> {<span class="ident">NonZeroI64::new_unchecked</span>(<span class="ident">id</span>.<span class="ident">get</span>() <span class="kw">as</span> <span class="ident">i64</span>)}
+                }
+            }
+
             <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">u64</span> {
                 <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">id</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>) -&gt; <span class="ident">u64</span> {
-                    <span class="ident">id</span>.<span class="number">0</span> <span class="kw">as</span> <span class="ident">u64</span>
+                    <span class="ident">id</span>.<span class="ident">get</span>()
                 }
             }
 
             <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">i64</span> {
                 <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">id</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>) -&gt; <span class="ident">i64</span> {
-                    <span class="ident">id</span>.<span class="number">0</span> <span class="kw">as</span> <span class="ident">i64</span>
+                    <span class="ident">id</span>.<span class="ident">get</span>() <span class="kw">as</span> <span class="ident">i64</span>
                 }
             }
         )<span class="op">*</span>
@@ -466,144 +481,98 @@
 }
 
 <span class="doccomment">/// An identifier for an Application.</span>
-<span class="attribute">#[<span class="ident">derive</span>(
-    <span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">Default</span>, <span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>, <span class="ident">PartialEq</span>, <span class="ident">PartialOrd</span>, <span class="ident">Ord</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>,
-)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ApplicationId</span>(<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">with</span> <span class="op">=</span> <span class="string">&quot;snowflake&quot;</span>)]</span> <span class="kw">pub</span> <span class="ident">u64</span>);
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>, <span class="ident">PartialEq</span>, <span class="ident">PartialOrd</span>, <span class="ident">Ord</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ApplicationId</span>(<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">with</span> <span class="op">=</span> <span class="string">&quot;snowflake&quot;</span>)]</span> <span class="kw">pub</span> <span class="ident">NonZeroU64</span>);
 
 <span class="doccomment">/// An identifier for a Channel</span>
-<span class="attribute">#[<span class="ident">derive</span>(
-    <span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">Default</span>, <span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>, <span class="ident">PartialEq</span>, <span class="ident">PartialOrd</span>, <span class="ident">Ord</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>,
-)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ChannelId</span>(<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">with</span> <span class="op">=</span> <span class="string">&quot;snowflake&quot;</span>)]</span> <span class="kw">pub</span> <span class="ident">u64</span>);
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>, <span class="ident">PartialEq</span>, <span class="ident">PartialOrd</span>, <span class="ident">Ord</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ChannelId</span>(<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">with</span> <span class="op">=</span> <span class="string">&quot;snowflake&quot;</span>)]</span> <span class="kw">pub</span> <span class="ident">NonZeroU64</span>);
 
 <span class="doccomment">/// An identifier for an Emoji</span>
-<span class="attribute">#[<span class="ident">derive</span>(
-    <span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">Default</span>, <span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>, <span class="ident">PartialEq</span>, <span class="ident">PartialOrd</span>, <span class="ident">Ord</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>,
-)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">EmojiId</span>(<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">with</span> <span class="op">=</span> <span class="string">&quot;snowflake&quot;</span>)]</span> <span class="kw">pub</span> <span class="ident">u64</span>);
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>, <span class="ident">PartialEq</span>, <span class="ident">PartialOrd</span>, <span class="ident">Ord</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">EmojiId</span>(<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">with</span> <span class="op">=</span> <span class="string">&quot;snowflake&quot;</span>)]</span> <span class="kw">pub</span> <span class="ident">NonZeroU64</span>);
 
 <span class="doccomment">/// An identifier for an unspecific entity.</span>
-<span class="attribute">#[<span class="ident">derive</span>(
-    <span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">Default</span>, <span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>, <span class="ident">PartialEq</span>, <span class="ident">PartialOrd</span>, <span class="ident">Ord</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>,
-)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">GenericId</span>(<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">with</span> <span class="op">=</span> <span class="string">&quot;snowflake&quot;</span>)]</span> <span class="kw">pub</span> <span class="ident">u64</span>);
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>, <span class="ident">PartialEq</span>, <span class="ident">PartialOrd</span>, <span class="ident">Ord</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">GenericId</span>(<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">with</span> <span class="op">=</span> <span class="string">&quot;snowflake&quot;</span>)]</span> <span class="kw">pub</span> <span class="ident">NonZeroU64</span>);
 
 <span class="doccomment">/// An identifier for a Guild</span>
-<span class="attribute">#[<span class="ident">derive</span>(
-    <span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">Default</span>, <span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>, <span class="ident">PartialEq</span>, <span class="ident">PartialOrd</span>, <span class="ident">Ord</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>,
-)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">GuildId</span>(<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">with</span> <span class="op">=</span> <span class="string">&quot;snowflake&quot;</span>)]</span> <span class="kw">pub</span> <span class="ident">u64</span>);
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>, <span class="ident">PartialEq</span>, <span class="ident">PartialOrd</span>, <span class="ident">Ord</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">GuildId</span>(<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">with</span> <span class="op">=</span> <span class="string">&quot;snowflake&quot;</span>)]</span> <span class="kw">pub</span> <span class="ident">NonZeroU64</span>);
 
 <span class="doccomment">/// An identifier for an Integration</span>
-<span class="attribute">#[<span class="ident">derive</span>(
-    <span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">Default</span>, <span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>, <span class="ident">PartialEq</span>, <span class="ident">PartialOrd</span>, <span class="ident">Ord</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>,
-)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">IntegrationId</span>(<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">with</span> <span class="op">=</span> <span class="string">&quot;snowflake&quot;</span>)]</span> <span class="kw">pub</span> <span class="ident">u64</span>);
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>, <span class="ident">PartialEq</span>, <span class="ident">PartialOrd</span>, <span class="ident">Ord</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">IntegrationId</span>(<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">with</span> <span class="op">=</span> <span class="string">&quot;snowflake&quot;</span>)]</span> <span class="kw">pub</span> <span class="ident">NonZeroU64</span>);
 
 <span class="doccomment">/// An identifier for a Message</span>
-<span class="attribute">#[<span class="ident">derive</span>(
-    <span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">Default</span>, <span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>, <span class="ident">PartialEq</span>, <span class="ident">PartialOrd</span>, <span class="ident">Ord</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>,
-)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">MessageId</span>(<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">with</span> <span class="op">=</span> <span class="string">&quot;snowflake&quot;</span>)]</span> <span class="kw">pub</span> <span class="ident">u64</span>);
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>, <span class="ident">PartialEq</span>, <span class="ident">PartialOrd</span>, <span class="ident">Ord</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">MessageId</span>(<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">with</span> <span class="op">=</span> <span class="string">&quot;snowflake&quot;</span>)]</span> <span class="kw">pub</span> <span class="ident">NonZeroU64</span>);
 
 <span class="doccomment">/// An identifier for a Role</span>
-<span class="attribute">#[<span class="ident">derive</span>(
-    <span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">Default</span>, <span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>, <span class="ident">PartialEq</span>, <span class="ident">PartialOrd</span>, <span class="ident">Ord</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>,
-)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">RoleId</span>(<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">with</span> <span class="op">=</span> <span class="string">&quot;snowflake&quot;</span>)]</span> <span class="kw">pub</span> <span class="ident">u64</span>);
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>, <span class="ident">PartialEq</span>, <span class="ident">PartialOrd</span>, <span class="ident">Ord</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">RoleId</span>(<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">with</span> <span class="op">=</span> <span class="string">&quot;snowflake&quot;</span>)]</span> <span class="kw">pub</span> <span class="ident">NonZeroU64</span>);
 
 <span class="doccomment">/// An identifier for a Scheduled Event</span>
-<span class="attribute">#[<span class="ident">derive</span>(
-    <span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">Default</span>, <span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>, <span class="ident">PartialEq</span>, <span class="ident">PartialOrd</span>, <span class="ident">Ord</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>,
-)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ScheduledEventId</span>(<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">with</span> <span class="op">=</span> <span class="string">&quot;snowflake&quot;</span>)]</span> <span class="kw">pub</span> <span class="ident">u64</span>);
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>, <span class="ident">PartialEq</span>, <span class="ident">PartialOrd</span>, <span class="ident">Ord</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ScheduledEventId</span>(<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">with</span> <span class="op">=</span> <span class="string">&quot;snowflake&quot;</span>)]</span> <span class="kw">pub</span> <span class="ident">NonZeroU64</span>);
 
 <span class="doccomment">/// An identifier for a User</span>
-<span class="attribute">#[<span class="ident">derive</span>(
-    <span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">Default</span>, <span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>, <span class="ident">PartialEq</span>, <span class="ident">PartialOrd</span>, <span class="ident">Ord</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>,
-)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">UserId</span>(<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">with</span> <span class="op">=</span> <span class="string">&quot;snowflake&quot;</span>)]</span> <span class="kw">pub</span> <span class="ident">u64</span>);
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>, <span class="ident">PartialEq</span>, <span class="ident">PartialOrd</span>, <span class="ident">Ord</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">UserId</span>(<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">with</span> <span class="op">=</span> <span class="string">&quot;snowflake&quot;</span>)]</span> <span class="kw">pub</span> <span class="ident">NonZeroU64</span>);
 
 <span class="doccomment">/// An identifier for a [`Webhook`][super::webhook::Webhook]</span>
-<span class="attribute">#[<span class="ident">derive</span>(
-    <span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">Default</span>, <span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>, <span class="ident">PartialEq</span>, <span class="ident">PartialOrd</span>, <span class="ident">Ord</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>,
-)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">WebhookId</span>(<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">with</span> <span class="op">=</span> <span class="string">&quot;snowflake&quot;</span>)]</span> <span class="kw">pub</span> <span class="ident">u64</span>);
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>, <span class="ident">PartialEq</span>, <span class="ident">PartialOrd</span>, <span class="ident">Ord</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">WebhookId</span>(<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">with</span> <span class="op">=</span> <span class="string">&quot;snowflake&quot;</span>)]</span> <span class="kw">pub</span> <span class="ident">NonZeroU64</span>);
 
 <span class="doccomment">/// An identifier for an audit log entry.</span>
-<span class="attribute">#[<span class="ident">derive</span>(
-    <span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">Default</span>, <span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>, <span class="ident">PartialEq</span>, <span class="ident">PartialOrd</span>, <span class="ident">Ord</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>,
-)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">AuditLogEntryId</span>(<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">with</span> <span class="op">=</span> <span class="string">&quot;snowflake&quot;</span>)]</span> <span class="kw">pub</span> <span class="ident">u64</span>);
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>, <span class="ident">PartialEq</span>, <span class="ident">PartialOrd</span>, <span class="ident">Ord</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">AuditLogEntryId</span>(<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">with</span> <span class="op">=</span> <span class="string">&quot;snowflake&quot;</span>)]</span> <span class="kw">pub</span> <span class="ident">NonZeroU64</span>);
 
 <span class="doccomment">/// An identifier for an attachment.</span>
-<span class="attribute">#[<span class="ident">derive</span>(
-    <span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">Default</span>, <span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>, <span class="ident">PartialEq</span>, <span class="ident">PartialOrd</span>, <span class="ident">Ord</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>,
-)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">AttachmentId</span>(<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">with</span> <span class="op">=</span> <span class="string">&quot;snowflake&quot;</span>)]</span> <span class="kw">pub</span> <span class="ident">u64</span>);
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>, <span class="ident">PartialEq</span>, <span class="ident">PartialOrd</span>, <span class="ident">Ord</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">AttachmentId</span>(<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">with</span> <span class="op">=</span> <span class="string">&quot;snowflake&quot;</span>)]</span> <span class="kw">pub</span> <span class="ident">NonZeroU64</span>);
 
 <span class="doccomment">/// An identifier for a sticker.</span>
-<span class="attribute">#[<span class="ident">derive</span>(
-    <span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">Default</span>, <span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>, <span class="ident">PartialEq</span>, <span class="ident">PartialOrd</span>, <span class="ident">Ord</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>,
-)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">StickerId</span>(<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">with</span> <span class="op">=</span> <span class="string">&quot;snowflake&quot;</span>)]</span> <span class="kw">pub</span> <span class="ident">u64</span>);
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>, <span class="ident">PartialEq</span>, <span class="ident">PartialOrd</span>, <span class="ident">Ord</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">StickerId</span>(<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">with</span> <span class="op">=</span> <span class="string">&quot;snowflake&quot;</span>)]</span> <span class="kw">pub</span> <span class="ident">NonZeroU64</span>);
 
 <span class="doccomment">/// An identifier for a sticker pack.</span>
-<span class="attribute">#[<span class="ident">derive</span>(
-    <span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">Default</span>, <span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>, <span class="ident">PartialEq</span>, <span class="ident">PartialOrd</span>, <span class="ident">Ord</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>,
-)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">StickerPackId</span>(<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">with</span> <span class="op">=</span> <span class="string">&quot;snowflake&quot;</span>)]</span> <span class="kw">pub</span> <span class="ident">u64</span>);
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>, <span class="ident">PartialEq</span>, <span class="ident">PartialOrd</span>, <span class="ident">Ord</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">StickerPackId</span>(<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">with</span> <span class="op">=</span> <span class="string">&quot;snowflake&quot;</span>)]</span> <span class="kw">pub</span> <span class="ident">NonZeroU64</span>);
 
 <span class="doccomment">/// An identifier for a sticker pack banner.</span>
-<span class="attribute">#[<span class="ident">derive</span>(
-    <span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">Default</span>, <span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>, <span class="ident">PartialEq</span>, <span class="ident">PartialOrd</span>, <span class="ident">Ord</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>,
-)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">StickerPackBannerId</span>(<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">with</span> <span class="op">=</span> <span class="string">&quot;snowflake&quot;</span>)]</span> <span class="kw">pub</span> <span class="ident">u64</span>);
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>, <span class="ident">PartialEq</span>, <span class="ident">PartialOrd</span>, <span class="ident">Ord</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">StickerPackBannerId</span>(<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">with</span> <span class="op">=</span> <span class="string">&quot;snowflake&quot;</span>)]</span> <span class="kw">pub</span> <span class="ident">NonZeroU64</span>);
 
 <span class="doccomment">/// An identifier for a SKU.</span>
-<span class="attribute">#[<span class="ident">derive</span>(
-    <span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">Default</span>, <span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>, <span class="ident">PartialEq</span>, <span class="ident">PartialOrd</span>, <span class="ident">Ord</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>,
-)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">SkuId</span>(<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">with</span> <span class="op">=</span> <span class="string">&quot;snowflake&quot;</span>)]</span> <span class="kw">pub</span> <span class="ident">u64</span>);
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>, <span class="ident">PartialEq</span>, <span class="ident">PartialOrd</span>, <span class="ident">Ord</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">SkuId</span>(<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">with</span> <span class="op">=</span> <span class="string">&quot;snowflake&quot;</span>)]</span> <span class="kw">pub</span> <span class="ident">NonZeroU64</span>);
 
 <span class="doccomment">/// An identifier for an interaction.</span>
-<span class="attribute">#[<span class="ident">derive</span>(
-    <span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">Default</span>, <span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>, <span class="ident">PartialEq</span>, <span class="ident">PartialOrd</span>, <span class="ident">Ord</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>,
-)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">InteractionId</span>(<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">with</span> <span class="op">=</span> <span class="string">&quot;snowflake&quot;</span>)]</span> <span class="kw">pub</span> <span class="ident">u64</span>);
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>, <span class="ident">PartialEq</span>, <span class="ident">PartialOrd</span>, <span class="ident">Ord</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">InteractionId</span>(<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">with</span> <span class="op">=</span> <span class="string">&quot;snowflake&quot;</span>)]</span> <span class="kw">pub</span> <span class="ident">NonZeroU64</span>);
 
 <span class="doccomment">/// An identifier for a slash command.</span>
-<span class="attribute">#[<span class="ident">derive</span>(
-    <span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">Default</span>, <span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>, <span class="ident">PartialEq</span>, <span class="ident">PartialOrd</span>, <span class="ident">Ord</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>,
-)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">CommandId</span>(<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">with</span> <span class="op">=</span> <span class="string">&quot;snowflake&quot;</span>)]</span> <span class="kw">pub</span> <span class="ident">u64</span>);
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>, <span class="ident">PartialEq</span>, <span class="ident">PartialOrd</span>, <span class="ident">Ord</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">CommandId</span>(<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">with</span> <span class="op">=</span> <span class="string">&quot;snowflake&quot;</span>)]</span> <span class="kw">pub</span> <span class="ident">NonZeroU64</span>);
 
 <span class="doccomment">/// An identifier for a slash command permission Id. Can contain</span>
 <span class="doccomment">/// a [`RoleId`] or [`UserId`].</span>
-<span class="attribute">#[<span class="ident">derive</span>(
-    <span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">Default</span>, <span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>, <span class="ident">PartialEq</span>, <span class="ident">PartialOrd</span>, <span class="ident">Ord</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>,
-)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">CommandPermissionId</span>(<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">with</span> <span class="op">=</span> <span class="string">&quot;snowflake&quot;</span>)]</span> <span class="kw">pub</span> <span class="ident">u64</span>);
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>, <span class="ident">PartialEq</span>, <span class="ident">PartialOrd</span>, <span class="ident">Ord</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">CommandPermissionId</span>(<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">with</span> <span class="op">=</span> <span class="string">&quot;snowflake&quot;</span>)]</span> <span class="kw">pub</span> <span class="ident">NonZeroU64</span>);
 
 <span class="doccomment">/// An identifier for a slash command version Id.</span>
-<span class="attribute">#[<span class="ident">derive</span>(
-    <span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">Default</span>, <span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>, <span class="ident">PartialEq</span>, <span class="ident">PartialOrd</span>, <span class="ident">Ord</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>,
-)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">CommandVersionId</span>(<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">with</span> <span class="op">=</span> <span class="string">&quot;snowflake&quot;</span>)]</span> <span class="kw">pub</span> <span class="ident">u64</span>);
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>, <span class="ident">PartialEq</span>, <span class="ident">PartialOrd</span>, <span class="ident">Ord</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">CommandVersionId</span>(<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">with</span> <span class="op">=</span> <span class="string">&quot;snowflake&quot;</span>)]</span> <span class="kw">pub</span> <span class="ident">NonZeroU64</span>);
 
 <span class="doccomment">/// An identifier for a slash command target Id. Can contain</span>
 <span class="doccomment">/// a [`UserId`] or [`MessageId`].</span>
-<span class="attribute">#[<span class="ident">derive</span>(
-    <span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">Default</span>, <span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>, <span class="ident">PartialEq</span>, <span class="ident">PartialOrd</span>, <span class="ident">Ord</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>,
-)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">TargetId</span>(<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">with</span> <span class="op">=</span> <span class="string">&quot;snowflake&quot;</span>)]</span> <span class="kw">pub</span> <span class="ident">u64</span>);
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>, <span class="ident">PartialEq</span>, <span class="ident">PartialOrd</span>, <span class="ident">Ord</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">TargetId</span>(<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">with</span> <span class="op">=</span> <span class="string">&quot;snowflake&quot;</span>)]</span> <span class="kw">pub</span> <span class="ident">NonZeroU64</span>);
 
 <span class="doccomment">/// An identifier for a stage channel instance.</span>
-<span class="attribute">#[<span class="ident">derive</span>(
-    <span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">Default</span>, <span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>, <span class="ident">PartialEq</span>, <span class="ident">PartialOrd</span>, <span class="ident">Ord</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>,
-)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">StageInstanceId</span>(<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">with</span> <span class="op">=</span> <span class="string">&quot;snowflake&quot;</span>)]</span> <span class="kw">pub</span> <span class="ident">u64</span>);
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>, <span class="ident">PartialEq</span>, <span class="ident">PartialOrd</span>, <span class="ident">Ord</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">StageInstanceId</span>(<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">with</span> <span class="op">=</span> <span class="string">&quot;snowflake&quot;</span>)]</span> <span class="kw">pub</span> <span class="ident">NonZeroU64</span>);
 
 <span class="macro">id_u64!</span> {
     <span class="ident">AttachmentId</span>;
@@ -657,35 +626,36 @@
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">mod</span> <span class="ident">snowflake</span> {
     <span class="kw">use</span> <span class="ident">std::convert::TryFrom</span>;
     <span class="kw">use</span> <span class="ident">std::fmt</span>;
+    <span class="kw">use</span> <span class="ident">std::num::NonZeroU64</span>;
 
     <span class="kw">use</span> <span class="ident">serde::de</span>::{<span class="ident">Error</span>, <span class="ident">Visitor</span>};
     <span class="kw">use</span> <span class="ident">serde</span>::{<span class="ident">Deserializer</span>, <span class="ident">Serializer</span>};
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">deserialize</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span>, <span class="ident">D</span>: <span class="ident">Deserializer</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">deserializer</span>: <span class="ident">D</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">u64</span>, <span class="ident">D::Error</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">deserialize</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span>, <span class="ident">D</span>: <span class="ident">Deserializer</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">deserializer</span>: <span class="ident">D</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">NonZeroU64</span>, <span class="ident">D::Error</span><span class="op">&gt;</span> {
         <span class="ident">deserializer</span>.<span class="ident">deserialize_any</span>(<span class="ident">SnowflakeVisitor</span>)
     }
 
     <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::trivially_copy_pass_by_ref</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">serialize</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">Serializer</span><span class="op">&gt;</span>(<span class="ident">id</span>: <span class="kw-2">&amp;</span><span class="ident">u64</span>, <span class="ident">serializer</span>: <span class="ident">S</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">S::Ok</span>, <span class="ident">S::Error</span><span class="op">&gt;</span> {
-        <span class="ident">serializer</span>.<span class="ident">collect_str</span>(<span class="ident">id</span>)
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">serialize</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">Serializer</span><span class="op">&gt;</span>(<span class="ident">id</span>: <span class="kw-2">&amp;</span><span class="ident">NonZeroU64</span>, <span class="ident">serializer</span>: <span class="ident">S</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">S::Ok</span>, <span class="ident">S::Error</span><span class="op">&gt;</span> {
+        <span class="ident">serializer</span>.<span class="ident">collect_str</span>(<span class="kw-2">&amp;</span><span class="ident">id</span>.<span class="ident">get</span>())
     }
 
     <span class="kw">struct</span> <span class="ident">SnowflakeVisitor</span>;
 
     <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="ident">Visitor</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">SnowflakeVisitor</span> {
-        <span class="kw">type</span> <span class="ident">Value</span> <span class="op">=</span> <span class="ident">u64</span>;
+        <span class="kw">type</span> <span class="ident">Value</span> <span class="op">=</span> <span class="ident">NonZeroU64</span>;
 
         <span class="kw">fn</span> <span class="ident">expecting</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">formatter</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
-            <span class="ident">formatter</span>.<span class="ident">write_str</span>(<span class="string">&quot;string or integer snowflake&quot;</span>)
+            <span class="ident">formatter</span>.<span class="ident">write_str</span>(<span class="string">&quot;a non-zero string or integer snowflake&quot;</span>)
         }
 
         <span class="comment">// Called by formats like TOML.</span>
         <span class="kw">fn</span> <span class="ident">visit_i64</span><span class="op">&lt;</span><span class="ident">E</span>: <span class="ident">Error</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">value</span>: <span class="ident">i64</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Value</span>, <span class="ident">E</span><span class="op">&gt;</span> {
-            <span class="ident">u64::try_from</span>(<span class="ident">value</span>).<span class="ident">map_err</span>(<span class="ident">Error::custom</span>)
+            <span class="self">self</span>.<span class="ident">visit_u64</span>(<span class="ident">u64::try_from</span>(<span class="ident">value</span>).<span class="ident">map_err</span>(<span class="ident">Error::custom</span>)<span class="question-mark">?</span>)
         }
 
         <span class="kw">fn</span> <span class="ident">visit_u64</span><span class="op">&lt;</span><span class="ident">E</span>: <span class="ident">Error</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">value</span>: <span class="ident">u64</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Value</span>, <span class="ident">E</span><span class="op">&gt;</span> {
-            <span class="prelude-val">Ok</span>(<span class="ident">value</span>)
+            <span class="ident">NonZeroU64::new</span>(<span class="ident">value</span>).<span class="ident">ok_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">Error::custom</span>(<span class="string">&quot;invalid value, expected non-zero&quot;</span>))
         }
 
         <span class="kw">fn</span> <span class="ident">visit_str</span><span class="op">&lt;</span><span class="ident">E</span>: <span class="ident">Error</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">value</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Value</span>, <span class="ident">E</span><span class="op">&gt;</span> {
@@ -696,12 +666,14 @@
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
 <span class="kw">mod</span> <span class="ident">tests</span> {
+    <span class="kw">use</span> <span class="ident">std::num::NonZeroU64</span>;
+
     <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::GuildId</span>;
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">test_created_at</span>() {
         <span class="comment">// The id is from discord&#39;s snowflake docs</span>
-        <span class="kw">let</span> <span class="ident">id</span> <span class="op">=</span> <span class="ident">GuildId</span>(<span class="number">175928847299117063</span>);
+        <span class="kw">let</span> <span class="ident">id</span> <span class="op">=</span> <span class="ident">GuildId::new</span>(<span class="number">175928847299117063</span>);
         <span class="macro">assert_eq!</span>(<span class="ident">id</span>.<span class="ident">created_at</span>().<span class="ident">unix_timestamp</span>(), <span class="number">1462015105</span>);
         <span class="macro">assert_eq!</span>(<span class="ident">id</span>.<span class="ident">created_at</span>().<span class="ident">to_string</span>(), <span class="string">&quot;2016-04-30T11:18:25.796Z&quot;</span>);
     }
@@ -716,7 +688,7 @@
         <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">PartialEq</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
         <span class="kw">struct</span> <span class="ident">S</span> {
             <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">with</span> <span class="op">=</span> <span class="string">&quot;snowflake&quot;</span>)]</span>
-            <span class="ident">id</span>: <span class="ident">u64</span>,
+            <span class="ident">id</span>: <span class="ident">NonZeroU64</span>,
         }
 
         <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">PartialEq</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
@@ -724,7 +696,7 @@
             <span class="ident">id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">GuildId</span><span class="op">&gt;</span>,
         }
 
-        <span class="kw">let</span> <span class="ident">id</span> <span class="op">=</span> <span class="ident">GuildId</span>(<span class="number">17_5928_8472_9911_7063</span>);
+        <span class="kw">let</span> <span class="ident">id</span> <span class="op">=</span> <span class="ident">GuildId::new</span>(<span class="number">17_5928_8472_9911_7063</span>);
         <span class="ident">assert_tokens</span>(<span class="kw-2">&amp;</span><span class="ident">id</span>, <span class="kw-2">&amp;</span>[
             <span class="ident">Token::NewtypeStruct</span> {
                 <span class="ident">name</span>: <span class="string">&quot;GuildId&quot;</span>,
@@ -739,7 +711,7 @@
         ]);
 
         <span class="kw">let</span> <span class="ident">s</span> <span class="op">=</span> <span class="ident">S</span> {
-            <span class="ident">id</span>: <span class="number">17_5928_8472_9911_7063</span>,
+            <span class="ident">id</span>: <span class="ident">NonZeroU64::new</span>(<span class="number">17_5928_8472_9911_7063</span>).<span class="ident">unwrap</span>(),
         };
         <span class="ident">assert_tokens</span>(<span class="kw-2">&amp;</span><span class="ident">s</span>, <span class="kw-2">&amp;</span>[
             <span class="ident">Token::Struct</span> {
@@ -752,7 +724,7 @@
         ]);
 
         <span class="kw">let</span> <span class="ident">s</span> <span class="op">=</span> <span class="ident">Opt</span> {
-            <span class="ident">id</span>: <span class="prelude-val">Some</span>(<span class="ident">GuildId</span>(<span class="number">17_5928_8472_9911_7063</span>)),
+            <span class="ident">id</span>: <span class="prelude-val">Some</span>(<span class="ident">GuildId::new</span>(<span class="number">17_5928_8472_9911_7063</span>)),
         };
         <span class="ident">assert_tokens</span>(<span class="kw-2">&amp;</span><span class="ident">s</span>, <span class="kw-2">&amp;</span>[
             <span class="ident">Token::Struct</span> {

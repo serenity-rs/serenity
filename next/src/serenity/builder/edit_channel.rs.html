@@ -217,7 +217,7 @@
 <span class="doccomment">/// #</span>
 <span class="doccomment">/// # async fn run() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {</span>
 <span class="doccomment">/// #     let http = Http::new(&quot;token&quot;);</span>
-<span class="doccomment">/// #     let mut channel = ChannelId(0);</span>
+<span class="doccomment">/// #     let mut channel = ChannelId::new(1);</span>
 <span class="doccomment">/// // assuming a channel has already been bound</span>
 <span class="doccomment">/// if let Err(why) = channel.edit(&amp;http, |c| c.name(&quot;new name&quot;).topic(&quot;a test topic&quot;)).await {</span>
 <span class="doccomment">///     // properly handle the error</span>
@@ -373,7 +373,7 @@
     <span class="doccomment">/// #</span>
     <span class="doccomment">/// # async fn run() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {</span>
     <span class="doccomment">/// #     let http = Arc::new(Http::new(&quot;token&quot;));</span>
-    <span class="doccomment">/// #     let mut channel = ChannelId(0);</span>
+    <span class="doccomment">/// #     let mut channel = ChannelId::new(1);</span>
     <span class="doccomment">/// use serenity::model::channel::{PermissionOverwrite, PermissionOverwriteType};</span>
     <span class="doccomment">/// use serenity::model::id::UserId;</span>
     <span class="doccomment">/// use serenity::model::permissions::Permissions;</span>
@@ -382,7 +382,7 @@
     <span class="doccomment">/// let permissions = vec![PermissionOverwrite {</span>
     <span class="doccomment">///     allow: Permissions::VIEW_CHANNEL,</span>
     <span class="doccomment">///     deny: Permissions::SEND_TTS_MESSAGES,</span>
-    <span class="doccomment">///     kind: PermissionOverwriteType::Member(UserId(1234)),</span>
+    <span class="doccomment">///     kind: PermissionOverwriteType::Member(UserId::new(1234)),</span>
     <span class="doccomment">/// }];</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// channel.edit(http, |c| c.name(&quot;my_edited_cool_channel&quot;).permissions(permissions)).await?;</span>

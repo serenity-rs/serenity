@@ -2453,7 +2453,7 @@
     <span class="doccomment">/// ```rust,ignore</span>
     <span class="doccomment">/// use serenity::model::GuildId;</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// GuildId(7).edit_member(user_id, |m| m.mute(true).roles(&amp;vec![role_id])).await;</span>
+    <span class="doccomment">/// GuildId::new(7).edit_member(user_id, |m| m.mute(true).roles(&amp;vec![role_id])).await;</span>
     <span class="doccomment">/// ```</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// # Errors</span>
@@ -2502,7 +2502,7 @@
     <span class="doccomment">/// Make a role hoisted:</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// ```rust,ignore</span>
-    <span class="doccomment">/// partial_guild.edit_role(&amp;context, RoleId(7), |r| r.hoist(true));</span>
+    <span class="doccomment">/// partial_guild.edit_role(&amp;context, RoleId::new(7), |r| r.hoist(true));</span>
     <span class="doccomment">/// ```</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// # Errors</span>
@@ -2532,7 +2532,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// ```rust,ignore</span>
     <span class="doccomment">/// use serenity::model::id::RoleId;</span>
-    <span class="doccomment">/// partial_guild.edit_role_position(&amp;context, RoleId(8), 2);</span>
+    <span class="doccomment">/// partial_guild.edit_role_position(&amp;context, RoleId::new(8), 2);</span>
     <span class="doccomment">/// ```</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// # Errors</span>
@@ -2675,14 +2675,14 @@
             .<span class="ident">members</span>
             .<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="ident">lhs_id</span>)<span class="question-mark">?</span>
             .<span class="ident">highest_role_info</span>(<span class="kw-2">&amp;</span><span class="ident">cache</span>)
-            .<span class="ident">unwrap_or</span>((<span class="ident">RoleId</span>(<span class="number">0</span>), <span class="number">0</span>));
+            .<span class="ident">unwrap_or</span>((<span class="ident">RoleId::new</span>(<span class="number">1</span>), <span class="number">0</span>));
         <span class="kw">let</span> <span class="ident">rhs</span> <span class="op">=</span> <span class="ident">cache</span>
             .<span class="ident">as_ref</span>()
             .<span class="ident">guild</span>(<span class="self">self</span>.<span class="ident">id</span>)<span class="question-mark">?</span>
             .<span class="ident">members</span>
             .<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="ident">rhs_id</span>)<span class="question-mark">?</span>
             .<span class="ident">highest_role_info</span>(<span class="kw-2">&amp;</span><span class="ident">cache</span>)
-            .<span class="ident">unwrap_or</span>((<span class="ident">RoleId</span>(<span class="number">0</span>), <span class="number">0</span>));
+            .<span class="ident">unwrap_or</span>((<span class="ident">RoleId::new</span>(<span class="number">1</span>), <span class="number">0</span>));
 
         <span class="comment">// If LHS and RHS both have no top position or have the same role ID,</span>
         <span class="comment">// then no one wins.</span>

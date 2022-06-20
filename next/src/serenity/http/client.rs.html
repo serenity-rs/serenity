@@ -4013,13 +4013,12 @@
 <span id="4008">4008</span>
 <span id="4009">4009</span>
 <span id="4010">4010</span>
-<span id="4011">4011</span>
-<span id="4012">4012</span>
 </pre><pre class="rust"><code><span class="attribute">#![<span class="ident">allow</span>(<span class="ident">clippy::missing_errors_doc</span>)]</span>
 
 <span class="kw">use</span> <span class="ident">std::borrow::Cow</span>;
 <span class="kw">use</span> <span class="ident">std::convert::TryFrom</span>;
 <span class="kw">use</span> <span class="ident">std::fmt</span>;
+<span class="kw">use</span> <span class="ident">std::num::NonZeroU64</span>;
 <span class="kw">use</span> <span class="ident">std::str::FromStr</span>;
 <span class="kw">use</span> <span class="ident">std::sync::atomic</span>::{<span class="ident">AtomicU64</span>, <span class="ident">Ordering</span>};
 <span class="kw">use</span> <span class="ident">std::sync::Arc</span>;
@@ -4264,18 +4263,15 @@
         <span class="ident">http</span>
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">application_id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">application_id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">NonZeroU64</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">application_id</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">application_id</span>.<span class="ident">load</span>(<span class="ident">Ordering::Relaxed</span>);
-
-        <span class="kw">if</span> <span class="ident">application_id</span> <span class="op">==</span> <span class="number">0</span> {
-            <span class="prelude-val">None</span>
-        } <span class="kw">else</span> {
-            <span class="prelude-val">Some</span>(<span class="ident">application_id</span>)
-        }
+        <span class="ident">NonZeroU64::new</span>(<span class="ident">application_id</span>)
     }
 
     <span class="kw">fn</span> <span class="ident">try_application_id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">application_id</span>().<span class="ident">ok_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">HttpError::ApplicationIdMissing</span>.<span class="ident">into</span>())
+        <span class="self">self</span>.<span class="ident">application_id</span>()
+            .<span class="ident">map</span>(<span class="ident">NonZeroU64::get</span>)
+            .<span class="ident">ok_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">HttpError::ApplicationIdMissing</span>.<span class="ident">into</span>())
     }
 
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_application_id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">application_id</span>: <span class="ident">u64</span>) {
@@ -5127,10 +5123,10 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// # async fn run() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {</span>
     <span class="doccomment">/// # let http = Http::new(&quot;token&quot;);</span>
-    <span class="doccomment">/// let channel_id = ChannelId(7);</span>
-    <span class="doccomment">/// let message_id = MessageId(8);</span>
+    <span class="doccomment">/// let channel_id = ChannelId::new(7);</span>
+    <span class="doccomment">/// let message_id = MessageId::new(8);</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// http.delete_message_reactions(channel_id.0, message_id.0).await?;</span>
+    <span class="doccomment">/// http.delete_message_reactions(channel_id.get(), message_id.get()).await?;</span>
     <span class="doccomment">/// #     Ok(())</span>
     <span class="doccomment">/// # }</span>
     <span class="doccomment">/// ```</span>
@@ -7106,8 +7102,8 @@
         <span class="kw">let</span> (<span class="ident">after</span>, <span class="ident">before</span>) <span class="op">=</span> <span class="kw">match</span> <span class="ident">target</span> {
             <span class="prelude-val">None</span> =&gt; (<span class="prelude-val">None</span>, <span class="prelude-val">None</span>),
             <span class="prelude-val">Some</span>(<span class="ident">p</span>) =&gt; <span class="kw">match</span> <span class="ident">p</span> {
-                <span class="ident">UserPagination::After</span>(<span class="ident">id</span>) =&gt; (<span class="prelude-val">Some</span>(<span class="ident">id</span>.<span class="number">0</span>), <span class="prelude-val">None</span>),
-                <span class="ident">UserPagination::Before</span>(<span class="ident">id</span>) =&gt; (<span class="prelude-val">None</span>, <span class="prelude-val">Some</span>(<span class="ident">id</span>.<span class="number">0</span>)),
+                <span class="ident">UserPagination::After</span>(<span class="ident">id</span>) =&gt; (<span class="prelude-val">Some</span>(<span class="ident">id</span>.<span class="ident">get</span>()), <span class="prelude-val">None</span>),
+                <span class="ident">UserPagination::Before</span>(<span class="ident">id</span>) =&gt; (<span class="prelude-val">None</span>, <span class="prelude-val">Some</span>(<span class="ident">id</span>.<span class="ident">get</span>())),
             },
         };
 
@@ -7225,7 +7221,7 @@
     <span class="doccomment">/// use serenity::http::GuildPagination;</span>
     <span class="doccomment">/// use serenity::model::id::GuildId;</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// let guild_id = GuildId(81384788765712384);</span>
+    <span class="doccomment">/// let guild_id = GuildId::new(81384788765712384);</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// let guilds = http.get_guilds(Some(&amp;GuildPagination::After(guild_id)), Some(10)).await?;</span>
     <span class="doccomment">/// #     Ok(())</span>
@@ -7241,8 +7237,8 @@
         <span class="kw">let</span> (<span class="ident">after</span>, <span class="ident">before</span>) <span class="op">=</span> <span class="kw">match</span> <span class="ident">target</span> {
             <span class="prelude-val">None</span> =&gt; (<span class="prelude-val">None</span>, <span class="prelude-val">None</span>),
             <span class="prelude-val">Some</span>(<span class="ident">gp</span>) =&gt; <span class="kw">match</span> <span class="ident">gp</span> {
-                <span class="ident">GuildPagination::After</span>(<span class="ident">id</span>) =&gt; (<span class="prelude-val">Some</span>(<span class="ident">id</span>.<span class="number">0</span>), <span class="prelude-val">None</span>),
-                <span class="ident">GuildPagination::Before</span>(<span class="ident">id</span>) =&gt; (<span class="prelude-val">None</span>, <span class="prelude-val">Some</span>(<span class="ident">id</span>.<span class="number">0</span>)),
+                <span class="ident">GuildPagination::After</span>(<span class="ident">id</span>) =&gt; (<span class="prelude-val">Some</span>(<span class="ident">id</span>.<span class="ident">get</span>()), <span class="prelude-val">None</span>),
+                <span class="ident">GuildPagination::Before</span>(<span class="ident">id</span>) =&gt; (<span class="prelude-val">None</span>, <span class="prelude-val">Some</span>(<span class="ident">id</span>.<span class="ident">get</span>())),
             },
         };
 

@@ -272,7 +272,7 @@
     <span class="doccomment">/// #     use serenity::http::Http;</span>
     <span class="doccomment">/// #     use serenity::model::id::ChannelId;</span>
     <span class="doccomment">/// #     let http = Http::new(&quot;token&quot;);</span>
-    <span class="doccomment">/// #     let category = ChannelId(1234);</span>
+    <span class="doccomment">/// #     let category = ChannelId::new(1234);</span>
     <span class="doccomment">/// category.edit(&amp;http, |c| c.name(&quot;test&quot;).bitrate(86400)).await;</span>
     <span class="doccomment">/// # }</span>
     <span class="doccomment">/// ```</span>
@@ -291,7 +291,7 @@
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">edit_channel</span> <span class="op">=</span> <span class="ident">EditChannel::default</span>();
         <span class="ident">f</span>(<span class="kw-2">&amp;mut</span> <span class="ident">edit_channel</span>);
 
-        <span class="ident">cache_http</span>.<span class="ident">http</span>().<span class="ident">edit_channel</span>(<span class="self">self</span>.<span class="ident">id</span>.<span class="number">0</span>, <span class="kw-2">&amp;</span><span class="ident">edit_channel</span>, <span class="prelude-val">None</span>).<span class="kw">await</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">channel</span><span class="op">|</span> {
+        <span class="ident">cache_http</span>.<span class="ident">http</span>().<span class="ident">edit_channel</span>(<span class="self">self</span>.<span class="ident">id</span>.<span class="ident">get</span>(), <span class="kw-2">&amp;</span><span class="ident">edit_channel</span>, <span class="prelude-val">None</span>).<span class="kw">await</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">channel</span><span class="op">|</span> {
             <span class="kw">let</span> <span class="ident">GuildChannel</span> {
                 <span class="ident">id</span>,
                 <span class="ident">guild_id</span>,

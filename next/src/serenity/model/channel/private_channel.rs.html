@@ -764,7 +764,7 @@
     <span class="doccomment">/// # fn long_process() {}</span>
     <span class="doccomment">/// # let http = Arc::new(Http::new(&quot;token&quot;));</span>
     <span class="doccomment">/// # let cache = Cache::default();</span>
-    <span class="doccomment">/// # let channel = cache.private_channel(ChannelId(7))</span>
+    <span class="doccomment">/// # let channel = cache.private_channel(ChannelId::new(7))</span>
     <span class="doccomment">/// #    .ok_or(ModelError::ItemMissing)?</span>
     <span class="doccomment">/// #    .clone();</span>
     <span class="doccomment">/// // Initiate typing (assuming http is `Arc&lt;Http&gt;` and `channel` is bound)</span>
@@ -785,7 +785,7 @@
     <span class="doccomment">/// May return [`Error::Http`] if the current user cannot send a direct message</span>
     <span class="doccomment">/// to this user.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">start_typing</span>(<span class="self">self</span>, <span class="ident">http</span>: <span class="kw-2">&amp;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Typing</span><span class="op">&gt;</span> {
-        <span class="ident">http</span>.<span class="ident">start_typing</span>(<span class="self">self</span>.<span class="ident">id</span>.<span class="number">0</span>)
+        <span class="ident">http</span>.<span class="ident">start_typing</span>(<span class="self">self</span>.<span class="ident">id</span>.<span class="ident">get</span>())
     }
 
     <span class="doccomment">/// Unpins a [`Message`] in the channel given by its Id.</span>

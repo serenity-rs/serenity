@@ -17,7 +17,7 @@ and will never match any events.</p>
 <div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="macro">assert!</span>(<span class="macro">matches!</span>(
     <span class="ident">EventCollectorBuilder::new</span>(<span class="kw-2">&amp;</span><span class="ident">ctx</span>)
         .<span class="ident">add_event_type</span>(<span class="ident">EventType::GuildCreate</span>)
-        .<span class="ident">add_user_id</span>(<span class="ident">UserId::default</span>())
+        .<span class="ident">add_user_id</span>(<span class="ident">UserId::new</span>(<span class="number">1</span>))
         .<span class="ident">build</span>(),
     <span class="prelude-val">Err</span>(<span class="ident">SerenityError::Collector</span>(<span class="ident">CollectorError::InvalidEventIdFilters</span>)),
 ));</code></pre></div>

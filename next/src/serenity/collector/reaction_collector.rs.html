@@ -419,11 +419,9 @@
 <span id="414">414</span>
 <span id="415">415</span>
 <span id="416">416</span>
-<span id="417">417</span>
-<span id="418">418</span>
-<span id="419">419</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::fmt</span>;
 <span class="kw">use</span> <span class="ident">std::future::Future</span>;
+<span class="kw">use</span> <span class="ident">std::num::NonZeroU64</span>;
 <span class="kw">use</span> <span class="ident">std::pin::Pin</span>;
 <span class="kw">use</span> <span class="ident">std::sync::Arc</span>;
 <span class="kw">use</span> <span class="ident">std::task</span>::{<span class="ident">Context</span> <span class="kw">as</span> <span class="ident">FutContext</span>, <span class="ident">Poll</span>};
@@ -441,7 +439,6 @@
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::client::bridge::gateway::ShardMessenger</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::collector</span>::{<span class="ident">FilterFn</span>, <span class="ident">LazyArc</span>};
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::channel::Reaction</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::id::UserId</span>;
 
 <span class="macro">macro_rules!</span> <span class="ident">impl_reaction_collector</span> {
     ($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>:<span class="ident">ident</span>;)<span class="kw-2">*</span>) =&gt; {
@@ -481,7 +478,7 @@
                 <span class="doccomment">/// Sets the required author ID of a reaction.</span>
                 <span class="doccomment">/// If a reaction is not issued by a user with this ID, it won&#39;t be received.</span>
                 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">author_id</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">author_id</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-                    <span class="self">self</span>.<span class="ident">filter</span>.<span class="ident">as_mut</span>().<span class="ident">unwrap</span>().<span class="ident">author_id</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">author_id</span>.<span class="ident">into</span>());
+                    <span class="self">self</span>.<span class="ident">filter</span>.<span class="ident">as_mut</span>().<span class="ident">unwrap</span>().<span class="ident">author_id</span> <span class="op">=</span> <span class="ident">NonZeroU64::new</span>(<span class="ident">author_id</span>.<span class="ident">into</span>());
 
                     <span class="self">self</span>
                 }
@@ -489,7 +486,7 @@
                 <span class="doccomment">/// Sets the message on which the reaction must occur.</span>
                 <span class="doccomment">/// If a reaction is not on a message with this ID, it won&#39;t be received.</span>
                 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">message_id</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">message_id</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-                    <span class="self">self</span>.<span class="ident">filter</span>.<span class="ident">as_mut</span>().<span class="ident">unwrap</span>().<span class="ident">message_id</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">message_id</span>.<span class="ident">into</span>());
+                    <span class="self">self</span>.<span class="ident">filter</span>.<span class="ident">as_mut</span>().<span class="ident">unwrap</span>().<span class="ident">message_id</span> <span class="op">=</span> <span class="ident">NonZeroU64::new</span>(<span class="ident">message_id</span>.<span class="ident">into</span>());
 
                     <span class="self">self</span>
                 }
@@ -497,7 +494,7 @@
                 <span class="doccomment">/// Sets the guild in which the reaction must occur.</span>
                 <span class="doccomment">/// If a reaction is not on a message with this guild ID, it won&#39;t be received.</span>
                 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">guild_id</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">guild_id</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-                    <span class="self">self</span>.<span class="ident">filter</span>.<span class="ident">as_mut</span>().<span class="ident">unwrap</span>().<span class="ident">guild_id</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">guild_id</span>.<span class="ident">into</span>());
+                    <span class="self">self</span>.<span class="ident">filter</span>.<span class="ident">as_mut</span>().<span class="ident">unwrap</span>().<span class="ident">guild_id</span> <span class="op">=</span> <span class="ident">NonZeroU64::new</span>(<span class="ident">guild_id</span>.<span class="ident">into</span>());
 
                     <span class="self">self</span>
                 }
@@ -505,7 +502,7 @@
                 <span class="doccomment">/// Sets the channel on which the reaction must occur.</span>
                 <span class="doccomment">/// If a reaction is not on a message with this channel ID, it won&#39;t be received.</span>
                 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">channel_id</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">channel_id</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-                    <span class="self">self</span>.<span class="ident">filter</span>.<span class="ident">as_mut</span>().<span class="ident">unwrap</span>().<span class="ident">channel_id</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">channel_id</span>.<span class="ident">into</span>());
+                    <span class="self">self</span>.<span class="ident">filter</span>.<span class="ident">as_mut</span>().<span class="ident">unwrap</span>().<span class="ident">channel_id</span> <span class="op">=</span> <span class="ident">NonZeroU64::new</span>(<span class="ident">channel_id</span>.<span class="ident">into</span>());
 
                     <span class="self">self</span>
                 }
@@ -661,10 +658,7 @@
         <span class="self">self</span>.<span class="ident">options</span>.<span class="ident">guild_id</span>.<span class="ident">map_or</span>(<span class="bool-val">true</span>, <span class="op">|</span><span class="ident">id</span><span class="op">|</span> <span class="prelude-val">Some</span>(<span class="ident">id</span>) <span class="op">==</span> <span class="ident">reaction</span>.<span class="ident">guild_id</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">g</span><span class="op">|</span> <span class="ident">g</span>.<span class="number">0</span>))
             <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">options</span>.<span class="ident">message_id</span>.<span class="ident">map_or</span>(<span class="bool-val">true</span>, <span class="op">|</span><span class="ident">id</span><span class="op">|</span> <span class="ident">id</span> <span class="op">==</span> <span class="ident">reaction</span>.<span class="ident">message_id</span>.<span class="number">0</span>)
             <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">options</span>.<span class="ident">channel_id</span>.<span class="ident">map_or</span>(<span class="bool-val">true</span>, <span class="op">|</span><span class="ident">id</span><span class="op">|</span> <span class="ident">id</span> <span class="op">==</span> <span class="ident">reaction</span>.<span class="ident">channel_id</span>.<span class="number">0</span>)
-            <span class="op">&amp;&amp;</span> <span class="self">self</span>
-                .<span class="ident">options</span>
-                .<span class="ident">author_id</span>
-                .<span class="ident">map_or</span>(<span class="bool-val">true</span>, <span class="op">|</span><span class="ident">id</span><span class="op">|</span> <span class="ident">id</span> <span class="op">==</span> <span class="ident">reaction</span>.<span class="ident">user_id</span>.<span class="ident">unwrap_or</span>(<span class="ident">UserId</span>(<span class="number">0</span>)).<span class="number">0</span>)
+            <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">options</span>.<span class="ident">author_id</span>.<span class="ident">map_or</span>(<span class="bool-val">true</span>, <span class="op">|</span><span class="ident">id</span><span class="op">|</span> <span class="prelude-val">Some</span>(<span class="ident">id</span>) <span class="op">==</span> <span class="ident">reaction</span>.<span class="ident">user_id</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">u</span><span class="op">|</span> <span class="ident">u</span>.<span class="number">0</span>))
             <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">options</span>.<span class="ident">filter</span>.<span class="ident">as_ref</span>().<span class="ident">map_or</span>(<span class="bool-val">true</span>, <span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="ident">f</span>.<span class="number">0</span>(<span class="ident">reaction</span>))
     }
 
@@ -682,10 +676,10 @@
     <span class="ident">filter_limit</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
     <span class="ident">collect_limit</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
     <span class="ident">filter</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">FilterFn</span><span class="op">&lt;</span><span class="ident">Reaction</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="ident">channel_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span>,
-    <span class="ident">guild_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span>,
-    <span class="ident">author_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span>,
-    <span class="ident">message_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span>,
+    <span class="ident">channel_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">NonZeroU64</span><span class="op">&gt;</span>,
+    <span class="ident">guild_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">NonZeroU64</span><span class="op">&gt;</span>,
+    <span class="ident">author_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">NonZeroU64</span><span class="op">&gt;</span>,
+    <span class="ident">message_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">NonZeroU64</span><span class="op">&gt;</span>,
     <span class="ident">accept_added</span>: <span class="ident">bool</span>,
     <span class="ident">accept_removed</span>: <span class="ident">bool</span>,
 }

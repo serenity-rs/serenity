@@ -8,7 +8,7 @@
 <p>The <a href="struct.Timestamp.html" title="Timestamp"><code>Timestamp</code></a> newtype wraps <code>chrono::DateTime&lt;Utc&gt;</code> or <code>time::OffsetDateTime</code> if the <code>time</code>
 feature is enabled.</p>
 <h2 id="formatting"><a href="#formatting">Formatting</a></h2>
-<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">let</span> <span class="ident">timestamp</span>: <span class="ident">Timestamp</span> <span class="op">=</span> <span class="ident">GuildId</span>(<span class="number">175928847299117063</span>).<span class="ident">created_at</span>();
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">let</span> <span class="ident">timestamp</span>: <span class="ident">Timestamp</span> <span class="op">=</span> <span class="ident">GuildId::new</span>(<span class="number">175928847299117063</span>).<span class="ident">created_at</span>();
 <span class="macro">assert_eq!</span>(<span class="ident">timestamp</span>.<span class="ident">unix_timestamp</span>(), <span class="number">1462015105</span>);
 <span class="macro">assert_eq!</span>(<span class="ident">timestamp</span>.<span class="ident">to_string</span>(), <span class="string">&quot;2016-04-30T11:18:25.796Z&quot;</span>);</code></pre></div>
 <h2 id="parsing-rfc-3339-string"><a href="#parsing-rfc-3339-string">Parsing RFC 3339 string</a></h2>

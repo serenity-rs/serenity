@@ -542,7 +542,7 @@
 
         <span class="kw">let</span> <span class="ident">builder</span> <span class="op">=</span> <span class="ident">f</span>(<span class="ident">CreateInvite::default</span>());
 
-        <span class="ident">cache_http</span>.<span class="ident">http</span>().<span class="ident">create_invite</span>(<span class="ident">channel_id</span>.<span class="number">0</span>, <span class="kw-2">&amp;</span><span class="ident">builder</span>, <span class="prelude-val">None</span>).<span class="kw">await</span>
+        <span class="ident">cache_http</span>.<span class="ident">http</span>().<span class="ident">create_invite</span>(<span class="ident">channel_id</span>.<span class="ident">get</span>(), <span class="kw-2">&amp;</span><span class="ident">builder</span>, <span class="prelude-val">None</span>).<span class="kw">await</span>
     }
 
     <span class="doccomment">/// Deletes the invite.</span>
@@ -628,12 +628,12 @@
     <span class="doccomment">/// #     &quot;approximate_presence_count&quot;: Some(717),</span>
     <span class="doccomment">/// #     &quot;code&quot;: &quot;WxZumR&quot;,</span>
     <span class="doccomment">/// #     &quot;channel&quot;: {</span>
-    <span class="doccomment">/// #         &quot;id&quot;: ChannelId(1),</span>
+    <span class="doccomment">/// #         &quot;id&quot;: ChannelId::new(1),</span>
     <span class="doccomment">/// #         &quot;name&quot;: &quot;foo&quot;,</span>
     <span class="doccomment">/// #         &quot;type&quot;: ChannelType::Text,</span>
     <span class="doccomment">/// #     },</span>
     <span class="doccomment">/// #     &quot;guild&quot;: {</span>
-    <span class="doccomment">/// #         &quot;id&quot;: GuildId(2),</span>
+    <span class="doccomment">/// #         &quot;id&quot;: GuildId::new(2),</span>
     <span class="doccomment">/// #         &quot;icon&quot;: None::&lt;String&gt;,</span>
     <span class="doccomment">/// #         &quot;name&quot;: &quot;bar&quot;,</span>
     <span class="doccomment">/// #         &quot;splash_hash&quot;: None::&lt;String&gt;,</span>
@@ -641,7 +641,7 @@
     <span class="doccomment">/// #         &quot;voice_channel_count&quot;: 3,</span>
     <span class="doccomment">/// #     },</span>
     <span class="doccomment">/// #     &quot;inviter&quot;: {</span>
-    <span class="doccomment">/// #         &quot;id&quot;: UserId(3),</span>
+    <span class="doccomment">/// #         &quot;id&quot;: UserId::new(3),</span>
     <span class="doccomment">/// #         &quot;username&quot;: &quot;foo&quot;,</span>
     <span class="doccomment">/// #         &quot;discriminator&quot;: &quot;1234&quot;,</span>
     <span class="doccomment">/// #         &quot;avatar&quot;: &quot;aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa&quot;</span>
@@ -810,13 +810,13 @@
     <span class="doccomment">/// # let invite = from_value::&lt;RichInvite&gt;(json!({</span>
     <span class="doccomment">/// #     &quot;code&quot;: &quot;WxZumR&quot;,</span>
     <span class="doccomment">/// #     &quot;channel&quot;: {</span>
-    <span class="doccomment">/// #         &quot;id&quot;: ChannelId(1),</span>
+    <span class="doccomment">/// #         &quot;id&quot;: ChannelId::new(1),</span>
     <span class="doccomment">/// #         &quot;name&quot;: &quot;foo&quot;,</span>
     <span class="doccomment">/// #         &quot;type&quot;: ChannelType::Text,</span>
     <span class="doccomment">/// #     },</span>
     <span class="doccomment">/// #     &quot;created_at&quot;: &quot;2017-01-29T15:35:17.136000+00:00&quot;,</span>
     <span class="doccomment">/// #     &quot;guild&quot;: {</span>
-    <span class="doccomment">/// #         &quot;id&quot;: GuildId(2),</span>
+    <span class="doccomment">/// #         &quot;id&quot;: GuildId::new(2),</span>
     <span class="doccomment">/// #         &quot;icon&quot;: None::&lt;String&gt;,</span>
     <span class="doccomment">/// #         &quot;name&quot;: &quot;baz&quot;,</span>
     <span class="doccomment">/// #         &quot;splash_hash&quot;: None::&lt;String&gt;,</span>
@@ -827,7 +827,7 @@
     <span class="doccomment">/// #         &quot;avatar&quot;: None::&lt;String&gt;,</span>
     <span class="doccomment">/// #         &quot;bot&quot;: false,</span>
     <span class="doccomment">/// #         &quot;discriminator&quot;: 3,</span>
-    <span class="doccomment">/// #         &quot;id&quot;: UserId(4),</span>
+    <span class="doccomment">/// #         &quot;id&quot;: UserId::new(4),</span>
     <span class="doccomment">/// #         &quot;username&quot;: &quot;qux&quot;,</span>
     <span class="doccomment">/// #         &quot;public_flags&quot;: None::&lt;UserPublicFlags&gt;,</span>
     <span class="doccomment">/// #     },</span>

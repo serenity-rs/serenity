@@ -141,10 +141,10 @@
 <span class="doccomment">/// use serenity::model::id::{ChannelId, MessageId};</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// // you can then pass it into a function which retrieves messages:</span>
-<span class="doccomment">/// let channel_id = ChannelId(81384788765712384);</span>
+<span class="doccomment">/// let channel_id = ChannelId::new(81384788765712384);</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// let _messages = channel_id</span>
-<span class="doccomment">///     .messages(&amp;http, |retriever| retriever.after(MessageId(158339864557912064)).limit(25))</span>
+<span class="doccomment">///     .messages(&amp;http, |retriever| retriever.after(MessageId::new(158339864557912064)).limit(25))</span>
 <span class="doccomment">///     .await?;</span>
 <span class="doccomment">/// #     Ok(())</span>
 <span class="doccomment">/// # }</span>

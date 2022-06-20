@@ -337,7 +337,7 @@
         <span class="ident">StickerFormatType::Unknown</span> =&gt; <span class="kw">return</span> <span class="prelude-val">None</span>,
     };
 
-    <span class="prelude-val">Some</span>(<span class="macro">cdn!</span>(<span class="string">&quot;/stickers/{}.{}&quot;</span>, <span class="ident">sticker_id</span>.<span class="number">0</span>, <span class="ident">ext</span>))
+    <span class="prelude-val">Some</span>(<span class="macro">cdn!</span>(<span class="string">&quot;/stickers/{}.{}&quot;</span>, <span class="ident">sticker_id</span>.<span class="ident">get</span>(), <span class="ident">ext</span>))
 }
 </code></pre></div>
 </section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.61.0-nightly (3c17c84a3 2022-03-21)" ></div>

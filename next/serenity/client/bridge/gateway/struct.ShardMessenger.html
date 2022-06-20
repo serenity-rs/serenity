@@ -25,14 +25,14 @@ specifying a query parameter:</p>
 
 <div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use</span> <span class="ident">serenity::model::id::GuildId</span>;
 
-<span class="ident">shard</span>.<span class="ident">chunk_guild</span>(<span class="ident">GuildId</span>(<span class="number">81384788765712384</span>), <span class="prelude-val">Some</span>(<span class="number">2000</span>), <span class="ident">ChunkGuildFilter::None</span>, <span class="prelude-val">None</span>);</code></pre></div>
+<span class="ident">shard</span>.<span class="ident">chunk_guild</span>(<span class="ident">GuildId::new</span>(<span class="number">81384788765712384</span>), <span class="prelude-val">Some</span>(<span class="number">2000</span>), <span class="ident">ChunkGuildFilter::None</span>, <span class="prelude-val">None</span>);</code></pre></div>
 <p>Chunk a single guild by Id, limiting to 20 members, specifying a
 query parameter of <code>&quot;do&quot;</code> and a nonce of <code>&quot;request&quot;</code>:</p>
 
 <div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use</span> <span class="ident">serenity::model::id::GuildId</span>;
 
 <span class="ident">shard</span>.<span class="ident">chunk_guild</span>(
-    <span class="ident">GuildId</span>(<span class="number">81384788765712384</span>),
+    <span class="ident">GuildId::new</span>(<span class="number">81384788765712384</span>),
     <span class="prelude-val">Some</span>(<span class="number">20</span>),
     <span class="ident">ChunkGuildFilter::Query</span>(<span class="string">&quot;do&quot;</span>.<span class="ident">to_owned</span>()),
     <span class="prelude-val">Some</span>(<span class="string">&quot;request&quot;</span>),

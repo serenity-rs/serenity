@@ -641,6 +641,15 @@
 <span id="636">636</span>
 <span id="637">637</span>
 <span id="638">638</span>
+<span id="639">639</span>
+<span id="640">640</span>
+<span id="641">641</span>
+<span id="642">642</span>
+<span id="643">643</span>
+<span id="644">644</span>
+<span id="645">645</span>
+<span id="646">646</span>
+<span id="647">647</span>
 </pre><pre class="rust"><code><span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
 <span class="kw">use</span> <span class="ident">std::cmp::Ordering</span>;
 <span class="kw">use</span> <span class="ident">std::convert::TryFrom</span>;
@@ -690,7 +699,7 @@
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">id</span>) <span class="op">=</span> <span class="ident">guild_id</span> {
             <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">member</span>) <span class="op">=</span> <span class="ident">map</span>.<span class="ident">get_mut</span>(<span class="string">&quot;member&quot;</span>) {
                 <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">object</span>) <span class="op">=</span> <span class="ident">member</span>.<span class="ident">as_object_mut</span>() {
-                    <span class="ident">object</span>.<span class="ident">insert</span>(<span class="string">&quot;guild_id&quot;</span>.<span class="ident">to_owned</span>(), <span class="ident">from_number</span>(<span class="ident">id</span>.<span class="number">0</span>));
+                    <span class="ident">object</span>.<span class="ident">insert</span>(<span class="string">&quot;guild_id&quot;</span>.<span class="ident">to_owned</span>(), <span class="ident">from_number</span>(<span class="ident">id</span>.<span class="ident">get</span>()));
                 }
             }
         }
@@ -745,7 +754,7 @@
     <span class="doccomment">/// [permissions]: super::permissions</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">delete</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">cache_http</span>: <span class="kw">impl</span> <span class="ident">CacheHttp</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>), <span class="ident">allow</span>(<span class="ident">unused_mut</span>))]</span>
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">user_id</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">user_id</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">id</span><span class="op">|</span> <span class="ident">id</span>.<span class="number">0</span>);
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">user_id</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">user_id</span>;
 
         <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
         {
@@ -767,7 +776,12 @@
 
         <span class="ident">cache_http</span>
             .<span class="ident">http</span>()
-            .<span class="ident">delete_reaction</span>(<span class="self">self</span>.<span class="ident">channel_id</span>.<span class="number">0</span>, <span class="self">self</span>.<span class="ident">message_id</span>.<span class="number">0</span>, <span class="ident">user_id</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">emoji</span>)
+            .<span class="ident">delete_reaction</span>(
+                <span class="self">self</span>.<span class="ident">channel_id</span>.<span class="ident">get</span>(),
+                <span class="self">self</span>.<span class="ident">message_id</span>.<span class="ident">get</span>(),
+                <span class="ident">user_id</span>.<span class="ident">map</span>(<span class="ident">UserId::get</span>),
+                <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">emoji</span>,
+            )
             .<span class="kw">await</span>
     }
 
@@ -800,7 +814,11 @@
         <span class="ident">cache_http</span>
             .<span class="ident">http</span>()
             .<span class="ident">as_ref</span>()
-            .<span class="ident">delete_message_reaction_emoji</span>(<span class="self">self</span>.<span class="ident">channel_id</span>.<span class="number">0</span>, <span class="self">self</span>.<span class="ident">message_id</span>.<span class="number">0</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">emoji</span>)
+            .<span class="ident">delete_message_reaction_emoji</span>(
+                <span class="self">self</span>.<span class="ident">channel_id</span>.<span class="ident">get</span>(),
+                <span class="self">self</span>.<span class="ident">message_id</span>.<span class="ident">get</span>(),
+                <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">emoji</span>,
+            )
             .<span class="kw">await</span>
     }
 
@@ -898,11 +916,11 @@
 
         <span class="ident">http</span>.<span class="ident">as_ref</span>()
             .<span class="ident">get_reaction_users</span>(
-                <span class="self">self</span>.<span class="ident">channel_id</span>.<span class="number">0</span>,
-                <span class="self">self</span>.<span class="ident">message_id</span>.<span class="number">0</span>,
+                <span class="self">self</span>.<span class="ident">channel_id</span>.<span class="ident">get</span>(),
+                <span class="self">self</span>.<span class="ident">message_id</span>.<span class="ident">get</span>(),
                 <span class="ident">reaction_type</span>,
                 <span class="ident">limit</span>,
-                <span class="ident">after</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">u</span><span class="op">|</span> <span class="ident">u</span>.<span class="number">0</span>),
+                <span class="ident">after</span>.<span class="ident">map</span>(<span class="ident">UserId::get</span>),
             )
             .<span class="kw">await</span>
     }
@@ -1088,12 +1106,12 @@
     <span class="doccomment">/// # use serenity::client::Context;</span>
     <span class="doccomment">/// # #[cfg(feature = &quot;framework&quot;)]</span>
     <span class="doccomment">/// # use serenity::framework::standard::{CommandResult, macros::command};</span>
-    <span class="doccomment">/// # use serenity::model::id::ChannelId;</span>
+    <span class="doccomment">/// # use serenity::model::id::{ChannelId, MessageId};</span>
     <span class="doccomment">/// #</span>
     <span class="doccomment">/// # #[cfg(all(feature = &quot;client&quot;, feature = &quot;framework&quot;, feature = &quot;http&quot;))]</span>
     <span class="doccomment">/// # #[command]</span>
     <span class="doccomment">/// # async fn example(ctx: &amp;Context) -&gt; CommandResult {</span>
-    <span class="doccomment">/// #   let message = ChannelId(0).message(&amp;ctx.http, 0).await?;</span>
+    <span class="doccomment">/// #   let message = ChannelId::new(1).message(&amp;ctx.http, MessageId::new(0)).await?;</span>
     <span class="doccomment">/// #</span>
     <span class="doccomment">/// message.react(ctx, &#39;🍎&#39;).await?;</span>
     <span class="doccomment">/// # Ok(())</span>
@@ -1198,7 +1216,7 @@
     <span class="doccomment">/// let reaction = ReactionType::try_from(emoji_string).unwrap();</span>
     <span class="doccomment">/// let reaction2 = ReactionType::Custom {</span>
     <span class="doccomment">///     animated: false,</span>
-    <span class="doccomment">///     id: EmojiId(600404340292059257),</span>
+    <span class="doccomment">///     id: EmojiId::new(600404340292059257),</span>
     <span class="doccomment">///     name: Some(&quot;customemoji&quot;.to_string()),</span>
     <span class="doccomment">/// };</span>
     <span class="doccomment">///</span>
@@ -1230,9 +1248,9 @@
 
         <span class="kw">let</span> <span class="ident">id</span> <span class="op">=</span> <span class="ident">split_iter</span>
             .<span class="ident">next</span>()
-            .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">s</span><span class="op">|</span> <span class="ident">s</span>.<span class="ident">parse</span>::<span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span>().<span class="ident">ok</span>())
-            .<span class="ident">ok_or</span>(<span class="ident">ReactionConversionError</span>)<span class="question-mark">?</span>
-            .<span class="ident">into</span>();
+            .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">s</span><span class="op">|</span> <span class="ident">s</span>.<span class="ident">parse</span>().<span class="ident">ok</span>())
+            .<span class="ident">map</span>(<span class="ident">EmojiId</span>)
+            .<span class="ident">ok_or</span>(<span class="ident">ReactionConversionError</span>)<span class="question-mark">?</span>;
 
         <span class="prelude-val">Ok</span>(<span class="ident">ReactionType::Custom</span> {
             <span class="ident">animated</span>,

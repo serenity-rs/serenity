@@ -308,7 +308,7 @@
 
     <span class="doccomment">/// Assign the dummy message a proper ID for identification.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// If not used, the default value is `MessageId(0)`.</span>
+    <span class="doccomment">/// If not used, the default value is `MessageId::new(1)`.</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="attribute">#[<span class="ident">must_use</span>]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">id</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">id</span>: <span class="ident">MessageId</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
@@ -342,7 +342,7 @@
 
     <span class="doccomment">/// Assign the dummy message its origin channel&#39;s ID.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// If not used, the default value is `ChannelId(0)`.</span>
+    <span class="doccomment">/// If not used, the default value is `ChannelId::new(1)`.</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">channel_id</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">channel_id</span>: <span class="ident">ChannelId</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">msg</span>.<span class="ident">channel_id</span> <span class="op">=</span> <span class="ident">channel_id</span>;
@@ -524,10 +524,10 @@
 <span class="attribute">#[<span class="ident">inline</span>]</span>
 <span class="kw">fn</span> <span class="ident">dummy_message</span>() -&gt; <span class="ident">Message</span> {
     <span class="ident">Message</span> {
-        <span class="ident">id</span>: <span class="ident">MessageId::default</span>(),
+        <span class="ident">id</span>: <span class="ident">MessageId::new</span>(<span class="number">1</span>),
         <span class="ident">attachments</span>: <span class="ident">Vec::new</span>(),
         <span class="ident">author</span>: <span class="ident">User</span> {
-            <span class="ident">id</span>: <span class="ident">UserId::default</span>(),
+            <span class="ident">id</span>: <span class="ident">UserId::new</span>(<span class="number">1</span>),
             <span class="ident">avatar</span>: <span class="prelude-val">None</span>,
             <span class="ident">bot</span>: <span class="bool-val">false</span>,
             <span class="ident">discriminator</span>: <span class="number">0x0000</span>,
@@ -536,7 +536,7 @@
             <span class="ident">banner</span>: <span class="prelude-val">None</span>,
             <span class="ident">accent_colour</span>: <span class="prelude-val">None</span>,
         },
-        <span class="ident">channel_id</span>: <span class="ident">ChannelId::default</span>(),
+        <span class="ident">channel_id</span>: <span class="ident">ChannelId::new</span>(<span class="number">1</span>),
         <span class="ident">content</span>: <span class="ident">String::new</span>(),
         <span class="ident">edited_timestamp</span>: <span class="prelude-val">None</span>,
         <span class="ident">embeds</span>: <span class="ident">Vec::new</span>(),

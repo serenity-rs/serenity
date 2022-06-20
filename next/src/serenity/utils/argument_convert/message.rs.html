@@ -84,6 +84,9 @@
 <span id="79">79</span>
 <span id="80">80</span>
 <span id="81">81</span>
+<span id="82">82</span>
+<span id="83">83</span>
+<span id="84">84</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::fmt</span>;
 
 <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::ArgumentConvert</span>;
@@ -159,7 +162,10 @@
         }
 
         <span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http&quot;</span>) {
-            <span class="ident">ctx</span>.<span class="ident">http</span>.<span class="ident">get_message</span>(<span class="ident">channel_id</span>.<span class="number">0</span>, <span class="ident">message_id</span>.<span class="number">0</span>).<span class="kw">await</span>.<span class="ident">map_err</span>(<span class="ident">MessageParseError::Http</span>)
+            <span class="ident">ctx</span>.<span class="ident">http</span>
+                .<span class="ident">get_message</span>(<span class="ident">channel_id</span>.<span class="ident">get</span>(), <span class="ident">message_id</span>.<span class="ident">get</span>())
+                .<span class="kw">await</span>
+                .<span class="ident">map_err</span>(<span class="ident">MessageParseError::Http</span>)
         } <span class="kw">else</span> {
             <span class="prelude-val">Err</span>(<span class="ident">MessageParseError::HttpNotAvailable</span>)
         }

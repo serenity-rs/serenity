@@ -1128,7 +1128,7 @@
 
     <span class="doccomment">/// Gets the application ID, if already initialized. See [`Self::application_id`] for more info.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_application_id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ApplicationId</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">http</span>.<span class="ident">as_ref</span>().<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">h</span><span class="op">|</span> <span class="ident">h</span>.<span class="ident">application_id</span>().<span class="ident">map</span>(<span class="ident">ApplicationId</span>))
+        <span class="self">self</span>.<span class="ident">http</span>.<span class="ident">as_ref</span>().<span class="ident">and_then</span>(<span class="ident">Http::application_id</span>).<span class="ident">map</span>(<span class="ident">ApplicationId</span>)
     }
 
     <span class="doccomment">/// Sets the entire [`TypeMap`] that will be available in [`Context`]s.</span>

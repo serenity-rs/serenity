@@ -22,7 +22,7 @@ option.</p>
 
 <div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use</span> <span class="ident">serenity::model::id::ChannelId</span>;
 
-<span class="kw">let</span> <span class="ident">channel_id</span> <span class="op">=</span> <span class="ident">ChannelId</span>(<span class="number">7</span>);
+<span class="kw">let</span> <span class="ident">channel_id</span> <span class="op">=</span> <span class="ident">ChannelId::new</span>(<span class="number">7</span>);
 
 <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="ident">channel_id</span>.<span class="ident">send_message</span>(<span class="kw-2">&amp;</span><span class="ident">http</span>, <span class="op">|</span><span class="ident">m</span><span class="op">|</span> {
     <span class="ident">m</span>.<span class="ident">content</span>(<span class="string">&quot;test&quot;</span>)

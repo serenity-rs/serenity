@@ -1143,7 +1143,7 @@
                 <span class="self">self</span>.<span class="ident">stage</span> <span class="op">=</span> <span class="ident">ConnectionStage::Connected</span>;
 
                 <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">http</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">http</span> {
-                    <span class="ident">http</span>.<span class="ident">set_application_id</span>(<span class="ident">ready</span>.<span class="ident">ready</span>.<span class="ident">application</span>.<span class="ident">id</span>.<span class="number">0</span>);
+                    <span class="ident">http</span>.<span class="ident">set_application_id</span>(<span class="ident">ready</span>.<span class="ident">ready</span>.<span class="ident">application</span>.<span class="ident">id</span>.<span class="ident">get</span>());
                 }
             },
             <span class="ident">Event::Resumed</span>(<span class="kw">_</span>) =&gt; {
@@ -1487,7 +1487,7 @@
     <span class="doccomment">/// #</span>
     <span class="doccomment">/// use serenity::model::id::GuildId;</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// shard.chunk_guild(GuildId(81384788765712384), Some(2000), ChunkGuildFilter::None, None).await?;</span>
+    <span class="doccomment">/// shard.chunk_guild(GuildId::new(81384788765712384), Some(2000), ChunkGuildFilter::None, None).await?;</span>
     <span class="doccomment">/// #     Ok(())</span>
     <span class="doccomment">/// # }</span>
     <span class="doccomment">/// ```</span>
@@ -1513,7 +1513,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// shard</span>
     <span class="doccomment">///     .chunk_guild(</span>
-    <span class="doccomment">///         GuildId(81384788765712384),</span>
+    <span class="doccomment">///         GuildId::new(81384788765712384),</span>
     <span class="doccomment">///         Some(20),</span>
     <span class="doccomment">///         ChunkGuildFilter::Query(&quot;do&quot;.to_owned()),</span>
     <span class="doccomment">///         Some(&quot;request&quot;),</span>

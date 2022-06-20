@@ -197,7 +197,7 @@
 <span class="doccomment">///</span>
 <span class="doccomment">/// assert_eq!(</span>
 <span class="doccomment">///     parse_message_id_pair(&quot;673965002805477386-842482646604972082&quot;),</span>
-<span class="doccomment">///     Some((ChannelId(673965002805477386), MessageId(842482646604972082))),</span>
+<span class="doccomment">///     Some((ChannelId::new(673965002805477386), MessageId::new(842482646604972082))),</span>
 <span class="doccomment">/// );</span>
 <span class="doccomment">/// assert_eq!(</span>
 <span class="doccomment">///     parse_message_id_pair(&quot;673965002805477386-842482646604972082-472029906943868929&quot;),</span>
@@ -226,9 +226,9 @@
 <span class="doccomment">///         &quot;https://discord.com/channels/381880193251409931/381880193700069377/806164913558781963&quot;</span>
 <span class="doccomment">///     ),</span>
 <span class="doccomment">///     Some((</span>
-<span class="doccomment">///         GuildId(381880193251409931),</span>
-<span class="doccomment">///         ChannelId(381880193700069377),</span>
-<span class="doccomment">///         MessageId(806164913558781963),</span>
+<span class="doccomment">///         GuildId::new(381880193251409931),</span>
+<span class="doccomment">///         ChannelId::new(381880193700069377),</span>
+<span class="doccomment">///         MessageId::new(806164913558781963),</span>
 <span class="doccomment">///     )),</span>
 <span class="doccomment">/// );</span>
 <span class="doccomment">/// assert_eq!(parse_message_url(&quot;https://google.com&quot;), None);</span>

@@ -39,7 +39,7 @@ and finally building it to retrieve the inner String:</p>
 <div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use</span> <span class="ident">serenity::model::id::ChannelId</span>;
 <span class="kw">use</span> <span class="ident">serenity::utils::MessageBuilder</span>;
 
-<span class="kw">let</span> <span class="ident">channel_id</span> <span class="op">=</span> <span class="ident">ChannelId</span>(<span class="number">81384788765712384</span>);
+<span class="kw">let</span> <span class="ident">channel_id</span> <span class="op">=</span> <span class="ident">ChannelId::new</span>(<span class="number">81384788765712384</span>);
 
 <span class="kw">let</span> <span class="ident">content</span> <span class="op">=</span> <span class="ident">MessageBuilder::new</span>().<span class="ident">channel</span>(<span class="ident">channel_id</span>).<span class="ident">push</span>(<span class="string">&quot;!&quot;</span>).<span class="ident">build</span>();
 
@@ -63,7 +63,7 @@ how this is formatted.</p>
 <div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use</span> <span class="ident">serenity::model::id::ChannelId</span>;
 <span class="kw">use</span> <span class="ident">serenity::utils::MessageBuilder</span>;
 
-<span class="kw">let</span> <span class="ident">channel_id</span> <span class="op">=</span> <span class="ident">ChannelId</span>(<span class="number">81384788765712384</span>);
+<span class="kw">let</span> <span class="ident">channel_id</span> <span class="op">=</span> <span class="ident">ChannelId::new</span>(<span class="number">81384788765712384</span>);
 
 <span class="kw">let</span> <span class="ident">content</span> <span class="op">=</span> <span class="ident">MessageBuilder::new</span>().<span class="ident">push</span>(<span class="string">&quot;The channel is: &quot;</span>).<span class="ident">channel</span>(<span class="ident">channel_id</span>).<span class="ident">build</span>();
 

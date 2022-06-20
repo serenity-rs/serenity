@@ -68,7 +68,7 @@
     <span class="doccomment">/// assert!(matches!(</span>
     <span class="doccomment">///     EventCollectorBuilder::new(&amp;ctx)</span>
     <span class="doccomment">///         .add_event_type(EventType::GuildCreate)</span>
-    <span class="doccomment">///         .add_user_id(UserId::default())</span>
+    <span class="doccomment">///         .add_user_id(UserId::new(1))</span>
     <span class="doccomment">///         .build(),</span>
     <span class="doccomment">///     Err(SerenityError::Collector(CollectorError::InvalidEventIdFilters)),</span>
     <span class="doccomment">/// ));</span>

@@ -514,6 +514,10 @@
 <span id="509">509</span>
 <span id="510">510</span>
 <span id="511">511</span>
+<span id="512">512</span>
+<span id="513">513</span>
+<span id="514">514</span>
+<span id="515">515</span>
 </pre><pre class="rust"><code><span class="doccomment">//! A set of utilities to help with common use cases that are not required to</span>
 <span class="doccomment">//! fully use the library.</span>
 
@@ -543,10 +547,11 @@
 <span class="kw">use</span> <span class="ident">std::ffi::OsStr</span>;
 <span class="kw">use</span> <span class="ident">std::fs::File</span>;
 <span class="kw">use</span> <span class="ident">std::io::Read</span>;
+<span class="kw">use</span> <span class="ident">std::num::NonZeroU64</span>;
 <span class="kw">use</span> <span class="ident">std::path::Path</span>;
 
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::internal::prelude</span>::<span class="kw-2">*</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::id::EmojiId</span>;
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::id</span>::{<span class="ident">ChannelId</span>, <span class="ident">EmojiId</span>, <span class="ident">RoleId</span>, <span class="ident">UserId</span>};
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::misc::EmojiIdentifier</span>;
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
@@ -627,13 +632,14 @@
 <span class="doccomment">/// Retrieving an Id from a valid [`User`] mention:</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// ```rust</span>
+<span class="doccomment">/// use serenity::model::id::UserId;</span>
 <span class="doccomment">/// use serenity::utils::parse_username;</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// // regular username mention</span>
-<span class="doccomment">/// assert_eq!(parse_username(&quot;&lt;@114941315417899012&gt;&quot;), Some(114941315417899012));</span>
+<span class="doccomment">/// assert_eq!(parse_username(&quot;&lt;@114941315417899012&gt;&quot;), Some(UserId::new(114941315417899012)));</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// // nickname mention</span>
-<span class="doccomment">/// assert_eq!(parse_username(&quot;&lt;@!114941315417899012&gt;&quot;), Some(114941315417899012));</span>
+<span class="doccomment">/// assert_eq!(parse_username(&quot;&lt;@!114941315417899012&gt;&quot;), Some(UserId::new(114941315417899012)));</span>
 <span class="doccomment">/// ```</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// Asserting that an invalid username or nickname mention returns [`None`]:</span>
@@ -646,7 +652,7 @@
 <span class="doccomment">/// ```</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// [`User`]: crate::model::user::User</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">parse_username</span>(<span class="ident">mention</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">parse_username</span>(<span class="ident">mention</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">UserId</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="ident">mention</span> <span class="op">=</span> <span class="ident">mention</span>.<span class="ident">as_ref</span>();
 
     <span class="kw">if</span> <span class="ident">mention</span>.<span class="ident">len</span>() <span class="op">&lt;</span> <span class="number">4</span> {
@@ -655,10 +661,10 @@
 
     <span class="kw">if</span> <span class="ident">mention</span>.<span class="ident">starts_with</span>(<span class="string">&quot;&lt;@!&quot;</span>) {
         <span class="kw">let</span> <span class="ident">len</span> <span class="op">=</span> <span class="ident">mention</span>.<span class="ident">len</span>() <span class="op">-</span> <span class="number">1</span>;
-        <span class="ident">mention</span>[<span class="number">3</span>..<span class="ident">len</span>].<span class="ident">parse</span>::<span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span>().<span class="ident">ok</span>()
+        <span class="ident">mention</span>[<span class="number">3</span>..<span class="ident">len</span>].<span class="ident">parse</span>().<span class="ident">map</span>(<span class="ident">UserId</span>).<span class="ident">ok</span>()
     } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">mention</span>.<span class="ident">starts_with</span>(<span class="string">&quot;&lt;@&quot;</span>) {
         <span class="kw">let</span> <span class="ident">len</span> <span class="op">=</span> <span class="ident">mention</span>.<span class="ident">len</span>() <span class="op">-</span> <span class="number">1</span>;
-        <span class="ident">mention</span>[<span class="number">2</span>..<span class="ident">len</span>].<span class="ident">parse</span>::<span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span>().<span class="ident">ok</span>()
+        <span class="ident">mention</span>[<span class="number">2</span>..<span class="ident">len</span>].<span class="ident">parse</span>().<span class="ident">map</span>(<span class="ident">UserId</span>).<span class="ident">ok</span>()
     } <span class="kw">else</span> {
         <span class="prelude-val">None</span>
     }
@@ -673,9 +679,10 @@
 <span class="doccomment">/// Retrieving an Id from a valid [`Role`] mention:</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// ```rust</span>
+<span class="doccomment">/// use serenity::model::id::RoleId;</span>
 <span class="doccomment">/// use serenity::utils::parse_role;</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// assert_eq!(parse_role(&quot;&lt;@&amp;136107769680887808&gt;&quot;), Some(136107769680887808));</span>
+<span class="doccomment">/// assert_eq!(parse_role(&quot;&lt;@&amp;136107769680887808&gt;&quot;), Some(RoleId::new(136107769680887808)));</span>
 <span class="doccomment">/// ```</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// Asserting that an invalid role mention returns [`None`]:</span>
@@ -687,7 +694,7 @@
 <span class="doccomment">/// ```</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// [`Role`]: crate::model::guild::Role</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">parse_role</span>(<span class="ident">mention</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">parse_role</span>(<span class="ident">mention</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">RoleId</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="ident">mention</span> <span class="op">=</span> <span class="ident">mention</span>.<span class="ident">as_ref</span>();
 
     <span class="kw">if</span> <span class="ident">mention</span>.<span class="ident">len</span>() <span class="op">&lt;</span> <span class="number">4</span> {
@@ -696,7 +703,7 @@
 
     <span class="kw">if</span> <span class="ident">mention</span>.<span class="ident">starts_with</span>(<span class="string">&quot;&lt;@&amp;&quot;</span>) <span class="op">&amp;&amp;</span> <span class="ident">mention</span>.<span class="ident">ends_with</span>(<span class="string">&#39;&gt;&#39;</span>) {
         <span class="kw">let</span> <span class="ident">len</span> <span class="op">=</span> <span class="ident">mention</span>.<span class="ident">len</span>() <span class="op">-</span> <span class="number">1</span>;
-        <span class="ident">mention</span>[<span class="number">3</span>..<span class="ident">len</span>].<span class="ident">parse</span>::<span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span>().<span class="ident">ok</span>()
+        <span class="ident">mention</span>[<span class="number">3</span>..<span class="ident">len</span>].<span class="ident">parse</span>().<span class="ident">map</span>(<span class="ident">RoleId</span>).<span class="ident">ok</span>()
     } <span class="kw">else</span> {
         <span class="prelude-val">None</span>
     }
@@ -711,9 +718,10 @@
 <span class="doccomment">/// Retrieving an Id from a valid [`Channel`] mention:</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// ```rust</span>
+<span class="doccomment">/// use serenity::model::id::ChannelId;</span>
 <span class="doccomment">/// use serenity::utils::parse_channel;</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// assert_eq!(parse_channel(&quot;&lt;#81384788765712384&gt;&quot;), Some(81384788765712384));</span>
+<span class="doccomment">/// assert_eq!(parse_channel(&quot;&lt;#81384788765712384&gt;&quot;), Some(ChannelId::new(81384788765712384)));</span>
 <span class="doccomment">/// ```</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// Asserting that an invalid channel mention returns [`None`]:</span>
@@ -726,7 +734,7 @@
 <span class="doccomment">/// ```</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// [`Channel`]: crate::model::channel::Channel</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">parse_channel</span>(<span class="ident">mention</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">parse_channel</span>(<span class="ident">mention</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ChannelId</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="ident">mention</span> <span class="op">=</span> <span class="ident">mention</span>.<span class="ident">as_ref</span>();
 
     <span class="kw">if</span> <span class="ident">mention</span>.<span class="ident">len</span>() <span class="op">&lt;</span> <span class="number">4</span> {
@@ -735,7 +743,7 @@
 
     <span class="kw">if</span> <span class="ident">mention</span>.<span class="ident">starts_with</span>(<span class="string">&quot;&lt;#&quot;</span>) <span class="op">&amp;&amp;</span> <span class="ident">mention</span>.<span class="ident">ends_with</span>(<span class="string">&#39;&gt;&#39;</span>) {
         <span class="kw">let</span> <span class="ident">len</span> <span class="op">=</span> <span class="ident">mention</span>.<span class="ident">len</span>() <span class="op">-</span> <span class="number">1</span>;
-        <span class="ident">mention</span>[<span class="number">2</span>..<span class="ident">len</span>].<span class="ident">parse</span>::<span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span>().<span class="ident">ok</span>()
+        <span class="ident">mention</span>[<span class="number">2</span>..<span class="ident">len</span>].<span class="ident">parse</span>::<span class="op">&lt;</span><span class="ident">NonZeroU64</span><span class="op">&gt;</span>().<span class="ident">map</span>(<span class="ident">ChannelId</span>).<span class="ident">ok</span>()
     } <span class="kw">else</span> {
         <span class="prelude-val">None</span>
     }
@@ -757,7 +765,7 @@
 <span class="doccomment">///</span>
 <span class="doccomment">/// let expected = EmojiIdentifier {</span>
 <span class="doccomment">///     animated: false,</span>
-<span class="doccomment">///     id: EmojiId(302516740095606785),</span>
+<span class="doccomment">///     id: EmojiId::new(302516740095606785),</span>
 <span class="doccomment">///     name: &quot;smugAnimeFace&quot;.to_string(),</span>
 <span class="doccomment">/// };</span>
 <span class="doccomment">///</span>
@@ -805,7 +813,7 @@
             <span class="ident">name</span>.<span class="ident">push</span>(<span class="ident">x</span>);
         }
 
-        <span class="kw">match</span> <span class="ident">id</span>.<span class="ident">parse</span>::<span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span>() {
+        <span class="kw">match</span> <span class="ident">id</span>.<span class="ident">parse</span>() {
             <span class="prelude-val">Ok</span>(<span class="ident">x</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">EmojiIdentifier</span> {
                 <span class="ident">animated</span>,
                 <span class="ident">name</span>,

@@ -96,12 +96,16 @@
 <span id="91">91</span>
 <span id="92">92</span>
 <span id="93">93</span>
+<span id="94">94</span>
+<span id="95">95</span>
 </pre><pre class="rust"><code><span class="doccomment">//! Models about OAuth2 applications.</span>
 
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">command</span>;
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">component</span>;
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">interaction</span>;
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">oauth</span>;
+
+<span class="kw">use</span> <span class="ident">std::num::NonZeroU64</span>;
 
 <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::id</span>::{<span class="ident">snowflake</span>, <span class="ident">ApplicationId</span>, <span class="ident">UserId</span>};
 <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::user::User</span>;
@@ -138,7 +142,7 @@
     <span class="kw">pub</span> <span class="ident">icon</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
     <span class="doccomment">/// The snowflake ID of the team.</span>
     <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">with</span> <span class="op">=</span> <span class="string">&quot;snowflake&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">id</span>: <span class="ident">u64</span>,
+    <span class="kw">pub</span> <span class="ident">id</span>: <span class="ident">NonZeroU64</span>,
     <span class="doccomment">/// The name of the team.</span>
     <span class="kw">pub</span> <span class="ident">name</span>: <span class="ident">String</span>,
     <span class="doccomment">/// The members of the team</span>
@@ -158,7 +162,7 @@
     <span class="kw">pub</span> <span class="ident">permissions</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
     <span class="doccomment">/// The ID of the team they are a member of.</span>
     <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">with</span> <span class="op">=</span> <span class="string">&quot;snowflake&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">team_id</span>: <span class="ident">u64</span>,
+    <span class="kw">pub</span> <span class="ident">team_id</span>: <span class="ident">NonZeroU64</span>,
     <span class="doccomment">/// The user type of the team member.</span>
     <span class="kw">pub</span> <span class="ident">user</span>: <span class="ident">User</span>,
 }

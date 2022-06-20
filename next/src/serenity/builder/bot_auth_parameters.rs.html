@@ -119,10 +119,10 @@
 <span class="doccomment">/// A builder for constructing an invite link with custom OAuth2 scopes.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Default</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">CreateBotAuthParameters</span> {
-    <span class="ident">client_id</span>: <span class="ident">ApplicationId</span>,
+    <span class="ident">client_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ApplicationId</span><span class="op">&gt;</span>,
     <span class="ident">scopes</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Scope</span><span class="op">&gt;</span>,
     <span class="ident">permissions</span>: <span class="ident">Permissions</span>,
-    <span class="ident">guild_id</span>: <span class="ident">GuildId</span>,
+    <span class="ident">guild_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">GuildId</span><span class="op">&gt;</span>,
     <span class="ident">disable_guild_select</span>: <span class="ident">bool</span>,
 }
 
@@ -133,8 +133,8 @@
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">valid_data</span> <span class="op">=</span> <span class="macro">vec!</span>[];
         <span class="kw">let</span> <span class="ident">bits</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">permissions</span>.<span class="ident">bits</span>();
 
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">client_id</span>.<span class="number">0</span> <span class="op">!</span><span class="op">=</span> <span class="number">0</span> {
-            <span class="ident">valid_data</span>.<span class="ident">push</span>((<span class="string">&quot;client_id&quot;</span>, <span class="self">self</span>.<span class="ident">client_id</span>.<span class="number">0</span>.<span class="ident">to_string</span>()));
+        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">client_id</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">client_id</span> {
+            <span class="ident">valid_data</span>.<span class="ident">push</span>((<span class="string">&quot;client_id&quot;</span>, <span class="ident">client_id</span>.<span class="number">0</span>.<span class="ident">to_string</span>()));
         }
 
         <span class="kw">if</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">scopes</span>.<span class="ident">is_empty</span>() {
@@ -148,8 +148,8 @@
             <span class="ident">valid_data</span>.<span class="ident">push</span>((<span class="string">&quot;permissions&quot;</span>, <span class="ident">bits</span>.<span class="ident">to_string</span>()));
         }
 
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">guild_id</span>.<span class="number">0</span> <span class="op">!</span><span class="op">=</span> <span class="number">0</span> {
-            <span class="ident">valid_data</span>.<span class="ident">push</span>((<span class="string">&quot;guild&quot;</span>, <span class="self">self</span>.<span class="ident">guild_id</span>.<span class="number">0</span>.<span class="ident">to_string</span>()));
+        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">guild_id</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">guild_id</span> {
+            <span class="ident">valid_data</span>.<span class="ident">push</span>((<span class="string">&quot;guild&quot;</span>, <span class="ident">guild_id</span>.<span class="number">0</span>.<span class="ident">to_string</span>()));
         }
 
         <span class="kw">if</span> <span class="self">self</span>.<span class="ident">disable_guild_select</span> {
@@ -164,7 +164,7 @@
 
     <span class="doccomment">/// Specify the client Id of your application.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">client_id</span><span class="op">&lt;</span><span class="ident">U</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">ApplicationId</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">client_id</span>: <span class="ident">U</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">client_id</span> <span class="op">=</span> <span class="ident">client_id</span>.<span class="ident">into</span>();
+        <span class="self">self</span>.<span class="ident">client_id</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">client_id</span>.<span class="ident">into</span>());
         <span class="self">self</span>
     }
 
@@ -179,7 +179,7 @@
     <span class="doccomment">/// [`HttpError::UnsuccessfulRequest`]: crate::http::HttpError::UnsuccessfulRequest</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http&quot;</span>)]</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">auto_client_id</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="self">Self</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">client_id</span> <span class="op">=</span> <span class="ident">http</span>.<span class="ident">as_ref</span>().<span class="ident">get_current_application_info</span>().<span class="kw">await</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">v</span><span class="op">|</span> <span class="ident">v</span>.<span class="ident">id</span>)<span class="question-mark">?</span>;
+        <span class="self">self</span>.<span class="ident">client_id</span> <span class="op">=</span> <span class="ident">http</span>.<span class="ident">as_ref</span>().<span class="ident">get_current_application_info</span>().<span class="kw">await</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">v</span><span class="op">|</span> <span class="prelude-val">Some</span>(<span class="ident">v</span>.<span class="ident">id</span>))<span class="question-mark">?</span>;
         <span class="prelude-val">Ok</span>(<span class="self">self</span>)
     }
 
@@ -201,7 +201,7 @@
 
     <span class="doccomment">/// Specify the Id of the guild to prefill the dropdown picker for the user.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">guild_id</span><span class="op">&lt;</span><span class="ident">G</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">GuildId</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">guild_id</span>: <span class="ident">G</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">guild_id</span> <span class="op">=</span> <span class="ident">guild_id</span>.<span class="ident">into</span>();
+        <span class="self">self</span>.<span class="ident">guild_id</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">guild_id</span>.<span class="ident">into</span>());
         <span class="self">self</span>
     }
 

@@ -311,8 +311,10 @@
 <span id="306">306</span>
 <span id="307">307</span>
 <span id="308">308</span>
+<span id="309">309</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::fmt</span>;
 <span class="kw">use</span> <span class="ident">std::future::Future</span>;
+<span class="kw">use</span> <span class="ident">std::num::NonZeroU64</span>;
 <span class="kw">use</span> <span class="ident">std::pin::Pin</span>;
 <span class="kw">use</span> <span class="ident">std::sync::Arc</span>;
 <span class="kw">use</span> <span class="ident">std::task</span>::{<span class="ident">Context</span> <span class="kw">as</span> <span class="ident">FutContext</span>, <span class="ident">Poll</span>};
@@ -369,7 +371,7 @@
                 <span class="doccomment">/// Sets the required author ID of an interaction.</span>
                 <span class="doccomment">/// If an interaction is not triggered by a user with this ID, it won&#39;t be received.</span>
                 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">author_id</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">author_id</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-                    <span class="self">self</span>.<span class="ident">filter</span>.<span class="ident">as_mut</span>().<span class="ident">unwrap</span>().<span class="ident">author_id</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">author_id</span>.<span class="ident">into</span>());
+                    <span class="self">self</span>.<span class="ident">filter</span>.<span class="ident">as_mut</span>().<span class="ident">unwrap</span>().<span class="ident">author_id</span> <span class="op">=</span> <span class="ident">NonZeroU64::new</span>(<span class="ident">author_id</span>.<span class="ident">into</span>());
 
                     <span class="self">self</span>
                 }
@@ -377,7 +379,7 @@
                 <span class="doccomment">/// Sets the message on which the interaction must occur.</span>
                 <span class="doccomment">/// If an interaction is not on a message with this ID, it won&#39;t be received.</span>
                 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">message_id</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">message_id</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-                    <span class="self">self</span>.<span class="ident">filter</span>.<span class="ident">as_mut</span>().<span class="ident">unwrap</span>().<span class="ident">message_id</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">message_id</span>.<span class="ident">into</span>());
+                    <span class="self">self</span>.<span class="ident">filter</span>.<span class="ident">as_mut</span>().<span class="ident">unwrap</span>().<span class="ident">message_id</span> <span class="op">=</span> <span class="ident">NonZeroU64::new</span>(<span class="ident">message_id</span>.<span class="ident">into</span>());
 
                     <span class="self">self</span>
                 }
@@ -385,7 +387,7 @@
                 <span class="doccomment">/// Sets the guild in which the interaction must occur.</span>
                 <span class="doccomment">/// If an interaction is not on a message with this guild ID, it won&#39;t be received.</span>
                 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">guild_id</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">guild_id</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-                    <span class="self">self</span>.<span class="ident">filter</span>.<span class="ident">as_mut</span>().<span class="ident">unwrap</span>().<span class="ident">guild_id</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">guild_id</span>.<span class="ident">into</span>());
+                    <span class="self">self</span>.<span class="ident">filter</span>.<span class="ident">as_mut</span>().<span class="ident">unwrap</span>().<span class="ident">guild_id</span> <span class="op">=</span> <span class="ident">NonZeroU64::new</span>(<span class="ident">guild_id</span>.<span class="ident">into</span>());
 
                     <span class="self">self</span>
                 }
@@ -393,7 +395,7 @@
                 <span class="doccomment">/// Sets the channel on which the interaction must occur.</span>
                 <span class="doccomment">/// If an interaction is not on a message with this channel ID, it won&#39;t be received.</span>
                 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">channel_id</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">channel_id</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-                    <span class="self">self</span>.<span class="ident">filter</span>.<span class="ident">as_mut</span>().<span class="ident">unwrap</span>().<span class="ident">channel_id</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">channel_id</span>.<span class="ident">into</span>());
+                    <span class="self">self</span>.<span class="ident">filter</span>.<span class="ident">as_mut</span>().<span class="ident">unwrap</span>().<span class="ident">channel_id</span> <span class="op">=</span> <span class="ident">NonZeroU64::new</span>(<span class="ident">channel_id</span>.<span class="ident">into</span>());
 
                     <span class="self">self</span>
                 }
@@ -478,10 +480,10 @@
     <span class="ident">filter_limit</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
     <span class="ident">collect_limit</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
     <span class="ident">filter</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">FilterFn</span><span class="op">&lt;</span><span class="ident">MessageComponentInteraction</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="ident">channel_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span>,
-    <span class="ident">guild_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span>,
-    <span class="ident">author_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span>,
-    <span class="ident">message_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span>,
+    <span class="ident">channel_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">NonZeroU64</span><span class="op">&gt;</span>,
+    <span class="ident">guild_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">NonZeroU64</span><span class="op">&gt;</span>,
+    <span class="ident">author_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">NonZeroU64</span><span class="op">&gt;</span>,
+    <span class="ident">message_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">NonZeroU64</span><span class="op">&gt;</span>,
 }
 
 <span class="kw">impl</span> <span class="ident">fmt::Debug</span> <span class="kw">for</span> <span class="ident">FilterOptions</span> {

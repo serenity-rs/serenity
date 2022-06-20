@@ -301,7 +301,7 @@
     <span class="doccomment">/// # #[command]</span>
     <span class="doccomment">/// # async fn example(ctx: &amp;Context) -&gt; CommandResult {</span>
     <span class="doccomment">/// #     let mut emoji = from_value::&lt;Emoji&gt;(json!({</span>
-    <span class="doccomment">/// #         &quot;id&quot;: EmojiId(7),</span>
+    <span class="doccomment">/// #         &quot;id&quot;: EmojiId::new(7),</span>
     <span class="doccomment">/// #         &quot;name&quot;: &quot;blobface&quot;,</span>
     <span class="doccomment">/// #     }))?;</span>
     <span class="doccomment">/// #</span>
@@ -325,7 +325,7 @@
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">delete</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">cache_http</span>: <span class="kw">impl</span> <span class="ident">CacheHttp</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">guild_id</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">try_find_guild_id</span>(<span class="kw-2">&amp;</span><span class="ident">cache_http</span>)<span class="question-mark">?</span>;
-        <span class="ident">cache_http</span>.<span class="ident">http</span>().<span class="ident">delete_emoji</span>(<span class="ident">guild_id</span>.<span class="number">0</span>, <span class="self">self</span>.<span class="ident">id</span>.<span class="number">0</span>).<span class="kw">await</span>
+        <span class="ident">cache_http</span>.<span class="ident">http</span>().<span class="ident">delete_emoji</span>(<span class="ident">guild_id</span>.<span class="ident">get</span>(), <span class="self">self</span>.<span class="ident">id</span>.<span class="ident">get</span>()).<span class="kw">await</span>
     }
 
     <span class="doccomment">/// Edits the emoji by updating it with a new name.</span>
@@ -344,7 +344,7 @@
         <span class="kw">let</span> <span class="ident">guild_id</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">try_find_guild_id</span>(<span class="kw-2">&amp;</span><span class="ident">cache_http</span>)<span class="question-mark">?</span>;
         <span class="kw">let</span> <span class="ident">map</span> <span class="op">=</span> <span class="macro">json!</span>({ <span class="string">&quot;name&quot;</span>: <span class="ident">name</span> });
 
-        <span class="kw-2">*</span><span class="self">self</span> <span class="op">=</span> <span class="ident">cache_http</span>.<span class="ident">http</span>().<span class="ident">edit_emoji</span>(<span class="ident">guild_id</span>.<span class="number">0</span>, <span class="self">self</span>.<span class="ident">id</span>.<span class="number">0</span>, <span class="kw-2">&amp;</span><span class="ident">map</span>, <span class="prelude-val">None</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+        <span class="kw-2">*</span><span class="self">self</span> <span class="op">=</span> <span class="ident">cache_http</span>.<span class="ident">http</span>().<span class="ident">edit_emoji</span>(<span class="ident">guild_id</span>.<span class="ident">get</span>(), <span class="self">self</span>.<span class="ident">id</span>.<span class="ident">get</span>(), <span class="kw-2">&amp;</span><span class="ident">map</span>, <span class="prelude-val">None</span>).<span class="kw">await</span><span class="question-mark">?</span>;
 
         <span class="prelude-val">Ok</span>(())
     }

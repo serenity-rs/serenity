@@ -1787,6 +1787,20 @@
 <span id="1782">1782</span>
 <span id="1783">1783</span>
 <span id="1784">1784</span>
+<span id="1785">1785</span>
+<span id="1786">1786</span>
+<span id="1787">1787</span>
+<span id="1788">1788</span>
+<span id="1789">1789</span>
+<span id="1790">1790</span>
+<span id="1791">1791</span>
+<span id="1792">1792</span>
+<span id="1793">1793</span>
+<span id="1794">1794</span>
+<span id="1795">1795</span>
+<span id="1796">1796</span>
+<span id="1797">1797</span>
+<span id="1798">1798</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::fmt</span>;
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
@@ -1855,7 +1869,7 @@
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">builder</span> <span class="op">=</span> <span class="ident">AddMember::default</span>();
         <span class="ident">f</span>(<span class="kw-2">&amp;mut</span> <span class="ident">builder</span>);
 
-        <span class="ident">http</span>.<span class="ident">as_ref</span>().<span class="ident">add_guild_member</span>(<span class="self">self</span>.<span class="number">0</span>, <span class="ident">user_id</span>.<span class="ident">into</span>().<span class="number">0</span>, <span class="kw-2">&amp;</span><span class="ident">builder</span>).<span class="kw">await</span>
+        <span class="ident">http</span>.<span class="ident">as_ref</span>().<span class="ident">add_guild_member</span>(<span class="self">self</span>.<span class="ident">get</span>(), <span class="ident">user_id</span>.<span class="ident">into</span>().<span class="ident">get</span>(), <span class="kw-2">&amp;</span><span class="ident">builder</span>).<span class="kw">await</span>
     }
 
     <span class="doccomment">/// Ban a [`User`] from the guild, deleting a number of</span>
@@ -1875,9 +1889,9 @@
     <span class="doccomment">/// # async fn run() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {</span>
     <span class="doccomment">/// # use serenity::http::Http;</span>
     <span class="doccomment">/// # let http = Http::new(&quot;token&quot;);</span>
-    <span class="doccomment">/// # let user = UserId(1);</span>
+    <span class="doccomment">/// # let user = UserId::new(1);</span>
     <span class="doccomment">/// // assuming a `user` has already been bound</span>
-    <span class="doccomment">/// let _ = GuildId(81384788765712384).ban(&amp;http, user, 4).await;</span>
+    <span class="doccomment">/// let _ = GuildId::new(81384788765712384).ban(&amp;http, user, 4).await;</span>
     <span class="doccomment">/// #    Ok(())</span>
     <span class="doccomment">/// # }</span>
     <span class="doccomment">/// ```</span>
@@ -1927,7 +1941,7 @@
             <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::ExceededLimit</span>(<span class="ident">reason</span>.<span class="ident">to_string</span>(), <span class="number">512</span>));
         }
 
-        <span class="ident">http</span>.<span class="ident">as_ref</span>().<span class="ident">ban_user</span>(<span class="self">self</span>.<span class="number">0</span>, <span class="ident">user</span>.<span class="number">0</span>, <span class="ident">dmd</span>, <span class="ident">reason</span>).<span class="kw">await</span>
+        <span class="ident">http</span>.<span class="ident">as_ref</span>().<span class="ident">ban_user</span>(<span class="self">self</span>.<span class="ident">get</span>(), <span class="ident">user</span>.<span class="ident">get</span>(), <span class="ident">dmd</span>, <span class="ident">reason</span>).<span class="kw">await</span>
     }
 
     <span class="doccomment">/// Gets a list of the guild&#39;s bans.</span>
@@ -1941,7 +1955,7 @@
     <span class="doccomment">/// [Ban Members]: Permissions::BAN_MEMBERS</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">bans</span>(<span class="self">self</span>, <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Ban</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="ident">http</span>.<span class="ident">as_ref</span>().<span class="ident">get_bans</span>(<span class="self">self</span>.<span class="number">0</span>).<span class="kw">await</span>
+        <span class="ident">http</span>.<span class="ident">as_ref</span>().<span class="ident">get_bans</span>(<span class="self">self</span>.<span class="ident">get</span>()).<span class="kw">await</span>
     }
 
     <span class="doccomment">/// Gets a list of the guild&#39;s audit log entries</span>
@@ -1964,7 +1978,13 @@
         <span class="ident">limit</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>,
     ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">AuditLogs</span><span class="op">&gt;</span> {
         <span class="ident">http</span>.<span class="ident">as_ref</span>()
-            .<span class="ident">get_audit_logs</span>(<span class="self">self</span>.<span class="number">0</span>, <span class="ident">action_type</span>, <span class="ident">user_id</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">u</span><span class="op">|</span> <span class="ident">u</span>.<span class="number">0</span>), <span class="ident">before</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">a</span><span class="op">|</span> <span class="ident">a</span>.<span class="number">0</span>), <span class="ident">limit</span>)
+            .<span class="ident">get_audit_logs</span>(
+                <span class="self">self</span>.<span class="ident">get</span>(),
+                <span class="ident">action_type</span>,
+                <span class="ident">user_id</span>.<span class="ident">map</span>(<span class="ident">UserId::get</span>),
+                <span class="ident">before</span>.<span class="ident">map</span>(<span class="ident">AuditLogEntryId::get</span>),
+                <span class="ident">limit</span>,
+            )
             .<span class="kw">await</span>
     }
 
@@ -1978,7 +1998,7 @@
         <span class="self">self</span>,
         <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>,
     ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">ChannelId</span>, <span class="ident">GuildChannel</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">channels</span> <span class="op">=</span> <span class="ident">http</span>.<span class="ident">as_ref</span>().<span class="ident">get_channels</span>(<span class="self">self</span>.<span class="number">0</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+        <span class="kw">let</span> <span class="ident">channels</span> <span class="op">=</span> <span class="ident">http</span>.<span class="ident">as_ref</span>().<span class="ident">get_channels</span>(<span class="self">self</span>.<span class="ident">get</span>()).<span class="kw">await</span><span class="question-mark">?</span>;
 
         <span class="prelude-val">Ok</span>(<span class="ident">channels</span>.<span class="ident">into_iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> (<span class="ident">c</span>.<span class="ident">id</span>, <span class="ident">c</span>)).<span class="ident">collect</span>())
     }
@@ -2001,7 +2021,7 @@
     <span class="doccomment">/// # use serenity::http::Http;</span>
     <span class="doccomment">/// # let http = Http::new(&quot;token&quot;);</span>
     <span class="doccomment">/// let _channel =</span>
-    <span class="doccomment">///     GuildId(7).create_channel(&amp;http, |c| c.name(&quot;test&quot;).kind(ChannelType::Voice)).await;</span>
+    <span class="doccomment">///     GuildId::new(7).create_channel(&amp;http, |c| c.name(&quot;test&quot;).kind(ChannelType::Voice)).await;</span>
     <span class="doccomment">/// # }</span>
     <span class="doccomment">/// ```</span>
     <span class="doccomment">///</span>
@@ -2020,7 +2040,7 @@
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">builder</span> <span class="op">=</span> <span class="ident">CreateChannel::default</span>();
         <span class="ident">f</span>(<span class="kw-2">&amp;mut</span> <span class="ident">builder</span>);
 
-        <span class="ident">http</span>.<span class="ident">as_ref</span>().<span class="ident">create_channel</span>(<span class="self">self</span>.<span class="number">0</span>, <span class="kw-2">&amp;</span><span class="ident">builder</span>, <span class="prelude-val">None</span>).<span class="kw">await</span>
+        <span class="ident">http</span>.<span class="ident">as_ref</span>().<span class="ident">create_channel</span>(<span class="self">self</span>.<span class="ident">get</span>(), <span class="kw-2">&amp;</span><span class="ident">builder</span>, <span class="prelude-val">None</span>).<span class="kw">await</span>
     }
 
     <span class="doccomment">/// Creates an emoji in the guild with a name and base64-encoded image.</span>
@@ -2055,7 +2075,7 @@
             <span class="string">&quot;image&quot;</span>: <span class="ident">image</span>,
         });
 
-        <span class="ident">http</span>.<span class="ident">as_ref</span>().<span class="ident">create_emoji</span>(<span class="self">self</span>.<span class="number">0</span>, <span class="kw-2">&amp;</span><span class="ident">map</span>, <span class="prelude-val">None</span>).<span class="kw">await</span>
+        <span class="ident">http</span>.<span class="ident">as_ref</span>().<span class="ident">create_emoji</span>(<span class="self">self</span>.<span class="ident">get</span>(), <span class="kw-2">&amp;</span><span class="ident">map</span>, <span class="prelude-val">None</span>).<span class="kw">await</span>
     }
 
     <span class="doccomment">/// Creates an integration for the guild.</span>
@@ -2080,7 +2100,7 @@
             <span class="string">&quot;type&quot;</span>: <span class="ident">kind</span>,
         });
 
-        <span class="ident">http</span>.<span class="ident">as_ref</span>().<span class="ident">create_guild_integration</span>(<span class="self">self</span>.<span class="number">0</span>, <span class="ident">integration_id</span>.<span class="number">0</span>, <span class="kw-2">&amp;</span><span class="ident">map</span>, <span class="prelude-val">None</span>).<span class="kw">await</span>
+        <span class="ident">http</span>.<span class="ident">as_ref</span>().<span class="ident">create_guild_integration</span>(<span class="self">self</span>.<span class="ident">get</span>(), <span class="ident">integration_id</span>.<span class="ident">get</span>(), <span class="kw-2">&amp;</span><span class="ident">map</span>, <span class="prelude-val">None</span>).<span class="kw">await</span>
     }
 
     <span class="doccomment">/// Creates a new role in the guild with the data set, if any.</span>
@@ -2103,7 +2123,7 @@
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">edit_role</span> <span class="op">=</span> <span class="ident">EditRole::default</span>();
         <span class="ident">f</span>(<span class="kw-2">&amp;mut</span> <span class="ident">edit_role</span>);
 
-        <span class="kw">let</span> <span class="ident">role</span> <span class="op">=</span> <span class="ident">http</span>.<span class="ident">as_ref</span>().<span class="ident">create_role</span>(<span class="self">self</span>.<span class="number">0</span>, <span class="kw-2">&amp;</span><span class="ident">edit_role</span>, <span class="prelude-val">None</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+        <span class="kw">let</span> <span class="ident">role</span> <span class="op">=</span> <span class="ident">http</span>.<span class="ident">as_ref</span>().<span class="ident">create_role</span>(<span class="self">self</span>.<span class="ident">get</span>(), <span class="kw-2">&amp;</span><span class="ident">edit_role</span>, <span class="prelude-val">None</span>).<span class="kw">await</span><span class="question-mark">?</span>;
 
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">position</span>) <span class="op">=</span> <span class="ident">edit_role</span>.<span class="ident">position</span> {
             <span class="self">self</span>.<span class="ident">edit_role_position</span>(<span class="kw-2">&amp;</span><span class="ident">http</span>, <span class="ident">role</span>.<span class="ident">id</span>, <span class="ident">position</span> <span class="kw">as</span> <span class="ident">u64</span>).<span class="kw">await</span><span class="question-mark">?</span>;
@@ -2132,7 +2152,7 @@
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">builder</span> <span class="op">=</span> <span class="ident">CreateScheduledEvent::default</span>();
         <span class="ident">f</span>(<span class="kw-2">&amp;mut</span> <span class="ident">builder</span>);
 
-        <span class="ident">http</span>.<span class="ident">as_ref</span>().<span class="ident">create_scheduled_event</span>(<span class="self">self</span>.<span class="number">0</span>, <span class="kw-2">&amp;</span><span class="ident">builder</span>, <span class="prelude-val">None</span>).<span class="kw">await</span>
+        <span class="ident">http</span>.<span class="ident">as_ref</span>().<span class="ident">create_scheduled_event</span>(<span class="self">self</span>.<span class="ident">get</span>(), <span class="kw-2">&amp;</span><span class="ident">builder</span>, <span class="prelude-val">None</span>).<span class="kw">await</span>
     }
 
     <span class="doccomment">/// Creates a new sticker in the guild with the data set, if any.</span>
@@ -2156,7 +2176,7 @@
         <span class="kw">let</span> (<span class="ident">map</span>, <span class="ident">file</span>) <span class="op">=</span>
             <span class="ident">create_sticker</span>.<span class="ident">build</span>().<span class="ident">ok_or</span>(<span class="ident">Error::Model</span>(<span class="ident">ModelError::NoStickerFileSet</span>))<span class="question-mark">?</span>;
 
-        <span class="ident">http</span>.<span class="ident">as_ref</span>().<span class="ident">create_sticker</span>(<span class="self">self</span>.<span class="number">0</span>, <span class="ident">map</span>, <span class="ident">file</span>, <span class="prelude-val">None</span>).<span class="kw">await</span>
+        <span class="ident">http</span>.<span class="ident">as_ref</span>().<span class="ident">create_sticker</span>(<span class="self">self</span>.<span class="ident">get</span>(), <span class="ident">map</span>, <span class="ident">file</span>, <span class="prelude-val">None</span>).<span class="kw">await</span>
     }
 
     <span class="doccomment">/// Deletes the current guild if the current account is the owner of the</span>
@@ -2171,7 +2191,7 @@
     <span class="doccomment">/// Returns [`Error::Http`] if the current user is not the owner of the guild.</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">delete</span>(<span class="self">self</span>, <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">PartialGuild</span><span class="op">&gt;</span> {
-        <span class="ident">http</span>.<span class="ident">as_ref</span>().<span class="ident">delete_guild</span>(<span class="self">self</span>.<span class="number">0</span>).<span class="kw">await</span>
+        <span class="ident">http</span>.<span class="ident">as_ref</span>().<span class="ident">delete_guild</span>(<span class="self">self</span>.<span class="ident">get</span>()).<span class="kw">await</span>
     }
 
     <span class="doccomment">/// Deletes an [`Emoji`] from the guild.</span>
@@ -2190,7 +2210,7 @@
         <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>,
         <span class="ident">emoji_id</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">EmojiId</span><span class="op">&gt;</span>,
     ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="ident">http</span>.<span class="ident">as_ref</span>().<span class="ident">delete_emoji</span>(<span class="self">self</span>.<span class="number">0</span>, <span class="ident">emoji_id</span>.<span class="ident">into</span>().<span class="number">0</span>).<span class="kw">await</span>
+        <span class="ident">http</span>.<span class="ident">as_ref</span>().<span class="ident">delete_emoji</span>(<span class="self">self</span>.<span class="ident">get</span>(), <span class="ident">emoji_id</span>.<span class="ident">into</span>().<span class="ident">get</span>()).<span class="kw">await</span>
     }
 
     <span class="doccomment">/// Deletes an integration by Id from the guild.</span>
@@ -2209,7 +2229,7 @@
         <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>,
         <span class="ident">integration_id</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">IntegrationId</span><span class="op">&gt;</span>,
     ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="ident">http</span>.<span class="ident">as_ref</span>().<span class="ident">delete_guild_integration</span>(<span class="self">self</span>.<span class="number">0</span>, <span class="ident">integration_id</span>.<span class="ident">into</span>().<span class="number">0</span>).<span class="kw">await</span>
+        <span class="ident">http</span>.<span class="ident">as_ref</span>().<span class="ident">delete_guild_integration</span>(<span class="self">self</span>.<span class="ident">get</span>(), <span class="ident">integration_id</span>.<span class="ident">into</span>().<span class="ident">get</span>()).<span class="kw">await</span>
     }
 
     <span class="doccomment">/// Deletes a [`Role`] by Id from the guild.</span>
@@ -2231,7 +2251,7 @@
         <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>,
         <span class="ident">role_id</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">RoleId</span><span class="op">&gt;</span>,
     ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="ident">http</span>.<span class="ident">as_ref</span>().<span class="ident">delete_role</span>(<span class="self">self</span>.<span class="number">0</span>, <span class="ident">role_id</span>.<span class="ident">into</span>().<span class="number">0</span>).<span class="kw">await</span>
+        <span class="ident">http</span>.<span class="ident">as_ref</span>().<span class="ident">delete_role</span>(<span class="self">self</span>.<span class="ident">get</span>(), <span class="ident">role_id</span>.<span class="ident">into</span>().<span class="ident">get</span>()).<span class="kw">await</span>
     }
 
     <span class="doccomment">/// Deletes a specified scheduled event in the guild.</span>
@@ -2249,7 +2269,7 @@
         <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>,
         <span class="ident">event_id</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">ScheduledEventId</span><span class="op">&gt;</span>,
     ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="ident">http</span>.<span class="ident">as_ref</span>().<span class="ident">delete_scheduled_event</span>(<span class="self">self</span>.<span class="number">0</span>, <span class="ident">event_id</span>.<span class="ident">into</span>().<span class="number">0</span>).<span class="kw">await</span>
+        <span class="ident">http</span>.<span class="ident">as_ref</span>().<span class="ident">delete_scheduled_event</span>(<span class="self">self</span>.<span class="ident">get</span>(), <span class="ident">event_id</span>.<span class="ident">into</span>().<span class="ident">get</span>()).<span class="kw">await</span>
     }
 
     <span class="doccomment">/// Deletes a [`Sticker`] by Id from the guild.</span>
@@ -2268,7 +2288,7 @@
         <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>,
         <span class="ident">sticker_id</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">StickerId</span><span class="op">&gt;</span>,
     ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="ident">http</span>.<span class="ident">as_ref</span>().<span class="ident">delete_sticker</span>(<span class="self">self</span>.<span class="number">0</span>, <span class="ident">sticker_id</span>.<span class="ident">into</span>().<span class="number">0</span>, <span class="prelude-val">None</span>).<span class="kw">await</span>
+        <span class="ident">http</span>.<span class="ident">as_ref</span>().<span class="ident">delete_sticker</span>(<span class="self">self</span>.<span class="ident">get</span>(), <span class="ident">sticker_id</span>.<span class="ident">into</span>().<span class="ident">get</span>(), <span class="prelude-val">None</span>).<span class="kw">await</span>
     }
 
     <span class="doccomment">/// Edits the current guild with new data where specified.</span>
@@ -2292,7 +2312,7 @@
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">edit_guild</span> <span class="op">=</span> <span class="ident">EditGuild::default</span>();
         <span class="ident">f</span>(<span class="kw-2">&amp;mut</span> <span class="ident">edit_guild</span>);
 
-        <span class="ident">http</span>.<span class="ident">as_ref</span>().<span class="ident">edit_guild</span>(<span class="self">self</span>.<span class="number">0</span>, <span class="kw-2">&amp;</span><span class="ident">edit_guild</span>, <span class="prelude-val">None</span>).<span class="kw">await</span>
+        <span class="ident">http</span>.<span class="ident">as_ref</span>().<span class="ident">edit_guild</span>(<span class="self">self</span>.<span class="ident">get</span>(), <span class="kw-2">&amp;</span><span class="ident">edit_guild</span>, <span class="prelude-val">None</span>).<span class="kw">await</span>
     }
 
     <span class="doccomment">/// Edits an [`Emoji`]&#39;s name in the guild.</span>
@@ -2319,7 +2339,7 @@
             <span class="string">&quot;name&quot;</span>: <span class="ident">name</span>,
         });
 
-        <span class="ident">http</span>.<span class="ident">as_ref</span>().<span class="ident">edit_emoji</span>(<span class="self">self</span>.<span class="number">0</span>, <span class="ident">emoji_id</span>.<span class="ident">into</span>().<span class="number">0</span>, <span class="kw-2">&amp;</span><span class="ident">map</span>, <span class="prelude-val">None</span>).<span class="kw">await</span>
+        <span class="ident">http</span>.<span class="ident">as_ref</span>().<span class="ident">edit_emoji</span>(<span class="self">self</span>.<span class="ident">get</span>(), <span class="ident">emoji_id</span>.<span class="ident">into</span>().<span class="ident">get</span>(), <span class="kw-2">&amp;</span><span class="ident">map</span>, <span class="prelude-val">None</span>).<span class="kw">await</span>
     }
 
     <span class="doccomment">/// Edits the properties of member of the guild, such as muting or</span>
@@ -2354,7 +2374,7 @@
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">edit_member</span> <span class="op">=</span> <span class="ident">EditMember::default</span>();
         <span class="ident">f</span>(<span class="kw-2">&amp;mut</span> <span class="ident">edit_member</span>);
 
-        <span class="ident">http</span>.<span class="ident">as_ref</span>().<span class="ident">edit_member</span>(<span class="self">self</span>.<span class="number">0</span>, <span class="ident">user_id</span>.<span class="ident">into</span>().<span class="number">0</span>, <span class="kw-2">&amp;</span><span class="ident">edit_member</span>, <span class="prelude-val">None</span>).<span class="kw">await</span>
+        <span class="ident">http</span>.<span class="ident">as_ref</span>().<span class="ident">edit_member</span>(<span class="self">self</span>.<span class="ident">get</span>(), <span class="ident">user_id</span>.<span class="ident">into</span>().<span class="ident">get</span>(), <span class="kw-2">&amp;</span><span class="ident">edit_member</span>, <span class="prelude-val">None</span>).<span class="kw">await</span>
     }
 
     <span class="doccomment">/// Edits the current user&#39;s nickname for the guild.</span>
@@ -2375,7 +2395,7 @@
         <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>,
         <span class="ident">new_nickname</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span>,
     ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="ident">http</span>.<span class="ident">as_ref</span>().<span class="ident">edit_nickname</span>(<span class="self">self</span>.<span class="number">0</span>, <span class="ident">new_nickname</span>).<span class="kw">await</span>
+        <span class="ident">http</span>.<span class="ident">as_ref</span>().<span class="ident">edit_nickname</span>(<span class="self">self</span>.<span class="ident">get</span>(), <span class="ident">new_nickname</span>).<span class="kw">await</span>
     }
 
     <span class="doccomment">/// Edits a [`Role`], optionally setting its new fields.</span>
@@ -2389,7 +2409,7 @@
     <span class="doccomment">/// ```rust,ignore</span>
     <span class="doccomment">/// use serenity::model::{GuildId, RoleId};</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// GuildId(7).edit_role(&amp;context, RoleId(8), |r| r.hoist(true));</span>
+    <span class="doccomment">/// GuildId::new(7).edit_role(&amp;context, RoleId::new(8), |r| r.hoist(true));</span>
     <span class="doccomment">/// ```</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// # Errors</span>
@@ -2411,7 +2431,7 @@
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">edit_role</span> <span class="op">=</span> <span class="ident">EditRole::default</span>();
         <span class="ident">f</span>(<span class="kw-2">&amp;mut</span> <span class="ident">edit_role</span>);
 
-        <span class="ident">http</span>.<span class="ident">as_ref</span>().<span class="ident">edit_role</span>(<span class="self">self</span>.<span class="number">0</span>, <span class="ident">role_id</span>.<span class="ident">into</span>().<span class="number">0</span>, <span class="kw-2">&amp;</span><span class="ident">edit_role</span>, <span class="prelude-val">None</span>).<span class="kw">await</span>
+        <span class="ident">http</span>.<span class="ident">as_ref</span>().<span class="ident">edit_role</span>(<span class="self">self</span>.<span class="ident">get</span>(), <span class="ident">role_id</span>.<span class="ident">into</span>().<span class="ident">get</span>(), <span class="kw-2">&amp;</span><span class="ident">edit_role</span>, <span class="prelude-val">None</span>).<span class="kw">await</span>
     }
 
     <span class="doccomment">/// Modifies a scheduled event in the guild with the data set, if any.</span>
@@ -2436,7 +2456,7 @@
         <span class="ident">f</span>(<span class="kw-2">&amp;mut</span> <span class="ident">edit_scheduled_event</span>);
 
         <span class="ident">http</span>.<span class="ident">as_ref</span>()
-            .<span class="ident">edit_scheduled_event</span>(<span class="self">self</span>.<span class="number">0</span>, <span class="ident">event_id</span>.<span class="ident">into</span>().<span class="number">0</span>, <span class="kw-2">&amp;</span><span class="ident">edit_scheduled_event</span>, <span class="prelude-val">None</span>)
+            .<span class="ident">edit_scheduled_event</span>(<span class="self">self</span>.<span class="ident">get</span>(), <span class="ident">event_id</span>.<span class="ident">into</span>().<span class="ident">get</span>(), <span class="kw-2">&amp;</span><span class="ident">edit_scheduled_event</span>, <span class="prelude-val">None</span>)
             .<span class="kw">await</span>
     }
 
@@ -2471,7 +2491,7 @@
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">edit_sticker</span> <span class="op">=</span> <span class="ident">EditSticker::default</span>();
         <span class="ident">f</span>(<span class="kw-2">&amp;mut</span> <span class="ident">edit_sticker</span>);
 
-        <span class="ident">http</span>.<span class="ident">as_ref</span>().<span class="ident">edit_sticker</span>(<span class="self">self</span>.<span class="number">0</span>, <span class="ident">sticker_id</span>.<span class="ident">into</span>().<span class="number">0</span>, <span class="kw-2">&amp;</span><span class="ident">edit_sticker</span>, <span class="prelude-val">None</span>).<span class="kw">await</span>
+        <span class="ident">http</span>.<span class="ident">as_ref</span>().<span class="ident">edit_sticker</span>(<span class="self">self</span>.<span class="ident">get</span>(), <span class="ident">sticker_id</span>.<span class="ident">into</span>().<span class="ident">get</span>(), <span class="kw-2">&amp;</span><span class="ident">edit_sticker</span>, <span class="prelude-val">None</span>).<span class="kw">await</span>
     }
 
     <span class="doccomment">/// Edits the order of [`Role`]s</span>
@@ -2483,7 +2503,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// ```rust,ignore</span>
     <span class="doccomment">/// use serenity::model::{GuildId, RoleId};</span>
-    <span class="doccomment">/// GuildId(7).edit_role_position(&amp;context, RoleId(8), 2);</span>
+    <span class="doccomment">/// GuildId::new(7).edit_role_position(&amp;context, RoleId::new(8), 2);</span>
     <span class="doccomment">/// ```</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// # Errors</span>
@@ -2499,7 +2519,7 @@
         <span class="ident">role_id</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">RoleId</span><span class="op">&gt;</span>,
         <span class="ident">position</span>: <span class="ident">u64</span>,
     ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Role</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="ident">http</span>.<span class="ident">as_ref</span>().<span class="ident">edit_role_position</span>(<span class="self">self</span>.<span class="number">0</span>, <span class="ident">role_id</span>.<span class="ident">into</span>().<span class="number">0</span>, <span class="ident">position</span>, <span class="prelude-val">None</span>).<span class="kw">await</span>
+        <span class="ident">http</span>.<span class="ident">as_ref</span>().<span class="ident">edit_role_position</span>(<span class="self">self</span>.<span class="ident">get</span>(), <span class="ident">role_id</span>.<span class="ident">into</span>().<span class="ident">get</span>(), <span class="ident">position</span>, <span class="prelude-val">None</span>).<span class="kw">await</span>
     }
 
     <span class="doccomment">/// Edits the [`GuildWelcomeScreen`].</span>
@@ -2520,7 +2540,7 @@
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">map</span> <span class="op">=</span> <span class="ident">EditGuildWelcomeScreen::default</span>();
         <span class="ident">f</span>(<span class="kw-2">&amp;mut</span> <span class="ident">map</span>);
 
-        <span class="ident">http</span>.<span class="ident">as_ref</span>().<span class="ident">edit_guild_welcome_screen</span>(<span class="self">self</span>.<span class="number">0</span>, <span class="kw-2">&amp;</span><span class="ident">map</span>).<span class="kw">await</span>
+        <span class="ident">http</span>.<span class="ident">as_ref</span>().<span class="ident">edit_guild_welcome_screen</span>(<span class="self">self</span>.<span class="ident">get</span>(), <span class="kw-2">&amp;</span><span class="ident">map</span>).<span class="kw">await</span>
     }
 
     <span class="doccomment">/// Edits the [`GuildWidget`].</span>
@@ -2538,7 +2558,7 @@
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">map</span> <span class="op">=</span> <span class="ident">EditGuildWidget::default</span>();
         <span class="ident">f</span>(<span class="kw-2">&amp;mut</span> <span class="ident">map</span>);
 
-        <span class="ident">http</span>.<span class="ident">as_ref</span>().<span class="ident">edit_guild_widget</span>(<span class="self">self</span>.<span class="number">0</span>, <span class="kw-2">&amp;</span><span class="ident">map</span>).<span class="kw">await</span>
+        <span class="ident">http</span>.<span class="ident">as_ref</span>().<span class="ident">edit_guild_widget</span>(<span class="self">self</span>.<span class="ident">get</span>(), <span class="kw-2">&amp;</span><span class="ident">map</span>).<span class="kw">await</span>
     }
 
     <span class="doccomment">/// Gets all of the guild&#39;s roles over the REST API.</span>
@@ -2548,7 +2568,7 @@
     <span class="doccomment">/// Returns [`Error::Http`] if the current user is not in</span>
     <span class="doccomment">/// the guild.</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">roles</span>(<span class="self">self</span>, <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">RoleId</span>, <span class="ident">Role</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">roles</span> <span class="op">=</span> <span class="ident">http</span>.<span class="ident">as_ref</span>().<span class="ident">get_guild_roles</span>(<span class="self">self</span>.<span class="number">0</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+        <span class="kw">let</span> <span class="ident">roles</span> <span class="op">=</span> <span class="ident">http</span>.<span class="ident">as_ref</span>().<span class="ident">get_guild_roles</span>(<span class="self">self</span>.<span class="ident">get</span>()).<span class="kw">await</span><span class="question-mark">?</span>;
 
         <span class="prelude-val">Ok</span>(<span class="ident">roles</span>.<span class="ident">into_iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">r</span><span class="op">|</span> (<span class="ident">r</span>.<span class="ident">id</span>, <span class="ident">r</span>)).<span class="ident">collect</span>())
     }
@@ -2572,7 +2592,7 @@
     <span class="doccomment">/// [`Error::Http`]: crate::error::Error::Http</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">to_partial_guild</span>(<span class="self">self</span>, <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">PartialGuild</span><span class="op">&gt;</span> {
-        <span class="ident">http</span>.<span class="ident">as_ref</span>().<span class="ident">get_guild</span>(<span class="self">self</span>.<span class="number">0</span>).<span class="kw">await</span>
+        <span class="ident">http</span>.<span class="ident">as_ref</span>().<span class="ident">get_guild</span>(<span class="self">self</span>.<span class="ident">get</span>()).<span class="kw">await</span>
     }
 
     <span class="doccomment">/// Requests [`PartialGuild`] over REST API with counts.</span>
@@ -2590,7 +2610,7 @@
         <span class="self">self</span>,
         <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>,
     ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">PartialGuild</span><span class="op">&gt;</span> {
-        <span class="ident">http</span>.<span class="ident">as_ref</span>().<span class="ident">get_guild_with_counts</span>(<span class="self">self</span>.<span class="number">0</span>).<span class="kw">await</span>
+        <span class="ident">http</span>.<span class="ident">as_ref</span>().<span class="ident">get_guild_with_counts</span>(<span class="self">self</span>.<span class="ident">get</span>()).<span class="kw">await</span>
     }
 
     <span class="doccomment">/// Gets all [`Emoji`]s of this guild via HTTP.</span>
@@ -2602,7 +2622,7 @@
     <span class="doccomment">/// [`Error::Http`]: crate::error::Error::Http</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">emojis</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Emoji</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="ident">http</span>.<span class="ident">as_ref</span>().<span class="ident">get_emojis</span>(<span class="self">self</span>.<span class="number">0</span>).<span class="kw">await</span>
+        <span class="ident">http</span>.<span class="ident">as_ref</span>().<span class="ident">get_emojis</span>(<span class="self">self</span>.<span class="ident">get</span>()).<span class="kw">await</span>
     }
 
     <span class="doccomment">/// Gets an [`Emoji`] of this guild by its ID via HTTP.</span>
@@ -2614,7 +2634,7 @@
     <span class="doccomment">/// [`Error::Http`]: crate::error::Error::Http</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">emoji</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>, <span class="ident">emoji_id</span>: <span class="ident">EmojiId</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Emoji</span><span class="op">&gt;</span> {
-        <span class="ident">http</span>.<span class="ident">as_ref</span>().<span class="ident">get_emoji</span>(<span class="self">self</span>.<span class="number">0</span>, <span class="ident">emoji_id</span>.<span class="number">0</span>).<span class="kw">await</span>
+        <span class="ident">http</span>.<span class="ident">as_ref</span>().<span class="ident">get_emoji</span>(<span class="self">self</span>.<span class="ident">get</span>(), <span class="ident">emoji_id</span>.<span class="ident">get</span>()).<span class="kw">await</span>
     }
 
     <span class="doccomment">/// Gets all [`Sticker`]s of this guild via HTTP.</span>
@@ -2626,7 +2646,7 @@
     <span class="doccomment">/// [`Error::Http`]: crate::error::Error::Http</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">stickers</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Sticker</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="ident">http</span>.<span class="ident">as_ref</span>().<span class="ident">get_guild_stickers</span>(<span class="self">self</span>.<span class="number">0</span>).<span class="kw">await</span>
+        <span class="ident">http</span>.<span class="ident">as_ref</span>().<span class="ident">get_guild_stickers</span>(<span class="self">self</span>.<span class="ident">get</span>()).<span class="kw">await</span>
     }
 
     <span class="doccomment">/// Gets an [`Sticker`] of this guild by its ID via HTTP.</span>
@@ -2638,7 +2658,7 @@
     <span class="doccomment">/// [`Error::Http`]: crate::error::Error::Http</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">sticker</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>, <span class="ident">sticker_id</span>: <span class="ident">StickerId</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Sticker</span><span class="op">&gt;</span> {
-        <span class="ident">http</span>.<span class="ident">as_ref</span>().<span class="ident">get_guild_sticker</span>(<span class="self">self</span>.<span class="number">0</span>, <span class="ident">sticker_id</span>.<span class="number">0</span>).<span class="kw">await</span>
+        <span class="ident">http</span>.<span class="ident">as_ref</span>().<span class="ident">get_guild_sticker</span>(<span class="self">self</span>.<span class="ident">get</span>(), <span class="ident">sticker_id</span>.<span class="ident">get</span>()).<span class="kw">await</span>
     }
 
     <span class="doccomment">/// Gets all integration of the guild.</span>
@@ -2656,7 +2676,7 @@
     <span class="doccomment">/// [`Error::Json`]: crate::error::Error::Json</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">integrations</span>(<span class="self">self</span>, <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Integration</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="ident">http</span>.<span class="ident">as_ref</span>().<span class="ident">get_guild_integrations</span>(<span class="self">self</span>.<span class="number">0</span>).<span class="kw">await</span>
+        <span class="ident">http</span>.<span class="ident">as_ref</span>().<span class="ident">get_guild_integrations</span>(<span class="self">self</span>.<span class="ident">get</span>()).<span class="kw">await</span>
     }
 
     <span class="doccomment">/// Gets all of the guild&#39;s invites.</span>
@@ -2674,7 +2694,7 @@
     <span class="doccomment">/// [`Error::Json`]: crate::error::Error::Json</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">invites</span>(<span class="self">self</span>, <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">RichInvite</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="ident">http</span>.<span class="ident">as_ref</span>().<span class="ident">get_guild_invites</span>(<span class="self">self</span>.<span class="number">0</span>).<span class="kw">await</span>
+        <span class="ident">http</span>.<span class="ident">as_ref</span>().<span class="ident">get_guild_invites</span>(<span class="self">self</span>.<span class="ident">get</span>()).<span class="kw">await</span>
     }
 
     <span class="doccomment">/// Kicks a [`Member`] from the guild.</span>
@@ -2690,7 +2710,7 @@
     <span class="doccomment">/// [Kick Members]: Permissions::KICK_MEMBERS</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">kick</span>(<span class="self">self</span>, <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>, <span class="ident">user_id</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">UserId</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="ident">http</span>.<span class="ident">as_ref</span>().<span class="ident">kick_member</span>(<span class="self">self</span>.<span class="number">0</span>, <span class="ident">user_id</span>.<span class="ident">into</span>().<span class="number">0</span>).<span class="kw">await</span>
+        <span class="ident">http</span>.<span class="ident">as_ref</span>().<span class="ident">kick_member</span>(<span class="self">self</span>.<span class="ident">get</span>(), <span class="ident">user_id</span>.<span class="ident">into</span>().<span class="ident">get</span>()).<span class="kw">await</span>
     }
 
     <span class="doccomment">/// # Errors</span>
@@ -2704,7 +2724,7 @@
         <span class="ident">user_id</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">UserId</span><span class="op">&gt;</span>,
         <span class="ident">reason</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
     ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="ident">http</span>.<span class="ident">as_ref</span>().<span class="ident">kick_member_with_reason</span>(<span class="self">self</span>.<span class="number">0</span>, <span class="ident">user_id</span>.<span class="ident">into</span>().<span class="number">0</span>, <span class="ident">reason</span>).<span class="kw">await</span>
+        <span class="ident">http</span>.<span class="ident">as_ref</span>().<span class="ident">kick_member_with_reason</span>(<span class="self">self</span>.<span class="ident">get</span>(), <span class="ident">user_id</span>.<span class="ident">into</span>().<span class="ident">get</span>(), <span class="ident">reason</span>).<span class="kw">await</span>
     }
 
     <span class="doccomment">/// Leaves the guild.</span>
@@ -2717,7 +2737,7 @@
     <span class="doccomment">/// [`Error::Http`]: crate::error::Error::Http</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">leave</span>(<span class="self">self</span>, <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="ident">http</span>.<span class="ident">as_ref</span>().<span class="ident">leave_guild</span>(<span class="self">self</span>.<span class="number">0</span>).<span class="kw">await</span>
+        <span class="ident">http</span>.<span class="ident">as_ref</span>().<span class="ident">leave_guild</span>(<span class="self">self</span>.<span class="ident">get</span>()).<span class="kw">await</span>
     }
 
     <span class="doccomment">/// Gets a user&#39;s [`Member`] for the guild by Id.</span>
@@ -2742,13 +2762,13 @@
         <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
         {
             <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">cache</span>) <span class="op">=</span> <span class="ident">cache_http</span>.<span class="ident">cache</span>() {
-                <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">member</span>) <span class="op">=</span> <span class="ident">cache</span>.<span class="ident">member</span>(<span class="self">self</span>.<span class="number">0</span>, <span class="ident">user_id</span>) {
+                <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">member</span>) <span class="op">=</span> <span class="ident">cache</span>.<span class="ident">member</span>(<span class="self">self</span>, <span class="ident">user_id</span>) {
                     <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">member</span>);
                 }
             }
         }
 
-        <span class="ident">cache_http</span>.<span class="ident">http</span>().<span class="ident">get_member</span>(<span class="self">self</span>.<span class="number">0</span>, <span class="ident">user_id</span>.<span class="number">0</span>).<span class="kw">await</span>
+        <span class="ident">cache_http</span>.<span class="ident">http</span>().<span class="ident">get_member</span>(<span class="self">self</span>.<span class="ident">get</span>(), <span class="ident">user_id</span>.<span class="ident">get</span>()).<span class="kw">await</span>
     }
 
     <span class="doccomment">/// Gets a list of the guild&#39;s members.</span>
@@ -2773,7 +2793,7 @@
         <span class="ident">limit</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span>,
         <span class="ident">after</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">UserId</span><span class="op">&gt;</span><span class="op">&gt;</span>,
     ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Member</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="ident">http</span>.<span class="ident">as_ref</span>().<span class="ident">get_guild_members</span>(<span class="self">self</span>.<span class="number">0</span>, <span class="ident">limit</span>, <span class="ident">after</span>.<span class="ident">into</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">x</span><span class="op">|</span> <span class="ident">x</span>.<span class="number">0</span>)).<span class="kw">await</span>
+        <span class="ident">http</span>.<span class="ident">as_ref</span>().<span class="ident">get_guild_members</span>(<span class="self">self</span>.<span class="ident">get</span>(), <span class="ident">limit</span>, <span class="ident">after</span>.<span class="ident">into</span>().<span class="ident">map</span>(<span class="ident">UserId::get</span>)).<span class="kw">await</span>
     }
 
     <span class="doccomment">/// Streams over all the members in a guild.</span>
@@ -2788,7 +2808,7 @@
     <span class="doccomment">/// # use serenity::http::Http;</span>
     <span class="doccomment">/// #</span>
     <span class="doccomment">/// # async fn run() {</span>
-    <span class="doccomment">/// # let guild_id = GuildId::default();</span>
+    <span class="doccomment">/// # let guild_id = GuildId::new(1);</span>
     <span class="doccomment">/// # let ctx = Http::new(&quot;token&quot;);</span>
     <span class="doccomment">/// use serenity::futures::StreamExt;</span>
     <span class="doccomment">/// use serenity::model::guild::MembersIter;</span>
@@ -2866,7 +2886,7 @@
     <span class="doccomment">/// [Kick Members]: Permissions::KICK_MEMBERS</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">prune_count</span>(<span class="self">self</span>, <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>, <span class="ident">days</span>: <span class="ident">u8</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">GuildPrune</span><span class="op">&gt;</span> {
-        <span class="ident">http</span>.<span class="ident">as_ref</span>().<span class="ident">get_guild_prune_count</span>(<span class="self">self</span>.<span class="number">0</span>, <span class="ident">days</span>).<span class="kw">await</span>
+        <span class="ident">http</span>.<span class="ident">as_ref</span>().<span class="ident">get_guild_prune_count</span>(<span class="self">self</span>.<span class="ident">get</span>(), <span class="ident">days</span>).<span class="kw">await</span>
     }
 
     <span class="doccomment">/// Re-orders the channels of the guild.</span>
@@ -2900,7 +2920,7 @@
             })
             .<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>();
 
-        <span class="ident">http</span>.<span class="ident">as_ref</span>().<span class="ident">edit_guild_channel_positions</span>(<span class="self">self</span>.<span class="number">0</span>, <span class="kw-2">&amp;</span><span class="ident">Value::from</span>(<span class="ident">items</span>)).<span class="kw">await</span>
+        <span class="ident">http</span>.<span class="ident">as_ref</span>().<span class="ident">edit_guild_channel_positions</span>(<span class="self">self</span>.<span class="ident">get</span>(), <span class="kw-2">&amp;</span><span class="ident">Value::from</span>(<span class="ident">items</span>)).<span class="kw">await</span>
     }
 
     <span class="doccomment">/// Returns a list of [`Member`]s in a [`Guild`] whose username or nickname</span>
@@ -2921,7 +2941,7 @@
         <span class="ident">query</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
         <span class="ident">limit</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span>,
     ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Member</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="ident">http</span>.<span class="ident">as_ref</span>().<span class="ident">search_guild_members</span>(<span class="self">self</span>.<span class="number">0</span>, <span class="ident">query</span>, <span class="ident">limit</span>).<span class="kw">await</span>
+        <span class="ident">http</span>.<span class="ident">as_ref</span>().<span class="ident">search_guild_members</span>(<span class="self">self</span>.<span class="ident">get</span>(), <span class="ident">query</span>, <span class="ident">limit</span>).<span class="kw">await</span>
     }
 
     <span class="doccomment">/// Fetches a specifified scheduled event in the guild, by Id. If `with_user_count` is set to</span>
@@ -2942,7 +2962,7 @@
         <span class="ident">event_id</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">ScheduledEventId</span><span class="op">&gt;</span>,
         <span class="ident">with_user_count</span>: <span class="ident">bool</span>,
     ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">ScheduledEvent</span><span class="op">&gt;</span> {
-        <span class="ident">http</span>.<span class="ident">as_ref</span>().<span class="ident">get_scheduled_event</span>(<span class="self">self</span>.<span class="number">0</span>, <span class="ident">event_id</span>.<span class="ident">into</span>().<span class="number">0</span>, <span class="ident">with_user_count</span>).<span class="kw">await</span>
+        <span class="ident">http</span>.<span class="ident">as_ref</span>().<span class="ident">get_scheduled_event</span>(<span class="self">self</span>.<span class="ident">get</span>(), <span class="ident">event_id</span>.<span class="ident">into</span>().<span class="ident">get</span>(), <span class="ident">with_user_count</span>).<span class="kw">await</span>
     }
 
     <span class="doccomment">/// Fetches a list of all scheduled events in the guild. If `with_user_count` is set to `true`,</span>
@@ -2960,7 +2980,7 @@
         <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>,
         <span class="ident">with_user_count</span>: <span class="ident">bool</span>,
     ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ScheduledEvent</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="ident">http</span>.<span class="ident">as_ref</span>().<span class="ident">get_scheduled_events</span>(<span class="self">self</span>.<span class="number">0</span>, <span class="ident">with_user_count</span>).<span class="kw">await</span>
+        <span class="ident">http</span>.<span class="ident">as_ref</span>().<span class="ident">get_scheduled_events</span>(<span class="self">self</span>.<span class="ident">get</span>(), <span class="ident">with_user_count</span>).<span class="kw">await</span>
     }
 
     <span class="doccomment">/// Fetches a list of interested users for the specified event.</span>
@@ -2981,7 +3001,9 @@
         <span class="ident">event_id</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">ScheduledEventId</span><span class="op">&gt;</span>,
         <span class="ident">limit</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span>,
     ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ScheduledEventUser</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="ident">http</span>.<span class="ident">as_ref</span>().<span class="ident">get_scheduled_event_users</span>(<span class="self">self</span>.<span class="number">0</span>, <span class="ident">event_id</span>.<span class="ident">into</span>().<span class="number">0</span>, <span class="ident">limit</span>, <span class="prelude-val">None</span>, <span class="prelude-val">None</span>).<span class="kw">await</span>
+        <span class="ident">http</span>.<span class="ident">as_ref</span>()
+            .<span class="ident">get_scheduled_event_users</span>(<span class="self">self</span>.<span class="ident">get</span>(), <span class="ident">event_id</span>.<span class="ident">into</span>().<span class="ident">get</span>(), <span class="ident">limit</span>, <span class="prelude-val">None</span>, <span class="prelude-val">None</span>)
+            .<span class="kw">await</span>
     }
 
     <span class="doccomment">/// Fetches a list of interested users for the specified event, with additional options and</span>
@@ -3004,7 +3026,13 @@
         <span class="ident">with_member</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span>,
     ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ScheduledEventUser</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="ident">http</span>.<span class="ident">as_ref</span>()
-            .<span class="ident">get_scheduled_event_users</span>(<span class="self">self</span>.<span class="number">0</span>, <span class="ident">event_id</span>.<span class="ident">into</span>().<span class="number">0</span>, <span class="ident">limit</span>, <span class="ident">target</span>, <span class="ident">with_member</span>)
+            .<span class="ident">get_scheduled_event_users</span>(
+                <span class="self">self</span>.<span class="ident">get</span>(),
+                <span class="ident">event_id</span>.<span class="ident">into</span>().<span class="ident">get</span>(),
+                <span class="ident">limit</span>,
+                <span class="ident">target</span>,
+                <span class="ident">with_member</span>,
+            )
             .<span class="kw">await</span>
     }
 
@@ -3021,7 +3049,7 @@
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;utils&quot;</span>))]</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">shard_id</span>(<span class="self">self</span>, <span class="ident">cache</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Cache</span><span class="op">&gt;</span>) -&gt; <span class="ident">u64</span> {
-        <span class="ident"><span class="kw">crate</span>::utils::shard_id</span>(<span class="self">self</span>.<span class="number">0</span>, <span class="ident">cache</span>.<span class="ident">as_ref</span>().<span class="ident">shard_count</span>())
+        <span class="ident"><span class="kw">crate</span>::utils::shard_id</span>(<span class="self">self</span>.<span class="ident">get</span>(), <span class="ident">cache</span>.<span class="ident">as_ref</span>().<span class="ident">shard_count</span>())
     }
 
     <span class="doccomment">/// Returns the Id of the shard associated with the guild.</span>
@@ -3041,14 +3069,14 @@
     <span class="doccomment">/// use serenity::model::id::GuildId;</span>
     <span class="doccomment">/// use serenity::utils;</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// let guild_id = GuildId(81384788765712384);</span>
+    <span class="doccomment">/// let guild_id = GuildId::new(81384788765712384);</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// assert_eq!(guild_id.shard_id(17), 7);</span>
     <span class="doccomment">/// ```</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;utils&quot;</span>, <span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)))]</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">shard_id</span>(<span class="self">self</span>, <span class="ident">shard_count</span>: <span class="ident">u64</span>) -&gt; <span class="ident">u64</span> {
-        <span class="ident"><span class="kw">crate</span>::utils::shard_id</span>(<span class="self">self</span>.<span class="number">0</span>, <span class="ident">shard_count</span>)
+        <span class="ident"><span class="kw">crate</span>::utils::shard_id</span>(<span class="self">self</span>.<span class="ident">get</span>(), <span class="ident">shard_count</span>)
     }
 
     <span class="doccomment">/// Starts an integration sync for the given integration Id.</span>
@@ -3067,7 +3095,7 @@
         <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>,
         <span class="ident">integration_id</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">IntegrationId</span><span class="op">&gt;</span>,
     ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="ident">http</span>.<span class="ident">as_ref</span>().<span class="ident">start_integration_sync</span>(<span class="self">self</span>.<span class="number">0</span>, <span class="ident">integration_id</span>.<span class="ident">into</span>().<span class="number">0</span>).<span class="kw">await</span>
+        <span class="ident">http</span>.<span class="ident">as_ref</span>().<span class="ident">start_integration_sync</span>(<span class="self">self</span>.<span class="ident">get</span>(), <span class="ident">integration_id</span>.<span class="ident">into</span>().<span class="ident">get</span>()).<span class="kw">await</span>
     }
 
     <span class="doccomment">/// Starts a prune of [`Member`]s.</span>
@@ -3083,7 +3111,7 @@
     <span class="doccomment">/// [Kick Members]: Permissions::KICK_MEMBERS</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">start_prune</span>(<span class="self">self</span>, <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>, <span class="ident">days</span>: <span class="ident">u8</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">GuildPrune</span><span class="op">&gt;</span> {
-        <span class="ident">http</span>.<span class="ident">as_ref</span>().<span class="ident">start_guild_prune</span>(<span class="self">self</span>.<span class="number">0</span>, <span class="ident">days</span>, <span class="prelude-val">None</span>).<span class="kw">await</span>
+        <span class="ident">http</span>.<span class="ident">as_ref</span>().<span class="ident">start_guild_prune</span>(<span class="self">self</span>.<span class="ident">get</span>(), <span class="ident">days</span>, <span class="prelude-val">None</span>).<span class="kw">await</span>
     }
 
     <span class="doccomment">/// Unbans a [`User`] from the guild.</span>
@@ -3097,7 +3125,7 @@
     <span class="doccomment">/// [Ban Members]: Permissions::BAN_MEMBERS</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">unban</span>(<span class="self">self</span>, <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>, <span class="ident">user_id</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">UserId</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="ident">http</span>.<span class="ident">as_ref</span>().<span class="ident">remove_ban</span>(<span class="self">self</span>.<span class="number">0</span>, <span class="ident">user_id</span>.<span class="ident">into</span>().<span class="number">0</span>, <span class="prelude-val">None</span>).<span class="kw">await</span>
+        <span class="ident">http</span>.<span class="ident">as_ref</span>().<span class="ident">remove_ban</span>(<span class="self">self</span>.<span class="ident">get</span>(), <span class="ident">user_id</span>.<span class="ident">into</span>().<span class="ident">get</span>(), <span class="prelude-val">None</span>).<span class="kw">await</span>
     }
 
     <span class="doccomment">/// Retrieve&#39;s the guild&#39;s vanity URL.</span>
@@ -3113,7 +3141,7 @@
     <span class="doccomment">/// [Manage Guild]: Permissions::MANAGE_GUILD</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">vanity_url</span>(<span class="self">self</span>, <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
-        <span class="ident">http</span>.<span class="ident">as_ref</span>().<span class="ident">get_guild_vanity_url</span>(<span class="self">self</span>.<span class="number">0</span>).<span class="kw">await</span>
+        <span class="ident">http</span>.<span class="ident">as_ref</span>().<span class="ident">get_guild_vanity_url</span>(<span class="self">self</span>.<span class="ident">get</span>()).<span class="kw">await</span>
     }
 
     <span class="doccomment">/// Retrieves the guild&#39;s webhooks.</span>
@@ -3132,7 +3160,7 @@
     <span class="doccomment">/// [`Error::Json`]: crate::error::Error::Json</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">webhooks</span>(<span class="self">self</span>, <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Webhook</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="ident">http</span>.<span class="ident">as_ref</span>().<span class="ident">get_guild_webhooks</span>(<span class="self">self</span>.<span class="number">0</span>).<span class="kw">await</span>
+        <span class="ident">http</span>.<span class="ident">as_ref</span>().<span class="ident">get_guild_webhooks</span>(<span class="self">self</span>.<span class="ident">get</span>()).<span class="kw">await</span>
     }
 
     <span class="doccomment">/// Returns a future that will await one message sent in this guild.</span>
@@ -3183,7 +3211,7 @@
         <span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="kw-2">&amp;mut</span> <span class="ident">CreateApplicationCommand</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="ident">CreateApplicationCommand</span>,
     {
         <span class="kw">let</span> <span class="ident">map</span> <span class="op">=</span> <span class="ident">Command::build_application_command</span>(<span class="ident">f</span>);
-        <span class="ident">http</span>.<span class="ident">as_ref</span>().<span class="ident">create_guild_application_command</span>(<span class="self">self</span>.<span class="number">0</span>, <span class="kw-2">&amp;</span><span class="ident">map</span>).<span class="kw">await</span>
+        <span class="ident">http</span>.<span class="ident">as_ref</span>().<span class="ident">create_guild_application_command</span>(<span class="self">self</span>.<span class="ident">get</span>(), <span class="kw-2">&amp;</span><span class="ident">map</span>).<span class="kw">await</span>
     }
 
     <span class="doccomment">/// Overrides all guild application commands.</span>
@@ -3205,7 +3233,7 @@
 
         <span class="ident">f</span>(<span class="kw-2">&amp;mut</span> <span class="ident">array</span>);
 
-        <span class="ident">http</span>.<span class="ident">as_ref</span>().<span class="ident">create_guild_application_commands</span>(<span class="self">self</span>.<span class="number">0</span>, <span class="kw-2">&amp;</span><span class="ident">array</span>).<span class="kw">await</span>
+        <span class="ident">http</span>.<span class="ident">as_ref</span>().<span class="ident">create_guild_application_commands</span>(<span class="self">self</span>.<span class="ident">get</span>(), <span class="kw-2">&amp;</span><span class="ident">array</span>).<span class="kw">await</span>
     }
 
     <span class="doccomment">/// Creates a guild specific [`CommandPermission`].</span>
@@ -3233,7 +3261,7 @@
         <span class="ident">f</span>(<span class="kw-2">&amp;mut</span> <span class="ident">map</span>);
 
         <span class="ident">http</span>.<span class="ident">as_ref</span>()
-            .<span class="ident">edit_guild_application_command_permissions</span>(<span class="self">self</span>.<span class="number">0</span>, <span class="ident">command_id</span>.<span class="ident">into</span>(), <span class="kw-2">&amp;</span><span class="ident">map</span>)
+            .<span class="ident">edit_guild_application_command_permissions</span>(<span class="self">self</span>.<span class="ident">get</span>(), <span class="ident">command_id</span>.<span class="ident">into</span>(), <span class="kw-2">&amp;</span><span class="ident">map</span>)
             .<span class="kw">await</span>
     }
 
@@ -3258,7 +3286,7 @@
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">map</span> <span class="op">=</span> <span class="ident">CreateApplicationCommandsPermissions::default</span>();
         <span class="ident">f</span>(<span class="kw-2">&amp;mut</span> <span class="ident">map</span>);
 
-        <span class="ident">http</span>.<span class="ident">as_ref</span>().<span class="ident">edit_guild_application_commands_permissions</span>(<span class="self">self</span>.<span class="number">0</span>, <span class="kw-2">&amp;</span><span class="ident">map</span>).<span class="kw">await</span>
+        <span class="ident">http</span>.<span class="ident">as_ref</span>().<span class="ident">edit_guild_application_commands_permissions</span>(<span class="self">self</span>.<span class="ident">get</span>(), <span class="kw-2">&amp;</span><span class="ident">map</span>).<span class="kw">await</span>
     }
 
     <span class="doccomment">/// Get all guild application commands.</span>
@@ -3270,7 +3298,7 @@
     <span class="doccomment">/// [`Error::Http`]: crate::error::Error::Http</span>
     <span class="doccomment">/// [`Error::Json`]: crate::error::Error::Json</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_application_commands</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Command</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="ident">http</span>.<span class="ident">as_ref</span>().<span class="ident">get_guild_application_commands</span>(<span class="self">self</span>.<span class="number">0</span>).<span class="kw">await</span>
+        <span class="ident">http</span>.<span class="ident">as_ref</span>().<span class="ident">get_guild_application_commands</span>(<span class="self">self</span>.<span class="ident">get</span>()).<span class="kw">await</span>
     }
 
     <span class="doccomment">/// Get a specific guild application command by its Id.</span>
@@ -3286,7 +3314,7 @@
         <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>,
         <span class="ident">command_id</span>: <span class="ident">CommandId</span>,
     ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Command</span><span class="op">&gt;</span> {
-        <span class="ident">http</span>.<span class="ident">as_ref</span>().<span class="ident">get_guild_application_command</span>(<span class="self">self</span>.<span class="number">0</span>, <span class="ident">command_id</span>.<span class="ident">into</span>()).<span class="kw">await</span>
+        <span class="ident">http</span>.<span class="ident">as_ref</span>().<span class="ident">get_guild_application_command</span>(<span class="self">self</span>.<span class="ident">get</span>(), <span class="ident">command_id</span>.<span class="ident">into</span>()).<span class="kw">await</span>
     }
 
     <span class="doccomment">/// Edit guild application command by its Id.</span>
@@ -3307,7 +3335,7 @@
         <span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="kw-2">&amp;mut</span> <span class="ident">CreateApplicationCommand</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="ident">CreateApplicationCommand</span>,
     {
         <span class="kw">let</span> <span class="ident">map</span> <span class="op">=</span> <span class="ident">Command::build_application_command</span>(<span class="ident">f</span>);
-        <span class="ident">http</span>.<span class="ident">as_ref</span>().<span class="ident">edit_guild_application_command</span>(<span class="self">self</span>.<span class="number">0</span>, <span class="ident">command_id</span>.<span class="ident">into</span>(), <span class="kw-2">&amp;</span><span class="ident">map</span>).<span class="kw">await</span>
+        <span class="ident">http</span>.<span class="ident">as_ref</span>().<span class="ident">edit_guild_application_command</span>(<span class="self">self</span>.<span class="ident">get</span>(), <span class="ident">command_id</span>.<span class="ident">into</span>(), <span class="kw-2">&amp;</span><span class="ident">map</span>).<span class="kw">await</span>
     }
 
     <span class="doccomment">/// Delete guild application command by its Id.</span>
@@ -3323,7 +3351,7 @@
         <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>,
         <span class="ident">command_id</span>: <span class="ident">CommandId</span>,
     ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="ident">http</span>.<span class="ident">as_ref</span>().<span class="ident">delete_guild_application_command</span>(<span class="self">self</span>.<span class="number">0</span>, <span class="ident">command_id</span>.<span class="ident">into</span>()).<span class="kw">await</span>
+        <span class="ident">http</span>.<span class="ident">as_ref</span>().<span class="ident">delete_guild_application_command</span>(<span class="self">self</span>.<span class="ident">get</span>(), <span class="ident">command_id</span>.<span class="ident">into</span>()).<span class="kw">await</span>
     }
 
     <span class="doccomment">/// Get all guild application commands permissions only.</span>
@@ -3338,7 +3366,7 @@
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>,
     ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">CommandPermission</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="ident">http</span>.<span class="ident">as_ref</span>().<span class="ident">get_guild_application_commands_permissions</span>(<span class="self">self</span>.<span class="number">0</span>).<span class="kw">await</span>
+        <span class="ident">http</span>.<span class="ident">as_ref</span>().<span class="ident">get_guild_application_commands_permissions</span>(<span class="self">self</span>.<span class="ident">get</span>()).<span class="kw">await</span>
     }
 
     <span class="doccomment">/// Get permissions for specific guild application command by its Id.</span>
@@ -3354,7 +3382,7 @@
         <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>,
         <span class="ident">command_id</span>: <span class="ident">CommandId</span>,
     ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">CommandPermission</span><span class="op">&gt;</span> {
-        <span class="ident">http</span>.<span class="ident">as_ref</span>().<span class="ident">get_guild_application_command_permissions</span>(<span class="self">self</span>.<span class="number">0</span>, <span class="ident">command_id</span>.<span class="ident">into</span>()).<span class="kw">await</span>
+        <span class="ident">http</span>.<span class="ident">as_ref</span>().<span class="ident">get_guild_application_command_permissions</span>(<span class="self">self</span>.<span class="ident">get</span>(), <span class="ident">command_id</span>.<span class="ident">into</span>()).<span class="kw">await</span>
     }
 
     <span class="doccomment">/// Get the guild welcome screen.</span>
@@ -3363,7 +3391,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// Returns [`Error::Http`] if the guild does not have a welcome screen.</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_welcome_screen</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">GuildWelcomeScreen</span><span class="op">&gt;</span> {
-        <span class="ident">http</span>.<span class="ident">as_ref</span>().<span class="ident">get_guild_welcome_screen</span>(<span class="self">self</span>.<span class="number">0</span>).<span class="kw">await</span>
+        <span class="ident">http</span>.<span class="ident">as_ref</span>().<span class="ident">get_guild_welcome_screen</span>(<span class="self">self</span>.<span class="ident">get</span>()).<span class="kw">await</span>
     }
 
     <span class="doccomment">/// Get the guild preview.</span>
@@ -3375,7 +3403,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// Returns [`Error::Http`] if the bot cannot see the guild preview, see the note.</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_preview</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">GuildPreview</span><span class="op">&gt;</span> {
-        <span class="ident">http</span>.<span class="ident">as_ref</span>().<span class="ident">get_guild_preview</span>(<span class="self">self</span>.<span class="number">0</span>).<span class="kw">await</span>
+        <span class="ident">http</span>.<span class="ident">as_ref</span>().<span class="ident">get_guild_preview</span>(<span class="self">self</span>.<span class="ident">get</span>()).<span class="kw">await</span>
     }
 
     <span class="doccomment">/// Get the guild widget.</span>
@@ -3384,13 +3412,13 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// Returns [`Error::Http`] if the bot does not have `MANAGE_MESSAGES` permission.</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_widget</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">GuildWidget</span><span class="op">&gt;</span> {
-        <span class="ident">http</span>.<span class="ident">as_ref</span>().<span class="ident">get_guild_widget</span>(<span class="self">self</span>.<span class="number">0</span>).<span class="kw">await</span>
+        <span class="ident">http</span>.<span class="ident">as_ref</span>().<span class="ident">get_guild_widget</span>(<span class="self">self</span>.<span class="ident">get</span>()).<span class="kw">await</span>
     }
 
     <span class="doccomment">/// Get the widget image URL.</span>
     <span class="attribute">#[<span class="ident">must_use</span>]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">widget_image_url</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">style</span>: <span class="ident">GuildWidgetStyle</span>) -&gt; <span class="ident">String</span> {
-        <span class="macro">api!</span>(<span class="string">&quot;/guilds/{}/widget.png?style={}&quot;</span>, <span class="self">self</span>.<span class="number">0</span>, <span class="ident">style</span>)
+        <span class="macro">api!</span>(<span class="string">&quot;/guilds/{}/widget.png?style={}&quot;</span>, <span class="self">self</span>.<span class="ident">get</span>(), <span class="ident">style</span>)
     }
 
     <span class="doccomment">/// Gets the guild active threads.</span>
@@ -3400,7 +3428,7 @@
     <span class="doccomment">/// Returns [`Error::Http`] if there is an error in the deserialization, or</span>
     <span class="doccomment">/// if the bot issuing the request is not in the guild.</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_active_threads</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">ThreadsData</span><span class="op">&gt;</span> {
-        <span class="ident">http</span>.<span class="ident">as_ref</span>().<span class="ident">get_guild_active_threads</span>(<span class="self">self</span>.<span class="number">0</span>).<span class="kw">await</span>
+        <span class="ident">http</span>.<span class="ident">as_ref</span>().<span class="ident">get_guild_active_threads</span>(<span class="self">self</span>.<span class="ident">get</span>()).<span class="kw">await</span>
     }
 }
 
@@ -3521,7 +3549,7 @@
     <span class="doccomment">/// # use serenity::http::Http;</span>
     <span class="doccomment">/// #</span>
     <span class="doccomment">/// # async fn run() {</span>
-    <span class="doccomment">/// # let guild_id = GuildId::default();</span>
+    <span class="doccomment">/// # let guild_id = GuildId::new(1);</span>
     <span class="doccomment">/// # let ctx = Http::new(&quot;token&quot;);</span>
     <span class="doccomment">/// use serenity::futures::StreamExt;</span>
     <span class="doccomment">/// use serenity::model::guild::MembersIter;</span>

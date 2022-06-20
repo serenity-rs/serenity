@@ -221,7 +221,7 @@
 <span class="doccomment">/// # #[cfg(all(feature = &quot;model&quot;, feature = &quot;utils&quot;, feature = &quot;framework&quot;))]</span>
 <span class="doccomment">/// # #[command]</span>
 <span class="doccomment">/// # async fn example(ctx: &amp;Context) -&gt; CommandResult {</span>
-<span class="doccomment">/// # let mut message = ChannelId(7).message(&amp;ctx, MessageId(8)).await?;</span>
+<span class="doccomment">/// # let mut message = ChannelId::new(7).message(&amp;ctx, MessageId::new(8)).await?;</span>
 <span class="doccomment">/// message.edit(ctx, |m| m.content(&quot;hello&quot;)).await?;</span>
 <span class="doccomment">/// # Ok(())</span>
 <span class="doccomment">/// # }</span>

@@ -33,7 +33,7 @@ and cannot do.</p>
 <span class="kw">let</span> <span class="ident">permissions</span> <span class="op">=</span> <span class="macro">vec!</span>[<span class="ident">PermissionOverwrite</span> {
     <span class="ident">allow</span>: <span class="ident">Permissions::VIEW_CHANNEL</span>,
     <span class="ident">deny</span>: <span class="ident">Permissions::SEND_TTS_MESSAGES</span>,
-    <span class="ident">kind</span>: <span class="ident">PermissionOverwriteType::Member</span>(<span class="ident">UserId</span>(<span class="number">1234</span>)),
+    <span class="ident">kind</span>: <span class="ident">PermissionOverwriteType::Member</span>(<span class="ident">UserId::new</span>(<span class="number">1234</span>)),
 }];
 
 <span class="ident">guild</span>.<span class="ident">create_channel</span>(<span class="ident">http</span>, <span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="ident">c</span>.<span class="ident">name</span>(<span class="string">&quot;my_new_cool_channel&quot;</span>).<span class="ident">permissions</span>(<span class="ident">permissions</span>)).<span class="kw">await</span><span class="question-mark">?</span>;</code></pre></div>

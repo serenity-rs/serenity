@@ -12,7 +12,7 @@
 
 <span class="macro">assert_eq!</span>(
     <span class="ident">parse_message_id_pair</span>(<span class="string">&quot;673965002805477386-842482646604972082&quot;</span>),
-    <span class="prelude-val">Some</span>((<span class="ident">ChannelId</span>(<span class="number">673965002805477386</span>), <span class="ident">MessageId</span>(<span class="number">842482646604972082</span>))),
+    <span class="prelude-val">Some</span>((<span class="ident">ChannelId::new</span>(<span class="number">673965002805477386</span>), <span class="ident">MessageId::new</span>(<span class="number">842482646604972082</span>))),
 );
 <span class="macro">assert_eq!</span>(
     <span class="ident">parse_message_id_pair</span>(<span class="string">&quot;673965002805477386-842482646604972082-472029906943868929&quot;</span>),
