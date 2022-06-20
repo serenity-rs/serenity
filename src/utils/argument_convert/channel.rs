@@ -46,8 +46,10 @@ async fn lookup_channel_global(
     guild_id: Option<GuildId>,
     s: &str,
 ) -> Result<Channel, ChannelParseError> {
-    if let Some(channel_id) = s.parse::<u64>().ok().or_else(|| crate::utils::parse_channel(s)) {
-        return ChannelId(channel_id).to_channel(ctx).await.map_err(ChannelParseError::Http);
+    if let Some(channel_id) =
+        s.parse().ok().map(ChannelId).or_else(|| crate::utils::parse_channel(s))
+    {
+        return channel_id.to_channel(ctx).await.map_err(ChannelParseError::Http);
     }
 
     #[cfg(feature = "cache")]
@@ -63,7 +65,8 @@ async fn lookup_channel_global(
     }
 
     if let Some(guild_id) = guild_id {
-        let channels = ctx.http.get_channels(guild_id.0).await.map_err(ChannelParseError::Http)?;
+        let channels =
+            ctx.http.get_channels(guild_id.get()).await.map_err(ChannelParseError::Http)?;
         if let Some(channel) =
             channels.into_iter().find(|channel| channel.name.eq_ignore_ascii_case(s))
         {

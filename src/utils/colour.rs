@@ -25,8 +25,8 @@
 /// # let role = from_value::<Role>(json!({
 /// #     "color": Colour::BLURPLE,
 /// #     "hoist": false,
-/// #     "id": RoleId(1),
-/// #     "guild_id": GuildId(2),
+/// #     "id": RoleId::new(1),
+/// #     "guild_id": GuildId::new(2),
 /// #     "managed": false,
 /// #     "mentionable": false,
 /// #     "name": "test",
