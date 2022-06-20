@@ -284,7 +284,7 @@ mod tests {
     #[test]
     fn test_content_safe() {
         let user = User {
-            id: UserId(100000000000000000),
+            id: UserId::new(100000000000000000),
             avatar: None,
             bot: false,
             discriminator: 0000,
@@ -295,7 +295,7 @@ mod tests {
         };
 
         let outside_cache_user = User {
-            id: UserId(100000000000000001),
+            id: UserId::new(100000000000000001),
             avatar: None,
             bot: false,
             discriminator: 0000,
@@ -315,14 +315,14 @@ mod tests {
             explicit_content_filter: ExplicitContentFilter::None,
             features: Vec::new(),
             icon: None,
-            id: GuildId(381880193251409931),
+            id: GuildId::new(381880193251409931),
             joined_at: Timestamp::now(),
             large: false,
             member_count: 1,
             members: HashMap::new(),
             mfa_level: MfaLevel::None,
             name: "serenity".to_string(),
-            owner_id: UserId(114941315417899012),
+            owner_id: UserId::new(114941315417899012),
             presences: HashMap::new(),
             roles: HashMap::new(),
             splash: None,
@@ -369,7 +369,7 @@ mod tests {
         };
 
         let role = Role {
-            id: RoleId(333333333333333333),
+            id: RoleId::new(333333333333333333),
             colour: Colour::ORANGE,
             guild_id: guild.id,
             hoist: true,
@@ -384,7 +384,7 @@ mod tests {
         };
 
         let channel = GuildChannel {
-            id: ChannelId(111880193700067777),
+            id: ChannelId::new(111880193700067777),
             bitrate: None,
             parent_id: None,
             guild_id: guild.id,
@@ -421,7 +421,8 @@ mod tests {
         <@!i)/==(<<>z/9080)> <@!1231invalid> <@invalid123> \
         <@123invalid> <@> <@ ";
 
-        let without_user_mentions = "@Crab#0000 @invalid-user @invalid-user @invalid-user \
+        let without_user_mentions =
+            "@Crab#0000 <@!000000000000000000> @invalid-user @invalid-user \
         <@!123123123123123123123> @invalid-user @invalid-user <@!invalid> \
         <@invalid> <@日本語 한국어$§)[/__#\\(/&2032$§#> \
         <@!i)/==(<<>z/9080)> <@!1231invalid> <@invalid123> \
@@ -474,9 +475,9 @@ mod tests {
         assert_eq!(with_user_mentions, content_safe(&cache, with_user_mentions, &options, &[]));
 
         // Channel mentions
-        let with_channel_mentions = "<#> <#deleted-channel> #deleted-channel <#0> \
+        let with_channel_mentions = "<#> <#deleted-channel> #deleted-channel <#1> \
         #unsafe-club <#111880193700067777> <#ferrisferrisferris> \
-        <#000000000000000000>";
+        <#000000000000000001>";
 
         let without_channel_mentions = "<#> <#deleted-channel> #deleted-channel \
         #deleted-channel #unsafe-club #general <#ferrisferrisferris> \
@@ -495,7 +496,7 @@ mod tests {
 
         // Role mentions
         let with_role_mentions = "<@&> @deleted-role <@&9829> \
-        <@&333333333333333333> <@&000000000000000000> \
+        <@&333333333333333333> <@&000000000000000001> \
         <@&111111111111111111111111111111> <@&<@&1234>";
 
         let without_role_mentions = "<@&> @deleted-role @deleted-role \
