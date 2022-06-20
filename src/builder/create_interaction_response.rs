@@ -215,14 +215,14 @@ impl<'a> CreateInteractionResponseData<'a> {
     }
 }
 
+#[derive(Clone, Debug, Default, Serialize)]
 #[non_exhaustive]
-#[derive(Clone, Default, Debug, Serialize)]
 pub struct AutocompleteChoice {
     pub name: String,
     pub value: Value,
 }
 
-#[derive(Clone, Default, Debug, Serialize)]
+#[derive(Clone, Debug, Default, Serialize)]
 pub struct CreateAutocompleteResponse {
     choices: Vec<AutocompleteChoice>,
 }
