@@ -12,7 +12,7 @@ type DynamicPrefixHook =
 
 /// A configuration struct for deciding whether the framework
 /// should allow optional whitespace between prefixes, group prefixes and command names.
-#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
 pub struct WithWhiteSpace {
     pub prefixes: bool,
     pub groups: bool,

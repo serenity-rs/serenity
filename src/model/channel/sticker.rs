@@ -29,7 +29,7 @@ pub struct Sticker {
 /// Differentiates between sticker formats.
 ///
 /// [Discord docs](https://discord.com/developers/docs/resources/sticker#sticker-object-sticker-format-types).
-#[derive(Clone, Copy, Debug, Eq, Hash, PartialEq, PartialOrd, Ord)]
+#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
 #[non_exhaustive]
 pub enum StickerFormatType {
     /// A PNG format sticker.
