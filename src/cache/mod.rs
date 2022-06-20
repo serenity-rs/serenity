@@ -59,17 +59,30 @@ type MessageCache = DashMap<ChannelId, DashMap<MessageId, Message>>;
 
 struct NotSend;
 
+enum CacheRefInner<'a, K, V> {
+    DashRef(Ref<'a, K, V>),
+    ReadGuard(parking_lot::RwLockReadGuard<'a, V>),
+}
+
 pub struct CacheRef<'a, K, V> {
-    inner: Ref<'a, K, V>,
+    inner: CacheRefInner<'a, K, V>,
     phantom: std::marker::PhantomData<*const NotSend>,
 }
 
 impl<'a, K, V> CacheRef<'a, K, V> {
-    fn from_ref(inner: Ref<'a, K, V>) -> Self {
-        CacheRef {
+    fn new(inner: CacheRefInner<'a, K, V>) -> Self {
+        Self {
             inner,
             phantom: std::marker::PhantomData,
         }
+    }
+
+    fn from_ref(inner: Ref<'a, K, V>) -> Self {
+        Self::new(CacheRefInner::DashRef(inner))
+    }
+
+    fn from_guard(inner: parking_lot::RwLockReadGuard<'a, V>) -> Self {
+        Self::new(CacheRefInner::ReadGuard(inner))
     }
 }
 
@@ -77,11 +90,15 @@ impl<K: Eq + Hash, V> std::ops::Deref for CacheRef<'_, K, V> {
     type Target = V;
 
     fn deref(&self) -> &Self::Target {
-        self.inner.value()
+        match &self.inner {
+            CacheRefInner::DashRef(inner) => inner.value(),
+            CacheRefInner::ReadGuard(inner) => &*inner,
+        }
     }
 }
 
 pub type GuildRef<'a> = CacheRef<'a, GuildId, Guild>;
+pub type CurrentUserRef<'a> = CacheRef<'a, (), CurrentUser>;
 pub type GuildChannelRef<'a> = CacheRef<'a, ChannelId, GuildChannel>;
 pub type PrivateChannelRef<'a> = CacheRef<'a, ChannelId, PrivateChannel>;
 
@@ -904,41 +921,10 @@ impl Cache {
         self.categories.get(&channel_id).map(|category| category.id)
     }
 
-    /// This method clones and returns the user used by the bot.
+    /// This method provides a reference to the user used by the bot.
     #[inline]
-    pub fn current_user(&self) -> CurrentUser {
-        self.user.read().clone()
-    }
-
-    /// This method returns the bot's ID.
-    #[inline]
-    pub fn current_user_id(&self) -> UserId {
-        self.user.read().id
-    }
-
-    /// This method allows to only clone a field of the current user instead of
-    /// the entire user by providing a `field_selector`-closure picking what
-    /// you want to clone.
-    ///
-    /// ```rust,no_run
-    /// # use serenity::cache::Cache;
-    /// #
-    /// # fn run() -> Result<(), Box<dyn std::error::Error>> {
-    /// # let cache = Cache::default();
-    /// // We clone only the `name` instead of the entire channel.
-    /// let id = cache.current_user_field(|user| user.id);
-    /// println!("Current user's ID: {}", id);
-    /// #   Ok(())
-    /// # }
-    /// ```
-    #[inline]
-    pub fn current_user_field<Ret: Clone, Fun>(&self, field_selector: Fun) -> Ret
-    where
-        Fun: FnOnce(&CurrentUser) -> Ret,
-    {
-        let user = self.user.read();
-
-        field_selector(&user)
+    pub fn current_user(&self) -> CurrentUserRef<'_> {
+        CacheRef::from_guard(self.user.read())
     }
 
     /// Updates the cache with the update implementation for an event or other
