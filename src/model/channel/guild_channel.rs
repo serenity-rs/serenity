@@ -748,7 +748,7 @@ impl GuildChannel {
     /// #[serenity::async_trait]
     /// impl EventHandler for Handler {
     ///     async fn message(&self, context: Context, mut msg: Message) {
-    ///         let current_user_id = context.cache.current_user_id();
+    ///         let current_user_id = context.cache.current_user().id;
     ///         let permissions = match context.cache.guild_channel(msg.channel_id) {
     ///             Some(channel) => channel.permissions_for_user(&context.cache, current_user_id),
     ///             None => return,
