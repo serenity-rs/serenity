@@ -452,7 +452,7 @@ impl CacheUpdate for MessageCreateEvent {
             return None;
         }
 
-        let messages =
+        let mut messages =
             cache.messages.entry(self.message.channel_id).or_insert_with(Default::default);
         let mut queue =
             cache.message_queue.entry(self.message.channel_id).or_insert_with(Default::default);
@@ -468,7 +468,7 @@ impl CacheUpdate for MessageCreateEvent {
         queue.push_back(self.message.id);
         messages.insert(self.message.id, self.message.clone());
 
-        removed_msg.map(|i| i.1)
+        removed_msg
     }
 }
 
@@ -488,7 +488,7 @@ impl CacheUpdate for MessageUpdateEvent {
             author: _, timestamp: _,  nonce: _, kind: _, stickers: _,  guild_id: _,
         } = &self;
 
-        let messages = cache.messages.get_mut(channel_id)?;
+        let mut messages = cache.messages.get_mut(channel_id)?;
         let mut message = messages.get_mut(id)?;
         let old_message = message.clone();
 
