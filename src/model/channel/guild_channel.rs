@@ -236,7 +236,7 @@ impl GuildChannel {
     /// #
     /// #     let http = Arc::new(Http::new("token"));
     /// #     let cache = Cache::default();
-    /// #     let (channel_id, user_id) = (ChannelId(0), UserId(0));
+    /// #     let (channel_id, user_id) = (ChannelId::new(1), UserId::new(1));
     /// #
     /// use serenity::model::channel::{PermissionOverwrite, PermissionOverwriteType};
     /// use serenity::model::{ModelError, Permissions};
@@ -268,7 +268,7 @@ impl GuildChannel {
     /// #
     /// #   let http = Arc::new(Http::new("token"));
     /// #   let cache = Cache::default();
-    /// #   let (channel_id, user_id) = (ChannelId(0), UserId(0));
+    /// #   let (channel_id, user_id) = (ChannelId::new(1), UserId::new(1));
     /// #
     /// use serenity::model::channel::{Channel, PermissionOverwrite, PermissionOverwriteType};
     /// use serenity::model::{ModelError, Permissions};
@@ -438,7 +438,7 @@ impl GuildChannel {
         let mut edit_channel = EditChannel::default();
         f(&mut edit_channel);
 
-        *self = cache_http.http().edit_channel(self.id.0, &edit_channel, None).await?;
+        *self = cache_http.http().edit_channel(self.id.get(), &edit_channel, None).await?;
 
         Ok(())
     }
@@ -505,7 +505,7 @@ impl GuildChannel {
     /// #
     /// #     let http = Arc::new(Http::new("token"));
     /// #     let cache = Cache::default();
-    /// #     let (channel_id, user_id) = (ChannelId(0), UserId(0));
+    /// #     let (channel_id, user_id) = (ChannelId::new(1), UserId::new(1));
     /// #
     /// use serenity::model::ModelError;
     ///
@@ -555,7 +555,7 @@ impl GuildChannel {
     /// #
     /// #     let http = Arc::new(Http::new("token"));
     /// #     let cache = Cache::default();
-    /// #     let channel_id = ChannelId(0);
+    /// #     let channel_id = ChannelId::new(1);
     /// #
     /// use serenity::model::ModelError;
     ///
@@ -582,7 +582,7 @@ impl GuildChannel {
     where
         F: FnOnce(&mut EditVoiceState) -> &mut EditVoiceState,
     {
-        self._edit_voice_state(http, None::<u64>, f).await
+        self._edit_voice_state(http, None::<UserId>, f).await
     }
 
     async fn _edit_voice_state<F>(
@@ -604,9 +604,9 @@ impl GuildChannel {
         voice_state.channel_id = Some(self.id);
 
         if let Some(id) = user_id {
-            http.as_ref().edit_voice_state(self.guild_id.0, id.into().0, &voice_state).await
+            http.as_ref().edit_voice_state(self.guild_id.get(), id.into().get(), &voice_state).await
         } else {
-            http.as_ref().edit_voice_state_me(self.guild_id.0, &voice_state).await
+            http.as_ref().edit_voice_state_me(self.guild_id.get(), &voice_state).await
         }
     }
 
@@ -1021,7 +1021,7 @@ impl GuildChannel {
     /// # let http = Arc::new(Http::new("token"));
     /// # let cache = Cache::default();
     /// # let channel = cache
-    /// #    .guild_channel(ChannelId(7))
+    /// #    .guild_channel(ChannelId::new(7))
     /// #    .ok_or(ModelError::ItemMissing)?
     /// #    .clone();
     /// // Initiate typing (assuming http is `Arc<Http>` and `channel` is bound)
@@ -1038,7 +1038,7 @@ impl GuildChannel {
     /// ```
     #[allow(clippy::missing_errors_doc)]
     pub fn start_typing(self, http: &Arc<Http>) -> Result<Typing> {
-        http.start_typing(self.id.0)
+        http.start_typing(self.id.get())
     }
 
     /// Unpins a [`Message`] in the channel given by its Id.

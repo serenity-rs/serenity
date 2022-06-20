@@ -15,6 +15,7 @@ use std::convert::{TryFrom, TryInto};
 #[cfg(all(feature = "cache", feature = "model", feature = "utils"))]
 use std::error::Error as StdError;
 use std::fmt;
+use std::num::NonZeroU64;
 
 use serde::de::{Error as DeError, Unexpected};
 use serde::ser::{Serialize, Serializer};
@@ -358,7 +359,7 @@ pub(crate) struct PermissionOverwriteData {
     allow: Permissions,
     deny: Permissions,
     #[serde(with = "snowflake")]
-    id: u64,
+    id: NonZeroU64,
     #[serde(rename = "type")]
     kind: u8,
 }
@@ -524,10 +525,10 @@ mod test {
 
         fn guild_channel() -> GuildChannel {
             GuildChannel {
-                id: ChannelId(1),
+                id: ChannelId::new(1),
                 bitrate: None,
                 parent_id: None,
-                guild_id: GuildId(2),
+                guild_id: GuildId::new(2),
                 kind: ChannelType::Text,
                 last_message_id: None,
                 last_pin_timestamp: None,
@@ -550,12 +551,12 @@ mod test {
 
         fn private_channel() -> PrivateChannel {
             PrivateChannel {
-                id: ChannelId(1),
+                id: ChannelId::new(1),
                 last_message_id: None,
                 last_pin_timestamp: None,
                 kind: ChannelType::Private,
                 recipient: User {
-                    id: UserId(2),
+                    id: UserId::new(2),
                     avatar: None,
                     bot: false,
                     discriminator: 1,
@@ -628,7 +629,7 @@ impl FromStrAndCache for Channel {
         C: AsRef<Cache> + Send + Sync,
     {
         match parse_channel(s) {
-            Some(x) => match ChannelId(x).to_channel_cached(&cache) {
+            Some(x) => match x.to_channel_cached(&cache) {
                 Some(channel) => Ok(channel),
                 _ => Err(ChannelParseError::NotPresentInCache),
             },
