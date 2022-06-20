@@ -104,7 +104,7 @@ impl MessageFilter {
     }
 }
 
-#[derive(Clone, Default, Debug)]
+#[derive(Clone, Debug, Default)]
 struct FilterOptions {
     filter_limit: Option<u32>,
     collect_limit: Option<u32>,
