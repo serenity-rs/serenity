@@ -281,7 +281,7 @@ impl fmt::Display for Channel {
 /// A representation of a type of channel.
 ///
 /// [Discord docs](https://discord.com/developers/docs/resources/channel#channel-object-channel-types).
-#[derive(Clone, Copy, Debug, Eq, Hash, PartialEq, PartialOrd, Ord)]
+#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
 #[non_exhaustive]
 #[repr(u8)]
 pub enum ChannelType {
@@ -443,7 +443,7 @@ pub enum PermissionOverwriteType {
 /// The video quality mode for a voice channel.
 ///
 /// [Discord docs](https://discord.com/developers/docs/resources/channel#channel-object-video-quality-modes).
-#[derive(Clone, Copy, Debug, Eq, Hash, PartialEq, PartialOrd, Ord)]
+#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
 #[non_exhaustive]
 pub enum VideoQualityMode {
     /// An indicator that the video quality is chosen by Discord for optimal
@@ -477,7 +477,7 @@ pub struct StageInstance {
 /// A thread data.
 ///
 /// [Discord docs](https://discord.com/developers/docs/resources/channel#thread-metadata-object).
-#[derive(Debug, Clone, Copy, Serialize, Deserialize)]
+#[derive(Clone, Copy, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 pub struct ThreadMetadata {
     /// Whether the thread is archived.
@@ -505,7 +505,7 @@ pub struct ThreadMetadata {
 /// A response to getting several threads channels.
 ///
 /// Discord docs: scattered, but e.g. [here](https://discord.com/developers/docs/resources/channel#list-public-archived-threads-response-body).
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 pub struct ThreadsData {
     /// The threads channels.

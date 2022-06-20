@@ -428,7 +428,7 @@ pub struct InviteStageInstance {
 }
 
 /// [Discord docs](https://discord.com/developers/docs/resources/invite#invite-object-invite-target-types).
-#[derive(Clone, Copy, Debug, Eq, Hash, PartialEq, PartialOrd, Ord)]
+#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
 #[non_exhaustive]
 pub enum InviteTargetType {
     Normal = 0,

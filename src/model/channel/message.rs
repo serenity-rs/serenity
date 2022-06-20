@@ -1019,7 +1019,7 @@ pub struct MessageReaction {
 /// Differentiates between regular and different types of system messages.
 ///
 /// [Discord docs](https://discord.com/developers/docs/resources/channel#message-object-message-types).
-#[derive(Clone, Copy, Debug, Eq, Hash, PartialEq, PartialOrd, Ord)]
+#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
 #[non_exhaustive]
 pub enum MessageType {
     /// A regular message.
@@ -1102,7 +1102,7 @@ enum_number!(MessageType {
 });
 
 /// [Discord docs](https://discord.com/developers/docs/resources/channel#message-object-message-activity-types).
-#[derive(Clone, Copy, Debug, Eq, Hash, PartialEq, PartialOrd, Ord)]
+#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
 #[non_exhaustive]
 pub enum MessageActivityKind {
     #[allow(clippy::upper_case_acronyms)]
