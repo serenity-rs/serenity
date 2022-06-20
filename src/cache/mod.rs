@@ -1008,10 +1008,10 @@ mod test {
         let datetime = Timestamp::now();
         let mut event = MessageCreateEvent {
             message: Message {
-                id: MessageId(3),
+                id: MessageId::new(3),
                 attachments: vec![],
                 author: User {
-                    id: UserId(2),
+                    id: UserId::new(2),
                     avatar: None,
                     bot: false,
                     discriminator: 1,
@@ -1021,8 +1021,8 @@ mod test {
                     member: None,
                     accent_colour: None,
                 },
-                channel_id: ChannelId(2),
-                guild_id: Some(GuildId(1)),
+                channel_id: ChannelId::new(2),
+                guild_id: Some(GuildId::new(1)),
                 content: String::new(),
                 edited_timestamp: None,
                 embeds: vec![],
@@ -1061,12 +1061,12 @@ mod test {
         assert_eq!(cache.messages.get(&event.message.channel_id).unwrap().len(), 1);
 
         // Add a second message, assert that channel message cache length is 2.
-        event.message.id = MessageId(4);
+        event.message.id = MessageId::new(4);
         assert!(event.update(&cache).is_none());
         assert_eq!(cache.messages.get(&event.message.channel_id).unwrap().len(), 2);
 
         // Add a third message, the first should now be removed.
-        event.message.id = MessageId(5);
+        event.message.id = MessageId::new(5);
         assert!(event.update(&cache).is_some());
 
         {
@@ -1074,7 +1074,7 @@ mod test {
 
             assert_eq!(channel.len(), 2);
             // Check that the first message is now removed.
-            assert!(!channel.contains_key(&MessageId(3)));
+            assert!(!channel.contains_key(&MessageId::new(3)));
         }
 
         let channel = Channel::Guild(GuildChannel {
@@ -1113,11 +1113,11 @@ mod test {
         // is received.
         let mut guild_create = {
             let mut channels = HashMap::new();
-            channels.insert(ChannelId(2), channel);
+            channels.insert(ChannelId::new(2), channel);
 
             GuildCreateEvent {
                 guild: Guild {
-                    id: GuildId(1),
+                    id: GuildId::new(1),
                     afk_channel_id: None,
                     afk_timeout: 0,
                     application_id: None,
@@ -1132,7 +1132,7 @@ mod test {
                     members: HashMap::new(),
                     mfa_level: MfaLevel::None,
                     name: String::new(),
-                    owner_id: UserId(3),
+                    owner_id: UserId::new(3),
                     presences: HashMap::new(),
                     roles: HashMap::new(),
                     splash: None,
@@ -1170,7 +1170,7 @@ mod test {
 
         let mut guild_delete = GuildDeleteEvent {
             guild: UnavailableGuild {
-                id: GuildId(1),
+                id: GuildId::new(1),
                 unavailable: false,
             },
         };
@@ -1180,6 +1180,6 @@ mod test {
         assert!(cache.update(&mut guild_delete).is_some());
 
         // Assert that the channel's message cache no longer exists.
-        assert!(!cache.messages.contains_key(&ChannelId(2)));
+        assert!(!cache.messages.contains_key(&ChannelId::new(2)));
     }
 }

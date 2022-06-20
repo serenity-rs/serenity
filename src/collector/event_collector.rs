@@ -312,7 +312,7 @@ mod test {
             Err(Error::Collector(CollectorError::NoEventTypes))
         ));
         assert!(matches!(
-            EventCollectorBuilder::new(&msg).add_channel_id(ChannelId::default()).build(),
+            EventCollectorBuilder::new(&msg).add_channel_id(ChannelId::new(1)).build(),
             Err(Error::Collector(CollectorError::NoEventTypes))
         ));
     }
@@ -325,7 +325,7 @@ mod test {
         assert!(matches!(
             EventCollectorBuilder::new(&msg)
                 .add_event_type(EventType::GuildCreate)
-                .add_user_id(UserId::default())
+                .add_user_id(UserId::new(1))
                 .build(),
             Err(Error::Collector(CollectorError::InvalidEventIdFilters))
         ));
@@ -333,7 +333,7 @@ mod test {
             EventCollectorBuilder::new(&msg)
                 .add_event_type(EventType::GuildCreate)
                 .add_event_type(EventType::GuildRoleCreate)
-                .add_user_id(UserId::default())
+                .add_user_id(UserId::new(1))
                 .build(),
             Err(Error::Collector(CollectorError::InvalidEventIdFilters))
         ));
@@ -341,7 +341,7 @@ mod test {
         assert!(matches!(
             EventCollectorBuilder::new(&msg)
                 .add_event_type(EventType::GuildBanAdd)
-                .add_user_id(UserId::default())
+                .add_user_id(UserId::new(1))
                 .build(),
             Ok(_)
         ));
@@ -349,7 +349,7 @@ mod test {
             EventCollectorBuilder::new(&msg)
                 .add_event_type(EventType::GuildBanAdd)
                 .add_event_type(EventType::GuildCreate)
-                .add_user_id(UserId::default())
+                .add_user_id(UserId::new(1))
                 .build(),
             Ok(_)
         ));
@@ -363,15 +363,15 @@ mod test {
         assert!(matches!(
             EventCollectorBuilder::new(&msg)
                 .add_event_type(EventType::UserUpdate)
-                .add_user_id(UserId::default())
-                .add_guild_id(GuildId::default())
+                .add_user_id(UserId::new(1))
+                .add_guild_id(GuildId::new(1))
                 .build(),
             Err(Error::Collector(CollectorError::InvalidEventIdFilters))
         ));
         assert!(matches!(
             EventCollectorBuilder::new(&msg)
                 .add_event_type(EventType::UserUpdate)
-                .add_user_id(UserId::default())
+                .add_user_id(UserId::new(1))
                 .build(),
             Ok(_)
         ));
@@ -388,7 +388,7 @@ mod test {
             EventCollectorBuilder::new(&msg)
                 .add_event_type(EventType::GuildCreate)
                 .add_event_type(EventType::GuildMemberAdd)
-                .add_user_id(UserId::default())
+                .add_user_id(UserId::new(1))
                 .build(),
             Ok(_)
         ));
@@ -397,7 +397,7 @@ mod test {
             EventCollectorBuilder::new(&msg)
                 .add_event_type(EventType::GuildCreate)
                 .add_event_type(EventType::UserUpdate)
-                .add_channel_id(ChannelId::default())
+                .add_channel_id(ChannelId::new(1))
                 .build(),
             Err(Error::Collector(CollectorError::InvalidEventIdFilters))
         ));
