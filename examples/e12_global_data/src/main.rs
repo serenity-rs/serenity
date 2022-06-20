@@ -89,18 +89,13 @@ impl EventHandler for Handler {
                 data_read.get::<MessageCount>().expect("Expected MessageCount in TypeMap.").clone()
             };
 
-            // To check how many "owo" there are in msg.content, we split the string with the "owo" pattern 
-            // and reduce the count of iterator returned by the split function by one.
-            let owo_in_msg = msg.content.to_lowercase().split("owo").count() - 1;
+            // Here, we are checking how many "owo" there are in the message content.
+            let owo_in_msg = msg.content.to_ascii_lowercase().matches("owo").count();
             
             // Atomic operations with ordering do not require mut to be modified.
             // In this case, we want to increase the message count by 1.
             // https://doc.rust-lang.org/std/sync/atomic/struct.AtomicUsize.html#method.fetch_add
-            if owo_in_msg == 0 {
-                count.fetch_add(1, Ordering::SeqCst);
-            } else {
                 count.fetch_add(owo_in_msg, Ordering::SeqCst);
-            }
         }
     }
 
