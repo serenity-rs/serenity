@@ -34,7 +34,7 @@ pub const USER_AGENT: &str = concat!(
 /// An enum representing the [gateway opcodes].
 ///
 /// [gateway opcodes]: https://discord.com/developers/docs/topics/opcodes-and-status-codes#gateway
-#[derive(Clone, Copy, Debug, Eq, Hash, PartialEq, PartialOrd, Ord)]
+#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
 #[non_exhaustive]
 pub enum Opcode {
     /// Dispatches an event.

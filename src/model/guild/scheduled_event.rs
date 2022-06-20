@@ -1,7 +1,7 @@
 use crate::model::prelude::*;
 
 /// Information about a guild scheduled event.
-#[derive(Clone, Debug, Serialize, Deserialize)]
+#[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 pub struct ScheduledEvent {
     /// The Id of the scheduled event.
@@ -46,7 +46,7 @@ pub struct ScheduledEvent {
     pub image: Option<String>,
 }
 
-#[derive(Copy, Clone, Debug)]
+#[derive(Clone, Copy, Debug)]
 pub enum ScheduledEventStatus {
     Scheduled = 1,
     Active = 2,
@@ -62,7 +62,7 @@ enum_number!(ScheduledEventStatus {
     Canceled,
 });
 
-#[derive(Copy, Clone, Debug)]
+#[derive(Clone, Copy, Debug)]
 pub enum ScheduledEventType {
     StageInstance = 1,
     Voice = 2,
@@ -76,14 +76,14 @@ enum_number!(ScheduledEventType {
     External,
 });
 
-#[derive(Clone, Debug, Serialize, Deserialize)]
+#[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct ScheduledEventMetadata {
     // TODO: Change to `Option<String>` in next version.
     #[serde(default)]
     pub location: String,
 }
 
-#[derive(Clone, Debug, Serialize, Deserialize)]
+#[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct ScheduledEventUser {
     #[serde(rename = "guild_scheduled_event_id")]
     pub event_id: ScheduledEventId,
