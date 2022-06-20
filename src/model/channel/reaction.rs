@@ -204,7 +204,7 @@ impl Reaction {
             #[cfg(feature = "cache")]
             {
                 if let Some(cache) = cache_http.cache() {
-                    return Ok(User::from(&cache.current_user()));
+                    return Ok(User::from(&*cache.current_user()));
                 }
             }
 
