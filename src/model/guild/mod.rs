@@ -1221,7 +1221,7 @@ impl Guild {
     /// Make a role hoisted:
     ///
     /// ```rust,ignore
-    /// guild.edit_role(&context, RoleId(7), |r| r.hoist(true));
+    /// guild.edit_role(&context, RoleId::new(7), |r| r.hoist(true));
     /// ```
     ///
     /// # Errors
@@ -1251,7 +1251,7 @@ impl Guild {
     ///
     /// ```rust,ignore
     /// use serenity::model::id::RoleId;
-    /// guild.edit_role_position(&context, RoleId(8), 2);
+    /// guild.edit_role_position(&context, RoleId::new(8), 2);
     /// ```
     ///
     /// # Errors
@@ -1416,8 +1416,10 @@ impl Guild {
             return Some(rhs_id);
         }
 
-        let lhs = self.members.get(&lhs_id)?.highest_role_info(&cache).unwrap_or((RoleId(0), 0));
-        let rhs = self.members.get(&rhs_id)?.highest_role_info(&cache).unwrap_or((RoleId(0), 0));
+        let lhs =
+            self.members.get(&lhs_id)?.highest_role_info(&cache).unwrap_or((RoleId::new(1), 0));
+        let rhs =
+            self.members.get(&rhs_id)?.highest_role_info(&cache).unwrap_or((RoleId::new(1), 0));
 
         // If LHS and RHS both have no top position or have the same role ID,
         // then no one wins.
@@ -1607,7 +1609,7 @@ impl Guild {
         if let Some(member) = self.members.get(&user_id) {
             Ok(Cow::Borrowed(member))
         } else {
-            cache_http.http().get_member(self.id.0, user_id.0).await.map(Cow::Owned)
+            cache_http.http().get_member(self.id.get(), user_id.get()).await.map(Cow::Owned)
         }
     }
 
@@ -2868,7 +2870,7 @@ mod test {
 
             Member {
                 deaf: false,
-                guild_id: GuildId(1),
+                guild_id: GuildId::new(1),
                 joined_at: Some(dt),
                 mute: false,
                 nick: Some("aaaa".to_string()),
@@ -2903,21 +2905,21 @@ mod test {
             let notifications = DefaultMessageNotificationLevel::All;
 
             Guild {
-                afk_channel_id: Some(ChannelId(0)),
+                afk_channel_id: Some(ChannelId::new(1)),
                 afk_timeout: 0,
                 channels: hm1,
                 default_message_notifications: notifications,
                 emojis: hm2,
                 features: vec1,
                 icon: Some("/avatars/210/a_aaa.webp?size=1024".to_string()),
-                id: GuildId(1),
+                id: GuildId::new(1),
                 joined_at: dt,
                 large: false,
                 member_count: 1,
                 members: hm3,
                 mfa_level: MfaLevel::Elevated,
                 name: "Spaghetti".to_string(),
-                owner_id: UserId(210),
+                owner_id: UserId::new(210),
                 presences: hm4,
                 roles: hm5,
                 splash: Some("asdf".to_string()),
@@ -2925,9 +2927,9 @@ mod test {
                 voice_states: hm6,
                 description: None,
                 premium_tier: PremiumTier::Tier1,
-                application_id: Some(ApplicationId(0)),
+                application_id: Some(ApplicationId::new(1)),
                 explicit_content_filter: ExplicitContentFilter::None,
-                system_channel_id: Some(ChannelId(0)),
+                system_channel_id: Some(ChannelId::new(1)),
                 system_channel_flags: SystemChannelFlags::default(),
                 rules_channel_id: None,
                 premium_subscription_count: 12,

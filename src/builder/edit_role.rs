@@ -31,7 +31,7 @@ use crate::utils::encode_image;
 /// # use std::sync::Arc;
 /// #
 /// # let http = Arc::new(Http::new("token"));
-/// # let (channel_id, guild_id) = (ChannelId(1), GuildId(2));
+/// # let (channel_id, guild_id) = (ChannelId::new(1), GuildId::new(2));
 /// #
 /// // assuming a `channel_id` and `guild_id` has been bound
 ///

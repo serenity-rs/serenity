@@ -259,7 +259,7 @@ impl serde::Serialize for InteractionResponseType {
 
 fn add_guild_id_to_resolved(map: &mut JsonMap, guild_id: GuildId) {
     if let Some(member) = map.get_mut("member").and_then(Value::as_object_mut) {
-        member.insert("guild_id".to_string(), from_number(guild_id.0));
+        member.insert("guild_id".to_string(), from_number(guild_id.get()));
     }
 
     if let Some(data) = map.get_mut("data") {
@@ -268,7 +268,7 @@ fn add_guild_id_to_resolved(map: &mut JsonMap, guild_id: GuildId) {
                 if let Some(values) = roles.as_object_mut() {
                     for value in values.values_mut() {
                         if let Some(role) = value.as_object_mut() {
-                            role.insert("guild_id".to_string(), from_number(guild_id.0));
+                            role.insert("guild_id".to_string(), from_number(guild_id.get()));
                         };
                     }
                 }
