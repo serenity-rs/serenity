@@ -125,7 +125,7 @@ pub enum ShardQueuerMessage {
 
 /// A light tuplestruct wrapper around a u64 to verify type correctness when
 /// working with the IDs of shards.
-#[derive(Clone, Copy, Debug, Eq, Hash, PartialEq, PartialOrd, Ord)]
+#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
 pub struct ShardId(pub u64);
 
 impl fmt::Display for ShardId {
