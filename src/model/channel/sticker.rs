@@ -25,7 +25,7 @@ pub struct Sticker {
 }
 
 /// Differentiates between sticker formats.
-#[derive(Clone, Copy, Debug, Eq, Hash, PartialEq, PartialOrd, Ord)]
+#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
 #[non_exhaustive]
 pub enum StickerFormatType {
     /// A PNG format sticker.
