@@ -152,7 +152,7 @@ impl Message {
         #[cfg(feature = "cache")]
         {
             if let Some(cache) = cache_http.cache() {
-                if self.author.id != cache.current_user_id() && self.guild_id.is_some() {
+                if self.author.id != cache.current_user().id && self.guild_id.is_some() {
                     utils::user_has_perms_cache(
                         cache,
                         self.channel_id,
@@ -213,7 +213,7 @@ impl Message {
         #[cfg(feature = "cache")]
         {
             if let Some(cache) = cache_http.cache() {
-                if self.author.id != cache.current_user_id() {
+                if self.author.id != cache.current_user().id {
                     if self.is_private() {
                         return Err(Error::Model(ModelError::NotAuthor));
                     }
@@ -328,7 +328,7 @@ impl Message {
         #[cfg(feature = "cache")]
         {
             if let Some(cache) = cache_http.cache() {
-                if self.author.id != cache.current_user_id() {
+                if self.author.id != cache.current_user().id {
                     return Err(Error::Model(ModelError::InvalidUser));
                 }
             }
@@ -553,7 +553,7 @@ impl Message {
                     )?;
                 }
 
-                user_id = Some(cache.current_user_id());
+                user_id = Some(cache.current_user().id);
             }
         }
 
@@ -715,7 +715,7 @@ impl Message {
                     Permissions::MANAGE_MESSAGES,
                 )?;
 
-                if self.author.id != cache.current_user_id() {
+                if self.author.id != cache.current_user().id {
                     return Err(Error::Model(ModelError::NotAuthor));
                 }
             }
@@ -753,7 +753,7 @@ impl Message {
         #[cfg(feature = "cache")]
         {
             if let Some(cache) = cache_http.cache() {
-                return Ok(self.mentions_user_id(cache.current_user_id()));
+                return Ok(self.mentions_user_id(cache.current_user().id));
             }
         }
 
