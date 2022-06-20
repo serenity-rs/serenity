@@ -441,14 +441,14 @@ impl PresenceUser {
     }
 
     #[cfg(feature = "cache")] // method is only used with the cache feature enabled
-    pub(crate) fn update_with_user(&mut self, user: User) {
+    pub(crate) fn update_with_user(&mut self, user: &User) {
         self.id = user.id;
-        if let Some(avatar) = user.avatar {
-            self.avatar = Some(avatar);
+        if let Some(avatar) = &user.avatar {
+            self.avatar = Some(avatar.clone());
         }
         self.bot = Some(user.bot);
         self.discriminator = Some(user.discriminator);
-        self.name = Some(user.name);
+        self.name = Some(user.name.clone());
         if let Some(public_flags) = user.public_flags {
             self.public_flags = Some(public_flags);
         }

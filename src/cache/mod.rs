@@ -34,6 +34,8 @@ use std::collections::{HashMap, VecDeque};
 use std::hash::Hash;
 use std::str::FromStr;
 #[cfg(feature = "temp_cache")]
+use std::sync::Arc;
+#[cfg(feature = "temp_cache")]
 use std::time::Duration;
 
 use dashmap::mapref::entry::Entry;
@@ -57,6 +59,8 @@ type MessageCache = DashMap<ChannelId, HashMap<MessageId, Message>>;
 struct NotSend;
 
 enum CacheRefInner<'a, K, V> {
+    #[cfg(feature = "temp_cache")]
+    Arc(Arc<V>),
     DashRef(Ref<'a, K, V>),
     ReadGuard(parking_lot::RwLockReadGuard<'a, V>),
 }
@@ -74,6 +78,11 @@ impl<'a, K, V> CacheRef<'a, K, V> {
         }
     }
 
+    #[cfg(feature = "temp_cache")]
+    fn from_arc(inner: Arc<V>) -> Self {
+        Self::new(CacheRefInner::Arc(inner))
+    }
+
     fn from_ref(inner: Ref<'a, K, V>) -> Self {
         Self::new(CacheRefInner::DashRef(inner))
     }
@@ -88,12 +97,15 @@ impl<K: Eq + Hash, V> std::ops::Deref for CacheRef<'_, K, V> {
 
     fn deref(&self) -> &Self::Target {
         match &self.inner {
+            #[cfg(feature = "temp_cache")]
+            CacheRefInner::Arc(inner) => &*inner,
             CacheRefInner::DashRef(inner) => inner.value(),
             CacheRefInner::ReadGuard(inner) => &*inner,
         }
     }
 }
 
+pub type UserRef<'a> = CacheRef<'a, UserId, User>;
 pub type GuildRef<'a> = CacheRef<'a, GuildId, Guild>;
 pub type CurrentUserRef<'a> = CacheRef<'a, (), CurrentUser>;
 pub type GuildChannelRef<'a> = CacheRef<'a, ChannelId, GuildChannel>;
@@ -214,7 +226,7 @@ pub struct Cache {
     ///
     /// Each value has a max TTL of 1 hour.
     #[cfg(feature = "temp_cache")]
-    pub(crate) temp_users: DashCache<UserId, User>,
+    pub(crate) temp_users: DashCache<UserId, Arc<User>>,
     /// The settings for the cache.
     settings: RwLock<Settings>,
 }
@@ -837,22 +849,22 @@ impl Cache {
     /// # }
     /// ```
     #[inline]
-    pub fn user<U: Into<UserId>>(&self, user_id: U) -> Option<User> {
+    pub fn user<U: Into<UserId>>(&self, user_id: U) -> Option<UserRef<'_>> {
         self._user(user_id.into())
     }
 
     #[cfg(feature = "temp_cache")]
-    fn _user(&self, user_id: UserId) -> Option<User> {
+    fn _user(&self, user_id: UserId) -> Option<UserRef<'_>> {
         if let Some(user) = self.users.get(&user_id) {
-            Some(user.clone())
+            Some(CacheRef::from_ref(user))
         } else {
-            self.temp_users.get(&user_id)
+            self.temp_users.get(&user_id).map(CacheRef::from_arc)
         }
     }
 
     #[cfg(not(feature = "temp_cache"))]
-    fn _user(&self, user_id: UserId) -> Option<User> {
-        self.users.get(&user_id).map(|u| u.clone())
+    fn _user(&self, user_id: UserId) -> Option<UserRef<'_>> {
+        self.users.get(&user_id).map(CacheRef::from_ref)
     }
 
     /// Clones all users and returns them.
