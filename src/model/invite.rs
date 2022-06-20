@@ -74,11 +74,7 @@ impl Invite {
     /// [permission]: super::permissions
     #[inline]
     pub fn create(channel_id: impl Into<ChannelId>) -> CreateInvite {
-        CreateInvite::new(
-            channel_id.into(),
-            #[cfg(feature = "cache")]
-            None,
-        )
+        channel_id.into().create_invite()
     }
 
     /// Deletes the invite.

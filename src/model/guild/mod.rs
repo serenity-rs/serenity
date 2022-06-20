@@ -577,7 +577,7 @@ impl Guild {
     ///
     /// [Manage Channels]: Permissions::MANAGE_CHANNELS
     pub fn create_channel(&self) -> CreateChannel {
-        CreateChannel::new(self.id)
+        self.id.create_channel()
     }
 
     /// Creates an emoji in the guild with a name and base64-encoded image. The
@@ -860,7 +860,7 @@ impl Guild {
     ///
     /// [Manage Events]: Permissions::MANAGE_EVENTS
     pub fn create_scheduled_event(&self) -> CreateScheduledEvent {
-        CreateScheduledEvent::new(self.id)
+        self.id.create_scheduled_event()
     }
 
     /// Returns a request builder that will create a new [`Sticker`] in the guild when executed.
@@ -869,7 +869,7 @@ impl Guild {
     ///
     /// [Manage Emojis and Stickers]: crate::model::permissions::Permissions::MANAGE_EMOJIS_AND_STICKERS
     pub fn create_sticker<'a>(&self) -> CreateSticker<'a> {
-        CreateSticker::new(self.id)
+        self.id.create_sticker()
     }
 
     /// Deletes the current guild if the current user is the owner of the

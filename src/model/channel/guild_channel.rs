@@ -1157,7 +1157,7 @@ impl GuildChannel {
 
     /// Returns a request builder that creates a [`StageInstance`] when executed.
     pub fn create_stage_instance(&self) -> CreateStageInstance {
-        CreateStageInstance::new(self.id)
+        self.id.create_stage_instance()
     }
 
     /// Edits a stage instance.

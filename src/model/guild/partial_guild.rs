@@ -307,7 +307,7 @@ impl PartialGuild {
     /// [Manage Channels]: Permissions::MANAGE_CHANNELS
     #[inline]
     pub fn create_channel(&self) -> CreateChannel {
-        CreateChannel::new(self.id)
+        self.id.create_channel()
     }
 
     /// Creates an emoji in the guild with a name and base64-encoded image.
@@ -569,7 +569,7 @@ impl PartialGuild {
     ///
     /// [Manage Emojis and Stickers]: crate::model::permissions::Permissions::MANAGE_EMOJIS_AND_STICKERS
     pub fn create_sticker<'a>(&self) -> CreateSticker<'a> {
-        CreateSticker::new(self.id)
+        self.id.create_sticker()
     }
 
     /// Deletes the current guild if the current user is the owner of the
