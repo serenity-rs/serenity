@@ -165,7 +165,7 @@ pub(crate) mod discriminator {
 }
 
 /// Information about the current user.
-#[derive(Clone, Default, Debug, Deserialize, Serialize)]
+#[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 pub struct CurrentUser {
     pub id: UserId,
@@ -321,7 +321,7 @@ impl CurrentUser {
                 .as_ref()
                 .get_guilds(
                     Some(&GuildPagination::After(
-                        guilds.last().map_or(GuildId(1), |g: &GuildInfo| g.id),
+                        guilds.last().map_or(GuildId::new(1), |g: &GuildInfo| g.id),
                     )),
                     Some(100),
                 )
@@ -533,6 +533,24 @@ impl CurrentUser {
     }
 }
 
+impl Default for CurrentUser {
+    fn default() -> Self {
+        Self {
+            id: UserId::new(1),
+            avatar: None,
+            bot: Default::default(),
+            discriminator: Default::default(),
+            email: None,
+            mfa_enabled: Default::default(),
+            name: String::default(),
+            verified: None,
+            public_flags: None,
+            banner: None,
+            accent_colour: None,
+        }
+    }
+}
+
 /// An enum that represents a default avatar.
 ///
 /// The default avatar is calculated via the result of `discriminator % 5`.
@@ -693,7 +711,7 @@ bitflags! {
 
 impl Default for User {
     /// Initializes a [`User`] with default values. Setting the following:
-    /// - **id** to `UserId(210)`
+    /// - **id** to `UserId::new(210)`
     /// - **avatar** to `Some("abc")`
     /// - **bot** to `true`.
     /// - **discriminator** to `1432`.
@@ -701,7 +719,7 @@ impl Default for User {
     /// - **public_flags** to [`None`].
     fn default() -> Self {
         User {
-            id: UserId(210),
+            id: UserId::new(210),
             avatar: Some("abc".to_string()),
             bot: true,
             discriminator: 1432,
@@ -1128,7 +1146,7 @@ impl UserId {
             }
         }
 
-        let user = cache_http.http().get_user(self.0).await?;
+        let user = cache_http.http().get_user(self.get()).await?;
 
         #[cfg(all(feature = "cache", feature = "temp_cache"))]
         {

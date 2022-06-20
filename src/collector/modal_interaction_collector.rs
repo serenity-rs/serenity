@@ -1,5 +1,6 @@
 use std::fmt;
 use std::future::Future;
+use std::num::NonZeroU64;
 use std::pin::Pin;
 use std::sync::Arc;
 use std::task::{Context as FutContext, Poll};
@@ -115,10 +116,10 @@ struct FilterOptions {
     filter_limit: Option<u32>,
     collect_limit: Option<u32>,
     filter: Option<FilterFn<ModalSubmitInteraction>>,
-    channel_id: Option<u64>,
-    guild_id: Option<u64>,
-    author_id: Option<u64>,
-    message_id: Option<u64>,
+    channel_id: Option<NonZeroU64>,
+    guild_id: Option<NonZeroU64>,
+    author_id: Option<NonZeroU64>,
+    message_id: Option<NonZeroU64>,
 }
 
 impl fmt::Debug for FilterOptions {

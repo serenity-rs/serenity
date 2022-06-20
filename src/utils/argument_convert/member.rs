@@ -54,8 +54,10 @@ impl ArgumentConvert for Member {
         // DON'T use guild.members: it's only populated when guild presences intent is enabled!
 
         // If string is a raw user ID or a mention
-        if let Some(user_id) = s.parse().ok().or_else(|| crate::utils::parse_username(s)) {
-            if let Ok(member) = guild_id.member(ctx, UserId(user_id)).await {
+        if let Some(user_id) =
+            s.parse().ok().map(UserId).or_else(|| crate::utils::parse_username(s))
+        {
+            if let Ok(member) = guild_id.member(ctx, user_id).await {
                 return Ok(member);
             }
         }

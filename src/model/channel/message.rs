@@ -22,6 +22,7 @@ use crate::collector::{
 };
 #[cfg(feature = "model")]
 use crate::http::{CacheHttp, Http};
+#[cfg(feature = "model")]
 use crate::json::prelude::*;
 use crate::model::application::component::ActionRow;
 use crate::model::application::interaction::MessageInteraction;
@@ -91,7 +92,7 @@ pub struct Message {
     pub mentions: Vec<User>,
     /// Non-repeating number used for ensuring message order.
     #[serde(default)]
-    pub nonce: Value,
+    pub nonce: Option<Nonce>,
     /// Indicator of whether the message is pinned.
     pub pinned: bool,
     /// Array of reactions performed on the message.
@@ -172,7 +173,7 @@ impl Message {
             }
         }
 
-        self.channel_id.crosspost(cache_http.http(), self.id.0).await
+        self.channel_id.crosspost(cache_http.http(), self.id).await
     }
 
     /// First attempts to find a [`Channel`] by its Id in the cache,
@@ -253,7 +254,11 @@ impl Message {
             }
         }
 
-        cache_http.http().as_ref().delete_message_reactions(self.channel_id.0, self.id.0).await
+        cache_http
+            .http()
+            .as_ref()
+            .delete_message_reactions(self.channel_id.get(), self.id.get())
+            .await
     }
 
     /// Deletes all of the [`Reaction`]s of a given emoji associated with the message.
@@ -287,7 +292,11 @@ impl Message {
         cache_http
             .http()
             .as_ref()
-            .delete_message_reaction_emoji(self.channel_id.0, self.id.0, &reaction_type.into())
+            .delete_message_reaction_emoji(
+                self.channel_id.get(),
+                self.id.get(),
+                &reaction_type.into(),
+            )
             .await
     }
 
@@ -357,7 +366,7 @@ impl Message {
         let files = std::mem::take(&mut builder.files);
 
         *self = http
-            .edit_message_and_attachments(self.channel_id.0, self.id.0, &builder, files)
+            .edit_message_and_attachments(self.channel_id.get(), self.id.get(), &builder, files)
             .await?;
         Ok(())
     }
@@ -508,7 +517,7 @@ impl Message {
             }
         }
 
-        self.channel_id.pin(cache_http.http(), self.id.0).await
+        self.channel_id.pin(cache_http.http(), self.id).await
     }
 
     /// React to the message with a custom [`Emoji`] or unicode character.
@@ -556,7 +565,10 @@ impl Message {
             }
         }
 
-        cache_http.http().create_reaction(self.channel_id.0, self.id.0, &reaction_type).await?;
+        cache_http
+            .http()
+            .create_reaction(self.channel_id.get(), self.id.get(), &reaction_type)
+            .await?;
 
         Ok(Reaction {
             channel_id: self.channel_id,
@@ -723,7 +735,8 @@ impl Message {
         let mut suppress = EditMessage::default();
         suppress.suppress_embeds(true);
 
-        *self = cache_http.http().edit_message(self.channel_id.0, self.id.0, &suppress).await?;
+        *self =
+            cache_http.http().edit_message(self.channel_id.get(), self.id.get(), &suppress).await?;
 
         Ok(())
     }
@@ -786,7 +799,7 @@ impl Message {
             }
         }
 
-        cache_http.http().unpin_message(self.channel_id.0, self.id.0, None).await
+        cache_http.http().unpin_message(self.channel_id.get(), self.id.get(), None).await
     }
 
     /// Tries to return author's nickname in the current channel's guild.
@@ -1231,4 +1244,11 @@ impl MessageId {
 
         self.link(channel_id, guild_id)
     }
+}
+
+#[derive(Clone, Debug, Deserialize, Serialize)]
+#[serde(untagged)]
+pub enum Nonce {
+    String(String),
+    Number(u64),
 }

@@ -87,7 +87,7 @@ use super::Cache;
 /// let mut update_message = DatabaseUserUpdate {
 ///     user_avatar: None,
 ///     user_discriminator: 6082,
-///     user_id: UserId(379740138303127564),
+///     user_id: UserId::new(379740138303127564),
 ///     user_is_bot: true,
 ///     user_name: "TofuBot".to_owned(),
 /// };

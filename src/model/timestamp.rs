@@ -8,7 +8,7 @@
 //! # use serenity::model::id::GuildId;
 //! # use serenity::model::Timestamp;
 //! #
-//! let timestamp: Timestamp = GuildId(175928847299117063).created_at();
+//! let timestamp: Timestamp = GuildId::new(175928847299117063).created_at();
 //! assert_eq!(timestamp.unix_timestamp(), 1462015105);
 //! assert_eq!(timestamp.to_string(), "2016-04-30T11:18:25.796Z");
 //! ```
@@ -50,7 +50,7 @@ cfg_if::cfg_if! {
         /// # use serenity::model::id::GuildId;
         /// # use serenity::model::Timestamp;
         /// #
-        /// let timestamp: Timestamp = GuildId(175928847299117063).created_at();
+        /// let timestamp: Timestamp = GuildId::new(175928847299117063).created_at();
         /// assert_eq!(timestamp.unix_timestamp(), 1462015105);
         /// assert_eq!(timestamp.to_string(), "2016-04-30T11:18:25.796Z");
         /// ```
@@ -128,7 +128,7 @@ cfg_if::cfg_if! {
         /// # use serenity::model::id::GuildId;
         /// # use serenity::model::Timestamp;
         /// #
-        /// let timestamp: Timestamp = GuildId(175928847299117063).created_at();
+        /// let timestamp: Timestamp = GuildId::new(175928847299117063).created_at();
         /// assert_eq!(timestamp.unix_timestamp(), 1462015105);
         /// assert_eq!(timestamp.to_string(), "2016-04-30T11:18:25.796Z");
         /// ```

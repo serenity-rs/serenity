@@ -1,5 +1,6 @@
 use std::fmt;
 use std::future::Future;
+use std::num::NonZeroU64;
 use std::pin::Pin;
 use std::sync::Arc;
 use std::task::{Context as FutContext, Poll};
@@ -17,7 +18,6 @@ use crate::client::bridge::gateway::ShardMessenger;
 use crate::collector::macros::*;
 use crate::collector::{FilterFn, LazyArc};
 use crate::model::channel::Reaction;
-use crate::model::id::UserId;
 
 macro_rules! impl_reaction_collector {
     ($($name:ident;)*) => {
@@ -185,10 +185,7 @@ impl ReactionFilter {
         self.options.guild_id.map_or(true, |id| Some(id) == reaction.guild_id.map(|g| g.0))
             && self.options.message_id.map_or(true, |id| id == reaction.message_id.0)
             && self.options.channel_id.map_or(true, |id| id == reaction.channel_id.0)
-            && self
-                .options
-                .author_id
-                .map_or(true, |id| id == reaction.user_id.unwrap_or(UserId(0)).0)
+            && self.options.author_id.map_or(true, |id| Some(id) == reaction.user_id.map(|u| u.0))
             && self.options.filter.as_ref().map_or(true, |f| f.0(reaction))
     }
 
@@ -206,10 +203,10 @@ struct FilterOptions {
     filter_limit: Option<u32>,
     collect_limit: Option<u32>,
     filter: Option<FilterFn<Reaction>>,
-    channel_id: Option<u64>,
-    guild_id: Option<u64>,
-    author_id: Option<u64>,
-    message_id: Option<u64>,
+    channel_id: Option<NonZeroU64>,
+    guild_id: Option<NonZeroU64>,
+    author_id: Option<NonZeroU64>,
+    message_id: Option<NonZeroU64>,
     accept_added: bool,
     accept_removed: bool,
 }

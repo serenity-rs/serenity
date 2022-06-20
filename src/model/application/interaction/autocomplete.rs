@@ -90,7 +90,7 @@ impl AutocompleteInteraction {
             kind: InteractionResponseType::Autocomplete,
         };
 
-        http.as_ref().create_interaction_response(self.id.0, &self.token, &map).await
+        http.as_ref().create_interaction_response(self.id.get(), &self.token, &map).await
     }
 }
 

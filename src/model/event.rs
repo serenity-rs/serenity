@@ -245,10 +245,9 @@ impl<'de> Deserialize<'de> for GuildMembersChunkEvent {
 
                 let members = members
                     .into_iter()
-                    .map(|m| {
-                        let mut m = Member::from(m);
-                        m.guild_id = guild_id;
-                        (m.user.id, m)
+                    .map(|mut m| {
+                        m.guild_id = Some(guild_id);
+                        (m.user.id, Member::from(m))
                     })
                     .collect();
 

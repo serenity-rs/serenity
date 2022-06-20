@@ -387,9 +387,8 @@ pub struct ClientStatus {
 }
 
 /// Information about the user of a [`Presence`] event.
-#[derive(Clone, Default, Debug, Deserialize, Serialize)]
+#[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
-#[serde(default)]
 pub struct PresenceUser {
     pub id: UserId,
     pub avatar: Option<String>,

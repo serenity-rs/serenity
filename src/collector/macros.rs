@@ -12,7 +12,7 @@ macro_rules! gen_macro {
 gen_macro!(
     impl_author_id,
     pub fn author_id(mut self, author_id: impl Into<u64>) -> Self {
-        self.filter.as_mut().unwrap().author_id = Some(author_id.into());
+        self.filter.as_mut().unwrap().author_id = std::num::NonZeroU64::new(author_id.into());
 
         self
     }
@@ -21,7 +21,7 @@ gen_macro!(
 gen_macro!(
     impl_channel_id,
     pub fn channel_id(mut self, channel_id: impl Into<u64>) -> Self {
-        self.filter.as_mut().unwrap().channel_id = Some(channel_id.into());
+        self.filter.as_mut().unwrap().channel_id = std::num::NonZeroU64::new(channel_id.into());
 
         self
     }
@@ -48,7 +48,7 @@ gen_macro!(
 gen_macro!(
     impl_guild_id,
     pub fn guild_id(mut self, guild_id: impl Into<u64>) -> Self {
-        self.filter.as_mut().unwrap().guild_id = Some(guild_id.into());
+        self.filter.as_mut().unwrap().guild_id = std::num::NonZeroU64::new(guild_id.into());
 
         self
     }
@@ -57,7 +57,7 @@ gen_macro!(
 gen_macro!(
     impl_message_id,
     pub fn message_id(mut self, message_id: impl Into<u64>) -> Self {
-        self.filter.as_mut().unwrap().message_id = Some(message_id.into());
+        self.filter.as_mut().unwrap().message_id = std::num::NonZeroU64::new(message_id.into());
 
         self
     }

@@ -88,7 +88,7 @@ impl From<(bool, bool, bool)> for WithWhiteSpace {
 /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
 /// let token = std::env::var("DISCORD_BOT_TOKEN")?;
 /// let framework =
-///     StandardFramework::new().configure(|c| c.on_mention(Some(UserId(5))).prefix("~"));
+///     StandardFramework::new().configure(|c| c.on_mention(Some(UserId::new(5))).prefix("~"));
 ///
 /// let mut client = Client::builder(&token, GatewayIntents::default())
 ///     .event_handler(Handler)
@@ -197,8 +197,9 @@ impl Configuration {
     /// use serenity::framework::StandardFramework;
     /// use serenity::model::id::ChannelId;
     ///
-    /// let framework = StandardFramework::new()
-    ///     .configure(|c| c.allowed_channels(vec![ChannelId(7), ChannelId(77)].into_iter().collect()));
+    /// let framework = StandardFramework::new().configure(|c| {
+    ///     c.allowed_channels(vec![ChannelId::new(7), ChannelId::new(77)].into_iter().collect())
+    /// });
     /// ```
     pub fn allowed_channels(&mut self, channels: HashSet<ChannelId>) -> &mut Self {
         self.allowed_channels = channels;
@@ -219,8 +220,9 @@ impl Configuration {
     /// use serenity::framework::StandardFramework;
     /// use serenity::model::id::GuildId;
     ///
-    /// let framework = StandardFramework::new()
-    ///     .configure(|c| c.blocked_guilds(vec![GuildId(7), GuildId(77)].into_iter().collect()));
+    /// let framework = StandardFramework::new().configure(|c| {
+    ///     c.blocked_guilds(vec![GuildId::new(7), GuildId::new(77)].into_iter().collect())
+    /// });
     /// ```
     pub fn blocked_guilds(&mut self, guilds: HashSet<GuildId>) -> &mut Self {
         self.blocked_guilds = guilds;
@@ -243,8 +245,9 @@ impl Configuration {
     /// use serenity::framework::StandardFramework;
     /// use serenity::model::id::UserId;
     ///
-    /// let framework = StandardFramework::new()
-    ///     .configure(|c| c.blocked_users(vec![UserId(7), UserId(77)].into_iter().collect()));
+    /// let framework = StandardFramework::new().configure(|c| {
+    ///     c.blocked_users(vec![UserId::new(7), UserId::new(77)].into_iter().collect())
+    /// });
     /// ```
     pub fn blocked_users(&mut self, users: HashSet<UserId>) -> &mut Self {
         self.blocked_users = users;
@@ -319,9 +322,9 @@ impl Configuration {
     ///
     /// let framework = StandardFramework::new().configure(|c| {
     ///     c.dynamic_prefix(|_, msg| {
-    ///         Box::pin(
-    ///             async move { Some(if msg.channel_id.0 % 5 == 0 { "!" } else { "*" }.to_string()) },
-    ///         )
+    ///         Box::pin(async move {
+    ///             Some(if msg.channel_id.get() % 5 == 0 { "!" } else { "*" }.to_string())
+    ///         })
     ///     })
     /// });
     /// ```
@@ -335,9 +338,9 @@ impl Configuration {
     ///
     /// let framework = StandardFramework::new().configure(|c| {
     ///     c.dynamic_prefix(|_, msg| {
-    ///         Box::pin(
-    ///             async move { Some(if msg.channel_id.0 % 5 == 0 { "!" } else { "*" }.to_string()) },
-    ///         )
+    ///         Box::pin(async move {
+    ///             Some(if msg.channel_id.get() % 5 == 0 { "!" } else { "*" }.to_string())
+    ///         })
     ///     })
     ///     .prefix("") // This disables the default prefix "~"
     /// });
@@ -411,7 +414,7 @@ impl Configuration {
     /// use serenity::model::id::UserId;
     ///
     /// let framework = StandardFramework::new()
-    ///     .configure(|c| c.owners(vec![UserId(7), UserId(77)].into_iter().collect()));
+    ///     .configure(|c| c.owners(vec![UserId::new(7), UserId::new(77)].into_iter().collect()));
     /// ```
     ///
     /// Create a HashSet beforehand:
@@ -423,8 +426,8 @@ impl Configuration {
     /// use serenity::model::id::UserId;
     ///
     /// let mut set = HashSet::new();
-    /// set.insert(UserId(7));
-    /// set.insert(UserId(77));
+    /// set.insert(UserId::new(7));
+    /// set.insert(UserId::new(77));
     ///
     /// let framework = StandardFramework::new().configure(|c| c.owners(set));
     /// ```

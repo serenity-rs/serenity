@@ -84,12 +84,12 @@ pub struct Role {
 
 /// Helper for deserialization without a `GuildId` but then later updated to the correct `GuildId`.
 ///
-/// The only difference to `Role` is `#[serde(default)]` on `guild_id`.
+/// The only difference to `Role` is `guild_id` is wrapped in `Option`.
 #[derive(Deserialize)]
 pub(crate) struct InterimRole {
     pub id: RoleId,
     #[serde(default)]
-    pub guild_id: GuildId,
+    pub guild_id: Option<GuildId>,
     #[cfg(feature = "utils")]
     #[serde(rename = "color")]
     pub colour: Colour,
@@ -111,7 +111,7 @@ impl From<InterimRole> for Role {
     fn from(r: InterimRole) -> Self {
         Self {
             id: r.id,
-            guild_id: r.guild_id,
+            guild_id: r.guild_id.expect("GuildID was not set on InterimRole"),
             colour: r.colour,
             hoist: r.hoist,
             managed: r.managed,
@@ -140,7 +140,7 @@ impl Role {
     /// [Manage Roles]: Permissions::MANAGE_ROLES
     #[inline]
     pub async fn delete(&mut self, http: impl AsRef<Http>) -> Result<()> {
-        http.as_ref().delete_role(self.guild_id.0, self.id.0).await
+        http.as_ref().delete_role(self.guild_id.get(), self.id.get()).await
     }
 
     /// Edits a [`Role`], optionally setting its new fields.
@@ -153,7 +153,7 @@ impl Role {
     ///
     /// ```rust,ignore
     /// # use serenity::model::id::RoleId;
-    /// # let role = RoleId(7).to_role_cached(&cache).unwrap();
+    /// # let role = RoleId::new(7).to_role_cached(&cache).unwrap();
     /// // assuming a `role` has already been bound
     /// role.edit(|r| r.hoist(true));
     /// ```
@@ -292,7 +292,7 @@ impl FromStrAndCache for Role {
         CRL: AsRef<Cache> + Send + Sync,
     {
         match parse_role(s) {
-            Some(x) => match RoleId(x).to_role_cached(&cache) {
+            Some(x) => match x.to_role_cached(&cache) {
                 Some(role) => Ok(role),
                 None => Err(RoleParseError::NotPresentInCache),
             },

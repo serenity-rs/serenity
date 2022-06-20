@@ -47,7 +47,7 @@ impl<'de> Deserialize<'de> for Reaction {
         if let Some(id) = guild_id {
             if let Some(member) = map.get_mut("member") {
                 if let Some(object) = member.as_object_mut() {
-                    object.insert("guild_id".to_owned(), from_number(id.0));
+                    object.insert("guild_id".to_owned(), from_number(id.get()));
                 }
             }
         }
@@ -102,7 +102,7 @@ impl Reaction {
     /// [permissions]: super::permissions
     pub async fn delete(&self, cache_http: impl CacheHttp) -> Result<()> {
         #[cfg_attr(not(feature = "cache"), allow(unused_mut))]
-        let mut user_id = self.user_id.map(|id| id.0);
+        let mut user_id = self.user_id;
 
         #[cfg(feature = "cache")]
         {
@@ -124,7 +124,12 @@ impl Reaction {
 
         cache_http
             .http()
-            .delete_reaction(self.channel_id.0, self.message_id.0, user_id, &self.emoji)
+            .delete_reaction(
+                self.channel_id.get(),
+                self.message_id.get(),
+                user_id.map(UserId::get),
+                &self.emoji,
+            )
             .await
     }
 
@@ -157,7 +162,11 @@ impl Reaction {
         cache_http
             .http()
             .as_ref()
-            .delete_message_reaction_emoji(self.channel_id.0, self.message_id.0, &self.emoji)
+            .delete_message_reaction_emoji(
+                self.channel_id.get(),
+                self.message_id.get(),
+                &self.emoji,
+            )
             .await
     }
 
@@ -255,11 +264,11 @@ impl Reaction {
 
         http.as_ref()
             .get_reaction_users(
-                self.channel_id.0,
-                self.message_id.0,
+                self.channel_id.get(),
+                self.message_id.get(),
                 reaction_type,
                 limit,
-                after.map(|u| u.0),
+                after.map(UserId::get),
             )
             .await
     }
@@ -358,24 +367,24 @@ impl Serialize for ReactionType {
     where
         S: Serializer,
     {
-        match *self {
+        match self {
             ReactionType::Custom {
                 animated,
                 id,
-                ref name,
+                name,
             } => {
                 let mut map = serializer.serialize_map(Some(3))?;
 
-                map.serialize_entry("animated", &animated)?;
-                map.serialize_entry("id", &id)?;
-                map.serialize_entry("name", &name)?;
+                map.serialize_entry("animated", animated)?;
+                map.serialize_entry("id", id)?;
+                map.serialize_entry("name", name)?;
 
                 map.end()
             },
-            ReactionType::Unicode(ref name) => {
+            ReactionType::Unicode(name) => {
                 let mut map = serializer.serialize_map(Some(1))?;
 
-                map.serialize_entry("name", &name)?;
+                map.serialize_entry("name", name)?;
 
                 map.end()
             },
@@ -445,12 +454,12 @@ impl From<char> for ReactionType {
     /// # use serenity::client::Context;
     /// # #[cfg(feature = "framework")]
     /// # use serenity::framework::standard::{CommandResult, macros::command};
-    /// # use serenity::model::id::ChannelId;
+    /// # use serenity::model::id::{ChannelId, MessageId};
     /// #
     /// # #[cfg(all(feature = "client", feature = "framework", feature = "http"))]
     /// # #[command]
     /// # async fn example(ctx: &Context) -> CommandResult {
-    /// #   let message = ChannelId(0).message(&ctx.http, 0).await?;
+    /// #   let message = ChannelId::new(1).message(&ctx.http, MessageId::new(0)).await?;
     /// #
     /// message.react(ctx, '🍎').await?;
     /// # Ok(())
@@ -555,7 +564,7 @@ impl<'a> TryFrom<&'a str> for ReactionType {
     /// let reaction = ReactionType::try_from(emoji_string).unwrap();
     /// let reaction2 = ReactionType::Custom {
     ///     animated: false,
-    ///     id: EmojiId(600404340292059257),
+    ///     id: EmojiId::new(600404340292059257),
     ///     name: Some("customemoji".to_string()),
     /// };
     ///
@@ -587,9 +596,9 @@ impl<'a> TryFrom<&'a str> for ReactionType {
 
         let id = split_iter
             .next()
-            .and_then(|s| s.parse::<u64>().ok())
-            .ok_or(ReactionConversionError)?
-            .into();
+            .and_then(|s| s.parse().ok())
+            .map(EmojiId)
+            .ok_or(ReactionConversionError)?;
 
         Ok(ReactionType::Custom {
             animated,
