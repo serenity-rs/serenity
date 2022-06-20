@@ -3,13 +3,13 @@ use std::fmt;
 use std::sync::Arc;
 
 #[cfg(feature = "model")]
-use crate::builder::EditChannel;
-#[cfg(feature = "model")]
 use crate::builder::{
     CreateInvite,
     CreateMessage,
     CreateStageInstance,
     CreateThread,
+    CreateWebhook,
+    EditChannel,
     EditMessage,
     EditStageInstance,
     EditThread,
@@ -1147,47 +1147,15 @@ impl GuildChannel {
     /// Returns a [`ModelError::NameTooLong`] if the name of the webhook is
     /// over the limit of 100 characters.
     /// Returns a [`ModelError::InvalidChannelType`] if the channel type is not text.
-    pub async fn create_webhook(
-        &self,
-        http: impl AsRef<Http>,
-        name: impl std::fmt::Display,
-    ) -> Result<Webhook> {
-        let name = name.to_string();
-
-        if name.len() < 2 {
-            return Err(Error::Model(ModelError::NameTooShort));
-        } else if name.len() > 100 {
-            return Err(Error::Model(ModelError::NameTooLong));
-        } else if !self.is_text_based() {
-            return Err(Error::Model(ModelError::InvalidChannelType));
+    pub async fn create_webhook<F>(&self, http: impl AsRef<Http>, f: F) -> Result<Webhook>
+    where
+        F: FnOnce(&mut CreateWebhook) -> &mut CreateWebhook,
+    {
+        if self.is_text_based() {
+            self.id.create_webhook(&http, f).await
+        } else {
+            Err(Error::Model(ModelError::InvalidChannelType))
         }
-
-        self.id.create_webhook(&http, name).await
-    }
-
-    /// Creates a webhook with a name and an avatar.
-    ///
-    /// # Errors
-    ///
-    /// In addition to the reasons [`Self::create_webhook`] may return an [`Error::Http`],
-    /// if the image is too large.
-    pub async fn create_webhook_with_avatar<'a>(
-        &self,
-        http: impl AsRef<Http>,
-        name: impl std::fmt::Display,
-        avatar: impl Into<AttachmentType<'a>>,
-    ) -> Result<Webhook> {
-        let name = name.to_string();
-
-        if name.len() < 2 {
-            return Err(Error::Model(ModelError::NameTooShort));
-        } else if name.len() > 100 {
-            return Err(Error::Model(ModelError::NameTooLong));
-        } else if !self.is_text_based() {
-            return Err(Error::Model(ModelError::InvalidChannelType));
-        }
-
-        self.id.create_webhook_with_avatar(&http, name, avatar).await
     }
 
     /// Gets a stage instance.
