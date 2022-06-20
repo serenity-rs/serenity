@@ -51,8 +51,8 @@ impl GuildId {
     /// Returns a request builder that adds on execution will add a [`User`] to this guild with a
     /// valid OAuth2 access token.
     #[inline]
-    pub fn add_member(&self, user_id: impl Into<UserId>) -> AddMember {
-        AddMember::new(*self, user_id.into())
+    pub fn add_member(self, user_id: impl Into<UserId>) -> AddMember {
+        AddMember::new(self, user_id.into())
     }
 
     /// Ban a [`User`] from the guild, deleting a number of
@@ -211,8 +211,8 @@ impl GuildId {
     ///
     /// [Manage Channels]: Permissions::MANAGE_CHANNELS
     #[inline]
-    pub fn create_channel(&self) -> CreateChannel {
-        CreateChannel::new(*self)
+    pub fn create_channel(self) -> CreateChannel {
+        CreateChannel::new(self)
     }
 
     /// Creates an emoji in the guild with a name and base64-encoded image.
@@ -310,8 +310,8 @@ impl GuildId {
     /// **Note**: Requires the [Manage Events] permission.
     ///
     /// [Manage Events]: Permissions::MANAGE_EVENTS
-    pub fn create_scheduled_event(&self) -> CreateScheduledEvent {
-        CreateScheduledEvent::new(*self)
+    pub fn create_scheduled_event(self) -> CreateScheduledEvent {
+        CreateScheduledEvent::new(self)
     }
 
     /// Returns a request builder that will create a new [`Sticker`] in the guild when executed.
@@ -320,8 +320,8 @@ impl GuildId {
     ///
     /// [Manage Emojis and Stickers]: crate::model::permissions::Permissions::MANAGE_EMOJIS_AND_STICKERS
     #[inline]
-    pub fn create_sticker<'a>(&self) -> CreateSticker<'a> {
-        CreateSticker::new(*self)
+    pub fn create_sticker<'a>(self) -> CreateSticker<'a> {
+        CreateSticker::new(self)
     }
 
     /// Deletes the current guild if the current account is the owner of the

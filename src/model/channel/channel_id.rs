@@ -79,9 +79,9 @@ impl ChannelId {
     /// **Note**: Requires the [Create Instant Invite] permission.
     ///
     /// [Create Instant Invite]: Permissions::CREATE_INSTANT_INVITE
-    pub fn create_invite(&self) -> CreateInvite {
+    pub fn create_invite(self) -> CreateInvite {
         CreateInvite::new(
-            *self,
+            self,
             #[cfg(feature = "cache")]
             None,
         )
@@ -987,13 +987,13 @@ impl ChannelId {
 
     /// Returns a request builder that, when executed, will create a public thread that is
     /// connected to a message.
-    pub fn create_public_thread(&self, message_id: impl Into<MessageId>) -> CreateThread {
-        CreateThread::new(*self, Some(message_id.into()))
+    pub fn create_public_thread(self, message_id: impl Into<MessageId>) -> CreateThread {
+        CreateThread::new(self, Some(message_id.into()))
     }
 
     /// Returns a request builder that will create a private thread on execution.
-    pub fn create_private_thread(&self) -> CreateThread {
-        CreateThread::new(*self, None).kind(ChannelType::PrivateThread)
+    pub fn create_private_thread(self) -> CreateThread {
+        CreateThread::new(self, None).kind(ChannelType::PrivateThread)
     }
 
     /// Gets the thread members, if this channel is a thread.
