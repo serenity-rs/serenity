@@ -1411,7 +1411,7 @@
         <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
         {
             <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">cache</span>) <span class="op">=</span> <span class="ident">cache_http</span>.<span class="ident">cache</span>() {
-                <span class="kw">if</span> <span class="self">self</span>.<span class="ident">author</span>.<span class="ident">id</span> <span class="op">!</span><span class="op">=</span> <span class="ident">cache</span>.<span class="ident">current_user_id</span>() <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">guild_id</span>.<span class="ident">is_some</span>() {
+                <span class="kw">if</span> <span class="self">self</span>.<span class="ident">author</span>.<span class="ident">id</span> <span class="op">!</span><span class="op">=</span> <span class="ident">cache</span>.<span class="ident">current_user</span>().<span class="ident">id</span> <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">guild_id</span>.<span class="ident">is_some</span>() {
                     <span class="ident">utils::user_has_perms_cache</span>(
                         <span class="ident">cache</span>,
                         <span class="self">self</span>.<span class="ident">channel_id</span>,
@@ -1472,7 +1472,7 @@
         <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
         {
             <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">cache</span>) <span class="op">=</span> <span class="ident">cache_http</span>.<span class="ident">cache</span>() {
-                <span class="kw">if</span> <span class="self">self</span>.<span class="ident">author</span>.<span class="ident">id</span> <span class="op">!</span><span class="op">=</span> <span class="ident">cache</span>.<span class="ident">current_user_id</span>() {
+                <span class="kw">if</span> <span class="self">self</span>.<span class="ident">author</span>.<span class="ident">id</span> <span class="op">!</span><span class="op">=</span> <span class="ident">cache</span>.<span class="ident">current_user</span>().<span class="ident">id</span> {
                     <span class="kw">if</span> <span class="self">self</span>.<span class="ident">is_private</span>() {
                         <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::Model</span>(<span class="ident">ModelError::NotAuthor</span>));
                     }
@@ -1595,7 +1595,7 @@
         <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
         {
             <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">cache</span>) <span class="op">=</span> <span class="ident">cache_http</span>.<span class="ident">cache</span>() {
-                <span class="kw">if</span> <span class="self">self</span>.<span class="ident">author</span>.<span class="ident">id</span> <span class="op">!</span><span class="op">=</span> <span class="ident">cache</span>.<span class="ident">current_user_id</span>() {
+                <span class="kw">if</span> <span class="self">self</span>.<span class="ident">author</span>.<span class="ident">id</span> <span class="op">!</span><span class="op">=</span> <span class="ident">cache</span>.<span class="ident">current_user</span>().<span class="ident">id</span> {
                     <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::Model</span>(<span class="ident">ModelError::InvalidUser</span>));
                 }
             }
@@ -1820,7 +1820,7 @@
                     )<span class="question-mark">?</span>;
                 }
 
-                <span class="ident">user_id</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">cache</span>.<span class="ident">current_user_id</span>());
+                <span class="ident">user_id</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">cache</span>.<span class="ident">current_user</span>().<span class="ident">id</span>);
             }
         }
 
@@ -1985,7 +1985,7 @@
                     <span class="ident">Permissions::MANAGE_MESSAGES</span>,
                 )<span class="question-mark">?</span>;
 
-                <span class="kw">if</span> <span class="self">self</span>.<span class="ident">author</span>.<span class="ident">id</span> <span class="op">!</span><span class="op">=</span> <span class="ident">cache</span>.<span class="ident">current_user_id</span>() {
+                <span class="kw">if</span> <span class="self">self</span>.<span class="ident">author</span>.<span class="ident">id</span> <span class="op">!</span><span class="op">=</span> <span class="ident">cache</span>.<span class="ident">current_user</span>().<span class="ident">id</span> {
                     <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::Model</span>(<span class="ident">ModelError::NotAuthor</span>));
                 }
             }
@@ -2024,7 +2024,7 @@
         <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
         {
             <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">cache</span>) <span class="op">=</span> <span class="ident">cache_http</span>.<span class="ident">cache</span>() {
-                <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="self">self</span>.<span class="ident">mentions_user_id</span>(<span class="ident">cache</span>.<span class="ident">current_user_id</span>()));
+                <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="self">self</span>.<span class="ident">mentions_user_id</span>(<span class="ident">cache</span>.<span class="ident">current_user</span>().<span class="ident">id</span>));
             }
         }
 

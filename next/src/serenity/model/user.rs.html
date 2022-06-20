@@ -2214,15 +2214,15 @@
     <span class="doccomment">/// #   #[cfg(feature = &quot;cache&quot;)]</span>
     <span class="doccomment">///     async fn message(&amp;self, ctx: Context, msg: Message) {</span>
     <span class="doccomment">///         if msg.content == &quot;~help&quot; {</span>
-    <span class="doccomment">///             let url =</span>
-    <span class="doccomment">///                 match ctx.cache.current_user().invite_url(&amp;ctx, Permissions::empty()).await {</span>
-    <span class="doccomment">///                     Ok(v) =&gt; v,</span>
-    <span class="doccomment">///                     Err(why) =&gt; {</span>
-    <span class="doccomment">///                         println!(&quot;Error creating invite url: {:?}&quot;, why);</span>
+    <span class="doccomment">///             let current_user = ctx.cache.current_user().clone();</span>
+    <span class="doccomment">///             let url = match current_user.invite_url(&amp;ctx, Permissions::empty()).await {</span>
+    <span class="doccomment">///                 Ok(v) =&gt; v,</span>
+    <span class="doccomment">///                 Err(why) =&gt; {</span>
+    <span class="doccomment">///                     println!(&quot;Error creating invite url: {:?}&quot;, why);</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">///                         return;</span>
-    <span class="doccomment">///                     },</span>
-    <span class="doccomment">///                 };</span>
+    <span class="doccomment">///                     return;</span>
+    <span class="doccomment">///                 },</span>
+    <span class="doccomment">///             };</span>
     <span class="doccomment">///</span>
     <span class="doccomment">///             let help = format!(&quot;Helpful info here. Invite me with this link: &lt;{}&gt;&quot;, url,);</span>
     <span class="doccomment">///</span>

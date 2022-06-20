@@ -107,7 +107,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// let base64 = utils::read_image(&quot;./my_image.jpg&quot;).expect(&quot;Failed to read image&quot;);</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// let mut user = context.cache.current_user();</span>
+    <span class="doccomment">/// let mut user = context.cache.current_user().clone();</span>
     <span class="doccomment">/// let _ = user.edit(&amp;context, |p| p.avatar(Some(base64))).await;</span>
     <span class="doccomment">/// #     }</span>
     <span class="doccomment">/// # }</span>

@@ -1171,20 +1171,6 @@
 <span id="1166">1166</span>
 <span id="1167">1167</span>
 <span id="1168">1168</span>
-<span id="1169">1169</span>
-<span id="1170">1170</span>
-<span id="1171">1171</span>
-<span id="1172">1172</span>
-<span id="1173">1173</span>
-<span id="1174">1174</span>
-<span id="1175">1175</span>
-<span id="1176">1176</span>
-<span id="1177">1177</span>
-<span id="1178">1178</span>
-<span id="1179">1179</span>
-<span id="1180">1180</span>
-<span id="1181">1181</span>
-<span id="1182">1182</span>
 </pre><pre class="rust"><code><span class="doccomment">//! A cache containing data received from [`Shard`]s.</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! Using the cache allows to avoid REST API requests via the [`http`] module</span>
@@ -1246,17 +1232,30 @@
 
 <span class="kw">struct</span> <span class="ident">NotSend</span>;
 
+<span class="kw">enum</span> <span class="ident">CacheRefInner</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">K</span>, <span class="ident">V</span><span class="op">&gt;</span> {
+    <span class="ident">DashRef</span>(<span class="ident">Ref</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">K</span>, <span class="ident">V</span><span class="op">&gt;</span>),
+    <span class="ident">ReadGuard</span>(<span class="ident">parking_lot::RwLockReadGuard</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">V</span><span class="op">&gt;</span>),
+}
+
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">CacheRef</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">K</span>, <span class="ident">V</span><span class="op">&gt;</span> {
-    <span class="ident">inner</span>: <span class="ident">Ref</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">K</span>, <span class="ident">V</span><span class="op">&gt;</span>,
+    <span class="ident">inner</span>: <span class="ident">CacheRefInner</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">K</span>, <span class="ident">V</span><span class="op">&gt;</span>,
     <span class="ident">phantom</span>: <span class="ident">std::marker::PhantomData</span><span class="op">&lt;</span><span class="kw-2">*const</span> <span class="ident">NotSend</span><span class="op">&gt;</span>,
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">K</span>, <span class="ident">V</span><span class="op">&gt;</span> <span class="ident">CacheRef</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">K</span>, <span class="ident">V</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">from_ref</span>(<span class="ident">inner</span>: <span class="ident">Ref</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">K</span>, <span class="ident">V</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">CacheRef</span> {
+    <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">inner</span>: <span class="ident">CacheRefInner</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">K</span>, <span class="ident">V</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
+        <span class="self">Self</span> {
             <span class="ident">inner</span>,
             <span class="ident">phantom</span>: <span class="ident">std::marker::PhantomData</span>,
         }
+    }
+
+    <span class="kw">fn</span> <span class="ident">from_ref</span>(<span class="ident">inner</span>: <span class="ident">Ref</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">K</span>, <span class="ident">V</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
+        <span class="ident"><span class="self">Self</span>::new</span>(<span class="ident">CacheRefInner::DashRef</span>(<span class="ident">inner</span>))
+    }
+
+    <span class="kw">fn</span> <span class="ident">from_guard</span>(<span class="ident">inner</span>: <span class="ident">parking_lot::RwLockReadGuard</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">V</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
+        <span class="ident"><span class="self">Self</span>::new</span>(<span class="ident">CacheRefInner::ReadGuard</span>(<span class="ident">inner</span>))
     }
 }
 
@@ -1264,11 +1263,15 @@
     <span class="kw">type</span> <span class="ident">Target</span> <span class="op">=</span> <span class="ident">V</span>;
 
     <span class="kw">fn</span> <span class="ident">deref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident"><span class="self">Self</span>::Target</span> {
-        <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">value</span>()
+        <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">inner</span> {
+            <span class="ident">CacheRefInner::DashRef</span>(<span class="ident">inner</span>) =&gt; <span class="ident">inner</span>.<span class="ident">value</span>(),
+            <span class="ident">CacheRefInner::ReadGuard</span>(<span class="ident">inner</span>) =&gt; <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">inner</span>,
+        }
     }
 }
 
 <span class="kw">pub</span> <span class="kw">type</span> <span class="ident">GuildRef</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">CacheRef</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">GuildId</span>, <span class="ident">Guild</span><span class="op">&gt;</span>;
+<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">CurrentUserRef</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">CacheRef</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, (), <span class="ident">CurrentUser</span><span class="op">&gt;</span>;
 <span class="kw">pub</span> <span class="kw">type</span> <span class="ident">GuildChannelRef</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">CacheRef</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">ChannelId</span>, <span class="ident">GuildChannel</span><span class="op">&gt;</span>;
 <span class="kw">pub</span> <span class="kw">type</span> <span class="ident">PrivateChannelRef</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">CacheRef</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">ChannelId</span>, <span class="ident">PrivateChannel</span><span class="op">&gt;</span>;
 
@@ -2091,41 +2094,10 @@
         <span class="self">self</span>.<span class="ident">categories</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="ident">channel_id</span>).<span class="ident">map</span>(<span class="op">|</span><span class="ident">category</span><span class="op">|</span> <span class="ident">category</span>.<span class="ident">id</span>)
     }
 
-    <span class="doccomment">/// This method clones and returns the user used by the bot.</span>
+    <span class="doccomment">/// This method provides a reference to the user used by the bot.</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">current_user</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">CurrentUser</span> {
-        <span class="self">self</span>.<span class="ident">user</span>.<span class="ident">read</span>().<span class="ident">clone</span>()
-    }
-
-    <span class="doccomment">/// This method returns the bot&#39;s ID.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">current_user_id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">UserId</span> {
-        <span class="self">self</span>.<span class="ident">user</span>.<span class="ident">read</span>().<span class="ident">id</span>
-    }
-
-    <span class="doccomment">/// This method allows to only clone a field of the current user instead of</span>
-    <span class="doccomment">/// the entire user by providing a `field_selector`-closure picking what</span>
-    <span class="doccomment">/// you want to clone.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```rust,no_run</span>
-    <span class="doccomment">/// # use serenity::cache::Cache;</span>
-    <span class="doccomment">/// #</span>
-    <span class="doccomment">/// # fn run() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {</span>
-    <span class="doccomment">/// # let cache = Cache::default();</span>
-    <span class="doccomment">/// // We clone only the `name` instead of the entire channel.</span>
-    <span class="doccomment">/// let id = cache.current_user_field(|user| user.id);</span>
-    <span class="doccomment">/// println!(&quot;Current user&#39;s ID: {}&quot;, id);</span>
-    <span class="doccomment">/// #   Ok(())</span>
-    <span class="doccomment">/// # }</span>
-    <span class="doccomment">/// ```</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">current_user_field</span><span class="op">&lt;</span><span class="ident">Ret</span>: <span class="ident">Clone</span>, <span class="ident">Fun</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">field_selector</span>: <span class="ident">Fun</span>) -&gt; <span class="ident">Ret</span>
-    <span class="kw">where</span>
-        <span class="ident">Fun</span>: <span class="ident">FnOnce</span>(<span class="kw-2">&amp;</span><span class="ident">CurrentUser</span>) -&gt; <span class="ident">Ret</span>,
-    {
-        <span class="kw">let</span> <span class="ident">user</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">user</span>.<span class="ident">read</span>();
-
-        <span class="ident">field_selector</span>(<span class="kw-2">&amp;</span><span class="ident">user</span>)
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">current_user</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">CurrentUserRef</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> {
+        <span class="ident">CacheRef::from_guard</span>(<span class="self">self</span>.<span class="ident">user</span>.<span class="ident">read</span>())
     }
 
     <span class="doccomment">/// Updates the cache with the update implementation for an event or other</span>

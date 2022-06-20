@@ -2037,7 +2037,7 @@
     <span class="doccomment">/// #[serenity::async_trait]</span>
     <span class="doccomment">/// impl EventHandler for Handler {</span>
     <span class="doccomment">///     async fn message(&amp;self, context: Context, mut msg: Message) {</span>
-    <span class="doccomment">///         let current_user_id = context.cache.current_user_id();</span>
+    <span class="doccomment">///         let current_user_id = context.cache.current_user().id;</span>
     <span class="doccomment">///         let permissions = match context.cache.guild_channel(msg.channel_id) {</span>
     <span class="doccomment">///             Some(channel) =&gt; channel.permissions_for_user(&amp;context.cache, current_user_id),</span>
     <span class="doccomment">///             None =&gt; return,</span>
