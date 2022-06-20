@@ -4,7 +4,7 @@ use crate::model::id::GuildId;
 /// Preview [`Guild`] information.
 ///
 /// [`Guild`]: super::Guild
-#[derive(Clone, Debug, Serialize, Deserialize)]
+#[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 pub struct GuildPreview {
     /// The guild Id.

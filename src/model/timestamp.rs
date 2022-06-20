@@ -54,7 +54,7 @@ cfg_if::cfg_if! {
         /// assert_eq!(timestamp.unix_timestamp(), 1462015105);
         /// assert_eq!(timestamp.to_string(), "2016-04-30T11:18:25.796Z");
         /// ```
-        #[derive(Debug, Clone, Copy, Eq, PartialEq, Deserialize, Serialize, Ord, PartialOrd)]
+        #[derive(Clone, Copy, Debug, Eq, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
         #[serde(transparent)]
         pub struct Timestamp(DateTime<Utc>);
 
@@ -132,7 +132,7 @@ cfg_if::cfg_if! {
         /// assert_eq!(timestamp.unix_timestamp(), 1462015105);
         /// assert_eq!(timestamp.to_string(), "2016-04-30T11:18:25.796Z");
         /// ```
-        #[derive(Debug, Clone, Copy, Eq, PartialEq, Deserialize, Serialize, Ord, PartialOrd)]
+        #[derive(Clone, Copy, Debug, Eq, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
         #[serde(transparent)]
         pub struct Timestamp(#[serde(with = "rfc3339")] OffsetDateTime);
 

@@ -79,7 +79,7 @@ use crate::model::utils::{emojis, presences, roles, stickers};
 use crate::model::Timestamp;
 
 /// A representation of a banning of a user.
-#[derive(Clone, Debug, Deserialize, Eq, PartialEq, Hash, Serialize)]
+#[derive(Clone, Debug, Eq, Hash, PartialEq, Deserialize, Serialize)]
 pub struct Ban {
     /// The reason given for this ban.
     pub reason: Option<String>,
@@ -2716,7 +2716,7 @@ fn closest_to_origin(origin: &str, word_a: &str, word_b: &str) -> std::cmp::Orde
 }
 
 /// A [`Guild`] widget.
-#[derive(Clone, Debug, Serialize, Deserialize)]
+#[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 pub struct GuildWidget {
     /// Whether the widget is enabled.
@@ -2787,7 +2787,7 @@ pub struct UnavailableGuild {
 }
 
 /// Default message notification level for a guild.
-#[derive(Clone, Copy, Debug, Eq, Hash, PartialEq, PartialOrd, Ord)]
+#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
 #[non_exhaustive]
 pub enum DefaultMessageNotificationLevel {
     /// Receive notifications for everything.
@@ -2804,7 +2804,7 @@ enum_number!(DefaultMessageNotificationLevel {
 });
 
 /// Setting used to filter explicit messages from members.
-#[derive(Clone, Copy, Debug, Eq, Hash, PartialEq, PartialOrd, Ord)]
+#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
 #[non_exhaustive]
 pub enum ExplicitContentFilter {
     /// Don't scan any messages.
@@ -2824,7 +2824,7 @@ enum_number!(ExplicitContentFilter {
 });
 
 /// Multi-Factor Authentication level for guild moderators.
-#[derive(Clone, Copy, Debug, Eq, Hash, PartialEq, PartialOrd, Ord)]
+#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
 #[non_exhaustive]
 pub enum MfaLevel {
     /// MFA is disabled.
@@ -2842,7 +2842,7 @@ enum_number!(MfaLevel {
 
 /// The level to set as criteria prior to a user being able to send
 /// messages in a [`Guild`].
-#[derive(Clone, Copy, Debug, Eq, Hash, PartialEq, PartialOrd, Ord)]
+#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
 #[non_exhaustive]
 pub enum VerificationLevel {
     /// Does not require any verification.
@@ -2868,7 +2868,7 @@ enum_number!(VerificationLevel {
 });
 
 /// The [`Guild`] nsfw level.
-#[derive(Clone, Copy, Debug, Eq, Hash, PartialEq, PartialOrd, Ord)]
+#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
 #[non_exhaustive]
 pub enum NsfwLevel {
     /// The nsfw level is not specified.

@@ -118,7 +118,7 @@ impl Sticker {
 }
 
 /// Differentiates between sticker types.
-#[derive(Clone, Copy, Debug, Eq, Hash, PartialEq, PartialOrd, Ord)]
+#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
 #[non_exhaustive]
 pub enum StickerType {
     /// An official sticker in a pack, part of Nitro or in a removed purchasable
@@ -136,7 +136,7 @@ enum_number!(StickerType {
 });
 
 /// Differentiates between sticker formats.
-#[derive(Clone, Copy, Debug, Eq, Hash, PartialEq, PartialOrd, Ord)]
+#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
 #[non_exhaustive]
 pub enum StickerFormatType {
     /// A PNG format sticker.
