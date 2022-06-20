@@ -28,10 +28,11 @@ pub type Color = Colour;
 use std::ffi::OsStr;
 use std::fs::File;
 use std::io::Read;
+use std::num::NonZeroU64;
 use std::path::Path;
 
 use crate::internal::prelude::*;
-use crate::model::id::EmojiId;
+use crate::model::id::{ChannelId, EmojiId, RoleId, UserId};
 use crate::model::misc::EmojiIdentifier;
 
 #[cfg(feature = "model")]
@@ -112,13 +113,14 @@ pub fn parse_user_tag(s: &str) -> Option<(&str, u16)> {
 /// Retrieving an Id from a valid [`User`] mention:
 ///
 /// ```rust
+/// use serenity::model::id::UserId;
 /// use serenity::utils::parse_username;
 ///
 /// // regular username mention
-/// assert_eq!(parse_username("<@114941315417899012>"), Some(114941315417899012));
+/// assert_eq!(parse_username("<@114941315417899012>"), Some(UserId::new(114941315417899012)));
 ///
 /// // nickname mention
-/// assert_eq!(parse_username("<@!114941315417899012>"), Some(114941315417899012));
+/// assert_eq!(parse_username("<@!114941315417899012>"), Some(UserId::new(114941315417899012)));
 /// ```
 ///
 /// Asserting that an invalid username or nickname mention returns [`None`]:
@@ -131,7 +133,7 @@ pub fn parse_user_tag(s: &str) -> Option<(&str, u16)> {
 /// ```
 ///
 /// [`User`]: crate::model::user::User
-pub fn parse_username(mention: impl AsRef<str>) -> Option<u64> {
+pub fn parse_username(mention: impl AsRef<str>) -> Option<UserId> {
     let mention = mention.as_ref();
 
     if mention.len() < 4 {
@@ -140,10 +142,10 @@ pub fn parse_username(mention: impl AsRef<str>) -> Option<u64> {
 
     if mention.starts_with("<@!") {
         let len = mention.len() - 1;
-        mention[3..len].parse::<u64>().ok()
+        mention[3..len].parse().map(UserId).ok()
     } else if mention.starts_with("<@") {
         let len = mention.len() - 1;
-        mention[2..len].parse::<u64>().ok()
+        mention[2..len].parse().map(UserId).ok()
     } else {
         None
     }
@@ -158,9 +160,10 @@ pub fn parse_username(mention: impl AsRef<str>) -> Option<u64> {
 /// Retrieving an Id from a valid [`Role`] mention:
 ///
 /// ```rust
+/// use serenity::model::id::RoleId;
 /// use serenity::utils::parse_role;
 ///
-/// assert_eq!(parse_role("<@&136107769680887808>"), Some(136107769680887808));
+/// assert_eq!(parse_role("<@&136107769680887808>"), Some(RoleId::new(136107769680887808)));
 /// ```
 ///
 /// Asserting that an invalid role mention returns [`None`]:
@@ -172,7 +175,7 @@ pub fn parse_username(mention: impl AsRef<str>) -> Option<u64> {
 /// ```
 ///
 /// [`Role`]: crate::model::guild::Role
-pub fn parse_role(mention: impl AsRef<str>) -> Option<u64> {
+pub fn parse_role(mention: impl AsRef<str>) -> Option<RoleId> {
     let mention = mention.as_ref();
 
     if mention.len() < 4 {
@@ -181,7 +184,7 @@ pub fn parse_role(mention: impl AsRef<str>) -> Option<u64> {
 
     if mention.starts_with("<@&") && mention.ends_with('>') {
         let len = mention.len() - 1;
-        mention[3..len].parse::<u64>().ok()
+        mention[3..len].parse().map(RoleId).ok()
     } else {
         None
     }
@@ -196,9 +199,10 @@ pub fn parse_role(mention: impl AsRef<str>) -> Option<u64> {
 /// Retrieving an Id from a valid [`Channel`] mention:
 ///
 /// ```rust
+/// use serenity::model::id::ChannelId;
 /// use serenity::utils::parse_channel;
 ///
-/// assert_eq!(parse_channel("<#81384788765712384>"), Some(81384788765712384));
+/// assert_eq!(parse_channel("<#81384788765712384>"), Some(ChannelId::new(81384788765712384)));
 /// ```
 ///
 /// Asserting that an invalid channel mention returns [`None`]:
@@ -211,7 +215,7 @@ pub fn parse_role(mention: impl AsRef<str>) -> Option<u64> {
 /// ```
 ///
 /// [`Channel`]: crate::model::channel::Channel
-pub fn parse_channel(mention: impl AsRef<str>) -> Option<u64> {
+pub fn parse_channel(mention: impl AsRef<str>) -> Option<ChannelId> {
     let mention = mention.as_ref();
 
     if mention.len() < 4 {
@@ -220,7 +224,7 @@ pub fn parse_channel(mention: impl AsRef<str>) -> Option<u64> {
 
     if mention.starts_with("<#") && mention.ends_with('>') {
         let len = mention.len() - 1;
-        mention[2..len].parse::<u64>().ok()
+        mention[2..len].parse::<NonZeroU64>().map(ChannelId).ok()
     } else {
         None
     }
@@ -242,7 +246,7 @@ pub fn parse_channel(mention: impl AsRef<str>) -> Option<u64> {
 ///
 /// let expected = EmojiIdentifier {
 ///     animated: false,
-///     id: EmojiId(302516740095606785),
+///     id: EmojiId::new(302516740095606785),
 ///     name: "smugAnimeFace".to_string(),
 /// };
 ///
@@ -290,7 +294,7 @@ pub fn parse_emoji(mention: impl AsRef<str>) -> Option<EmojiIdentifier> {
             name.push(x);
         }
 
-        match id.parse::<u64>() {
+        match id.parse() {
             Ok(x) => Some(EmojiIdentifier {
                 animated,
                 name,

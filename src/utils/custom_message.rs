@@ -23,7 +23,7 @@ impl CustomMessage {
 
     /// Assign the dummy message a proper ID for identification.
     ///
-    /// If not used, the default value is `MessageId(0)`.
+    /// If not used, the default value is `MessageId::new(1)`.
     #[inline]
     #[must_use]
     pub fn id(&mut self, id: MessageId) -> &mut Self {
@@ -57,7 +57,7 @@ impl CustomMessage {
 
     /// Assign the dummy message its origin channel's ID.
     ///
-    /// If not used, the default value is `ChannelId(0)`.
+    /// If not used, the default value is `ChannelId::new(1)`.
     #[inline]
     pub fn channel_id(&mut self, channel_id: ChannelId) -> &mut Self {
         self.msg.channel_id = channel_id;
@@ -239,10 +239,10 @@ impl Default for CustomMessage {
 #[inline]
 fn dummy_message() -> Message {
     Message {
-        id: MessageId::default(),
+        id: MessageId::new(1),
         attachments: Vec::new(),
         author: User {
-            id: UserId::default(),
+            id: UserId::new(1),
             avatar: None,
             bot: false,
             discriminator: 0x0000,
@@ -251,7 +251,7 @@ fn dummy_message() -> Message {
             banner: None,
             accent_colour: None,
         },
-        channel_id: ChannelId::default(),
+        channel_id: ChannelId::new(1),
         content: String::new(),
         edited_timestamp: None,
         embeds: Vec::new(),

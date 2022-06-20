@@ -112,11 +112,11 @@ impl Webhook {
     ///
     /// ```rust,no_run
     /// # use serenity::http::Http;
-    /// # use serenity::model::webhook::Webhook;
+    /// # use serenity::model::{webhook::Webhook, id::WebhookId};
     /// #
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// #     let http = Http::new("token");
-    /// let id = 245037420704169985;
+    /// let id = WebhookId::new(245037420704169985);
     /// let webhook = Webhook::from_id(&http, id).await?;
     /// #     Ok(())
     /// # }
@@ -129,7 +129,7 @@ impl Webhook {
     ///
     /// May also return an [`Error::Json`] if there is an error in deserialising Discord's response.
     pub async fn from_id(http: impl AsRef<Http>, webhook_id: impl Into<WebhookId>) -> Result<Self> {
-        http.as_ref().get_webhook(webhook_id.into().0).await
+        http.as_ref().get_webhook(webhook_id.into().get()).await
     }
 
     /// Retrieves a webhook given its Id and unique token.
@@ -142,11 +142,11 @@ impl Webhook {
     ///
     /// ```rust,no_run
     /// # use serenity::http::Http;
-    /// # use serenity::model::webhook::Webhook;
+    /// # use serenity::model::{webhook::Webhook, id::WebhookId};
     /// #
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// #     let http = Http::new("token");
-    /// let id = 245037420704169985;
+    /// let id = WebhookId::new(245037420704169985);
     /// let token = "ig5AO-wdVWpCBtUUMxmgsWryqgsW3DChbKYOINftJ4DCrUbnkedoYZD0VOH1QLr-S3sV";
     ///
     /// let webhook = Webhook::from_id_with_token(&http, id, token).await?;
@@ -164,7 +164,7 @@ impl Webhook {
         webhook_id: impl Into<WebhookId>,
         token: &str,
     ) -> Result<Self> {
-        http.as_ref().get_webhook_with_token(webhook_id.into().0, token).await
+        http.as_ref().get_webhook_with_token(webhook_id.into().get(), token).await
     }
 
     /// Retrieves a webhook given its url.
@@ -211,7 +211,7 @@ impl Webhook {
     #[inline]
     pub async fn delete(&self, http: impl AsRef<Http>) -> Result<()> {
         let token = self.token.as_ref().ok_or(ModelError::NoTokenSet)?;
-        http.as_ref().delete_webhook_with_token(self.id.0, token).await
+        http.as_ref().delete_webhook_with_token(self.id.get(), token).await
     }
 
     /// Edits the webhook
@@ -253,7 +253,7 @@ impl Webhook {
         let mut builder = EditWebhook::default();
         f(&mut builder);
 
-        *self = http.as_ref().edit_webhook_with_token(self.id.0, token, &builder).await?;
+        *self = http.as_ref().edit_webhook_with_token(self.id.get(), token, &builder).await?;
         Ok(())
     }
 
@@ -396,13 +396,13 @@ impl Webhook {
         f(&mut builder);
 
         let http = http.as_ref();
-        let thread_id = thread_id.map(|id| id.0);
+        let thread_id = thread_id.map(ChannelId::get);
         let files = std::mem::take(&mut builder.files);
 
         if files.is_empty() {
-            http.execute_webhook(self.id.0, thread_id, token, wait, &builder).await
+            http.execute_webhook(self.id.get(), thread_id, token, wait, &builder).await
         } else {
-            http.execute_webhook_with_files(self.id.0, thread_id, token, wait, files, &builder)
+            http.execute_webhook_with_files(self.id.get(), thread_id, token, wait, files, &builder)
                 .await
         }
     }
@@ -424,7 +424,7 @@ impl Webhook {
     ) -> Result<Message> {
         let token = self.token.as_ref().ok_or(ModelError::NoTokenSet)?;
 
-        http.as_ref().get_webhook_message(self.id.0, token, message_id.0).await
+        http.as_ref().get_webhook_message(self.id.get(), token, message_id.get()).await
     }
 
     /// Edits a webhook message with the fields set via the given builder.
@@ -450,7 +450,7 @@ impl Webhook {
         let mut builder = EditWebhookMessage::default();
         f(&mut builder);
 
-        http.as_ref().edit_webhook_message(self.id.0, token, message_id.0, &builder).await
+        http.as_ref().edit_webhook_message(self.id.get(), token, message_id.get(), &builder).await
     }
 
     /// Deletes a webhook message.
@@ -467,7 +467,7 @@ impl Webhook {
         message_id: MessageId,
     ) -> Result<()> {
         let token = self.token.as_ref().ok_or(ModelError::NoTokenSet)?;
-        http.as_ref().delete_webhook_message(self.id.0, token, message_id.0).await
+        http.as_ref().delete_webhook_message(self.id.get(), token, message_id.get()).await
     }
 
     /// Retrieves the latest information about the webhook, editing the
@@ -486,7 +486,7 @@ impl Webhook {
     /// Or may return an [`Error::Json`] if there is an error deserialising Discord's response.
     pub async fn refresh(&mut self, http: impl AsRef<Http>) -> Result<()> {
         let token = self.token.as_ref().ok_or(ModelError::NoTokenSet)?;
-        http.as_ref().get_webhook_with_token(self.id.0, token).await.map(|replacement| {
+        http.as_ref().get_webhook_with_token(self.id.get(), token).await.map(|replacement| {
             *self = replacement;
         })
     }
@@ -522,6 +522,6 @@ impl WebhookId {
     /// [Manage Webhooks]: super::permissions::Permissions::MANAGE_WEBHOOKS
     #[inline]
     pub async fn to_webhook(self, http: impl AsRef<Http>) -> Result<Webhook> {
-        http.as_ref().get_webhook(self.0).await
+        http.as_ref().get_webhook(self.get()).await
     }
 }

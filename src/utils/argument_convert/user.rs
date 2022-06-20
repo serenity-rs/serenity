@@ -29,8 +29,7 @@ fn lookup_by_global_cache(ctx: &Context, s: &str) -> Option<User> {
 
     let lookup_by_id = || users.get(&UserId(s.parse().ok()?)).map(|u| u.clone());
 
-    let lookup_by_mention =
-        || users.get(&UserId(crate::utils::parse_username(s)?)).map(|u| u.clone());
+    let lookup_by_mention = || users.get(&crate::utils::parse_username(s)?).map(|u| u.clone());
 
     let lookup_by_name_and_discrim = || {
         let (name, discrim) = crate::utils::parse_user_tag(s)?;
