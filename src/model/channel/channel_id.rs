@@ -920,24 +920,9 @@ impl ChannelId {
         http.as_ref().get_stage_instance(self.get()).await
     }
 
-    /// Creates a stage instance.
-    ///
-    /// # Errors
-    ///
-    /// Returns [`Error::Http`] if the channel is not a stage channel,
-    /// or if there is already a stage instance currently.
-    pub async fn create_stage_instance<F>(
-        &self,
-        http: impl AsRef<Http>,
-        f: F,
-    ) -> Result<StageInstance>
-    where
-        F: FnOnce(&mut CreateStageInstance) -> &mut CreateStageInstance,
-    {
-        let mut instance = CreateStageInstance::default();
-        f(&mut instance);
-
-        http.as_ref().create_stage_instance(&instance).await
+    /// Returns a request builder that creates a [`StageInstance`] when executed.
+    pub fn create_stage_instance(self) -> CreateStageInstance {
+        CreateStageInstance::new(self)
     }
 
     /// Edits a stage instance.

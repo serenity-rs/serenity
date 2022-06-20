@@ -1155,25 +1155,9 @@ impl GuildChannel {
         self.id.get_stage_instance(http).await
     }
 
-    /// Creates a stage instance.
-    ///
-    /// # Errors
-    ///
-    /// Returns [`ModelError::InvalidChannelType`] if the channel is not a stage channel.
-    /// Returns [`Error::Http`] if there is already a stage instance currently.
-    pub async fn create_stage_instance<F>(
-        &self,
-        http: impl AsRef<Http>,
-        f: F,
-    ) -> Result<StageInstance>
-    where
-        F: FnOnce(&mut CreateStageInstance) -> &mut CreateStageInstance,
-    {
-        if self.kind != ChannelType::Stage {
-            return Err(Error::Model(ModelError::InvalidChannelType));
-        }
-
-        self.id.create_stage_instance(http, f).await
+    /// Returns a request builder that creates a [`StageInstance`] when executed.
+    pub fn create_stage_instance(&self) -> CreateStageInstance {
+        CreateStageInstance::new(self.id)
     }
 
     /// Edits a stage instance.
