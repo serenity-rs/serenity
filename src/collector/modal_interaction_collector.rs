@@ -4,7 +4,6 @@ use std::num::NonZeroU64;
 use std::pin::Pin;
 use std::sync::Arc;
 use std::task::{Context as FutContext, Poll};
-use std::time::Duration;
 
 use futures::future::BoxFuture;
 use futures::stream::{Stream, StreamExt};
@@ -13,9 +12,10 @@ use tokio::sync::mpsc::{
     UnboundedReceiver as Receiver,
     UnboundedSender as Sender,
 };
-use tokio::time::{sleep, Sleep};
+use tokio::time::Sleep;
 
 use crate::client::bridge::gateway::ShardMessenger;
+use crate::collector::macros::*;
 use crate::collector::{FilterFn, LazyArc};
 use crate::model::application::interaction::modal::ModalSubmitInteraction;
 
@@ -23,26 +23,6 @@ macro_rules! impl_modal_interaction_collector {
     ($($name:ident;)*) => {
         $(
             impl $name {
-                /// Limits how many interactions will attempt to be filtered.
-                ///
-                /// The filter checks whether the message has been sent
-                /// in the right guild, channel, and by the right author.
-                pub fn filter_limit(mut self, limit: u32) -> Self {
-                    self.filter.as_mut().unwrap().filter_limit = Some(limit);
-
-                    self
-                }
-
-                /// Limits how many interactions can be collected.
-                ///
-                /// An interaction is considered *collected*, if the interaction
-                /// passes all the requirements.
-                pub fn collect_limit(mut self, limit: u32) -> Self {
-                    self.filter.as_mut().unwrap().collect_limit = Some(limit);
-
-                    self
-                }
-
                 /// Sets a filter function where interactions passed to the function must
                 /// return `true`, otherwise the interaction won't be collected.
                 /// This is the last instance to pass for an interaction to count as *collected*.
@@ -54,45 +34,12 @@ macro_rules! impl_modal_interaction_collector {
                     self
                 }
 
-                /// Sets the required author ID of an interaction.
-                /// If an interaction is not triggered by a user with this ID, it won't be received.
-                pub fn author_id(mut self, author_id: impl Into<u64>) -> Self {
-                    self.filter.as_mut().unwrap().author_id = NonZeroU64::new(author_id.into());
-
-                    self
-                }
-
-                /// Sets the message on which the interaction must occur.
-                /// If an interaction is not on a message with this ID, it won't be received.
-                pub fn message_id(mut self, message_id: impl Into<u64>) -> Self {
-                    self.filter.as_mut().unwrap().message_id = NonZeroU64::new(message_id.into());
-
-                    self
-                }
-
-                /// Sets the guild in which the interaction must occur.
-                /// If an interaction is not on a message with this guild ID, it won't be received.
-                pub fn guild_id(mut self, guild_id: impl Into<u64>) -> Self {
-                    self.filter.as_mut().unwrap().guild_id = NonZeroU64::new(guild_id.into());
-
-                    self
-                }
-
-                /// Sets the channel on which the interaction must occur.
-                /// If an interaction is not on a message with this channel ID, it won't be received.
-                pub fn channel_id(mut self, channel_id: impl Into<u64>) -> Self {
-                    self.filter.as_mut().unwrap().channel_id = NonZeroU64::new(channel_id.into());
-
-                    self
-                }
-
-                /// Sets a `duration` for how long the collector shall receive
-                /// interactions.
-                pub fn timeout(mut self, duration: Duration) -> Self {
-                    self.timeout = Some(Box::pin(sleep(duration)));
-
-                    self
-                }
+                impl_collect_limit!("Limits how many interactions can be collected. An interaction is considered *collected*, if the interaction passes all the requirements.");
+                impl_channel_id!("Sets the channel on which the interaction must occur. If an interaction is not on a message with this channel ID, it won't be received.");
+                impl_guild_id!("Sets the guild in which the interaction must occur. If an interaction is not on a message with this guild ID, it won't be received.");
+                impl_message_id!("Sets the message on which the interaction must occur. If an interaction is not on a message with this ID, it won't be received.");
+                impl_author_id!("Sets the required author ID of an interaction. If an interaction is not triggered by a user with this ID, it won't be received");
+                impl_timeout!("Sets a `duration` for how long the collector shall receive interactions.");
             }
         )*
     }
