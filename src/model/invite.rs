@@ -419,7 +419,7 @@ pub struct InviteStageInstance {
     topic: String,
 }
 
-#[derive(Clone, Copy, Debug, Eq, Hash, PartialEq, PartialOrd, Ord)]
+#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
 #[non_exhaustive]
 pub enum InviteTargetType {
     Normal = 0,

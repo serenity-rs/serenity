@@ -1013,7 +1013,7 @@ pub struct MessageReaction {
 }
 
 /// Differentiates between regular and different types of system messages.
-#[derive(Clone, Copy, Debug, Eq, Hash, PartialEq, PartialOrd, Ord)]
+#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
 #[non_exhaustive]
 pub enum MessageType {
     /// A regular message.
@@ -1092,7 +1092,7 @@ enum_number!(MessageType {
     ContextMenuCommand,
 });
 
-#[derive(Clone, Copy, Debug, Eq, Hash, PartialEq, PartialOrd, Ord)]
+#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
 #[non_exhaustive]
 pub enum MessageActivityKind {
     #[allow(clippy::upper_case_acronyms)]

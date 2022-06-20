@@ -989,7 +989,7 @@ pub enum ContentModifier {
 }
 
 /// Describes formatting on string content
-#[derive(Debug, Default, Clone)]
+#[derive(Clone, Debug, Default)]
 pub struct Content {
     pub italic: bool,
     pub bold: bool,
