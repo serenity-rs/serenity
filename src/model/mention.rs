@@ -54,9 +54,9 @@ pub trait Mentionable {
     /// ```
     /// # use serenity::model::id::{RoleId, ChannelId, UserId};
     /// use serenity::model::mention::Mentionable;
-    /// let user: UserId = 1.into();
-    /// let channel: ChannelId = 2.into();
-    /// let role: RoleId = 3.into();
+    /// let user = UserId::new(1);
+    /// let channel = ChannelId::new(2);
+    /// let role = RoleId::new(3);
     /// assert_eq!(
     ///     "<@1> <#2> <@&3>",
     ///     format!("{} {} {}", user.mention(), channel.mention(), role.mention(),),
@@ -80,9 +80,9 @@ pub trait Mentionable {
 /// ```
 /// # use serenity::model::id::{RoleId, ChannelId, UserId};
 /// use serenity::model::mention::Mention;
-/// let user: UserId = 1.into();
-/// let channel: ChannelId = 2.into();
-/// let role: RoleId = 3.into();
+/// let user = UserId::new(1);
+/// let channel = ChannelId::new(2);
+/// let role = RoleId::new(3);
 /// assert_eq!(
 ///     "<@1> <#2> <@&3>",
 ///     format!("{} {} {}", Mention::from(user), Mention::from(channel), Mention::from(role),),
@@ -150,11 +150,11 @@ impl FromStr for Mention {
 
     fn from_str(s: &str) -> StdResult<Self, Self::Err> {
         let m = if let Some(id) = utils::parse_channel(s) {
-            ChannelId(id).mention()
+            id.mention()
         } else if let Some(id) = utils::parse_role(s) {
-            RoleId(id).mention()
+            id.mention()
         } else if let Some(id) = utils::parse_username(s) {
-            UserId(id).mention()
+            id.mention()
         } else if let Some(emoji_ident) = utils::parse_emoji(s) {
             emoji_ident.mention()
         } else {
@@ -212,9 +212,9 @@ mod test {
         let channel = Channel::Guild(GuildChannel {
             bitrate: None,
             parent_id: None,
-            guild_id: GuildId(1),
+            guild_id: GuildId::new(1),
             kind: ChannelType::Text,
-            id: ChannelId(4),
+            id: ChannelId::new(4),
             last_message_id: None,
             last_pin_timestamp: None,
             name: "a".to_string(),
@@ -235,7 +235,7 @@ mod test {
         let emoji = Emoji {
             animated: false,
             available: true,
-            id: EmojiId(5),
+            id: EmojiId::new(5),
             name: "a".to_string(),
             managed: true,
             require_colons: true,
@@ -243,8 +243,8 @@ mod test {
             user: None,
         };
         let role = Role {
-            id: RoleId(2),
-            guild_id: GuildId(1),
+            id: RoleId::new(2),
+            guild_id: GuildId::new(1),
             colour: Colour::ROSEWATER,
             hoist: false,
             managed: false,
@@ -257,7 +257,7 @@ mod test {
             unicode_emoji: None,
         };
         let user = User {
-            id: UserId(6),
+            id: UserId::new(6),
             avatar: None,
             bot: false,
             discriminator: 4132,
@@ -268,7 +268,7 @@ mod test {
         };
         let member = Member {
             deaf: false,
-            guild_id: GuildId(2),
+            guild_id: GuildId::new(2),
             joined_at: None,
             mute: false,
             nick: None,
@@ -281,7 +281,7 @@ mod test {
             communication_disabled_until: None,
         };
 
-        assert_eq!(ChannelId(1).mention().to_string(), "<#1>");
+        assert_eq!(ChannelId::new(1).mention().to_string(), "<#1>");
         #[cfg(feature = "model")]
         assert_eq!(channel.mention().to_string(), "<#4>");
         assert_eq!(emoji.mention().to_string(), "<:omitted:5>");
