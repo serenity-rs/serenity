@@ -262,66 +262,12 @@
 <span id="257">257</span>
 <span id="258">258</span>
 <span id="259">259</span>
-<span id="260">260</span>
-<span id="261">261</span>
-<span id="262">262</span>
-<span id="263">263</span>
-<span id="264">264</span>
-<span id="265">265</span>
-<span id="266">266</span>
-<span id="267">267</span>
-<span id="268">268</span>
-<span id="269">269</span>
-<span id="270">270</span>
-<span id="271">271</span>
-<span id="272">272</span>
-<span id="273">273</span>
-<span id="274">274</span>
-<span id="275">275</span>
-<span id="276">276</span>
-<span id="277">277</span>
-<span id="278">278</span>
-<span id="279">279</span>
-<span id="280">280</span>
-<span id="281">281</span>
-<span id="282">282</span>
-<span id="283">283</span>
-<span id="284">284</span>
-<span id="285">285</span>
-<span id="286">286</span>
-<span id="287">287</span>
-<span id="288">288</span>
-<span id="289">289</span>
-<span id="290">290</span>
-<span id="291">291</span>
-<span id="292">292</span>
-<span id="293">293</span>
-<span id="294">294</span>
-<span id="295">295</span>
-<span id="296">296</span>
-<span id="297">297</span>
-<span id="298">298</span>
-<span id="299">299</span>
-<span id="300">300</span>
-<span id="301">301</span>
-<span id="302">302</span>
-<span id="303">303</span>
-<span id="304">304</span>
-<span id="305">305</span>
-<span id="306">306</span>
-<span id="307">307</span>
-<span id="308">308</span>
-<span id="309">309</span>
-<span id="310">310</span>
-<span id="311">311</span>
-<span id="312">312</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::fmt</span>;
 <span class="kw">use</span> <span class="ident">std::future::Future</span>;
 <span class="kw">use</span> <span class="ident">std::num::NonZeroU64</span>;
 <span class="kw">use</span> <span class="ident">std::pin::Pin</span>;
 <span class="kw">use</span> <span class="ident">std::sync::Arc</span>;
 <span class="kw">use</span> <span class="ident">std::task</span>::{<span class="ident">Context</span> <span class="kw">as</span> <span class="ident">FutContext</span>, <span class="ident">Poll</span>};
-<span class="kw">use</span> <span class="ident">std::time::Duration</span>;
 
 <span class="kw">use</span> <span class="ident">futures::future::BoxFuture</span>;
 <span class="kw">use</span> <span class="ident">futures::stream</span>::{<span class="ident">Stream</span>, <span class="ident">StreamExt</span>};
@@ -330,9 +276,10 @@
     <span class="ident">UnboundedReceiver</span> <span class="kw">as</span> <span class="ident">Receiver</span>,
     <span class="ident">UnboundedSender</span> <span class="kw">as</span> <span class="ident">Sender</span>,
 };
-<span class="kw">use</span> <span class="ident">tokio::time</span>::{<span class="ident">sleep</span>, <span class="ident">Sleep</span>};
+<span class="kw">use</span> <span class="ident">tokio::time::Sleep</span>;
 
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::client::bridge::gateway::ShardMessenger</span>;
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::collector::macros</span>::<span class="kw-2">*</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::collector</span>::{<span class="ident">FilterFn</span>, <span class="ident">LazyArc</span>};
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::application::interaction::modal::ModalSubmitInteraction</span>;
 
@@ -340,26 +287,6 @@
     ($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>:<span class="ident">ident</span>;)<span class="kw-2">*</span>) =&gt; {
         $(
             <span class="kw">impl</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span> {
-                <span class="doccomment">/// Limits how many interactions will attempt to be filtered.</span>
-                <span class="doccomment">///</span>
-                <span class="doccomment">/// The filter checks whether the message has been sent</span>
-                <span class="doccomment">/// in the right guild, channel, and by the right author.</span>
-                <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">filter_limit</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">limit</span>: <span class="ident">u32</span>) -&gt; <span class="self">Self</span> {
-                    <span class="self">self</span>.<span class="ident">filter</span>.<span class="ident">as_mut</span>().<span class="ident">unwrap</span>().<span class="ident">filter_limit</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">limit</span>);
-
-                    <span class="self">self</span>
-                }
-
-                <span class="doccomment">/// Limits how many interactions can be collected.</span>
-                <span class="doccomment">///</span>
-                <span class="doccomment">/// An interaction is considered *collected*, if the interaction</span>
-                <span class="doccomment">/// passes all the requirements.</span>
-                <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">collect_limit</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">limit</span>: <span class="ident">u32</span>) -&gt; <span class="self">Self</span> {
-                    <span class="self">self</span>.<span class="ident">filter</span>.<span class="ident">as_mut</span>().<span class="ident">unwrap</span>().<span class="ident">collect_limit</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">limit</span>);
-
-                    <span class="self">self</span>
-                }
-
                 <span class="doccomment">/// Sets a filter function where interactions passed to the function must</span>
                 <span class="doccomment">/// return `true`, otherwise the interaction won&#39;t be collected.</span>
                 <span class="doccomment">/// This is the last instance to pass for an interaction to count as *collected*.</span>
@@ -371,45 +298,12 @@
                     <span class="self">self</span>
                 }
 
-                <span class="doccomment">/// Sets the required author ID of an interaction.</span>
-                <span class="doccomment">/// If an interaction is not triggered by a user with this ID, it won&#39;t be received.</span>
-                <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">author_id</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">author_id</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-                    <span class="self">self</span>.<span class="ident">filter</span>.<span class="ident">as_mut</span>().<span class="ident">unwrap</span>().<span class="ident">author_id</span> <span class="op">=</span> <span class="ident">NonZeroU64::new</span>(<span class="ident">author_id</span>.<span class="ident">into</span>());
-
-                    <span class="self">self</span>
-                }
-
-                <span class="doccomment">/// Sets the message on which the interaction must occur.</span>
-                <span class="doccomment">/// If an interaction is not on a message with this ID, it won&#39;t be received.</span>
-                <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">message_id</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">message_id</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-                    <span class="self">self</span>.<span class="ident">filter</span>.<span class="ident">as_mut</span>().<span class="ident">unwrap</span>().<span class="ident">message_id</span> <span class="op">=</span> <span class="ident">NonZeroU64::new</span>(<span class="ident">message_id</span>.<span class="ident">into</span>());
-
-                    <span class="self">self</span>
-                }
-
-                <span class="doccomment">/// Sets the guild in which the interaction must occur.</span>
-                <span class="doccomment">/// If an interaction is not on a message with this guild ID, it won&#39;t be received.</span>
-                <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">guild_id</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">guild_id</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-                    <span class="self">self</span>.<span class="ident">filter</span>.<span class="ident">as_mut</span>().<span class="ident">unwrap</span>().<span class="ident">guild_id</span> <span class="op">=</span> <span class="ident">NonZeroU64::new</span>(<span class="ident">guild_id</span>.<span class="ident">into</span>());
-
-                    <span class="self">self</span>
-                }
-
-                <span class="doccomment">/// Sets the channel on which the interaction must occur.</span>
-                <span class="doccomment">/// If an interaction is not on a message with this channel ID, it won&#39;t be received.</span>
-                <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">channel_id</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">channel_id</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-                    <span class="self">self</span>.<span class="ident">filter</span>.<span class="ident">as_mut</span>().<span class="ident">unwrap</span>().<span class="ident">channel_id</span> <span class="op">=</span> <span class="ident">NonZeroU64::new</span>(<span class="ident">channel_id</span>.<span class="ident">into</span>());
-
-                    <span class="self">self</span>
-                }
-
-                <span class="doccomment">/// Sets a `duration` for how long the collector shall receive</span>
-                <span class="doccomment">/// interactions.</span>
-                <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">timeout</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">duration</span>: <span class="ident">Duration</span>) -&gt; <span class="self">Self</span> {
-                    <span class="self">self</span>.<span class="ident">timeout</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">Box::pin</span>(<span class="ident">sleep</span>(<span class="ident">duration</span>)));
-
-                    <span class="self">self</span>
-                }
+                <span class="macro">impl_collect_limit!</span>(<span class="string">&quot;Limits how many interactions can be collected. An interaction is considered *collected*, if the interaction passes all the requirements.&quot;</span>);
+                <span class="macro">impl_channel_id!</span>(<span class="string">&quot;Sets the channel on which the interaction must occur. If an interaction is not on a message with this channel ID, it won&#39;t be received.&quot;</span>);
+                <span class="macro">impl_guild_id!</span>(<span class="string">&quot;Sets the guild in which the interaction must occur. If an interaction is not on a message with this guild ID, it won&#39;t be received.&quot;</span>);
+                <span class="macro">impl_message_id!</span>(<span class="string">&quot;Sets the message on which the interaction must occur. If an interaction is not on a message with this ID, it won&#39;t be received.&quot;</span>);
+                <span class="macro">impl_author_id!</span>(<span class="string">&quot;Sets the required author ID of an interaction. If an interaction is not triggered by a user with this ID, it won&#39;t be received&quot;</span>);
+                <span class="macro">impl_timeout!</span>(<span class="string">&quot;Sets a `duration` for how long the collector shall receive interactions.&quot;</span>);
             }
         )<span class="op">*</span>
     }

@@ -382,37 +382,10 @@
 <span id="377">377</span>
 <span id="378">378</span>
 <span id="379">379</span>
-<span id="380">380</span>
-<span id="381">381</span>
-<span id="382">382</span>
-<span id="383">383</span>
-<span id="384">384</span>
-<span id="385">385</span>
-<span id="386">386</span>
-<span id="387">387</span>
-<span id="388">388</span>
-<span id="389">389</span>
-<span id="390">390</span>
-<span id="391">391</span>
-<span id="392">392</span>
-<span id="393">393</span>
-<span id="394">394</span>
-<span id="395">395</span>
-<span id="396">396</span>
-<span id="397">397</span>
-<span id="398">398</span>
-<span id="399">399</span>
-<span id="400">400</span>
-<span id="401">401</span>
-<span id="402">402</span>
-<span id="403">403</span>
-<span id="404">404</span>
-<span id="405">405</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::future::Future</span>;
 <span class="kw">use</span> <span class="ident">std::pin::Pin</span>;
 <span class="kw">use</span> <span class="ident">std::sync::Arc</span>;
 <span class="kw">use</span> <span class="ident">std::task</span>::{<span class="ident">Context</span> <span class="kw">as</span> <span class="ident">FutContext</span>, <span class="ident">Poll</span>};
-<span class="kw">use</span> <span class="ident">std::time::Duration</span>;
 
 <span class="kw">use</span> <span class="ident">futures::stream::Stream</span>;
 <span class="kw">use</span> <span class="ident">tokio::sync::mpsc</span>::{
@@ -420,9 +393,10 @@
     <span class="ident">UnboundedReceiver</span> <span class="kw">as</span> <span class="ident">Receiver</span>,
     <span class="ident">UnboundedSender</span> <span class="kw">as</span> <span class="ident">Sender</span>,
 };
-<span class="kw">use</span> <span class="ident">tokio::time</span>::{<span class="ident">sleep</span>, <span class="ident">Sleep</span>};
+<span class="kw">use</span> <span class="ident">tokio::time::Sleep</span>;
 
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::client::bridge::gateway::ShardMessenger</span>;
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::collector::macros</span>::<span class="kw-2">*</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::collector</span>::{<span class="ident">CollectorError</span>, <span class="ident">FilterFn</span>, <span class="ident">LazyArc</span>};
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::event</span>::{<span class="ident">Event</span>, <span class="ident">EventType</span>, <span class="ident">RelatedIdsForEventType</span>};
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::id</span>::{<span class="ident">ChannelId</span>, <span class="ident">GuildId</span>, <span class="ident">MessageId</span>, <span class="ident">UserId</span>};
@@ -562,28 +536,6 @@
         }
     }
 
-    <span class="doccomment">/// Limits how many events will attempt to be filtered.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The filter checks whether the event has the right related guild, channel, user, and message.</span>
-    <span class="doccomment">/// Only events with types passed to [`Self::add_event_type`] as counted towards this limit.</span>
-    <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::unwrap_used</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">filter_limit</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">limit</span>: <span class="ident">u32</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">filter</span>.<span class="ident">as_mut</span>().<span class="ident">unwrap</span>().<span class="ident">filter_limit</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">limit</span>);
-
-        <span class="self">self</span>
-    }
-
-    <span class="doccomment">/// Limits how many events can be collected.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// An event is considered *collected*, if the event</span>
-    <span class="doccomment">/// passes all the requirements.</span>
-    <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::unwrap_used</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">collect_limit</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">limit</span>: <span class="ident">u32</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">filter</span>.<span class="ident">as_mut</span>().<span class="ident">unwrap</span>().<span class="ident">collect_limit</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">limit</span>);
-
-        <span class="self">self</span>
-    }
-
     <span class="doccomment">/// Sets a filter function where events passed to the `function` must</span>
     <span class="doccomment">/// return `true`, otherwise the event won&#39;t be collected and failed the filter</span>
     <span class="doccomment">/// process.</span>
@@ -640,13 +592,9 @@
         <span class="self">self</span>
     }
 
-    <span class="doccomment">/// Sets a `duration` for how long the collector shall receive</span>
-    <span class="doccomment">/// events.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">timeout</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">duration</span>: <span class="ident">Duration</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">timeout</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">Box::pin</span>(<span class="ident">sleep</span>(<span class="ident">duration</span>)));
-
-        <span class="self">self</span>
-    }
+    <span class="macro">impl_filter_limit!</span>(<span class="string">&quot;Limits how many events will attempt to be filtered. The filter checks whether the event has the right related guild, channel, user, and message. Only events with types passed to [`Self::add_event_type`] as counted towards this limit.&quot;</span>);
+    <span class="macro">impl_collect_limit!</span>(<span class="string">&quot;Limits how many events can be collected. An event is considered *collected*, if the event passes all the requirements.&quot;</span>);
+    <span class="macro">impl_timeout!</span>(<span class="string">&quot;Sets a `duration` for how long the collector shall receive events.&quot;</span>);
 
     <span class="doccomment">/// Use the given configuration to build the [`EventCollector`].</span>
     <span class="doccomment">///</span>

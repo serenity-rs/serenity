@@ -64,6 +64,7 @@
 <span id="59">59</span>
 <span id="60">60</span>
 <span id="61">61</span>
+<span id="62">62</span>
 </pre><pre class="rust"><code><span class="doccomment">//! Collectors will receive events from the contextual shard, check if the</span>
 <span class="doccomment">//! filter lets them pass, and collects if the receive, collect, or time limits</span>
 <span class="doccomment">//! are not reached yet.</span>
@@ -72,6 +73,7 @@
 <span class="kw">use</span> <span class="ident">std::sync::Arc</span>;
 
 <span class="kw">mod</span> <span class="ident">error</span>;
+<span class="kw">mod</span> <span class="ident">macros</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">error::Error</span> <span class="kw">as</span> <span class="ident">CollectorError</span>;
 
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">component_interaction_collector</span>;
