@@ -807,15 +807,15 @@ impl User {
     /// #   #[cfg(feature = "cache")]
     ///     async fn message(&self, ctx: Context, msg: Message) {
     ///         if msg.content == "~help" {
-    ///             let url =
-    ///                 match ctx.cache.current_user().clone().invite_url(&ctx, Permissions::empty()).await {
-    ///                     Ok(v) => v,
-    ///                     Err(why) => {
-    ///                         println!("Error creating invite url: {:?}", why);
+    ///             let current_user = ctx.cache.current_user().clone();
+    ///             let url = match current_user.invite_url(&ctx, Permissions::empty()).await {
+    ///                 Ok(v) => v,
+    ///                 Err(why) => {
+    ///                     println!("Error creating invite url: {:?}", why);
     ///
-    ///                         return;
-    ///                     },
-    ///                 };
+    ///                     return;
+    ///                 },
+    ///             };
     ///
     ///             let help = format!("Helpful info here. Invite me with this link: <{}>", url,);
     ///
