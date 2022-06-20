@@ -260,24 +260,20 @@ impl Command {
     }
 }
 
-/// The type of an application command.
-///
-/// [Discord docs](https://discord.com/developers/docs/interactions/application-commands#application-command-object-application-command-types).
-#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
-#[non_exhaustive]
-#[repr(u8)]
-pub enum CommandType {
-    ChatInput = 1,
-    User = 2,
-    Message = 3,
-    Unknown = !0,
+enum_number! {
+    /// The type of an application command.
+    ///
+    /// [Discord docs](https://discord.com/developers/docs/interactions/application-commands#application-command-object-application-command-types).
+    #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
+    #[serde(from = "u8", into = "u8")]
+    #[non_exhaustive]
+    pub enum CommandType {
+        ChatInput = 1,
+        User = 2,
+        Message = 3,
+        _ => Unknown(u8),
+    }
 }
-
-enum_number!(CommandType {
-    ChatInput,
-    User,
-    Message
-});
 
 /// The parameters for an [`Command`].
 ///
@@ -332,40 +328,28 @@ pub struct CommandOption {
     pub autocomplete: bool,
 }
 
-/// The type of an [`CommandOption`].
-///
-/// [Discord docs](https://discord.com/developers/docs/interactions/application-commands#application-command-object-application-command-option-type).
-#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
-#[non_exhaustive]
-#[repr(u8)]
-pub enum CommandOptionType {
-    SubCommand = 1,
-    SubCommandGroup = 2,
-    String = 3,
-    Integer = 4,
-    Boolean = 5,
-    User = 6,
-    Channel = 7,
-    Role = 8,
-    Mentionable = 9,
-    Number = 10,
-    Attachment = 11,
-    Unknown = !0,
+enum_number! {
+    /// The type of an [`CommandOption`].
+    ///
+    /// [Discord docs](https://discord.com/developers/docs/interactions/application-commands#application-command-object-application-command-option-type).
+    #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
+    #[serde(from = "u8", into = "u8")]
+    #[non_exhaustive]
+    pub enum CommandOptionType {
+        SubCommand = 1,
+        SubCommandGroup = 2,
+        String = 3,
+        Integer = 4,
+        Boolean = 5,
+        User = 6,
+        Channel = 7,
+        Role = 8,
+        Mentionable = 9,
+        Number = 10,
+        Attachment = 11,
+        _ => Unknown(u8),
+    }
 }
-
-enum_number!(CommandOptionType {
-    SubCommand,
-    SubCommandGroup,
-    String,
-    Integer,
-    Boolean,
-    User,
-    Channel,
-    Role,
-    Mentionable,
-    Number,
-    Attachment
-});
 
 /// The only valid values a user can pick in an [`CommandOption`].
 ///
@@ -413,24 +397,20 @@ pub struct CommandPermissionData {
     pub permission: bool,
 }
 
-/// The type of an [`CommandPermissionData`].
-///
-/// [Discord docs](https://discord.com/developers/docs/interactions/application-commands#application-command-permissions-object-application-command-permission-type).
-#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
-#[non_exhaustive]
-#[repr(u8)]
-pub enum CommandPermissionType {
-    Role = 1,
-    User = 2,
-    Channel = 3,
-    Unknown = !0,
+enum_number! {
+    /// The type of an [`CommandPermissionData`].
+    ///
+    /// [Discord docs](https://discord.com/developers/docs/interactions/application-commands#application-command-permissions-object-application-command-permission-type).
+    #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
+    #[serde(from = "u8", into = "u8")]
+    #[non_exhaustive]
+    pub enum CommandPermissionType {
+        Role = 1,
+        User = 2,
+        Channel = 3,
+        _ => Unknown(u8),
+    }
 }
-
-enum_number!(CommandPermissionType {
-    Role,
-    User,
-    Channel,
-});
 
 impl CommandPermissionId {
     /// Converts this [`CommandPermissionId`] to [`UserId`].

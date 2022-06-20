@@ -29,17 +29,14 @@ pub struct Connection {
     pub visibility: ConnectionVisibility,
 }
 
-/// The visibility of a user connection on a user's profile.
-#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
-#[non_exhaustive]
-#[repr(u8)]
-pub enum ConnectionVisibility {
-    None = 0,
-    Everyone = 1,
-    Unknown = !0,
+enum_number! {
+    /// The visibility of a user connection on a user's profile.
+    #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
+    #[serde(from = "u8", into = "u8")]
+    #[non_exhaustive]
+    pub enum ConnectionVisibility {
+        None = 0,
+        Everyone = 1,
+        _ => Unknown(u8),
+    }
 }
-
-enum_number!(ConnectionVisibility {
-    None,
-    Everyone
-});

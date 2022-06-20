@@ -152,7 +152,7 @@ impl<'de> Deserialize<'de> for Interaction {
             InteractionType::Autocomplete => from_value(value).map(Interaction::Autocomplete),
             InteractionType::ModalSubmit => from_value(value).map(Interaction::ModalSubmit),
             InteractionType::Ping => from_value(value).map(Interaction::Ping),
-            InteractionType::Unknown => return Err(DeError::custom("Unknown interaction type")),
+            InteractionType::Unknown(_) => return Err(DeError::custom("Unknown interaction type")),
         }
         .map_err(DeError::custom)
     }
@@ -170,28 +170,22 @@ impl Serialize for Interaction {
     }
 }
 
-/// The type of an Interaction.
-///
-/// [Discord docs](https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-object-interaction-type).
-#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
-#[non_exhaustive]
-#[repr(u8)]
-pub enum InteractionType {
-    Ping = 1,
-    ApplicationCommand = 2,
-    MessageComponent = 3,
-    Autocomplete = 4,
-    ModalSubmit = 5,
-    Unknown = !0,
+enum_number! {
+    /// The type of an Interaction.
+    ///
+    /// [Discord docs](https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-object-interaction-type).
+    #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
+    #[serde(from = "u8", into = "u8")]
+    #[non_exhaustive]
+    pub enum InteractionType {
+        Ping = 1,
+        ApplicationCommand = 2,
+        MessageComponent = 3,
+        Autocomplete = 4,
+        ModalSubmit = 5,
+        _ => Unknown(u8),
+    }
 }
-
-enum_number!(InteractionType {
-    Ping,
-    MessageComponent,
-    ApplicationCommand,
-    Autocomplete,
-    ModalSubmit
-});
 
 bitflags! {
     /// The flags for an interaction response message.

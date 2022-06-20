@@ -324,7 +324,7 @@ impl<'de> Deserialize<'de> for CommandDataOption {
                         CommandDataOptionValue::SubCommandGroup(options()?)
                     },
                     CommandOptionType::SubCommand => CommandDataOptionValue::SubCommand(options()?),
-                    CommandOptionType::Unknown => CommandDataOptionValue::Unknown,
+                    CommandOptionType::Unknown(unknown) => CommandDataOptionValue::Unknown(unknown),
                 };
 
                 Ok(CommandDataOption {
@@ -347,7 +347,7 @@ impl Serialize for CommandDataOption {
             CommandDataOptionValue::SubCommand(o) | CommandDataOptionValue::SubCommandGroup(o) => {
                 (!o.is_empty(), false)
             },
-            CommandDataOptionValue::Unknown => (false, false),
+            CommandDataOptionValue::Unknown(_) => (false, false),
             _ => (true, false),
         };
         let len = 2 + usize::from(value_or_options) + usize::from(focused);
@@ -404,7 +404,7 @@ pub enum CommandDataOptionValue {
     Mentionable(GenericId),
     Role(RoleId),
     User(UserId),
-    Unknown,
+    Unknown(u8),
 }
 
 impl CommandDataOptionValue {
@@ -426,7 +426,7 @@ impl CommandDataOptionValue {
             Self::Mentionable(_) => CommandOptionType::Mentionable,
             Self::Role(_) => CommandOptionType::Role,
             Self::User(_) => CommandOptionType::User,
-            Self::Unknown => CommandOptionType::Unknown,
+            Self::Unknown(unknown) => CommandOptionType::Unknown(*unknown),
         }
     }
 
