@@ -48,25 +48,11 @@ use crate::model::prelude::*;
 
 #[cfg(feature = "model")]
 impl GuildId {
-    /// Adds a [`User`] to this guild with a valid OAuth2 access token.
-    ///
-    /// Returns the created [`Member`] object, or nothing if the user is already a member of the guild.
-    ///
-    /// # Errors
-    ///
-    /// Returns [`Error::Http`] if the current user lacks permission,
-    /// or if invalid values are set.
+    /// Returns a request builder that adds on execution will add a [`User`] to this guild with a
+    /// valid OAuth2 access token.
     #[inline]
-    pub async fn add_member(
-        self,
-        http: impl AsRef<Http>,
-        user_id: impl Into<UserId>,
-        f: impl FnOnce(&mut AddMember) -> &mut AddMember,
-    ) -> Result<Option<Member>> {
-        let mut builder = AddMember::default();
-        f(&mut builder);
-
-        http.as_ref().add_guild_member(self.get(), user_id.into().get(), &builder).await
+    pub fn add_member(&self, user_id: impl Into<UserId>) -> AddMember {
+        AddMember::new(*self, user_id.into())
     }
 
     /// Ban a [`User`] from the guild, deleting a number of
