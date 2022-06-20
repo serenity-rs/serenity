@@ -87,7 +87,7 @@ impl<'a> CreateSticker<'a> {
     /// # Errors
     ///
     /// If the `cache` is enabled, returns a [`ModelError::InvalidPermissions`] if the current user
-    /// lacks permission. Otherwise, returns [`Error::Http`] - see [`Self::execute`].
+    /// lacks permission. Otherwise, returns [`Error::Http`].
     ///
     /// [Manage Emojis and Stickers]: crate::model::permissions::Permissions::MANAGE_EMOJIS_AND_STICKERS
     #[cfg(feature = "http")]

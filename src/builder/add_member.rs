@@ -10,6 +10,7 @@ use crate::model::prelude::*;
 ///
 /// [`GuildId::add_member`]: crate::model::id::GuildId::add_member
 #[derive(Clone, Debug, Serialize)]
+#[must_use]
 pub struct AddMember {
     #[cfg(feature = "http")]
     #[serde(skip)]

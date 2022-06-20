@@ -48,7 +48,7 @@ use crate::model::prelude::*;
 
 #[cfg(feature = "model")]
 impl GuildId {
-    /// Returns a request builder that adds on execution will add a [`User`] to this guild with a
+    /// Returns a request builder that, when executed, will add a [`User`] to this guild with a
     /// valid OAuth2 access token.
     #[inline]
     pub fn add_member(self, user_id: impl Into<UserId>) -> AddMember {

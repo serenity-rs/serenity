@@ -167,10 +167,8 @@ impl CreateChannel {
     /// # Errors
     ///
     /// If the `cache` is enabled, returns a [`ModelError::InvalidPermissions`] if the current user
-    /// does not have permission to manage channels.
-    ///
-    /// Otherwise will return [`Error::Http`] if the current user lacks permission, or if invalid
-    /// data was given.
+    /// does not have permission to manage channels. Otherwise returns [`Error::Http`], as well as
+    /// if invalid data was given.
     ///
     /// [Manage Channels]: Permissions::MANAGE_CHANNELS
     pub async fn execute(self, cache_http: impl CacheHttp) -> Result<GuildChannel> {

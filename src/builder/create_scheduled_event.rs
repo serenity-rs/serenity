@@ -140,9 +140,7 @@ impl CreateScheduledEvent {
     /// # Errors
     ///
     /// If the `cache` is enabled, returns a [`ModelError::InvalidPermissions`] if the current user
-    /// does not have permission to manage scheduled events.
-    ///
-    /// Otherwise will return [`Error::Http`] if the current user does not have permission.
+    /// does not have permission to manage scheduled events. Otherwise, returns [`Error::Http`].
     ///
     /// [Manage Events]: Permissions::MANAGE_EVENTS
     #[cfg(feature = "http")]

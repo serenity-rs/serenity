@@ -72,6 +72,7 @@ use crate::model::prelude::*;
 /// [`GuildChannel::create_invite`]: crate::model::channel::GuildChannel::create_invite
 /// [`RichInvite`]: crate::model::invite::RichInvite
 #[derive(Clone, Debug, Serialize)]
+#[must_use]
 pub struct CreateInvite {
     #[cfg(feature = "http")]
     #[serde(skip)]
@@ -281,10 +282,8 @@ impl CreateInvite {
     ///
     /// # Errors
     ///
-    /// If the `cache` is enabled, returns [`ModelError::InvalidPermissions`]
-    /// if the current user does not have permission to create invites.
-    ///
-    /// Otherwise returns [`Error::Http`] if the current user lacks permission.
+    /// If the `cache` is enabled, returns [`ModelError::InvalidPermissions`] if the current user
+    /// does not have permission to create invites. Otherwise, returns [`Error::Http`].
     ///
     /// [Create Instant Invite]: Permissions::CREATE_INSTANT_INVITE
     #[cfg(feature = "http")]
