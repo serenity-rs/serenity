@@ -171,6 +171,13 @@ jobs:
       - name: Pin indexmap to 1.8.2
         run: cargo update -p indexmap --precise 1.8.2
 
+      # time 0.3.10+ MSRV is 1.57
+      - name: Pin time to 0.3.9
+        run: |
+          # We have `time` 0.1 & 0.3 in the tree
+          latest_version=$(cargo search --limit 1 time | head -1 | cut -d'"' -f2)
+          cargo update -p time:$latest_version --precise 0.3.9
+
       - name: Check
         run: cargo check --features collector,unstable_discord_api
 

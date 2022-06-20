@@ -923,7 +923,7 @@ impl Http {
     pub async fn create_webhook(
         &self,
         channel_id: u64,
-        map: &Value,
+        map: &impl serde::Serialize,
         audit_log_reason: Option<&str>,
     ) -> Result<Webhook> {
         let body = to_vec(map)?;
@@ -2161,7 +2161,7 @@ impl Http {
         &self,
         webhook_id: u64,
         token: &str,
-        map: &JsonMap,
+        map: &impl serde::Serialize,
     ) -> Result<Webhook> {
         let body = to_vec(map)?;
 
