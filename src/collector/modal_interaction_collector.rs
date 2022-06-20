@@ -1,5 +1,6 @@
 use std::fmt;
 use std::future::Future;
+use std::num::NonZeroU64;
 use std::pin::Pin;
 use std::sync::Arc;
 use std::task::{Context as FutContext, Poll};
@@ -56,7 +57,7 @@ macro_rules! impl_modal_interaction_collector {
                 /// Sets the required author ID of an interaction.
                 /// If an interaction is not triggered by a user with this ID, it won't be received.
                 pub fn author_id(mut self, author_id: impl Into<u64>) -> Self {
-                    self.filter.as_mut().unwrap().author_id = Some(author_id.into());
+                    self.filter.as_mut().unwrap().author_id = NonZeroU64::new(author_id.into());
 
                     self
                 }
@@ -64,7 +65,7 @@ macro_rules! impl_modal_interaction_collector {
                 /// Sets the message on which the interaction must occur.
                 /// If an interaction is not on a message with this ID, it won't be received.
                 pub fn message_id(mut self, message_id: impl Into<u64>) -> Self {
-                    self.filter.as_mut().unwrap().message_id = Some(message_id.into());
+                    self.filter.as_mut().unwrap().message_id = NonZeroU64::new(message_id.into());
 
                     self
                 }
@@ -72,7 +73,7 @@ macro_rules! impl_modal_interaction_collector {
                 /// Sets the guild in which the interaction must occur.
                 /// If an interaction is not on a message with this guild ID, it won't be received.
                 pub fn guild_id(mut self, guild_id: impl Into<u64>) -> Self {
-                    self.filter.as_mut().unwrap().guild_id = Some(guild_id.into());
+                    self.filter.as_mut().unwrap().guild_id = NonZeroU64::new(guild_id.into());
 
                     self
                 }
@@ -80,7 +81,7 @@ macro_rules! impl_modal_interaction_collector {
                 /// Sets the channel on which the interaction must occur.
                 /// If an interaction is not on a message with this channel ID, it won't be received.
                 pub fn channel_id(mut self, channel_id: impl Into<u64>) -> Self {
-                    self.filter.as_mut().unwrap().channel_id = Some(channel_id.into());
+                    self.filter.as_mut().unwrap().channel_id = NonZeroU64::new(channel_id.into());
 
                     self
                 }
@@ -168,10 +169,10 @@ struct FilterOptions {
     filter_limit: Option<u32>,
     collect_limit: Option<u32>,
     filter: Option<FilterFn<ModalSubmitInteraction>>,
-    channel_id: Option<u64>,
-    guild_id: Option<u64>,
-    author_id: Option<u64>,
-    message_id: Option<u64>,
+    channel_id: Option<NonZeroU64>,
+    guild_id: Option<NonZeroU64>,
+    author_id: Option<NonZeroU64>,
+    message_id: Option<NonZeroU64>,
 }
 
 impl fmt::Debug for FilterOptions {

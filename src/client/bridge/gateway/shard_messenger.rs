@@ -72,7 +72,7 @@ impl ShardMessenger {
     /// #
     /// use serenity::model::id::GuildId;
     ///
-    /// shard.chunk_guild(GuildId(81384788765712384), Some(2000), ChunkGuildFilter::None, None);
+    /// shard.chunk_guild(GuildId::new(81384788765712384), Some(2000), ChunkGuildFilter::None, None);
     /// #     Ok(())
     /// # }
     /// ```
@@ -96,7 +96,7 @@ impl ShardMessenger {
     /// use serenity::model::id::GuildId;
     ///
     /// shard.chunk_guild(
-    ///     GuildId(81384788765712384),
+    ///     GuildId::new(81384788765712384),
     ///     Some(20),
     ///     ChunkGuildFilter::Query("do".to_owned()),
     ///     Some("request"),

@@ -52,10 +52,10 @@ impl ArgumentConvert for Emoji {
         #[cfg(feature = "cache")]
         let guild = ctx.cache.guilds.get(&guild_id);
         #[cfg(not(feature = "cache"))]
-        let guild = ctx.http.get_guild(guild_id.0).await.ok();
+        let guild = ctx.http.get_guild(guild_id.get()).await.ok();
         let guild = guild.ok_or(EmojiParseError::FailedToRetrieveGuild)?;
 
-        let direct_id = s.parse::<u64>().ok().map(EmojiId);
+        let direct_id = s.parse().ok().map(EmojiId);
         let id_from_mention = crate::utils::parse_emoji(s).map(|e| e.id);
 
         if let Some(emoji_id) = direct_id.or(id_from_mention) {

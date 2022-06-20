@@ -66,7 +66,7 @@ impl MessageBuilder {
     /// use serenity::model::id::ChannelId;
     /// use serenity::utils::MessageBuilder;
     ///
-    /// let channel_id = ChannelId(81384788765712384);
+    /// let channel_id = ChannelId::new(81384788765712384);
     ///
     /// let content = MessageBuilder::new().channel(channel_id).push("!").build();
     ///
@@ -103,7 +103,7 @@ impl MessageBuilder {
     /// use serenity::model::id::ChannelId;
     /// use serenity::utils::MessageBuilder;
     ///
-    /// let channel_id = ChannelId(81384788765712384);
+    /// let channel_id = ChannelId::new(81384788765712384);
     ///
     /// let content = MessageBuilder::new().push("The channel is: ").channel(channel_id).build();
     ///
@@ -139,7 +139,7 @@ impl MessageBuilder {
     /// # use serenity::utils::MessageBuilder;
     ///
     /// # let emoji = from_value::<Emoji>(json!({
-    /// #     "id": EmojiId(302516740095606785),
+    /// #     "id": EmojiId::new(302516740095606785),
     /// #     "name": "smugAnimeFace",
     /// # })).unwrap();
     ///
@@ -1203,7 +1203,7 @@ mod test {
             .emoji(&Emoji {
                 animated: false,
                 available: true,
-                id: EmojiId(32),
+                id: EmojiId::new(32),
                 name: "Rohrkatze".to_string(),
                 managed: false,
                 require_colons: true,
@@ -1211,8 +1211,12 @@ mod test {
                 user: None,
             })
             .build();
-        let content_mentions =
-            MessageBuilder::new().channel(1).mention(&UserId(2)).role(3).user(4).build();
+        let content_mentions = MessageBuilder::new()
+            .channel(ChannelId::new(1))
+            .mention(&UserId::new(2))
+            .role(RoleId::new(3))
+            .user(UserId::new(4))
+            .build();
         assert_eq!(content_mentions, "<#1><@2><@&3><@4>");
         assert_eq!(content_emoji, "<:Rohrkatze:32>");
     }

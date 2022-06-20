@@ -81,7 +81,7 @@ impl EditGuild {
     /// #
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// #     let http = Http::new("token");
-    /// #     let mut guild = GuildId(0).to_partial_guild(&http).await?;
+    /// #     let mut guild = GuildId::new(1).to_partial_guild(&http).await?;
     /// use serenity::utils;
     ///
     /// // assuming a `guild` has already been bound
@@ -246,7 +246,7 @@ impl EditGuild {
     /// #
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// #     let http = Http::new("token");
-    /// #     let mut guild = GuildId(0).to_partial_guild(&http).await?;
+    /// #     let mut guild = GuildId::new(1).to_partial_guild(&http).await?;
     /// use serenity::model::guild::VerificationLevel;
     ///
     /// // assuming a `guild` has already been bound
@@ -275,7 +275,7 @@ impl EditGuild {
     /// #
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// #     let http = Http::new("token");
-    /// #     let mut guild = GuildId(0).to_partial_guild(&http).await?;
+    /// #     let mut guild = GuildId::new(1).to_partial_guild(&http).await?;
     /// use serenity::model::guild::SystemChannelFlags;
     ///
     /// // assuming a `guild` has already been bound

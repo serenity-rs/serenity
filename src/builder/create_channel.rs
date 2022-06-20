@@ -117,7 +117,7 @@ impl CreateChannel {
     /// #
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// #     let http = Arc::new(Http::new("token"));
-    /// #     let mut guild = GuildId(0).to_partial_guild(&http).await?;
+    /// #     let mut guild = GuildId::new(1).to_partial_guild(&http).await?;
     /// use serenity::model::channel::{PermissionOverwrite, PermissionOverwriteType};
     /// use serenity::model::id::UserId;
     /// use serenity::model::permissions::Permissions;
@@ -126,7 +126,7 @@ impl CreateChannel {
     /// let permissions = vec![PermissionOverwrite {
     ///     allow: Permissions::VIEW_CHANNEL,
     ///     deny: Permissions::SEND_TTS_MESSAGES,
-    ///     kind: PermissionOverwriteType::Member(UserId(1234)),
+    ///     kind: PermissionOverwriteType::Member(UserId::new(1234)),
     /// }];
     ///
     /// guild.create_channel(http, |c| c.name("my_new_cool_channel").permissions(permissions)).await?;
