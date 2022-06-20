@@ -452,7 +452,7 @@ impl CacheUpdate for MessageCreateEvent {
             return None;
         }
 
-        let messages =
+        let mut messages =
             cache.messages.entry(self.message.channel_id).or_insert_with(Default::default);
         let mut queue =
             cache.message_queue.entry(self.message.channel_id).or_insert_with(Default::default);
@@ -468,7 +468,7 @@ impl CacheUpdate for MessageCreateEvent {
         queue.push_back(self.message.id);
         messages.insert(self.message.id, self.message.clone());
 
-        removed_msg.map(|i| i.1)
+        removed_msg
     }
 }
 
@@ -476,7 +476,7 @@ impl CacheUpdate for MessageUpdateEvent {
     type Output = Message;
 
     fn update(&mut self, cache: &Cache) -> Option<Self::Output> {
-        if let Some(messages) = cache.messages.get_mut(&self.channel_id) {
+        if let Some(mut messages) = cache.messages.get_mut(&self.channel_id) {
             if let Some(mut message) = messages.get_mut(&self.id) {
                 let item = message.clone();
 
