@@ -105,6 +105,10 @@
 <span id="100">100</span>
 <span id="101">101</span>
 <span id="102">102</span>
+<span id="103">103</span>
+<span id="104">104</span>
+<span id="105">105</span>
+<span id="106">106</span>
 </pre><pre class="rust"><code><span class="doccomment">//! A set of builders used to make using methods on certain structs simpler to</span>
 <span class="doccomment">//! use.</span>
 <span class="doccomment">//!</span>
@@ -134,6 +138,7 @@
 <span class="kw">mod</span> <span class="ident">create_stage_instance</span>;
 <span class="kw">mod</span> <span class="ident">create_sticker</span>;
 <span class="kw">mod</span> <span class="ident">create_thread</span>;
+<span class="kw">mod</span> <span class="ident">create_webhook</span>;
 <span class="kw">mod</span> <span class="ident">edit_channel</span>;
 <span class="kw">mod</span> <span class="ident">edit_guild</span>;
 <span class="kw">mod</span> <span class="ident">edit_guild_welcome_screen</span>;
@@ -148,6 +153,7 @@
 <span class="kw">mod</span> <span class="ident">edit_sticker</span>;
 <span class="kw">mod</span> <span class="ident">edit_thread</span>;
 <span class="kw">mod</span> <span class="ident">edit_voice_state</span>;
+<span class="kw">mod</span> <span class="ident">edit_webhook</span>;
 <span class="kw">mod</span> <span class="ident">edit_webhook_message</span>;
 <span class="kw">mod</span> <span class="ident">execute_webhook</span>;
 <span class="kw">mod</span> <span class="ident">get_messages</span>;
@@ -190,6 +196,7 @@
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="self">self</span>::create_stage_instance::CreateStageInstance</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="self">self</span>::create_sticker::CreateSticker</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="self">self</span>::create_thread::CreateThread</span>;
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="self">self</span>::create_webhook::CreateWebhook</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="self">self</span>::edit_channel::EditChannel</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="self">self</span>::edit_guild::EditGuild</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="self">self</span>::edit_guild_welcome_screen::EditGuildWelcomeScreen</span>;
@@ -204,6 +211,7 @@
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="self">self</span>::edit_sticker::EditSticker</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="self">self</span>::edit_thread::EditThread</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="self">self</span>::edit_voice_state::EditVoiceState</span>;
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="self">self</span>::edit_webhook::EditWebhook</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="self">self</span>::edit_webhook_message::EditWebhookMessage</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="self">self</span>::execute_webhook::ExecuteWebhook</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="self">self</span>::get_messages</span>::{<span class="ident">GetMessages</span>, <span class="ident">SearchFilter</span>};
