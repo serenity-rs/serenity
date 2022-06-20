@@ -1405,7 +1405,7 @@ impl PartialGuild {
     /// ```
     #[cfg(all(feature = "utils", not(feature = "cache")))]
     #[inline]
-    pub fn shard_id(&self, shard_count: u64) -> u64 {
+    pub fn shard_id(&self, shard_count: u32) -> u32 {
         self.id.shard_id(shard_count)
     }
 
