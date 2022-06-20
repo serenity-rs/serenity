@@ -48,6 +48,10 @@ pub struct CreateApplicationCommandOption {
     min_value: Option<Number>,
     #[serde(skip_serializing_if = "Option::is_none")]
     max_value: Option<Number>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    min_length: Option<u16>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    max_length: Option<u16>,
 
     channel_types: Vec<ChannelType>,
     choices: Vec<CommandOptionChoice>,
@@ -290,7 +294,7 @@ impl CreateApplicationCommandOption {
     ///
     /// The value of `min_length` must be greater or equal to `0`.
     pub fn min_length(&mut self, value: u16) -> &mut Self {
-        self.0.insert("min_length", value.into());
+        self.min_length = Some(value);
 
         self
     }
@@ -299,7 +303,7 @@ impl CreateApplicationCommandOption {
     ///
     /// The value of `max_length` must be greater or equal to `1`.
     pub fn max_length(&mut self, value: u16) -> &mut Self {
-        self.0.insert("max_length", value.into());
+        self.max_length = Some(value);
 
         self
     }
