@@ -37,12 +37,10 @@ macro_rules! impl_from_str {
                 type Err = $err;
 
                 fn from_str(s: &str) -> StdResult<Self, Self::Err> {
-                    let id = match utils::$parse_function(s) {
-                        Some(id) => id,
-                        None => s.parse::<u64>().map_err(|_| $err::InvalidFormat)?,
-                    };
-
-                    Ok($id(id))
+                    match utils::$parse_function(s) {
+                        Some(id) => Ok(id),
+                        None => s.parse().map($id::new).map_err(|_| $err::InvalidFormat),
+                    }
                 }
             }
         )*
@@ -180,11 +178,11 @@ mod test {
 
     #[test]
     fn test_formatters() {
-        assert_eq!(ChannelId(1).to_string(), "1");
-        assert_eq!(EmojiId(2).to_string(), "2");
-        assert_eq!(GuildId(3).to_string(), "3");
-        assert_eq!(RoleId(4).to_string(), "4");
-        assert_eq!(UserId(5).to_string(), "5");
+        assert_eq!(ChannelId::new(1).to_string(), "1");
+        assert_eq!(EmojiId::new(2).to_string(), "2");
+        assert_eq!(GuildId::new(3).to_string(), "3");
+        assert_eq!(RoleId::new(4).to_string(), "4");
+        assert_eq!(UserId::new(5).to_string(), "5");
     }
 
     #[cfg(feature = "utils")]
@@ -194,9 +192,9 @@ mod test {
         #[cfg(feature = "model")]
         #[test]
         fn parse_mentions() {
-            assert_eq!("<@1234>".parse::<UserId>().unwrap(), UserId(1234));
-            assert_eq!("<@&1234>".parse::<RoleId>().unwrap(), RoleId(1234));
-            assert_eq!("<#1234>".parse::<ChannelId>().unwrap(), ChannelId(1234));
+            assert_eq!("<@1234>".parse::<UserId>().unwrap(), UserId::new(1234));
+            assert_eq!("<@&1234>".parse::<RoleId>().unwrap(), RoleId::new(1234));
+            assert_eq!("<#1234>".parse::<ChannelId>().unwrap(), ChannelId::new(1234));
 
             assert!("<@1234>".parse::<ChannelId>().is_err());
             assert!("<@&1234>".parse::<UserId>().is_err());
