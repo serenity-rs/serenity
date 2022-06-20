@@ -564,7 +564,7 @@ impl Guild {
     ///
     /// # async fn run() -> serenity::Result<()> {
     /// # let http = Http::new("token");
-    /// # let guild = Guild::get(&http, GuildId(7)).await?;
+    /// # let guild = Guild::get(&http, GuildId::new(7)).await?;
     /// let channel = guild
     ///     .create_channel()
     ///     .name("my-test-channel")

@@ -293,7 +293,7 @@ impl PartialGuild {
     ///
     /// # async fn run() -> serenity::Result<()> {
     /// # let http = Http::new("token");
-    /// # let guild = PartialGuild::get(&http, GuildId(7)).await?;
+    /// # let guild = PartialGuild::get(&http, GuildId::new(7)).await?;
     /// let channel = guild
     ///     .create_channel()
     ///     .name("my-test-channel")
