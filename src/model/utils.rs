@@ -63,7 +63,7 @@ pub fn add_guild_id_to_map(map: &mut JsonMap, key: &str, id: GuildId) {
     if let Some(array) = map.get_mut(key).and_then(Value::as_array_mut) {
         for value in array {
             if let Some(item) = value.as_object_mut() {
-                item.insert("guild_id".to_string(), from_number(id.0));
+                item.insert("guild_id".to_string(), from_number(id.get()));
             }
         }
     }
@@ -163,15 +163,15 @@ fn try_resolve(
             Some(CommandDataOptionValue::Channel(channel))
         },
         CommandOptionType::Mentionable => {
-            let id: u64 = string?.parse().ok()?;
+            let id = UserId(string?.parse().ok()?);
 
-            if let Some(user) = resolved.users.get(&UserId(id)) {
+            if let Some(user) = resolved.users.get(&id) {
                 let user = user.clone();
-                let member = resolved.members.get(&UserId(id)).cloned();
+                let member = resolved.members.get(&id).cloned();
 
                 Some(CommandDataOptionValue::User(user, member))
             } else {
-                let role = resolved.roles.get(&RoleId(id))?.clone();
+                let role = resolved.roles.get(&RoleId(id.0))?.clone();
 
                 Some(CommandDataOptionValue::Role(role))
             }
@@ -287,13 +287,11 @@ pub mod roles {
 
         let Event {
             guild_id,
-            role,
+            mut role,
         } = Event::deserialize(deserializer)?;
 
-        let mut role = Role::from(role);
-        role.guild_id = guild_id;
-
-        Ok(role)
+        role.guild_id = Some(guild_id);
+        Ok(Role::from(role))
     }
 }
 
