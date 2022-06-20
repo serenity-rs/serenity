@@ -19,7 +19,7 @@ impl StickerId {
     ///
     /// [Manage Emojis and Stickers]: crate::model::permissions::Permissions::MANAGE_EMOJIS_AND_STICKERS
     pub async fn delete(&self, http: impl AsRef<Http>, guild_id: impl Into<GuildId>) -> Result<()> {
-        guild_id.into().delete_sticker(http, self.0).await
+        guild_id.into().delete_sticker(http, self).await
     }
 
     /// Requests the sticker via the REST API to get a [`Sticker`] with all
@@ -30,7 +30,7 @@ impl StickerId {
     /// Returns [`Error::Http`] if a [`Sticker`] with that [`StickerId`] does
     /// not exist, or is otherwise unavailable.
     pub async fn to_sticker(&self, http: impl AsRef<Http>) -> Result<Sticker> {
-        http.as_ref().get_sticker(self.0).await
+        http.as_ref().get_sticker(self.get()).await
     }
 
     /// Edits the sticker.
@@ -52,6 +52,6 @@ impl StickerId {
     where
         F: FnOnce(&mut EditSticker) -> &mut EditSticker,
     {
-        guild_id.into().edit_sticker(http, self.0, f).await
+        guild_id.into().edit_sticker(http, self, f).await
     }
 }
