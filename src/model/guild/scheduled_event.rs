@@ -46,7 +46,8 @@ pub struct ScheduledEvent {
     pub image: Option<String>,
 }
 
-#[derive(Clone, Copy, Debug)]
+#[derive(Clone, Copy, Debug, Eq, Hash, PartialEq, PartialOrd, Ord)]
+#[non_exhaustive]
 pub enum ScheduledEventStatus {
     Scheduled = 1,
     Active = 2,
@@ -62,7 +63,8 @@ enum_number!(ScheduledEventStatus {
     Canceled,
 });
 
-#[derive(Clone, Copy, Debug)]
+#[derive(Clone, Copy, Debug, Eq, Hash, PartialEq, PartialOrd, Ord)]
+#[non_exhaustive]
 pub enum ScheduledEventType {
     StageInstance = 1,
     Voice = 2,

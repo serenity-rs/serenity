@@ -67,7 +67,8 @@ pub struct TeamMember {
     pub user: User,
 }
 
-#[derive(Clone, Debug, Copy, PartialEq)]
+#[derive(Clone, Copy, Debug, Eq, Hash, PartialEq, PartialOrd, Ord)]
+#[non_exhaustive]
 pub enum MembershipState {
     Invited = 1,
     Accepted = 2,

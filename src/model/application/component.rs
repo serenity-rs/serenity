@@ -7,7 +7,7 @@ use crate::model::channel::ReactionType;
 use crate::model::utils::deserialize_val;
 
 /// The type of a component
-#[derive(Copy, Clone, Debug, Hash, Eq, PartialEq, PartialOrd, Ord)]
+#[derive(Clone, Copy, Debug, Eq, Hash, PartialEq, PartialOrd, Ord)]
 #[non_exhaustive]
 #[repr(u8)]
 pub enum ComponentType {
@@ -105,7 +105,7 @@ pub struct Button {
 }
 
 /// The style of a button.
-#[derive(Copy, Clone, Debug, Hash, Eq, PartialEq, PartialOrd, Ord)]
+#[derive(Clone, Copy, Debug, Eq, Hash, PartialEq, PartialOrd, Ord)]
 #[non_exhaustive]
 #[repr(u8)]
 pub enum ButtonStyle {
@@ -173,7 +173,7 @@ pub struct InputText {
 }
 
 /// The style of the input text
-#[derive(Copy, Clone, Debug, Hash, Eq, PartialEq, PartialOrd, Ord)]
+#[derive(Clone, Copy, Debug, Eq, Hash, PartialEq, PartialOrd, Ord)]
 #[non_exhaustive]
 #[repr(u8)]
 pub enum InputTextStyle {
