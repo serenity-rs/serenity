@@ -59,21 +59,21 @@ impl Bucket {
     pub async fn take(&mut self, ctx: &Context, msg: &Message) -> Option<RateLimitInfo> {
         match self {
             Self::Global(counter) => counter.take(ctx, msg, 0).await,
-            Self::User(counter) => counter.take(ctx, msg, msg.author.id.0).await,
+            Self::User(counter) => counter.take(ctx, msg, msg.author.id.get()).await,
             Self::Guild(counter) => {
                 if let Some(guild_id) = msg.guild_id {
-                    counter.take(ctx, msg, guild_id.0).await
+                    counter.take(ctx, msg, guild_id.get()).await
                 } else {
                     None
                 }
             },
-            Self::Channel(counter) => counter.take(ctx, msg, msg.channel_id.0).await,
+            Self::Channel(counter) => counter.take(ctx, msg, msg.channel_id.get()).await,
             // This requires the cache, as messages do not contain their channel's
             // category.
             #[cfg(feature = "cache")]
             Self::Category(counter) => {
                 if let Some(category_id) = msg.category_id(ctx) {
-                    counter.take(ctx, msg, category_id.0).await
+                    counter.take(ctx, msg, category_id.get()).await
                 } else {
                     None
                 }
@@ -85,19 +85,19 @@ impl Bucket {
     pub async fn give(&mut self, ctx: &Context, msg: &Message) {
         match self {
             Self::Global(counter) => counter.give(ctx, msg, 0).await,
-            Self::User(counter) => counter.give(ctx, msg, msg.author.id.0).await,
+            Self::User(counter) => counter.give(ctx, msg, msg.author.id.get()).await,
             Self::Guild(counter) => {
                 if let Some(guild_id) = msg.guild_id {
-                    counter.give(ctx, msg, guild_id.0).await;
+                    counter.give(ctx, msg, guild_id.get()).await;
                 }
             },
-            Self::Channel(counter) => counter.give(ctx, msg, msg.channel_id.0).await,
+            Self::Channel(counter) => counter.give(ctx, msg, msg.channel_id.get()).await,
             // This requires the cache, as messages do not contain their channel's
             // category.
             #[cfg(feature = "cache")]
             Self::Category(counter) => {
                 if let Some(category_id) = msg.category_id(ctx) {
-                    counter.give(ctx, msg, category_id.0).await;
+                    counter.give(ctx, msg, category_id.get()).await;
                 }
             },
         }

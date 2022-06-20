@@ -257,7 +257,8 @@ impl EventHandler for Handler {
                 #[cfg(feature = "post-ping")]
                 let post_latency = {
                     let now = Instant::now();
-                    let _ = ChannelId(381926291785383946).say(&ctx_clone, "Latency Test").await;
+                    let _ =
+                        ChannelId::new(381926291785383946).say(&ctx_clone, "Latency Test").await;
                     now.elapsed().as_millis() as f64
                 };
 

@@ -34,7 +34,7 @@ use crate::model::id::StickerId;
 /// #
 /// # let http = Arc::new(Http::new("token"));
 ///
-/// let channel_id = ChannelId(7);
+/// let channel_id = ChannelId::new(7);
 ///
 /// let _ = channel_id.send_message(&http, |m| {
 ///     m.content("test")
