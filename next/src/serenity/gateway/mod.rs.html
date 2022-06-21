@@ -244,7 +244,7 @@
 <span class="doccomment">/// Indicates the current connection stage of a [`Shard`].</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// This can be useful for knowing which shards are currently &quot;down&quot;/&quot;up&quot;.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>, <span class="ident">PartialEq</span>, <span class="ident">PartialOrd</span>, <span class="ident">Ord</span>)]</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>, <span class="ident">Ord</span>, <span class="ident">PartialEq</span>, <span class="ident">PartialOrd</span>)]</span>
 <span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">ConnectionStage</span> {
     <span class="doccomment">/// Indicator that the [`Shard`] is normally connected and is not in, e.g.,</span>

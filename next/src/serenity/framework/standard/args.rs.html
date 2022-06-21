@@ -1083,14 +1083,14 @@
     }
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">PartialEq</span>)]</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Debug</span>, <span class="ident">PartialEq</span>)]</span>
 <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::enum_variant_names</span>)]</span>
 <span class="kw">enum</span> <span class="ident">TokenKind</span> {
     <span class="ident">Argument</span>,
     <span class="ident">QuotedArgument</span>,
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>)]</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Debug</span>)]</span>
 <span class="kw">struct</span> <span class="ident">Token</span> {
     <span class="ident">kind</span>: <span class="ident">TokenKind</span>,
     <span class="ident">span</span>: (<span class="ident">usize</span>, <span class="ident">usize</span>),
@@ -1214,7 +1214,7 @@
     <span class="ident">strip</span>(<span class="ident">s</span>, <span class="string">&#39;\u{201C}&#39;</span>, <span class="string">&#39;\u{201D}&#39;</span>).<span class="ident">unwrap_or</span>(<span class="ident">s</span>)
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>)]</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Debug</span>)]</span>
 <span class="kw">enum</span> <span class="ident">State</span> {
     <span class="prelude-val">None</span>,
     <span class="ident">Quoted</span>,

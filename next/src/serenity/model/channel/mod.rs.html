@@ -981,7 +981,7 @@
     }
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">PermissionOverwriteData</span> {
     <span class="ident">allow</span>: <span class="ident">Permissions</span>,
     <span class="ident">deny</span>: <span class="ident">Permissions</span>,
@@ -1054,7 +1054,7 @@
 <span class="doccomment">/// The type of edit being made to a Channel&#39;s permissions.</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// This is for use with methods such as [`GuildChannel::create_permission`].</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>)]</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>)]</span>
 <span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">PermissionOverwriteType</span> {
     <span class="doccomment">/// A member which is having its permission overwrites edited.</span>

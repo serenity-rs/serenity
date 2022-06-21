@@ -387,7 +387,7 @@
 <span class="doccomment">///     format!(&quot;{} {} {}&quot;, Mention::from(user), Mention::from(channel), Mention::from(role),),</span>
 <span class="doccomment">/// )</span>
 <span class="doccomment">/// ```</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>)]</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Debug</span>)]</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">Mention</span> {
     <span class="ident">Channel</span>(<span class="ident">ChannelId</span>),
     <span class="ident">Role</span>(<span class="ident">RoleId</span>),

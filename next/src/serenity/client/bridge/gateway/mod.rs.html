@@ -234,7 +234,7 @@
 }
 
 <span class="doccomment">/// A message for a [`ShardManager`] relating to an operation with a shard.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>, <span class="ident">PartialEq</span>, <span class="ident">PartialOrd</span>, <span class="ident">Ord</span>)]</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>, <span class="ident">Ord</span>, <span class="ident">PartialEq</span>, <span class="ident">PartialOrd</span>)]</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">ShardManagerMessage</span> {
     <span class="doccomment">/// Indicator that a [`ShardManagerMonitor`] should restart a shard.</span>
     <span class="ident">Restart</span>(<span class="ident">ShardId</span>),
