@@ -2,7 +2,7 @@ use std::fmt;
 
 /// The available OAuth2 Scopes.
 #[non_exhaustive]
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord)]
+#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
 pub enum Scope {
     /// For oauth2 bots, this puts the bot in the user's selected guild by default.
     Bot,

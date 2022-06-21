@@ -3,7 +3,7 @@ use serde::{Deserialize, Serialize};
 use crate::protocol_data::ProtocolData;
 
 /// Used to select the voice protocol and encryption mechanism.
-#[derive(Clone, Debug, Deserialize, Eq, Hash, PartialEq, Serialize)]
+#[derive(Clone, Debug, Eq, Hash, PartialEq, Deserialize, Serialize)]
 pub struct SelectProtocol {
     /// Client's response to encryption/connection negotiation.
     pub data: ProtocolData,

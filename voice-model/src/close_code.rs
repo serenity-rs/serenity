@@ -2,7 +2,7 @@ use enum_primitive::*;
 
 enum_from_primitive! {
 /// Discord Voice Gateway Websocket close codes.
-#[derive(Copy, Clone, Debug, Eq, PartialEq)]
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
 pub enum CloseCode {
     /// Invalid Voice OP Code.
     UnknownOpcode = 4001,
