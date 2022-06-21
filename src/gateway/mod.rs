@@ -66,7 +66,7 @@ pub type CurrentPresence = (Option<Activity>, OnlineStatus);
 /// Indicates the current connection stage of a [`Shard`].
 ///
 /// This can be useful for knowing which shards are currently "down"/"up".
-#[derive(Copy, Clone, Debug, Eq, Hash, PartialEq, PartialOrd, Ord)]
+#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
 #[non_exhaustive]
 pub enum ConnectionStage {
     /// Indicator that the [`Shard`] is normally connected and is not in, e.g.,

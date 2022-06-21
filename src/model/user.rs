@@ -553,7 +553,7 @@ impl Default for CurrentUser {
 /// The default avatar is calculated via the result of `discriminator % 5`.
 ///
 /// The has of the avatar can be retrieved via calling [`Self::name`] on the enum.
-#[derive(Copy, Clone, Debug, Deserialize, Hash, Eq, PartialEq, PartialOrd, Ord, Serialize)]
+#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
 #[non_exhaustive]
 pub enum DefaultAvatar {
     /// The avatar when the result is `0`.
@@ -587,7 +587,7 @@ impl DefaultAvatar {
 /// The representation of a user's status.
 ///
 /// [Discord docs](https://discord.com/developers/docs/topics/gateway#update-presence-status-types).
-#[derive(Clone, Copy, Debug, Deserialize, Eq, Hash, PartialEq, PartialOrd, Ord, Serialize)]
+#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
 #[non_exhaustive]
 pub enum OnlineStatus {
     #[serde(rename = "dnd")]
