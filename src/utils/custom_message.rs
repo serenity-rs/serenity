@@ -6,7 +6,7 @@ use crate::model::Timestamp;
 /// but you don't have a message in hand, or just have a fragment of its data.
 ///
 /// [`dispatch`]: crate::framework::Framework::dispatch
-#[derive(Debug, Clone)]
+#[derive(Clone, Debug)]
 pub struct CustomMessage {
     msg: Message,
 }

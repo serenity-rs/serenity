@@ -18,7 +18,7 @@ use crate::model::prelude::*;
 use crate::model::ModelError;
 
 /// A representation of a type of webhook.
-#[derive(Clone, Copy, Debug, Eq, Hash, PartialEq, PartialOrd, Ord)]
+#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
 #[non_exhaustive]
 pub enum WebhookType {
     /// An indicator that the webhook can post messages to channels with

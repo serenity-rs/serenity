@@ -30,16 +30,13 @@
 //! [`Shard`]: crate::gateway::Shard
 //! [`http`]: crate::http
 
-use std::collections::hash_map::RandomState;
 use std::collections::{HashMap, VecDeque};
-use std::hash::{BuildHasher, Hash};
+use std::hash::Hash;
 use std::str::FromStr;
 #[cfg(feature = "temp_cache")]
 use std::time::Duration;
 
-use dashmap::iter::Iter;
 use dashmap::mapref::entry::Entry;
-use dashmap::mapref::multiple::RefMulti;
 use dashmap::mapref::one::Ref;
 use dashmap::{DashMap, DashSet};
 #[cfg(feature = "temp_cache")]
@@ -55,21 +52,34 @@ mod settings;
 pub use self::cache_update::CacheUpdate;
 pub use self::settings::Settings;
 
-type MessageCache = DashMap<ChannelId, DashMap<MessageId, Message>>;
+type MessageCache = DashMap<ChannelId, HashMap<MessageId, Message>>;
 
 struct NotSend;
 
+enum CacheRefInner<'a, K, V> {
+    DashRef(Ref<'a, K, V>),
+    ReadGuard(parking_lot::RwLockReadGuard<'a, V>),
+}
+
 pub struct CacheRef<'a, K, V> {
-    inner: Ref<'a, K, V>,
+    inner: CacheRefInner<'a, K, V>,
     phantom: std::marker::PhantomData<*const NotSend>,
 }
 
 impl<'a, K, V> CacheRef<'a, K, V> {
-    fn from_ref(inner: Ref<'a, K, V>) -> Self {
-        CacheRef {
+    fn new(inner: CacheRefInner<'a, K, V>) -> Self {
+        Self {
             inner,
             phantom: std::marker::PhantomData,
         }
+    }
+
+    fn from_ref(inner: Ref<'a, K, V>) -> Self {
+        Self::new(CacheRefInner::DashRef(inner))
+    }
+
+    fn from_guard(inner: parking_lot::RwLockReadGuard<'a, V>) -> Self {
+        Self::new(CacheRefInner::ReadGuard(inner))
     }
 }
 
@@ -77,11 +87,15 @@ impl<K: Eq + Hash, V> std::ops::Deref for CacheRef<'_, K, V> {
     type Target = V;
 
     fn deref(&self) -> &Self::Target {
-        self.inner.value()
+        match &self.inner {
+            CacheRefInner::DashRef(inner) => inner.value(),
+            CacheRefInner::ReadGuard(inner) => &*inner,
+        }
     }
 }
 
 pub type GuildRef<'a> = CacheRef<'a, GuildId, Guild>;
+pub type CurrentUserRef<'a> = CacheRef<'a, (), CurrentUser>;
 pub type GuildChannelRef<'a> = CacheRef<'a, ChannelId, GuildChannel>;
 pub type PrivateChannelRef<'a> = CacheRef<'a, ChannelId, PrivateChannel>;
 
@@ -120,26 +134,6 @@ impl<F: FromStr> FromStrAndCache for F {
         CRL: AsRef<Cache> + Send + Sync,
     {
         s.parse::<F>()
-    }
-}
-
-/// Iterator given to the selector closure in [`Cache::channel_messages_field`].
-// Wrapper around a specific iterator type to allow swapping out iterators on cache design changes
-#[derive(Clone)]
-pub struct MessageIterator<'a, S: BuildHasher + Clone>(
-    Iter<'a, MessageId, Message, S, DashMap<MessageId, Message, S>>,
-);
-
-impl<'a, S: 'a + BuildHasher + Clone> Iterator for MessageIterator<'a, S> {
-    // type Item = &'a Message;
-    type Item = RefMulti<'a, MessageId, Message, S>;
-
-    fn next(&mut self) -> Option<Self::Item> {
-        self.0.next()
-    }
-
-    fn size_hint(&self) -> (usize, Option<usize>) {
-        self.0.size_hint()
     }
 }
 
@@ -407,25 +401,24 @@ impl Cache {
 
     /// This method allows to extract specific data from the cached messages of a channel by
     /// providing a `selector` closure picking what you want to extract from the messages
-    /// iterator of a given channel.
+    /// HashMap of a channel.
     ///
     /// ```rust,no_run
     /// # let cache: serenity::cache::Cache = todo!();
     /// // Find all messages by user ID 8 in channel ID 7
     /// let messages_by_user = cache.channel_messages_field(7, |msgs| {
-    ///     msgs.filter_map(|m| if m.author.id == 8 { Some(m.clone()) } else { None })
+    ///     msgs.values()
+    ///         .filter_map(|m| if m.author.id == 8 { Some(m.clone()) } else { None })
     ///         .collect::<Vec<_>>()
     /// });
     /// ```
     pub fn channel_messages_field<T>(
         &self,
         channel_id: impl Into<ChannelId>,
-        selector: impl FnOnce(MessageIterator<'_, RandomState>) -> T,
+        field_selector: impl FnOnce(&HashMap<MessageId, Message>) -> T,
     ) -> Option<T> {
-        let msg = self.messages.get(&channel_id.into())?;
-        let message_iter = MessageIterator(msg.iter());
-
-        Some(selector(message_iter))
+        let msgs = self.messages.get(&channel_id.into())?;
+        Some(field_selector(&msgs))
     }
 
     /// Gets a reference to a guild from the cache based on the given `id`.
@@ -727,9 +720,7 @@ impl Cache {
     }
 
     fn _message(&self, channel_id: ChannelId, message_id: MessageId) -> Option<Message> {
-        self.messages
-            .get(&channel_id)
-            .and_then(|messages| messages.get(&message_id).map(|i| i.clone()))
+        self.messages.get(&channel_id).and_then(|messages| messages.get(&message_id).cloned())
     }
 
     /// Retrieves a [`PrivateChannel`] from the cache's [`Self::private_channels`]
@@ -904,41 +895,10 @@ impl Cache {
         self.categories.get(&channel_id).map(|category| category.id)
     }
 
-    /// This method clones and returns the user used by the bot.
+    /// This method provides a reference to the user used by the bot.
     #[inline]
-    pub fn current_user(&self) -> CurrentUser {
-        self.user.read().clone()
-    }
-
-    /// This method returns the bot's ID.
-    #[inline]
-    pub fn current_user_id(&self) -> UserId {
-        self.user.read().id
-    }
-
-    /// This method allows to only clone a field of the current user instead of
-    /// the entire user by providing a `field_selector`-closure picking what
-    /// you want to clone.
-    ///
-    /// ```rust,no_run
-    /// # use serenity::cache::Cache;
-    /// #
-    /// # fn run() -> Result<(), Box<dyn std::error::Error>> {
-    /// # let cache = Cache::default();
-    /// // We clone only the `name` instead of the entire channel.
-    /// let id = cache.current_user_field(|user| user.id);
-    /// println!("Current user's ID: {}", id);
-    /// #   Ok(())
-    /// # }
-    /// ```
-    #[inline]
-    pub fn current_user_field<Ret: Clone, Fun>(&self, field_selector: Fun) -> Ret
-    where
-        Fun: FnOnce(&CurrentUser) -> Ret,
-    {
-        let user = self.user.read();
-
-        field_selector(&user)
+    pub fn current_user(&self) -> CurrentUserRef<'_> {
+        CacheRef::from_guard(self.user.read())
     }
 
     /// Updates the cache with the update implementation for an event or other

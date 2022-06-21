@@ -335,7 +335,7 @@ pub struct ActivityEmoji {
     pub animated: Option<bool>,
 }
 
-#[derive(Clone, Copy, Debug, PartialEq)]
+#[derive(Copy, Clone, Debug, Hash, Eq, PartialEq, PartialOrd, Ord)]
 #[non_exhaustive]
 pub enum ActivityType {
     /// An indicator that the user is playing a game.

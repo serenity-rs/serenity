@@ -4,7 +4,6 @@ use std::num::NonZeroU64;
 use std::pin::Pin;
 use std::sync::Arc;
 use std::task::{Context as FutContext, Poll};
-use std::time::Duration;
 
 use futures::future::BoxFuture;
 use futures::stream::{Stream, StreamExt};
@@ -13,9 +12,10 @@ use tokio::sync::mpsc::{
     UnboundedReceiver as Receiver,
     UnboundedSender as Sender,
 };
-use tokio::time::{sleep, Sleep};
+use tokio::time::Sleep;
 
 use crate::client::bridge::gateway::ShardMessenger;
+use crate::collector::macros::*;
 use crate::collector::{FilterFn, LazyArc};
 use crate::model::channel::Reaction;
 
@@ -23,26 +23,6 @@ macro_rules! impl_reaction_collector {
     ($($name:ident;)*) => {
         $(
             impl $name {
-                /// Limits how many messages will attempt to be filtered.
-                ///
-                /// The filter checks whether the message has been sent
-                /// in the right guild, channel, and by the right author.
-                pub fn filter_limit(mut self, limit: u32) -> Self {
-                    self.filter.as_mut().unwrap().filter_limit = Some(limit);
-
-                    self
-                }
-
-                /// Limits how many reactions can be collected.
-                ///
-                /// A reaction is considered *collected*, if the reaction
-                /// passes all the requirements.
-                pub fn collect_limit(mut self, limit: u32) -> Self {
-                    self.filter.as_mut().unwrap().collect_limit = Some(limit);
-
-                    self
-                }
-
                 /// Sets a filter function where reactions passed to the function must
                 /// return `true`, otherwise the reaction won't be collected.
                 /// This is the last instance to pass for a reaction to count as *collected*.
@@ -50,38 +30,6 @@ macro_rules! impl_reaction_collector {
                 /// This function is intended to be a reaction content filter.
                 pub fn filter<F: Fn(&Reaction) -> bool + 'static + Send + Sync>(mut self, function: F) -> Self {
                     self.filter.as_mut().unwrap().filter = Some(FilterFn(Arc::new(function)));
-
-                    self
-                }
-
-                /// Sets the required author ID of a reaction.
-                /// If a reaction is not issued by a user with this ID, it won't be received.
-                pub fn author_id(mut self, author_id: impl Into<u64>) -> Self {
-                    self.filter.as_mut().unwrap().author_id = NonZeroU64::new(author_id.into());
-
-                    self
-                }
-
-                /// Sets the message on which the reaction must occur.
-                /// If a reaction is not on a message with this ID, it won't be received.
-                pub fn message_id(mut self, message_id: impl Into<u64>) -> Self {
-                    self.filter.as_mut().unwrap().message_id = NonZeroU64::new(message_id.into());
-
-                    self
-                }
-
-                /// Sets the guild in which the reaction must occur.
-                /// If a reaction is not on a message with this guild ID, it won't be received.
-                pub fn guild_id(mut self, guild_id: impl Into<u64>) -> Self {
-                    self.filter.as_mut().unwrap().guild_id = NonZeroU64::new(guild_id.into());
-
-                    self
-                }
-
-                /// Sets the channel on which the reaction must occur.
-                /// If a reaction is not on a message with this channel ID, it won't be received.
-                pub fn channel_id(mut self, channel_id: impl Into<u64>) -> Self {
-                    self.filter.as_mut().unwrap().channel_id = NonZeroU64::new(channel_id.into());
 
                     self
                 }
@@ -104,13 +52,13 @@ macro_rules! impl_reaction_collector {
                     self
                 }
 
-                /// Sets a `duration` for how long the collector shall receive
-                /// reactions.
-                pub fn timeout(mut self, duration: Duration) -> Self {
-                    self.timeout = Some(Box::pin(sleep(duration)));
-
-                    self
-                }
+                impl_filter_limit!("Limits how many messages will attempt to be filtered.\n\nThe filter checks whether the message has been sent in the right guild, channel, and by the right author.");
+                impl_collect_limit!("Limits how many reactions can be collected. A reaction is considered *collected*, if the reaction passes all the requirements.");
+                impl_channel_id!("Sets the channel on which the reaction must occur. If a reaction is not on a message with this channel ID, it won't be received.");
+                impl_guild_id!("Sets the guild in which the reaction must occur. If a reaction is not on a message with this guild ID, it won't be received.");
+                impl_message_id!("Sets the message on which the reaction must occur. If a reaction is not on a message with this ID, it won't be received.");
+                impl_author_id!("Sets the required author ID of a reaction. If a reaction is not issued by a user with this ID, it won't be received.");
+                impl_timeout!("Sets a `duration` for how long the collector shall receive reactions.");
             }
         )*
     }
