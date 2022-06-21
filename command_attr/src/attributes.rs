@@ -8,7 +8,7 @@ use syn::{Attribute, Ident, Lit, LitStr, Meta, NestedMeta, Path};
 use crate::structures::{Checks, Colour, HelpBehaviour, OnlyIn, Permissions};
 use crate::util::{AsOption, LitExt};
 
-#[derive(Debug, Clone, Copy, PartialEq)]
+#[derive(Clone, Copy, Debug, PartialEq)]
 pub enum ValueKind {
     // #[<name>]
     Name,
