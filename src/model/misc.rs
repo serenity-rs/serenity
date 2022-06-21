@@ -149,7 +149,7 @@ pub struct IncidentUpdate {
 }
 
 /// The type of status update during a service incident.
-#[derive(Copy, Clone, Debug, Deserialize, Hash, Eq, PartialEq, PartialOrd, Ord, Serialize)]
+#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
 #[non_exhaustive]
 #[serde(rename_all = "snake_case")]
 pub enum IncidentStatus {

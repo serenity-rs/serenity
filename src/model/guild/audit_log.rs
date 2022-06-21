@@ -15,7 +15,7 @@ use utils::{optional_string, users, webhooks};
 use crate::model::prelude::*;
 
 /// Determines the action that was done on a target.
-#[derive(Copy, Clone, Debug)]
+#[derive(Clone, Copy, Debug)]
 #[non_exhaustive]
 pub enum Action {
     GuildUpdate,
@@ -95,7 +95,7 @@ impl Serialize for Action {
     }
 }
 
-#[derive(Copy, Clone, Debug)]
+#[derive(Clone, Copy, Debug)]
 #[non_exhaustive]
 #[repr(u8)]
 pub enum ChannelAction {
@@ -104,7 +104,7 @@ pub enum ChannelAction {
     Delete = 12,
 }
 
-#[derive(Copy, Clone, Debug)]
+#[derive(Clone, Copy, Debug)]
 #[non_exhaustive]
 #[repr(u8)]
 pub enum ChannelOverwriteAction {
@@ -113,7 +113,7 @@ pub enum ChannelOverwriteAction {
     Delete = 15,
 }
 
-#[derive(Copy, Clone, Debug)]
+#[derive(Clone, Copy, Debug)]
 #[non_exhaustive]
 #[repr(u8)]
 pub enum MemberAction {
@@ -128,7 +128,7 @@ pub enum MemberAction {
     BotAdd = 28,
 }
 
-#[derive(Copy, Clone, Debug)]
+#[derive(Clone, Copy, Debug)]
 #[non_exhaustive]
 #[repr(u8)]
 pub enum RoleAction {
@@ -137,7 +137,7 @@ pub enum RoleAction {
     Delete = 32,
 }
 
-#[derive(Copy, Clone, Debug)]
+#[derive(Clone, Copy, Debug)]
 #[non_exhaustive]
 #[repr(u8)]
 pub enum InviteAction {
@@ -146,7 +146,7 @@ pub enum InviteAction {
     Delete = 42,
 }
 
-#[derive(Copy, Clone, Debug)]
+#[derive(Clone, Copy, Debug)]
 #[non_exhaustive]
 #[repr(u8)]
 pub enum WebhookAction {
@@ -155,7 +155,7 @@ pub enum WebhookAction {
     Delete = 52,
 }
 
-#[derive(Copy, Clone, Debug)]
+#[derive(Clone, Copy, Debug)]
 #[non_exhaustive]
 #[repr(u8)]
 pub enum EmojiAction {
@@ -164,7 +164,7 @@ pub enum EmojiAction {
     Delete = 62,
 }
 
-#[derive(Copy, Clone, Debug)]
+#[derive(Clone, Copy, Debug)]
 #[non_exhaustive]
 #[repr(u8)]
 pub enum MessageAction {
@@ -174,7 +174,7 @@ pub enum MessageAction {
     Unpin = 75,
 }
 
-#[derive(Copy, Clone, Debug)]
+#[derive(Clone, Copy, Debug)]
 #[non_exhaustive]
 #[repr(u8)]
 pub enum IntegrationAction {
@@ -183,7 +183,7 @@ pub enum IntegrationAction {
     Delete = 82,
 }
 
-#[derive(Copy, Clone, Debug)]
+#[derive(Clone, Copy, Debug)]
 #[non_exhaustive]
 #[repr(u8)]
 pub enum StageInstanceAction {
@@ -192,7 +192,7 @@ pub enum StageInstanceAction {
     Delete = 85,
 }
 
-#[derive(Copy, Clone, Debug)]
+#[derive(Clone, Copy, Debug)]
 #[non_exhaustive]
 #[repr(u8)]
 pub enum StickerAction {
@@ -201,7 +201,7 @@ pub enum StickerAction {
     Delete = 92,
 }
 
-#[derive(Copy, Clone, Debug)]
+#[derive(Clone, Copy, Debug)]
 #[non_exhaustive]
 #[repr(u8)]
 pub enum ScheduledEventAction {
@@ -210,7 +210,7 @@ pub enum ScheduledEventAction {
     Delete = 102,
 }
 
-#[derive(Copy, Clone, Debug)]
+#[derive(Clone, Copy, Debug)]
 #[non_exhaustive]
 #[repr(u8)]
 pub enum ThreadAction {
