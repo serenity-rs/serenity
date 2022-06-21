@@ -5,7 +5,7 @@ use crate::model::Permissions;
 /// A container for any partial channel.
 ///
 /// [Discord docs](https://discord.com/developers/docs/resources/channel#channel-object), [subset specification](https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-object-resolved-data-structure).
-#[derive(Clone, Debug, Serialize, Deserialize)]
+#[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 pub struct PartialChannel {
     /// The channel Id.
@@ -22,7 +22,7 @@ pub struct PartialChannel {
 /// A container for the IDs returned by following a news channel.
 ///
 /// [Discord docs](https://discord.com/developers/docs/resources/channel#followed-channel-object).
-#[derive(Clone, Debug, Serialize, Deserialize)]
+#[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 pub struct FollowedChannel {
     /// The source news channel

@@ -4,7 +4,7 @@ use crate::{model::prelude::*, prelude::*};
 
 /// Error that can be returned from [`PLACEHOLDER::convert`].
 #[non_exhaustive]
-#[derive(Copy, Clone, Debug, Eq, Hash, PartialEq)]
+#[derive(Clone, Copy, Debug, Eq, Hash, PartialEq)]
 pub enum PLACEHOLDERParseError {
 }
 
