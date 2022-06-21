@@ -844,7 +844,7 @@ pub async fn create_customised_help_data<'a>(
     ctx: &Context,
     msg: &Message,
     args: &'a Args,
-    groups: &[&'static CommandGroup],
+    groups: &'a [&'static CommandGroup],
     owners: &HashSet<UserId, impl std::hash::BuildHasher + Send + Sync>,
     help_options: &'a HelpOptions,
 ) -> CustomisedHelpData<'a> {
