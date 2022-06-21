@@ -3,7 +3,7 @@ use crate::model::id::{ChannelId, WebhookId};
 use crate::model::Permissions;
 
 /// A container for any partial channel.
-#[derive(Clone, Debug, Serialize, Deserialize)]
+#[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 pub struct PartialChannel {
     /// The channel Id.
@@ -18,7 +18,7 @@ pub struct PartialChannel {
 }
 
 /// A container for the IDs returned by following a news channel.
-#[derive(Clone, Debug, Serialize, Deserialize)]
+#[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 pub struct FollowedChannel {
     /// The source news channel
