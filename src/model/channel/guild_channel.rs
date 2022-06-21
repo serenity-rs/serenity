@@ -1165,7 +1165,7 @@ impl GuildChannel {
     /// Returns [`ModelError::InvalidChannelType`] if the channel is not a stage channel.
     /// Returns [`Error::Http`] if there is no stage instance currently.
     pub async fn get_stage_instance(&self, http: impl AsRef<Http>) -> Result<StageInstance> {
-        if self.kind.num() != 13 {
+        if self.kind != ChannelType::Stage {
             return Err(Error::Model(ModelError::InvalidChannelType));
         }
 
@@ -1186,7 +1186,7 @@ impl GuildChannel {
     where
         F: FnOnce(&mut CreateStageInstance) -> &mut CreateStageInstance,
     {
-        if self.kind.num() != 13 {
+        if self.kind != ChannelType::Stage {
             return Err(Error::Model(ModelError::InvalidChannelType));
         }
 
@@ -1207,7 +1207,7 @@ impl GuildChannel {
     where
         F: FnOnce(&mut EditStageInstance) -> &mut EditStageInstance,
     {
-        if self.kind.num() != 13 {
+        if self.kind != ChannelType::Stage {
             return Err(Error::Model(ModelError::InvalidChannelType));
         }
 
@@ -1221,7 +1221,7 @@ impl GuildChannel {
     /// Returns [`ModelError::InvalidChannelType`] if the channel is not a stage channel.
     /// Returns [`Error::Http`] if there is no stage instance currently.
     pub async fn delete_stage_instance(&self, http: impl AsRef<Http>) -> Result<()> {
-        if self.kind.num() != 13 {
+        if self.kind != ChannelType::Stage {
             return Err(Error::Model(ModelError::InvalidChannelType));
         }
 
