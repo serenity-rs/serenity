@@ -355,7 +355,7 @@ impl ChannelType {
 }
 
 /// [Discord docs](https://discord.com/developers/docs/resources/channel#overwrite-object).
-#[derive(Debug, Clone, Deserialize, Serialize)]
+#[derive(Clone, Debug, Deserialize, Serialize)]
 pub(crate) struct PermissionOverwriteData {
     allow: Permissions,
     deny: Permissions,
@@ -432,7 +432,7 @@ impl Serialize for PermissionOverwrite {
 /// This is for use with methods such as [`GuildChannel::create_permission`].
 ///
 /// [Discord docs](https://discord.com/developers/docs/resources/channel#overwrite-object-overwrite-structure) (field `type`).
-#[derive(Copy, Clone, Debug, Eq, PartialEq)]
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
 #[non_exhaustive]
 pub enum PermissionOverwriteType {
     /// A member which is having its permission overwrites edited.

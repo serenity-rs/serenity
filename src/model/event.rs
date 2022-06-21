@@ -1574,7 +1574,7 @@ impl<T> TryFrom<RelatedId<T>> for Option<T> {
 /// [`EventType::ChannelCreate`].
 ///
 /// [Discord docs](https://discord.com/developers/docs/topics/gateway#commands-and-events-gateway-events).
-#[derive(Clone, Debug, Eq, PartialEq, PartialOrd, Ord)]
+#[derive(Clone, Debug, Eq, Ord, PartialEq, PartialOrd)]
 #[non_exhaustive]
 pub enum EventType {
     /// Indicator that an application command permission update payload was received.
