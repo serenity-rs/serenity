@@ -181,7 +181,7 @@ pub fn generate_type_validation(have: &Type, expect: &Type) -> syn::Stmt {
     }
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
 pub enum DeclarFor {
     Command,
     Help,
