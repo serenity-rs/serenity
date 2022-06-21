@@ -1144,7 +1144,6 @@
 <span id="1139">1139</span>
 <span id="1140">1140</span>
 <span id="1141">1141</span>
-<span id="1142">1142</span>
 </pre><pre class="rust"><code><span class="doccomment">//! A cache containing data received from [`Shard`]s.</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! Using the cache allows to avoid REST API requests via the [`http`] module</span>
@@ -1245,6 +1244,7 @@
 <span class="kw">pub</span> <span class="kw">type</span> <span class="ident">CurrentUserRef</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">CacheRef</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, (), <span class="ident">CurrentUser</span><span class="op">&gt;</span>;
 <span class="kw">pub</span> <span class="kw">type</span> <span class="ident">GuildChannelRef</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">CacheRef</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">ChannelId</span>, <span class="ident">GuildChannel</span><span class="op">&gt;</span>;
 <span class="kw">pub</span> <span class="kw">type</span> <span class="ident">PrivateChannelRef</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">CacheRef</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">ChannelId</span>, <span class="ident">PrivateChannel</span><span class="op">&gt;</span>;
+<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">ChannelMessagesRef</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">CacheRef</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">ChannelId</span>, <span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">MessageId</span>, <span class="ident">Message</span><span class="op">&gt;</span><span class="op">&gt;</span>;
 
 <span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">FromStrAndCache</span>: <span class="ident">Sized</span> {
     <span class="kw">type</span> <span class="prelude-val">Err</span>;
@@ -1546,26 +1546,24 @@
         <span class="prelude-val">None</span>
     }
 
-    <span class="doccomment">/// This method allows to extract specific data from the cached messages of a channel by</span>
-    <span class="doccomment">/// providing a `selector` closure picking what you want to extract from the messages</span>
-    <span class="doccomment">/// HashMap of a channel.</span>
+    <span class="doccomment">/// Get a reference to the cached messages for a channel based on the given `Id`.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Examples</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// Find all messages by user ID 8 in channel ID 7:</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// ```rust,no_run</span>
     <span class="doccomment">/// # let cache: serenity::cache::Cache = todo!();</span>
-    <span class="doccomment">/// // Find all messages by user ID 8 in channel ID 7</span>
-    <span class="doccomment">/// let messages_by_user = cache.channel_messages_field(7, |msgs| {</span>
-    <span class="doccomment">///     msgs.values()</span>
-    <span class="doccomment">///         .filter_map(|m| if m.author.id == 8 { Some(m.clone()) } else { None })</span>
-    <span class="doccomment">///         .collect::&lt;Vec&lt;_&gt;&gt;()</span>
-    <span class="doccomment">/// });</span>
+    <span class="doccomment">/// let messages_in_channel = cache.channel_messages(7);</span>
+    <span class="doccomment">/// let messages_by_user = messages_in_channel</span>
+    <span class="doccomment">///     .as_ref()</span>
+    <span class="doccomment">///     .map(|msgs| msgs.values().filter(|m| m.author.id == 8).collect::&lt;Vec&lt;_&gt;&gt;());</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">channel_messages_field</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">channel_messages</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">channel_id</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">ChannelId</span><span class="op">&gt;</span>,
-        <span class="ident">field_selector</span>: <span class="kw">impl</span> <span class="ident">FnOnce</span>(<span class="kw-2">&amp;</span><span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">MessageId</span>, <span class="ident">Message</span><span class="op">&gt;</span>) -&gt; <span class="ident">T</span>,
-    ) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">msgs</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">messages</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="ident">channel_id</span>.<span class="ident">into</span>())<span class="question-mark">?</span>;
-        <span class="prelude-val">Some</span>(<span class="ident">field_selector</span>(<span class="kw-2">&amp;</span><span class="ident">msgs</span>))
+    ) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ChannelMessagesRef</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+        <span class="self">self</span>.<span class="ident">messages</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="ident">channel_id</span>.<span class="ident">into</span>()).<span class="ident">map</span>(<span class="ident">CacheRef::from_ref</span>)
     }
 
     <span class="doccomment">/// Gets a reference to a guild from the cache based on the given `id`.</span>
