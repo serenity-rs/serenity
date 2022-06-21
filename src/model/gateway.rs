@@ -507,7 +507,7 @@ pub struct SessionStartLimit {
     pub total: u64,
 }
 
-#[derive(Debug, Clone, Copy)]
+#[derive(Clone, Copy, Debug)]
 pub struct ShardInfo {
     pub id: u32,
     pub total: u32,
