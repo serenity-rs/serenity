@@ -106,7 +106,8 @@ pub struct TeamMember {
 }
 
 /// [Discord docs](https://discord.com/developers/docs/topics/teams#data-models-membership-state-enum).
-#[derive(Clone, Debug, Copy, PartialEq)]
+#[derive(Clone, Copy, Debug, Eq, Hash, PartialEq, PartialOrd, Ord)]
+#[non_exhaustive]
 pub enum MembershipState {
     Invited = 1,
     Accepted = 2,
