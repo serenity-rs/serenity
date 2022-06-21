@@ -49,7 +49,8 @@ pub struct ScheduledEvent {
 }
 
 /// [Discord docs](https://discord.com/developers/docs/resources/guild-scheduled-event#guild-scheduled-event-object-guild-scheduled-event-status).
-#[derive(Clone, Copy, Debug)]
+#[derive(Clone, Copy, Debug, Eq, Hash, PartialEq, PartialOrd, Ord)]
+#[non_exhaustive]
 pub enum ScheduledEventStatus {
     Scheduled = 1,
     Active = 2,
@@ -66,7 +67,8 @@ enum_number!(ScheduledEventStatus {
 });
 
 /// [Discord docs](https://discord.com/developers/docs/resources/guild-scheduled-event#guild-scheduled-event-object-guild-scheduled-event-entity-types).
-#[derive(Clone, Copy, Debug)]
+#[derive(Clone, Copy, Debug, Eq, Hash, PartialEq, PartialOrd, Ord)]
+#[non_exhaustive]
 pub enum ScheduledEventType {
     StageInstance = 1,
     Voice = 2,
