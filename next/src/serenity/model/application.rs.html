@@ -98,6 +98,7 @@
 <span id="93">93</span>
 <span id="94">94</span>
 <span id="95">95</span>
+<span id="96">96</span>
 </pre><pre class="rust"><code><span class="doccomment">//! Models about OAuth2 applications.</span>
 
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">command</span>;
@@ -167,7 +168,8 @@
     <span class="kw">pub</span> <span class="ident">user</span>: <span class="ident">User</span>,
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Copy</span>, <span class="ident">PartialEq</span>)]</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>, <span class="ident">PartialEq</span>, <span class="ident">PartialOrd</span>, <span class="ident">Ord</span>)]</span>
+<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">MembershipState</span> {
     <span class="ident">Invited</span> <span class="op">=</span> <span class="number">1</span>,
     <span class="ident">Accepted</span> <span class="op">=</span> <span class="number">2</span>,
