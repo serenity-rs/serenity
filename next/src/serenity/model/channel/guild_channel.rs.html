@@ -2454,7 +2454,7 @@
     <span class="doccomment">/// Returns [`ModelError::InvalidChannelType`] if the channel is not a stage channel.</span>
     <span class="doccomment">/// Returns [`Error::Http`] if there is no stage instance currently.</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_stage_instance</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">StageInstance</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">kind</span>.<span class="ident">num</span>() <span class="op">!</span><span class="op">=</span> <span class="number">13</span> {
+        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">kind</span> <span class="op">!</span><span class="op">=</span> <span class="ident">ChannelType::Stage</span> {
             <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::Model</span>(<span class="ident">ModelError::InvalidChannelType</span>));
         }
 
@@ -2475,7 +2475,7 @@
     <span class="kw">where</span>
         <span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="kw-2">&amp;mut</span> <span class="ident">CreateStageInstance</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="ident">CreateStageInstance</span>,
     {
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">kind</span>.<span class="ident">num</span>() <span class="op">!</span><span class="op">=</span> <span class="number">13</span> {
+        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">kind</span> <span class="op">!</span><span class="op">=</span> <span class="ident">ChannelType::Stage</span> {
             <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::Model</span>(<span class="ident">ModelError::InvalidChannelType</span>));
         }
 
@@ -2496,7 +2496,7 @@
     <span class="kw">where</span>
         <span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="kw-2">&amp;mut</span> <span class="ident">EditStageInstance</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="ident">EditStageInstance</span>,
     {
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">kind</span>.<span class="ident">num</span>() <span class="op">!</span><span class="op">=</span> <span class="number">13</span> {
+        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">kind</span> <span class="op">!</span><span class="op">=</span> <span class="ident">ChannelType::Stage</span> {
             <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::Model</span>(<span class="ident">ModelError::InvalidChannelType</span>));
         }
 
@@ -2510,7 +2510,7 @@
     <span class="doccomment">/// Returns [`ModelError::InvalidChannelType`] if the channel is not a stage channel.</span>
     <span class="doccomment">/// Returns [`Error::Http`] if there is no stage instance currently.</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">delete_stage_instance</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">kind</span>.<span class="ident">num</span>() <span class="op">!</span><span class="op">=</span> <span class="number">13</span> {
+        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">kind</span> <span class="op">!</span><span class="op">=</span> <span class="ident">ChannelType::Stage</span> {
             <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::Model</span>(<span class="ident">ModelError::InvalidChannelType</span>));
         }
 
