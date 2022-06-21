@@ -2,7 +2,7 @@ use serde::{Deserialize, Serialize};
 
 use crate::model::id::{RoleId, UserId};
 
-#[derive(Debug, Clone, Copy, Serialize, Deserialize)]
+#[derive(Clone, Copy, Debug, Deserialize, Serialize)]
 #[serde(rename_all = "lowercase")]
 pub enum ParseValue {
     Everyone,
