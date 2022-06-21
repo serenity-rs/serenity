@@ -1,5 +1,5 @@
 /// The guild's premium tier, depends on the amount of users boosting the guild currently
-#[derive(Clone, Copy, Debug, Eq, Hash, PartialEq, PartialOrd, Ord)]
+#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
 #[non_exhaustive]
 pub enum PremiumTier {
     /// No tier, considered None

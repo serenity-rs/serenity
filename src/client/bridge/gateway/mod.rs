@@ -72,7 +72,7 @@ pub enum ShardClientMessage {
 }
 
 /// A message for a [`ShardManager`] relating to an operation with a shard.
-#[derive(Clone, Debug, Eq, Hash, PartialEq, PartialOrd, Ord)]
+#[derive(Clone, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
 pub enum ShardManagerMessage {
     /// Indicator that a [`ShardManagerMonitor`] should restart a shard.
     Restart(ShardId),

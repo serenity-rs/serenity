@@ -9,7 +9,7 @@ use crate::prelude::*;
 
 /// Error that can be returned from [`Guild::convert`].
 #[non_exhaustive]
-#[derive(Copy, Clone, Debug, Eq, Hash, PartialEq)]
+#[derive(Clone, Copy, Debug, Eq, Hash, PartialEq)]
 pub enum GuildParseError {
     /// The provided guild string failed to parse, or the parsed result cannot be found in the
     /// cache.

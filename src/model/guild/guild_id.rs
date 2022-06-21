@@ -1775,7 +1775,7 @@ impl<H: AsRef<Http>> MembersIter<H> {
     }
 }
 
-#[derive(Copy, Clone, Debug, Hash, Eq, PartialEq, Serialize, Deserialize)]
+#[derive(Clone, Copy, Debug, Eq, Hash, PartialEq, Deserialize, Serialize)]
 #[non_exhaustive]
 pub enum GuildWidgetStyle {
     Shield,

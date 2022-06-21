@@ -6,7 +6,7 @@ use crate::prelude::*;
 
 /// Error that can be returned from [`Emoji::convert`].
 #[non_exhaustive]
-#[derive(Copy, Clone, Debug, Eq, Hash, PartialEq)]
+#[derive(Clone, Copy, Debug, Eq, Hash, PartialEq)]
 pub enum EmojiParseError {
     /// Parser was invoked outside a guild.
     OutsideGuild,

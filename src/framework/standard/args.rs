@@ -80,14 +80,14 @@ impl<'a> From<&'a str> for Delimiter {
     }
 }
 
-#[derive(Debug, Clone, Copy, PartialEq)]
+#[derive(Clone, Copy, Debug, PartialEq)]
 #[allow(clippy::enum_variant_names)]
 enum TokenKind {
     Argument,
     QuotedArgument,
 }
 
-#[derive(Debug, Clone, Copy)]
+#[derive(Clone, Copy, Debug)]
 struct Token {
     kind: TokenKind,
     span: (usize, usize),
@@ -211,7 +211,7 @@ fn remove_quotes(s: &str) -> &str {
     strip(s, '\u{201C}', '\u{201D}').unwrap_or(s)
 }
 
-#[derive(Debug, Clone, Copy)]
+#[derive(Clone, Copy, Debug)]
 enum State {
     None,
     Quoted,

@@ -88,7 +88,7 @@ pub trait Mentionable {
 ///     format!("{} {} {}", Mention::from(user), Mention::from(channel), Mention::from(role),),
 /// )
 /// ```
-#[derive(Debug, Clone, Copy)]
+#[derive(Clone, Copy, Debug)]
 pub enum Mention {
     Channel(ChannelId),
     Role(RoleId),

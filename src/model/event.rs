@@ -1415,7 +1415,7 @@ impl<T> TryFrom<RelatedId<T>> for Option<T> {
 /// A Deserialization implementation is provided for deserializing raw event
 /// dispatch type strings to this enum, e.g. deserializing `"CHANNEL_CREATE"` to
 /// [`EventType::ChannelCreate`].
-#[derive(Clone, Debug, Eq, PartialEq, PartialOrd, Ord)]
+#[derive(Clone, Debug, Eq, Ord, PartialEq, PartialOrd)]
 #[non_exhaustive]
 pub enum EventType {
     /// Indicator that an application command permission update payload was received.
