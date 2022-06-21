@@ -3,7 +3,7 @@ use serde::{Deserialize, Serialize};
 use crate::id::*;
 
 /// Used to begin a voice websocket connection.
-#[derive(Clone, Debug, Deserialize, Eq, Hash, PartialEq, Serialize)]
+#[derive(Clone, Debug, Eq, Hash, PartialEq, Deserialize, Serialize)]
 pub struct Identify {
     /// GuildId which the target voice channel belongs to.
     pub server_id: GuildId,
