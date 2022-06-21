@@ -26,7 +26,7 @@ pub struct Integration {
 }
 
 /// The behavior once the integration expires.
-#[derive(Copy, Clone, Debug, Hash, Eq, PartialEq, PartialOrd, Ord)]
+#[derive(Clone, Copy, Debug, Eq, Hash, PartialEq, PartialOrd, Ord)]
 #[non_exhaustive]
 #[repr(u8)]
 pub enum IntegrationExpireBehaviour {
