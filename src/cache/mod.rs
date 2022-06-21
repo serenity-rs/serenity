@@ -98,6 +98,7 @@ pub type GuildRef<'a> = CacheRef<'a, GuildId, Guild>;
 pub type CurrentUserRef<'a> = CacheRef<'a, (), CurrentUser>;
 pub type GuildChannelRef<'a> = CacheRef<'a, ChannelId, GuildChannel>;
 pub type PrivateChannelRef<'a> = CacheRef<'a, ChannelId, PrivateChannel>;
+pub type ChannelMessagesRef<'a> = CacheRef<'a, ChannelId, HashMap<MessageId, Message>>;
 
 pub trait FromStrAndCache: Sized {
     type Err;
@@ -399,26 +400,24 @@ impl Cache {
         None
     }
 
-    /// This method allows to extract specific data from the cached messages of a channel by
-    /// providing a `selector` closure picking what you want to extract from the messages
-    /// HashMap of a channel.
+    /// Get a reference to the cached messages for a channel based on the given `Id`.
+    ///
+    /// # Examples
+    ///
+    /// Find all messages by user ID 8 in channel ID 7:
     ///
     /// ```rust,no_run
     /// # let cache: serenity::cache::Cache = todo!();
-    /// // Find all messages by user ID 8 in channel ID 7
-    /// let messages_by_user = cache.channel_messages_field(7, |msgs| {
-    ///     msgs.values()
-    ///         .filter_map(|m| if m.author.id == 8 { Some(m.clone()) } else { None })
-    ///         .collect::<Vec<_>>()
-    /// });
+    /// let messages_in_channel = cache.channel_messages(7);
+    /// let messages_by_user = messages_in_channel
+    ///     .as_ref()
+    ///     .map(|msgs| msgs.values().filter(|m| m.author.id == 8).collect::<Vec<_>>());
     /// ```
-    pub fn channel_messages_field<T>(
+    pub fn channel_messages(
         &self,
         channel_id: impl Into<ChannelId>,
-        field_selector: impl FnOnce(&HashMap<MessageId, Message>) -> T,
-    ) -> Option<T> {
-        let msgs = self.messages.get(&channel_id.into())?;
-        Some(field_selector(&msgs))
+    ) -> Option<ChannelMessagesRef<'_>> {
+        self.messages.get(&channel_id.into()).map(CacheRef::from_ref)
     }
 
     /// Gets a reference to a guild from the cache based on the given `id`.
