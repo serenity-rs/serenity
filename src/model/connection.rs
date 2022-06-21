@@ -30,7 +30,7 @@ pub struct Connection {
 }
 
 /// The visibility of a user connection on a user's profile.
-#[derive(Copy, Clone, Debug, Hash, Eq, PartialEq, PartialOrd, Ord)]
+#[derive(Clone, Copy, Debug, Eq, Hash, PartialEq, PartialOrd, Ord)]
 #[non_exhaustive]
 #[repr(u8)]
 pub enum ConnectionVisibility {
