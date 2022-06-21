@@ -84,6 +84,19 @@ where
     }
 }
 
+impl<T> CacheHttp for Arc<T>
+where
+    T: CacheHttp,
+{
+    fn http(&self) -> &Http {
+        (**self).http()
+    }
+    #[cfg(feature = "cache")]
+    fn cache(&self) -> Option<&Arc<Cache>> {
+        (**self).cache()
+    }
+}
+
 #[cfg(feature = "client")]
 impl CacheHttp for Context {
     fn http(&self) -> &Http {
@@ -106,17 +119,6 @@ impl CacheHttp for CacheAndHttp {
     }
 }
 
-#[cfg(feature = "client")]
-impl CacheHttp for Arc<CacheAndHttp> {
-    fn http(&self) -> &Http {
-        &self.http
-    }
-    #[cfg(feature = "cache")]
-    fn cache(&self) -> Option<&Arc<Cache>> {
-        Some(&self.cache)
-    }
-}
-
 #[cfg(feature = "cache")]
 impl CacheHttp for (&Arc<Cache>, &Http) {
     fn cache(&self) -> Option<&Arc<Cache>> {
@@ -130,12 +132,6 @@ impl CacheHttp for (&Arc<Cache>, &Http) {
 impl CacheHttp for Http {
     fn http(&self) -> &Http {
         self
-    }
-}
-
-impl CacheHttp for Arc<Http> {
-    fn http(&self) -> &Http {
-        &*self
     }
 }
 
