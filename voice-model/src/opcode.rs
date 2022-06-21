@@ -4,7 +4,7 @@ use serde_repr::{Deserialize_repr, Serialize_repr};
 ///
 /// [voice opcodes]: https://discord.com/developers/docs/topics/opcodes-and-status-codes#voice
 #[derive(
-    Clone, Copy, Debug, Deserialize_repr, Eq, Hash, PartialEq, PartialOrd, Ord, Serialize_repr,
+    Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize_repr, Serialize_repr,
 )]
 #[non_exhaustive]
 #[repr(u8)]
