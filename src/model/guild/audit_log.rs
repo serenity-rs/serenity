@@ -17,7 +17,7 @@ use crate::model::prelude::*;
 /// Determines the action that was done on a target.
 ///
 /// [Discord docs](https://discord.com/developers/docs/resources/audit-log#audit-log-entry-object-audit-log-events).
-#[derive(Copy, Clone, Debug)]
+#[derive(Clone, Copy, Debug)]
 #[non_exhaustive]
 pub enum Action {
     GuildUpdate,
@@ -98,7 +98,7 @@ impl Serialize for Action {
 }
 
 /// [Discord docs](https://discord.com/developers/docs/resources/audit-log#audit-log-entry-object-audit-log-events).
-#[derive(Copy, Clone, Debug)]
+#[derive(Clone, Copy, Debug)]
 #[non_exhaustive]
 #[repr(u8)]
 pub enum ChannelAction {
@@ -108,7 +108,7 @@ pub enum ChannelAction {
 }
 
 /// [Discord docs](https://discord.com/developers/docs/resources/audit-log#audit-log-entry-object-audit-log-events).
-#[derive(Copy, Clone, Debug)]
+#[derive(Clone, Copy, Debug)]
 #[non_exhaustive]
 #[repr(u8)]
 pub enum ChannelOverwriteAction {
@@ -118,7 +118,7 @@ pub enum ChannelOverwriteAction {
 }
 
 /// [Discord docs](https://discord.com/developers/docs/resources/audit-log#audit-log-entry-object-audit-log-events).
-#[derive(Copy, Clone, Debug)]
+#[derive(Clone, Copy, Debug)]
 #[non_exhaustive]
 #[repr(u8)]
 pub enum MemberAction {
@@ -134,7 +134,7 @@ pub enum MemberAction {
 }
 
 /// [Discord docs](https://discord.com/developers/docs/resources/audit-log#audit-log-entry-object-audit-log-events).
-#[derive(Copy, Clone, Debug)]
+#[derive(Clone, Copy, Debug)]
 #[non_exhaustive]
 #[repr(u8)]
 pub enum RoleAction {
@@ -144,7 +144,7 @@ pub enum RoleAction {
 }
 
 /// [Discord docs](https://discord.com/developers/docs/resources/audit-log#audit-log-entry-object-audit-log-events).
-#[derive(Copy, Clone, Debug)]
+#[derive(Clone, Copy, Debug)]
 #[non_exhaustive]
 #[repr(u8)]
 pub enum InviteAction {
@@ -154,7 +154,7 @@ pub enum InviteAction {
 }
 
 /// [Discord docs](https://discord.com/developers/docs/resources/audit-log#audit-log-entry-object-audit-log-events).
-#[derive(Copy, Clone, Debug)]
+#[derive(Clone, Copy, Debug)]
 #[non_exhaustive]
 #[repr(u8)]
 pub enum WebhookAction {
@@ -164,7 +164,7 @@ pub enum WebhookAction {
 }
 
 /// [Discord docs](https://discord.com/developers/docs/resources/audit-log#audit-log-entry-object-audit-log-events).
-#[derive(Copy, Clone, Debug)]
+#[derive(Clone, Copy, Debug)]
 #[non_exhaustive]
 #[repr(u8)]
 pub enum EmojiAction {
@@ -174,7 +174,7 @@ pub enum EmojiAction {
 }
 
 /// [Discord docs](https://discord.com/developers/docs/resources/audit-log#audit-log-entry-object-audit-log-events).
-#[derive(Copy, Clone, Debug)]
+#[derive(Clone, Copy, Debug)]
 #[non_exhaustive]
 #[repr(u8)]
 pub enum MessageAction {
@@ -185,7 +185,7 @@ pub enum MessageAction {
 }
 
 /// [Discord docs](https://discord.com/developers/docs/resources/audit-log#audit-log-entry-object-audit-log-events).
-#[derive(Copy, Clone, Debug)]
+#[derive(Clone, Copy, Debug)]
 #[non_exhaustive]
 #[repr(u8)]
 pub enum IntegrationAction {
@@ -195,7 +195,7 @@ pub enum IntegrationAction {
 }
 
 /// [Discord docs](https://discord.com/developers/docs/resources/audit-log#audit-log-entry-object-audit-log-events).
-#[derive(Copy, Clone, Debug)]
+#[derive(Clone, Copy, Debug)]
 #[non_exhaustive]
 #[repr(u8)]
 pub enum StageInstanceAction {
@@ -205,7 +205,7 @@ pub enum StageInstanceAction {
 }
 
 /// [Discord docs](https://discord.com/developers/docs/resources/audit-log#audit-log-entry-object-audit-log-events).
-#[derive(Copy, Clone, Debug)]
+#[derive(Clone, Copy, Debug)]
 #[non_exhaustive]
 #[repr(u8)]
 pub enum StickerAction {
@@ -215,7 +215,7 @@ pub enum StickerAction {
 }
 
 /// [Discord docs](https://discord.com/developers/docs/resources/audit-log#audit-log-entry-object-audit-log-events).
-#[derive(Copy, Clone, Debug)]
+#[derive(Clone, Copy, Debug)]
 #[non_exhaustive]
 #[repr(u8)]
 pub enum ScheduledEventAction {
@@ -225,7 +225,7 @@ pub enum ScheduledEventAction {
 }
 
 /// [Discord docs](https://discord.com/developers/docs/resources/audit-log#audit-log-entry-object-audit-log-events).
-#[derive(Copy, Clone, Debug)]
+#[derive(Clone, Copy, Debug)]
 #[non_exhaustive]
 #[repr(u8)]
 pub enum ThreadAction {
