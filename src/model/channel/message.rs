@@ -1095,22 +1095,18 @@ enum_number!(MessageType {
 #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
 #[non_exhaustive]
 pub enum MessageActivityKind {
-    #[allow(clippy::upper_case_acronyms)]
-    JOIN = 1,
-    #[allow(clippy::upper_case_acronyms)]
-    SPECTATE = 2,
-    #[allow(clippy::upper_case_acronyms)]
-    LISTEN = 3,
-    #[allow(non_camel_case_types)]
-    JOIN_REQUEST = 5,
+    Join = 1,
+    Spectate = 2,
+    Listen = 3,
+    JoinRequest = 5,
     Unknown = !0,
 }
 
 enum_number!(MessageActivityKind {
-    JOIN,
-    SPECTATE,
-    LISTEN,
-    JOIN_REQUEST
+    Join,
+    Spectate,
+    Listen,
+    JoinRequest,
 });
 
 /// Rich Presence application information.
