@@ -17,7 +17,7 @@ use crate::constants::{self, Opcode};
 use crate::gateway::{CurrentPresence, GatewayError};
 use crate::json::{from_str, to_string};
 use crate::model::event::GatewayEvent;
-use crate::model::gateway::{ActivityType, GatewayIntents};
+use crate::model::gateway::{ActivityType, GatewayIntents, ShardInfo};
 use crate::model::id::{GuildId, UserId};
 use crate::{Error, Result};
 
@@ -54,9 +54,9 @@ enum WebSocketMessageData<'a> {
     ChunkGuild(ChunkGuildMessage<'a>),
     Identify {
         compress: bool,
-        shard: &'a [u64; 2],
         token: &'a str,
         large_threshold: u8,
+        shard: &'a ShardInfo,
         intents: GatewayIntents,
         properties: IdentifyProperties,
     },
@@ -163,7 +163,7 @@ impl WsClient {
     pub async fn send_chunk_guild(
         &mut self,
         guild_id: GuildId,
-        shard_info: &[u64; 2],
+        shard_info: &ShardInfo,
         limit: Option<u16>,
         filter: ChunkGuildFilter,
         nonce: Option<&str>,
@@ -190,7 +190,7 @@ impl WsClient {
     }
 
     #[instrument(skip(self))]
-    pub async fn send_heartbeat(&mut self, shard_info: &[u64; 2], seq: Option<u64>) -> Result<()> {
+    pub async fn send_heartbeat(&mut self, shard_info: &ShardInfo, seq: Option<u64>) -> Result<()> {
         trace!("[Shard {:?}] Sending heartbeat d: {:?}", shard_info, seq);
 
         self.send_json(&WebSocketMessage {
@@ -203,7 +203,7 @@ impl WsClient {
     #[instrument(skip(self, token))]
     pub async fn send_identify(
         &mut self,
-        shard: &[u64; 2],
+        shard: &ShardInfo,
         token: &str,
         intents: GatewayIntents,
     ) -> Result<()> {
@@ -231,7 +231,7 @@ impl WsClient {
     #[instrument(skip(self))]
     pub async fn send_presence_update(
         &mut self,
-        shard_info: &[u64; 2],
+        shard_info: &ShardInfo,
         current_presence: &CurrentPresence,
     ) -> Result<()> {
         let &(ref activity, ref status) = current_presence;
@@ -258,7 +258,7 @@ impl WsClient {
     #[instrument(skip(self, token))]
     pub async fn send_resume(
         &mut self,
-        shard_info: &[u64; 2],
+        shard_info: &ShardInfo,
         session_id: &str,
         seq: u64,
         token: &str,
