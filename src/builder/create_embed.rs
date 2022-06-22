@@ -14,7 +14,11 @@
 //! [`ExecuteWebhook::embeds`]: crate::builder::ExecuteWebhook::embeds
 //! [here]: https://discord.com/developers/docs/resources/channel#embed-object
 
+#[cfg(feature = "http")]
+use crate::internal::prelude::*;
 use crate::model::channel::{Embed, EmbedField};
+#[cfg(feature = "http")]
+use crate::model::prelude::*;
 use crate::model::Timestamp;
 #[cfg(feature = "utils")]
 use crate::utils::Colour;
@@ -332,6 +336,43 @@ impl CreateEmbed {
 
         self.image = Some(HoldsUrl::new(filename));
         self
+    }
+
+    #[cfg(feature = "http")]
+    pub(crate) fn check_length(&self) -> Result<()> {
+        let mut length = 0;
+        if let Some(ref author) = self.author {
+            if let Some(ref name) = author.name {
+                length += name.chars().count();
+            }
+        }
+
+        if let Some(ref description) = self.description {
+            length += description.chars().count();
+        }
+
+        for field in &self.fields {
+            length += field.name.chars().count();
+            length += field.value.chars().count();
+        }
+
+        if let Some(ref footer) = self.footer {
+            if let Some(ref text) = footer.text {
+                length += text.chars().count();
+            }
+        }
+
+        if let Some(ref title) = self.title {
+            length += title.chars().count();
+        }
+
+        let max_length = crate::constants::EMBED_MAX_LENGTH;
+        if length > max_length {
+            let overflow = length - max_length;
+            return Err(Error::Model(ModelError::EmbedTooLarge(overflow)));
+        }
+
+        Ok(())
     }
 }
 

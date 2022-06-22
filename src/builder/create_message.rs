@@ -1,5 +1,7 @@
 use super::{CreateAllowedMentions, CreateComponents, CreateEmbed};
 #[cfg(feature = "http")]
+use crate::constants;
+#[cfg(feature = "http")]
 use crate::http::{CacheHttp, Http};
 #[cfg(feature = "http")]
 use crate::internal::prelude::*;
@@ -364,6 +366,7 @@ impl<'a> CreateMessage<'a> {
 
     #[cfg(feature = "http")]
     async fn _execute(mut self, http: &Http) -> Result<Message> {
+        self.check_lengths()?;
         let files = std::mem::take(&mut self.files);
 
         let message = if files.is_empty() {
@@ -377,5 +380,30 @@ impl<'a> CreateMessage<'a> {
         }
 
         Ok(message)
+    }
+
+    #[cfg(feature = "http")]
+    pub(crate) fn check_lengths(&self) -> Result<()> {
+        if let Some(ref content) = self.content {
+            let length = content.chars().count();
+            let max_length = constants::MESSAGE_CODE_LIMIT;
+            if length > max_length {
+                let overflow = length - max_length;
+                return Err(Error::Model(ModelError::MessageTooLong(overflow)));
+            }
+        }
+
+        if self.embeds.len() > constants::EMBED_MAX_COUNT {
+            return Err(Error::Model(ModelError::EmbedAmount));
+        }
+        for embed in &self.embeds {
+            embed.check_length()?;
+        }
+
+        if self.sticker_ids.len() > constants::STICKER_MAX_COUNT {
+            return Err(Error::Model(ModelError::StickerAmount));
+        }
+
+        Ok(())
     }
 }
