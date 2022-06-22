@@ -1253,10 +1253,6 @@
 <span id="1248">1248</span>
 <span id="1249">1249</span>
 <span id="1250">1250</span>
-<span id="1251">1251</span>
-<span id="1252">1252</span>
-<span id="1253">1253</span>
-<span id="1254">1254</span>
 </pre><pre class="rust"><code><span class="doccomment">//! Models relating to Discord channels.</span>
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
@@ -2354,22 +2350,18 @@
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>, <span class="ident">Ord</span>, <span class="ident">PartialEq</span>, <span class="ident">PartialOrd</span>)]</span>
 <span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">MessageActivityKind</span> {
-    <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::upper_case_acronyms</span>)]</span>
-    <span class="ident">JOIN</span> <span class="op">=</span> <span class="number">1</span>,
-    <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::upper_case_acronyms</span>)]</span>
-    <span class="ident">SPECTATE</span> <span class="op">=</span> <span class="number">2</span>,
-    <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::upper_case_acronyms</span>)]</span>
-    <span class="ident">LISTEN</span> <span class="op">=</span> <span class="number">3</span>,
-    <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">non_camel_case_types</span>)]</span>
-    <span class="ident">JOIN_REQUEST</span> <span class="op">=</span> <span class="number">5</span>,
+    <span class="ident">Join</span> <span class="op">=</span> <span class="number">1</span>,
+    <span class="ident">Spectate</span> <span class="op">=</span> <span class="number">2</span>,
+    <span class="ident">Listen</span> <span class="op">=</span> <span class="number">3</span>,
+    <span class="ident">JoinRequest</span> <span class="op">=</span> <span class="number">5</span>,
     <span class="ident">Unknown</span> <span class="op">=</span> <span class="op">!</span><span class="number">0</span>,
 }
 
 <span class="macro">enum_number!</span>(<span class="ident">MessageActivityKind</span> {
-    <span class="ident">JOIN</span>,
-    <span class="ident">SPECTATE</span>,
-    <span class="ident">LISTEN</span>,
-    <span class="ident">JOIN_REQUEST</span>
+    <span class="ident">Join</span>,
+    <span class="ident">Spectate</span>,
+    <span class="ident">Listen</span>,
+    <span class="ident">JoinRequest</span>,
 });
 
 <span class="doccomment">/// Rich Presence application information.</span>
