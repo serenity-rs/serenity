@@ -515,7 +515,7 @@ pub struct ShardInfo {
 
 impl ShardInfo {
     #[must_use]
-    pub fn new(id: u32, total: u32) -> Self {
+    pub(crate) fn new(id: u32, total: u32) -> Self {
         Self {
             id,
             total,
