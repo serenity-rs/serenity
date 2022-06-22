@@ -1,5 +1,6 @@
 //! Models pertaining to the gateway.
 
+use serde::ser::SerializeSeq;
 use url::Url;
 
 use super::prelude::*;
@@ -21,7 +22,7 @@ pub struct BotGateway {
     pub session_start_limit: SessionStartLimit,
     /// The number of shards that is recommended to be used by the current bot
     /// user.
-    pub shards: u64,
+    pub shards: u32,
     /// The gateway to connect to.
     pub url: String,
 }
@@ -510,7 +511,7 @@ pub struct Ready {
     #[serde(default, with = "private_channels")]
     pub private_channels: HashMap<ChannelId, Channel>,
     pub session_id: String,
-    pub shard: Option<[u64; 2]>,
+    pub shard: Option<ShardInfo>,
     #[serde(default, rename = "_trace")]
     pub trace: Vec<String>,
     pub user: CurrentUser,
@@ -535,6 +536,42 @@ pub struct SessionStartLimit {
     /// The number of identify requests allowed per 5 seconds.
     pub max_concurrency: u64,
 }
+
+#[derive(Clone, Copy, Debug)]
+pub struct ShardInfo {
+    pub id: u32,
+    pub total: u32,
+}
+
+impl ShardInfo {
+    #[cfg(feature = "client")]
+    #[must_use]
+    pub(crate) fn new(id: u32, total: u32) -> Self {
+        Self {
+            id,
+            total,
+        }
+    }
+}
+
+impl<'de> serde::Deserialize<'de> for ShardInfo {
+    fn deserialize<D: serde::Deserializer<'de>>(deserializer: D) -> StdResult<Self, D::Error> {
+        <(u32, u32)>::deserialize(deserializer).map(|(id, total)| ShardInfo {
+            id,
+            total,
+        })
+    }
+}
+
+impl serde::Serialize for ShardInfo {
+    fn serialize<S: serde::Serializer>(&self, serializer: S) -> StdResult<S::Ok, S::Error> {
+        let mut seq = serializer.serialize_seq(Some(2))?;
+        seq.serialize_element(&self.id)?;
+        seq.serialize_element(&self.total)?;
+        seq.end()
+    }
+}
+
 /// Timestamps of when a user started and/or is ending their activity.
 ///
 /// [Discord docs](https://discord.com/developers/docs/game-sdk/activities#data-models-activitytimestamps-struct).
