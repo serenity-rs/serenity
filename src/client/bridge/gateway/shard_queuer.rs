@@ -26,7 +26,7 @@ use crate::framework::Framework;
 use crate::gateway::{ConnectionStage, InterMessage, Shard};
 use crate::internal::prelude::*;
 use crate::internal::tokio::spawn_named;
-use crate::model::gateway::GatewayIntents;
+use crate::model::gateway::{GatewayIntents, ShardInfo};
 use crate::CacheAndHttp;
 
 const WAIT_BETWEEN_BOOTS_IN_SECONDS: u64 = 5;
@@ -68,7 +68,7 @@ pub struct ShardQueuer {
     /// The shards that are queued for booting.
     ///
     /// This will typically be filled with previously failed boots.
-    pub queue: VecDeque<(u64, u64)>,
+    pub queue: VecDeque<ShardInfo>,
     /// A copy of the map of shard runners.
     pub runners: Arc<Mutex<HashMap<ShardId, ShardRunnerInfo>>>,
     /// A receiver channel for the shard queuer to be told to start shards.
@@ -125,8 +125,8 @@ impl ShardQueuer {
                 },
                 Ok(None) => break,
                 Err(_) => {
-                    if let Some((id, total)) = self.queue.pop_front() {
-                        self.checked_start(id, total).await;
+                    if let Some(shard) = self.queue.pop_front() {
+                        self.checked_start(shard.id, shard.total).await;
                     }
                 },
             }
@@ -155,7 +155,7 @@ impl ShardQueuer {
     }
 
     #[instrument(skip(self))]
-    async fn checked_start(&mut self, id: u64, total: u64) {
+    async fn checked_start(&mut self, id: u32, total: u32) {
         debug!("[Shard Queuer] Checked start for shard {} out of {}", id, total);
         self.check_last_start().await;
 
@@ -163,15 +163,15 @@ impl ShardQueuer {
             warn!("[Shard Queuer] Err starting shard {}: {:?}", id, why);
             info!("[Shard Queuer] Re-queueing start of shard {}", id);
 
-            self.queue.push_back((id, total));
+            self.queue.push_back(ShardInfo::new(id, total));
         }
 
         self.last_start = Some(Instant::now());
     }
 
     #[instrument(skip(self))]
-    async fn start(&mut self, shard_id: u64, shard_total: u64) -> Result<()> {
-        let shard_info = [shard_id, shard_total];
+    async fn start(&mut self, id: u32, total: u32) -> Result<()> {
+        let shard_info = ShardInfo::new(id, total);
 
         let mut shard = Shard::new(
             Arc::clone(&self.ws_url),
@@ -207,7 +207,7 @@ impl ShardQueuer {
             debug!("[ShardRunner {:?}] Stopping", runner.shard.shard_info());
         });
 
-        self.runners.lock().await.insert(ShardId(shard_id), runner_info);
+        self.runners.lock().await.insert(ShardId(id), runner_info);
 
         Ok(())
     }
