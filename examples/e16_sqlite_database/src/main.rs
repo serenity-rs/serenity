@@ -51,7 +51,7 @@ impl EventHandler for Bot {
             let response = format!("Successfully completed `{}`!", entry.task);
             msg.channel_id.say(&ctx, response).await.unwrap();
         } else if msg.content.trim() == "~todo list" {
-            // "SELECT" will return just the task of all rows where user_id(sql) = user_id(rust) in todo. 
+            // "SELECT" will return just the task of all rows where user_id(sql) = user_id(rust) in todo.
             let todos = sqlx::query!("SELECT task FROM todo WHERE user_id = ? ORDER BY rowid", user_id)
                     .fetch_all(&self.database) // < All matched data will be sent to todos
                     .await
