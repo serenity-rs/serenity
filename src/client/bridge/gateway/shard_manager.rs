@@ -105,11 +105,11 @@ pub struct ShardManager {
     /// where possible.
     pub runners: Arc<Mutex<HashMap<ShardId, ShardRunnerInfo>>>,
     /// The index of the first shard to initialize, 0-indexed.
-    shard_index: u64,
+    shard_index: u32,
     /// The number of shards to initialize.
-    shard_init: u64,
+    shard_init: u32,
     /// The total shards in use, 1-indexed.
-    shard_total: u64,
+    shard_total: u32,
     shard_queuer: Sender<ShardQueuerMessage>,
     shard_shutdown: Receiver<ShardId>,
 }
@@ -196,7 +196,7 @@ impl ShardManager {
     ///
     /// This will _not_ instantiate the new shards.
     #[instrument(skip(self))]
-    pub async fn set_shards(&mut self, index: u64, init: u64, total: u64) {
+    pub async fn set_shards(&mut self, index: u32, init: u32, total: u32) {
         self.shutdown_all().await;
 
         self.shard_index = index;
@@ -351,9 +351,9 @@ pub struct ShardManagerOptions {
     pub raw_event_handler: Option<Arc<dyn RawEventHandler>>,
     #[cfg(feature = "framework")]
     pub framework: Option<Arc<dyn Framework + Send + Sync>>,
-    pub shard_index: u64,
-    pub shard_init: u64,
-    pub shard_total: u64,
+    pub shard_index: u32,
+    pub shard_init: u32,
+    pub shard_total: u32,
     #[cfg(feature = "voice")]
     pub voice_manager: Option<Arc<dyn VoiceGatewayManager + Send + Sync + 'static>>,
     pub ws_url: Arc<Mutex<String>>,

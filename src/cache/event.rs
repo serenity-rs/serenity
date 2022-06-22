@@ -30,6 +30,7 @@ use crate::model::event::{
     UserUpdateEvent,
     VoiceStateUpdateEvent,
 };
+use crate::model::gateway::ShardInfo;
 use crate::model::guild::{Guild, Member, Role};
 use crate::model::user::{CurrentUser, OnlineStatus};
 use crate::model::voice::VoiceState;
@@ -597,11 +598,12 @@ impl CacheUpdate for ReadyEvent {
         let mut guilds_to_remove = vec![];
         let ready_guilds_hashset =
             self.ready.guilds.iter().map(|status| status.id).collect::<HashSet<_>>();
-        let shard_data = self.ready.shard.unwrap_or([1, 1]);
+        let shard_data = self.ready.shard.unwrap_or_else(|| ShardInfo::new(1, 1));
+
         for guild_entry in cache.guilds.iter() {
             let guild = guild_entry.key();
             // Only handle data for our shard.
-            if crate::utils::shard_id(guild.0, shard_data[1]) == shard_data[0]
+            if crate::utils::shard_id(guild.0, shard_data.total) == shard_data.id
                 && !ready_guilds_hashset.contains(guild)
             {
                 guilds_to_remove.push(*guild);
@@ -627,7 +629,7 @@ impl CacheUpdate for ReadyEvent {
             cache.presences.insert(*user_id, presence.clone());
         }
 
-        *cache.shard_count.write() = ready.shard.map_or(1, |s| s[1]);
+        *cache.shard_count.write() = ready.shard.map_or(1, |s| s.total);
         *cache.user.write() = ready.user;
 
         None

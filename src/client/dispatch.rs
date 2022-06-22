@@ -46,7 +46,7 @@ fn update<E>(_cache_and_http: &Arc<CacheAndHttp>, _event: &mut E) -> Option<()> 
 fn context(
     data: &Arc<RwLock<TypeMap>>,
     runner_tx: &Sender<InterMessage>,
-    shard_id: u64,
+    shard_id: u32,
     http: &Arc<Http>,
     cache: &Arc<Cache>,
 ) -> Context {
@@ -57,7 +57,7 @@ fn context(
 fn context(
     data: &Arc<RwLock<TypeMap>>,
     runner_tx: &Sender<InterMessage>,
-    shard_id: u64,
+    shard_id: u32,
     http: &Arc<Http>,
 ) -> Context {
     Context::new(Arc::clone(data), runner_tx.clone(), shard_id, Arc::clone(http))
@@ -160,7 +160,7 @@ pub(crate) fn dispatch<'rec>(
     event_handler: &'rec Option<Arc<dyn EventHandler>>,
     raw_event_handler: &'rec Option<Arc<dyn RawEventHandler>>,
     runner_tx: &'rec Sender<InterMessage>,
-    shard_id: u64,
+    shard_id: u32,
     cache_and_http: Arc<CacheAndHttp>,
 ) -> BoxFuture<'rec, ()> {
     async move {
@@ -337,7 +337,7 @@ async fn handle_event(
     data: &Arc<RwLock<TypeMap>>,
     event_handler: &Arc<dyn EventHandler>,
     runner_tx: &Sender<InterMessage>,
-    shard_id: u64,
+    shard_id: u32,
     cache_and_http: Arc<CacheAndHttp>,
 ) {
     #[cfg(not(feature = "cache"))]
