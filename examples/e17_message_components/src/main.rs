@@ -172,10 +172,10 @@ impl EventHandler for Handler {
         // Ask the user for its favorite animal
         let m = msg
             .channel_id
-            .send_message(&ctx, |m| {
-                m.content("Please select your favorite animal")
-                    .components(|c| c.add_action_row(Animal::action_row()))
-            })
+            .send_message()
+            .content("Please select your favorite animal")
+            .components(|c| c.add_action_row(Animal::action_row()))
+            .execute(&ctx)
             .await
             .unwrap();
 

@@ -294,36 +294,21 @@ impl PrivateChannel {
     ///
     /// [Send Messages]: Permissions::SEND_MESSAGES
     #[inline]
-    pub async fn send_files<'a, F, T, It>(
-        &self,
-        http: impl AsRef<Http>,
-        files: It,
-        f: F,
-    ) -> Result<Message>
+    pub fn send_files<'a, T, It>(&self, files: It) -> CreateMessage<'a>
     where
-        for<'b> F: FnOnce(&'b mut CreateMessage<'a>) -> &'b mut CreateMessage<'a>,
         T: Into<AttachmentType<'a>>,
         It: IntoIterator<Item = T>,
     {
-        self.id.send_files(&http, files, f).await
+        self.id.send_files(files)
     }
 
     /// Sends a message to the channel with the given content.
     ///
-    /// Refer to the documentation for [`CreateMessage`] for more information
-    /// regarding message restrictions and requirements.
-    ///
-    /// # Errors
-    ///
-    /// Returns a [`ModelError::MessageTooLong`] if the content of the message
-    /// is over the above limit, containing the number of unicode code points
-    /// over the limit.
+    /// Refer to the documentation for [`CreateMessage`] for more information regarding message
+    /// restrictions and requirements.
     #[inline]
-    pub async fn send_message<'a, F>(&self, http: impl AsRef<Http>, f: F) -> Result<Message>
-    where
-        for<'b> F: FnOnce(&'b mut CreateMessage<'a>) -> &'b mut CreateMessage<'a>,
-    {
-        self.id.send_message(&http, f).await
+    pub fn send_message<'a>(&self) -> CreateMessage<'a> {
+        self.id.send_message()
     }
 
     /// Starts typing in the channel for an indefinite period of time.

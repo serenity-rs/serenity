@@ -752,9 +752,9 @@ impl GuildChannel {
     ///
     ///             let _ = msg
     ///                 .channel_id
-    ///                 .send_files(&context.http, vec![(&file, "cat.png")], |m| {
-    ///                     m.content("here's a cat")
-    ///                 })
+    ///                 .send_files(vec![(&file, "cat.png")])
+    ///                 .content("here's a cat")
+    ///                 .execute(&context.http)
     ///                 .await;
     ///         }
     ///     }
@@ -878,84 +878,40 @@ impl GuildChannel {
 
     /// Sends a message with just the given message content in the channel.
     ///
+    /// **Note**: Message contents must be under 2000 unicode code points.
+    ///
     /// # Errors
     ///
-    /// Returns a [`ModelError::MessageTooLong`] if the content of the message
-    /// is over the above limit, containing the number of unicode code points
-    /// over the limit.
+    /// Returns a [`ModelError::MessageTooLong`] if the content of the message is over the above
+    /// limit, containing the number of unicode code points over the limit.
     ///
-    /// May also return [`Error::Http`] if the current user lacks permission
-    /// to send a message to the channel.
+    /// Returns an [`Error::Http`] if the current user lacks permission to send a message to the
+    /// channel.
     #[inline]
     pub async fn say(&self, http: impl AsRef<Http>, content: impl Into<String>) -> Result<Message> {
         self.id.say(&http, content).await
     }
 
-    /// Sends (a) file(s) along with optional message contents.
+    /// Returns a request builder that, when executed, sends (a) file(s) to the channel, along with
+    /// optional message contents.
     ///
-    /// Refer to [`ChannelId::send_files`] for examples and more information.
-    ///
-    /// The [Attach Files] and [Send Messages] permissions are required.
-    ///
-    /// **Note**: Message contents must be under 2000 unicode code points.
-    ///
-    /// # Errors
-    ///
-    /// If the content of the message is over the above limit, then a
-    /// [`ModelError::MessageTooLong`] will be returned, containing the number
-    /// of unicode code points over the limit.
-    ///
-    /// [Attach Files]: Permissions::ATTACH_FILES
-    /// [Send Messages]: Permissions::SEND_MESSAGES
+    /// Refer to the documentation for [`CreateMessage`] for more information regarding message
+    /// restrictions and requirements.
     #[inline]
-    pub async fn send_files<'a, F, T, It>(
-        &self,
-        http: impl AsRef<Http>,
-        files: It,
-        f: F,
-    ) -> Result<Message>
+    pub fn send_files<'a, T, It>(&self, files: It) -> CreateMessage<'a>
     where
-        for<'b> F: FnOnce(&'b mut CreateMessage<'a>) -> &'b mut CreateMessage<'a>,
         T: Into<AttachmentType<'a>>,
         It: IntoIterator<Item = T>,
     {
-        self.id.send_files(&http, files, f).await
+        self.id.send_files(files)
     }
 
-    /// Sends a message to the channel with the given content.
+    /// Returns a request builder that sends a message to the channel when executed.
     ///
-    /// **Note**: Requires the [Send Messages] permission.
-    ///
-    /// # Errors
-    ///
-    /// Returns a [`ModelError::MessageTooLong`] if the content of the message
-    /// is over the above limit, containing the number of unicode code points
-    /// over the limit.
-    ///
-    /// If the `cache` is enabled, returns a [`ModelError::InvalidPermissions`] if the current user does
-    /// not have the required permissions.
-    ///
-    /// Otherwise will return [`Error::Http`] if the current user lacks permission.
-    ///
-    /// [Send Messages]: Permissions::SEND_MESSAGES
-    pub async fn send_message<'a, F>(&self, cache_http: impl CacheHttp, f: F) -> Result<Message>
-    where
-        for<'b> F: FnOnce(&'b mut CreateMessage<'a>) -> &'b mut CreateMessage<'a>,
-    {
-        #[cfg(feature = "cache")]
-        {
-            if let Some(cache) = cache_http.cache() {
-                let req = Permissions::SEND_MESSAGES;
-
-                if let Ok(false) =
-                    crate::utils::user_has_perms(&cache, self.id, Some(self.guild_id), req)
-                {
-                    return Err(Error::Model(ModelError::InvalidPermissions(req)));
-                }
-            }
-        }
-
-        self.id.send_message(&cache_http.http(), f).await
+    /// Refer to the documentation for [`CreateMessage`] for more information regarding message
+    /// restrictions and requirements.
+    pub fn send_message<'a>(&self) -> CreateMessage<'a> {
+        CreateMessage::new(self.id, Some(self.guild_id))
     }
 
     /// Starts typing in the channel for an indefinite period of time.

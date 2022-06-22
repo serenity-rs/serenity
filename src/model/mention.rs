@@ -37,15 +37,15 @@ pub trait Mentionable {
     /// ) -> Result<(), Error> {
     ///     to_channel
     ///         .id
-    ///         .send_message(ctx, |m| {
-    ///             m.content(format!(
-    ///                 "Hi {member}, welcome to the server! \
-    ///                 Please refer to {rules} for our code of conduct, \
-    ///                 and enjoy your stay.",
-    ///                 member = member.mention(),
-    ///                 rules = rules_channel.mention(),
-    ///             ))
-    ///         })
+    ///         .send_message()
+    ///         .content(format!(
+    ///             "Hi {member}, welcome to the server! \
+    ///             Please refer to {rules} for our code of conduct, \
+    ///             and enjoy your stay.",
+    ///             member = member.mention(),
+    ///             rules = rules_channel.mention(),
+    ///         ))
+    ///         .execute(ctx)
     ///         .await?;
     ///     Ok(())
     /// }

@@ -18,24 +18,24 @@ impl EventHandler for Handler {
             // a title, description, an image, three fields, and a footer.
             let msg = msg
                 .channel_id
-                .send_message(&ctx.http, |m| {
-                    m.content("Hello, World!")
-                        .embed(|e| {
-                            e.title("This is a title")
-                                .description("This is a description")
-                                .image("attachment://ferris_eyes.png")
-                                .fields(vec![
-                                    ("This is the first field", "This is a field body", true),
-                                    ("This is the second field", "Both fields are inline", true),
-                                ])
-                                .field("This is the third field", "This is not an inline field", false)
-                                .footer(|f| f.text("This is a footer"))
-                                // Add a timestamp for the current time
-                                // This also accepts a rfc3339 Timestamp
-                                .timestamp(Timestamp::now())
-                        })
-                        .add_file("./ferris_eyes.png")
+                .send_message()
+                .content("Hello, World!")
+                .embed(|e| {
+                    e.title("This is a title")
+                        .description("This is a description")
+                        .image("attachment://ferris_eyes.png")
+                        .fields(vec![
+                            ("This is the first field", "This is a field body", true),
+                            ("This is the second field", "Both fields are inline", true),
+                        ])
+                        .field("This is the third field", "This is not an inline field", false)
+                        .footer(|f| f.text("This is a footer"))
+                        // Add a timestamp for the current time
+                        // This also accepts a rfc3339 Timestamp
+                        .timestamp(Timestamp::now())
                 })
+                .add_file("./ferris_eyes.png")
+                .execute(&ctx.http)
                 .await;
 
             if let Err(why) = msg {

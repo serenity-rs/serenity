@@ -235,9 +235,9 @@ impl CreateEmbed {
     ///         if msg.content == "~embed" {
     ///             let _ = msg
     ///                 .channel_id
-    ///                 .send_message(&context.http, |m| {
-    ///                     m.embed(|e| e.title("hello").timestamp("2004-06-08T16:04:23"))
-    ///                 })
+    ///                 .send_message()
+    ///                 .embed(|e| e.title("hello").timestamp("2004-06-08T16:04:23"))
+    ///                 .execute(&context.http)
     ///                 .await;
     ///         }
     ///     }
@@ -277,15 +277,15 @@ impl CreateEmbed {
     ///                 let user = &member.user;
     ///
     ///                 let _ = channel
-    ///                     .send_message(&context, |m| {
-    ///                         m.embed(|e| {
-    ///                             if let Some(ref joined_at) = member.joined_at {
-    ///                                 e.timestamp(joined_at);
-    ///                             }
-    ///                             e.author(|a| a.icon_url(&user.face()).name(&user.name))
-    ///                                 .title("Member Join")
-    ///                         })
+    ///                     .send_message()
+    ///                     .embed(|e| {
+    ///                         if let Some(ref joined_at) = member.joined_at {
+    ///                             e.timestamp(joined_at);
+    ///                         }
+    ///                         e.author(|a| a.icon_url(&user.face()).name(&user.name))
+    ///                             .title("Member Join")
     ///                     })
+    ///                     .execute(&context)
     ///                     .await;
     ///             }
     ///         }

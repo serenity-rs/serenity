@@ -686,22 +686,18 @@ impl Message {
             }
         }
 
-        self.channel_id
-            .send_message(cache_http.http(), |builder| {
-                if let Some(ping_user) = inlined {
-                    builder.reference_message(self).allowed_mentions(|f| {
-                        f.replied_user(ping_user)
-                            // By providing allowed_mentions, Discord disabled _all_ pings by
-                            // default so we need to re-enable them
-                            .parse(crate::builder::ParseValue::Everyone)
-                            .parse(crate::builder::ParseValue::Users)
-                            .parse(crate::builder::ParseValue::Roles)
-                    });
-                }
-
-                builder.content(content)
+        let mut builder = self.channel_id.send_message().content(content);
+        if let Some(ping_user) = inlined {
+            builder = builder.reference_message(self).allowed_mentions(|f| {
+                f.replied_user(ping_user)
+                    // By providing allowed_mentions, Discord disabled _all_ pings by
+                    // default so we need to re-enable them
+                    .parse(crate::builder::ParseValue::Everyone)
+                    .parse(crate::builder::ParseValue::Users)
+                    .parse(crate::builder::ParseValue::Roles)
             })
-            .await
+        }
+        builder.execute(cache_http.http()).await
     }
 
     /// Delete all embeds in this message

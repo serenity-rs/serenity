@@ -805,8 +805,11 @@ impl User {
         default_avatar_url(self.discriminator)
     }
 
-    /// Sends a message to a user through a direct message channel. This is a
-    /// channel that can only be accessed by you and the recipient.
+    /// Returns a builder that, when executed, sends a message to a user through a direct message
+    /// channel. This is a channel that can only be accessed by you and the recipient.'
+    ///
+    /// This method first attempts to create the channel if it does not already exist, before
+    /// returning a [`CreateMessage`] builder.
     ///
     /// # Examples
     ///
@@ -837,13 +840,19 @@ impl User {
     ///                 },
     ///             };
     ///
-    ///             let help = format!("Helpful info here. Invite me with this link: <{}>", url,);
+    ///             match msg.author.direct_message(&ctx).await {
+    ///                 Ok(create_message) => {
+    ///                     let help = format!("Invite me with this link: <{}>", url);
+    ///                     match create_message.content(&help).execute(&ctx).await {
+    ///                         Ok(_) => {
+    ///                             let _ = msg.react(&ctx, '👌').await;
+    ///                         },
+    ///                         Err(why) => {
+    ///                             println!("Err sending help: {:?}", why);
     ///
-    ///             let dm = msg.author.direct_message(&ctx, |m| m.content(&help)).await;
-    ///
-    ///             match dm {
-    ///                 Ok(_) => {
-    ///                     let _ = msg.react(&ctx, '👌').await;
+    ///                             let _ = msg.reply(&ctx, "There was an error DMing you help.").await;
+    ///                         },
+    ///                     }
     ///                 },
     ///                 Err(why) => {
     ///                     println!("Err sending help: {:?}", why);
@@ -865,32 +874,26 @@ impl User {
     ///
     /// # Errors
     ///
-    /// Returns a [`ModelError::MessagingBot`] if the user being direct messaged
-    /// is a bot user.
+    /// Returns a [`ModelError::MessagingBot`] if the user being direct messaged is a bot user.
     ///
-    /// May also return an [`Error::Http`] if the message was illformed, or if the
-    /// user cannot be sent a direct message.
+    /// May also return an [`Error::Http`] if the user cannot be sent a direct message.
     ///
-    /// [`Error::Json`] can also be returned if there is an error deserializing
-    /// the API response.
+    /// [`Error::Json`] can also be returned if there is an error deserializing the API response.
     ///
     /// [`Error::Http`]: crate::error::Error::Http
     /// [`Error::Json`]: crate::error::Error::Json
-    pub async fn direct_message<'a, F>(&self, cache_http: impl CacheHttp, f: F) -> Result<Message>
-    where
-        for<'b> F: FnOnce(&'b mut CreateMessage<'a>) -> &'b mut CreateMessage<'a>,
-    {
-        self.create_dm_channel(&cache_http).await?.send_message(&cache_http.http(), f).await
+    pub async fn direct_message<'a>(
+        &self,
+        cache_http: impl CacheHttp,
+    ) -> Result<CreateMessage<'a>> {
+        Ok(self.create_dm_channel(&cache_http).await?.send_message())
     }
 
     /// This is an alias of [`Self::direct_message`].
     #[allow(clippy::missing_errors_doc)]
     #[inline]
-    pub async fn dm<'a, F>(&self, cache_http: impl CacheHttp, f: F) -> Result<Message>
-    where
-        for<'b> F: FnOnce(&'b mut CreateMessage<'a>) -> &'b mut CreateMessage<'a>,
-    {
-        self.direct_message(cache_http, f).await
+    pub async fn dm<'a>(&self, cache_http: impl CacheHttp) -> Result<CreateMessage<'a>> {
+        self.direct_message(cache_http).await
     }
 
     /// Retrieves the URL to the user's avatar, falling back to the default
