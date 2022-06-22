@@ -437,8 +437,8 @@ impl ShardRunner {
                         self.shard.set_activity(activity);
                         self.shard.update_presence().await.is_ok()
                     },
-                    ShardRunnerMessage::SetPresence(status, activity) => {
-                        self.shard.set_presence(status, activity);
+                    ShardRunnerMessage::SetPresence(activity, status) => {
+                        self.shard.set_presence(activity, status);
                         self.shard.update_presence().await.is_ok()
                     },
                     ShardRunnerMessage::SetStatus(status) => {

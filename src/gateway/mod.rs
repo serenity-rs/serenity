@@ -52,16 +52,104 @@ mod ws;
 
 use std::fmt;
 
+use reqwest::{IntoUrl, Url};
+
 pub use self::error::Error as GatewayError;
 pub use self::shard::Shard;
 pub use self::ws::WsClient;
 #[cfg(feature = "client")]
 use crate::client::bridge::gateway::ShardClientMessage;
+use crate::internal::prelude::*;
 use crate::json::Value;
-use crate::model::gateway::Activity;
+use crate::model::gateway::{Activity, ActivityType};
 use crate::model::user::OnlineStatus;
 
-pub type CurrentPresence = (Option<Activity>, OnlineStatus);
+/// Presence data of the current user.
+#[derive(Clone, Debug, Default)]
+pub struct PresenceData {
+    /// The current activity, if present
+    pub activity: Option<ActivityData>,
+    /// The current online status
+    pub status: OnlineStatus,
+}
+
+/// Activity data of the current user.
+#[derive(Clone, Debug, Serialize)]
+pub struct ActivityData {
+    /// The name of the activity
+    pub name: String,
+    /// The type of the activity
+    #[serde(rename = "type")]
+    pub kind: ActivityType,
+    /// The url of the activity, if the type is [`ActivityType::Streaming`]
+    pub url: Option<Url>,
+}
+
+impl ActivityData {
+    /// Creates an activity that appears as `Playing <name>`.
+    #[must_use]
+    pub fn playing(name: impl Into<String>) -> Self {
+        Self {
+            name: name.into(),
+            kind: ActivityType::Playing,
+            url: None,
+        }
+    }
+
+    /// Creates an activity that appears as `Streaming <name>`.
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if the URL parsing fails.
+    #[must_use]
+    pub fn streaming(name: impl Into<String>, url: impl IntoUrl) -> Result<Self> {
+        Ok(Self {
+            name: name.into(),
+            kind: ActivityType::Streaming,
+            url: Some(url.into_url()?),
+        })
+    }
+
+    /// Creates an activity that appears as `Listening to <name>`.
+    #[must_use]
+    pub fn listening(name: impl Into<String>) -> Self {
+        Self {
+            name: name.into(),
+            kind: ActivityType::Listening,
+            url: None,
+        }
+    }
+
+    /// Creates an activity that appears as `Watching <name>`.
+    #[must_use]
+    pub fn watching(name: impl Into<String>) -> Self {
+        Self {
+            name: name.into(),
+            kind: ActivityType::Watching,
+            url: None,
+        }
+    }
+
+    /// Creates an activity that appears as `Competing in <name>`.
+    #[must_use]
+    pub fn competing(name: impl Into<String>) -> Self {
+        Self {
+            name: name.into(),
+            kind: ActivityType::Competing,
+            url: None,
+        }
+    }
+}
+
+impl From<Activity> for ActivityData {
+    fn from(activity: Activity) -> Self {
+        Self {
+            name: activity.name,
+            kind: activity.kind,
+            url: activity.url,
+        }
+    }
+}
 
 /// Indicates the current connection stage of a [`Shard`].
 ///

@@ -8,7 +8,7 @@ use crate::collector::{
     ModalInteractionFilter,
     ReactionFilter,
 };
-use crate::model::gateway::Activity;
+use crate::gateway::ActivityData;
 use crate::model::id::{GuildId, UserId};
 use crate::model::user::OnlineStatus;
 
@@ -55,10 +55,10 @@ pub enum ShardRunnerMessage {
     /// Indicates that the client is to send a custom WebSocket message.
     Message(Message),
     /// Indicates that the client is to update the shard's presence's activity.
-    SetActivity(Option<Activity>),
+    SetActivity(Option<ActivityData>),
     /// Indicates that the client is to update the shard's presence in its
     /// entirety.
-    SetPresence(OnlineStatus, Option<Activity>),
+    SetPresence(Option<ActivityData>, OnlineStatus),
     /// Indicates that the client is to update the shard's presence's status.
     SetStatus(OnlineStatus),
     /// Sends a new filter for events to the shard.

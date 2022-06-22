@@ -10,7 +10,7 @@ use crate::collector::{
     ModalInteractionFilter,
     ReactionFilter,
 };
-use crate::gateway::InterMessage;
+use crate::gateway::{ActivityData, InterMessage};
 use crate::model::prelude::*;
 
 /// A lightweight wrapper around an mpsc sender.
@@ -149,13 +149,13 @@ impl ShardMessenger {
     /// #     };
     /// #
     /// #     let mut shard = Shard::new(mutex.clone(), "", shard_info, GatewayIntents::all()).await?;
-    /// use serenity::model::gateway::Activity;
+    /// use serenity::gateway::ActivityData;
     ///
-    /// shard.set_activity(Some(Activity::playing("Heroes of the Storm")));
+    /// shard.set_activity(Some(ActivityData::playing("Heroes of the Storm")));
     /// #     Ok(())
     /// # }
     /// ```
-    pub fn set_activity(&self, activity: Option<Activity>) {
+    pub fn set_activity(&self, activity: Option<ActivityData>) {
         drop(self.send_to_shard(ShardRunnerMessage::SetActivity(activity)));
     }
 
@@ -184,20 +184,20 @@ impl ShardMessenger {
     /// #
     /// #     let mut shard = Shard::new(mutex.clone(), "", shard_info, None).await?;
     /// #
-    /// use serenity::model::gateway::Activity;
+    /// use serenity::gateway::ActivityData;
     /// use serenity::model::user::OnlineStatus;
     ///
-    /// let activity = Activity::playing("Heroes of the Storm");
+    /// let activity = ActivityData::playing("Heroes of the Storm");
     /// shard.set_presence(Some(activity), OnlineStatus::Online);
     /// #     Ok(())
     /// # }
     /// ```
-    pub fn set_presence(&self, activity: Option<Activity>, mut status: OnlineStatus) {
+    pub fn set_presence(&self, activity: Option<ActivityData>, mut status: OnlineStatus) {
         if status == OnlineStatus::Offline {
             status = OnlineStatus::Invisible;
         }
 
-        drop(self.send_to_shard(ShardRunnerMessage::SetPresence(status, activity)));
+        drop(self.send_to_shard(ShardRunnerMessage::SetPresence(activity, status)));
     }
 
     /// Sets the user's current online status.
