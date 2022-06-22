@@ -514,6 +514,7 @@ pub struct ShardInfo {
 }
 
 impl ShardInfo {
+    #[cfg(feature = "client")]
     #[must_use]
     pub(crate) fn new(id: u32, total: u32) -> Self {
         Self {
