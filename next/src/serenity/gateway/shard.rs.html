@@ -796,26 +796,6 @@
 <span id="791">791</span>
 <span id="792">792</span>
 <span id="793">793</span>
-<span id="794">794</span>
-<span id="795">795</span>
-<span id="796">796</span>
-<span id="797">797</span>
-<span id="798">798</span>
-<span id="799">799</span>
-<span id="800">800</span>
-<span id="801">801</span>
-<span id="802">802</span>
-<span id="803">803</span>
-<span id="804">804</span>
-<span id="805">805</span>
-<span id="806">806</span>
-<span id="807">807</span>
-<span id="808">808</span>
-<span id="809">809</span>
-<span id="810">810</span>
-<span id="811">811</span>
-<span id="812">812</span>
-<span id="813">813</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::sync::Arc</span>;
 <span class="kw">use</span> <span class="ident">std::time</span>::{<span class="ident">Duration</span> <span class="kw">as</span> <span class="ident">StdDuration</span>, <span class="ident">Instant</span>};
 
@@ -831,7 +811,7 @@
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::http::Http</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::internal::prelude</span>::<span class="kw-2">*</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::event</span>::{<span class="ident">Event</span>, <span class="ident">GatewayEvent</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::gateway</span>::{<span class="ident">Activity</span>, <span class="ident">GatewayIntents</span>};
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::gateway</span>::{<span class="ident">Activity</span>, <span class="ident">GatewayIntents</span>, <span class="ident">ShardInfo</span>};
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::id::GuildId</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::user::OnlineStatus</span>;
 
@@ -888,7 +868,7 @@
     <span class="ident">last_heartbeat_acknowledged</span>: <span class="ident">bool</span>,
     <span class="ident">seq</span>: <span class="ident">u64</span>,
     <span class="ident">session_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-    <span class="ident">shard_info</span>: [<span class="ident">u64</span>; <span class="number">2</span>],
+    <span class="ident">shard_info</span>: <span class="ident">ShardInfo</span>,
     <span class="ident">stage</span>: <span class="ident">ConnectionStage</span>,
     <span class="doccomment">/// Instant of when the shard was started.</span>
     <span class="comment">// This acts as a timeout to determine if the shard has - for some reason -</span>
@@ -916,14 +896,19 @@
     <span class="doccomment">/// use tokio::sync::Mutex;</span>
     <span class="doccomment">/// #</span>
     <span class="doccomment">/// # use serenity::http::Http;</span>
-    <span class="doccomment">/// # use serenity::model::gateway::GatewayIntents;</span>
+    <span class="doccomment">/// # use serenity::model::gateway::{GatewayIntents, ShardInfo};</span>
     <span class="doccomment">/// #</span>
     <span class="doccomment">/// # async fn run() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {</span>
     <span class="doccomment">/// #     let http = Arc::new(Http::new(&quot;token&quot;));</span>
     <span class="doccomment">/// let token = std::env::var(&quot;DISCORD_BOT_TOKEN&quot;)?;</span>
+    <span class="doccomment">/// let shard_info = ShardInfo {</span>
+    <span class="doccomment">///     id: 0,</span>
+    <span class="doccomment">///     total: 1,</span>
+    <span class="doccomment">/// };</span>
+    <span class="doccomment">///</span>
     <span class="doccomment">/// // retrieve the gateway response, which contains the URL to connect to</span>
     <span class="doccomment">/// let gateway = Arc::new(Mutex::new(http.get_gateway().await?.url));</span>
-    <span class="doccomment">/// let shard = Shard::new(gateway, &amp;token, [0u64, 1u64], GatewayIntents::all()).await?;</span>
+    <span class="doccomment">/// let shard = Shard::new(gateway, &amp;token, shard_info, GatewayIntents::all()).await?;</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// // at this point, you can create a `loop`, and receive events and match</span>
     <span class="doccomment">/// // their variants</span>
@@ -940,7 +925,7 @@
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">new</span>(
         <span class="ident">ws_url</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Mutex</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span><span class="op">&gt;</span>,
         <span class="ident">token</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
-        <span class="ident">shard_info</span>: [<span class="ident">u64</span>; <span class="number">2</span>],
+        <span class="ident">shard_info</span>: <span class="ident">ShardInfo</span>,
         <span class="ident">intents</span>: <span class="ident">GatewayIntents</span>,
     ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Shard</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">url</span> <span class="op">=</span> <span class="ident">ws_url</span>.<span class="ident">lock</span>().<span class="kw">await</span>.<span class="ident">clone</span>();
@@ -1086,41 +1071,9 @@
 
     <span class="doccomment">/// Retrieves a copy of the current shard information.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// The first element is the _current_ shard - 0-indexed - while the second</span>
-    <span class="doccomment">/// element is the _total number_ of shards -- 1-indexed.</span>
-    <span class="doccomment">///</span>
     <span class="doccomment">/// For example, if using 3 shards in total, and if this is shard 1, then it</span>
     <span class="doccomment">/// can be read as &quot;the second of three shards&quot;.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Retrieving the shard info for the second shard, out of two shards total:</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// For example, if using 3 shards in total, and if this is shard 1, then it</span>
-    <span class="doccomment">/// can be read as &quot;the second of three shards&quot;.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Retrieving the shard info for the second shard, out of two shards total:</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```rust,no_run</span>
-    <span class="doccomment">/// # use serenity::gateway::Shard;</span>
-    <span class="doccomment">/// # use serenity::prelude::Mutex;</span>
-    <span class="doccomment">/// # use serenity::model::gateway::GatewayIntents;</span>
-    <span class="doccomment">/// # use std::sync::Arc;</span>
-    <span class="doccomment">/// #</span>
-    <span class="doccomment">/// # #[cfg(feature = &quot;model&quot;)]</span>
-    <span class="doccomment">/// # async fn run() {</span>
-    <span class="doccomment">/// #</span>
-    <span class="doccomment">/// # let mutex = Arc::new(Mutex::new(&quot;&quot;.to_string()));</span>
-    <span class="doccomment">/// #</span>
-    <span class="doccomment">/// # let mut shard = Shard::new(mutex.clone(), &quot;&quot;, [0u64, 1u64],</span>
-    <span class="doccomment">/// #                            GatewayIntents::all()).await.unwrap();</span>
-    <span class="doccomment">/// #</span>
-    <span class="doccomment">/// assert_eq!(shard.shard_info(), [1, 2]);</span>
-    <span class="doccomment">/// # }</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">shard_info</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; [<span class="ident">u64</span>; <span class="number">2</span>] {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">shard_info</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">ShardInfo</span> {
         <span class="self">self</span>.<span class="ident">shard_info</span>
     }
 
@@ -1475,15 +1428,19 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// ```rust,no_run</span>
     <span class="doccomment">/// # use tokio::sync::Mutex;</span>
-    <span class="doccomment">/// # use serenity::model::gateway::GatewayIntents;</span>
+    <span class="doccomment">/// # use serenity::model::gateway::{GatewayIntents, ShardInfo};</span>
     <span class="doccomment">/// # use serenity::client::bridge::gateway::ChunkGuildFilter;</span>
     <span class="doccomment">/// # use serenity::gateway::Shard;</span>
     <span class="doccomment">/// # use std::sync::Arc;</span>
     <span class="doccomment">/// #</span>
     <span class="doccomment">/// # async fn run() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {</span>
     <span class="doccomment">/// #     let mutex = Arc::new(Mutex::new(&quot;&quot;.to_string()));</span>
+    <span class="doccomment">/// #     let shard_info = ShardInfo {</span>
+    <span class="doccomment">/// #          id: 0,</span>
+    <span class="doccomment">/// #          total: 1,</span>
+    <span class="doccomment">/// #     };</span>
     <span class="doccomment">/// #</span>
-    <span class="doccomment">/// #     let mut shard = Shard::new(mutex.clone(), &quot;&quot;, [0u64, 1u64], GatewayIntents::all()).await?;</span>
+    <span class="doccomment">/// #     let mut shard = Shard::new(mutex.clone(), &quot;&quot;, shard_info, GatewayIntents::all()).await?;</span>
     <span class="doccomment">/// #</span>
     <span class="doccomment">/// use serenity::model::id::GuildId;</span>
     <span class="doccomment">///</span>
@@ -1498,7 +1455,7 @@
     <span class="doccomment">/// ```rust,no_run</span>
     <span class="doccomment">/// # use tokio::sync::Mutex;</span>
     <span class="doccomment">/// # use serenity::gateway::Shard;</span>
-    <span class="doccomment">/// # use serenity::model::gateway::GatewayIntents;</span>
+    <span class="doccomment">/// # use serenity::model::gateway::{GatewayIntents, ShardInfo};</span>
     <span class="doccomment">/// # use serenity::client::bridge::gateway::ChunkGuildFilter;</span>
     <span class="doccomment">/// # use std::error::Error;</span>
     <span class="doccomment">/// # use std::sync::Arc;</span>
@@ -1506,8 +1463,11 @@
     <span class="doccomment">/// # async fn run() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {</span>
     <span class="doccomment">/// #     let mutex = Arc::new(Mutex::new(&quot;&quot;.to_string()));</span>
     <span class="doccomment">/// #</span>
-    <span class="doccomment">/// #     let mut shard = Shard::new(mutex.clone(), &quot;&quot;, [0u64, 1u64],</span>
-    <span class="doccomment">/// #                                GatewayIntents::all()).await?;</span>
+    <span class="doccomment">/// #     let shard_info = ShardInfo {</span>
+    <span class="doccomment">/// #          id: 0,</span>
+    <span class="doccomment">/// #          total: 1,</span>
+    <span class="doccomment">/// #     };</span>
+    <span class="doccomment">/// #     let mut shard = Shard::new(mutex.clone(), &quot;&quot;, shard_info, GatewayIntents::all()).await?;</span>
     <span class="doccomment">/// #</span>
     <span class="doccomment">/// use serenity::model::id::GuildId;</span>
     <span class="doccomment">///</span>

@@ -719,6 +719,8 @@
 <span id="714">714</span>
 <span id="715">715</span>
 <span id="716">716</span>
+<span id="717">717</span>
+<span id="718">718</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::collections::HashSet</span>;
 
 <span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">Cache</span>, <span class="ident">CacheUpdate</span>};
@@ -751,6 +753,7 @@
     <span class="ident">UserUpdateEvent</span>,
     <span class="ident">VoiceStateUpdateEvent</span>,
 };
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::gateway::ShardInfo</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::guild</span>::{<span class="ident">Guild</span>, <span class="ident">Member</span>, <span class="ident">Role</span>};
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::user</span>::{<span class="ident">CurrentUser</span>, <span class="ident">OnlineStatus</span>};
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::voice::VoiceState</span>;
@@ -1318,11 +1321,12 @@
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">guilds_to_remove</span> <span class="op">=</span> <span class="macro">vec!</span>[];
         <span class="kw">let</span> <span class="ident">ready_guilds_hashset</span> <span class="op">=</span>
             <span class="self">self</span>.<span class="ident">ready</span>.<span class="ident">guilds</span>.<span class="ident">iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">status</span><span class="op">|</span> <span class="ident">status</span>.<span class="ident">id</span>).<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">HashSet</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>();
-        <span class="kw">let</span> <span class="ident">shard_data</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">ready</span>.<span class="ident">shard</span>.<span class="ident">unwrap_or</span>([<span class="number">1</span>, <span class="number">1</span>]);
+        <span class="kw">let</span> <span class="ident">shard_data</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">ready</span>.<span class="ident">shard</span>.<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">ShardInfo::new</span>(<span class="number">1</span>, <span class="number">1</span>));
+
         <span class="kw">for</span> <span class="ident">guild_entry</span> <span class="kw">in</span> <span class="ident">cache</span>.<span class="ident">guilds</span>.<span class="ident">iter</span>() {
             <span class="kw">let</span> <span class="ident">guild</span> <span class="op">=</span> <span class="ident">guild_entry</span>.<span class="ident">key</span>();
             <span class="comment">// Only handle data for our shard.</span>
-            <span class="kw">if</span> <span class="ident"><span class="kw">crate</span>::utils::shard_id</span>(<span class="ident">guild</span>.<span class="number">0</span>, <span class="ident">shard_data</span>[<span class="number">1</span>]) <span class="op">==</span> <span class="ident">shard_data</span>[<span class="number">0</span>]
+            <span class="kw">if</span> <span class="ident"><span class="kw">crate</span>::utils::shard_id</span>(<span class="ident">guild</span>.<span class="number">0</span>, <span class="ident">shard_data</span>.<span class="ident">total</span>) <span class="op">==</span> <span class="ident">shard_data</span>.<span class="ident">id</span>
                 <span class="op">&amp;&amp;</span> <span class="op">!</span><span class="ident">ready_guilds_hashset</span>.<span class="ident">contains</span>(<span class="ident">guild</span>)
             {
                 <span class="ident">guilds_to_remove</span>.<span class="ident">push</span>(<span class="kw-2">*</span><span class="ident">guild</span>);
@@ -1348,7 +1352,7 @@
             <span class="ident">cache</span>.<span class="ident">presences</span>.<span class="ident">insert</span>(<span class="kw-2">*</span><span class="ident">user_id</span>, <span class="ident">presence</span>.<span class="ident">clone</span>());
         }
 
-        <span class="kw-2">*</span><span class="ident">cache</span>.<span class="ident">shard_count</span>.<span class="ident">write</span>() <span class="op">=</span> <span class="ident">ready</span>.<span class="ident">shard</span>.<span class="ident">map_or</span>(<span class="number">1</span>, <span class="op">|</span><span class="ident">s</span><span class="op">|</span> <span class="ident">s</span>[<span class="number">1</span>]);
+        <span class="kw-2">*</span><span class="ident">cache</span>.<span class="ident">shard_count</span>.<span class="ident">write</span>() <span class="op">=</span> <span class="ident">ready</span>.<span class="ident">shard</span>.<span class="ident">map_or</span>(<span class="number">1</span>, <span class="op">|</span><span class="ident">s</span><span class="op">|</span> <span class="ident">s</span>.<span class="ident">total</span>);
         <span class="kw-2">*</span><span class="ident">cache</span>.<span class="ident">user</span>.<span class="ident">write</span>() <span class="op">=</span> <span class="ident">ready</span>.<span class="ident">user</span>;
 
         <span class="prelude-val">None</span>

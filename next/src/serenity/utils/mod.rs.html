@@ -977,8 +977,8 @@
 <span class="doccomment">/// assert_eq!(utils::shard_id(81384788765712384 as u64, 17), 7);</span>
 <span class="doccomment">/// ```</span>
 <span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">shard_id</span>(<span class="ident">guild_id</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span>, <span class="ident">shard_count</span>: <span class="ident">u64</span>) -&gt; <span class="ident">u64</span> {
-    (<span class="ident">guild_id</span>.<span class="ident">into</span>() <span class="op">&gt;</span><span class="op">&gt;</span> <span class="number">22</span>) <span class="op">%</span> <span class="ident">shard_count</span>
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">shard_id</span>(<span class="ident">guild_id</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span>, <span class="ident">shard_count</span>: <span class="ident">u32</span>) -&gt; <span class="ident">u32</span> {
+    ((<span class="ident">guild_id</span>.<span class="ident">into</span>() <span class="op">&gt;</span><span class="op">&gt;</span> <span class="number">22</span>) <span class="op">%</span> (<span class="ident">shard_count</span> <span class="kw">as</span> <span class="ident">u64</span>)) <span class="kw">as</span> <span class="ident">u32</span>
 }
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>

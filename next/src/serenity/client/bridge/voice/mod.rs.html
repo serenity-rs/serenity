@@ -63,7 +63,7 @@
     <span class="doccomment">/// Performs initial setup at the start of a connection to Discord.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// This will only occur once, and provides the bot&#39;s ID and shard count.</span>
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">initialise</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">shard_count</span>: <span class="ident">u64</span>, <span class="ident">user_id</span>: <span class="ident">UserId</span>);
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">initialise</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">shard_count</span>: <span class="ident">u32</span>, <span class="ident">user_id</span>: <span class="ident">UserId</span>);
 
     <span class="doccomment">/// Handler fired in response to a [`Ready`] event.</span>
     <span class="doccomment">///</span>
@@ -71,7 +71,7 @@
     <span class="doccomment">/// once per active shard.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// [`Ready`]: crate::model::event::Event</span>
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">register_shard</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">shard_id</span>: <span class="ident">u64</span>, <span class="ident">sender</span>: <span class="ident">Sender</span><span class="op">&lt;</span><span class="ident">InterMessage</span><span class="op">&gt;</span>);
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">register_shard</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">shard_id</span>: <span class="ident">u32</span>, <span class="ident">sender</span>: <span class="ident">Sender</span><span class="op">&lt;</span><span class="ident">InterMessage</span><span class="op">&gt;</span>);
 
     <span class="doccomment">/// Handler fired in response to a disconnect, reconnection, or rebalance.</span>
     <span class="doccomment">///</span>
@@ -79,7 +79,7 @@
     <span class="doccomment">/// Unless the bot is fully disconnecting, this is often followed by a call</span>
     <span class="doccomment">/// to [`Self::register_shard`]. Users may wish to buffer manually any gateway messages</span>
     <span class="doccomment">/// sent between these calls.</span>
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">deregister_shard</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">shard_id</span>: <span class="ident">u64</span>);
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">deregister_shard</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">shard_id</span>: <span class="ident">u32</span>);
 
     <span class="doccomment">/// Handler for VOICE_SERVER_UPDATE messages.</span>
     <span class="doccomment">///</span>

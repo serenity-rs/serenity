@@ -289,7 +289,7 @@
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::gateway</span>::{<span class="ident">ConnectionStage</span>, <span class="ident">InterMessage</span>, <span class="ident">Shard</span>};
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::internal::prelude</span>::<span class="kw-2">*</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::internal::tokio::spawn_named</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::gateway::GatewayIntents</span>;
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::gateway</span>::{<span class="ident">GatewayIntents</span>, <span class="ident">ShardInfo</span>};
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::CacheAndHttp</span>;
 
 <span class="kw">const</span> <span class="ident">WAIT_BETWEEN_BOOTS_IN_SECONDS</span>: <span class="ident">u64</span> <span class="op">=</span> <span class="number">5</span>;
@@ -331,7 +331,7 @@
     <span class="doccomment">/// The shards that are queued for booting.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// This will typically be filled with previously failed boots.</span>
-    <span class="kw">pub</span> <span class="ident">queue</span>: <span class="ident">VecDeque</span><span class="op">&lt;</span>(<span class="ident">u64</span>, <span class="ident">u64</span>)<span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">queue</span>: <span class="ident">VecDeque</span><span class="op">&lt;</span><span class="ident">ShardInfo</span><span class="op">&gt;</span>,
     <span class="doccomment">/// A copy of the map of shard runners.</span>
     <span class="kw">pub</span> <span class="ident">runners</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Mutex</span><span class="op">&lt;</span><span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">ShardId</span>, <span class="ident">ShardRunnerInfo</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>,
     <span class="doccomment">/// A receiver channel for the shard queuer to be told to start shards.</span>
@@ -388,8 +388,8 @@
                 },
                 <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>) =&gt; <span class="kw">break</span>,
                 <span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; {
-                    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>((<span class="ident">id</span>, <span class="ident">total</span>)) <span class="op">=</span> <span class="self">self</span>.<span class="ident">queue</span>.<span class="ident">pop_front</span>() {
-                        <span class="self">self</span>.<span class="ident">checked_start</span>(<span class="ident">id</span>, <span class="ident">total</span>).<span class="kw">await</span>;
+                    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">shard</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">queue</span>.<span class="ident">pop_front</span>() {
+                        <span class="self">self</span>.<span class="ident">checked_start</span>(<span class="ident">shard</span>.<span class="ident">id</span>, <span class="ident">shard</span>.<span class="ident">total</span>).<span class="kw">await</span>;
                     }
                 },
             }
@@ -418,7 +418,7 @@
     }
 
     <span class="attribute">#[<span class="ident">instrument</span>(<span class="ident">skip</span>(<span class="self">self</span>))]</span>
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">checked_start</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">id</span>: <span class="ident">u64</span>, <span class="ident">total</span>: <span class="ident">u64</span>) {
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">checked_start</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">id</span>: <span class="ident">u32</span>, <span class="ident">total</span>: <span class="ident">u32</span>) {
         <span class="macro">debug!</span>(<span class="string">&quot;[Shard Queuer] Checked start for shard {} out of {}&quot;</span>, <span class="ident">id</span>, <span class="ident">total</span>);
         <span class="self">self</span>.<span class="ident">check_last_start</span>().<span class="kw">await</span>;
 
@@ -426,15 +426,15 @@
             <span class="macro">warn!</span>(<span class="string">&quot;[Shard Queuer] Err starting shard {}: {:?}&quot;</span>, <span class="ident">id</span>, <span class="ident">why</span>);
             <span class="macro">info!</span>(<span class="string">&quot;[Shard Queuer] Re-queueing start of shard {}&quot;</span>, <span class="ident">id</span>);
 
-            <span class="self">self</span>.<span class="ident">queue</span>.<span class="ident">push_back</span>((<span class="ident">id</span>, <span class="ident">total</span>));
+            <span class="self">self</span>.<span class="ident">queue</span>.<span class="ident">push_back</span>(<span class="ident">ShardInfo::new</span>(<span class="ident">id</span>, <span class="ident">total</span>));
         }
 
         <span class="self">self</span>.<span class="ident">last_start</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">Instant::now</span>());
     }
 
     <span class="attribute">#[<span class="ident">instrument</span>(<span class="ident">skip</span>(<span class="self">self</span>))]</span>
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">start</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">shard_id</span>: <span class="ident">u64</span>, <span class="ident">shard_total</span>: <span class="ident">u64</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">shard_info</span> <span class="op">=</span> [<span class="ident">shard_id</span>, <span class="ident">shard_total</span>];
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">start</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">id</span>: <span class="ident">u32</span>, <span class="ident">total</span>: <span class="ident">u32</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+        <span class="kw">let</span> <span class="ident">shard_info</span> <span class="op">=</span> <span class="ident">ShardInfo::new</span>(<span class="ident">id</span>, <span class="ident">total</span>);
 
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">shard</span> <span class="op">=</span> <span class="ident">Shard::new</span>(
             <span class="ident">Arc::clone</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">ws_url</span>),
@@ -470,7 +470,7 @@
             <span class="macro">debug!</span>(<span class="string">&quot;[ShardRunner {:?}] Stopping&quot;</span>, <span class="ident">runner</span>.<span class="ident">shard</span>.<span class="ident">shard_info</span>());
         });
 
-        <span class="self">self</span>.<span class="ident">runners</span>.<span class="ident">lock</span>().<span class="kw">await</span>.<span class="ident">insert</span>(<span class="ident">ShardId</span>(<span class="ident">shard_id</span>), <span class="ident">runner_info</span>);
+        <span class="self">self</span>.<span class="ident">runners</span>.<span class="ident">lock</span>().<span class="kw">await</span>.<span class="ident">insert</span>(<span class="ident">ShardId</span>(<span class="ident">id</span>), <span class="ident">runner_info</span>);
 
         <span class="prelude-val">Ok</span>(())
     }

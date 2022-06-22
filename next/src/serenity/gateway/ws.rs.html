@@ -300,7 +300,7 @@
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::gateway</span>::{<span class="ident">CurrentPresence</span>, <span class="ident">GatewayError</span>};
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::json</span>::{<span class="ident">from_str</span>, <span class="ident">to_string</span>};
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::event::GatewayEvent</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::gateway</span>::{<span class="ident">ActivityType</span>, <span class="ident">GatewayIntents</span>};
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::gateway</span>::{<span class="ident">ActivityType</span>, <span class="ident">GatewayIntents</span>, <span class="ident">ShardInfo</span>};
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::id</span>::{<span class="ident">GuildId</span>, <span class="ident">UserId</span>};
 <span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">Error</span>, <span class="prelude-ty">Result</span>};
 
@@ -337,9 +337,9 @@
     <span class="ident">ChunkGuild</span>(<span class="ident">ChunkGuildMessage</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>),
     <span class="ident">Identify</span> {
         <span class="ident">compress</span>: <span class="ident">bool</span>,
-        <span class="ident">shard</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">u64</span>; <span class="number">2</span>],
         <span class="ident">token</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>,
         <span class="ident">large_threshold</span>: <span class="ident">u8</span>,
+        <span class="ident">shard</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">ShardInfo</span>,
         <span class="ident">intents</span>: <span class="ident">GatewayIntents</span>,
         <span class="ident">properties</span>: <span class="ident">IdentifyProperties</span>,
     },
@@ -446,7 +446,7 @@
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">send_chunk_guild</span>(
         <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
         <span class="ident">guild_id</span>: <span class="ident">GuildId</span>,
-        <span class="ident">shard_info</span>: <span class="kw-2">&amp;</span>[<span class="ident">u64</span>; <span class="number">2</span>],
+        <span class="ident">shard_info</span>: <span class="kw-2">&amp;</span><span class="ident">ShardInfo</span>,
         <span class="ident">limit</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u16</span><span class="op">&gt;</span>,
         <span class="ident">filter</span>: <span class="ident">ChunkGuildFilter</span>,
         <span class="ident">nonce</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span>,
@@ -473,7 +473,7 @@
     }
 
     <span class="attribute">#[<span class="ident">instrument</span>(<span class="ident">skip</span>(<span class="self">self</span>))]</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">send_heartbeat</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">shard_info</span>: <span class="kw-2">&amp;</span>[<span class="ident">u64</span>; <span class="number">2</span>], <span class="ident">seq</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">send_heartbeat</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">shard_info</span>: <span class="kw-2">&amp;</span><span class="ident">ShardInfo</span>, <span class="ident">seq</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="macro">trace!</span>(<span class="string">&quot;[Shard {:?}] Sending heartbeat d: {:?}&quot;</span>, <span class="ident">shard_info</span>, <span class="ident">seq</span>);
 
         <span class="self">self</span>.<span class="ident">send_json</span>(<span class="kw-2">&amp;</span><span class="ident">WebSocketMessage</span> {
@@ -486,7 +486,7 @@
     <span class="attribute">#[<span class="ident">instrument</span>(<span class="ident">skip</span>(<span class="self">self</span>, <span class="ident">token</span>))]</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">send_identify</span>(
         <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
-        <span class="ident">shard</span>: <span class="kw-2">&amp;</span>[<span class="ident">u64</span>; <span class="number">2</span>],
+        <span class="ident">shard</span>: <span class="kw-2">&amp;</span><span class="ident">ShardInfo</span>,
         <span class="ident">token</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
         <span class="ident">intents</span>: <span class="ident">GatewayIntents</span>,
     ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
@@ -514,7 +514,7 @@
     <span class="attribute">#[<span class="ident">instrument</span>(<span class="ident">skip</span>(<span class="self">self</span>))]</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">send_presence_update</span>(
         <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
-        <span class="ident">shard_info</span>: <span class="kw-2">&amp;</span>[<span class="ident">u64</span>; <span class="number">2</span>],
+        <span class="ident">shard_info</span>: <span class="kw-2">&amp;</span><span class="ident">ShardInfo</span>,
         <span class="ident">current_presence</span>: <span class="kw-2">&amp;</span><span class="ident">CurrentPresence</span>,
     ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">&amp;</span>(<span class="kw-2">ref</span> <span class="ident">activity</span>, <span class="kw-2">ref</span> <span class="ident">status</span>) <span class="op">=</span> <span class="ident">current_presence</span>;
@@ -541,7 +541,7 @@
     <span class="attribute">#[<span class="ident">instrument</span>(<span class="ident">skip</span>(<span class="self">self</span>, <span class="ident">token</span>))]</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">send_resume</span>(
         <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
-        <span class="ident">shard_info</span>: <span class="kw-2">&amp;</span>[<span class="ident">u64</span>; <span class="number">2</span>],
+        <span class="ident">shard_info</span>: <span class="kw-2">&amp;</span><span class="ident">ShardInfo</span>,
         <span class="ident">session_id</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
         <span class="ident">seq</span>: <span class="ident">u64</span>,
         <span class="ident">token</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,

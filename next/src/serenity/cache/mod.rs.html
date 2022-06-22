@@ -1321,7 +1321,7 @@
     <span class="doccomment">/// other users.</span>
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">private_channels</span>: <span class="ident">DashMap</span><span class="op">&lt;</span><span class="ident">ChannelId</span>, <span class="ident">PrivateChannel</span><span class="op">&gt;</span>,
     <span class="doccomment">/// The total number of shards being used by the bot.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">shard_count</span>: <span class="ident">RwLock</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">shard_count</span>: <span class="ident">RwLock</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
     <span class="doccomment">/// A list of guilds which are &quot;unavailable&quot;.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// Additionally, guilds are always unavailable for bot users when a Ready</span>
@@ -1827,7 +1827,7 @@
 
     <span class="doccomment">/// Returns the number of shards.</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">shard_count</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u64</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">shard_count</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u32</span> {
         <span class="kw-2">*</span><span class="self">self</span>.<span class="ident">shard_count</span>.<span class="ident">read</span>()
     }
 

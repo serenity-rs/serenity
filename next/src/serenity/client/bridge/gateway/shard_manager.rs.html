@@ -472,11 +472,11 @@
     <span class="doccomment">/// where possible.</span>
     <span class="kw">pub</span> <span class="ident">runners</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Mutex</span><span class="op">&lt;</span><span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">ShardId</span>, <span class="ident">ShardRunnerInfo</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>,
     <span class="doccomment">/// The index of the first shard to initialize, 0-indexed.</span>
-    <span class="ident">shard_index</span>: <span class="ident">u64</span>,
+    <span class="ident">shard_index</span>: <span class="ident">u32</span>,
     <span class="doccomment">/// The number of shards to initialize.</span>
-    <span class="ident">shard_init</span>: <span class="ident">u64</span>,
+    <span class="ident">shard_init</span>: <span class="ident">u32</span>,
     <span class="doccomment">/// The total shards in use, 1-indexed.</span>
-    <span class="ident">shard_total</span>: <span class="ident">u64</span>,
+    <span class="ident">shard_total</span>: <span class="ident">u32</span>,
     <span class="ident">shard_queuer</span>: <span class="ident">Sender</span><span class="op">&lt;</span><span class="ident">ShardQueuerMessage</span><span class="op">&gt;</span>,
     <span class="ident">shard_shutdown</span>: <span class="ident">Receiver</span><span class="op">&lt;</span><span class="ident">ShardId</span><span class="op">&gt;</span>,
 }
@@ -563,7 +563,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// This will _not_ instantiate the new shards.</span>
     <span class="attribute">#[<span class="ident">instrument</span>(<span class="ident">skip</span>(<span class="self">self</span>))]</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">set_shards</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">index</span>: <span class="ident">u64</span>, <span class="ident">init</span>: <span class="ident">u64</span>, <span class="ident">total</span>: <span class="ident">u64</span>) {
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">set_shards</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">index</span>: <span class="ident">u32</span>, <span class="ident">init</span>: <span class="ident">u32</span>, <span class="ident">total</span>: <span class="ident">u32</span>) {
         <span class="self">self</span>.<span class="ident">shutdown_all</span>().<span class="kw">await</span>;
 
         <span class="self">self</span>.<span class="ident">shard_index</span> <span class="op">=</span> <span class="ident">index</span>;
@@ -718,9 +718,9 @@
     <span class="kw">pub</span> <span class="ident">raw_event_handler</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">RawEventHandler</span><span class="op">&gt;</span><span class="op">&gt;</span>,
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;framework&quot;</span>)]</span>
     <span class="kw">pub</span> <span class="ident">framework</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">Framework</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span> <span class="ident">shard_index</span>: <span class="ident">u64</span>,
-    <span class="kw">pub</span> <span class="ident">shard_init</span>: <span class="ident">u64</span>,
-    <span class="kw">pub</span> <span class="ident">shard_total</span>: <span class="ident">u64</span>,
+    <span class="kw">pub</span> <span class="ident">shard_index</span>: <span class="ident">u32</span>,
+    <span class="kw">pub</span> <span class="ident">shard_init</span>: <span class="ident">u32</span>,
+    <span class="kw">pub</span> <span class="ident">shard_total</span>: <span class="ident">u32</span>,
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;voice&quot;</span>)]</span>
     <span class="kw">pub</span> <span class="ident">voice_manager</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">VoiceGatewayManager</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="lifetime">&#39;static</span><span class="op">&gt;</span><span class="op">&gt;</span>,
     <span class="kw">pub</span> <span class="ident">ws_url</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Mutex</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span><span class="op">&gt;</span>,

@@ -837,7 +837,7 @@
                 <span class="kw">let</span> <span class="ident">e</span> <span class="op">=</span> <span class="ident">ClientEvent::ShardStageUpdate</span>(<span class="ident">ShardStageUpdateEvent</span> {
                     <span class="ident">new</span>: <span class="ident">post</span>,
                     <span class="ident">old</span>: <span class="ident">pre</span>,
-                    <span class="ident">shard_id</span>: <span class="ident">ShardId</span>(<span class="self">self</span>.<span class="ident">shard</span>.<span class="ident">shard_info</span>()[<span class="number">0</span>]),
+                    <span class="ident">shard_id</span>: <span class="ident">ShardId</span>(<span class="self">self</span>.<span class="ident">shard</span>.<span class="ident">shard_info</span>().<span class="ident">id</span>),
                 });
 
                 <span class="self">self</span>.<span class="ident">dispatch</span>(<span class="ident">DispatchEvent::Client</span>(<span class="ident">e</span>)).<span class="kw">await</span>;
@@ -991,7 +991,7 @@
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">checked_shutdown</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">id</span>: <span class="ident">ShardId</span>, <span class="ident">close_code</span>: <span class="ident">u16</span>) -&gt; <span class="ident">bool</span> {
         <span class="comment">// First verify the ID so we know for certain this runner is</span>
         <span class="comment">// to shutdown.</span>
-        <span class="kw">if</span> <span class="ident">id</span>.<span class="number">0</span> <span class="op">!</span><span class="op">=</span> <span class="self">self</span>.<span class="ident">shard</span>.<span class="ident">shard_info</span>()[<span class="number">0</span>] {
+        <span class="kw">if</span> <span class="ident">id</span>.<span class="number">0</span> <span class="op">!</span><span class="op">=</span> <span class="self">self</span>.<span class="ident">shard</span>.<span class="ident">shard_info</span>().<span class="ident">id</span> {
             <span class="comment">// Not meant for this runner for some reason, don&#39;t</span>
             <span class="comment">// shutdown.</span>
             <span class="kw">return</span> <span class="bool-val">true</span>;
@@ -1047,7 +1047,7 @@
             <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">event_handler</span>,
             <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">raw_event_handler</span>,
             <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">runner_tx</span>,
-            <span class="self">self</span>.<span class="ident">shard</span>.<span class="ident">shard_info</span>()[<span class="number">0</span>],
+            <span class="self">self</span>.<span class="ident">shard</span>.<span class="ident">shard_info</span>().<span class="ident">id</span>,
             <span class="ident">Arc::clone</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">cache_and_http</span>),
         )
         .<span class="kw">await</span>;
@@ -1185,7 +1185,7 @@
             <span class="kw">match</span> <span class="kw-2">*</span><span class="ident">event</span> {
                 <span class="ident">Event::Ready</span>(<span class="kw">_</span>) =&gt; {
                     <span class="ident">voice_manager</span>
-                        .<span class="ident">register_shard</span>(<span class="self">self</span>.<span class="ident">shard</span>.<span class="ident">shard_info</span>()[<span class="number">0</span>], <span class="self">self</span>.<span class="ident">runner_tx</span>.<span class="ident">clone</span>())
+                        .<span class="ident">register_shard</span>(<span class="self">self</span>.<span class="ident">shard</span>.<span class="ident">shard_info</span>().<span class="ident">id</span>, <span class="self">self</span>.<span class="ident">runner_tx</span>.<span class="ident">clone</span>())
                         .<span class="kw">await</span>;
                 },
                 <span class="ident">Event::VoiceServerUpdate</span>(<span class="kw-2">ref</span> <span class="ident">event</span>) =&gt; {
@@ -1343,7 +1343,7 @@
         <span class="self">self</span>.<span class="ident">update_manager</span>();
 
         <span class="macro">debug!</span>(<span class="string">&quot;[ShardRunner {:?}] Requesting restart&quot;</span>, <span class="self">self</span>.<span class="ident">shard</span>.<span class="ident">shard_info</span>(),);
-        <span class="kw">let</span> <span class="ident">shard_id</span> <span class="op">=</span> <span class="ident">ShardId</span>(<span class="self">self</span>.<span class="ident">shard</span>.<span class="ident">shard_info</span>()[<span class="number">0</span>]);
+        <span class="kw">let</span> <span class="ident">shard_id</span> <span class="op">=</span> <span class="ident">ShardId</span>(<span class="self">self</span>.<span class="ident">shard</span>.<span class="ident">shard_info</span>().<span class="ident">id</span>);
         <span class="kw">let</span> <span class="ident">msg</span> <span class="op">=</span> <span class="ident">ShardManagerMessage::Restart</span>(<span class="ident">shard_id</span>);
 
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Err</span>(<span class="ident">error</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">manager_tx</span>.<span class="ident">unbounded_send</span>(<span class="ident">msg</span>) {
@@ -1361,7 +1361,7 @@
     <span class="attribute">#[<span class="ident">instrument</span>(<span class="ident">skip</span>(<span class="self">self</span>))]</span>
     <span class="kw">fn</span> <span class="ident">update_manager</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) {
         <span class="ident">drop</span>(<span class="self">self</span>.<span class="ident">manager_tx</span>.<span class="ident">unbounded_send</span>(<span class="ident">ShardManagerMessage::ShardUpdate</span> {
-            <span class="ident">id</span>: <span class="ident">ShardId</span>(<span class="self">self</span>.<span class="ident">shard</span>.<span class="ident">shard_info</span>()[<span class="number">0</span>]),
+            <span class="ident">id</span>: <span class="ident">ShardId</span>(<span class="self">self</span>.<span class="ident">shard</span>.<span class="ident">shard_info</span>().<span class="ident">id</span>),
             <span class="ident">latency</span>: <span class="self">self</span>.<span class="ident">shard</span>.<span class="ident">latency</span>(),
             <span class="ident">stage</span>: <span class="self">self</span>.<span class="ident">shard</span>.<span class="ident">stage</span>(),
         }));

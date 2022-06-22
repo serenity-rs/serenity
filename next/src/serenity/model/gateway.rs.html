@@ -847,8 +847,46 @@
 <span id="842">842</span>
 <span id="843">843</span>
 <span id="844">844</span>
+<span id="845">845</span>
+<span id="846">846</span>
+<span id="847">847</span>
+<span id="848">848</span>
+<span id="849">849</span>
+<span id="850">850</span>
+<span id="851">851</span>
+<span id="852">852</span>
+<span id="853">853</span>
+<span id="854">854</span>
+<span id="855">855</span>
+<span id="856">856</span>
+<span id="857">857</span>
+<span id="858">858</span>
+<span id="859">859</span>
+<span id="860">860</span>
+<span id="861">861</span>
+<span id="862">862</span>
+<span id="863">863</span>
+<span id="864">864</span>
+<span id="865">865</span>
+<span id="866">866</span>
+<span id="867">867</span>
+<span id="868">868</span>
+<span id="869">869</span>
+<span id="870">870</span>
+<span id="871">871</span>
+<span id="872">872</span>
+<span id="873">873</span>
+<span id="874">874</span>
+<span id="875">875</span>
+<span id="876">876</span>
+<span id="877">877</span>
+<span id="878">878</span>
+<span id="879">879</span>
+<span id="880">880</span>
+<span id="881">881</span>
 </pre><pre class="rust"><code><span class="doccomment">//! Models pertaining to the gateway.</span>
 
+<span class="kw">use</span> <span class="ident">serde::ser::SerializeSeq</span>;
 <span class="kw">use</span> <span class="ident">url::Url</span>;
 
 <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::prelude</span>::<span class="kw-2">*</span>;
@@ -868,7 +906,7 @@
     <span class="kw">pub</span> <span class="ident">session_start_limit</span>: <span class="ident">SessionStartLimit</span>,
     <span class="doccomment">/// The number of shards that is recommended to be used by the current bot</span>
     <span class="doccomment">/// user.</span>
-    <span class="kw">pub</span> <span class="ident">shards</span>: <span class="ident">u64</span>,
+    <span class="kw">pub</span> <span class="ident">shards</span>: <span class="ident">u32</span>,
     <span class="doccomment">/// The gateway to connect to.</span>
     <span class="kw">pub</span> <span class="ident">url</span>: <span class="ident">String</span>,
 }
@@ -1333,7 +1371,7 @@
     <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">default</span>, <span class="ident">with</span> <span class="op">=</span> <span class="string">&quot;private_channels&quot;</span>)]</span>
     <span class="kw">pub</span> <span class="ident">private_channels</span>: <span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">ChannelId</span>, <span class="ident">Channel</span><span class="op">&gt;</span>,
     <span class="kw">pub</span> <span class="ident">session_id</span>: <span class="ident">String</span>,
-    <span class="kw">pub</span> <span class="ident">shard</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span>[<span class="ident">u64</span>; <span class="number">2</span>]<span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">shard</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ShardInfo</span><span class="op">&gt;</span>,
     <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">default</span>, <span class="ident">rename</span> <span class="op">=</span> <span class="string">&quot;_trace&quot;</span>)]</span>
     <span class="kw">pub</span> <span class="ident">trace</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
     <span class="kw">pub</span> <span class="ident">user</span>: <span class="ident">CurrentUser</span>,
@@ -1354,6 +1392,42 @@
     <span class="doccomment">/// The total number of session starts within the ratelimit period allowed.</span>
     <span class="kw">pub</span> <span class="ident">total</span>: <span class="ident">u64</span>,
 }
+
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Debug</span>)]</span>
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ShardInfo</span> {
+    <span class="kw">pub</span> <span class="ident">id</span>: <span class="ident">u32</span>,
+    <span class="kw">pub</span> <span class="ident">total</span>: <span class="ident">u32</span>,
+}
+
+<span class="kw">impl</span> <span class="ident">ShardInfo</span> {
+    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;client&quot;</span>)]</span>
+    <span class="attribute">#[<span class="ident">must_use</span>]</span>
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">id</span>: <span class="ident">u32</span>, <span class="ident">total</span>: <span class="ident">u32</span>) -&gt; <span class="self">Self</span> {
+        <span class="self">Self</span> {
+            <span class="ident">id</span>,
+            <span class="ident">total</span>,
+        }
+    }
+}
+
+<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="ident">serde::Deserialize</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">ShardInfo</span> {
+    <span class="kw">fn</span> <span class="ident">deserialize</span><span class="op">&lt;</span><span class="ident">D</span>: <span class="ident">serde::Deserializer</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">deserializer</span>: <span class="ident">D</span>) -&gt; <span class="ident">StdResult</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">D::Error</span><span class="op">&gt;</span> {
+        <span class="op">&lt;</span>(<span class="ident">u32</span>, <span class="ident">u32</span>)<span class="op">&gt;</span><span class="ident">::deserialize</span>(<span class="ident">deserializer</span>).<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">id</span>, <span class="ident">total</span>)<span class="op">|</span> <span class="ident">ShardInfo</span> {
+            <span class="ident">id</span>,
+            <span class="ident">total</span>,
+        })
+    }
+}
+
+<span class="kw">impl</span> <span class="ident">serde::Serialize</span> <span class="kw">for</span> <span class="ident">ShardInfo</span> {
+    <span class="kw">fn</span> <span class="ident">serialize</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">serde::Serializer</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">serializer</span>: <span class="ident">S</span>) -&gt; <span class="ident">StdResult</span><span class="op">&lt;</span><span class="ident">S::Ok</span>, <span class="ident">S::Error</span><span class="op">&gt;</span> {
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">seq</span> <span class="op">=</span> <span class="ident">serializer</span>.<span class="ident">serialize_seq</span>(<span class="prelude-val">Some</span>(<span class="number">2</span>))<span class="question-mark">?</span>;
+        <span class="ident">seq</span>.<span class="ident">serialize_element</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">id</span>)<span class="question-mark">?</span>;
+        <span class="ident">seq</span>.<span class="ident">serialize_element</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">total</span>)<span class="question-mark">?</span>;
+        <span class="ident">seq</span>.<span class="ident">end</span>()
+    }
+}
+
 <span class="doccomment">/// Timestamps of when a user started and/or is ending their activity.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
 <span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>

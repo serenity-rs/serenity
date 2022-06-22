@@ -977,6 +977,12 @@
 <span id="972">972</span>
 <span id="973">973</span>
 <span id="974">974</span>
+<span id="975">975</span>
+<span id="976">976</span>
+<span id="977">977</span>
+<span id="978">978</span>
+<span id="979">979</span>
+<span id="980">980</span>
 </pre><pre class="rust"><code><span class="doccomment">//! The Client contains information about a single bot&#39;s token, as well</span>
 <span class="doccomment">//! as event handlers. Dispatching events to configured handlers and starting</span>
 <span class="doccomment">//! the shards&#39; connections are handled directly via the client. In addition,</span>
@@ -1005,6 +1011,7 @@
 <span class="kw">mod</span> <span class="ident">event_handler</span>;
 
 <span class="kw">use</span> <span class="ident">std::future::Future</span>;
+<span class="kw">use</span> <span class="ident">std::ops::Range</span>;
 <span class="kw">use</span> <span class="ident">std::pin::Pin</span>;
 <span class="kw">use</span> <span class="ident">std::sync::Arc</span>;
 <span class="kw">use</span> <span class="ident">std::task</span>::{<span class="ident">Context</span> <span class="kw">as</span> <span class="ident">FutContext</span>, <span class="ident">Poll</span>};
@@ -1672,7 +1679,7 @@
     <span class="doccomment">/// [gateway docs]: crate::gateway#sharding</span>
     <span class="attribute">#[<span class="ident">instrument</span>(<span class="ident">skip</span>(<span class="self">self</span>))]</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">start</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">start_connection</span>([<span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>]).<span class="kw">await</span>
+        <span class="self">self</span>.<span class="ident">start_connection</span>(<span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>).<span class="kw">await</span>
     }
 
     <span class="doccomment">/// Establish the connection(s) and start listening for events.</span>
@@ -1720,13 +1727,13 @@
     <span class="doccomment">/// [gateway docs]: crate::gateway#sharding</span>
     <span class="attribute">#[<span class="ident">instrument</span>(<span class="ident">skip</span>(<span class="self">self</span>))]</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">start_autosharded</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="kw">let</span> (<span class="ident">x</span>, <span class="ident">y</span>) <span class="op">=</span> {
+        <span class="kw">let</span> (<span class="ident">end</span>, <span class="ident">total</span>) <span class="op">=</span> {
             <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">cache_and_http</span>.<span class="ident">http</span>.<span class="ident">get_bot_gateway</span>().<span class="kw">await</span><span class="question-mark">?</span>;
 
-            (<span class="ident">res</span>.<span class="ident">shards</span> <span class="kw">as</span> <span class="ident">u64</span> <span class="op">-</span> <span class="number">1</span>, <span class="ident">res</span>.<span class="ident">shards</span> <span class="kw">as</span> <span class="ident">u64</span>)
+            (<span class="ident">res</span>.<span class="ident">shards</span> <span class="op">-</span> <span class="number">1</span>, <span class="ident">res</span>.<span class="ident">shards</span>)
         };
 
-        <span class="self">self</span>.<span class="ident">start_connection</span>([<span class="number">0</span>, <span class="ident">x</span>, <span class="ident">y</span>]).<span class="kw">await</span>
+        <span class="self">self</span>.<span class="ident">start_connection</span>(<span class="number">0</span>, <span class="ident">end</span>, <span class="ident">total</span>).<span class="kw">await</span>
     }
 
     <span class="doccomment">/// Establish a sharded connection and start listening for events.</span>
@@ -1797,8 +1804,8 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// [gateway docs]: crate::gateway#sharding</span>
     <span class="attribute">#[<span class="ident">instrument</span>(<span class="ident">skip</span>(<span class="self">self</span>))]</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">start_shard</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">shard</span>: <span class="ident">u64</span>, <span class="ident">shards</span>: <span class="ident">u64</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">start_connection</span>([<span class="ident">shard</span>, <span class="ident">shard</span>, <span class="ident">shards</span>]).<span class="kw">await</span>
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">start_shard</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">shard</span>: <span class="ident">u32</span>, <span class="ident">shards</span>: <span class="ident">u32</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+        <span class="self">self</span>.<span class="ident">start_connection</span>(<span class="ident">shard</span>, <span class="ident">shard</span>, <span class="ident">shards</span>).<span class="kw">await</span>
     }
 
     <span class="doccomment">/// Establish sharded connections and start listening for events.</span>
@@ -1845,8 +1852,8 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// [Gateway docs]: crate::gateway#sharding</span>
     <span class="attribute">#[<span class="ident">instrument</span>(<span class="ident">skip</span>(<span class="self">self</span>))]</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">start_shards</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">total_shards</span>: <span class="ident">u64</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">start_connection</span>([<span class="number">0</span>, <span class="ident">total_shards</span> <span class="op">-</span> <span class="number">1</span>, <span class="ident">total_shards</span>]).<span class="kw">await</span>
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">start_shards</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">total_shards</span>: <span class="ident">u32</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+        <span class="self">self</span>.<span class="ident">start_connection</span>(<span class="number">0</span>, <span class="ident">total_shards</span> <span class="op">-</span> <span class="number">1</span>, <span class="ident">total_shards</span>).<span class="kw">await</span>
     }
 
     <span class="doccomment">/// Establish a range of sharded connections and start listening for events.</span>
@@ -1880,7 +1887,7 @@
     <span class="doccomment">/// let mut client =</span>
     <span class="doccomment">///     Client::builder(&amp;token, GatewayIntents::default()).event_handler(Handler).await?;</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// if let Err(why) = client.start_shard_range([4, 7], 10).await {</span>
+    <span class="doccomment">/// if let Err(why) = client.start_shard_range(4..7, 10).await {</span>
     <span class="doccomment">///     println!(&quot;Err with client: {:?}&quot;, why);</span>
     <span class="doccomment">/// }</span>
     <span class="doccomment">/// # Ok(())</span>
@@ -1894,8 +1901,8 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// [Gateway docs]: crate::gateway#sharding</span>
     <span class="attribute">#[<span class="ident">instrument</span>(<span class="ident">skip</span>(<span class="self">self</span>))]</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">start_shard_range</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">range</span>: [<span class="ident">u64</span>; <span class="number">2</span>], <span class="ident">total_shards</span>: <span class="ident">u64</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">start_connection</span>([<span class="ident">range</span>[<span class="number">0</span>], <span class="ident">range</span>[<span class="number">1</span>], <span class="ident">total_shards</span>]).<span class="kw">await</span>
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">start_shard_range</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">range</span>: <span class="ident">Range</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>, <span class="ident">total_shards</span>: <span class="ident">u32</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+        <span class="self">self</span>.<span class="ident">start_connection</span>(<span class="ident">range</span>.<span class="ident">start</span>, <span class="ident">range</span>.<span class="ident">end</span>, <span class="ident">total_shards</span>).<span class="kw">await</span>
     }
 
     <span class="doccomment">/// Shard data layout is:</span>
@@ -1910,22 +1917,27 @@
     <span class="doccomment">/// Returns a [`ClientError::Shutdown`] when all shards have shutdown due to</span>
     <span class="doccomment">/// an error.</span>
     <span class="attribute">#[<span class="ident">instrument</span>(<span class="ident">skip</span>(<span class="self">self</span>))]</span>
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">start_connection</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">shard_data</span>: [<span class="ident">u64</span>; <span class="number">3</span>]) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">start_connection</span>(
+        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
+        <span class="ident">start_shard</span>: <span class="ident">u32</span>,
+        <span class="ident">end_shard</span>: <span class="ident">u32</span>,
+        <span class="ident">total_shards</span>: <span class="ident">u32</span>,
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;voice&quot;</span>)]</span>
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">voice_manager</span>) <span class="op">=</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">voice_manager</span> {
             <span class="kw">let</span> <span class="ident">user</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">cache_and_http</span>.<span class="ident">http</span>.<span class="ident">get_current_user</span>().<span class="kw">await</span><span class="question-mark">?</span>;
 
-            <span class="ident">voice_manager</span>.<span class="ident">initialise</span>(<span class="ident">shard_data</span>[<span class="number">2</span>], <span class="ident">user</span>.<span class="ident">id</span>).<span class="kw">await</span>;
+            <span class="ident">voice_manager</span>.<span class="ident">initialise</span>(<span class="ident">total_shards</span>, <span class="ident">user</span>.<span class="ident">id</span>).<span class="kw">await</span>;
         }
 
         {
             <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">manager</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">shard_manager</span>.<span class="ident">lock</span>().<span class="kw">await</span>;
 
-            <span class="kw">let</span> <span class="ident">init</span> <span class="op">=</span> <span class="ident">shard_data</span>[<span class="number">1</span>] <span class="op">-</span> <span class="ident">shard_data</span>[<span class="number">0</span>] <span class="op">+</span> <span class="number">1</span>;
+            <span class="kw">let</span> <span class="ident">init</span> <span class="op">=</span> <span class="ident">end_shard</span> <span class="op">-</span> <span class="ident">start_shard</span> <span class="op">+</span> <span class="number">1</span>;
 
-            <span class="ident">manager</span>.<span class="ident">set_shards</span>(<span class="ident">shard_data</span>[<span class="number">0</span>], <span class="ident">init</span>, <span class="ident">shard_data</span>[<span class="number">2</span>]).<span class="kw">await</span>;
+            <span class="ident">manager</span>.<span class="ident">set_shards</span>(<span class="ident">start_shard</span>, <span class="ident">init</span>, <span class="ident">total_shards</span>).<span class="kw">await</span>;
 
-            <span class="macro">debug!</span>(<span class="string">&quot;Initializing shard info: {} - {}/{}&quot;</span>, <span class="ident">shard_data</span>[<span class="number">0</span>], <span class="ident">init</span>, <span class="ident">shard_data</span>[<span class="number">2</span>],);
+            <span class="macro">debug!</span>(<span class="string">&quot;Initializing shard info: {} - {}/{}&quot;</span>, <span class="ident">start_shard</span>, <span class="ident">init</span>, <span class="ident">total_shards</span>);
 
             <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Err</span>(<span class="ident">why</span>) <span class="op">=</span> <span class="ident">manager</span>.<span class="ident">initialize</span>() {
                 <span class="macro">error!</span>(<span class="string">&quot;Failed to boot a shard: {:?}&quot;</span>, <span class="ident">why</span>);

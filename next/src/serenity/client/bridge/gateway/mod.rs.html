@@ -285,10 +285,10 @@
     <span class="ident">ShutdownShard</span>(<span class="ident">ShardId</span>, <span class="ident">u16</span>),
 }
 
-<span class="doccomment">/// A light tuplestruct wrapper around a u64 to verify type correctness when</span>
+<span class="doccomment">/// A light tuplestruct wrapper around a u32 to verify type correctness when</span>
 <span class="doccomment">/// working with the IDs of shards.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>, <span class="ident">Ord</span>, <span class="ident">PartialEq</span>, <span class="ident">PartialOrd</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ShardId</span>(<span class="kw">pub</span> <span class="ident">u64</span>);
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ShardId</span>(<span class="kw">pub</span> <span class="ident">u32</span>);
 
 <span class="kw">impl</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">ShardId</span> {
     <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {

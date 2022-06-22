@@ -857,7 +857,7 @@
 <span class="kw">fn</span> <span class="ident">context</span>(
     <span class="ident">data</span>: <span class="kw-2">&amp;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">RwLock</span><span class="op">&lt;</span><span class="ident">TypeMap</span><span class="op">&gt;</span><span class="op">&gt;</span>,
     <span class="ident">runner_tx</span>: <span class="kw-2">&amp;</span><span class="ident">Sender</span><span class="op">&lt;</span><span class="ident">InterMessage</span><span class="op">&gt;</span>,
-    <span class="ident">shard_id</span>: <span class="ident">u64</span>,
+    <span class="ident">shard_id</span>: <span class="ident">u32</span>,
     <span class="ident">http</span>: <span class="kw-2">&amp;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>,
     <span class="ident">cache</span>: <span class="kw-2">&amp;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Cache</span><span class="op">&gt;</span>,
 ) -&gt; <span class="ident">Context</span> {
@@ -868,7 +868,7 @@
 <span class="kw">fn</span> <span class="ident">context</span>(
     <span class="ident">data</span>: <span class="kw-2">&amp;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">RwLock</span><span class="op">&lt;</span><span class="ident">TypeMap</span><span class="op">&gt;</span><span class="op">&gt;</span>,
     <span class="ident">runner_tx</span>: <span class="kw-2">&amp;</span><span class="ident">Sender</span><span class="op">&lt;</span><span class="ident">InterMessage</span><span class="op">&gt;</span>,
-    <span class="ident">shard_id</span>: <span class="ident">u64</span>,
+    <span class="ident">shard_id</span>: <span class="ident">u32</span>,
     <span class="ident">http</span>: <span class="kw-2">&amp;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>,
 ) -&gt; <span class="ident">Context</span> {
     <span class="ident">Context::new</span>(<span class="ident">Arc::clone</span>(<span class="ident">data</span>), <span class="ident">runner_tx</span>.<span class="ident">clone</span>(), <span class="ident">shard_id</span>, <span class="ident">Arc::clone</span>(<span class="ident">http</span>))
@@ -971,7 +971,7 @@
     <span class="ident">event_handler</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;rec</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">EventHandler</span><span class="op">&gt;</span><span class="op">&gt;</span>,
     <span class="ident">raw_event_handler</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;rec</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">RawEventHandler</span><span class="op">&gt;</span><span class="op">&gt;</span>,
     <span class="ident">runner_tx</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;rec</span> <span class="ident">Sender</span><span class="op">&lt;</span><span class="ident">InterMessage</span><span class="op">&gt;</span>,
-    <span class="ident">shard_id</span>: <span class="ident">u64</span>,
+    <span class="ident">shard_id</span>: <span class="ident">u32</span>,
     <span class="ident">cache_and_http</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">CacheAndHttp</span><span class="op">&gt;</span>,
 ) -&gt; <span class="ident">BoxFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;rec</span>, ()<span class="op">&gt;</span> {
     <span class="kw">async</span> <span class="kw">move</span> {
@@ -1148,7 +1148,7 @@
     <span class="ident">data</span>: <span class="kw-2">&amp;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">RwLock</span><span class="op">&lt;</span><span class="ident">TypeMap</span><span class="op">&gt;</span><span class="op">&gt;</span>,
     <span class="ident">event_handler</span>: <span class="kw-2">&amp;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">EventHandler</span><span class="op">&gt;</span>,
     <span class="ident">runner_tx</span>: <span class="kw-2">&amp;</span><span class="ident">Sender</span><span class="op">&lt;</span><span class="ident">InterMessage</span><span class="op">&gt;</span>,
-    <span class="ident">shard_id</span>: <span class="ident">u64</span>,
+    <span class="ident">shard_id</span>: <span class="ident">u32</span>,
     <span class="ident">cache_and_http</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">CacheAndHttp</span><span class="op">&gt;</span>,
 ) {
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>))]</span>
