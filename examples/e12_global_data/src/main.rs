@@ -79,7 +79,7 @@ struct Handler;
 #[async_trait]
 impl EventHandler for Handler {
     async fn message(&self, ctx: Context, msg: Message) {
-        // We are verifying if the bot id is the same as the message author id
+        // We are verifying if the bot id is the same as the message author id.
         if msg.author.id != ctx.cache.current_user_id()
             && msg.content.to_lowercase().contains("owo")
         {
@@ -89,10 +89,13 @@ impl EventHandler for Handler {
                 data_read.get::<MessageCount>().expect("Expected MessageCount in TypeMap.").clone()
             };
 
+            // Here, we are checking how many "owo" there are in the message content.
+            let owo_in_msg = msg.content.to_ascii_lowercase().matches("owo").count();
+
             // Atomic operations with ordering do not require mut to be modified.
             // In this case, we want to increase the message count by 1.
             // https://doc.rust-lang.org/std/sync/atomic/struct.AtomicUsize.html#method.fetch_add
-            count.fetch_add(1, Ordering::SeqCst);
+            count.fetch_add(owo_in_msg, Ordering::SeqCst);
         }
     }
 
