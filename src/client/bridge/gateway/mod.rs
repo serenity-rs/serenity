@@ -123,10 +123,10 @@ pub enum ShardQueuerMessage {
     ShutdownShard(ShardId, u16),
 }
 
-/// A light tuplestruct wrapper around a u64 to verify type correctness when
+/// A light tuplestruct wrapper around a u32 to verify type correctness when
 /// working with the IDs of shards.
 #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
-pub struct ShardId(pub u64);
+pub struct ShardId(pub u32);
 
 impl fmt::Display for ShardId {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
