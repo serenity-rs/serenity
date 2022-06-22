@@ -91,11 +91,11 @@ impl EventHandler for Handler {
 
             // Here, we are checking how many "owo" there are in the message content.
             let owo_in_msg = msg.content.to_ascii_lowercase().matches("owo").count();
-            
+
             // Atomic operations with ordering do not require mut to be modified.
             // In this case, we want to increase the message count by 1.
             // https://doc.rust-lang.org/std/sync/atomic/struct.AtomicUsize.html#method.fetch_add
-                count.fetch_add(owo_in_msg, Ordering::SeqCst);
+            count.fetch_add(owo_in_msg, Ordering::SeqCst);
         }
     }
 
