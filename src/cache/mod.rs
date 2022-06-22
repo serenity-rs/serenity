@@ -175,7 +175,7 @@ pub struct Cache {
     /// other users.
     pub(crate) private_channels: DashMap<ChannelId, PrivateChannel>,
     /// The total number of shards being used by the bot.
-    pub(crate) shard_count: RwLock<u64>,
+    pub(crate) shard_count: RwLock<u32>,
     /// A list of guilds which are "unavailable".
     ///
     /// Additionally, guilds are always unavailable for bot users when a Ready
@@ -681,7 +681,7 @@ impl Cache {
 
     /// Returns the number of shards.
     #[inline]
-    pub fn shard_count(&self) -> u64 {
+    pub fn shard_count(&self) -> u32 {
         *self.shard_count.read()
     }
 

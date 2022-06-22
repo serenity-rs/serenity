@@ -26,6 +26,7 @@ mod error;
 mod event_handler;
 
 use std::future::Future;
+use std::ops::Range;
 use std::pin::Pin;
 use std::sync::Arc;
 use std::task::{Context as FutContext, Poll};
@@ -693,7 +694,7 @@ impl Client {
     /// [gateway docs]: crate::gateway#sharding
     #[instrument(skip(self))]
     pub async fn start(&mut self) -> Result<()> {
-        self.start_connection([0, 0, 1]).await
+        self.start_connection(0, 0, 1).await
     }
 
     /// Establish the connection(s) and start listening for events.
@@ -741,13 +742,13 @@ impl Client {
     /// [gateway docs]: crate::gateway#sharding
     #[instrument(skip(self))]
     pub async fn start_autosharded(&mut self) -> Result<()> {
-        let (x, y) = {
+        let (end, total) = {
             let res = self.cache_and_http.http.get_bot_gateway().await?;
 
-            (res.shards as u64 - 1, res.shards as u64)
+            (res.shards - 1, res.shards)
         };
 
-        self.start_connection([0, x, y]).await
+        self.start_connection(0, end, total).await
     }
 
     /// Establish a sharded connection and start listening for events.
@@ -818,8 +819,8 @@ impl Client {
     ///
     /// [gateway docs]: crate::gateway#sharding
     #[instrument(skip(self))]
-    pub async fn start_shard(&mut self, shard: u64, shards: u64) -> Result<()> {
-        self.start_connection([shard, shard, shards]).await
+    pub async fn start_shard(&mut self, shard: u32, shards: u32) -> Result<()> {
+        self.start_connection(shard, shard, shards).await
     }
 
     /// Establish sharded connections and start listening for events.
@@ -866,8 +867,8 @@ impl Client {
     ///
     /// [Gateway docs]: crate::gateway#sharding
     #[instrument(skip(self))]
-    pub async fn start_shards(&mut self, total_shards: u64) -> Result<()> {
-        self.start_connection([0, total_shards - 1, total_shards]).await
+    pub async fn start_shards(&mut self, total_shards: u32) -> Result<()> {
+        self.start_connection(0, total_shards - 1, total_shards).await
     }
 
     /// Establish a range of sharded connections and start listening for events.
@@ -901,7 +902,7 @@ impl Client {
     /// let mut client =
     ///     Client::builder(&token, GatewayIntents::default()).event_handler(Handler).await?;
     ///
-    /// if let Err(why) = client.start_shard_range([4, 7], 10).await {
+    /// if let Err(why) = client.start_shard_range(4..7, 10).await {
     ///     println!("Err with client: {:?}", why);
     /// }
     /// # Ok(())
@@ -915,8 +916,8 @@ impl Client {
     ///
     /// [Gateway docs]: crate::gateway#sharding
     #[instrument(skip(self))]
-    pub async fn start_shard_range(&mut self, range: [u64; 2], total_shards: u64) -> Result<()> {
-        self.start_connection([range[0], range[1], total_shards]).await
+    pub async fn start_shard_range(&mut self, range: Range<u32>, total_shards: u32) -> Result<()> {
+        self.start_connection(range.start, range.end, total_shards).await
     }
 
     /// Shard data layout is:
@@ -931,22 +932,27 @@ impl Client {
     /// Returns a [`ClientError::Shutdown`] when all shards have shutdown due to
     /// an error.
     #[instrument(skip(self))]
-    async fn start_connection(&mut self, shard_data: [u64; 3]) -> Result<()> {
+    async fn start_connection(
+        &mut self,
+        start_shard: u32,
+        end_shard: u32,
+        total_shards: u32,
+    ) -> Result<()> {
         #[cfg(feature = "voice")]
         if let Some(voice_manager) = &self.voice_manager {
             let user = self.cache_and_http.http.get_current_user().await?;
 
-            voice_manager.initialise(shard_data[2], user.id).await;
+            voice_manager.initialise(total_shards, user.id).await;
         }
 
         {
             let mut manager = self.shard_manager.lock().await;
 
-            let init = shard_data[1] - shard_data[0] + 1;
+            let init = end_shard - start_shard + 1;
 
-            manager.set_shards(shard_data[0], init, shard_data[2]).await;
+            manager.set_shards(start_shard, init, total_shards).await;
 
-            debug!("Initializing shard info: {} - {}/{}", shard_data[0], init, shard_data[2],);
+            debug!("Initializing shard info: {} - {}/{}", start_shard, init, total_shards);
 
             if let Err(why) = manager.initialize() {
                 error!("Failed to boot a shard: {:?}", why);
