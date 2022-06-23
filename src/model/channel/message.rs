@@ -1106,6 +1106,8 @@ pub enum MessageType {
     GuildInviteReminder = 22,
     /// A context menu command.
     ContextMenuCommand = 23,
+    /// A message from an auto moderation action.
+    AutoModerationAction = 24,
     /// An indicator that the message is of unknown type.
     Unknown = !0,
 }
@@ -1134,6 +1136,7 @@ enum_number!(MessageType {
     ThreadStarterMessage,
     GuildInviteReminder,
     ContextMenuCommand,
+    AutoModerationAction,
 });
 
 #[derive(Clone, Copy, Debug, Eq, Hash, PartialEq, PartialOrd, Ord)]
