@@ -188,7 +188,7 @@ impl CacheUpdate for GuildCreateEvent {
         for (user_id, member) in &mut guild.members {
             cache.update_user_entry(&member.user);
             if let Some(u) = cache.user(user_id) {
-                member.user = u;
+                member.user = u.clone();
             }
         }
 
@@ -266,7 +266,7 @@ impl CacheUpdate for GuildMemberAddEvent {
         let user_id = self.member.user.id;
         cache.update_user_entry(&self.member.user);
         if let Some(u) = cache.user(user_id) {
-            self.member.user = u;
+            self.member.user = u.clone();
         }
 
         if let Some(mut guild) = cache.guilds.get_mut(&self.member.guild_id) {
@@ -530,7 +530,7 @@ impl CacheUpdate for PresenceUpdateEvent {
         }
 
         if let Some(user) = cache.user(self.presence.user.id) {
-            self.presence.user.update_with_user(user);
+            self.presence.user.update_with_user(&user);
         }
 
         if let Some(guild_id) = self.presence.guild_id {
@@ -623,7 +623,7 @@ impl CacheUpdate for ReadyEvent {
                 cache.update_user_entry(&user);
             }
             if let Some(user) = cache.user(user_id) {
-                presence.user.update_with_user(user);
+                presence.user.update_with_user(&user);
             }
 
             cache.presences.insert(*user_id, presence.clone());
