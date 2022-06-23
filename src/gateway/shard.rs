@@ -7,13 +7,21 @@ use tokio::sync::Mutex;
 use tracing::{debug, error, info, instrument, trace, warn};
 use url::Url;
 
-use super::{ConnectionStage, CurrentPresence, GatewayError, ReconnectType, ShardAction, WsClient};
+use super::{
+    ActivityData,
+    ConnectionStage,
+    GatewayError,
+    PresenceData,
+    ReconnectType,
+    ShardAction,
+    WsClient,
+};
 use crate::client::bridge::gateway::ChunkGuildFilter;
 use crate::constants::{self, close_codes};
 use crate::http::Http;
 use crate::internal::prelude::*;
 use crate::model::event::{Event, GatewayEvent};
-use crate::model::gateway::{Activity, GatewayIntents, ShardInfo};
+use crate::model::gateway::{GatewayIntents, ShardInfo};
 use crate::model::id::GuildId;
 use crate::model::user::OnlineStatus;
 
@@ -51,7 +59,7 @@ use crate::model::user::OnlineStatus;
 /// [module docs]: crate::gateway#sharding
 pub struct Shard {
     pub client: WsClient,
-    current_presence: CurrentPresence,
+    presence: PresenceData,
     /// A tuple of:
     ///
     /// - the last instant that a heartbeat was sent
@@ -133,7 +141,7 @@ impl Shard {
         let url = ws_url.lock().await.clone();
         let client = connect(&url).await?;
 
-        let current_presence = (None, OnlineStatus::Online);
+        let presence = PresenceData::default();
         let heartbeat_instants = (None, None);
         let heartbeat_interval = None;
         let last_heartbeat_acknowledged = true;
@@ -143,7 +151,7 @@ impl Shard {
 
         Ok(Shard {
             client,
-            current_presence,
+            presence,
             heartbeat_instants,
             heartbeat_interval,
             http: None,
@@ -168,8 +176,8 @@ impl Shard {
 
     /// Retrieves the current presence of the shard.
     #[inline]
-    pub fn current_presence(&self) -> &CurrentPresence {
-        &self.current_presence
+    pub fn presence(&self) -> &PresenceData {
+        &self.presence
     }
 
     /// Retrieves the heartbeat instants of the shard.
@@ -250,13 +258,13 @@ impl Shard {
 
     #[inline]
     #[instrument(skip(self))]
-    pub fn set_activity(&mut self, activity: Option<Activity>) {
-        self.current_presence.0 = activity;
+    pub fn set_activity(&mut self, activity: Option<ActivityData>) {
+        self.presence.activity = activity;
     }
 
     #[inline]
     #[instrument(skip(self))]
-    pub fn set_presence(&mut self, status: OnlineStatus, activity: Option<Activity>) {
+    pub fn set_presence(&mut self, activity: Option<ActivityData>, status: OnlineStatus) {
         self.set_activity(activity);
         self.set_status(status);
     }
@@ -268,7 +276,7 @@ impl Shard {
             status = OnlineStatus::Invisible;
         }
 
-        self.current_presence.1 = status;
+        self.presence.status = status;
     }
 
     /// Retrieves a copy of the current shard information.
@@ -777,7 +785,7 @@ impl Shard {
 
     #[instrument(skip(self))]
     pub async fn update_presence(&mut self) -> Result<()> {
-        self.client.send_presence_update(&self.shard_info, &self.current_presence).await
+        self.client.send_presence_update(&self.shard_info, &self.presence).await
     }
 }
 

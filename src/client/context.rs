@@ -10,6 +10,7 @@ pub use crate::cache::Cache;
 use crate::client::bridge::gateway::ShardMessenger;
 #[cfg(feature = "collector")]
 use crate::collector::{ComponentInteractionFilter, MessageFilter, ReactionFilter};
+use crate::gateway::ActivityData;
 #[cfg(feature = "gateway")]
 use crate::gateway::InterMessage;
 use crate::http::Http;
@@ -277,10 +278,10 @@ impl Context {
     #[cfg(feature = "gateway")]
     #[inline]
     pub async fn reset_presence(&self) {
-        self.shard.set_presence(None::<Activity>, OnlineStatus::Online);
+        self.shard.set_presence(None, OnlineStatus::Online);
     }
 
-    /// Sets the current activity, defaulting to an online status of [`Online`].
+    /// Sets the current activity.
     ///
     /// # Examples
     ///
@@ -291,7 +292,7 @@ impl Context {
     /// # use serenity::prelude::*;
     /// # use serenity::model::channel::Message;
     /// #
-    /// use serenity::model::gateway::Activity;
+    /// use serenity::gateway::ActivityData;
     ///
     /// struct Handler;
     ///
@@ -301,7 +302,7 @@ impl Context {
     ///         let mut args = msg.content.splitn(2, ' ');
     ///
     ///         if let (Some("~setgame"), Some(game)) = (args.next(), args.next()) {
-    ///             ctx.set_activity(Activity::playing(game)).await;
+    ///             ctx.set_activity(Some(ActivityData::playing(game))).await;
     ///         }
     ///     }
     /// }
@@ -314,12 +315,10 @@ impl Context {
     /// #     Ok(())
     /// # }
     /// ```
-    ///
-    /// [`Online`]: OnlineStatus::Online
     #[cfg(feature = "gateway")]
     #[inline]
-    pub async fn set_activity(&self, activity: Activity) {
-        self.shard.set_presence(Some(activity), OnlineStatus::Online);
+    pub async fn set_activity(&self, activity: Option<ActivityData>) {
+        self.shard.set_activity(activity);
     }
 
     /// Sets the current user's presence, providing all fields to be passed.
@@ -364,10 +363,10 @@ impl Context {
     /// #[serenity::async_trait]
     /// impl EventHandler for Handler {
     ///     async fn ready(&self, context: Context, _: Ready) {
-    ///         use serenity::model::gateway::Activity;
+    ///         use serenity::gateway::ActivityData;
     ///         use serenity::model::user::OnlineStatus;
     ///
-    ///         let activity = Activity::playing("Heroes of the Storm");
+    ///         let activity = ActivityData::playing("Heroes of the Storm");
     ///         let status = OnlineStatus::DoNotDisturb;
     ///
     ///         context.set_presence(Some(activity), status);
@@ -387,7 +386,7 @@ impl Context {
     /// [`Idle`]: OnlineStatus::Idle
     #[cfg(feature = "gateway")]
     #[inline]
-    pub async fn set_presence(&self, activity: Option<Activity>, status: OnlineStatus) {
+    pub async fn set_presence(&self, activity: Option<ActivityData>, status: OnlineStatus) {
         self.shard.set_presence(activity, status);
     }
 
