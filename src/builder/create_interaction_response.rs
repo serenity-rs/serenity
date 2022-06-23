@@ -57,15 +57,7 @@ impl<'a> CreateInteractionResponse<'a> {
     }
 
     /// Sets the `InteractionApplicationCommandCallbackData` for the message.
-    pub fn interaction_response_data<F>(mut self, f: F) -> Self
-    where
-        for<'b> F: FnOnce(
-            &'b mut CreateInteractionResponseData<'a>,
-        ) -> &'b mut CreateInteractionResponseData<'a>,
-    {
-        let mut data = CreateInteractionResponseData::default();
-        f(&mut data);
-
+    pub fn interaction_response_data(mut self, data: CreateInteractionResponseData<'a>) -> Self {
         self.data = Some(data);
         self
     }
@@ -117,6 +109,7 @@ impl<'a> CreateInteractionResponse<'a> {
 }
 
 #[derive(Clone, Debug, Default, Serialize)]
+#[must_use]
 pub struct CreateInteractionResponseData<'a> {
     embeds: Vec<CreateEmbed>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -144,22 +137,22 @@ impl<'a> CreateInteractionResponseData<'a> {
     /// Think carefully before setting this to `true`.
     ///
     /// Defaults to `false`.
-    pub fn tts(&mut self, tts: bool) -> &mut Self {
+    pub fn tts(mut self, tts: bool) -> Self {
         self.tts = Some(tts);
         self
     }
 
     /// Appends a file to the message.
-    pub fn add_file<T: Into<AttachmentType<'a>>>(&mut self, file: T) -> &mut Self {
+    pub fn add_file<T: Into<AttachmentType<'a>>>(mut self, file: T) -> Self {
         self.files.push(file.into());
         self
     }
 
     /// Appends a list of files to the message.
     pub fn add_files<T: Into<AttachmentType<'a>>, It: IntoIterator<Item = T>>(
-        &mut self,
+        mut self,
         files: It,
-    ) -> &mut Self {
+    ) -> Self {
         self.files.extend(files.into_iter().map(Into::into));
         self
     }
@@ -169,9 +162,9 @@ impl<'a> CreateInteractionResponseData<'a> {
     /// Calling this multiple times will overwrite the file list.
     /// To append files, call [`Self::add_file`] or [`Self::add_files`] instead.
     pub fn files<T: Into<AttachmentType<'a>>, It: IntoIterator<Item = T>>(
-        &mut self,
+        mut self,
         files: It,
-    ) -> &mut Self {
+    ) -> Self {
         self.files = files.into_iter().map(Into::into).collect();
         self
     }
@@ -180,13 +173,13 @@ impl<'a> CreateInteractionResponseData<'a> {
     ///
     /// **Note**: Message contents must be under 2000 unicode code points.
     #[inline]
-    pub fn content(&mut self, content: impl Into<String>) -> &mut Self {
+    pub fn content(mut self, content: impl Into<String>) -> Self {
         self.content = Some(content.into());
         self
     }
 
     /// Create an embed for the message.
-    pub fn embed<F>(&mut self, f: F) -> &mut Self
+    pub fn embed<F>(self, f: F) -> Self
     where
         F: FnOnce(&mut CreateEmbed) -> &mut CreateEmbed,
     {
@@ -196,13 +189,13 @@ impl<'a> CreateInteractionResponseData<'a> {
     }
 
     /// Adds an embed to the message.
-    pub fn add_embed(&mut self, embed: CreateEmbed) -> &mut Self {
+    pub fn add_embed(mut self, embed: CreateEmbed) -> Self {
         self.embeds.push(embed);
         self
     }
 
     /// Adds multiple embeds for the message.
-    pub fn add_embeds(&mut self, embeds: Vec<CreateEmbed>) -> &mut Self {
+    pub fn add_embeds(mut self, embeds: Vec<CreateEmbed>) -> Self {
         self.embeds.extend(embeds);
         self
     }
@@ -211,22 +204,21 @@ impl<'a> CreateInteractionResponseData<'a> {
     ///
     /// Calling this will overwrite the embed list.
     /// To append embeds, call [`Self::add_embed`] instead.
-    pub fn set_embed(&mut self, embed: CreateEmbed) -> &mut Self {
-        self.set_embeds(vec![embed]);
-        self
+    pub fn set_embed(self, embed: CreateEmbed) -> Self {
+        self.set_embeds(vec![embed])
     }
 
     /// Sets a list of embeds to include in the message.
     ///
     /// Calling this multiple times will overwrite the embed list.
     /// To append embeds, call [`Self::add_embed`] instead.
-    pub fn set_embeds(&mut self, embeds: Vec<CreateEmbed>) -> &mut Self {
+    pub fn set_embeds(mut self, embeds: Vec<CreateEmbed>) -> Self {
         self.embeds = embeds.into_iter().collect();
         self
     }
 
     /// Set the allowed mentions for the message.
-    pub fn allowed_mentions<F>(&mut self, f: F) -> &mut Self
+    pub fn allowed_mentions<F>(mut self, f: F) -> Self
     where
         F: FnOnce(&mut CreateAllowedMentions) -> &mut CreateAllowedMentions,
     {
@@ -238,13 +230,13 @@ impl<'a> CreateInteractionResponseData<'a> {
     }
 
     /// Sets the flags for the message.
-    pub fn flags(&mut self, flags: MessageFlags) -> &mut Self {
+    pub fn flags(mut self, flags: MessageFlags) -> Self {
         self.flags = Some(flags);
         self
     }
 
     /// Adds or removes the ephemeral flag
-    pub fn ephemeral(&mut self, ephemeral: bool) -> &mut Self {
+    pub fn ephemeral(mut self, ephemeral: bool) -> Self {
         let flags = self.flags.unwrap_or_else(MessageFlags::empty);
 
         let flags = if ephemeral {
@@ -258,7 +250,7 @@ impl<'a> CreateInteractionResponseData<'a> {
     }
 
     /// Creates components for this message.
-    pub fn components<F>(&mut self, f: F) -> &mut Self
+    pub fn components<F>(self, f: F) -> Self
     where
         F: FnOnce(&mut CreateComponents) -> &mut CreateComponents,
     {
@@ -269,19 +261,19 @@ impl<'a> CreateInteractionResponseData<'a> {
     }
 
     /// Sets the components of this message.
-    pub fn set_components(&mut self, components: CreateComponents) -> &mut Self {
+    pub fn set_components(mut self, components: CreateComponents) -> Self {
         self.components = Some(components);
         self
     }
 
     /// Sets the custom id for modal interactions
-    pub fn custom_id(&mut self, id: impl Into<String>) -> &mut Self {
+    pub fn custom_id(mut self, id: impl Into<String>) -> Self {
         self.custom_id = Some(id.into());
         self
     }
 
     /// Sets the title for modal interactions
-    pub fn title(&mut self, title: impl Into<String>) -> &mut Self {
+    pub fn title(mut self, title: impl Into<String>) -> Self {
         self.title = Some(title.into());
         self
     }
