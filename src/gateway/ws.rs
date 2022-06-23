@@ -12,12 +12,13 @@ use tokio::time::{timeout, Duration};
 use tracing::{debug, instrument, trace, warn};
 use url::Url;
 
+use super::{ActivityData, PresenceData};
 use crate::client::bridge::gateway::ChunkGuildFilter;
 use crate::constants::{self, Opcode};
-use crate::gateway::{CurrentPresence, GatewayError};
+use crate::gateway::GatewayError;
 use crate::json::{from_str, to_string};
 use crate::model::event::GatewayEvent;
-use crate::model::gateway::{ActivityType, GatewayIntents, ShardInfo};
+use crate::model::gateway::{GatewayIntents, ShardInfo};
 use crate::model::id::{GuildId, UserId};
 use crate::{Error, Result};
 
@@ -26,14 +27,6 @@ struct IdentifyProperties {
     browser: &'static str,
     device: &'static str,
     os: &'static str,
-}
-
-#[derive(Serialize)]
-struct ActivityData<'a> {
-    #[serde(rename = "type")]
-    kind: ActivityType,
-    url: &'a Option<Url>,
-    name: &'a str,
 }
 
 #[derive(Serialize)]
@@ -64,7 +57,7 @@ enum WebSocketMessageData<'a> {
         afk: bool,
         status: &'a str,
         since: SystemTime,
-        game: Option<ActivityData<'a>>,
+        activities: &'a [&'a ActivityData],
     },
     Resume {
         session_id: &'a str,
@@ -232,9 +225,9 @@ impl WsClient {
     pub async fn send_presence_update(
         &mut self,
         shard_info: &ShardInfo,
-        current_presence: &CurrentPresence,
+        presence: &PresenceData,
     ) -> Result<()> {
-        let &(ref activity, ref status) = current_presence;
+        let activities: Vec<_> = presence.activity.iter().collect();
         let now = SystemTime::now();
 
         debug!("[Shard {:?}] Sending presence update", shard_info);
@@ -244,12 +237,8 @@ impl WsClient {
             d: WebSocketMessageData::PresenceUpdate {
                 afk: false,
                 since: now,
-                status: status.name(),
-                game: activity.as_ref().map(|x| ActivityData {
-                    name: &x.name,
-                    kind: x.kind,
-                    url: &x.url,
-                }),
+                status: presence.status.name(),
+                activities: &activities,
             },
         })
         .await
