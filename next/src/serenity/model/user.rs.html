@@ -1387,11 +1387,15 @@
 <span id="1382">1382</span>
 <span id="1383">1383</span>
 <span id="1384">1384</span>
+<span id="1385">1385</span>
+<span id="1386">1386</span>
 </pre><pre class="rust"><code><span class="doccomment">//! User information-related models.</span>
 
 <span class="kw">use</span> <span class="ident">std::fmt</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
 <span class="kw">use</span> <span class="ident">std::fmt::Write</span>;
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;temp_cache&quot;</span>)]</span>
+<span class="kw">use</span> <span class="ident">std::sync::Arc</span>;
 
 <span class="kw">use</span> <span class="ident">serde</span>::{<span class="ident">Deserialize</span>, <span class="ident">Serialize</span>};
 
@@ -1399,7 +1403,7 @@
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::builder</span>::{<span class="ident">CreateBotAuthParameters</span>, <span class="ident">CreateMessage</span>, <span class="ident">EditProfile</span>};
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>))]</span>
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::cache::Cache</span>;
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::cache</span>::{<span class="ident">Cache</span>, <span class="ident">UserRef</span>};
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;collector&quot;</span>)]</span>
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::client::bridge::gateway::ShardMessenger</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;collector&quot;</span>)]</span>
@@ -2502,7 +2506,7 @@
     <span class="doccomment">/// Attempts to find a [`User`] by its Id in the cache.</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">to_user_cached</span>(<span class="self">self</span>, <span class="ident">cache</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Cache</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">User</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">to_user_cached</span>(<span class="self">self</span>, <span class="ident">cache</span>: <span class="kw-2">&amp;</span><span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Cache</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">UserRef</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="ident">cache</span>.<span class="ident">as_ref</span>().<span class="ident">user</span>(<span class="self">self</span>)
     }
 
@@ -2530,7 +2534,7 @@
         {
             <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">cache</span>) <span class="op">=</span> <span class="ident">cache_http</span>.<span class="ident">cache</span>() {
                 <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">user</span>) <span class="op">=</span> <span class="ident">cache</span>.<span class="ident">user</span>(<span class="self">self</span>) {
-                    <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">user</span>);
+                    <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">user</span>.<span class="ident">clone</span>());
                 }
             }
         }
@@ -2540,7 +2544,7 @@
         <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;temp_cache&quot;</span>))]</span>
         {
             <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">cache</span>) <span class="op">=</span> <span class="ident">cache_http</span>.<span class="ident">cache</span>() {
-                <span class="ident">cache</span>.<span class="ident">temp_users</span>.<span class="ident">insert</span>(<span class="ident">user</span>.<span class="ident">id</span>, <span class="ident">user</span>.<span class="ident">clone</span>());
+                <span class="ident">cache</span>.<span class="ident">temp_users</span>.<span class="ident">insert</span>(<span class="ident">user</span>.<span class="ident">id</span>, <span class="ident">Arc::new</span>(<span class="ident">user</span>.<span class="ident">clone</span>()));
             }
         }
 
