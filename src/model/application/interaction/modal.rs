@@ -74,50 +74,12 @@ impl ModalSubmitInteraction {
         http.as_ref().get_original_interaction_response(&self.token).await
     }
 
-    /// Creates a response to the interaction received.
+    /// Returns a request builder that, when executed, will create a response to the received
+    /// interaction.
     ///
     /// **Note**: Message contents must be under 2000 unicode code points.
-    ///
-    /// # Errors
-    ///
-    /// Returns an [`Error::Model`] if the message content is too long.
-    /// May also return an [`Error::Http`] if the API returns an error,
-    /// or an [`Error::Json`] if there is an error in deserializing the
-    /// API response.
-    ///
-    /// [`Error::Model`]: crate::error::Error::Model
-    /// [`Error::Http`]: crate::error::Error::Http
-    /// [`Error::Json`]: crate::error::Error::Json
-    pub async fn create_interaction_response<'a, F>(
-        &self,
-        http: impl AsRef<Http>,
-        f: F,
-    ) -> Result<()>
-    where
-        for<'b> F:
-            FnOnce(&'b mut CreateInteractionResponse<'a>) -> &'b mut CreateInteractionResponse<'a>,
-    {
-        let mut interaction_response = CreateInteractionResponse::default();
-        f(&mut interaction_response);
-
-        let http = http.as_ref();
-        let files = interaction_response
-            .data
-            .as_mut()
-            .map_or_else(Vec::new, |d| std::mem::take(&mut d.files));
-
-        if files.is_empty() {
-            http.create_interaction_response(self.id.get(), &self.token, &interaction_response)
-                .await
-        } else {
-            http.create_interaction_response_with_files(
-                self.id.get(),
-                &self.token,
-                &interaction_response,
-                files,
-            )
-            .await
-        }
+    pub fn create_interaction_response(&self) -> CreateInteractionResponse<'_> {
+        CreateInteractionResponse::new(self.id, &self.token)
     }
 
     /// Edits the initial interaction response.
@@ -237,23 +199,18 @@ impl ModalSubmitInteraction {
     ) -> Result<()> {
         http.as_ref().delete_followup_message(&self.token, message_id.into().into()).await
     }
-    /// Helper function to defer an interaction
+
+    /// Helper function to defer an interaction.
     ///
     /// # Errors
     ///
-    /// May also return an [`Error::Http`] if the API returns an error,
-    /// or an [`Error::Json`] if there is an error in deserializing the
-    /// API response.
-    ///
-    /// # Errors
-    ///
-    /// [`Error::Http`]: crate::error::Error::Http
-    /// [`Error::Json`]: crate::error::Error::Json
+    /// Returns an [`Error::Http`] if the API returns an error, or an [`Error::Json`] if there is
+    /// an error in deserializing the API response.
     pub async fn defer(&self, http: impl AsRef<Http>) -> Result<()> {
-        self.create_interaction_response(http, |f| {
-            f.kind(InteractionResponseType::DeferredUpdateMessage)
-        })
-        .await
+        self.create_interaction_response()
+            .kind(InteractionResponseType::DeferredUpdateMessage)
+            .execute(&http)
+            .await
     }
 }
 

@@ -1,27 +1,63 @@
+#[cfg(not(feature = "http"))]
+use std::marker::PhantomData;
+
 use super::{CreateAllowedMentions, CreateComponents, CreateEmbed};
-use crate::json::prelude::*;
+#[cfg(feature = "http")]
+use crate::constants;
+#[cfg(feature = "http")]
+use crate::http::Http;
+use crate::internal::prelude::*;
 use crate::model::application::interaction::{InteractionResponseType, MessageFlags};
 use crate::model::channel::AttachmentType;
+#[cfg(feature = "http")]
+use crate::model::prelude::*;
 
 #[derive(Clone, Debug, Serialize)]
+#[must_use]
 pub struct CreateInteractionResponse<'a> {
+    #[serde(skip)]
+    #[cfg(feature = "http")]
+    id: InteractionId,
+    #[serde(skip)]
+    #[cfg(feature = "http")]
+    token: &'a str,
+    #[cfg(not(feature = "http"))]
+    token: PhantomData<&'a ()>,
+
     #[serde(rename = "type")]
     kind: InteractionResponseType,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub(crate) data: Option<CreateInteractionResponseData<'a>>,
+    data: Option<CreateInteractionResponseData<'a>>,
 }
 
 impl<'a> CreateInteractionResponse<'a> {
+    pub fn new(
+        #[cfg(feature = "http")] id: InteractionId,
+        #[cfg(feature = "http")] token: &'a str,
+    ) -> Self {
+        Self {
+            #[cfg(feature = "http")]
+            id,
+            #[cfg(feature = "http")]
+            token,
+            #[cfg(not(feature = "http"))]
+            token: PhantomData::default(),
+
+            kind: InteractionResponseType::ChannelMessageWithSource,
+            data: None,
+        }
+    }
+
     /// Sets the InteractionResponseType of the message.
     ///
     /// Defaults to `ChannelMessageWithSource`.
-    pub fn kind(&mut self, kind: InteractionResponseType) -> &mut Self {
+    pub fn kind(mut self, kind: InteractionResponseType) -> Self {
         self.kind = kind;
         self
     }
 
     /// Sets the `InteractionApplicationCommandCallbackData` for the message.
-    pub fn interaction_response_data<F>(&mut self, f: F) -> &mut Self
+    pub fn interaction_response_data<F>(mut self, f: F) -> Self
     where
         for<'b> F: FnOnce(
             &'b mut CreateInteractionResponseData<'a>,
@@ -33,14 +69,50 @@ impl<'a> CreateInteractionResponse<'a> {
         self.data = Some(data);
         self
     }
-}
 
-impl<'a> Default for CreateInteractionResponse<'a> {
-    fn default() -> CreateInteractionResponse<'a> {
-        Self {
-            kind: InteractionResponseType::ChannelMessageWithSource,
-            data: None,
+    /// Creates a response to the corresponding interaction received.
+    ///
+    /// **Note**: Message contents must be under 2000 unicode code points.
+    ///
+    /// # Errors
+    ///
+    /// Returns an [`Error::Model`] if the message content is too long. May also return an
+    /// [`Error::Http`] if invalid data is provided, or an [`Error::Json`] if there is an error
+    /// when deserializing the API response.
+    #[cfg(feature = "http")]
+    pub async fn execute(mut self, http: impl AsRef<Http>) -> Result<()> {
+        self.check_lengths()?;
+        let files = self.data.as_mut().map_or_else(Vec::new, |d| std::mem::take(&mut d.files));
+
+        if files.is_empty() {
+            http.as_ref().create_interaction_response(self.id.into(), self.token, &self).await
+        } else {
+            http.as_ref()
+                .create_interaction_response_with_files(self.id.into(), self.token, &self, files)
+                .await
         }
+    }
+
+    #[cfg(feature = "http")]
+    fn check_lengths(&self) -> Result<()> {
+        if let Some(ref data) = self.data {
+            if let Some(ref content) = data.content {
+                let length = content.chars().count();
+                let max_length = constants::MESSAGE_CODE_LIMIT;
+                if length > max_length {
+                    let overflow = length - max_length;
+                    return Err(Error::Model(ModelError::MessageTooLong(overflow)));
+                }
+            }
+
+            if data.embeds.len() > constants::EMBED_MAX_COUNT {
+                return Err(Error::Model(ModelError::EmbedAmount));
+            }
+            for embed in &data.embeds {
+                embed.check_length()?;
+            }
+        }
+        Ok(())
     }
 }
 
@@ -63,7 +135,7 @@ pub struct CreateInteractionResponseData<'a> {
     title: Option<String>,
 
     #[serde(skip)]
-    pub(crate) files: Vec<AttachmentType<'a>>,
+    files: Vec<AttachmentType<'a>>,
 }
 
 impl<'a> CreateInteractionResponseData<'a> {
