@@ -5,8 +5,9 @@ use std::time::Duration;
 
 use chrono::offset::Utc;
 use serenity::async_trait;
+use serenity::gateway::ActivityData;
 use serenity::model::channel::Message;
-use serenity::model::gateway::{Activity, Ready};
+use serenity::model::gateway::Ready;
 use serenity::model::id::{ChannelId, GuildId};
 use serenity::prelude::*;
 
@@ -61,7 +62,7 @@ impl EventHandler for Handler {
             let ctx2 = Arc::clone(&ctx);
             tokio::spawn(async move {
                 loop {
-                    set_status_to_current_time(Arc::clone(&ctx2)).await;
+                    set_activity_to_current_time(Arc::clone(&ctx2)).await;
                     tokio::time::sleep(Duration::from_secs(60)).await;
                 }
             });
@@ -100,11 +101,11 @@ async fn log_system_load(ctx: Arc<Context>) {
     };
 }
 
-async fn set_status_to_current_time(ctx: Arc<Context>) {
+async fn set_activity_to_current_time(ctx: Arc<Context>) {
     let current_time = Utc::now();
     let formatted_time = current_time.to_rfc2822();
 
-    ctx.set_activity(Activity::playing(formatted_time)).await;
+    ctx.set_activity(Some(ActivityData::playing(formatted_time))).await;
 }
 
 #[tokio::main]
