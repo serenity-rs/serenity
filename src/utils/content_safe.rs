@@ -256,10 +256,10 @@ fn clean_mention(
                 }
                 .into()
             };
+
             cache
                 .user(id)
-                .as_ref()
-                .map(get_username)
+                .map(|u| get_username(&u))
                 .or_else(|| users.iter().find(|u| u.id == id).map(get_username))
                 .unwrap_or(Cow::Borrowed("@invalid-user"))
         },
