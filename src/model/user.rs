@@ -3,6 +3,8 @@
 use std::fmt;
 #[cfg(feature = "model")]
 use std::fmt::Write;
+#[cfg(feature = "temp_cache")]
+use std::sync::Arc;
 
 use serde::{Deserialize, Serialize};
 
@@ -10,7 +12,7 @@ use super::prelude::*;
 #[cfg(feature = "model")]
 use crate::builder::{CreateBotAuthParameters, CreateMessage, EditProfile};
 #[cfg(all(feature = "cache", feature = "model"))]
-use crate::cache::Cache;
+use crate::cache::{Cache, UserRef};
 #[cfg(feature = "collector")]
 use crate::client::bridge::gateway::ShardMessenger;
 #[cfg(feature = "collector")]
@@ -1098,7 +1100,7 @@ impl UserId {
     #[cfg(feature = "cache")]
     #[allow(clippy::unused_async)]
     #[inline]
-    pub async fn to_user_cached(self, cache: impl AsRef<Cache>) -> Option<User> {
+    pub async fn to_user_cached(self, cache: &impl AsRef<Cache>) -> Option<UserRef<'_>> {
         cache.as_ref().user(self)
     }
 
@@ -1123,7 +1125,7 @@ impl UserId {
         {
             if let Some(cache) = cache_http.cache() {
                 if let Some(user) = cache.user(self) {
-                    return Ok(user);
+                    return Ok(user.clone());
                 }
             }
         }
@@ -1133,7 +1135,7 @@ impl UserId {
         #[cfg(all(feature = "cache", feature = "temp_cache"))]
         {
             if let Some(cache) = cache_http.cache() {
-                cache.temp_users.insert(user.id, user.clone());
+                cache.temp_users.insert(user.id, Arc::new(user.clone()));
             }
         }
 
