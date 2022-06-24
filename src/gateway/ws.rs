@@ -161,7 +161,7 @@ impl WsClient {
         filter: ChunkGuildFilter,
         nonce: Option<&str>,
     ) -> Result<()> {
-        debug!("[Shard {:?}] Requesting member chunks", shard_info);
+        debug!("[{:?}] Requesting member chunks", shard_info);
 
         let (query, user_ids) = match filter {
             ChunkGuildFilter::None => (Some(String::new()), None),
@@ -184,7 +184,7 @@ impl WsClient {
 
     #[instrument(skip(self))]
     pub async fn send_heartbeat(&mut self, shard_info: &ShardInfo, seq: Option<u64>) -> Result<()> {
-        trace!("[Shard {:?}] Sending heartbeat d: {:?}", shard_info, seq);
+        trace!("[{:?}] Sending heartbeat d: {:?}", shard_info, seq);
 
         self.send_json(&WebSocketMessage {
             op: Opcode::Heartbeat,
@@ -200,7 +200,7 @@ impl WsClient {
         token: &str,
         intents: GatewayIntents,
     ) -> Result<()> {
-        debug!("[Shard {:?}] Identifying", shard);
+        debug!("[{:?}] Identifying", shard);
 
         let msg = WebSocketMessage {
             op: Opcode::Identify,
@@ -230,7 +230,7 @@ impl WsClient {
         let activities: Vec<_> = presence.activity.iter().collect();
         let now = SystemTime::now();
 
-        debug!("[Shard {:?}] Sending presence update", shard_info);
+        debug!("[{:?}] Sending presence update", shard_info);
 
         self.send_json(&WebSocketMessage {
             op: Opcode::PresenceUpdate,
@@ -252,7 +252,7 @@ impl WsClient {
         seq: u64,
         token: &str,
     ) -> Result<()> {
-        debug!("[Shard {:?}] Sending resume; seq: {}", shard_info, seq);
+        debug!("[{:?}] Sending resume; seq: {}", shard_info, seq);
 
         self.send_json(&WebSocketMessage {
             op: Opcode::Resume,
