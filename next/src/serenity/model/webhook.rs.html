@@ -561,10 +561,6 @@
 <span id="556">556</span>
 <span id="557">557</span>
 <span id="558">558</span>
-<span id="559">559</span>
-<span id="560">560</span>
-<span id="561">561</span>
-<span id="562">562</span>
 </pre><pre class="rust"><code><span class="doccomment">//! Webhook model and implementations.</span>
 
 <span class="kw">use</span> <span class="ident">std::fmt</span>;
@@ -584,27 +580,23 @@
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::ModelError</span>;
 
-<span class="doccomment">/// A representation of a type of webhook.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>, <span class="ident">Ord</span>, <span class="ident">PartialEq</span>, <span class="ident">PartialOrd</span>)]</span>
-<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">WebhookType</span> {
-    <span class="doccomment">/// An indicator that the webhook can post messages to channels with</span>
-    <span class="doccomment">/// a token.</span>
-    <span class="ident">Incoming</span> <span class="op">=</span> <span class="number">1</span>,
-    <span class="doccomment">/// An indicator that the webhook is managed by Discord for posting new</span>
-    <span class="doccomment">/// messages to channels without a token.</span>
-    <span class="ident">ChannelFollower</span> <span class="op">=</span> <span class="number">2</span>,
-    <span class="doccomment">/// Application webhooks are webhooks used with Interactions.</span>
-    <span class="ident">Application</span> <span class="op">=</span> <span class="number">3</span>,
-    <span class="doccomment">/// An indicator that the webhook is of unknown type.</span>
-    <span class="ident">Unknown</span> <span class="op">=</span> <span class="op">!</span><span class="number">0</span>,
+<span class="macro">enum_number!</span> {
+    <span class="doccomment">/// A representation of a type of webhook.</span>
+    <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>, <span class="ident">Ord</span>, <span class="ident">PartialEq</span>, <span class="ident">PartialOrd</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
+    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">from</span> <span class="op">=</span> <span class="string">&quot;u8&quot;</span>, <span class="ident">into</span> <span class="op">=</span> <span class="string">&quot;u8&quot;</span>)]</span>
+    <span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
+    <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">WebhookType</span> {
+        <span class="doccomment">/// An indicator that the webhook can post messages to channels with</span>
+        <span class="doccomment">/// a token.</span>
+        <span class="ident">Incoming</span> <span class="op">=</span> <span class="number">1</span>,
+        <span class="doccomment">/// An indicator that the webhook is managed by Discord for posting new</span>
+        <span class="doccomment">/// messages to channels without a token.</span>
+        <span class="ident">ChannelFollower</span> <span class="op">=</span> <span class="number">2</span>,
+        <span class="doccomment">/// Application webhooks are webhooks used with Interactions.</span>
+        <span class="ident">Application</span> <span class="op">=</span> <span class="number">3</span>,
+        <span class="kw">_</span> =&gt; <span class="ident">Unknown</span>(<span class="ident">u8</span>),
+    }
 }
-
-<span class="macro">enum_number!</span>(<span class="ident">WebhookType</span> {
-    <span class="ident">Incoming</span>,
-    <span class="ident">ChannelFollower</span>,
-    <span class="ident">Application</span>,
-});
 
 <span class="kw">impl</span> <span class="ident">WebhookType</span> {
     <span class="attribute">#[<span class="ident">inline</span>]</span>
@@ -614,7 +606,7 @@
             <span class="ident"><span class="self">Self</span>::Incoming</span> =&gt; <span class="string">&quot;incoming&quot;</span>,
             <span class="ident"><span class="self">Self</span>::ChannelFollower</span> =&gt; <span class="string">&quot;channel follower&quot;</span>,
             <span class="ident"><span class="self">Self</span>::Application</span> =&gt; <span class="string">&quot;application&quot;</span>,
-            <span class="ident"><span class="self">Self</span>::Unknown</span> =&gt; <span class="string">&quot;unknown&quot;</span>,
+            <span class="ident"><span class="self">Self</span>::Unknown</span>(<span class="kw">_</span>) =&gt; <span class="string">&quot;unknown&quot;</span>,
         }
     }
 }

@@ -466,26 +466,6 @@
 <span id="461">461</span>
 <span id="462">462</span>
 <span id="463">463</span>
-<span id="464">464</span>
-<span id="465">465</span>
-<span id="466">466</span>
-<span id="467">467</span>
-<span id="468">468</span>
-<span id="469">469</span>
-<span id="470">470</span>
-<span id="471">471</span>
-<span id="472">472</span>
-<span id="473">473</span>
-<span id="474">474</span>
-<span id="475">475</span>
-<span id="476">476</span>
-<span id="477">477</span>
-<span id="478">478</span>
-<span id="479">479</span>
-<span id="480">480</span>
-<span id="481">481</span>
-<span id="482">482</span>
-<span id="483">483</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::collections::HashMap</span>;
 
 <span class="kw">use</span> <span class="ident">serde</span>::{<span class="ident">Deserialize</span>, <span class="ident">Serialize</span>};
@@ -748,24 +728,20 @@
     }
 }
 
-<span class="doccomment">/// The type of an application command.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/interactions/application-commands#application-command-object-application-command-types).</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>, <span class="ident">Ord</span>, <span class="ident">PartialEq</span>, <span class="ident">PartialOrd</span>)]</span>
-<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">u8</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">CommandType</span> {
-    <span class="ident">ChatInput</span> <span class="op">=</span> <span class="number">1</span>,
-    <span class="ident">User</span> <span class="op">=</span> <span class="number">2</span>,
-    <span class="ident">Message</span> <span class="op">=</span> <span class="number">3</span>,
-    <span class="ident">Unknown</span> <span class="op">=</span> <span class="op">!</span><span class="number">0</span>,
+<span class="macro">enum_number!</span> {
+    <span class="doccomment">/// The type of an application command.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/interactions/application-commands#application-command-object-application-command-types).</span>
+    <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>, <span class="ident">Ord</span>, <span class="ident">PartialEq</span>, <span class="ident">PartialOrd</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
+    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">from</span> <span class="op">=</span> <span class="string">&quot;u8&quot;</span>, <span class="ident">into</span> <span class="op">=</span> <span class="string">&quot;u8&quot;</span>)]</span>
+    <span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
+    <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">CommandType</span> {
+        <span class="ident">ChatInput</span> <span class="op">=</span> <span class="number">1</span>,
+        <span class="ident">User</span> <span class="op">=</span> <span class="number">2</span>,
+        <span class="ident">Message</span> <span class="op">=</span> <span class="number">3</span>,
+        <span class="kw">_</span> =&gt; <span class="ident">Unknown</span>(<span class="ident">u8</span>),
+    }
 }
-
-<span class="macro">enum_number!</span>(<span class="ident">CommandType</span> {
-    <span class="ident">ChatInput</span>,
-    <span class="ident">User</span>,
-    <span class="ident">Message</span>
-});
 
 <span class="doccomment">/// The parameters for an [`Command`].</span>
 <span class="doccomment">///</span>
@@ -820,40 +796,28 @@
     <span class="kw">pub</span> <span class="ident">autocomplete</span>: <span class="ident">bool</span>,
 }
 
-<span class="doccomment">/// The type of an [`CommandOption`].</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/interactions/application-commands#application-command-object-application-command-option-type).</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>, <span class="ident">Ord</span>, <span class="ident">PartialEq</span>, <span class="ident">PartialOrd</span>)]</span>
-<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">u8</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">CommandOptionType</span> {
-    <span class="ident">SubCommand</span> <span class="op">=</span> <span class="number">1</span>,
-    <span class="ident">SubCommandGroup</span> <span class="op">=</span> <span class="number">2</span>,
-    <span class="ident">String</span> <span class="op">=</span> <span class="number">3</span>,
-    <span class="ident">Integer</span> <span class="op">=</span> <span class="number">4</span>,
-    <span class="ident">Boolean</span> <span class="op">=</span> <span class="number">5</span>,
-    <span class="ident">User</span> <span class="op">=</span> <span class="number">6</span>,
-    <span class="ident">Channel</span> <span class="op">=</span> <span class="number">7</span>,
-    <span class="ident">Role</span> <span class="op">=</span> <span class="number">8</span>,
-    <span class="ident">Mentionable</span> <span class="op">=</span> <span class="number">9</span>,
-    <span class="ident">Number</span> <span class="op">=</span> <span class="number">10</span>,
-    <span class="ident">Attachment</span> <span class="op">=</span> <span class="number">11</span>,
-    <span class="ident">Unknown</span> <span class="op">=</span> <span class="op">!</span><span class="number">0</span>,
+<span class="macro">enum_number!</span> {
+    <span class="doccomment">/// The type of an [`CommandOption`].</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/interactions/application-commands#application-command-object-application-command-option-type).</span>
+    <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>, <span class="ident">Ord</span>, <span class="ident">PartialEq</span>, <span class="ident">PartialOrd</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
+    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">from</span> <span class="op">=</span> <span class="string">&quot;u8&quot;</span>, <span class="ident">into</span> <span class="op">=</span> <span class="string">&quot;u8&quot;</span>)]</span>
+    <span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
+    <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">CommandOptionType</span> {
+        <span class="ident">SubCommand</span> <span class="op">=</span> <span class="number">1</span>,
+        <span class="ident">SubCommandGroup</span> <span class="op">=</span> <span class="number">2</span>,
+        <span class="ident">String</span> <span class="op">=</span> <span class="number">3</span>,
+        <span class="ident">Integer</span> <span class="op">=</span> <span class="number">4</span>,
+        <span class="ident">Boolean</span> <span class="op">=</span> <span class="number">5</span>,
+        <span class="ident">User</span> <span class="op">=</span> <span class="number">6</span>,
+        <span class="ident">Channel</span> <span class="op">=</span> <span class="number">7</span>,
+        <span class="ident">Role</span> <span class="op">=</span> <span class="number">8</span>,
+        <span class="ident">Mentionable</span> <span class="op">=</span> <span class="number">9</span>,
+        <span class="ident">Number</span> <span class="op">=</span> <span class="number">10</span>,
+        <span class="ident">Attachment</span> <span class="op">=</span> <span class="number">11</span>,
+        <span class="kw">_</span> =&gt; <span class="ident">Unknown</span>(<span class="ident">u8</span>),
+    }
 }
-
-<span class="macro">enum_number!</span>(<span class="ident">CommandOptionType</span> {
-    <span class="ident">SubCommand</span>,
-    <span class="ident">SubCommandGroup</span>,
-    <span class="ident">String</span>,
-    <span class="ident">Integer</span>,
-    <span class="ident">Boolean</span>,
-    <span class="ident">User</span>,
-    <span class="ident">Channel</span>,
-    <span class="ident">Role</span>,
-    <span class="ident">Mentionable</span>,
-    <span class="ident">Number</span>,
-    <span class="ident">Attachment</span>
-});
 
 <span class="doccomment">/// The only valid values a user can pick in an [`CommandOption`].</span>
 <span class="doccomment">///</span>
@@ -901,24 +865,20 @@
     <span class="kw">pub</span> <span class="ident">permission</span>: <span class="ident">bool</span>,
 }
 
-<span class="doccomment">/// The type of an [`CommandPermissionData`].</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/interactions/application-commands#application-command-permissions-object-application-command-permission-type).</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>, <span class="ident">Ord</span>, <span class="ident">PartialEq</span>, <span class="ident">PartialOrd</span>)]</span>
-<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">u8</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">CommandPermissionType</span> {
-    <span class="ident">Role</span> <span class="op">=</span> <span class="number">1</span>,
-    <span class="ident">User</span> <span class="op">=</span> <span class="number">2</span>,
-    <span class="ident">Channel</span> <span class="op">=</span> <span class="number">3</span>,
-    <span class="ident">Unknown</span> <span class="op">=</span> <span class="op">!</span><span class="number">0</span>,
+<span class="macro">enum_number!</span> {
+    <span class="doccomment">/// The type of an [`CommandPermissionData`].</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/interactions/application-commands#application-command-permissions-object-application-command-permission-type).</span>
+    <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>, <span class="ident">Ord</span>, <span class="ident">PartialEq</span>, <span class="ident">PartialOrd</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
+    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">from</span> <span class="op">=</span> <span class="string">&quot;u8&quot;</span>, <span class="ident">into</span> <span class="op">=</span> <span class="string">&quot;u8&quot;</span>)]</span>
+    <span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
+    <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">CommandPermissionType</span> {
+        <span class="ident">Role</span> <span class="op">=</span> <span class="number">1</span>,
+        <span class="ident">User</span> <span class="op">=</span> <span class="number">2</span>,
+        <span class="ident">Channel</span> <span class="op">=</span> <span class="number">3</span>,
+        <span class="kw">_</span> =&gt; <span class="ident">Unknown</span>(<span class="ident">u8</span>),
+    }
 }
-
-<span class="macro">enum_number!</span>(<span class="ident">CommandPermissionType</span> {
-    <span class="ident">Role</span>,
-    <span class="ident">User</span>,
-    <span class="ident">Channel</span>,
-});
 
 <span class="kw">impl</span> <span class="ident">CommandPermissionId</span> {
     <span class="doccomment">/// Converts this [`CommandPermissionId`] to [`UserId`].</span>

@@ -796,6 +796,14 @@
 <span id="791">791</span>
 <span id="792">792</span>
 <span id="793">793</span>
+<span id="794">794</span>
+<span id="795">795</span>
+<span id="796">796</span>
+<span id="797">797</span>
+<span id="798">798</span>
+<span id="799">799</span>
+<span id="800">800</span>
+<span id="801">801</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::sync::Arc</span>;
 <span class="kw">use</span> <span class="ident">std::time</span>::{<span class="ident">Duration</span> <span class="kw">as</span> <span class="ident">StdDuration</span>, <span class="ident">Instant</span>};
 
@@ -805,13 +813,21 @@
 <span class="kw">use</span> <span class="ident">tracing</span>::{<span class="ident">debug</span>, <span class="ident">error</span>, <span class="ident">info</span>, <span class="ident">instrument</span>, <span class="ident">trace</span>, <span class="ident">warn</span>};
 <span class="kw">use</span> <span class="ident">url::Url</span>;
 
-<span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">ConnectionStage</span>, <span class="ident">CurrentPresence</span>, <span class="ident">GatewayError</span>, <span class="ident">ReconnectType</span>, <span class="ident">ShardAction</span>, <span class="ident">WsClient</span>};
+<span class="kw">use</span> <span class="kw">super</span>::{
+    <span class="ident">ActivityData</span>,
+    <span class="ident">ConnectionStage</span>,
+    <span class="ident">GatewayError</span>,
+    <span class="ident">PresenceData</span>,
+    <span class="ident">ReconnectType</span>,
+    <span class="ident">ShardAction</span>,
+    <span class="ident">WsClient</span>,
+};
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::client::bridge::gateway::ChunkGuildFilter</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::constants</span>::{<span class="self">self</span>, <span class="ident">close_codes</span>};
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::http::Http</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::internal::prelude</span>::<span class="kw-2">*</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::event</span>::{<span class="ident">Event</span>, <span class="ident">GatewayEvent</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::gateway</span>::{<span class="ident">Activity</span>, <span class="ident">GatewayIntents</span>, <span class="ident">ShardInfo</span>};
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::gateway</span>::{<span class="ident">GatewayIntents</span>, <span class="ident">ShardInfo</span>};
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::id::GuildId</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::user::OnlineStatus</span>;
 
@@ -849,7 +865,7 @@
 <span class="doccomment">/// [module docs]: crate::gateway#sharding</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Shard</span> {
     <span class="kw">pub</span> <span class="ident">client</span>: <span class="ident">WsClient</span>,
-    <span class="ident">current_presence</span>: <span class="ident">CurrentPresence</span>,
+    <span class="ident">presence</span>: <span class="ident">PresenceData</span>,
     <span class="doccomment">/// A tuple of:</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// - the last instant that a heartbeat was sent</span>
@@ -931,7 +947,7 @@
         <span class="kw">let</span> <span class="ident">url</span> <span class="op">=</span> <span class="ident">ws_url</span>.<span class="ident">lock</span>().<span class="kw">await</span>.<span class="ident">clone</span>();
         <span class="kw">let</span> <span class="ident">client</span> <span class="op">=</span> <span class="ident">connect</span>(<span class="kw-2">&amp;</span><span class="ident">url</span>).<span class="kw">await</span><span class="question-mark">?</span>;
 
-        <span class="kw">let</span> <span class="ident">current_presence</span> <span class="op">=</span> (<span class="prelude-val">None</span>, <span class="ident">OnlineStatus::Online</span>);
+        <span class="kw">let</span> <span class="ident">presence</span> <span class="op">=</span> <span class="ident">PresenceData::default</span>();
         <span class="kw">let</span> <span class="ident">heartbeat_instants</span> <span class="op">=</span> (<span class="prelude-val">None</span>, <span class="prelude-val">None</span>);
         <span class="kw">let</span> <span class="ident">heartbeat_interval</span> <span class="op">=</span> <span class="prelude-val">None</span>;
         <span class="kw">let</span> <span class="ident">last_heartbeat_acknowledged</span> <span class="op">=</span> <span class="bool-val">true</span>;
@@ -941,7 +957,7 @@
 
         <span class="prelude-val">Ok</span>(<span class="ident">Shard</span> {
             <span class="ident">client</span>,
-            <span class="ident">current_presence</span>,
+            <span class="ident">presence</span>,
             <span class="ident">heartbeat_instants</span>,
             <span class="ident">heartbeat_interval</span>,
             <span class="ident">http</span>: <span class="prelude-val">None</span>,
@@ -966,8 +982,8 @@
 
     <span class="doccomment">/// Retrieves the current presence of the shard.</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">current_presence</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">CurrentPresence</span> {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">current_presence</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">presence</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">PresenceData</span> {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">presence</span>
     }
 
     <span class="doccomment">/// Retrieves the heartbeat instants of the shard.</span>
@@ -1048,13 +1064,13 @@
 
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="attribute">#[<span class="ident">instrument</span>(<span class="ident">skip</span>(<span class="self">self</span>))]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_activity</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">activity</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Activity</span><span class="op">&gt;</span>) {
-        <span class="self">self</span>.<span class="ident">current_presence</span>.<span class="number">0</span> <span class="op">=</span> <span class="ident">activity</span>;
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_activity</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">activity</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ActivityData</span><span class="op">&gt;</span>) {
+        <span class="self">self</span>.<span class="ident">presence</span>.<span class="ident">activity</span> <span class="op">=</span> <span class="ident">activity</span>;
     }
 
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="attribute">#[<span class="ident">instrument</span>(<span class="ident">skip</span>(<span class="self">self</span>))]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_presence</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">status</span>: <span class="ident">OnlineStatus</span>, <span class="ident">activity</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Activity</span><span class="op">&gt;</span>) {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_presence</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">activity</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ActivityData</span><span class="op">&gt;</span>, <span class="ident">status</span>: <span class="ident">OnlineStatus</span>) {
         <span class="self">self</span>.<span class="ident">set_activity</span>(<span class="ident">activity</span>);
         <span class="self">self</span>.<span class="ident">set_status</span>(<span class="ident">status</span>);
     }
@@ -1066,7 +1082,7 @@
             <span class="ident">status</span> <span class="op">=</span> <span class="ident">OnlineStatus::Invisible</span>;
         }
 
-        <span class="self">self</span>.<span class="ident">current_presence</span>.<span class="number">1</span> <span class="op">=</span> <span class="ident">status</span>;
+        <span class="self">self</span>.<span class="ident">presence</span>.<span class="ident">status</span> <span class="op">=</span> <span class="ident">status</span>;
     }
 
     <span class="doccomment">/// Retrieves a copy of the current shard information.</span>
@@ -1575,7 +1591,7 @@
 
     <span class="attribute">#[<span class="ident">instrument</span>(<span class="ident">skip</span>(<span class="self">self</span>))]</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">update_presence</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">client</span>.<span class="ident">send_presence_update</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">shard_info</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">current_presence</span>).<span class="kw">await</span>
+        <span class="self">self</span>.<span class="ident">client</span>.<span class="ident">send_presence_update</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">shard_info</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">presence</span>).<span class="kw">await</span>
     }
 }
 

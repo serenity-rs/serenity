@@ -177,21 +177,6 @@
 <span id="172">172</span>
 <span id="173">173</span>
 <span id="174">174</span>
-<span id="175">175</span>
-<span id="176">176</span>
-<span id="177">177</span>
-<span id="178">178</span>
-<span id="179">179</span>
-<span id="180">180</span>
-<span id="181">181</span>
-<span id="182">182</span>
-<span id="183">183</span>
-<span id="184">184</span>
-<span id="185">185</span>
-<span id="186">186</span>
-<span id="187">187</span>
-<span id="188">188</span>
-<span id="189">189</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">serde::de</span>::{<span class="ident">Deserialize</span>, <span class="ident">Deserializer</span>, <span class="ident">Error</span> <span class="kw">as</span> <span class="ident">DeError</span>};
 <span class="kw">use</span> <span class="ident">serde::ser</span>::{<span class="ident">Serialize</span>, <span class="ident">Serializer</span>};
 
@@ -200,24 +185,19 @@
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::channel::ReactionType</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::utils::deserialize_val</span>;
 
-<span class="doccomment">/// The type of a component</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>, <span class="ident">Ord</span>, <span class="ident">PartialEq</span>, <span class="ident">PartialOrd</span>)]</span>
-<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">u8</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">ComponentType</span> {
-    <span class="ident">ActionRow</span> <span class="op">=</span> <span class="number">1</span>,
-    <span class="ident">Button</span> <span class="op">=</span> <span class="number">2</span>,
-    <span class="ident">SelectMenu</span> <span class="op">=</span> <span class="number">3</span>,
-    <span class="ident">InputText</span> <span class="op">=</span> <span class="number">4</span>,
-    <span class="ident">Unknown</span> <span class="op">=</span> <span class="op">!</span><span class="number">0</span>,
+<span class="macro">enum_number!</span> {
+    <span class="doccomment">/// The type of a component</span>
+    <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>, <span class="ident">Ord</span>, <span class="ident">PartialEq</span>, <span class="ident">PartialOrd</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
+    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">from</span> <span class="op">=</span> <span class="string">&quot;u8&quot;</span>, <span class="ident">into</span> <span class="op">=</span> <span class="string">&quot;u8&quot;</span>)]</span>
+    <span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
+    <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">ComponentType</span> {
+        <span class="ident">ActionRow</span> <span class="op">=</span> <span class="number">1</span>,
+        <span class="ident">Button</span> <span class="op">=</span> <span class="number">2</span>,
+        <span class="ident">SelectMenu</span> <span class="op">=</span> <span class="number">3</span>,
+        <span class="ident">InputText</span> <span class="op">=</span> <span class="number">4</span>,
+        <span class="kw">_</span> =&gt; <span class="ident">Unknown</span>(<span class="ident">u8</span>),
+    }
 }
-
-<span class="macro">enum_number!</span>(<span class="ident">ComponentType</span> {
-    <span class="ident">ActionRow</span>,
-    <span class="ident">Button</span>,
-    <span class="ident">SelectMenu</span>,
-    <span class="ident">InputText</span>
-});
 
 <span class="doccomment">/// An action row.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
@@ -298,26 +278,20 @@
     <span class="kw">pub</span> <span class="ident">disabled</span>: <span class="ident">bool</span>,
 }
 
-<span class="doccomment">/// The style of a button.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>, <span class="ident">Ord</span>, <span class="ident">PartialEq</span>, <span class="ident">PartialOrd</span>)]</span>
-<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">u8</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">ButtonStyle</span> {
-    <span class="ident">Primary</span> <span class="op">=</span> <span class="number">1</span>,
-    <span class="ident">Secondary</span> <span class="op">=</span> <span class="number">2</span>,
-    <span class="ident">Success</span> <span class="op">=</span> <span class="number">3</span>,
-    <span class="ident">Danger</span> <span class="op">=</span> <span class="number">4</span>,
-    <span class="ident">Link</span> <span class="op">=</span> <span class="number">5</span>,
-    <span class="ident">Unknown</span> <span class="op">=</span> <span class="op">!</span><span class="number">0</span>,
+<span class="macro">enum_number!</span> {
+    <span class="doccomment">/// The style of a button.</span>
+    <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>, <span class="ident">Ord</span>, <span class="ident">PartialEq</span>, <span class="ident">PartialOrd</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
+    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">from</span> <span class="op">=</span> <span class="string">&quot;u8&quot;</span>, <span class="ident">into</span> <span class="op">=</span> <span class="string">&quot;u8&quot;</span>)]</span>
+    <span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
+    <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">ButtonStyle</span> {
+        <span class="ident">Primary</span> <span class="op">=</span> <span class="number">1</span>,
+        <span class="ident">Secondary</span> <span class="op">=</span> <span class="number">2</span>,
+        <span class="ident">Success</span> <span class="op">=</span> <span class="number">3</span>,
+        <span class="ident">Danger</span> <span class="op">=</span> <span class="number">4</span>,
+        <span class="ident">Link</span> <span class="op">=</span> <span class="number">5</span>,
+        <span class="kw">_</span> =&gt; <span class="ident">Unknown</span>(<span class="ident">u8</span>),
+    }
 }
-
-<span class="macro">enum_number!</span>(<span class="ident">ButtonStyle</span> {
-    <span class="ident">Primary</span>,
-    <span class="ident">Secondary</span>,
-    <span class="ident">Success</span>,
-    <span class="ident">Danger</span>,
-    <span class="ident">Link</span>
-});
 
 <span class="doccomment">/// A select menu component.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
@@ -366,21 +340,17 @@
     <span class="kw">pub</span> <span class="ident">value</span>: <span class="ident">String</span>,
 }
 
-<span class="doccomment">/// The style of the input text</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>, <span class="ident">Ord</span>, <span class="ident">PartialEq</span>, <span class="ident">PartialOrd</span>)]</span>
-<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">u8</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">InputTextStyle</span> {
-    <span class="ident">Short</span> <span class="op">=</span> <span class="number">1</span>,
-    <span class="ident">Paragraph</span> <span class="op">=</span> <span class="number">2</span>,
-    <span class="ident">Unknown</span> <span class="op">=</span> <span class="op">!</span><span class="number">0</span>,
+<span class="macro">enum_number!</span> {
+    <span class="doccomment">/// The style of the input text</span>
+    <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>, <span class="ident">Ord</span>, <span class="ident">PartialEq</span>, <span class="ident">PartialOrd</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
+    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">from</span> <span class="op">=</span> <span class="string">&quot;u8&quot;</span>, <span class="ident">into</span> <span class="op">=</span> <span class="string">&quot;u8&quot;</span>)]</span>
+    <span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
+    <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">InputTextStyle</span> {
+        <span class="ident">Short</span> <span class="op">=</span> <span class="number">1</span>,
+        <span class="ident">Paragraph</span> <span class="op">=</span> <span class="number">2</span>,
+        <span class="kw">_</span> =&gt; <span class="ident">Unknown</span>(<span class="ident">u8</span>),
+    }
 }
-
-<span class="macro">enum_number!</span>(<span class="ident">InputTextStyle</span> {
-    <span class="ident">Short</span>,
-    <span class="ident">Paragraph</span>,
-    <span class="ident">Unknown</span>
-});
 </code></pre></div>
 </section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.61.0-nightly (3c17c84a3 2022-03-21)" ></div>
 </body></html>

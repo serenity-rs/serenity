@@ -1131,8 +1131,8 @@
                         <span class="self">self</span>.<span class="ident">shard</span>.<span class="ident">set_activity</span>(<span class="ident">activity</span>);
                         <span class="self">self</span>.<span class="ident">shard</span>.<span class="ident">update_presence</span>().<span class="kw">await</span>.<span class="ident">is_ok</span>()
                     },
-                    <span class="ident">ShardRunnerMessage::SetPresence</span>(<span class="ident">status</span>, <span class="ident">activity</span>) =&gt; {
-                        <span class="self">self</span>.<span class="ident">shard</span>.<span class="ident">set_presence</span>(<span class="ident">status</span>, <span class="ident">activity</span>);
+                    <span class="ident">ShardRunnerMessage::SetPresence</span>(<span class="ident">activity</span>, <span class="ident">status</span>) =&gt; {
+                        <span class="self">self</span>.<span class="ident">shard</span>.<span class="ident">set_presence</span>(<span class="ident">activity</span>, <span class="ident">status</span>);
                         <span class="self">self</span>.<span class="ident">shard</span>.<span class="ident">update_presence</span>().<span class="kw">await</span>.<span class="ident">is_ok</span>()
                     },
                     <span class="ident">ShardRunnerMessage::SetStatus</span>(<span class="ident">status</span>) =&gt; {

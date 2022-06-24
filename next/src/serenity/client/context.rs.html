@@ -472,7 +472,6 @@
 <span id="467">467</span>
 <span id="468">468</span>
 <span id="469">469</span>
-<span id="470">470</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::sync::Arc</span>;
 
 <span class="kw">use</span> <span class="ident">futures::channel::mpsc::UnboundedSender</span> <span class="kw">as</span> <span class="ident">Sender</span>;
@@ -485,6 +484,7 @@
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::client::bridge::gateway::ShardMessenger</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;collector&quot;</span>)]</span>
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::collector</span>::{<span class="ident">ComponentInteractionFilter</span>, <span class="ident">MessageFilter</span>, <span class="ident">ReactionFilter</span>};
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::gateway::ActivityData</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;gateway&quot;</span>)]</span>
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::gateway::InterMessage</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::http::Http</span>;
@@ -752,10 +752,10 @@
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;gateway&quot;</span>)]</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">reset_presence</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) {
-        <span class="self">self</span>.<span class="ident">shard</span>.<span class="ident">set_presence</span>(<span class="prelude-val">None</span>::<span class="op">&lt;</span><span class="ident">Activity</span><span class="op">&gt;</span>, <span class="ident">OnlineStatus::Online</span>);
+        <span class="self">self</span>.<span class="ident">shard</span>.<span class="ident">set_presence</span>(<span class="prelude-val">None</span>, <span class="ident">OnlineStatus::Online</span>);
     }
 
-    <span class="doccomment">/// Sets the current activity, defaulting to an online status of [`Online`].</span>
+    <span class="doccomment">/// Sets the current activity.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// # Examples</span>
     <span class="doccomment">///</span>
@@ -766,7 +766,7 @@
     <span class="doccomment">/// # use serenity::prelude::*;</span>
     <span class="doccomment">/// # use serenity::model::channel::Message;</span>
     <span class="doccomment">/// #</span>
-    <span class="doccomment">/// use serenity::model::gateway::Activity;</span>
+    <span class="doccomment">/// use serenity::gateway::ActivityData;</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// struct Handler;</span>
     <span class="doccomment">///</span>
@@ -776,7 +776,7 @@
     <span class="doccomment">///         let mut args = msg.content.splitn(2, &#39; &#39;);</span>
     <span class="doccomment">///</span>
     <span class="doccomment">///         if let (Some(&quot;~setgame&quot;), Some(game)) = (args.next(), args.next()) {</span>
-    <span class="doccomment">///             ctx.set_activity(Activity::playing(game)).await;</span>
+    <span class="doccomment">///             ctx.set_activity(Some(ActivityData::playing(game))).await;</span>
     <span class="doccomment">///         }</span>
     <span class="doccomment">///     }</span>
     <span class="doccomment">/// }</span>
@@ -789,12 +789,10 @@
     <span class="doccomment">/// #     Ok(())</span>
     <span class="doccomment">/// # }</span>
     <span class="doccomment">/// ```</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`Online`]: OnlineStatus::Online</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;gateway&quot;</span>)]</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">set_activity</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">activity</span>: <span class="ident">Activity</span>) {
-        <span class="self">self</span>.<span class="ident">shard</span>.<span class="ident">set_presence</span>(<span class="prelude-val">Some</span>(<span class="ident">activity</span>), <span class="ident">OnlineStatus::Online</span>);
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">set_activity</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">activity</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ActivityData</span><span class="op">&gt;</span>) {
+        <span class="self">self</span>.<span class="ident">shard</span>.<span class="ident">set_activity</span>(<span class="ident">activity</span>);
     }
 
     <span class="doccomment">/// Sets the current user&#39;s presence, providing all fields to be passed.</span>
@@ -839,10 +837,10 @@
     <span class="doccomment">/// #[serenity::async_trait]</span>
     <span class="doccomment">/// impl EventHandler for Handler {</span>
     <span class="doccomment">///     async fn ready(&amp;self, context: Context, _: Ready) {</span>
-    <span class="doccomment">///         use serenity::model::gateway::Activity;</span>
+    <span class="doccomment">///         use serenity::gateway::ActivityData;</span>
     <span class="doccomment">///         use serenity::model::user::OnlineStatus;</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">///         let activity = Activity::playing(&quot;Heroes of the Storm&quot;);</span>
+    <span class="doccomment">///         let activity = ActivityData::playing(&quot;Heroes of the Storm&quot;);</span>
     <span class="doccomment">///         let status = OnlineStatus::DoNotDisturb;</span>
     <span class="doccomment">///</span>
     <span class="doccomment">///         context.set_presence(Some(activity), status);</span>
@@ -862,7 +860,7 @@
     <span class="doccomment">/// [`Idle`]: OnlineStatus::Idle</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;gateway&quot;</span>)]</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">set_presence</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">activity</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Activity</span><span class="op">&gt;</span>, <span class="ident">status</span>: <span class="ident">OnlineStatus</span>) {
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">set_presence</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">activity</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ActivityData</span><span class="op">&gt;</span>, <span class="ident">status</span>: <span class="ident">OnlineStatus</span>) {
         <span class="self">self</span>.<span class="ident">shard</span>.<span class="ident">set_presence</span>(<span class="ident">activity</span>, <span class="ident">status</span>);
     }
 

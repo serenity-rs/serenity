@@ -611,23 +611,6 @@
 <span id="606">606</span>
 <span id="607">607</span>
 <span id="608">608</span>
-<span id="609">609</span>
-<span id="610">610</span>
-<span id="611">611</span>
-<span id="612">612</span>
-<span id="613">613</span>
-<span id="614">614</span>
-<span id="615">615</span>
-<span id="616">616</span>
-<span id="617">617</span>
-<span id="618">618</span>
-<span id="619">619</span>
-<span id="620">620</span>
-<span id="621">621</span>
-<span id="622">622</span>
-<span id="623">623</span>
-<span id="624">624</span>
-<span id="625">625</span>
 </pre><pre class="rust"><code><span class="doccomment">//! Models relating to channels and types within channels.</span>
 
 <span class="kw">mod</span> <span class="ident">attachment</span>;
@@ -908,56 +891,42 @@
     }
 }
 
-<span class="doccomment">/// A representation of a type of channel.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>, <span class="ident">Ord</span>, <span class="ident">PartialEq</span>, <span class="ident">PartialOrd</span>)]</span>
-<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">u8</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">ChannelType</span> {
-    <span class="doccomment">/// An indicator that the channel is a text [`GuildChannel`].</span>
-    <span class="ident">Text</span> <span class="op">=</span> <span class="number">0</span>,
-    <span class="doccomment">/// An indicator that the channel is a [`PrivateChannel`].</span>
-    <span class="ident">Private</span> <span class="op">=</span> <span class="number">1</span>,
-    <span class="doccomment">/// An indicator that the channel is a voice [`GuildChannel`].</span>
-    <span class="ident">Voice</span> <span class="op">=</span> <span class="number">2</span>,
-    <span class="doccomment">/// An indicator that the channel is the channel of a [`ChannelCategory`].</span>
-    <span class="ident">Category</span> <span class="op">=</span> <span class="number">4</span>,
-    <span class="doccomment">/// An indicator that the channel is a `NewsChannel`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Note: `NewsChannel` is serialized into a [`GuildChannel`]</span>
-    <span class="ident">News</span> <span class="op">=</span> <span class="number">5</span>,
-    <span class="doccomment">/// An indicator that the channel is a news thread [`GuildChannel`].</span>
-    <span class="ident">NewsThread</span> <span class="op">=</span> <span class="number">10</span>,
-    <span class="doccomment">/// An indicator that the channel is a public thread [`GuildChannel`].</span>
-    <span class="ident">PublicThread</span> <span class="op">=</span> <span class="number">11</span>,
-    <span class="doccomment">/// An indicator that the channel is a private thread [`GuildChannel`].</span>
-    <span class="ident">PrivateThread</span> <span class="op">=</span> <span class="number">12</span>,
-    <span class="doccomment">/// An indicator that the channel is a stage [`GuildChannel`].</span>
-    <span class="ident">Stage</span> <span class="op">=</span> <span class="number">13</span>,
-    <span class="doccomment">/// An indicator that the channel is a directory [`GuildChannel`] in a [hub].</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [hub]: https://support.discord.com/hc/en-us/articles/4406046651927-Discord-Student-Hubs-FAQ</span>
-    <span class="ident">Directory</span> <span class="op">=</span> <span class="number">14</span>,
-    <span class="doccomment">/// An indicator that the channel is a forum [`GuildChannel`].</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
-    <span class="ident">Forum</span> <span class="op">=</span> <span class="number">15</span>,
-    <span class="doccomment">/// An indicator that the channel is of unknown type.</span>
-    <span class="ident">Unknown</span> <span class="op">=</span> <span class="op">!</span><span class="number">0</span>,
+<span class="macro">enum_number!</span> {
+    <span class="doccomment">/// A representation of a type of channel.</span>
+    <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>, <span class="ident">Ord</span>, <span class="ident">PartialEq</span>, <span class="ident">PartialOrd</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
+    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">from</span> <span class="op">=</span> <span class="string">&quot;u8&quot;</span>, <span class="ident">into</span> <span class="op">=</span> <span class="string">&quot;u8&quot;</span>)]</span>
+    <span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
+    <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">ChannelType</span> {
+        <span class="doccomment">/// An indicator that the channel is a text [`GuildChannel`].</span>
+        <span class="ident">Text</span> <span class="op">=</span> <span class="number">0</span>,
+        <span class="doccomment">/// An indicator that the channel is a [`PrivateChannel`].</span>
+        <span class="ident">Private</span> <span class="op">=</span> <span class="number">1</span>,
+        <span class="doccomment">/// An indicator that the channel is a voice [`GuildChannel`].</span>
+        <span class="ident">Voice</span> <span class="op">=</span> <span class="number">2</span>,
+        <span class="doccomment">/// An indicator that the channel is the channel of a [`ChannelCategory`].</span>
+        <span class="ident">Category</span> <span class="op">=</span> <span class="number">4</span>,
+        <span class="doccomment">/// An indicator that the channel is a `NewsChannel`.</span>
+        <span class="doccomment">///</span>
+        <span class="doccomment">/// Note: `NewsChannel` is serialized into a [`GuildChannel`]</span>
+        <span class="ident">News</span> <span class="op">=</span> <span class="number">5</span>,
+        <span class="doccomment">/// An indicator that the channel is a news thread [`GuildChannel`].</span>
+        <span class="ident">NewsThread</span> <span class="op">=</span> <span class="number">10</span>,
+        <span class="doccomment">/// An indicator that the channel is a public thread [`GuildChannel`].</span>
+        <span class="ident">PublicThread</span> <span class="op">=</span> <span class="number">11</span>,
+        <span class="doccomment">/// An indicator that the channel is a private thread [`GuildChannel`].</span>
+        <span class="ident">PrivateThread</span> <span class="op">=</span> <span class="number">12</span>,
+        <span class="doccomment">/// An indicator that the channel is a stage [`GuildChannel`].</span>
+        <span class="ident">Stage</span> <span class="op">=</span> <span class="number">13</span>,
+        <span class="doccomment">/// An indicator that the channel is a directory [`GuildChannel`] in a [hub].</span>
+        <span class="doccomment">///</span>
+        <span class="doccomment">/// [hub]: https://support.discord.com/hc/en-us/articles/4406046651927-Discord-Student-Hubs-FAQ</span>
+        <span class="ident">Directory</span> <span class="op">=</span> <span class="number">14</span>,
+        <span class="doccomment">/// An indicator that the channel is a forum [`GuildChannel`].</span>
+        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
+        <span class="ident">Forum</span> <span class="op">=</span> <span class="number">15</span>,
+        <span class="kw">_</span> =&gt; <span class="ident">Unknown</span>(<span class="ident">u8</span>),
+    }
 }
-
-<span class="macro">enum_number!</span>(<span class="ident">ChannelType</span> {
-    <span class="ident">Text</span>,
-    <span class="ident">Private</span>,
-    <span class="ident">Voice</span>,
-    <span class="ident">Category</span>,
-    <span class="ident">News</span>,
-    <span class="ident">NewsThread</span>,
-    <span class="ident">PublicThread</span>,
-    <span class="ident">PrivateThread</span>,
-    <span class="ident">Stage</span>,
-    <span class="ident">Directory</span>,
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
-    <span class="ident">Forum</span>,
-});
 
 <span class="kw">impl</span> <span class="ident">ChannelType</span> {
     <span class="attribute">#[<span class="ident">inline</span>]</span>
@@ -976,7 +945,7 @@
             <span class="ident"><span class="self">Self</span>::Directory</span> =&gt; <span class="string">&quot;directory&quot;</span>,
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
             <span class="ident"><span class="self">Self</span>::Forum</span> =&gt; <span class="string">&quot;forum&quot;</span>,
-            <span class="ident"><span class="self">Self</span>::Unknown</span> =&gt; <span class="string">&quot;unknown&quot;</span>,
+            <span class="ident"><span class="self">Self</span>::Unknown</span>(<span class="kw">_</span>) =&gt; <span class="string">&quot;unknown&quot;</span>,
         }
     }
 }
@@ -1063,23 +1032,20 @@
     <span class="ident">Role</span>(<span class="ident">RoleId</span>),
 }
 
-<span class="doccomment">/// The video quality mode for a voice channel.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>, <span class="ident">Ord</span>, <span class="ident">PartialEq</span>, <span class="ident">PartialOrd</span>)]</span>
-<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">VideoQualityMode</span> {
-    <span class="doccomment">/// An indicator that the video quality is chosen by Discord for optimal</span>
-    <span class="doccomment">/// performance.</span>
-    <span class="ident">Auto</span> <span class="op">=</span> <span class="number">1</span>,
-    <span class="doccomment">/// An indicator that the video quality is 720p.</span>
-    <span class="ident">Full</span> <span class="op">=</span> <span class="number">2</span>,
-    <span class="doccomment">/// An indicator that video quality is of unknown type.</span>
-    <span class="ident">Unknown</span> <span class="op">=</span> <span class="op">!</span><span class="number">0</span>,
+<span class="macro">enum_number!</span> {
+    <span class="doccomment">/// The video quality mode for a voice channel.</span>
+    <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>, <span class="ident">Ord</span>, <span class="ident">PartialEq</span>, <span class="ident">PartialOrd</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
+    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">from</span> <span class="op">=</span> <span class="string">&quot;u8&quot;</span>, <span class="ident">into</span> <span class="op">=</span> <span class="string">&quot;u8&quot;</span>)]</span>
+    <span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
+    <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">VideoQualityMode</span> {
+        <span class="doccomment">/// An indicator that the video quality is chosen by Discord for optimal</span>
+        <span class="doccomment">/// performance.</span>
+        <span class="ident">Auto</span> <span class="op">=</span> <span class="number">1</span>,
+        <span class="doccomment">/// An indicator that the video quality is 720p.</span>
+        <span class="ident">Full</span> <span class="op">=</span> <span class="number">2</span>,
+        <span class="kw">_</span> =&gt; <span class="ident">Unknown</span>(<span class="ident">u8</span>),
+    }
 }
-
-<span class="macro">enum_number!</span>(<span class="ident">VideoQualityMode</span> {
-    <span class="ident">Auto</span>,
-    <span class="ident">Full</span>
-});
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
 <span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>

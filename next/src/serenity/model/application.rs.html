@@ -97,8 +97,6 @@
 <span id="92">92</span>
 <span id="93">93</span>
 <span id="94">94</span>
-<span id="95">95</span>
-<span id="96">96</span>
 </pre><pre class="rust"><code><span class="doccomment">//! Models about OAuth2 applications.</span>
 
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">command</span>;
@@ -168,18 +166,16 @@
     <span class="kw">pub</span> <span class="ident">user</span>: <span class="ident">User</span>,
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>, <span class="ident">Ord</span>, <span class="ident">PartialEq</span>, <span class="ident">PartialOrd</span>)]</span>
-<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">MembershipState</span> {
-    <span class="ident">Invited</span> <span class="op">=</span> <span class="number">1</span>,
-    <span class="ident">Accepted</span> <span class="op">=</span> <span class="number">2</span>,
-    <span class="ident">Unknown</span> <span class="op">=</span> <span class="op">!</span><span class="number">0</span>,
+<span class="macro">enum_number!</span> {
+    <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>, <span class="ident">Ord</span>, <span class="ident">PartialEq</span>, <span class="ident">PartialOrd</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
+    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">from</span> <span class="op">=</span> <span class="string">&quot;u8&quot;</span>, <span class="ident">into</span> <span class="op">=</span> <span class="string">&quot;u8&quot;</span>)]</span>
+    <span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
+    <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">MembershipState</span> {
+        <span class="ident">Invited</span> <span class="op">=</span> <span class="number">1</span>,
+        <span class="ident">Accepted</span> <span class="op">=</span> <span class="number">2</span>,
+        <span class="kw">_</span> =&gt; <span class="ident">Unknown</span>(<span class="ident">u8</span>),
+    }
 }
-
-<span class="macro">enum_number!</span>(<span class="ident">MembershipState</span> {
-    <span class="ident">Invited</span>,
-    <span class="ident">Accepted</span>
-});
 
 <span class="macro">bitflags!</span> {
     <span class="doccomment">/// The flags of the application.</span>

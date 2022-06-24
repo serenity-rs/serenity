@@ -1225,34 +1225,6 @@
 <span id="1220">1220</span>
 <span id="1221">1221</span>
 <span id="1222">1222</span>
-<span id="1223">1223</span>
-<span id="1224">1224</span>
-<span id="1225">1225</span>
-<span id="1226">1226</span>
-<span id="1227">1227</span>
-<span id="1228">1228</span>
-<span id="1229">1229</span>
-<span id="1230">1230</span>
-<span id="1231">1231</span>
-<span id="1232">1232</span>
-<span id="1233">1233</span>
-<span id="1234">1234</span>
-<span id="1235">1235</span>
-<span id="1236">1236</span>
-<span id="1237">1237</span>
-<span id="1238">1238</span>
-<span id="1239">1239</span>
-<span id="1240">1240</span>
-<span id="1241">1241</span>
-<span id="1242">1242</span>
-<span id="1243">1243</span>
-<span id="1244">1244</span>
-<span id="1245">1245</span>
-<span id="1246">1246</span>
-<span id="1247">1247</span>
-<span id="1248">1248</span>
-<span id="1249">1249</span>
-<span id="1250">1250</span>
 </pre><pre class="rust"><code><span class="doccomment">//! Models relating to Discord channels.</span>
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
@@ -2267,102 +2239,74 @@
     <span class="kw">pub</span> <span class="ident">reaction_type</span>: <span class="ident">ReactionType</span>,
 }
 
-<span class="doccomment">/// Differentiates between regular and different types of system messages.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>, <span class="ident">Ord</span>, <span class="ident">PartialEq</span>, <span class="ident">PartialOrd</span>)]</span>
-<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">MessageType</span> {
-    <span class="doccomment">/// A regular message.</span>
-    <span class="ident">Regular</span> <span class="op">=</span> <span class="number">0</span>,
-    <span class="doccomment">/// An indicator that a recipient was added by the author.</span>
-    <span class="ident">GroupRecipientAddition</span> <span class="op">=</span> <span class="number">1</span>,
-    <span class="doccomment">/// An indicator that a recipient was removed by the author.</span>
-    <span class="ident">GroupRecipientRemoval</span> <span class="op">=</span> <span class="number">2</span>,
-    <span class="doccomment">/// An indicator that a call was started by the author.</span>
-    <span class="ident">GroupCallCreation</span> <span class="op">=</span> <span class="number">3</span>,
-    <span class="doccomment">/// An indicator that the group name was modified by the author.</span>
-    <span class="ident">GroupNameUpdate</span> <span class="op">=</span> <span class="number">4</span>,
-    <span class="doccomment">/// An indicator that the group icon was modified by the author.</span>
-    <span class="ident">GroupIconUpdate</span> <span class="op">=</span> <span class="number">5</span>,
-    <span class="doccomment">/// An indicator that a message was pinned by the author.</span>
-    <span class="ident">PinsAdd</span> <span class="op">=</span> <span class="number">6</span>,
-    <span class="doccomment">/// An indicator that a member joined the guild.</span>
-    <span class="ident">MemberJoin</span> <span class="op">=</span> <span class="number">7</span>,
-    <span class="doccomment">/// An indicator that someone has boosted the guild.</span>
-    <span class="ident">NitroBoost</span> <span class="op">=</span> <span class="number">8</span>,
-    <span class="doccomment">/// An indicator that the guild has reached nitro tier 1</span>
-    <span class="ident">NitroTier1</span> <span class="op">=</span> <span class="number">9</span>,
-    <span class="doccomment">/// An indicator that the guild has reached nitro tier 2</span>
-    <span class="ident">NitroTier2</span> <span class="op">=</span> <span class="number">10</span>,
-    <span class="doccomment">/// An indicator that the guild has reached nitro tier 3</span>
-    <span class="ident">NitroTier3</span> <span class="op">=</span> <span class="number">11</span>,
-    <span class="doccomment">/// An indicator that the channel is now following a news channel</span>
-    <span class="ident">ChannelFollowAdd</span> <span class="op">=</span> <span class="number">12</span>,
-    <span class="doccomment">/// An indicator that the guild is disqualified for Discovery Feature</span>
-    <span class="ident">GuildDiscoveryDisqualified</span> <span class="op">=</span> <span class="number">14</span>,
-    <span class="doccomment">/// An indicator that the guild is requalified for Discovery Feature</span>
-    <span class="ident">GuildDiscoveryRequalified</span> <span class="op">=</span> <span class="number">15</span>,
-    <span class="doccomment">/// The first warning before guild discovery removal.</span>
-    <span class="ident">GuildDiscoveryGracePeriodInitialWarning</span> <span class="op">=</span> <span class="number">16</span>,
-    <span class="doccomment">/// The last warning before guild discovery removal.</span>
-    <span class="ident">GuildDiscoveryGracePeriodFinalWarning</span> <span class="op">=</span> <span class="number">17</span>,
-    <span class="doccomment">/// Message sent to inform users that a thread was created.</span>
-    <span class="ident">ThreadCreated</span> <span class="op">=</span> <span class="number">18</span>,
-    <span class="doccomment">/// A message reply.</span>
-    <span class="ident">InlineReply</span> <span class="op">=</span> <span class="number">19</span>,
-    <span class="doccomment">/// A slash command.</span>
-    <span class="ident">ChatInputCommand</span> <span class="op">=</span> <span class="number">20</span>,
-    <span class="doccomment">/// A thread start message.</span>
-    <span class="ident">ThreadStarterMessage</span> <span class="op">=</span> <span class="number">21</span>,
-    <span class="doccomment">/// Server setup tips.</span>
-    <span class="ident">GuildInviteReminder</span> <span class="op">=</span> <span class="number">22</span>,
-    <span class="doccomment">/// A context menu command.</span>
-    <span class="ident">ContextMenuCommand</span> <span class="op">=</span> <span class="number">23</span>,
-    <span class="doccomment">/// An indicator that the message is of unknown type.</span>
-    <span class="ident">Unknown</span> <span class="op">=</span> <span class="op">!</span><span class="number">0</span>,
+<span class="macro">enum_number!</span> {
+    <span class="doccomment">/// Differentiates between regular and different types of system messages.</span>
+    <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>, <span class="ident">Ord</span>, <span class="ident">PartialEq</span>, <span class="ident">PartialOrd</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
+    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">from</span> <span class="op">=</span> <span class="string">&quot;u8&quot;</span>, <span class="ident">into</span> <span class="op">=</span> <span class="string">&quot;u8&quot;</span>)]</span>
+    <span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
+    <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">MessageType</span> {
+        <span class="doccomment">/// A regular message.</span>
+        <span class="ident">Regular</span> <span class="op">=</span> <span class="number">0</span>,
+        <span class="doccomment">/// An indicator that a recipient was added by the author.</span>
+        <span class="ident">GroupRecipientAddition</span> <span class="op">=</span> <span class="number">1</span>,
+        <span class="doccomment">/// An indicator that a recipient was removed by the author.</span>
+        <span class="ident">GroupRecipientRemoval</span> <span class="op">=</span> <span class="number">2</span>,
+        <span class="doccomment">/// An indicator that a call was started by the author.</span>
+        <span class="ident">GroupCallCreation</span> <span class="op">=</span> <span class="number">3</span>,
+        <span class="doccomment">/// An indicator that the group name was modified by the author.</span>
+        <span class="ident">GroupNameUpdate</span> <span class="op">=</span> <span class="number">4</span>,
+        <span class="doccomment">/// An indicator that the group icon was modified by the author.</span>
+        <span class="ident">GroupIconUpdate</span> <span class="op">=</span> <span class="number">5</span>,
+        <span class="doccomment">/// An indicator that a message was pinned by the author.</span>
+        <span class="ident">PinsAdd</span> <span class="op">=</span> <span class="number">6</span>,
+        <span class="doccomment">/// An indicator that a member joined the guild.</span>
+        <span class="ident">MemberJoin</span> <span class="op">=</span> <span class="number">7</span>,
+        <span class="doccomment">/// An indicator that someone has boosted the guild.</span>
+        <span class="ident">NitroBoost</span> <span class="op">=</span> <span class="number">8</span>,
+        <span class="doccomment">/// An indicator that the guild has reached nitro tier 1</span>
+        <span class="ident">NitroTier1</span> <span class="op">=</span> <span class="number">9</span>,
+        <span class="doccomment">/// An indicator that the guild has reached nitro tier 2</span>
+        <span class="ident">NitroTier2</span> <span class="op">=</span> <span class="number">10</span>,
+        <span class="doccomment">/// An indicator that the guild has reached nitro tier 3</span>
+        <span class="ident">NitroTier3</span> <span class="op">=</span> <span class="number">11</span>,
+        <span class="doccomment">/// An indicator that the channel is now following a news channel</span>
+        <span class="ident">ChannelFollowAdd</span> <span class="op">=</span> <span class="number">12</span>,
+        <span class="doccomment">/// An indicator that the guild is disqualified for Discovery Feature</span>
+        <span class="ident">GuildDiscoveryDisqualified</span> <span class="op">=</span> <span class="number">14</span>,
+        <span class="doccomment">/// An indicator that the guild is requalified for Discovery Feature</span>
+        <span class="ident">GuildDiscoveryRequalified</span> <span class="op">=</span> <span class="number">15</span>,
+        <span class="doccomment">/// The first warning before guild discovery removal.</span>
+        <span class="ident">GuildDiscoveryGracePeriodInitialWarning</span> <span class="op">=</span> <span class="number">16</span>,
+        <span class="doccomment">/// The last warning before guild discovery removal.</span>
+        <span class="ident">GuildDiscoveryGracePeriodFinalWarning</span> <span class="op">=</span> <span class="number">17</span>,
+        <span class="doccomment">/// Message sent to inform users that a thread was created.</span>
+        <span class="ident">ThreadCreated</span> <span class="op">=</span> <span class="number">18</span>,
+        <span class="doccomment">/// A message reply.</span>
+        <span class="ident">InlineReply</span> <span class="op">=</span> <span class="number">19</span>,
+        <span class="doccomment">/// A slash command.</span>
+        <span class="ident">ChatInputCommand</span> <span class="op">=</span> <span class="number">20</span>,
+        <span class="doccomment">/// A thread start message.</span>
+        <span class="ident">ThreadStarterMessage</span> <span class="op">=</span> <span class="number">21</span>,
+        <span class="doccomment">/// Server setup tips.</span>
+        <span class="ident">GuildInviteReminder</span> <span class="op">=</span> <span class="number">22</span>,
+        <span class="doccomment">/// A context menu command.</span>
+        <span class="ident">ContextMenuCommand</span> <span class="op">=</span> <span class="number">23</span>,
+        <span class="kw">_</span> =&gt; <span class="ident">Unknown</span>(<span class="ident">u8</span>),
+    }
 }
 
-<span class="macro">enum_number!</span>(<span class="ident">MessageType</span> {
-    <span class="ident">Regular</span>,
-    <span class="ident">GroupRecipientAddition</span>,
-    <span class="ident">GroupRecipientRemoval</span>,
-    <span class="ident">GroupCallCreation</span>,
-    <span class="ident">GroupNameUpdate</span>,
-    <span class="ident">GroupIconUpdate</span>,
-    <span class="ident">PinsAdd</span>,
-    <span class="ident">MemberJoin</span>,
-    <span class="ident">NitroBoost</span>,
-    <span class="ident">NitroTier1</span>,
-    <span class="ident">NitroTier2</span>,
-    <span class="ident">NitroTier3</span>,
-    <span class="ident">ChannelFollowAdd</span>,
-    <span class="ident">GuildDiscoveryDisqualified</span>,
-    <span class="ident">GuildDiscoveryRequalified</span>,
-    <span class="ident">GuildDiscoveryGracePeriodInitialWarning</span>,
-    <span class="ident">GuildDiscoveryGracePeriodFinalWarning</span>
-    <span class="ident">ThreadCreated</span>,
-    <span class="ident">InlineReply</span>,
-    <span class="ident">ChatInputCommand</span>,
-    <span class="ident">ThreadStarterMessage</span>,
-    <span class="ident">GuildInviteReminder</span>,
-    <span class="ident">ContextMenuCommand</span>,
-});
-
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>, <span class="ident">Ord</span>, <span class="ident">PartialEq</span>, <span class="ident">PartialOrd</span>)]</span>
-<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">MessageActivityKind</span> {
-    <span class="ident">Join</span> <span class="op">=</span> <span class="number">1</span>,
-    <span class="ident">Spectate</span> <span class="op">=</span> <span class="number">2</span>,
-    <span class="ident">Listen</span> <span class="op">=</span> <span class="number">3</span>,
-    <span class="ident">JoinRequest</span> <span class="op">=</span> <span class="number">5</span>,
-    <span class="ident">Unknown</span> <span class="op">=</span> <span class="op">!</span><span class="number">0</span>,
+<span class="macro">enum_number!</span> {
+    <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>, <span class="ident">Ord</span>, <span class="ident">PartialEq</span>, <span class="ident">PartialOrd</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
+    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">from</span> <span class="op">=</span> <span class="string">&quot;u8&quot;</span>, <span class="ident">into</span> <span class="op">=</span> <span class="string">&quot;u8&quot;</span>)]</span>
+    <span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
+    <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">MessageActivityKind</span> {
+        <span class="ident">Join</span> <span class="op">=</span> <span class="number">1</span>,
+        <span class="ident">Spectate</span> <span class="op">=</span> <span class="number">2</span>,
+        <span class="ident">Listen</span> <span class="op">=</span> <span class="number">3</span>,
+        <span class="ident">JoinRequest</span> <span class="op">=</span> <span class="number">5</span>,
+        <span class="kw">_</span> =&gt; <span class="ident">Unknown</span>(<span class="ident">u8</span>),
+    }
 }
-
-<span class="macro">enum_number!</span>(<span class="ident">MessageActivityKind</span> {
-    <span class="ident">Join</span>,
-    <span class="ident">Spectate</span>,
-    <span class="ident">Listen</span>,
-    <span class="ident">JoinRequest</span>,
-});
 
 <span class="doccomment">/// Rich Presence application information.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>

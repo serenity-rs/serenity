@@ -326,7 +326,7 @@
     <span class="ident">ModalInteractionFilter</span>,
     <span class="ident">ReactionFilter</span>,
 };
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::gateway::InterMessage</span>;
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::gateway</span>::{<span class="ident">ActivityData</span>, <span class="ident">InterMessage</span>};
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::prelude</span>::<span class="kw-2">*</span>;
 
 <span class="doccomment">/// A lightweight wrapper around an mpsc sender.</span>
@@ -465,13 +465,13 @@
     <span class="doccomment">/// #     };</span>
     <span class="doccomment">/// #</span>
     <span class="doccomment">/// #     let mut shard = Shard::new(mutex.clone(), &quot;&quot;, shard_info, GatewayIntents::all()).await?;</span>
-    <span class="doccomment">/// use serenity::model::gateway::Activity;</span>
+    <span class="doccomment">/// use serenity::gateway::ActivityData;</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// shard.set_activity(Some(Activity::playing(&quot;Heroes of the Storm&quot;)));</span>
+    <span class="doccomment">/// shard.set_activity(Some(ActivityData::playing(&quot;Heroes of the Storm&quot;)));</span>
     <span class="doccomment">/// #     Ok(())</span>
     <span class="doccomment">/// # }</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_activity</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">activity</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Activity</span><span class="op">&gt;</span>) {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_activity</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">activity</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ActivityData</span><span class="op">&gt;</span>) {
         <span class="ident">drop</span>(<span class="self">self</span>.<span class="ident">send_to_shard</span>(<span class="ident">ShardRunnerMessage::SetActivity</span>(<span class="ident">activity</span>)));
     }
 
@@ -500,20 +500,20 @@
     <span class="doccomment">/// #</span>
     <span class="doccomment">/// #     let mut shard = Shard::new(mutex.clone(), &quot;&quot;, shard_info, None).await?;</span>
     <span class="doccomment">/// #</span>
-    <span class="doccomment">/// use serenity::model::gateway::Activity;</span>
+    <span class="doccomment">/// use serenity::gateway::ActivityData;</span>
     <span class="doccomment">/// use serenity::model::user::OnlineStatus;</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// let activity = Activity::playing(&quot;Heroes of the Storm&quot;);</span>
+    <span class="doccomment">/// let activity = ActivityData::playing(&quot;Heroes of the Storm&quot;);</span>
     <span class="doccomment">/// shard.set_presence(Some(activity), OnlineStatus::Online);</span>
     <span class="doccomment">/// #     Ok(())</span>
     <span class="doccomment">/// # }</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_presence</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">activity</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Activity</span><span class="op">&gt;</span>, <span class="kw-2">mut</span> <span class="ident">status</span>: <span class="ident">OnlineStatus</span>) {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_presence</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">activity</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ActivityData</span><span class="op">&gt;</span>, <span class="kw-2">mut</span> <span class="ident">status</span>: <span class="ident">OnlineStatus</span>) {
         <span class="kw">if</span> <span class="ident">status</span> <span class="op">==</span> <span class="ident">OnlineStatus::Offline</span> {
             <span class="ident">status</span> <span class="op">=</span> <span class="ident">OnlineStatus::Invisible</span>;
         }
 
-        <span class="ident">drop</span>(<span class="self">self</span>.<span class="ident">send_to_shard</span>(<span class="ident">ShardRunnerMessage::SetPresence</span>(<span class="ident">status</span>, <span class="ident">activity</span>)));
+        <span class="ident">drop</span>(<span class="self">self</span>.<span class="ident">send_to_shard</span>(<span class="ident">ShardRunnerMessage::SetPresence</span>(<span class="ident">activity</span>, <span class="ident">status</span>)));
     }
 
     <span class="doccomment">/// Sets the user&#39;s current online status.</span>

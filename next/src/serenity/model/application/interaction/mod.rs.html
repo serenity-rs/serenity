@@ -275,12 +275,6 @@
 <span id="270">270</span>
 <span id="271">271</span>
 <span id="272">272</span>
-<span id="273">273</span>
-<span id="274">274</span>
-<span id="275">275</span>
-<span id="276">276</span>
-<span id="277">277</span>
-<span id="278">278</span>
 </pre><pre class="rust"><code><span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">application_command</span>;
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">autocomplete</span>;
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">message_component</span>;
@@ -435,7 +429,7 @@
             <span class="ident">InteractionType::Autocomplete</span> =&gt; <span class="ident">from_value</span>(<span class="ident">value</span>).<span class="ident">map</span>(<span class="ident">Interaction::Autocomplete</span>),
             <span class="ident">InteractionType::ModalSubmit</span> =&gt; <span class="ident">from_value</span>(<span class="ident">value</span>).<span class="ident">map</span>(<span class="ident">Interaction::ModalSubmit</span>),
             <span class="ident">InteractionType::Ping</span> =&gt; <span class="ident">from_value</span>(<span class="ident">value</span>).<span class="ident">map</span>(<span class="ident">Interaction::Ping</span>),
-            <span class="ident">InteractionType::Unknown</span> =&gt; <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">DeError::custom</span>(<span class="string">&quot;Unknown interaction type&quot;</span>)),
+            <span class="ident">InteractionType::Unknown</span>(<span class="kw">_</span>) =&gt; <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">DeError::custom</span>(<span class="string">&quot;Unknown interaction type&quot;</span>)),
         }
         .<span class="ident">map_err</span>(<span class="ident">DeError::custom</span>)
     }
@@ -453,28 +447,22 @@
     }
 }
 
-<span class="doccomment">/// The type of an Interaction.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-object-interaction-type).</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>, <span class="ident">Ord</span>, <span class="ident">PartialEq</span>, <span class="ident">PartialOrd</span>)]</span>
-<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">u8</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">InteractionType</span> {
-    <span class="ident">Ping</span> <span class="op">=</span> <span class="number">1</span>,
-    <span class="ident">ApplicationCommand</span> <span class="op">=</span> <span class="number">2</span>,
-    <span class="ident">MessageComponent</span> <span class="op">=</span> <span class="number">3</span>,
-    <span class="ident">Autocomplete</span> <span class="op">=</span> <span class="number">4</span>,
-    <span class="ident">ModalSubmit</span> <span class="op">=</span> <span class="number">5</span>,
-    <span class="ident">Unknown</span> <span class="op">=</span> <span class="op">!</span><span class="number">0</span>,
+<span class="macro">enum_number!</span> {
+    <span class="doccomment">/// The type of an Interaction.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-object-interaction-type).</span>
+    <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>, <span class="ident">Ord</span>, <span class="ident">PartialEq</span>, <span class="ident">PartialOrd</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
+    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">from</span> <span class="op">=</span> <span class="string">&quot;u8&quot;</span>, <span class="ident">into</span> <span class="op">=</span> <span class="string">&quot;u8&quot;</span>)]</span>
+    <span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
+    <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">InteractionType</span> {
+        <span class="ident">Ping</span> <span class="op">=</span> <span class="number">1</span>,
+        <span class="ident">ApplicationCommand</span> <span class="op">=</span> <span class="number">2</span>,
+        <span class="ident">MessageComponent</span> <span class="op">=</span> <span class="number">3</span>,
+        <span class="ident">Autocomplete</span> <span class="op">=</span> <span class="number">4</span>,
+        <span class="ident">ModalSubmit</span> <span class="op">=</span> <span class="number">5</span>,
+        <span class="kw">_</span> =&gt; <span class="ident">Unknown</span>(<span class="ident">u8</span>),
+    }
 }
-
-<span class="macro">enum_number!</span>(<span class="ident">InteractionType</span> {
-    <span class="ident">Ping</span>,
-    <span class="ident">MessageComponent</span>,
-    <span class="ident">ApplicationCommand</span>,
-    <span class="ident">Autocomplete</span>,
-    <span class="ident">ModalSubmit</span>
-});
 
 <span class="macro">bitflags!</span> {
     <span class="doccomment">/// The flags for an interaction response message.</span>

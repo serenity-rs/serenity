@@ -23,28 +23,20 @@
 <span id="18">18</span>
 <span id="19">19</span>
 <span id="20">20</span>
-<span id="21">21</span>
-<span id="22">22</span>
-<span id="23">23</span>
-<span id="24">24</span>
-</pre><pre class="rust"><code><span class="doccomment">/// The guild&#39;s premium tier, depends on the amount of users boosting the guild currently</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>, <span class="ident">Ord</span>, <span class="ident">PartialEq</span>, <span class="ident">PartialOrd</span>)]</span>
-<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">PremiumTier</span> {
-    <span class="doccomment">/// No tier, considered None</span>
-    <span class="ident">Tier0</span>,
-    <span class="ident">Tier1</span>,
-    <span class="ident">Tier2</span>,
-    <span class="ident">Tier3</span>,
-    <span class="ident">Unknown</span> <span class="op">=</span> <span class="op">!</span><span class="number">0</span>,
+</pre><pre class="rust"><code><span class="macro">enum_number!</span> {
+    <span class="doccomment">/// The guild&#39;s premium tier, depends on the amount of users boosting the guild currently</span>
+    <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>, <span class="ident">Ord</span>, <span class="ident">PartialEq</span>, <span class="ident">PartialOrd</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
+    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">from</span> <span class="op">=</span> <span class="string">&quot;u8&quot;</span>, <span class="ident">into</span> <span class="op">=</span> <span class="string">&quot;u8&quot;</span>)]</span>
+    <span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
+    <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">PremiumTier</span> {
+        <span class="doccomment">/// No tier, considered None</span>
+        <span class="ident">Tier0</span> <span class="op">=</span> <span class="number">0</span>,
+        <span class="ident">Tier1</span> <span class="op">=</span> <span class="number">1</span>,
+        <span class="ident">Tier2</span> <span class="op">=</span> <span class="number">2</span>,
+        <span class="ident">Tier3</span> <span class="op">=</span> <span class="number">3</span>,
+        <span class="kw">_</span> =&gt; <span class="ident">Unknown</span>(<span class="ident">u8</span>),
+    }
 }
-
-<span class="macro">enum_number!</span>(<span class="ident">PremiumTier</span> {
-    <span class="ident">Tier0</span>,
-    <span class="ident">Tier1</span>,
-    <span class="ident">Tier2</span>,
-    <span class="ident">Tier3</span>
-});
 
 <span class="kw">impl</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">PremiumTier</span> {
     <span class="kw">fn</span> <span class="ident">default</span>() -&gt; <span class="self">Self</span> {

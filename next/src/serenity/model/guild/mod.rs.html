@@ -2954,27 +2954,6 @@
 <span id="2949">2949</span>
 <span id="2950">2950</span>
 <span id="2951">2951</span>
-<span id="2952">2952</span>
-<span id="2953">2953</span>
-<span id="2954">2954</span>
-<span id="2955">2955</span>
-<span id="2956">2956</span>
-<span id="2957">2957</span>
-<span id="2958">2958</span>
-<span id="2959">2959</span>
-<span id="2960">2960</span>
-<span id="2961">2961</span>
-<span id="2962">2962</span>
-<span id="2963">2963</span>
-<span id="2964">2964</span>
-<span id="2965">2965</span>
-<span id="2966">2966</span>
-<span id="2967">2967</span>
-<span id="2968">2968</span>
-<span id="2969">2969</span>
-<span id="2970">2970</span>
-<span id="2971">2971</span>
-<span id="2972">2972</span>
 </pre><pre class="rust"><code><span class="doccomment">//! Models relating to guilds and types that it owns.</span>
 
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">audit_log</span>;
@@ -5723,109 +5702,88 @@
     <span class="kw">pub</span> <span class="ident">unavailable</span>: <span class="ident">bool</span>,
 }
 
-<span class="doccomment">/// Default message notification level for a guild.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>, <span class="ident">Ord</span>, <span class="ident">PartialEq</span>, <span class="ident">PartialOrd</span>)]</span>
-<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">DefaultMessageNotificationLevel</span> {
-    <span class="doccomment">/// Receive notifications for everything.</span>
-    <span class="ident">All</span> <span class="op">=</span> <span class="number">0</span>,
-    <span class="doccomment">/// Receive only mentions.</span>
-    <span class="ident">Mentions</span> <span class="op">=</span> <span class="number">1</span>,
-    <span class="doccomment">/// Unknown notification level.</span>
-    <span class="ident">Unknown</span> <span class="op">=</span> <span class="op">!</span><span class="number">0</span>,
+<span class="macro">enum_number!</span> {
+    <span class="doccomment">/// Default message notification level for a guild.</span>
+    <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>, <span class="ident">Ord</span>, <span class="ident">PartialEq</span>, <span class="ident">PartialOrd</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
+    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">from</span> <span class="op">=</span> <span class="string">&quot;u8&quot;</span>, <span class="ident">into</span> <span class="op">=</span> <span class="string">&quot;u8&quot;</span>)]</span>
+    <span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
+    <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">DefaultMessageNotificationLevel</span> {
+        <span class="doccomment">/// Receive notifications for everything.</span>
+        <span class="ident">All</span> <span class="op">=</span> <span class="number">0</span>,
+        <span class="doccomment">/// Receive only mentions.</span>
+        <span class="ident">Mentions</span> <span class="op">=</span> <span class="number">1</span>,
+        <span class="kw">_</span> =&gt; <span class="ident">Unknown</span>(<span class="ident">u8</span>),
+    }
 }
 
-<span class="macro">enum_number!</span>(<span class="ident">DefaultMessageNotificationLevel</span> {
-    <span class="ident">All</span>,
-    <span class="ident">Mentions</span>
-});
-
-<span class="doccomment">/// Setting used to filter explicit messages from members.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>, <span class="ident">Ord</span>, <span class="ident">PartialEq</span>, <span class="ident">PartialOrd</span>)]</span>
-<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">ExplicitContentFilter</span> {
-    <span class="doccomment">/// Don&#39;t scan any messages.</span>
-    <span class="prelude-val">None</span> <span class="op">=</span> <span class="number">0</span>,
-    <span class="doccomment">/// Scan messages from members without a role.</span>
-    <span class="ident">WithoutRole</span> <span class="op">=</span> <span class="number">1</span>,
-    <span class="doccomment">/// Scan messages sent by all members.</span>
-    <span class="ident">All</span> <span class="op">=</span> <span class="number">2</span>,
-    <span class="doccomment">/// Unknown content filter.</span>
-    <span class="ident">Unknown</span> <span class="op">=</span> <span class="op">!</span><span class="number">0</span>,
+<span class="macro">enum_number!</span> {
+    <span class="doccomment">/// Setting used to filter explicit messages from members.</span>
+    <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>, <span class="ident">Ord</span>, <span class="ident">PartialEq</span>, <span class="ident">PartialOrd</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
+    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">from</span> <span class="op">=</span> <span class="string">&quot;u8&quot;</span>, <span class="ident">into</span> <span class="op">=</span> <span class="string">&quot;u8&quot;</span>)]</span>
+    <span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
+    <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">ExplicitContentFilter</span> {
+        <span class="doccomment">/// Don&#39;t scan any messages.</span>
+        <span class="prelude-val">None</span> <span class="op">=</span> <span class="number">0</span>,
+        <span class="doccomment">/// Scan messages from members without a role.</span>
+        <span class="ident">WithoutRole</span> <span class="op">=</span> <span class="number">1</span>,
+        <span class="doccomment">/// Scan messages sent by all members.</span>
+        <span class="ident">All</span> <span class="op">=</span> <span class="number">2</span>,
+        <span class="kw">_</span> =&gt; <span class="ident">Unknown</span>(<span class="ident">u8</span>),
+    }
 }
 
-<span class="macro">enum_number!</span>(<span class="ident">ExplicitContentFilter</span> {
-    <span class="prelude-val">None</span>,
-    <span class="ident">WithoutRole</span>,
-    <span class="ident">All</span>
-});
-
-<span class="doccomment">/// Multi-Factor Authentication level for guild moderators.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>, <span class="ident">Ord</span>, <span class="ident">PartialEq</span>, <span class="ident">PartialOrd</span>)]</span>
-<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">MfaLevel</span> {
-    <span class="doccomment">/// MFA is disabled.</span>
-    <span class="prelude-val">None</span> <span class="op">=</span> <span class="number">0</span>,
-    <span class="doccomment">/// MFA is enabled.</span>
-    <span class="ident">Elevated</span> <span class="op">=</span> <span class="number">1</span>,
-    <span class="doccomment">/// Unknown MFA level.</span>
-    <span class="ident">Unknown</span> <span class="op">=</span> <span class="op">!</span><span class="number">0</span>,
+<span class="macro">enum_number!</span> {
+    <span class="doccomment">/// Multi-Factor Authentication level for guild moderators.</span>
+    <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>, <span class="ident">Ord</span>, <span class="ident">PartialEq</span>, <span class="ident">PartialOrd</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
+    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">from</span> <span class="op">=</span> <span class="string">&quot;u8&quot;</span>, <span class="ident">into</span> <span class="op">=</span> <span class="string">&quot;u8&quot;</span>)]</span>
+    <span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
+    <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">MfaLevel</span> {
+        <span class="doccomment">/// MFA is disabled.</span>
+        <span class="prelude-val">None</span> <span class="op">=</span> <span class="number">0</span>,
+        <span class="doccomment">/// MFA is enabled.</span>
+        <span class="ident">Elevated</span> <span class="op">=</span> <span class="number">1</span>,
+        <span class="kw">_</span> =&gt; <span class="ident">Unknown</span>(<span class="ident">u8</span>),
+    }
 }
 
-<span class="macro">enum_number!</span>(<span class="ident">MfaLevel</span> {
-    <span class="prelude-val">None</span>,
-    <span class="ident">Elevated</span>
-});
-
-<span class="doccomment">/// The level to set as criteria prior to a user being able to send</span>
-<span class="doccomment">/// messages in a [`Guild`].</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>, <span class="ident">Ord</span>, <span class="ident">PartialEq</span>, <span class="ident">PartialOrd</span>)]</span>
-<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">VerificationLevel</span> {
-    <span class="doccomment">/// Does not require any verification.</span>
-    <span class="prelude-val">None</span> <span class="op">=</span> <span class="number">0</span>,
-    <span class="doccomment">/// Must have a verified email on the user&#39;s Discord account.</span>
-    <span class="ident">Low</span> <span class="op">=</span> <span class="number">1</span>,
-    <span class="doccomment">/// Must also be a registered user on Discord for longer than 5 minutes.</span>
-    <span class="ident">Medium</span> <span class="op">=</span> <span class="number">2</span>,
-    <span class="doccomment">/// Must also be a member of the guild for longer than 10 minutes.</span>
-    <span class="ident">High</span> <span class="op">=</span> <span class="number">3</span>,
-    <span class="doccomment">/// Must have a verified phone on the user&#39;s Discord account.</span>
-    <span class="ident">Higher</span> <span class="op">=</span> <span class="number">4</span>,
-    <span class="doccomment">/// Unknown verification level.</span>
-    <span class="ident">Unknown</span> <span class="op">=</span> <span class="op">!</span><span class="number">0</span>,
+<span class="macro">enum_number!</span> {
+    <span class="doccomment">/// The level to set as criteria prior to a user being able to send</span>
+    <span class="doccomment">/// messages in a [`Guild`].</span>
+    <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>, <span class="ident">Ord</span>, <span class="ident">PartialEq</span>, <span class="ident">PartialOrd</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
+    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">from</span> <span class="op">=</span> <span class="string">&quot;u8&quot;</span>, <span class="ident">into</span> <span class="op">=</span> <span class="string">&quot;u8&quot;</span>)]</span>
+    <span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
+    <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">VerificationLevel</span> {
+        <span class="doccomment">/// Does not require any verification.</span>
+        <span class="prelude-val">None</span> <span class="op">=</span> <span class="number">0</span>,
+        <span class="doccomment">/// Must have a verified email on the user&#39;s Discord account.</span>
+        <span class="ident">Low</span> <span class="op">=</span> <span class="number">1</span>,
+        <span class="doccomment">/// Must also be a registered user on Discord for longer than 5 minutes.</span>
+        <span class="ident">Medium</span> <span class="op">=</span> <span class="number">2</span>,
+        <span class="doccomment">/// Must also be a member of the guild for longer than 10 minutes.</span>
+        <span class="ident">High</span> <span class="op">=</span> <span class="number">3</span>,
+        <span class="doccomment">/// Must have a verified phone on the user&#39;s Discord account.</span>
+        <span class="ident">Higher</span> <span class="op">=</span> <span class="number">4</span>,
+        <span class="kw">_</span> =&gt; <span class="ident">Unknown</span>(<span class="ident">u8</span>),
+    }
 }
 
-<span class="macro">enum_number!</span>(<span class="ident">VerificationLevel</span> {
-    <span class="prelude-val">None</span>,
-    <span class="ident">Low</span>,
-    <span class="ident">Medium</span>,
-    <span class="ident">High</span>,
-    <span class="ident">Higher</span>
-});
-
-<span class="doccomment">/// The [`Guild`] nsfw level.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>, <span class="ident">Ord</span>, <span class="ident">PartialEq</span>, <span class="ident">PartialOrd</span>)]</span>
-<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">NsfwLevel</span> {
-    <span class="doccomment">/// The nsfw level is not specified.</span>
-    <span class="ident">Default</span> <span class="op">=</span> <span class="number">0</span>,
-    <span class="doccomment">/// The guild is considered as explicit.</span>
-    <span class="ident">Explicit</span> <span class="op">=</span> <span class="number">1</span>,
-    <span class="doccomment">/// The guild is considered as safe.</span>
-    <span class="ident">Safe</span> <span class="op">=</span> <span class="number">2</span>,
-    <span class="doccomment">/// The guild is age restricted.</span>
-    <span class="ident">AgeRestricted</span> <span class="op">=</span> <span class="number">3</span>,
-    <span class="doccomment">/// Unknown nsfw level.</span>
-    <span class="ident">Unknown</span> <span class="op">=</span> <span class="op">!</span><span class="number">0</span>,
+<span class="macro">enum_number!</span> {
+    <span class="doccomment">/// The [`Guild`] nsfw level.</span>
+    <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>, <span class="ident">Ord</span>, <span class="ident">PartialEq</span>, <span class="ident">PartialOrd</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
+    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">from</span> <span class="op">=</span> <span class="string">&quot;u8&quot;</span>, <span class="ident">into</span> <span class="op">=</span> <span class="string">&quot;u8&quot;</span>)]</span>
+    <span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
+    <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">NsfwLevel</span> {
+        <span class="doccomment">/// The nsfw level is not specified.</span>
+        <span class="ident">Default</span> <span class="op">=</span> <span class="number">0</span>,
+        <span class="doccomment">/// The guild is considered as explicit.</span>
+        <span class="ident">Explicit</span> <span class="op">=</span> <span class="number">1</span>,
+        <span class="doccomment">/// The guild is considered as safe.</span>
+        <span class="ident">Safe</span> <span class="op">=</span> <span class="number">2</span>,
+        <span class="doccomment">/// The guild is age restricted.</span>
+        <span class="ident">AgeRestricted</span> <span class="op">=</span> <span class="number">3</span>,
+        <span class="kw">_</span> =&gt; <span class="ident">Unknown</span>(<span class="ident">u8</span>),
+    }
 }
-
-<span class="macro">enum_number!</span>(<span class="ident">NsfwLevel</span> {
-    <span class="ident">Default</span>,
-    <span class="ident">Explicit</span>,
-    <span class="ident">Safe</span>,
-    <span class="ident">AgeRestricted</span>
-});
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
 <span class="kw">mod</span> <span class="ident">test</span> {

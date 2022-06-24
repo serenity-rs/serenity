@@ -164,13 +164,6 @@
 <span id="159">159</span>
 <span id="160">160</span>
 <span id="161">161</span>
-<span id="162">162</span>
-<span id="163">163</span>
-<span id="164">164</span>
-<span id="165">165</span>
-<span id="166">166</span>
-<span id="167">167</span>
-<span id="168">168</span>
 </pre><pre class="rust"><code><span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::builder::EditSticker</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
@@ -291,50 +284,43 @@
     }
 }
 
-<span class="doccomment">/// Differentiates between sticker types.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>, <span class="ident">Ord</span>, <span class="ident">PartialEq</span>, <span class="ident">PartialOrd</span>)]</span>
-<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">StickerType</span> {
-    <span class="doccomment">/// An official sticker in a pack, part of Nitro or in a removed purchasable</span>
-    <span class="doccomment">/// pack.</span>
-    <span class="ident">Standard</span> <span class="op">=</span> <span class="number">1</span>,
-    <span class="doccomment">/// A sticker uploaded to a Boosted guild for the guild&#39;s members.</span>
-    <span class="ident">Guild</span> <span class="op">=</span> <span class="number">2</span>,
-    <span class="doccomment">/// Unknown sticker type.</span>
-    <span class="ident">Unknown</span> <span class="op">=</span> <span class="op">!</span><span class="number">0</span>,
+<span class="macro">enum_number!</span> {
+    <span class="doccomment">/// Differentiates between sticker types.</span>
+    <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>, <span class="ident">Ord</span>, <span class="ident">PartialEq</span>, <span class="ident">PartialOrd</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
+    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">from</span> <span class="op">=</span> <span class="string">&quot;u8&quot;</span>, <span class="ident">into</span> <span class="op">=</span> <span class="string">&quot;u8&quot;</span>)]</span>
+    <span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
+    <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">StickerType</span> {
+        <span class="doccomment">/// An official sticker in a pack, part of Nitro or in a removed purchasable</span>
+        <span class="doccomment">/// pack.</span>
+        <span class="ident">Standard</span> <span class="op">=</span> <span class="number">1</span>,
+        <span class="doccomment">/// A sticker uploaded to a Boosted guild for the guild&#39;s members.</span>
+        <span class="ident">Guild</span> <span class="op">=</span> <span class="number">2</span>,
+        <span class="kw">_</span> =&gt; <span class="ident">Unknown</span>(<span class="ident">u8</span>),
+    }
 }
 
-<span class="macro">enum_number!</span>(<span class="ident">StickerType</span> {
-    <span class="ident">Standard</span>,
-    <span class="ident">Guild</span>
-});
-
-<span class="doccomment">/// Differentiates between sticker formats.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>, <span class="ident">Ord</span>, <span class="ident">PartialEq</span>, <span class="ident">PartialOrd</span>)]</span>
-<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">StickerFormatType</span> {
-    <span class="doccomment">/// A PNG format sticker.</span>
-    <span class="ident">Png</span> <span class="op">=</span> <span class="number">1</span>,
-    <span class="doccomment">/// An APNG format animated sticker.</span>
-    <span class="ident">Apng</span> <span class="op">=</span> <span class="number">2</span>,
-    <span class="doccomment">/// A LOTTIE format animated sticker.</span>
-    <span class="ident">Lottie</span> <span class="op">=</span> <span class="number">3</span>,
-    <span class="doccomment">/// Unknown sticker format type.</span>
-    <span class="ident">Unknown</span> <span class="op">=</span> <span class="op">!</span><span class="number">0</span>,
+<span class="macro">enum_number!</span> {
+    <span class="doccomment">/// Differentiates between sticker formats.</span>
+    <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>, <span class="ident">Ord</span>, <span class="ident">PartialEq</span>, <span class="ident">PartialOrd</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
+    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">from</span> <span class="op">=</span> <span class="string">&quot;u8&quot;</span>, <span class="ident">into</span> <span class="op">=</span> <span class="string">&quot;u8&quot;</span>)]</span>
+    <span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
+    <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">StickerFormatType</span> {
+        <span class="doccomment">/// A PNG format sticker.</span>
+        <span class="ident">Png</span> <span class="op">=</span> <span class="number">1</span>,
+        <span class="doccomment">/// An APNG format animated sticker.</span>
+        <span class="ident">Apng</span> <span class="op">=</span> <span class="number">2</span>,
+        <span class="doccomment">/// A LOTTIE format animated sticker.</span>
+        <span class="ident">Lottie</span> <span class="op">=</span> <span class="number">3</span>,
+        <span class="kw">_</span> =&gt; <span class="ident">Unknown</span>(<span class="ident">u8</span>),
+    }
 }
-
-<span class="macro">enum_number!</span>(<span class="ident">StickerFormatType</span> {
-    <span class="ident">Png</span>,
-    <span class="ident">Apng</span>,
-    <span class="ident">Lottie</span>
-});
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
 <span class="kw">fn</span> <span class="ident">sticker_url</span>(<span class="ident">sticker_id</span>: <span class="ident">StickerId</span>, <span class="ident">sticker_format_type</span>: <span class="ident">StickerFormatType</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="ident">ext</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">sticker_format_type</span> {
         <span class="ident">StickerFormatType::Png</span> <span class="op">|</span> <span class="ident">StickerFormatType::Apng</span> =&gt; <span class="string">&quot;png&quot;</span>,
         <span class="ident">StickerFormatType::Lottie</span> =&gt; <span class="string">&quot;json&quot;</span>,
-        <span class="ident">StickerFormatType::Unknown</span> =&gt; <span class="kw">return</span> <span class="prelude-val">None</span>,
+        <span class="ident">StickerFormatType::Unknown</span>(<span class="kw">_</span>) =&gt; <span class="kw">return</span> <span class="prelude-val">None</span>,
     };
 
     <span class="prelude-val">Some</span>(<span class="macro">cdn!</span>(<span class="string">&quot;/stickers/{}.{}&quot;</span>, <span class="ident">sticker_id</span>.<span class="ident">get</span>(), <span class="ident">ext</span>))

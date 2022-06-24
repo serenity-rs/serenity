@@ -92,7 +92,7 @@
     <span class="ident">ModalInteractionFilter</span>,
     <span class="ident">ReactionFilter</span>,
 };
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::gateway::Activity</span>;
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::gateway::ActivityData</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::id</span>::{<span class="ident">GuildId</span>, <span class="ident">UserId</span>};
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::user::OnlineStatus</span>;
 
@@ -139,10 +139,10 @@
     <span class="doccomment">/// Indicates that the client is to send a custom WebSocket message.</span>
     <span class="ident">Message</span>(<span class="ident">Message</span>),
     <span class="doccomment">/// Indicates that the client is to update the shard&#39;s presence&#39;s activity.</span>
-    <span class="ident">SetActivity</span>(<span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Activity</span><span class="op">&gt;</span>),
+    <span class="ident">SetActivity</span>(<span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ActivityData</span><span class="op">&gt;</span>),
     <span class="doccomment">/// Indicates that the client is to update the shard&#39;s presence in its</span>
     <span class="doccomment">/// entirety.</span>
-    <span class="ident">SetPresence</span>(<span class="ident">OnlineStatus</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Activity</span><span class="op">&gt;</span>),
+    <span class="ident">SetPresence</span>(<span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ActivityData</span><span class="op">&gt;</span>, <span class="ident">OnlineStatus</span>),
     <span class="doccomment">/// Indicates that the client is to update the shard&#39;s presence&#39;s status.</span>
     <span class="ident">SetStatus</span>(<span class="ident">OnlineStatus</span>),
     <span class="doccomment">/// Sends a new filter for events to the shard.</span>
