@@ -8,8 +8,6 @@ use crate::constants;
 use crate::http::Http;
 use crate::internal::prelude::*;
 use crate::model::application::interaction::{InteractionResponseType, MessageFlags};
-use crate::model::channel::AttachmentType;
-#[cfg(feature = "http")]
 use crate::model::prelude::*;
 
 #[derive(Clone, Debug, Serialize)]

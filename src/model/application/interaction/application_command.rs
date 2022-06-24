@@ -133,85 +133,23 @@ impl ApplicationCommandInteraction {
         http.as_ref().delete_original_interaction_response(&self.token).await
     }
 
-    /// Creates a followup response to the response sent.
+    /// Returns a request builder that, when executed, creates a followup response to the response
+    /// previously sent.
     ///
     /// **Note**: Message contents must be under 2000 unicode code points.
-    ///
-    /// # Errors
-    ///
-    /// Will return [`Error::Model`] if the content is too long.
-    /// May also return [`Error::Http`] if the API returns an error,
-    /// or a [`Error::Json`] if there is an error in deserializing the response.
-    ///
-    /// [`Error::Model`]: crate::error::Error::Model
-    /// [`Error::Http`]: crate::error::Error::Http
-    /// [`Error::Json`]: crate::error::Error::Json
-    pub async fn create_followup_message<'a, F>(
-        &self,
-        http: impl AsRef<Http>,
-        f: F,
-    ) -> Result<Message>
-    where
-        for<'b> F: FnOnce(
-            &'b mut CreateInteractionResponseFollowup<'a>,
-        ) -> &'b mut CreateInteractionResponseFollowup<'a>,
-    {
-        let mut interaction_response = CreateInteractionResponseFollowup::default();
-        f(&mut interaction_response);
-        self._create_followup_message(http.as_ref(), interaction_response).await
+    pub async fn create_followup_message(&self) -> CreateInteractionResponseFollowup<'_> {
+        CreateInteractionResponseFollowup::new(None, &self.token)
     }
 
-    async fn _create_followup_message<'a>(
-        &self,
-        http: &Http,
-        mut interaction_response: CreateInteractionResponseFollowup<'a>,
-    ) -> Result<Message> {
-        let files = std::mem::take(&mut interaction_response.files);
-
-        if files.is_empty() {
-            http.create_followup_message(&self.token, &interaction_response).await
-        } else {
-            http.create_followup_message_with_files(&self.token, &interaction_response, files).await
-        }
-    }
-
-    /// Edits a followup response to the response sent.
+    /// Returns a request builder that, when executed, edits a followup response to the response
+    /// previously sent.
     ///
     /// **Note**: Message contents must be under 2000 unicode code points.
-    ///
-    /// # Errors
-    ///
-    /// Will return [`Error::Model`] if the content is too long.
-    /// May also return [`Error::Http`] if the API returns an error,
-    /// or a [`Error::Json`] if there is an error in deserializing the response.
-    ///
-    /// [`Error::Model`]: crate::error::Error::Model
-    /// [`Error::Http`]: crate::error::Error::Http
-    /// [`Error::Json`]: crate::error::Error::Json
-    pub async fn edit_followup_message<'a, F, M: Into<MessageId>>(
+    pub async fn edit_followup_message(
         &self,
-        http: impl AsRef<Http>,
-        message_id: M,
-        f: F,
-    ) -> Result<Message>
-    where
-        for<'b> F: FnOnce(
-            &'b mut CreateInteractionResponseFollowup<'a>,
-        ) -> &'b mut CreateInteractionResponseFollowup<'a>,
-    {
-        let mut builder = CreateInteractionResponseFollowup::default();
-        f(&mut builder);
-
-        let http = http.as_ref();
-        let message_id = message_id.into().into();
-        let files = std::mem::take(&mut builder.files);
-
-        if files.is_empty() {
-            http.edit_followup_message(&self.token, message_id, &builder).await
-        } else {
-            http.edit_followup_message_and_attachments(&self.token, message_id, &builder, files)
-                .await
-        }
+        message_id: impl Into<MessageId>,
+    ) -> CreateInteractionResponseFollowup<'_> {
+        CreateInteractionResponseFollowup::new(Some(message_id.into()), &self.token)
     }
 
     /// Deletes a followup message.

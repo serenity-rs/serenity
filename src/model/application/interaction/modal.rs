@@ -125,65 +125,23 @@ impl ModalSubmitInteraction {
         http.as_ref().delete_original_interaction_response(&self.token).await
     }
 
-    /// Creates a followup response to the response sent.
+    /// Returns a request builder that, when executed, creates a followup response to the response
+    /// previously sent.
     ///
     /// **Note**: Message contents must be under 2000 unicode code points.
-    ///
-    /// # Errors
-    ///
-    /// Will return [`Error::Model`] if the content is too long.
-    /// May also return [`Error::Http`] if the API returns an error,
-    /// or a [`Error::Json`] if there is an error in deserializing the response.
-    ///
-    /// [`Error::Model`]: crate::error::Error::Model
-    /// [`Error::Http`]: crate::error::Error::Http
-    /// [`Error::Json`]: crate::error::Error::Json
-    pub async fn create_followup_message<'a, F>(
-        &self,
-        http: impl AsRef<Http>,
-        f: F,
-    ) -> Result<Message>
-    where
-        for<'b> F: FnOnce(
-            &'b mut CreateInteractionResponseFollowup<'a>,
-        ) -> &'b mut CreateInteractionResponseFollowup<'a>,
-    {
-        let mut interaction_response = CreateInteractionResponseFollowup::default();
-        f(&mut interaction_response);
-
-        http.as_ref().create_followup_message(&self.token, &interaction_response).await
+    pub async fn create_followup_message(&self) -> CreateInteractionResponseFollowup<'_> {
+        CreateInteractionResponseFollowup::new(None, &self.token)
     }
 
-    /// Edits a followup response to the response sent.
+    /// Returns a request builder that, when executed, edits a followup response to the response
+    /// previously sent.
     ///
     /// **Note**: Message contents must be under 2000 unicode code points.
-    ///
-    /// # Errors
-    ///
-    /// Will return [`Error::Model`] if the content is too long.
-    /// May also return [`Error::Http`] if the API returns an error,
-    /// or a [`Error::Json`] if there is an error in deserializing the response.
-    ///
-    /// [`Error::Model`]: crate::error::Error::Model
-    /// [`Error::Http`]: crate::error::Error::Http
-    /// [`Error::Json`]: crate::error::Error::Json
-    pub async fn edit_followup_message<'a, F, M: Into<MessageId>>(
+    pub async fn edit_followup_message(
         &self,
-        http: impl AsRef<Http>,
-        message_id: M,
-        f: F,
-    ) -> Result<Message>
-    where
-        for<'b> F: FnOnce(
-            &'b mut CreateInteractionResponseFollowup<'a>,
-        ) -> &'b mut CreateInteractionResponseFollowup<'a>,
-    {
-        let mut interaction_response = CreateInteractionResponseFollowup::default();
-        f(&mut interaction_response);
-
-        http.as_ref()
-            .edit_followup_message(&self.token, message_id.into().into(), &interaction_response)
-            .await
+        message_id: impl Into<MessageId>,
+    ) -> CreateInteractionResponseFollowup<'_> {
+        CreateInteractionResponseFollowup::new(Some(message_id.into()), &self.token)
     }
 
     /// Deletes a followup message.
