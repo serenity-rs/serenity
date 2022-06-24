@@ -6,13 +6,9 @@ use serde::{Deserialize, Serialize};
 
 #[cfg(feature = "http")]
 use crate::builder::CreateAutocompleteResponse;
-#[cfg(feature = "http")]
-use crate::http::Http;
 use crate::internal::prelude::*;
 use crate::model::application::command::{CommandOptionType, CommandType};
 use crate::model::application::interaction::add_guild_id_to_resolved;
-#[cfg(feature = "http")]
-use crate::model::application::interaction::InteractionResponseType;
 use crate::model::guild::Member;
 use crate::model::id::{
     ApplicationId,
@@ -64,33 +60,10 @@ pub struct AutocompleteInteraction {
 
 #[cfg(feature = "http")]
 impl AutocompleteInteraction {
-    /// Creates a response to an autocomplete interaction.
-    ///
-    /// # Errors
-    ///
-    /// Returns an [`Error::Http`] if the API returns an error.
-    ///
-    /// [`Error::Http`]: crate::error::Error::Http
-    pub async fn create_autocomplete_response<F>(&self, http: impl AsRef<Http>, f: F) -> Result<()>
-    where
-        F: FnOnce(&mut CreateAutocompleteResponse) -> &mut CreateAutocompleteResponse,
-    {
-        #[derive(Serialize)]
-        struct AutocompleteResponse {
-            data: CreateAutocompleteResponse,
-            #[serde(rename = "type")]
-            kind: InteractionResponseType,
-        }
-
-        let mut response = CreateAutocompleteResponse::default();
-        f(&mut response);
-
-        let map = AutocompleteResponse {
-            data: response,
-            kind: InteractionResponseType::Autocomplete,
-        };
-
-        http.as_ref().create_interaction_response(self.id.get(), &self.token, &map).await
+    /// Returns a request builder that creates a response to an autocomplete interaction when
+    /// executed.
+    pub async fn create_autocomplete_response(&self) -> CreateAutocompleteResponse<'_> {
+        CreateAutocompleteResponse::new(self.id, &self.token)
     }
 }
 

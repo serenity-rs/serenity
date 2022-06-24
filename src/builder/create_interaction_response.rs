@@ -284,26 +284,57 @@ pub struct AutocompleteChoice {
     pub value: Value,
 }
 
+#[derive(Clone, Debug, Serialize)]
+#[must_use]
+pub struct CreateAutocompleteResponse<'a> {
+    #[cfg(feature = "http")]
+    id: InteractionId,
+    #[cfg(feature = "http")]
+    token: &'a str,
+    #[cfg(not(feature = "http"))]
+    token: PhantomData<&'a ()>,
+
+    data: CreateAutocompleteResponseData,
+    #[serde(rename = "type")]
+    kind: InteractionResponseType,
+}
+
 #[derive(Clone, Debug, Default, Serialize)]
-pub struct CreateAutocompleteResponse {
+struct CreateAutocompleteResponseData {
     choices: Vec<AutocompleteChoice>,
 }
 
-impl CreateAutocompleteResponse {
+impl<'a> CreateAutocompleteResponse<'a> {
+    pub fn new(
+        #[cfg(feature = "http")] id: InteractionId,
+        #[cfg(feature = "http")] token: &'a str,
+    ) -> Self {
+        Self {
+            #[cfg(feature = "http")]
+            id,
+            #[cfg(feature = "http")]
+            token,
+            #[cfg(not(feature = "http"))]
+            token: PhantomData::default(),
+            data: CreateAutocompleteResponseData::default(),
+            kind: InteractionResponseType::Autocomplete,
+        }
+    }
+
     /// For autocomplete responses this sets their autocomplete suggestions.
     ///
     /// See the official docs on [`Application Command Option Choices`] for more information.
     ///
     /// [`Application Command Option Choices`]: https://discord.com/developers/docs/interactions/application-commands#application-command-object-application-command-option-choice-structure
-    pub fn set_choices(&mut self, choices: Vec<AutocompleteChoice>) -> &mut Self {
-        self.choices = choices;
+    pub fn set_choices(mut self, choices: Vec<AutocompleteChoice>) -> Self {
+        self.data.choices = choices;
         self
     }
 
     /// Add an int autocomplete choice.
     ///
     /// **Note**: There can be no more than 25 choices set. Name must be between 1 and 100 characters. Value must be between -2^53 and 2^53.
-    pub fn add_int_choice(&mut self, name: impl Into<String>, value: i64) -> &mut Self {
+    pub fn add_int_choice(self, name: impl Into<String>, value: i64) -> Self {
         self.add_choice(AutocompleteChoice {
             name: name.into(),
             value: Value::from(value),
@@ -313,11 +344,7 @@ impl CreateAutocompleteResponse {
     /// Adds a string autocomplete choice.
     ///
     /// **Note**: There can be no more than 25 choices set. Name must be between 1 and 100 characters. Value must be up to 100 characters.
-    pub fn add_string_choice(
-        &mut self,
-        name: impl Into<String>,
-        value: impl Into<String>,
-    ) -> &mut Self {
+    pub fn add_string_choice(self, name: impl Into<String>, value: impl Into<String>) -> Self {
         self.add_choice(AutocompleteChoice {
             name: name.into(),
             value: Value::String(value.into()),
@@ -327,15 +354,25 @@ impl CreateAutocompleteResponse {
     /// Adds a number autocomplete choice.
     ///
     /// **Note**: There can be no more than 25 choices set. Name must be between 1 and 100 characters. Value must be between -2^53 and 2^53.
-    pub fn add_number_choice(&mut self, name: impl Into<String>, value: f64) -> &mut Self {
+    pub fn add_number_choice(self, name: impl Into<String>, value: f64) -> Self {
         self.add_choice(AutocompleteChoice {
             name: name.into(),
             value: Value::from(value),
         })
     }
 
-    fn add_choice(&mut self, value: AutocompleteChoice) -> &mut Self {
-        self.choices.push(value);
+    fn add_choice(mut self, value: AutocompleteChoice) -> Self {
+        self.data.choices.push(value);
         self
+    }
+
+    /// Creates a response to an autocomplete interaction.
+    ///
+    /// # Errors
+    ///
+    /// Returns an [`Error::Http`] if the API returns an error.
+    #[cfg(feature = "http")]
+    pub async fn execute(self, http: impl AsRef<Http>) -> Result<()> {
+        http.as_ref().create_interaction_response(self.id.into(), &self.token, &self).await
     }
 }
