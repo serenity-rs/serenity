@@ -6,24 +6,19 @@ use crate::json::from_value;
 use crate::model::channel::ReactionType;
 use crate::model::utils::deserialize_val;
 
-/// The type of a component
-#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
-#[non_exhaustive]
-#[repr(u8)]
-pub enum ComponentType {
-    ActionRow = 1,
-    Button = 2,
-    SelectMenu = 3,
-    InputText = 4,
-    Unknown = !0,
+enum_number! {
+    /// The type of a component
+    #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
+    #[serde(from = "u8", into = "u8")]
+    #[non_exhaustive]
+    pub enum ComponentType {
+        ActionRow = 1,
+        Button = 2,
+        SelectMenu = 3,
+        InputText = 4,
+        _ => Unknown(u8),
+    }
 }
-
-enum_number!(ComponentType {
-    ActionRow,
-    Button,
-    SelectMenu,
-    InputText
-});
 
 /// An action row.
 #[derive(Clone, Debug, Deserialize, Serialize)]
@@ -104,26 +99,20 @@ pub struct Button {
     pub disabled: bool,
 }
 
-/// The style of a button.
-#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
-#[non_exhaustive]
-#[repr(u8)]
-pub enum ButtonStyle {
-    Primary = 1,
-    Secondary = 2,
-    Success = 3,
-    Danger = 4,
-    Link = 5,
-    Unknown = !0,
+enum_number! {
+    /// The style of a button.
+    #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
+    #[serde(from = "u8", into = "u8")]
+    #[non_exhaustive]
+    pub enum ButtonStyle {
+        Primary = 1,
+        Secondary = 2,
+        Success = 3,
+        Danger = 4,
+        Link = 5,
+        _ => Unknown(u8),
+    }
 }
-
-enum_number!(ButtonStyle {
-    Primary,
-    Secondary,
-    Success,
-    Danger,
-    Link
-});
 
 /// A select menu component.
 #[derive(Clone, Debug, Deserialize, Serialize)]
@@ -172,18 +161,14 @@ pub struct InputText {
     pub value: String,
 }
 
-/// The style of the input text
-#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
-#[non_exhaustive]
-#[repr(u8)]
-pub enum InputTextStyle {
-    Short = 1,
-    Paragraph = 2,
-    Unknown = !0,
+enum_number! {
+    /// The style of the input text
+    #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
+    #[serde(from = "u8", into = "u8")]
+    #[non_exhaustive]
+    pub enum InputTextStyle {
+        Short = 1,
+        Paragraph = 2,
+        _ => Unknown(u8),
+    }
 }
-
-enum_number!(InputTextStyle {
-    Short,
-    Paragraph,
-    Unknown
-});

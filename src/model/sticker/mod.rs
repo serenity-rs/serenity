@@ -118,50 +118,43 @@ impl Sticker {
     }
 }
 
-/// Differentiates between sticker types.
-#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
-#[non_exhaustive]
-pub enum StickerType {
-    /// An official sticker in a pack, part of Nitro or in a removed purchasable
-    /// pack.
-    Standard = 1,
-    /// A sticker uploaded to a Boosted guild for the guild's members.
-    Guild = 2,
-    /// Unknown sticker type.
-    Unknown = !0,
+enum_number! {
+    /// Differentiates between sticker types.
+    #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
+    #[serde(from = "u8", into = "u8")]
+    #[non_exhaustive]
+    pub enum StickerType {
+        /// An official sticker in a pack, part of Nitro or in a removed purchasable
+        /// pack.
+        Standard = 1,
+        /// A sticker uploaded to a Boosted guild for the guild's members.
+        Guild = 2,
+        _ => Unknown(u8),
+    }
 }
 
-enum_number!(StickerType {
-    Standard,
-    Guild
-});
-
-/// Differentiates between sticker formats.
-#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
-#[non_exhaustive]
-pub enum StickerFormatType {
-    /// A PNG format sticker.
-    Png = 1,
-    /// An APNG format animated sticker.
-    Apng = 2,
-    /// A LOTTIE format animated sticker.
-    Lottie = 3,
-    /// Unknown sticker format type.
-    Unknown = !0,
+enum_number! {
+    /// Differentiates between sticker formats.
+    #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
+    #[serde(from = "u8", into = "u8")]
+    #[non_exhaustive]
+    pub enum StickerFormatType {
+        /// A PNG format sticker.
+        Png = 1,
+        /// An APNG format animated sticker.
+        Apng = 2,
+        /// A LOTTIE format animated sticker.
+        Lottie = 3,
+        _ => Unknown(u8),
+    }
 }
-
-enum_number!(StickerFormatType {
-    Png,
-    Apng,
-    Lottie
-});
 
 #[cfg(feature = "model")]
 fn sticker_url(sticker_id: StickerId, sticker_format_type: StickerFormatType) -> Option<String> {
     let ext = match sticker_format_type {
         StickerFormatType::Png | StickerFormatType::Apng => "png",
         StickerFormatType::Lottie => "json",
-        StickerFormatType::Unknown => return None,
+        StickerFormatType::Unknown(_) => return None,
     };
 
     Some(cdn!("/stickers/{}.{}", sticker_id.get(), ext))

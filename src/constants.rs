@@ -31,54 +31,41 @@ pub const USER_AGENT: &str = concat!(
     ")"
 );
 
-/// An enum representing the [gateway opcodes].
-///
-/// [gateway opcodes]: https://discord.com/developers/docs/topics/opcodes-and-status-codes#gateway
-#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
-#[non_exhaustive]
-pub enum Opcode {
-    /// Dispatches an event.
-    Dispatch = 0,
-    /// Used for ping checking.
-    Heartbeat = 1,
-    /// Used for client handshake.
-    Identify = 2,
-    /// Used to update the client status.
-    PresenceUpdate = 3,
-    /// Used to join/move/leave voice channels.
-    VoiceStateUpdate = 4,
-    /// Used for voice ping checking.
-    VoiceServerPing = 5,
-    /// Used to resume a closed connection.
-    Resume = 6,
-    /// Used to tell clients to reconnect to the gateway.
-    Reconnect = 7,
-    /// Used to request guild members.
-    RequestGuildMembers = 8,
-    /// Used to notify clients that they have an invalid session Id.
-    InvalidSession = 9,
-    /// Sent immediately after connection, contains heartbeat + server info.
-    Hello = 10,
-    /// Sent immediately following a client heartbeat that was received.
-    HeartbeatAck = 11,
-    /// Unknown opcode.
-    Unknown = !0,
+enum_number! {
+    /// An enum representing the [gateway opcodes].
+    ///
+    /// [gateway opcodes]: https://discord.com/developers/docs/topics/opcodes-and-status-codes#gateway
+    #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
+    #[serde(from = "u8", into = "u8")]
+    #[non_exhaustive]
+    pub enum Opcode {
+        /// Dispatches an event.
+        Dispatch = 0,
+        /// Used for ping checking.
+        Heartbeat = 1,
+        /// Used for client handshake.
+        Identify = 2,
+        /// Used to update the client status.
+        PresenceUpdate = 3,
+        /// Used to join/move/leave voice channels.
+        VoiceStateUpdate = 4,
+        /// Used for voice ping checking.
+        VoiceServerPing = 5,
+        /// Used to resume a closed connection.
+        Resume = 6,
+        /// Used to tell clients to reconnect to the gateway.
+        Reconnect = 7,
+        /// Used to request guild members.
+        RequestGuildMembers = 8,
+        /// Used to notify clients that they have an invalid session Id.
+        InvalidSession = 9,
+        /// Sent immediately after connection, contains heartbeat + server info.
+        Hello = 10,
+        /// Sent immediately following a client heartbeat that was received.
+        HeartbeatAck = 11,
+        _ => Unknown(u8),
+    }
 }
-
-enum_number!(Opcode {
-    Dispatch,
-    Heartbeat,
-    Identify,
-    PresenceUpdate,
-    VoiceStateUpdate,
-    VoiceServerPing,
-    Resume,
-    Reconnect,
-    RequestGuildMembers,
-    InvalidSession,
-    Hello,
-    HeartbeatAck,
-});
 
 pub mod close_codes {
     /// Unknown error; try reconnecting?

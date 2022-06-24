@@ -157,33 +157,26 @@ pub struct ActivityEmoji {
     pub animated: Option<bool>,
 }
 
-#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
-#[non_exhaustive]
-pub enum ActivityType {
-    /// An indicator that the user is playing a game.
-    Playing = 0,
-    /// An indicator that the user is streaming to a service.
-    Streaming = 1,
-    /// An indicator that the user is listening to something.
-    Listening = 2,
-    /// An indicator that the user is watching something.
-    Watching = 3,
-    /// An indicator that the user uses custom statuses
-    Custom = 4,
-    /// An indicator that the user is competing somewhere.
-    Competing = 5,
-    /// An indicator that the activity is of unknown type.
-    Unknown = !0,
+enum_number! {
+    #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
+    #[serde(from = "u8", into = "u8")]
+    #[non_exhaustive]
+    pub enum ActivityType {
+        /// An indicator that the user is playing a game.
+        Playing = 0,
+        /// An indicator that the user is streaming to a service.
+        Streaming = 1,
+        /// An indicator that the user is listening to something.
+        Listening = 2,
+        /// An indicator that the user is watching something.
+        Watching = 3,
+        /// An indicator that the user uses custom statuses
+        Custom = 4,
+        /// An indicator that the user is competing somewhere.
+        Competing = 5,
+        _ => Unknown(u8),
+    }
 }
-
-enum_number!(ActivityType {
-    Playing,
-    Streaming,
-    Listening,
-    Watching,
-    Custom,
-    Competing
-});
 
 impl Default for ActivityType {
     fn default() -> Self {
