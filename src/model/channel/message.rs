@@ -1012,105 +1012,76 @@ pub struct MessageReaction {
     pub reaction_type: ReactionType,
 }
 
-/// Differentiates between regular and different types of system messages.
-#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
-#[non_exhaustive]
-pub enum MessageType {
-    /// A regular message.
-    Regular = 0,
-    /// An indicator that a recipient was added by the author.
-    GroupRecipientAddition = 1,
-    /// An indicator that a recipient was removed by the author.
-    GroupRecipientRemoval = 2,
-    /// An indicator that a call was started by the author.
-    GroupCallCreation = 3,
-    /// An indicator that the group name was modified by the author.
-    GroupNameUpdate = 4,
-    /// An indicator that the group icon was modified by the author.
-    GroupIconUpdate = 5,
-    /// An indicator that a message was pinned by the author.
-    PinsAdd = 6,
-    /// An indicator that a member joined the guild.
-    MemberJoin = 7,
-    /// An indicator that someone has boosted the guild.
-    NitroBoost = 8,
-    /// An indicator that the guild has reached nitro tier 1
-    NitroTier1 = 9,
-    /// An indicator that the guild has reached nitro tier 2
-    NitroTier2 = 10,
-    /// An indicator that the guild has reached nitro tier 3
-    NitroTier3 = 11,
-    /// An indicator that the channel is now following a news channel
-    ChannelFollowAdd = 12,
-    /// An indicator that the guild is disqualified for Discovery Feature
-    GuildDiscoveryDisqualified = 14,
-    /// An indicator that the guild is requalified for Discovery Feature
-    GuildDiscoveryRequalified = 15,
-    /// The first warning before guild discovery removal.
-    GuildDiscoveryGracePeriodInitialWarning = 16,
-    /// The last warning before guild discovery removal.
-    GuildDiscoveryGracePeriodFinalWarning = 17,
-    /// Message sent to inform users that a thread was created.
-    ThreadCreated = 18,
-    /// A message reply.
-    InlineReply = 19,
-    /// A slash command.
-    ChatInputCommand = 20,
-    /// A thread start message.
-    ThreadStarterMessage = 21,
-    /// Server setup tips.
-    GuildInviteReminder = 22,
-    /// A context menu command.
-    ContextMenuCommand = 23,
-    /// A message from an auto moderation action.
-    AutoModerationAction = 24,
-    /// An indicator that the message is of unknown type.
-    Unknown = !0,
+enum_number! {
+    /// Differentiates between regular and different types of system messages.
+    #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
+    #[serde(from = "u8", into = "u8")]
+    #[non_exhaustive]
+    pub enum MessageType {
+        /// A regular message.
+        Regular = 0,
+        /// An indicator that a recipient was added by the author.
+        GroupRecipientAddition = 1,
+        /// An indicator that a recipient was removed by the author.
+        GroupRecipientRemoval = 2,
+        /// An indicator that a call was started by the author.
+        GroupCallCreation = 3,
+        /// An indicator that the group name was modified by the author.
+        GroupNameUpdate = 4,
+        /// An indicator that the group icon was modified by the author.
+        GroupIconUpdate = 5,
+        /// An indicator that a message was pinned by the author.
+        PinsAdd = 6,
+        /// An indicator that a member joined the guild.
+        MemberJoin = 7,
+        /// An indicator that someone has boosted the guild.
+        NitroBoost = 8,
+        /// An indicator that the guild has reached nitro tier 1
+        NitroTier1 = 9,
+        /// An indicator that the guild has reached nitro tier 2
+        NitroTier2 = 10,
+        /// An indicator that the guild has reached nitro tier 3
+        NitroTier3 = 11,
+        /// An indicator that the channel is now following a news channel
+        ChannelFollowAdd = 12,
+        /// An indicator that the guild is disqualified for Discovery Feature
+        GuildDiscoveryDisqualified = 14,
+        /// An indicator that the guild is requalified for Discovery Feature
+        GuildDiscoveryRequalified = 15,
+        /// The first warning before guild discovery removal.
+        GuildDiscoveryGracePeriodInitialWarning = 16,
+        /// The last warning before guild discovery removal.
+        GuildDiscoveryGracePeriodFinalWarning = 17,
+        /// Message sent to inform users that a thread was created.
+        ThreadCreated = 18,
+        /// A message reply.
+        InlineReply = 19,
+        /// A slash command.
+        ChatInputCommand = 20,
+        /// A thread start message.
+        ThreadStarterMessage = 21,
+        /// Server setup tips.
+        GuildInviteReminder = 22,
+        /// A context menu command.
+        ContextMenuCommand = 23,
+        /// A message from an auto moderation action.
+        AutoModerationAction = 24,
+        _ => Unknown(u8),
+    }
 }
 
-enum_number!(MessageType {
-    Regular,
-    GroupRecipientAddition,
-    GroupRecipientRemoval,
-    GroupCallCreation,
-    GroupNameUpdate,
-    GroupIconUpdate,
-    PinsAdd,
-    MemberJoin,
-    NitroBoost,
-    NitroTier1,
-    NitroTier2,
-    NitroTier3,
-    ChannelFollowAdd,
-    GuildDiscoveryDisqualified,
-    GuildDiscoveryRequalified,
-    GuildDiscoveryGracePeriodInitialWarning,
-    GuildDiscoveryGracePeriodFinalWarning
-    ThreadCreated,
-    InlineReply,
-    ChatInputCommand,
-    ThreadStarterMessage,
-    GuildInviteReminder,
-    ContextMenuCommand,
-    AutoModerationAction,
-});
-
-#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
-#[non_exhaustive]
-pub enum MessageActivityKind {
-    Join = 1,
-    Spectate = 2,
-    Listen = 3,
-    JoinRequest = 5,
-    Unknown = !0,
+enum_number! {
+    #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
+    #[serde(from = "u8", into = "u8")]
+    #[non_exhaustive]
+    pub enum MessageActivityKind {
+        Join = 1,
+        Spectate = 2,
+        Listen = 3,
+        JoinRequest = 5,
+        _ => Unknown(u8),
+    }
 }
-
-enum_number!(MessageActivityKind {
-    Join,
-    Spectate,
-    Listen,
-    JoinRequest,
-});
 
 /// Rich Presence application information.
 #[derive(Clone, Debug, Deserialize, Serialize)]

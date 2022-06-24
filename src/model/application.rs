@@ -67,18 +67,16 @@ pub struct TeamMember {
     pub user: User,
 }
 
-#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
-#[non_exhaustive]
-pub enum MembershipState {
-    Invited = 1,
-    Accepted = 2,
-    Unknown = !0,
+enum_number! {
+    #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
+    #[serde(from = "u8", into = "u8")]
+    #[non_exhaustive]
+    pub enum MembershipState {
+        Invited = 1,
+        Accepted = 2,
+        _ => Unknown(u8),
+    }
 }
-
-enum_number!(MembershipState {
-    Invited,
-    Accepted
-});
 
 bitflags! {
     /// The flags of the application.
