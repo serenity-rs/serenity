@@ -3,11 +3,22 @@
 //! are not reached yet.
 
 use std::fmt;
+use std::pin::Pin;
 use std::sync::Arc;
+use std::time::Duration;
+
+use futures::StreamExt;
+use tokio::sync::mpsc::UnboundedReceiver as Receiver;
+use tokio::time::Sleep;
+
+use crate::client::bridge::gateway::ShardMessenger;
 
 mod error;
 mod macros;
 pub use error::Error as CollectorError;
+
+mod base_collector;
+use base_collector::Collector;
 
 pub mod component_interaction_collector;
 pub mod event_collector;
@@ -22,7 +33,7 @@ pub use modal_interaction_collector::*;
 pub use reaction_collector::*;
 
 #[derive(Clone)]
-struct FilterFn<Arg>(Arc<dyn Fn(&Arg) -> bool + 'static + Send + Sync>);
+pub struct FilterFn<Arg: ?Sized>(Arc<dyn Fn(&Arg) -> bool + 'static + Send + Sync>);
 impl<Arg> fmt::Debug for FilterFn<Arg> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         f.debug_tuple("FilterFn")
@@ -58,5 +69,125 @@ impl<'a, T> std::ops::Deref for LazyArc<'a, T> {
 
     fn deref(&self) -> &Self::Target {
         self.value
+    }
+}
+
+mod sealed {
+    use crate::model::prelude::*;
+
+    pub trait Sealed {}
+
+    impl Sealed for Event {}
+    impl Sealed for Message {}
+    impl Sealed for crate::collector::ReactionAction {}
+    impl Sealed for interaction::modal::ModalSubmitInteraction {}
+    impl Sealed for interaction::message_component::MessageComponentInteraction {}
+}
+
+pub trait FilterOptions<Item: ?Sized> {
+    type FilterItem;
+
+    fn build(
+        self,
+        messenger: &ShardMessenger,
+        filter_limit: Option<u32>,
+        collect_limit: Option<u32>,
+        filter: Option<FilterFn<Self::FilterItem>>,
+    ) -> Receiver<Arc<Item>>;
+}
+
+pub trait Collectable {
+    type FilterOptions: FilterOptions<Self> + Default;
+}
+
+#[derive(Default)]
+pub struct CommonFilterOptions {
+    filter_limit: Option<u32>,
+    collect_limit: Option<u32>,
+    timeout: Option<Pin<Box<Sleep>>>,
+}
+
+#[must_use = "Builders must be built"]
+pub struct CollectorBuilder<'a, Item: Collectable + sealed::Sealed> {
+    filter_options: Item::FilterOptions,
+    common_options: CommonFilterOptions,
+    shard_messenger: &'a ShardMessenger,
+    filter: Option<FilterFn<<Item::FilterOptions as FilterOptions<Item>>::FilterItem>>,
+}
+
+impl<'a, Item: Collectable + sealed::Sealed> CollectorBuilder<'a, Item> {
+    pub fn new(shard_messenger: &'a ShardMessenger) -> Self {
+        Self {
+            shard_messenger,
+
+            filter: None,
+            common_options: CommonFilterOptions::default(),
+            filter_options: Item::FilterOptions::default(),
+        }
+    }
+
+    pub fn build(mut self) -> Collector<Item> {
+        let filter = self.filter.take();
+        let CommonFilterOptions {
+            filter_limit,
+            collect_limit,
+            timeout,
+        } = self.common_options;
+
+        let receiver =
+            self.filter_options.build(self.shard_messenger, filter_limit, collect_limit, filter);
+
+        Collector {
+            timeout,
+            receiver: Box::pin(receiver),
+        }
+    }
+
+    /// Sets a filter function where items passed to the `function` must return `true`,
+    /// otherwise the item won't be collected and failed the filter process.
+    ///
+    /// This is the last instance to pass for an item to count as *collected*.
+    pub fn filter<
+        F: Fn(&<Item::FilterOptions as FilterOptions<Item>>::FilterItem) -> bool
+            + 'static
+            + Send
+            + Sync,
+    >(
+        mut self,
+        function: F,
+    ) -> Self {
+        self.filter = Some(FilterFn(Arc::new(function)));
+
+        self
+    }
+
+    /// Limits how many items can be collected.
+    ///
+    /// An item is considered *collected*, if the message passes all the requirements.
+    pub fn collect_limit(mut self, limit: u32) -> Self {
+        self.common_options.collect_limit = Some(limit);
+
+        self
+    }
+
+    /// Limits how many events will attempt to be filtered.
+    pub fn filter_limit(mut self, limit: u32) -> Self {
+        self.common_options.filter_limit = Some(limit);
+
+        self
+    }
+
+    /// Sets a [`Duration`] for how long the collector shall receive events.
+    pub fn timeout(mut self, duration: Duration) -> Self {
+        self.common_options.timeout = Some(Box::pin(tokio::time::sleep(duration)));
+
+        self
+    }
+}
+
+impl<Item: Collectable + Send + Sync + sealed::Sealed + 'static> CollectorBuilder<'_, Item> {
+    pub async fn collect_single(self) -> Option<Arc<Item>> {
+        let mut collector = self.build();
+        collector.next().await
     }
 }

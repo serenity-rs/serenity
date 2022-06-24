@@ -13,9 +13,6 @@ use crate::cache::{Cache, GuildRef};
 use crate::client::bridge::gateway::ShardMessenger;
 #[cfg(feature = "collector")]
 use crate::collector::{
-    CollectComponentInteraction,
-    CollectModalInteraction,
-    CollectReaction,
     ComponentInteractionCollectorBuilder,
     ModalInteractionCollectorBuilder,
     ReactionCollectorBuilder,
@@ -827,54 +824,30 @@ impl Message {
         self.id.link_ensured(cache_http, self.channel_id, self.guild_id).await
     }
 
-    /// Await a single reaction on this message.
+    /// Returns a builder which can be awaited to obtain a reaction or stream of reactions on this message.
     #[cfg(feature = "collector")]
-    pub fn await_reaction(&self, shard_messenger: impl AsRef<ShardMessenger>) -> CollectReaction {
-        CollectReaction::new(shard_messenger).message_id(self.id.0)
-    }
-
-    /// Returns a stream builder which can be awaited to obtain a stream of reactions on this message.
-    #[cfg(feature = "collector")]
-    pub fn await_reactions(
+    pub fn reaction_collector<'a>(
         &self,
-        shard_messenger: impl AsRef<ShardMessenger>,
-    ) -> ReactionCollectorBuilder {
+        shard_messenger: &'a ShardMessenger,
+    ) -> ReactionCollectorBuilder<'a> {
         ReactionCollectorBuilder::new(shard_messenger).message_id(self.id.0)
     }
 
-    /// Await a single component interaction on this message.
+    /// Returns a builder which can be awaited to obtain a reaction or stream of component interactions on this message.
     #[cfg(feature = "collector")]
-    pub fn await_component_interaction(
+    pub fn component_interaction_collector<'a>(
         &self,
-        shard_messenger: impl AsRef<ShardMessenger>,
-    ) -> CollectComponentInteraction {
-        CollectComponentInteraction::new(shard_messenger).message_id(self.id.0)
-    }
-
-    /// Returns a stream builder which can be awaited to obtain a stream of component interactions on this message.
-    #[cfg(feature = "collector")]
-    pub fn await_component_interactions(
-        &self,
-        shard_messenger: impl AsRef<ShardMessenger>,
-    ) -> ComponentInteractionCollectorBuilder {
+        shard_messenger: &'a ShardMessenger,
+    ) -> ComponentInteractionCollectorBuilder<'a> {
         ComponentInteractionCollectorBuilder::new(shard_messenger).message_id(self.id.0)
     }
 
-    /// Await a single modal submit interaction on this message.
+    /// Returns a builder which can be awaited to obtain a model submit interaction or stream of modal submit interactions on this message.
     #[cfg(feature = "collector")]
-    pub fn await_modal_interaction(
+    pub fn await_modal_interactions<'a>(
         &self,
-        shard_messenger: impl AsRef<ShardMessenger>,
-    ) -> CollectModalInteraction {
-        CollectModalInteraction::new(shard_messenger).message_id(self.id.0)
-    }
-
-    /// Returns a stream builder which can be awaited to obtain a stream of modal submit interactions on this message.
-    #[cfg(feature = "collector")]
-    pub fn await_modal_interactions(
-        &self,
-        shard_messenger: impl AsRef<ShardMessenger>,
-    ) -> ModalInteractionCollectorBuilder {
+        shard_messenger: &'a ShardMessenger,
+    ) -> ModalInteractionCollectorBuilder<'a> {
         ModalInteractionCollectorBuilder::new(shard_messenger).message_id(self.id.0)
     }
 
