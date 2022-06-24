@@ -715,7 +715,11 @@ impl ChannelId {
     /// Refer to the documentation for [`CreateMessage`] for more information regarding message
     /// restrictions and requirements.
     pub fn send_message<'a>(self) -> CreateMessage<'a> {
-        CreateMessage::new(self, None)
+        CreateMessage::new(
+            self,
+            #[cfg(feature = "cache")]
+            None,
+        )
     }
 
     /// Starts typing in the channel for an indefinite period of time.

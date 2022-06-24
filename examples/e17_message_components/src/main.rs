@@ -5,7 +5,7 @@ use std::{env, fmt};
 
 use dotenv::dotenv;
 use serenity::async_trait;
-use serenity::builder::{CreateActionRow, CreateButton, CreateSelectMenu, CreateSelectMenuOption};
+use serenity::builder::*;
 use serenity::client::{Context, EventHandler};
 use serenity::futures::StreamExt;
 use serenity::model::application::component::ButtonStyle;
@@ -195,14 +195,15 @@ impl EventHandler for Handler {
         let animal = Animal::from_str(mci.data.values.get(0).unwrap()).unwrap();
 
         // Acknowledge the interaction and edit the message
-        mci.create_interaction_response(&ctx, |r| {
-            r.kind(InteractionResponseType::UpdateMessage).interaction_response_data(|d| {
-                d.content(format!("You chose: **{}**\nNow choose a sound!", animal))
-                    .components(|c| c.add_action_row(Sound::action_row()))
-            })
-        })
-        .await
-        .unwrap();
+        let data = CreateInteractionResponseData::default()
+            .content(format!("You chose: **{}**\nNow choose a sound!", animal))
+            .components(|c| c.add_action_row(Sound::action_row()));
+        mci.create_interaction_response()
+            .kind(InteractionResponseType::UpdateMessage)
+            .interaction_response_data(data)
+            .execute(&ctx)
+            .await
+            .unwrap();
 
         // Wait for multiple interactions
 
@@ -211,18 +212,18 @@ impl EventHandler for Handler {
 
         while let Some(mci) = cib.next().await {
             let sound = Sound::from_str(&mci.data.custom_id).unwrap();
+            let data = CreateInteractionResponseData::default()
+                // Make the message hidden for other users by setting `ephemeral(true)`.
+                .ephemeral(true)
+                .content(format!("The **{}** says __{}__", animal, sound));
             // Acknowledge the interaction and send a reply
-            mci.create_interaction_response(&ctx, |r| {
+            mci.create_interaction_response()
                 // This time we dont edit the message but reply to it
-                r.kind(InteractionResponseType::ChannelMessageWithSource).interaction_response_data(
-                    |d| {
-                        // Make the message hidden for other users by setting `ephemeral(true)`.
-                        d.ephemeral(true).content(format!("The **{}** says __{}__", animal, sound))
-                    },
-                )
-            })
-            .await
-            .unwrap();
+                .kind(InteractionResponseType::ChannelMessageWithSource)
+                .interaction_response_data(data)
+                .execute(&ctx)
+                .await
+                .unwrap();
         }
 
         // Delete the orig message or there will be dangling components

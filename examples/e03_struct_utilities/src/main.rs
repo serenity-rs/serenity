@@ -19,10 +19,14 @@ impl EventHandler for Handler {
             // In this case, you can direct message a User directly by simply
             // calling a method on its instance, with the content of the
             // message.
-            let dm = msg.author.dm(&context, |m| m.content("Hello!")).await;
-
-            if let Err(why) = dm {
-                println!("Error when direct messaging user: {:?}", why);
+            match msg.author.dm(&context).await {
+                Ok(create_message) => {
+                    let msg = create_message.content("Hello!").execute(&context).await;
+                    if let Err(why) = msg {
+                        println!("Error when direct messaging user: {:?}", why);
+                    }
+                },
+                Err(why) => println!("Error when direct messaging user: {:?}", why),
             }
         }
     }

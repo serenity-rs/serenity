@@ -911,7 +911,11 @@ impl GuildChannel {
     /// Refer to the documentation for [`CreateMessage`] for more information regarding message
     /// restrictions and requirements.
     pub fn send_message<'a>(&self) -> CreateMessage<'a> {
-        CreateMessage::new(self.id, Some(self.guild_id))
+        CreateMessage::new(
+            self.id,
+            #[cfg(feature = "cache")]
+            Some(self.guild_id),
+        )
     }
 
     /// Starts typing in the channel for an indefinite period of time.
