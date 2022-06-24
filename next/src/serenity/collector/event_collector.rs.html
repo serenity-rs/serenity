@@ -456,7 +456,7 @@
     <span class="doccomment">/// Sends a `event` to the consuming collector if the `event` conforms</span>
     <span class="doccomment">/// to the constraints and the limits are not reached yet.</span>
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">send_event</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">event</span>: <span class="kw-2">&amp;mut</span> <span class="ident">LazyArc</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">Event</span><span class="op">&gt;</span>) -&gt; <span class="ident">bool</span> {
-        <span class="comment">// Only events with matching types count towwards the filtered limit.</span>
+        <span class="comment">// Only events with matching types count towards the filtered limit.</span>
         <span class="kw">if</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">is_matching_event_type</span>(<span class="ident">event</span>) {
             <span class="kw">return</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">sender</span>.<span class="ident">is_closed</span>();
         }
