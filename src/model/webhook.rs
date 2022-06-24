@@ -17,27 +17,23 @@ use crate::model::prelude::*;
 #[cfg(feature = "model")]
 use crate::model::ModelError;
 
-/// A representation of a type of webhook.
-#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
-#[non_exhaustive]
-pub enum WebhookType {
-    /// An indicator that the webhook can post messages to channels with
-    /// a token.
-    Incoming = 1,
-    /// An indicator that the webhook is managed by Discord for posting new
-    /// messages to channels without a token.
-    ChannelFollower = 2,
-    /// Application webhooks are webhooks used with Interactions.
-    Application = 3,
-    /// An indicator that the webhook is of unknown type.
-    Unknown = !0,
+enum_number! {
+    /// A representation of a type of webhook.
+    #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
+    #[serde(from = "u8", into = "u8")]
+    #[non_exhaustive]
+    pub enum WebhookType {
+        /// An indicator that the webhook can post messages to channels with
+        /// a token.
+        Incoming = 1,
+        /// An indicator that the webhook is managed by Discord for posting new
+        /// messages to channels without a token.
+        ChannelFollower = 2,
+        /// Application webhooks are webhooks used with Interactions.
+        Application = 3,
+        _ => Unknown(u8),
+    }
 }
-
-enum_number!(WebhookType {
-    Incoming,
-    ChannelFollower,
-    Application,
-});
 
 impl WebhookType {
     #[inline]
@@ -47,7 +43,7 @@ impl WebhookType {
             Self::Incoming => "incoming",
             Self::ChannelFollower => "channel follower",
             Self::Application => "application",
-            Self::Unknown => "unknown",
+            Self::Unknown(_) => "unknown",
         }
     }
 }

@@ -46,37 +46,30 @@ pub struct ScheduledEvent {
     pub image: Option<String>,
 }
 
-#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
-#[non_exhaustive]
-pub enum ScheduledEventStatus {
-    Scheduled = 1,
-    Active = 2,
-    Completed = 3,
-    Canceled = 4,
-    Unknown = !0,
+enum_number! {
+    #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
+    #[serde(from = "u8", into = "u8")]
+    #[non_exhaustive]
+    pub enum ScheduledEventStatus {
+        Scheduled = 1,
+        Active = 2,
+        Completed = 3,
+        Canceled = 4,
+        _ => Unknown(u8),
+    }
 }
 
-enum_number!(ScheduledEventStatus {
-    Scheduled,
-    Active,
-    Completed,
-    Canceled,
-});
-
-#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
-#[non_exhaustive]
-pub enum ScheduledEventType {
-    StageInstance = 1,
-    Voice = 2,
-    External = 3,
-    Unknown = !0,
+enum_number! {
+    #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
+    #[serde(from = "u8", into = "u8")]
+    #[non_exhaustive]
+    pub enum ScheduledEventType {
+        StageInstance = 1,
+        Voice = 2,
+        External = 3,
+        _ => Unknown(u8),
+    }
 }
-
-enum_number!(ScheduledEventType {
-    StageInstance,
-    Voice,
-    External,
-});
 
 #[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct ScheduledEventMetadata {

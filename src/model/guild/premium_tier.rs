@@ -1,21 +1,17 @@
-/// The guild's premium tier, depends on the amount of users boosting the guild currently
-#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
-#[non_exhaustive]
-pub enum PremiumTier {
-    /// No tier, considered None
-    Tier0,
-    Tier1,
-    Tier2,
-    Tier3,
-    Unknown = !0,
+enum_number! {
+    /// The guild's premium tier, depends on the amount of users boosting the guild currently
+    #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
+    #[serde(from = "u8", into = "u8")]
+    #[non_exhaustive]
+    pub enum PremiumTier {
+        /// No tier, considered None
+        Tier0 = 0,
+        Tier1 = 1,
+        Tier2 = 2,
+        Tier3 = 3,
+        _ => Unknown(u8),
+    }
 }
-
-enum_number!(PremiumTier {
-    Tier0,
-    Tier1,
-    Tier2,
-    Tier3
-});
 
 impl Default for PremiumTier {
     fn default() -> Self {
