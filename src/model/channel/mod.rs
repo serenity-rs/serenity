@@ -279,58 +279,44 @@ impl fmt::Display for Channel {
     }
 }
 
-/// A representation of a type of channel.
-///
-/// [Discord docs](https://discord.com/developers/docs/resources/channel#channel-object-channel-types).
-#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
-#[non_exhaustive]
-#[repr(u8)]
-pub enum ChannelType {
-    /// An indicator that the channel is a text [`GuildChannel`].
-    Text = 0,
-    /// An indicator that the channel is a [`PrivateChannel`].
-    Private = 1,
-    /// An indicator that the channel is a voice [`GuildChannel`].
-    Voice = 2,
-    /// An indicator that the channel is the channel of a [`ChannelCategory`].
-    Category = 4,
-    /// An indicator that the channel is a `NewsChannel`.
+enum_number! {
+    /// A representation of a type of channel.
     ///
-    /// Note: `NewsChannel` is serialized into a [`GuildChannel`]
-    News = 5,
-    /// An indicator that the channel is a news thread [`GuildChannel`].
-    NewsThread = 10,
-    /// An indicator that the channel is a public thread [`GuildChannel`].
-    PublicThread = 11,
-    /// An indicator that the channel is a private thread [`GuildChannel`].
-    PrivateThread = 12,
-    /// An indicator that the channel is a stage [`GuildChannel`].
-    Stage = 13,
-    /// An indicator that the channel is a directory [`GuildChannel`] in a [hub].
-    ///
-    /// [hub]: https://support.discord.com/hc/en-us/articles/4406046651927-Discord-Student-Hubs-FAQ
-    Directory = 14,
-    /// An indicator that the channel is a forum [`GuildChannel`].
-    #[cfg(feature = "unstable_discord_api")]
-    Forum = 15,
-    /// An indicator that the channel is of unknown type.
-    Unknown = !0,
+    /// [Discord docs](https://discord.com/developers/docs/resources/channel#channel-object-channel-types).
+    #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
+    #[serde(from = "u8", into = "u8")]
+    #[non_exhaustive]
+    pub enum ChannelType {
+        /// An indicator that the channel is a text [`GuildChannel`].
+        Text = 0,
+        /// An indicator that the channel is a [`PrivateChannel`].
+        Private = 1,
+        /// An indicator that the channel is a voice [`GuildChannel`].
+        Voice = 2,
+        /// An indicator that the channel is the channel of a [`ChannelCategory`].
+        Category = 4,
+        /// An indicator that the channel is a `NewsChannel`.
+        ///
+        /// Note: `NewsChannel` is serialized into a [`GuildChannel`]
+        News = 5,
+        /// An indicator that the channel is a news thread [`GuildChannel`].
+        NewsThread = 10,
+        /// An indicator that the channel is a public thread [`GuildChannel`].
+        PublicThread = 11,
+        /// An indicator that the channel is a private thread [`GuildChannel`].
+        PrivateThread = 12,
+        /// An indicator that the channel is a stage [`GuildChannel`].
+        Stage = 13,
+        /// An indicator that the channel is a directory [`GuildChannel`] in a [hub].
+        ///
+        /// [hub]: https://support.discord.com/hc/en-us/articles/4406046651927-Discord-Student-Hubs-FAQ
+        Directory = 14,
+        /// An indicator that the channel is a forum [`GuildChannel`].
+        #[cfg(feature = "unstable_discord_api")]
+        Forum = 15,
+        _ => Unknown(u8),
+    }
 }
-
-enum_number!(ChannelType {
-    Text,
-    Private,
-    Voice,
-    Category,
-    News,
-    NewsThread,
-    PublicThread,
-    PrivateThread,
-    Stage,
-    Directory,
-    #[cfg(feature = "unstable_discord_api")]
-    Forum,
-});
 
 impl ChannelType {
     #[inline]
@@ -349,7 +335,7 @@ impl ChannelType {
             Self::Directory => "directory",
             #[cfg(feature = "unstable_discord_api")]
             Self::Forum => "forum",
-            Self::Unknown => "unknown",
+            Self::Unknown(_) => "unknown",
         }
     }
 }
@@ -441,25 +427,22 @@ pub enum PermissionOverwriteType {
     Role(RoleId),
 }
 
-/// The video quality mode for a voice channel.
-///
-/// [Discord docs](https://discord.com/developers/docs/resources/channel#channel-object-video-quality-modes).
-#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
-#[non_exhaustive]
-pub enum VideoQualityMode {
-    /// An indicator that the video quality is chosen by Discord for optimal
-    /// performance.
-    Auto = 1,
-    /// An indicator that the video quality is 720p.
-    Full = 2,
-    /// An indicator that video quality is of unknown type.
-    Unknown = !0,
+enum_number! {
+    /// The video quality mode for a voice channel.
+    ///
+    /// [Discord docs](https://discord.com/developers/docs/resources/channel#channel-object-video-quality-modes).
+    #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
+    #[serde(from = "u8", into = "u8")]
+    #[non_exhaustive]
+    pub enum VideoQualityMode {
+        /// An indicator that the video quality is chosen by Discord for optimal
+        /// performance.
+        Auto = 1,
+        /// An indicator that the video quality is 720p.
+        Full = 2,
+        _ => Unknown(u8),
+    }
 }
-
-enum_number!(VideoQualityMode {
-    Auto
-    Full
-});
 
 /// [Discord docs](https://discord.com/developers/docs/resources/stage-instance#stage-instance-object).
 #[derive(Clone, Debug, Deserialize, Serialize)]
@@ -686,24 +669,21 @@ pub struct DefaultReaction {
     pub emoji_name: Option<String>,
 }
 
-/// The sort order for threads in a forum.
-///
-/// [Discord docs](https://discord.com/developers/docs/resources/channel#channel-object-sort-order-types).
-#[derive(Clone, Copy, Debug, Eq, Hash, PartialEq, PartialOrd, Ord)]
-#[non_exhaustive]
-pub enum SortOrder {
-    /// Sort forum posts by activity.
-    LatestActivity = 0,
-    /// Sort forum posts by creation time (from most recent to oldest).
-    CreationDate = 2,
-    /// No sort order has been set.
-    Unknown = !0,
+enum_number! {
+    /// The sort order for threads in a forum.
+    ///
+    /// [Discord docs](https://discord.com/developers/docs/resources/channel#channel-object-sort-order-types).
+    #[derive(Clone, Copy, Debug, Eq, Hash, PartialEq, PartialOrd, Ord, Deserialize, Serialize)]
+    #[serde(from = "u8", into = "u8")]
+    #[non_exhaustive]
+    pub enum SortOrder {
+        /// Sort forum posts by activity.
+        LatestActivity = 0,
+        /// Sort forum posts by creation time (from most recent to oldest).
+        CreationDate = 2,
+        _ => Unknown(u8),
+    }
 }
-
-enum_number!(SortOrder {
-    LatestActivity
-    CreationDate
-});
 
 bitflags! {
     /// Describes extra features of the channel.
