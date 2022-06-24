@@ -340,10 +340,7 @@ impl Shard {
 
                 return ShardAction::Identify;
             }
-            warn!(
-                "[{:?}] Heartbeat during non-Handshake; auto-reconnecting",
-                self.shard_info
-            );
+            warn!("[{:?}] Heartbeat during non-Handshake; auto-reconnecting", self.shard_info);
 
             return ShardAction::Reconnect(self.reconnection_type());
         }
@@ -411,10 +408,7 @@ impl Shard {
                 return Err(Error::Gateway(GatewayError::InvalidGatewayIntents));
             },
             Some(close_codes::DISALLOWED_GATEWAY_INTENTS) => {
-                error!(
-                    "[{:?}] Disallowed gateway intents have been provided.",
-                    self.shard_info
-                );
+                error!("[{:?}] Disallowed gateway intents have been provided.", self.shard_info);
 
                 return Err(Error::Gateway(GatewayError::DisallowedGatewayIntents));
             },
