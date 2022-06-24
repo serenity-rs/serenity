@@ -477,10 +477,6 @@ impl ShardRunner {
                     },
                 },
             },
-            InterMessage::Json(value) => {
-                // Value must be forwarded over the websocket
-                self.shard.client.send_json(&value).await.is_ok()
-            },
         }
     }
 
