@@ -105,19 +105,17 @@ pub struct TeamMember {
     pub user: User,
 }
 
-/// [Discord docs](https://discord.com/developers/docs/topics/teams#data-models-membership-state-enum).
-#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
-#[non_exhaustive]
-pub enum MembershipState {
-    Invited = 1,
-    Accepted = 2,
-    Unknown = !0,
+enum_number! {
+    /// [Discord docs](https://discord.com/developers/docs/topics/teams#data-models-membership-state-enum).
+    #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
+    #[serde(from = "u8", into = "u8")]
+    #[non_exhaustive]
+    pub enum MembershipState {
+        Invited = 1,
+        Accepted = 2,
+        _ => Unknown(u8),
+    }
 }
-
-enum_number!(MembershipState {
-    Invited,
-    Accepted
-});
 
 bitflags! {
     /// The flags of the application.
