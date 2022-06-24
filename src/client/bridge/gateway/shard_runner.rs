@@ -203,55 +203,33 @@ impl ShardRunner {
     /// is accepted by them.
     #[cfg(feature = "collector")]
     fn handle_filters(&mut self, event: &Event) {
-        /// Unlike [`Vec`]'s `retain`, allows mutable references in `f`.
-        fn retain<T, F>(vec: &mut Vec<T>, mut f: F)
-        where
-            F: FnMut(&mut T) -> bool,
-        {
-            let len = vec.len();
-            let mut del = 0;
-            {
-                let v = &mut **vec;
-
-                for i in 0..len {
-                    if !f(&mut v[i]) {
-                        del += 1;
-                    } else if del > 0 {
-                        v.swap(i - del, i);
-                    }
-                }
-            }
-
-            if del > 0 {
-                vec.truncate(len - del);
-            }
-        }
+        use crate::utils::backports::retain_mut;
 
         match &event {
             Event::MessageCreate(ref msg_event) => {
                 let mut msg = LazyArc::new(&msg_event.message);
-                retain(&mut self.message_filters, |f| f.send_message(&mut msg));
+                retain_mut(&mut self.message_filters, |f| f.send_message(&mut msg));
             },
             Event::ReactionAdd(ref reaction_event) => {
                 let mut reaction = LazyReactionAction::new(&reaction_event.reaction, true);
-                retain(&mut self.reaction_filters, |f| f.send_reaction(&mut reaction));
+                retain_mut(&mut self.reaction_filters, |f| f.send_reaction(&mut reaction));
             },
             Event::ReactionRemove(ref reaction_event) => {
                 let mut reaction = LazyReactionAction::new(&reaction_event.reaction, false);
-                retain(&mut self.reaction_filters, |f| f.send_reaction(&mut reaction));
+                retain_mut(&mut self.reaction_filters, |f| f.send_reaction(&mut reaction));
             },
             #[cfg(feature = "collector")]
             Event::InteractionCreate(ref interaction_event) => {
                 match &interaction_event.interaction {
                     Interaction::MessageComponent(interaction) => {
                         let mut interaction = LazyArc::new(interaction);
-                        retain(&mut self.component_interaction_filters, |f| {
+                        retain_mut(&mut self.component_interaction_filters, |f| {
                             f.send_interaction(&mut interaction)
                         });
                     },
                     Interaction::ModalSubmit(interaction) => {
                         let mut interaction = LazyArc::new(interaction);
-                        retain(&mut self.modal_interaction_filters, |f| {
+                        retain_mut(&mut self.modal_interaction_filters, |f| {
                             f.send_interaction(&mut interaction)
                         });
                     },
@@ -262,7 +240,7 @@ impl ShardRunner {
         }
 
         let mut event = LazyArc::new(event);
-        retain(&mut self.event_filters, |f| f.send_event(&mut event));
+        retain_mut(&mut self.event_filters, |f| f.send_event(&mut event));
     }
 
     /// Clones the internal copy of the Sender to the shard runner.
