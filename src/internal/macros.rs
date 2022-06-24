@@ -42,60 +42,103 @@ macro_rules! feature_cache {
     }};
 }
 
+/// The `enum_number!` macro generates `From` implementations to convert between values and the
+/// enum which can then be utilized by `serde` with `#[serde(from = "u8", into = "u8")]`.
+///
+/// When defining the enum like this:
+/// ```ignore
+/// enum_number! {
+///     /// The `Foo` enum
+///     #[derive(Clone, Copy, Deserialize, Serialize)]
+///     #[serde(from = "u8", into = "u8")]
+///     pub enum Foo {
+///         /// First
+///         Aah = 1,
+///         /// Second
+///         Bar = 2,
+///         _ => Unknown(u8),
+///     }
+/// }
+/// ```
+///
+/// Code like this will be generated:
+///
+/// ```
+/// # use serde::{Deserialize, Serialize};
+/// #
+/// /// The `Foo` enum
+/// #[derive(Clone, Copy, Deserialize, Serialize)]
+/// #[serde(from = "u8", into = "u8")]
+/// pub enum Foo {
+///     /// First
+///     Aah,
+///     /// Second,
+///     Bar,
+///     /// Variant value is unknown.
+///     Unknown(u8),
+/// }
+///
+/// impl From<u8> for Foo {
+///     fn from(value: u8) -> Self {
+///         match value {
+///             1 => Self::Aah,
+///             2 => Self::Bar,
+///             unknown => Self::Unknown(unknown),
+///         }
+///     }
+/// }
+///
+/// impl From<Foo> for u8 {
+///     fn from(value: Foo) -> Self {
+///         match value {
+///             Foo::Aah => 1,
+///             Foo::Bar => 2,
+///             Foo::Unknown(unknown) => unknown,
+///         }
+///     }
+/// }
+/// ```
 macro_rules! enum_number {
-    ($name:ident { $($(#[$attr:meta])? $variant:ident $(,)? )* }) => {
-        impl $name {
-            #[inline]
-            #[must_use]
-            pub fn num(&self) -> u64 {
-                *self as u64
-            }
+    (
+        $(#[$outer:meta])*
+        $vis:vis enum $Enum:ident {
+            $(
+                $(#[$inner:ident $($args:tt)*])*
+                $Variant:ident = $value:literal,
+            )*
+            _ => Unknown($T:ty),
+        }
+    ) => {
+        $(#[$outer])*
+        $vis enum $Enum {
+            $(
+                $(#[$inner $($args)*])*
+                $Variant,
+            )*
+            /// Variant value is unknown.
+            Unknown($T),
         }
 
-        impl serde::Serialize for $name {
-            fn serialize<S>(&self, serializer: S) -> std::result::Result<S::Ok, S::Error>
-                where S: serde::Serializer
-            {
-                // Serialize the enum as a u64.
-                serializer.serialize_u64(*self as u64)
-            }
-        }
-
-        impl<'de> serde::Deserialize<'de> for $name {
-            fn deserialize<D>(deserializer: D) -> std::result::Result<Self, D::Error>
-                where D: serde::Deserializer<'de>
-            {
-                struct Visitor;
-
-                impl<'de> serde::de::Visitor<'de> for Visitor {
-                    type Value = $name;
-
-                    fn expecting(&self, formatter: &mut std::fmt::Formatter<'_>)
-                        -> std::fmt::Result {
-                        formatter.write_str("positive integer")
-                    }
-
-                    fn visit_u64<E>(self, value: u64) -> std::result::Result<$name, E>
-                        where E: serde::de::Error
-                    {
-                        // Rust does not come with a simple way of converting a
-                        // number to an enum, so use a big `match`.
-                        match value {
-                            $( $(#[$attr])? v if v == $name::$variant as u64 => Ok($name::$variant), )*
-                            _ => {
-                                tracing::warn!("Unknown {} value: {}", stringify!($name), value);
-
-                                Ok($name::Unknown)
-                            }
-                        }
-                    }
+        impl From<$T> for $Enum {
+            fn from(value: $T) -> Self {
+                #[allow(unused_doc_comments)]
+                match value {
+                    $($(#[$inner $($args)*])* $value => Self::$Variant,)*
+                    unknown => Self::Unknown(unknown),
                 }
-
-                // Deserialize the enum from a u64.
-                deserializer.deserialize_u64(Visitor)
             }
         }
-    }
+
+        impl From<$Enum> for $T {
+            fn from(value: $Enum) -> Self {
+                #[allow(unused_doc_comments)]
+                match value {
+                    $($(#[$inner $($args)*])* $Enum::$Variant => $value,)*
+                    $Enum::Unknown(unknown) => unknown,
+                }
+            }
+        }
+    };
 }
 
 /// The macro forwards the generation to the `bitflags::bitflags!` macro and implements
@@ -146,4 +189,31 @@ macro_rules! bitflags {
         }
     };
     () => {};
+}
+
+#[cfg(test)]
+mod tests {
+    use serde_test::Token;
+
+    #[test]
+    fn enum_number() {
+        enum_number! {
+            #[derive(Copy, Clone, Debug, PartialEq, Deserialize, Serialize)]
+            #[serde(from = "u8", into = "u8")]
+            pub enum T {
+                /// AAA
+                A = 1,
+                /// BBB
+                B = 2,
+                /// CCC
+                C = 3,
+                _ => Unknown(u8),
+            }
+        }
+
+        serde_test::assert_tokens(&T::A, &[Token::U8(1)]);
+        serde_test::assert_tokens(&T::B, &[Token::U8(2)]);
+        serde_test::assert_tokens(&T::C, &[Token::U8(3)]);
+        serde_test::assert_tokens(&T::Unknown(123), &[Token::U8(123)]);
+    }
 }
