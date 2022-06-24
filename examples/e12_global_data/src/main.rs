@@ -80,7 +80,7 @@ struct Handler;
 impl EventHandler for Handler {
     async fn message(&self, ctx: Context, msg: Message) {
         // We are verifying if the bot id is the same as the message author id.
-        if msg.author.id != ctx.cache.current_user_id()
+        if msg.author.id != ctx.cache.current_user().id
             && msg.content.to_lowercase().contains("owo")
         {
             // Since data is located in Context, this means you are also able to use it within events!
