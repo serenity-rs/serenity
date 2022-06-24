@@ -1294,6 +1294,9 @@
 <span id="1289">1289</span>
 <span id="1290">1290</span>
 <span id="1291">1291</span>
+<span id="1292">1292</span>
+<span id="1293">1293</span>
+<span id="1294">1294</span>
 </pre><pre class="rust"><code><span class="doccomment">//! Models relating to Discord channels.</span>
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
@@ -2402,6 +2405,8 @@
     <span class="ident">GuildInviteReminder</span> <span class="op">=</span> <span class="number">22</span>,
     <span class="doccomment">/// A context menu command.</span>
     <span class="ident">ContextMenuCommand</span> <span class="op">=</span> <span class="number">23</span>,
+    <span class="doccomment">/// A message from an auto moderation action.</span>
+    <span class="ident">AutoModerationAction</span> <span class="op">=</span> <span class="number">24</span>,
     <span class="doccomment">/// An indicator that the message is of unknown type.</span>
     <span class="ident">Unknown</span> <span class="op">=</span> <span class="op">!</span><span class="number">0</span>,
 }
@@ -2430,6 +2435,7 @@
     <span class="ident">ThreadStarterMessage</span>,
     <span class="ident">GuildInviteReminder</span>,
     <span class="ident">ContextMenuCommand</span>,
+    <span class="ident">AutoModerationAction</span>,
 });
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>, <span class="ident">PartialEq</span>, <span class="ident">PartialOrd</span>, <span class="ident">Ord</span>)]</span>
