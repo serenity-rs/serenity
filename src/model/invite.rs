@@ -427,18 +427,15 @@ pub struct InviteStageInstance {
     topic: String,
 }
 
-/// [Discord docs](https://discord.com/developers/docs/resources/invite#invite-object-invite-target-types).
-#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
-#[non_exhaustive]
-pub enum InviteTargetType {
-    Normal = 0,
-    Stream = 1,
-    EmmbeddedApplication = 2,
-    Unknown = !0,
+enum_number! {
+    /// [Discord docs](https://discord.com/developers/docs/resources/invite#invite-object-invite-target-types).
+    #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
+    #[serde(from = "u8", into = "u8")]
+    #[non_exhaustive]
+    pub enum InviteTargetType {
+        Normal = 0,
+        Stream = 1,
+        EmmbeddedApplication = 2,
+        _ => Unknown(u8),
+    }
 }
-
-enum_number!(InviteTargetType {
-    Normal,
-    Stream,
-    EmmbeddedApplication
-});
