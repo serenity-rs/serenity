@@ -87,8 +87,9 @@ impl From<(bool, bool, bool)> for WithWhiteSpace {
 ///
 /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
 /// let token = std::env::var("DISCORD_BOT_TOKEN")?;
-/// let framework =
-///     StandardFramework::new().configure(|c| c.on_mention(Some(UserId::new(5))).prefix("~"));
+///
+/// let framework = StandardFramework::new();
+/// framework.configure(|c| c.on_mention(Some(UserId::new(5))).prefix("~"));
 ///
 /// let mut client = Client::builder(&token, GatewayIntents::default())
 ///     .event_handler(Handler)
@@ -101,6 +102,7 @@ impl From<(bool, bool, bool)> for WithWhiteSpace {
 /// [`Client`]: crate::Client
 /// [`StandardFramework`]: super::StandardFramework
 /// [default implementation]: Self::default
+#[derive(Clone)]
 pub struct Configuration {
     #[doc(hidden)]
     pub allow_dm: bool,
@@ -197,9 +199,9 @@ impl Configuration {
     /// use serenity::framework::StandardFramework;
     /// use serenity::model::id::ChannelId;
     ///
-    /// let framework = StandardFramework::new().configure(|c| {
-    ///     c.allowed_channels(vec![ChannelId::new(7), ChannelId::new(77)].into_iter().collect())
-    /// });
+    /// let framework = StandardFramework::new();
+    /// framework
+    ///     .configure(|c| c.allowed_channels(vec![ChannelId::new(7), ChannelId::new(77)].into_iter().collect()));
     /// ```
     pub fn allowed_channels(&mut self, channels: HashSet<ChannelId>) -> &mut Self {
         self.allowed_channels = channels;
@@ -220,9 +222,8 @@ impl Configuration {
     /// use serenity::framework::StandardFramework;
     /// use serenity::model::id::GuildId;
     ///
-    /// let framework = StandardFramework::new().configure(|c| {
-    ///     c.blocked_guilds(vec![GuildId::new(7), GuildId::new(77)].into_iter().collect())
-    /// });
+    /// let framework = StandardFramework::new();
+    /// framework.configure(|c| c.blocked_guilds(vec![GuildId::new(7), GuildId::new(77)].into_iter().collect()));
     /// ```
     pub fn blocked_guilds(&mut self, guilds: HashSet<GuildId>) -> &mut Self {
         self.blocked_guilds = guilds;
@@ -245,9 +246,8 @@ impl Configuration {
     /// use serenity::framework::StandardFramework;
     /// use serenity::model::id::UserId;
     ///
-    /// let framework = StandardFramework::new().configure(|c| {
-    ///     c.blocked_users(vec![UserId::new(7), UserId::new(77)].into_iter().collect())
-    /// });
+    /// let framework = StandardFramework::new();
+    /// framework.configure(|c| c.blocked_users(vec![UserId::new(7), UserId::new(77)].into_iter().collect()));
     /// ```
     pub fn blocked_users(&mut self, users: HashSet<UserId>) -> &mut Self {
         self.blocked_users = users;
@@ -282,8 +282,8 @@ impl Configuration {
     ///
     /// let disabled = vec!["ping"].into_iter().map(|x| x.to_string()).collect();
     ///
-    /// let framework =
-    ///     StandardFramework::new().group(&PENG_GROUP).configure(|c| c.disabled_commands(disabled));
+    /// let framework = StandardFramework::new().group(&PENG_GROUP);
+    /// framework.configure(|c| c.disabled_commands(disabled));
     /// ```
     #[inline]
     pub fn disabled_commands(&mut self, commands: HashSet<String>) -> &mut Self {
@@ -336,7 +336,8 @@ impl Configuration {
     /// # use serenity::prelude::*;
     /// use serenity::framework::StandardFramework;
     ///
-    /// let framework = StandardFramework::new().configure(|c| {
+    /// let framework = StandardFramework::new();
+    /// framework.configure(|c| {
     ///     c.dynamic_prefix(|_, msg| {
     ///         Box::pin(async move {
     ///             Some(if msg.channel_id.get() % 5 == 0 { "!" } else { "*" }.to_string())
@@ -413,8 +414,8 @@ impl Configuration {
     /// use serenity::framework::StandardFramework;
     /// use serenity::model::id::UserId;
     ///
-    /// let framework = StandardFramework::new()
-    ///     .configure(|c| c.owners(vec![UserId::new(7), UserId::new(77)].into_iter().collect()));
+    /// let framework = StandardFramework::new();
+    /// framework.configure(|c| c.owners(vec![UserId::new(7), UserId::new(77)].into_iter().collect()));
     /// ```
     ///
     /// Create a HashSet beforehand:
@@ -429,7 +430,8 @@ impl Configuration {
     /// set.insert(UserId::new(7));
     /// set.insert(UserId::new(77));
     ///
-    /// let framework = StandardFramework::new().configure(|c| c.owners(set));
+    /// let framework = StandardFramework::new();
+    /// framework.configure(|c| c.owners(set));
     /// ```
     pub fn owners(&mut self, user_ids: HashSet<UserId>) -> &mut Self {
         self.owners = user_ids;
@@ -454,7 +456,8 @@ impl Configuration {
     /// ```rust,no_run
     /// use serenity::framework::StandardFramework;
     ///
-    /// let framework = StandardFramework::new().configure(|c| c.prefix("!"));
+    /// let framework = StandardFramework::new();
+    /// framework.configure(|c| c.prefix("!"));
     /// ```
     pub fn prefix(&mut self, prefix: impl Into<String>) -> &mut Self {
         let p = prefix.into();
@@ -478,7 +481,8 @@ impl Configuration {
     /// ```rust,no_run
     /// use serenity::framework::StandardFramework;
     ///
-    /// let framework = StandardFramework::new().configure(|c| c.prefixes(vec!["!", ">", "+"]));
+    /// let framework = StandardFramework::new();
+    /// framework.configure(|c| c.prefixes(vec!["!", ">", "+"]));
     /// ```
     #[inline]
     pub fn prefixes<T, It>(&mut self, prefixes: It) -> &mut Self
@@ -517,7 +521,8 @@ impl Configuration {
     /// ```rust,no_run
     /// use serenity::framework::StandardFramework;
     ///
-    /// let framework = StandardFramework::new().configure(|c| c.delimiter(", "));
+    /// let framework = StandardFramework::new();
+    /// framework.configure(|c| c.delimiter(", "));
     /// ```
     pub fn delimiter<I: Into<Delimiter>>(&mut self, delimiter: I) -> &mut Self {
         self.delimiters.clear();
@@ -538,7 +543,8 @@ impl Configuration {
     /// ```rust,no_run
     /// use serenity::framework::StandardFramework;
     ///
-    /// let framework = StandardFramework::new().configure(|c| c.delimiters(vec![", ", " "]));
+    /// let framework = StandardFramework::new();
+    /// framework.configure(|c| c.delimiters(vec![", ", " "]));
     /// ```
     pub fn delimiters<T, It>(&mut self, delimiters: It) -> &mut Self
     where
