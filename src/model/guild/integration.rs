@@ -27,22 +27,19 @@ pub struct Integration {
     pub application: Option<IntegrationApplication>,
 }
 
-/// The behavior once the integration expires.
-///
-/// [Discord docs](https://discord.com/developers/docs/resources/guild#integration-object-integration-expire-behaviors).
-#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
-#[non_exhaustive]
-#[repr(u8)]
-pub enum IntegrationExpireBehaviour {
-    RemoveRole = 0,
-    Kick = 1,
-    Unknown = !0,
+enum_number! {
+    /// The behavior once the integration expires.
+    ///
+    /// [Discord docs](https://discord.com/developers/docs/resources/guild#integration-object-integration-expire-behaviors).
+    #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
+    #[serde(from = "u8", into = "u8")]
+    #[non_exhaustive]
+    pub enum IntegrationExpireBehaviour {
+        RemoveRole = 0,
+        Kick = 1,
+        _ => Unknown(u8),
+    }
 }
-
-enum_number!(IntegrationExpireBehaviour {
-    RemoveRole,
-    Kick
-});
 
 impl From<Integration> for IntegrationId {
     /// Gets the Id of integration.
