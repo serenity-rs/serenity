@@ -844,7 +844,7 @@ impl Message {
 
     /// Returns a builder which can be awaited to obtain a model submit interaction or stream of modal submit interactions on this message.
     #[cfg(feature = "collector")]
-    pub fn await_modal_interactions<'a>(
+    pub fn modal_interaction_collector<'a>(
         &self,
         shard_messenger: &'a ShardMessenger,
     ) -> ModalInteractionCollectorBuilder<'a> {
