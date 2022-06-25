@@ -72,11 +72,7 @@ impl MessageFilter {
     /// constraints.
     fn is_within_limits(&self) -> bool {
         self.common_options.filter_limit.as_ref().map_or(true, |limit| self.filtered < *limit)
-            && self
-                .common_options
-                .collect_limit
-                .as_ref()
-                .map_or(true, |limit| self.collected < *limit)
+            && self.common_options.collect_limit.map_or(true, |limit| self.collected < limit)
     }
 }
 
