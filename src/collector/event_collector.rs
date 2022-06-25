@@ -6,7 +6,8 @@ use tokio::sync::mpsc::{
     UnboundedSender as Sender,
 };
 
-use crate::collector::{CollectorError, FilterFn, LazyArc};
+use crate::client::bridge::gateway::ShardMessenger;
+use crate::collector::{CollectorError, CommonFilterOptions, LazyArc};
 use crate::model::event::{Event, EventType, RelatedIdsForEventType};
 use crate::model::id::{ChannelId, GuildId, MessageId, UserId};
 use crate::{Error, Result};
@@ -18,19 +19,14 @@ pub struct EventFilter {
     collected: u32,
     options: FilterOptions,
     sender: Sender<Arc<Event>>,
-
-    filter_limit: Option<u32>,
-    collect_limit: Option<u32>,
-    filter: Option<FilterFn<Event>>,
+    common_options: CommonFilterOptions<Event>,
 }
 
 impl EventFilter {
     /// Creates a new filter
     fn new(
         options: FilterOptions,
-        filter_limit: Option<u32>,
-        collect_limit: Option<u32>,
-        filter: Option<FilterFn<Event>>,
+        common_options: CommonFilterOptions<Event>,
     ) -> (Self, Receiver<Arc<Event>>) {
         let (sender, receiver) = unbounded_channel();
 
@@ -38,10 +34,8 @@ impl EventFilter {
             filtered: 0,
             collected: 0,
             sender,
-            filter,
             options,
-            filter_limit,
-            collect_limit,
+            common_options,
         };
 
         (filter, receiver)
@@ -88,15 +82,15 @@ impl EventFilter {
             && empty_or_any(&self.options.user_id, |id| event.user_id().contains(id))
             && empty_or_any(&self.options.channel_id, |id| event.channel_id().contains(id))
             && empty_or_any(&self.options.message_id, |id| event.message_id().contains(id))
-            && self.filter.as_ref().map_or(true, |f| f.0(event))
+            && self.common_options.filter.as_ref().map_or(true, |f| f.0(event))
     }
 
     /// Checks if the filter is within set receive and collect limits.
     /// A event is considered *received* even when it does not meet the
     /// constraints.
     fn is_within_limits(&self) -> bool {
-        self.filter_limit.as_ref().map_or(true, |limit| self.filtered < *limit)
-            && self.collect_limit.as_ref().map_or(true, |limit| self.collected < *limit)
+        self.common_options.filter_limit.map_or(true, |limit| self.filtered < limit)
+            && self.common_options.collect_limit.map_or(true, |limit| self.collected < limit)
     }
 }
 
@@ -192,12 +186,10 @@ impl super::FilterOptions<Event> for FilterOptions {
 
     fn build(
         self,
-        messenger: &crate::client::bridge::gateway::ShardMessenger,
-        filter_limit: Option<u32>,
-        collect_limit: Option<u32>,
-        filter: Option<FilterFn<Self::FilterItem>>,
+        messenger: &ShardMessenger,
+        common_options: CommonFilterOptions<Self::FilterItem>,
     ) -> Receiver<Arc<Event>> {
-        let (filter, recv) = EventFilter::new(self, filter_limit, collect_limit, filter);
+        let (filter, recv) = EventFilter::new(self, common_options);
         messenger.set_event_filter(filter);
 
         recv

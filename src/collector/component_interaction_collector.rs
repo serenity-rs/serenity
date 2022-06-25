@@ -9,7 +9,7 @@ use tokio::sync::mpsc::{
 
 use super::macros::*;
 use crate::client::bridge::gateway::ShardMessenger;
-use crate::collector::{FilterFn, LazyArc};
+use crate::collector::{CommonFilterOptions, LazyArc};
 use crate::model::application::interaction::message_component::MessageComponentInteraction;
 
 /// Filters events on the shard's end and sends them to the collector.
@@ -19,19 +19,14 @@ pub struct ComponentInteractionFilter {
     collected: u32,
     options: FilterOptions,
     sender: Sender<Arc<MessageComponentInteraction>>,
-
-    filter_limit: Option<u32>,
-    collect_limit: Option<u32>,
-    filter: Option<FilterFn<MessageComponentInteraction>>,
+    common_options: CommonFilterOptions<MessageComponentInteraction>,
 }
 
 impl ComponentInteractionFilter {
     /// Creates a new filter
     fn new(
         options: FilterOptions,
-        filter_limit: Option<u32>,
-        collect_limit: Option<u32>,
-        filter: Option<FilterFn<MessageComponentInteraction>>,
+        common_options: CommonFilterOptions<MessageComponentInteraction>,
     ) -> (Self, Receiver<Arc<MessageComponentInteraction>>) {
         let (sender, receiver) = unbounded_channel();
 
@@ -39,10 +34,8 @@ impl ComponentInteractionFilter {
             filtered: 0,
             collected: 0,
             sender,
-            filter,
             options,
-            filter_limit,
-            collect_limit,
+            common_options,
         };
 
         (filter, receiver)
@@ -75,15 +68,15 @@ impl ComponentInteractionFilter {
             && self.options.message_id.map_or(true, |id| interaction.message.id.0 == id)
             && self.options.channel_id.map_or(true, |id| id == interaction.channel_id.as_ref().0)
             && self.options.author_id.map_or(true, |id| id == interaction.user.id.0)
-            && self.filter.as_ref().map_or(true, |f| f.0(interaction))
+            && self.common_options.filter.as_ref().map_or(true, |f| f.0(interaction))
     }
 
     /// Checks if the filter is within set receive and collect limits.
     /// An interaction is considered *received* even when it does not meet the
     /// constraints.
     fn is_within_limits(&self) -> bool {
-        self.filter_limit.map_or(true, |limit| self.filtered < limit)
-            && self.collect_limit.map_or(true, |limit| self.collected < limit)
+        self.common_options.filter_limit.map_or(true, |limit| self.filtered < limit)
+            && self.common_options.collect_limit.map_or(true, |limit| self.collected < limit)
     }
 }
 
@@ -108,12 +101,9 @@ impl super::FilterOptions<MessageComponentInteraction> for FilterOptions {
     fn build(
         self,
         messenger: &ShardMessenger,
-        filter_limit: Option<u32>,
-        collect_limit: Option<u32>,
-        filter: Option<FilterFn<Self::FilterItem>>,
+        common_options: CommonFilterOptions<Self::FilterItem>,
     ) -> Receiver<Arc<MessageComponentInteraction>> {
-        let (filter, recv) =
-            ComponentInteractionFilter::new(self, filter_limit, collect_limit, filter);
+        let (filter, recv) = ComponentInteractionFilter::new(self, common_options);
         messenger.set_component_interaction_filter(filter);
 
         recv

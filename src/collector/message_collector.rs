@@ -9,7 +9,7 @@ use tokio::sync::mpsc::{
 
 use crate::client::bridge::gateway::ShardMessenger;
 use crate::collector::macros::*;
-use crate::collector::{FilterFn, LazyArc};
+use crate::collector::{CommonFilterOptions, LazyArc};
 use crate::model::channel::Message;
 
 /// Filters events on the shard's end and sends them to the collector.
@@ -19,19 +19,14 @@ pub struct MessageFilter {
     collected: u32,
     options: FilterOptions,
     sender: Sender<Arc<Message>>,
-
-    filter_limit: Option<u32>,
-    collect_limit: Option<u32>,
-    filter: Option<FilterFn<Message>>,
+    common_options: CommonFilterOptions<Message>,
 }
 
 impl MessageFilter {
     /// Creates a new filter
     fn new(
         options: FilterOptions,
-        filter_limit: Option<u32>,
-        collect_limit: Option<u32>,
-        filter: Option<FilterFn<Message>>,
+        common_options: CommonFilterOptions<Message>,
     ) -> (Self, Receiver<Arc<Message>>) {
         let (sender, receiver) = unbounded_channel();
 
@@ -39,10 +34,8 @@ impl MessageFilter {
             filtered: 0,
             collected: 0,
             sender,
-            filter,
             options,
-            filter_limit,
-            collect_limit,
+            common_options,
         };
 
         (filter, receiver)
@@ -71,15 +64,19 @@ impl MessageFilter {
         self.options.guild_id.map_or(true, |g| Some(g) == message.guild_id.map(|g| g.0))
             && self.options.channel_id.map_or(true, |g| g == message.channel_id.0)
             && self.options.author_id.map_or(true, |g| g == message.author.id.0)
-            && self.filter.as_ref().map_or(true, |f| f.0(message))
+            && self.common_options.filter.as_ref().map_or(true, |f| f.0(message))
     }
 
     /// Checks if the filter is within set receive and collect limits.
     /// A message is considered *received* even when it does not meet the
     /// constraints.
     fn is_within_limits(&self) -> bool {
-        self.filter_limit.as_ref().map_or(true, |limit| self.filtered < *limit)
-            && self.collect_limit.as_ref().map_or(true, |limit| self.collected < *limit)
+        self.common_options.filter_limit.as_ref().map_or(true, |limit| self.filtered < *limit)
+            && self
+                .common_options
+                .collect_limit
+                .as_ref()
+                .map_or(true, |limit| self.collected < *limit)
     }
 }
 
@@ -102,11 +99,9 @@ impl super::FilterOptions<Message> for FilterOptions {
     fn build(
         self,
         messenger: &ShardMessenger,
-        filter_limit: Option<u32>,
-        collect_limit: Option<u32>,
-        filter: Option<FilterFn<Self::FilterItem>>,
+        common_options: CommonFilterOptions<Self::FilterItem>,
     ) -> Receiver<Arc<Message>> {
-        let (filter, recv) = MessageFilter::new(self, filter_limit, collect_limit, filter);
+        let (filter, recv) = MessageFilter::new(self, common_options);
         messenger.set_message_filter(filter);
 
         recv

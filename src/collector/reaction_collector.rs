@@ -9,7 +9,7 @@ use tokio::sync::mpsc::{
 
 use crate::client::bridge::gateway::ShardMessenger;
 use crate::collector::macros::*;
-use crate::collector::{FilterFn, LazyArc};
+use crate::collector::{CommonFilterOptions, LazyArc};
 use crate::model::channel::Reaction;
 
 /// Marks whether the reaction has been added or removed.
@@ -76,19 +76,14 @@ pub struct ReactionFilter {
     collected: u32,
     options: FilterOptions,
     sender: Sender<Arc<ReactionAction>>,
-
-    filter_limit: Option<u32>,
-    collect_limit: Option<u32>,
-    filter: Option<FilterFn<Reaction>>,
+    common_options: CommonFilterOptions<Reaction>,
 }
 
 impl ReactionFilter {
     /// Creates a new filter
     fn new(
         options: FilterOptions,
-        filter_limit: Option<u32>,
-        collect_limit: Option<u32>,
-        filter: Option<FilterFn<Reaction>>,
+        common_options: CommonFilterOptions<Reaction>,
     ) -> (Self, Receiver<Arc<ReactionAction>>) {
         let (sender, receiver) = unbounded_channel();
 
@@ -96,10 +91,8 @@ impl ReactionFilter {
             filtered: 0,
             collected: 0,
             sender,
-            filter,
             options,
-            filter_limit,
-            collect_limit,
+            common_options,
         };
 
         (filter, receiver)
@@ -146,15 +139,15 @@ impl ReactionFilter {
             && self.options.message_id.map_or(true, |id| id == reaction.message_id.0)
             && self.options.channel_id.map_or(true, |id| id == reaction.channel_id.0)
             && self.options.author_id.map_or(true, |id| Some(id) == reaction.user_id.map(|u| u.0))
-            && self.filter.as_ref().map_or(true, |f| f.0(reaction))
+            && self.common_options.filter.as_ref().map_or(true, |f| f.0(reaction))
     }
 
     /// Checks if the filter is within set receive and collect limits.
     /// A reaction is considered *received* even when it does not meet the
     /// constraints.
     fn is_within_limits(&self) -> bool {
-        self.filter_limit.map_or(true, |limit| self.filtered < limit)
-            && self.collect_limit.map_or(true, |limit| self.collected < limit)
+        self.common_options.filter_limit.map_or(true, |limit| self.filtered < limit)
+            && self.common_options.collect_limit.map_or(true, |limit| self.collected < limit)
     }
 }
 
@@ -212,11 +205,9 @@ impl super::FilterOptions<ReactionAction> for FilterOptions {
     fn build(
         self,
         messenger: &ShardMessenger,
-        filter_limit: Option<u32>,
-        collect_limit: Option<u32>,
-        filter: Option<FilterFn<Self::FilterItem>>,
+        common_options: CommonFilterOptions<Self::FilterItem>,
     ) -> Receiver<Arc<ReactionAction>> {
-        let (filter, recv) = ReactionFilter::new(self, filter_limit, collect_limit, filter);
+        let (filter, recv) = ReactionFilter::new(self, common_options);
         messenger.set_reaction_filter(filter);
 
         recv

@@ -90,9 +90,7 @@ pub trait FilterOptions<Item: ?Sized> {
     fn build(
         self,
         messenger: &ShardMessenger,
-        filter_limit: Option<u32>,
-        collect_limit: Option<u32>,
-        filter: Option<FilterFn<Self::FilterItem>>,
+        common: CommonFilterOptions<Self::FilterItem>,
     ) -> Receiver<Arc<Item>>;
 }
 
@@ -100,19 +98,30 @@ pub trait Collectable {
     type FilterOptions: FilterOptions<Self> + Default;
 }
 
-#[derive(Default)]
-pub struct CommonFilterOptions {
+#[derive(Clone, Debug)]
+pub struct CommonFilterOptions<FilterItem> {
     filter_limit: Option<u32>,
     collect_limit: Option<u32>,
-    timeout: Option<Pin<Box<Sleep>>>,
+    filter: Option<FilterFn<FilterItem>>,
+}
+
+// Needed to prevent `FilterItem` needing a `Default` bound, which `derive` adds.
+impl<FilterItem> Default for CommonFilterOptions<FilterItem> {
+    fn default() -> Self {
+        Self {
+            collect_limit: None,
+            filter_limit: None,
+            filter: None,
+        }
+    }
 }
 
 #[must_use = "Builders must be built"]
 pub struct CollectorBuilder<'a, Item: Collectable + sealed::Sealed> {
+    common_options: CommonFilterOptions<<Item::FilterOptions as FilterOptions<Item>>::FilterItem>,
     filter_options: Item::FilterOptions,
-    common_options: CommonFilterOptions,
     shard_messenger: &'a ShardMessenger,
-    filter: Option<FilterFn<<Item::FilterOptions as FilterOptions<Item>>::FilterItem>>,
+    timeout: Option<Pin<Box<Sleep>>>,
 }
 
 impl<'a, Item: Collectable + sealed::Sealed> CollectorBuilder<'a, Item> {
@@ -120,25 +129,17 @@ impl<'a, Item: Collectable + sealed::Sealed> CollectorBuilder<'a, Item> {
         Self {
             shard_messenger,
 
-            filter: None,
+            timeout: None,
             common_options: CommonFilterOptions::default(),
             filter_options: Item::FilterOptions::default(),
         }
     }
 
-    pub fn build(mut self) -> Collector<Item> {
-        let filter = self.filter.take();
-        let CommonFilterOptions {
-            filter_limit,
-            collect_limit,
-            timeout,
-        } = self.common_options;
-
-        let receiver =
-            self.filter_options.build(self.shard_messenger, filter_limit, collect_limit, filter);
+    pub fn build(self) -> Collector<Item> {
+        let receiver = self.filter_options.build(self.shard_messenger, self.common_options);
 
         Collector {
-            timeout,
+            timeout: self.timeout,
             receiver: Box::pin(receiver),
         }
     }
@@ -156,7 +157,7 @@ impl<'a, Item: Collectable + sealed::Sealed> CollectorBuilder<'a, Item> {
         mut self,
         function: F,
     ) -> Self {
-        self.filter = Some(FilterFn(Arc::new(function)));
+        self.common_options.filter = Some(FilterFn(Arc::new(function)));
 
         self
     }
@@ -179,7 +180,7 @@ impl<'a, Item: Collectable + sealed::Sealed> CollectorBuilder<'a, Item> {
 
     /// Sets a [`Duration`] for how long the collector shall receive events.
     pub fn timeout(mut self, duration: Duration) -> Self {
-        self.common_options.timeout = Some(Box::pin(tokio::time::sleep(duration)));
+        self.timeout = Some(Box::pin(tokio::time::sleep(duration)));
 
         self
     }

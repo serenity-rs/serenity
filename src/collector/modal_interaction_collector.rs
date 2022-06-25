@@ -7,10 +7,9 @@ use tokio::sync::mpsc::{
     UnboundedSender as Sender,
 };
 
-use super::FilterFn;
 use crate::client::bridge::gateway::ShardMessenger;
 use crate::collector::macros::*;
-use crate::collector::LazyArc;
+use crate::collector::{CommonFilterOptions, LazyArc};
 use crate::model::application::interaction::modal::ModalSubmitInteraction;
 
 /// Filters events on the shard's end and sends them to the collector.
@@ -20,19 +19,14 @@ pub struct ModalInteractionFilter {
     collected: u32,
     options: FilterOptions,
     sender: Sender<Arc<ModalSubmitInteraction>>,
-
-    filter_limit: Option<u32>,
-    collect_limit: Option<u32>,
-    filter: Option<FilterFn<ModalSubmitInteraction>>,
+    common_options: CommonFilterOptions<ModalSubmitInteraction>,
 }
 
 impl ModalInteractionFilter {
     /// Creates a new filter
     fn new(
         options: FilterOptions,
-        filter_limit: Option<u32>,
-        collect_limit: Option<u32>,
-        filter: Option<FilterFn<ModalSubmitInteraction>>,
+        common_options: CommonFilterOptions<ModalSubmitInteraction>,
     ) -> (Self, Receiver<Arc<ModalSubmitInteraction>>) {
         let (sender, receiver) = unbounded_channel();
 
@@ -40,10 +34,8 @@ impl ModalInteractionFilter {
             filtered: 0,
             collected: 0,
             sender,
-            filter,
             options,
-            filter_limit,
-            collect_limit,
+            common_options,
         };
 
         (filter, receiver)
@@ -79,15 +71,15 @@ impl ModalInteractionFilter {
                 .map_or(true, |id| Some(id) == interaction.message.as_ref().map(|m| m.id.0))
             && self.options.channel_id.map_or(true, |id| id == interaction.channel_id.as_ref().0)
             && self.options.author_id.map_or(true, |id| id == interaction.user.id.0)
-            && self.filter.as_ref().map_or(true, |f| f.0(interaction))
+            && self.common_options.filter.as_ref().map_or(true, |f| f.0(interaction))
     }
 
     /// Checks if the filter is within set receive and collect limits.
     /// An interaction is considered *received* even when it does not meet the
     /// constraints.
     fn is_within_limits(&self) -> bool {
-        self.filter_limit.map_or(true, |limit| self.filtered < limit)
-            && self.collect_limit.map_or(true, |limit| self.collected < limit)
+        self.common_options.filter_limit.map_or(true, |limit| self.filtered < limit)
+            && self.common_options.collect_limit.map_or(true, |limit| self.collected < limit)
     }
 }
 
@@ -112,11 +104,9 @@ impl super::FilterOptions<ModalSubmitInteraction> for FilterOptions {
     fn build(
         self,
         messenger: &ShardMessenger,
-        filter_limit: Option<u32>,
-        collect_limit: Option<u32>,
-        filter: Option<FilterFn<Self::FilterItem>>,
+        common_options: CommonFilterOptions<Self::FilterItem>,
     ) -> Receiver<Arc<ModalSubmitInteraction>> {
-        let (filter, recv) = ModalInteractionFilter::new(self, filter_limit, collect_limit, filter);
+        let (filter, recv) = ModalInteractionFilter::new(self, common_options);
         messenger.set_modal_interaction_filter(filter);
 
         recv
