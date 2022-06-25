@@ -66,14 +66,9 @@ impl<'a> EditMessage<'a> {
 
     /// Add an embed for the message.
     ///
-    /// **Note**: This will keep all existing embeds. Use [`Self::set_embed()`] to replace existing
+    /// **Note**: This will keep all existing embeds. Use [`Self::embed()`] to replace existing
     /// embeds.
-    pub fn add_embed<F>(&mut self, f: F) -> &mut Self
-    where
-        F: FnOnce(&mut CreateEmbed) -> &mut CreateEmbed,
-    {
-        let mut embed = CreateEmbed::default();
-        f(&mut embed);
+    pub fn add_embed(&mut self, embed: CreateEmbed) -> &mut Self {
         self._add_embed(embed)
     }
 
@@ -88,26 +83,9 @@ impl<'a> EditMessage<'a> {
 
     /// Set an embed for the message.
     ///
-    /// Equivalent to [`Self::set_embed()`].
-    ///
-    /// **Note**: This will replace all existing embeds. Use
-    /// [`Self::add_embed()`] to add an additional embed.
-    pub fn embed<F>(&mut self, f: F) -> &mut Self
-    where
-        F: FnOnce(&mut CreateEmbed) -> &mut CreateEmbed,
-    {
-        let mut embed = CreateEmbed::default();
-        f(&mut embed);
-        self.set_embed(embed)
-    }
-
-    /// Set an embed for the message.
-    ///
-    /// Equivalent to [`Self::embed()`].
-    ///
-    /// **Note**: This will replace all existing embeds.
-    /// Use [`Self::add_embed()`] to add an additional embed.
-    pub fn set_embed(&mut self, embed: CreateEmbed) -> &mut Self {
+    /// **Note**: This will replace all existing embeds. Use [`Self::add_embed()`] to keep existing
+    /// embeds.
+    pub fn embed(&mut self, embed: CreateEmbed) -> &mut Self {
         self.set_embeds(vec![embed])
     }
 

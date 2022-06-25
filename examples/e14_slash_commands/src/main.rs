@@ -1,7 +1,7 @@
 use std::env;
 
 use serenity::async_trait;
-use serenity::builder::*;
+use serenity::builder::CreateInteractionResponseData;
 use serenity::model::application::command::{Command, CommandOptionType};
 use serenity::model::application::interaction::application_command::CommandDataOptionValue;
 use serenity::model::application::interaction::{Interaction, InteractionResponseType};

@@ -297,20 +297,18 @@ impl Webhook {
     /// #
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// # let http = Http::new("token");
-    /// use serenity::model::channel::Embed;
+    /// use serenity::builder::CreateEmbed;
     ///
     /// let url = "https://discord.com/api/webhooks/245037420704169985/ig5AO-wdVWpCBtUUMxmgsWryqgsW3DChbKYOINftJ4DCrUbnkedoYZD0VOH1QLr-S3sV";
     /// let mut webhook = Webhook::from_url(&http, url).await?;
     ///
-    /// let embed = Embed::fake(|e| {
-    ///     e.title("Rust's website")
-    ///         .description(
-    ///             "Rust is a systems programming language that runs
-    ///                    blazingly fast, prevents segfaults, and guarantees
-    ///                    thread safety.",
-    ///         )
-    ///         .url("https://rust-lang.org")
-    /// });
+    /// let embed = CreateEmbed::default()
+    ///     .title("Rust's website")
+    ///     .description(
+    ///         "Rust is a systems programming language that runs blazingly fast, \
+    ///          prevents segfaults, and guarantees thread safety.",
+    ///     )
+    ///     .url("https://rust-lang.org");
     ///
     /// webhook
     ///     .execute(&http, false, |w| w.content("test").username("serenity").embeds(vec![embed]))

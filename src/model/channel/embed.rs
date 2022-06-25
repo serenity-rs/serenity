@@ -1,5 +1,3 @@
-#[cfg(feature = "model")]
-use crate::builder::CreateEmbed;
 #[cfg(feature = "utils")]
 use crate::utils::Colour;
 
@@ -60,40 +58,6 @@ pub struct Embed {
     ///
     /// This is present if the [`Self::kind`] is `"video"`.
     pub video: Option<EmbedVideo>,
-}
-
-#[cfg(feature = "model")]
-impl Embed {
-    /// Creates a fake Embed, giving back a [`serde_json`] map.
-    ///
-    /// This should only be useful in conjunction with [`Webhook::execute`].
-    ///
-    /// [`Webhook::execute`]: crate::model::webhook::Webhook::execute
-    ///
-    /// # Examples
-    ///
-    /// Create an embed:
-    ///
-    /// ```rust,no_run
-    /// use serenity::model::channel::Embed;
-    ///
-    /// let embed = Embed::fake(|e| {
-    ///     e.title("Embed title").description("Making a basic embed").field(
-    ///         "A field",
-    ///         "Has some content.",
-    ///         false,
-    ///     )
-    /// });
-    /// ```
-    #[inline]
-    pub fn fake<F>(f: F) -> CreateEmbed
-    where
-        F: FnOnce(&mut CreateEmbed) -> &mut CreateEmbed,
-    {
-        let mut create_embed = CreateEmbed::default();
-        f(&mut create_embed);
-        create_embed
-    }
 }
 
 /// An author object in an embed.

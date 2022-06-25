@@ -20,8 +20,8 @@ use crate::model::channel::MessageFlags;
 /// payload of [`Webhook::execute`]:
 ///
 /// ```rust,no_run
+/// use serenity::builder::CreateEmbed;
 /// use serenity::http::Http;
-/// use serenity::model::channel::Embed;
 /// use serenity::model::webhook::Webhook;
 /// use serenity::utils::Colour;
 ///
@@ -30,19 +30,17 @@ use crate::model::channel::MessageFlags;
 /// let url = "https://discord.com/api/webhooks/245037420704169985/ig5AO-wdVWpCBtUUMxmgsWryqgsW3DChbKYOINftJ4DCrUbnkedoYZD0VOH1QLr-S3sV";
 /// let webhook = Webhook::from_url(&http, url).await?;
 ///
-/// let website = Embed::fake(|e| {
-///     e.title("The Rust Language Website")
-///         .description("Rust is a systems programming language.")
-///         .colour(Colour::from_rgb(222, 165, 132))
-/// });
+/// let website = CreateEmbed::default()
+///     .title("The Rust Language Website")
+///     .description("Rust is a systems programming language.")
+///     .colour(Colour::from_rgb(222, 165, 132));
 ///
-/// let resources = Embed::fake(|e| {
-///     e.title("Rust Resources")
-///         .description("A few resources to help with learning Rust")
-///         .colour(0xDEA584)
-///         .field("The Rust Book", "A comprehensive resource for Rust.", false)
-///         .field("Rust by Example", "A collection of Rust examples", false)
-/// });
+/// let resources = CreateEmbed::default()
+///     .title("Rust Resources")
+///     .description("A few resources to help with learning Rust")
+///     .colour(0xDEA584)
+///     .field("The Rust Book", "A comprehensive resource for Rust.", false)
+///     .field("Rust by Example", "A collection of Rust examples", false);
 ///
 /// webhook
 ///     .execute(&http, false, |w| {

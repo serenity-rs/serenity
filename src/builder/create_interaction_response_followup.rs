@@ -129,12 +129,7 @@ impl<'a> CreateInteractionResponseFollowup<'a> {
     }
 
     /// Create an embed for the message.
-    pub fn embed<F>(self, f: F) -> Self
-    where
-        F: FnOnce(&mut CreateEmbed) -> &mut CreateEmbed,
-    {
-        let mut embed = CreateEmbed::default();
-        f(&mut embed);
+    pub fn embed(self, embed: CreateEmbed) -> Self {
         self.add_embed(embed)
     }
 

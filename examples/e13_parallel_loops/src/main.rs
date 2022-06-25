@@ -5,6 +5,7 @@ use std::time::Duration;
 
 use chrono::offset::Utc;
 use serenity::async_trait;
+use serenity::builder::CreateEmbed;
 use serenity::gateway::ActivityData;
 use serenity::model::channel::Message;
 use serenity::model::gateway::Ready;
@@ -79,23 +80,19 @@ async fn log_system_load(ctx: Arc<Context>) {
 
     // We can use ChannelId directly to send a message to a specific channel; in this case, the
     // message would be sent to the #testing channel on the discord server.
-    let message = ChannelId::new(381926291785383946)
-        .send_message()
-        .embed(|e| {
-            e.title("System Resource Load")
-                .field("CPU Load Average", &format!("{:.2}%", cpu_load.one * 10.0), false)
-                .field(
-                    "Memory Usage",
-                    &format!(
-                        "{:.2} MB Free out of {:.2} MB",
-                        mem_use.free as f32 / 1000.0,
-                        mem_use.total as f32 / 1000.0
-                    ),
-                    false,
-                )
-        })
-        .execute(ctx)
-        .await;
+    let embed = CreateEmbed::default()
+        .title("System Resource Load")
+        .field("CPU Load Average", format!("{:.2}%", cpu_load.one * 10.0), false)
+        .field(
+            "Memory Usage",
+            format!(
+                "{:.2} MB Free out of {:.2} MB",
+                mem_use.free as f32 / 1000.0,
+                mem_use.total as f32 / 1000.0
+            ),
+            false,
+        );
+    let message = ChannelId::new(381926291785383946).send_message().embed(embed).execute(ctx).await;
     if let Err(why) = message {
         eprintln!("Error sending message: {:?}", why);
     };

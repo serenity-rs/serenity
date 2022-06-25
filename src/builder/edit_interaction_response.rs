@@ -25,12 +25,7 @@ impl EditInteractionResponse {
     }
 
     /// Creates an embed for the message.
-    pub fn embed<F>(&mut self, f: F) -> &mut Self
-    where
-        F: FnOnce(&mut CreateEmbed) -> &mut CreateEmbed,
-    {
-        let mut embed = CreateEmbed::default();
-        f(&mut embed);
+    pub fn embed(&mut self, embed: CreateEmbed) -> &mut Self {
         self.add_embed(embed)
     }
 
