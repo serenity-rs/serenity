@@ -1,14 +1,13 @@
 #[cfg(feature = "utils")]
 use crate::utils::Colour;
 
-/// Represents a rich embed which allows using richer markdown, multiple fields
-/// and more. This was heavily inspired by [slack's attachments].
+/// Represents a rich embed which allows using richer markdown, multiple fields and more. This was
+/// heavily inspired by [slack's attachments].
 ///
-/// You can include an attachment in your own message by a user or a bot, or in
-/// a webhook.
+/// You can include an attachment in your own message by a user or a bot, or in a webhook.
 ///
-/// **Note**: Maximum amount of characters you can put is 256 in a field name,
-/// 1024 in a field value, and 2048 in a description.
+/// **Note**: Maximum amount of characters you can put is 256 in a field name, 1024 in a field
+/// value, and 2048 in a description.
 ///
 /// [slack's attachments]: https://api.slack.com/docs/message-attachments
 #[derive(Clone, Debug, Deserialize, Serialize)]
@@ -43,8 +42,8 @@ pub struct Embed {
     pub kind: Option<String>,
     /// Provider information for the embed.
     ///
-    /// For example, if the embed [`Self::kind`] is `"video"`, the provider might
-    /// contain information about YouTube.
+    /// For example, if the embed [`Self::kind`] is `"video"`, the provider might contain
+    /// information about YouTube.
     pub provider: Option<EmbedProvider>,
     /// Thumbnail information of the embed.
     pub thumbnail: Option<EmbedThumbnail>,

@@ -695,7 +695,7 @@ impl Message {
                     .parse(crate::builder::ParseValue::Everyone)
                     .parse(crate::builder::ParseValue::Users)
                     .parse(crate::builder::ParseValue::Roles)
-            })
+            });
         }
         builder.execute(cache_http.http()).await
     }

@@ -368,6 +368,6 @@ impl<'a> CreateAutocompleteResponse<'a> {
     /// Returns an [`Error::Http`] if the API returns an error.
     #[cfg(feature = "http")]
     pub async fn execute(self, http: impl AsRef<Http>) -> Result<()> {
-        http.as_ref().create_interaction_response(self.id.into(), &self.token, &self).await
+        http.as_ref().create_interaction_response(self.id.into(), self.token, &self).await
     }
 }

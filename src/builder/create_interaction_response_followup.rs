@@ -234,17 +234,17 @@ impl<'a> CreateInteractionResponseFollowup<'a> {
         match self.id {
             Some(id) => {
                 if files.is_empty() {
-                    http.edit_followup_message(&self.token, id.into(), &self).await
+                    http.edit_followup_message(self.token, id.into(), &self).await
                 } else {
-                    http.edit_followup_message_and_attachments(&self.token, id.into(), &self, files)
+                    http.edit_followup_message_and_attachments(self.token, id.into(), &self, files)
                         .await
                 }
             },
             None => {
                 if files.is_empty() {
-                    http.create_followup_message(&self.token, &self).await
+                    http.create_followup_message(self.token, &self).await
                 } else {
-                    http.create_followup_message_with_files(&self.token, &self, files).await
+                    http.create_followup_message_with_files(self.token, &self, files).await
                 }
             },
         }
