@@ -200,8 +200,9 @@ impl Configuration {
     /// use serenity::model::id::ChannelId;
     ///
     /// let framework = StandardFramework::new();
-    /// framework
-    ///     .configure(|c| c.allowed_channels(vec![ChannelId::new(7), ChannelId::new(77)].into_iter().collect()));
+    /// framework.configure(|c| {
+    ///     c.allowed_channels(vec![ChannelId::new(7), ChannelId::new(77)].into_iter().collect())
+    /// });
     /// ```
     pub fn allowed_channels(&mut self, channels: HashSet<ChannelId>) -> &mut Self {
         self.allowed_channels = channels;
@@ -223,7 +224,9 @@ impl Configuration {
     /// use serenity::model::id::GuildId;
     ///
     /// let framework = StandardFramework::new();
-    /// framework.configure(|c| c.blocked_guilds(vec![GuildId::new(7), GuildId::new(77)].into_iter().collect()));
+    /// framework.configure(|c| {
+    ///     c.blocked_guilds(vec![GuildId::new(7), GuildId::new(77)].into_iter().collect())
+    /// });
     /// ```
     pub fn blocked_guilds(&mut self, guilds: HashSet<GuildId>) -> &mut Self {
         self.blocked_guilds = guilds;
@@ -247,7 +250,9 @@ impl Configuration {
     /// use serenity::model::id::UserId;
     ///
     /// let framework = StandardFramework::new();
-    /// framework.configure(|c| c.blocked_users(vec![UserId::new(7), UserId::new(77)].into_iter().collect()));
+    /// framework.configure(|c| {
+    ///     c.blocked_users(vec![UserId::new(7), UserId::new(77)].into_iter().collect())
+    /// });
     /// ```
     pub fn blocked_users(&mut self, users: HashSet<UserId>) -> &mut Self {
         self.blocked_users = users;
