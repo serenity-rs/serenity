@@ -7,19 +7,246 @@ use serde_value::{DeserializerError, Value};
 
 use crate::model::id::{ChannelId, GuildId, RoleId, RuleId, UserId};
 
-#[derive(Clone, Debug, Deserialize, Serialize)]
+#[derive(Debug, Clone, PartialEq)]
 pub struct Rule {
     pub id: RuleId,
     pub guild_id: GuildId,
     pub name: String,
     pub creator_id: UserId,
     pub event_type: EventType,
-    pub trigger_type: TriggerType,
-    pub trigger_metadata: TriggerMetadata,
+    pub trigger: Trigger,
     pub actions: Vec<Action>,
     pub enabled: bool,
     pub exempt_roles: Vec<RoleId>,
     pub exempt_channels: Vec<ChannelId>,
+}
+
+impl<'de> Deserialize<'de> for Rule {
+    fn deserialize<D: Deserializer<'de>>(deserializer: D) -> Result<Self, D::Error> {
+        #[derive(Deserialize)]
+        struct Keyword {
+            keyword_filter: Vec<String>,
+        }
+
+        #[derive(Deserialize)]
+        struct Present {
+            presets: Vec<KeywordPresentType>,
+        }
+
+        #[derive(Deserialize)]
+        #[serde(field_identifier, rename_all = "snake_case")]
+        enum Field {
+            Id,
+            GuildId,
+            Name,
+            CreatorId,
+            EventType,
+            TriggerType,
+            TriggerMetadata,
+            Actions,
+            Enabled,
+            ExemptRoles,
+            ExemptChannels,
+            Unknown(String),
+        }
+
+        struct Visitor;
+
+        impl<'de> serde::de::Visitor<'de> for Visitor {
+            type Value = Rule;
+
+            fn expecting(&self, formatter: &mut fmt::Formatter<'_>) -> fmt::Result {
+                formatter.write_str("auto moderation rule")
+            }
+
+            fn visit_map<A: MapAccess<'de>>(self, mut map: A) -> Result<Self::Value, A::Error> {
+                let mut id = None;
+                let mut guild_id = None;
+                let mut name = None;
+                let mut creator_id = None;
+                let mut event_type = None;
+                let mut trigger_type = None;
+                let mut trigger_metadata = None;
+                let mut actions = None;
+                let mut enabled = None;
+                let mut exempt_roles = None;
+                let mut exempt_channels = None;
+
+                while let Some(key) = map.next_key()? {
+                    match key {
+                        Field::Id => {
+                            if id.is_some() {
+                                return Err(Error::duplicate_field("id"));
+                            }
+                            id = Some(map.next_value()?);
+                        },
+                        Field::GuildId => {
+                            if guild_id.is_some() {
+                                return Err(Error::duplicate_field("guild_id"));
+                            }
+                            guild_id = Some(map.next_value()?);
+                        },
+                        Field::Name => {
+                            if name.is_some() {
+                                return Err(Error::duplicate_field("name"));
+                            }
+                            name = Some(map.next_value()?);
+                        },
+                        Field::CreatorId => {
+                            if creator_id.is_some() {
+                                return Err(Error::duplicate_field("creator_id"));
+                            }
+                            creator_id = Some(map.next_value()?);
+                        },
+                        Field::EventType => {
+                            if event_type.is_some() {
+                                return Err(Error::duplicate_field("event_type"));
+                            }
+                            event_type = Some(map.next_value()?);
+                        },
+                        Field::TriggerType => {
+                            if trigger_type.is_some() {
+                                return Err(Error::duplicate_field("trigger_type"));
+                            }
+                            trigger_type = Some(map.next_value()?);
+                        },
+                        Field::TriggerMetadata => {
+                            if trigger_metadata.is_some() {
+                                return Err(Error::duplicate_field("trigger_metadata"));
+                            }
+                            trigger_metadata = Some(map.next_value::<Value>()?);
+                        },
+                        Field::Actions => {
+                            if actions.is_some() {
+                                return Err(Error::duplicate_field("actions"));
+                            }
+                            actions = Some(map.next_value()?);
+                        },
+                        Field::Enabled => {
+                            if enabled.is_some() {
+                                return Err(Error::duplicate_field("enabled"));
+                            }
+                            enabled = Some(map.next_value()?);
+                        },
+                        Field::ExemptRoles => {
+                            if exempt_roles.is_some() {
+                                return Err(Error::duplicate_field("exempt_roles"));
+                            }
+                            exempt_roles = Some(map.next_value()?);
+                        },
+                        Field::ExemptChannels => {
+                            if exempt_channels.is_some() {
+                                return Err(Error::duplicate_field("exempt_channels"));
+                            }
+                            exempt_channels = Some(map.next_value()?);
+                        },
+                        Field::Unknown(_) => {
+                            map.next_value::<IgnoredAny>()?;
+                        },
+                    }
+                }
+
+                let id = id.ok_or_else(|| Error::missing_field("id"))?;
+                let guild_id = guild_id.ok_or_else(|| Error::missing_field("guild_id"))?;
+                let name = name.ok_or_else(|| Error::missing_field("name"))?;
+                let creator_id = creator_id.ok_or_else(|| Error::missing_field("creator_id"))?;
+                let event_type = event_type.ok_or_else(|| Error::missing_field("event_type"))?;
+
+                let trigger_type =
+                    trigger_type.ok_or_else(|| Error::missing_field("trigger_type"))?;
+                let metadata =
+                    trigger_metadata.ok_or_else(|| Error::missing_field("trigger_metadata"))?;
+
+                let trigger = match trigger_type {
+                    TriggerType::Keyword => {
+                        let value = Keyword::deserialize(metadata)
+                            .map_err(DeserializerError::into_error)?;
+                        Trigger::Keyword(value.keyword_filter)
+                    },
+                    TriggerType::HarmfulLink => Trigger::HarmfulLink,
+                    TriggerType::Spam => Trigger::Spam,
+                    TriggerType::KeywordPresent => {
+                        let value = Present::deserialize(metadata)
+                            .map_err(DeserializerError::into_error)?;
+                        Trigger::KeywordPresent(value.presets)
+                    },
+                    TriggerType::Unknown(unknown) => Trigger::Unknown(unknown),
+                };
+
+                let actions = actions.ok_or_else(|| Error::missing_field("actions"))?;
+                let enabled = enabled.ok_or_else(|| Error::missing_field("enabled"))?;
+                let exempt_roles =
+                    exempt_roles.ok_or_else(|| Error::missing_field("exempt_roles"))?;
+                let exempt_channels =
+                    exempt_channels.ok_or_else(|| Error::missing_field("exempt_channels"))?;
+
+                Ok(Rule {
+                    id,
+                    guild_id,
+                    name,
+                    creator_id,
+                    event_type,
+                    trigger,
+                    actions,
+                    enabled,
+                    exempt_roles,
+                    exempt_channels,
+                })
+            }
+        }
+
+        deserializer.deserialize_any(Visitor)
+    }
+}
+
+impl Serialize for Rule {
+    fn serialize<S: Serializer>(&self, serializer: S) -> Result<S::Ok, S::Error> {
+        #[derive(Serialize)]
+        #[serde(rename = "TriggerMetadata")]
+        struct TriggerMetadataKeyword<'a> {
+            keyword_filter: &'a Vec<String>,
+        }
+
+        #[derive(Serialize)]
+        #[serde(rename = "TriggerMetadata")]
+        struct TriggerMetadataPresent<'a> {
+            presets: &'a Vec<KeywordPresentType>,
+        }
+
+        #[derive(Serialize)]
+        #[serde(rename = "TriggerMetadata")]
+        struct TriggerMetadataEmpty {}
+
+        let mut s = serializer.serialize_struct("Rule", 11)?;
+        s.serialize_field("id", &self.id)?;
+        s.serialize_field("guild_id", &self.guild_id)?;
+        s.serialize_field("name", &self.name)?;
+        s.serialize_field("creator_id", &self.creator_id)?;
+        s.serialize_field("event_type", &self.event_type)?;
+        match &self.trigger {
+            Trigger::Keyword(keyword_filter) => {
+                s.serialize_field("trigger_type", &TriggerType::Keyword)?;
+                s.serialize_field("trigger_metadata", &TriggerMetadataKeyword {
+                    keyword_filter,
+                })?;
+            },
+            Trigger::KeywordPresent(presets) => {
+                s.serialize_field("trigger_type", &TriggerType::KeywordPresent)?;
+                s.serialize_field("trigger_metadata", &TriggerMetadataPresent {
+                    presets,
+                })?;
+            },
+            trigger => {
+                s.serialize_field("trigger_type", &trigger.kind())?;
+                s.serialize_field("trigger_metadata", &TriggerMetadataEmpty {})?;
+            },
+        }
+        s.serialize_field("actions", &self.actions)?;
+        s.serialize_field("enabled", &self.enabled)?;
+        s.serialize_field("exempt_roles", &self.exempt_roles)?;
+        s.serialize_field("exempt_channels", &self.exempt_channels)?;
+        s.end()
+    }
 }
 
 #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
@@ -44,6 +271,29 @@ impl From<EventType> for u8 {
         match value {
             EventType::MessageSend => 1,
             EventType::Unknown(unknown) => unknown,
+        }
+    }
+}
+
+#[derive(Clone, Debug, PartialEq)]
+#[non_exhaustive]
+pub enum Trigger {
+    Keyword(Vec<String>),
+    HarmfulLink,
+    Spam,
+    KeywordPresent(Vec<KeywordPresentType>),
+    Unknown(u8),
+}
+
+impl Trigger {
+    #[must_use]
+    pub fn kind(&self) -> TriggerType {
+        match self {
+            Self::Keyword(_) => TriggerType::Keyword,
+            Self::HarmfulLink => TriggerType::HarmfulLink,
+            Self::Spam => TriggerType::Spam,
+            Self::KeywordPresent(_) => TriggerType::KeywordPresent,
+            Self::Unknown(unknown) => TriggerType::Unknown(*unknown),
         }
     }
 }
@@ -285,6 +535,166 @@ mod tests {
     use serde_test::Token;
 
     use super::*;
+
+    #[test]
+    fn rule_trigger_serde() {
+        let rule_tokens_head = [
+            Token::Struct {
+                name: "Rule",
+                len: 11,
+            },
+            Token::Str("id"),
+            Token::NewtypeStruct {
+                name: "RuleId",
+            },
+            Token::Str("1"),
+            Token::Str("guild_id"),
+            Token::NewtypeStruct {
+                name: "GuildId",
+            },
+            Token::Str("2"),
+            Token::Str("name"),
+            Token::Str("foobar"),
+            Token::Str("creator_id"),
+            Token::NewtypeStruct {
+                name: "UserId",
+            },
+            Token::Str("3"),
+            Token::Str("event_type"),
+            Token::U8(1),
+        ];
+        let rule_tokens_tail = [
+            Token::Str("actions"),
+            Token::Seq {
+                len: Some(0),
+            },
+            Token::SeqEnd,
+            Token::Str("enabled"),
+            Token::Bool(true),
+            Token::Str("exempt_roles"),
+            Token::Seq {
+                len: Some(0),
+            },
+            Token::SeqEnd,
+            Token::Str("exempt_channels"),
+            Token::Seq {
+                len: Some(0),
+            },
+            Token::SeqEnd,
+            Token::StructEnd,
+        ];
+
+        let mut value = Rule {
+            id: RuleId(1),
+            guild_id: GuildId(2),
+            name: String::from("foobar"),
+            creator_id: UserId(3),
+            event_type: EventType::MessageSend,
+            trigger: Trigger::Keyword(vec![String::from("foo"), String::from("bar")]),
+            actions: vec![],
+            enabled: true,
+            exempt_roles: vec![],
+            exempt_channels: vec![],
+        };
+
+        let mut tokens = rule_tokens_head.to_vec();
+        tokens.extend([
+            Token::Str("trigger_type"),
+            Token::U8(1),
+            Token::Str("trigger_metadata"),
+            Token::Struct {
+                name: "TriggerMetadata",
+                len: 1,
+            },
+            Token::Str("keyword_filter"),
+            Token::Seq {
+                len: Some(2),
+            },
+            Token::Str("foo"),
+            Token::Str("bar"),
+            Token::SeqEnd,
+            Token::StructEnd,
+        ]);
+        tokens.extend_from_slice(&rule_tokens_tail);
+
+        serde_test::assert_tokens(&value, &tokens);
+
+        value.trigger = Trigger::HarmfulLink;
+        let mut tokens = rule_tokens_head.to_vec();
+        tokens.extend([
+            Token::Str("trigger_type"),
+            Token::U8(2),
+            Token::Str("trigger_metadata"),
+            Token::Struct {
+                name: "TriggerMetadata",
+                len: 0,
+            },
+            Token::StructEnd,
+        ]);
+        tokens.extend_from_slice(&rule_tokens_tail);
+
+        serde_test::assert_tokens(&value, &tokens);
+
+        value.trigger = Trigger::Spam;
+        let mut tokens = rule_tokens_head.to_vec();
+        tokens.extend([
+            Token::Str("trigger_type"),
+            Token::U8(3),
+            Token::Str("trigger_metadata"),
+            Token::Struct {
+                name: "TriggerMetadata",
+                len: 0,
+            },
+            Token::StructEnd,
+        ]);
+        tokens.extend_from_slice(&rule_tokens_tail);
+
+        serde_test::assert_tokens(&value, &tokens);
+
+        value.trigger = Trigger::KeywordPresent(vec![
+            KeywordPresentType::Profanity,
+            KeywordPresentType::SexualContent,
+            KeywordPresentType::Slurs,
+        ]);
+        let mut tokens = rule_tokens_head.to_vec();
+        tokens.extend([
+            Token::Str("trigger_type"),
+            Token::U8(4),
+            Token::Str("trigger_metadata"),
+            Token::Struct {
+                name: "TriggerMetadata",
+                len: 1,
+            },
+            Token::Str("presets"),
+            Token::Seq {
+                len: Some(3),
+            },
+            Token::U8(KeywordPresentType::Profanity.into()),
+            Token::U8(KeywordPresentType::SexualContent.into()),
+            Token::U8(KeywordPresentType::Slurs.into()),
+            Token::SeqEnd,
+            Token::StructEnd,
+        ]);
+        tokens.extend_from_slice(&rule_tokens_tail);
+
+        serde_test::assert_tokens(&value, &tokens);
+
+        value.trigger = Trigger::Unknown(123);
+        let mut tokens = rule_tokens_head.to_vec();
+        tokens.extend([
+            Token::Str("trigger_type"),
+            Token::U8(123),
+            Token::Str("trigger_metadata"),
+            Token::Struct {
+                name: "TriggerMetadata",
+                len: 0,
+            },
+            Token::StructEnd,
+        ]);
+        tokens.extend_from_slice(&rule_tokens_tail);
+
+        serde_test::assert_tokens(&value, &tokens);
+    }
 
     #[test]
     fn action_serde() {
