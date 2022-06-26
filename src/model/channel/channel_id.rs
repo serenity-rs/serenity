@@ -777,22 +777,8 @@ impl ChannelId {
     /// Returns a [`ModelError::NameTooLong`] if the name of the webhook is
     /// over the limit of 100 characters.
     /// Returns a [`ModelError::InvalidChannelType`] if the channel type is not text.
-    pub async fn create_webhook<F>(&self, http: impl AsRef<Http>, f: F) -> Result<Webhook>
-    where
-        F: FnOnce(&mut CreateWebhook) -> &mut CreateWebhook,
-    {
-        let mut builder = CreateWebhook::default();
-        f(&mut builder);
-
-        if let Some(name) = &builder.name {
-            if name.len() < 2 {
-                return Err(Error::Model(ModelError::NameTooShort));
-            } else if name.len() > 100 {
-                return Err(Error::Model(ModelError::NameTooLong));
-            }
-        }
-
-        http.as_ref().create_webhook(self.get(), &builder, None).await
+    pub fn create_webhook(self) -> CreateWebhook {
+        CreateWebhook::new(self)
     }
 
     /// Returns a future that will await one message sent in this channel.

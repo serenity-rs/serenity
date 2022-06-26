@@ -1074,15 +1074,8 @@ impl GuildChannel {
     /// Returns a [`ModelError::NameTooLong`] if the name of the webhook is
     /// over the limit of 100 characters.
     /// Returns a [`ModelError::InvalidChannelType`] if the channel type is not text.
-    pub async fn create_webhook<F>(&self, http: impl AsRef<Http>, f: F) -> Result<Webhook>
-    where
-        F: FnOnce(&mut CreateWebhook) -> &mut CreateWebhook,
-    {
-        if self.is_text_based() {
-            self.id.create_webhook(&http, f).await
-        } else {
-            Err(Error::Model(ModelError::InvalidChannelType))
-        }
+    pub fn create_webhook(&self) -> CreateWebhook {
+        self.id.create_webhook()
     }
 
     /// Gets a stage instance.
