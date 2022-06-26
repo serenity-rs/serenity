@@ -222,9 +222,8 @@ impl Webhook {
         http.as_ref().delete_webhook_with_token(self.id.get(), token).await
     }
 
-    /// Edits the webhook
+    /// Returns a request builder that edits the webhook when executed.
     ///
-    /// Does not require authentication, as this calls [`Http::edit_webhook_with_token`] internally.
     /// # Examples
     ///
     /// ```rust,no_run
@@ -236,33 +235,12 @@ impl Webhook {
     /// let url = "https://discord.com/api/webhooks/245037420704169985/ig5AO-wdVWpCBtUUMxmgsWryqgsW3DChbKYOINftJ4DCrUbnkedoYZD0VOH1QLr-S3sV";
     /// let mut webhook = Webhook::from_url(&http, url).await?;
     ///
-    /// webhook.edit(&http, |b| b.name("new name")).await?;
+    /// webhook.edit().name("new name").execute(&http).await?;
     /// #     Ok(())
     /// # }
     /// ```
-    ///
-    /// # Errors
-    ///
-    /// Returns an [`Error::Model`] if the [`Self::token`] is [`None`].
-    ///
-    /// May also return an [`Error::Http`] if the content is malformed, or if the token is invalid.
-    ///
-    /// Or may return an [`Error::Json`] if there is an error in deserialising Discord's response.
-    ///
-    /// [`Error::Model`]: crate::error::Error::Model
-    /// [`Error::Http`]: crate::error::Error::Http
-    /// [`Error::Json`]: crate::error::Error::Json
-    pub async fn edit<F>(&mut self, http: impl AsRef<Http>, f: F) -> Result<()>
-    where
-        F: FnOnce(&mut EditWebhook) -> &mut EditWebhook,
-    {
-        let token = self.token.as_ref().ok_or(ModelError::NoTokenSet)?;
-
-        let mut builder = EditWebhook::default();
-        f(&mut builder);
-
-        *self = http.as_ref().edit_webhook_with_token(self.id.get(), token, &builder).await?;
-        Ok(())
+    pub fn edit(&mut self) -> EditWebhook<'_> {
+        EditWebhook::new(self)
     }
 
     /// Executes a webhook with the fields set via the given builder.
