@@ -115,30 +115,11 @@ impl Member {
         http: impl AsRef<Http>,
         role_id: impl Into<RoleId>,
     ) -> Result<()> {
-        self._add_role(&http, role_id.into()).await
+        self.add_roles(http, &[role_id.into()]).await
     }
 
-    async fn _add_role(&mut self, http: impl AsRef<Http>, role_id: RoleId) -> Result<()> {
-        if self.roles.contains(&role_id) {
-            return Ok(());
-        }
-
-        match http
-            .as_ref()
-            .add_member_role(self.guild_id.get(), self.user.id.get(), role_id.get(), None)
-            .await
-        {
-            Ok(()) => {
-                self.roles.push(role_id);
-
-                Ok(())
-            },
-            Err(why) => Err(why),
-        }
-    }
-
-    /// Adds one or multiple [`Role`]s to the member, editing
-    /// its roles in-place if the request was successful.
+    /// Adds one or multiple [`Role`]s to the member, editing its roles in-place if the request
+    /// was successful.
     ///
     /// **Note**: Requires the [Manage Roles] permission.
     ///
@@ -148,28 +129,8 @@ impl Member {
     /// or if a role with a given Id does not exist.
     ///
     /// [Manage Roles]: Permissions::MANAGE_ROLES
-    pub async fn add_roles(
-        &mut self,
-        http: impl AsRef<Http>,
-        role_ids: &[RoleId],
-    ) -> Result<Vec<RoleId>> {
-        self.roles.extend_from_slice(role_ids);
-
-        let mut builder = EditMember::default();
-        builder.roles(&self.roles);
-
-        match http
-            .as_ref()
-            .edit_member(self.guild_id.get(), self.user.id.get(), &builder, None)
-            .await
-        {
-            Ok(member) => Ok(member.roles),
-            Err(why) => {
-                self.roles.retain(|r| !role_ids.contains(r));
-
-                Err(why)
-            },
-        }
+    pub async fn add_roles(&mut self, http: impl AsRef<Http>, role_ids: &[RoleId]) -> Result<()> {
+        self.edit(http, |b| b.roles(role_ids)).await
     }
 
     /// Ban a [`User`] from the guild, deleting a number of
@@ -291,8 +252,7 @@ impl Member {
         format!("{}#{:04}", self.display_name(), self.user.discriminator)
     }
 
-    /// Edits the member with the given data. See [`Guild::edit_member`] for
-    /// more information.
+    /// Edits the member in place with the given data.
     ///
     /// See [`EditMember`] for the permission(s) required for separate builder
     /// methods, as well as usage of this.
@@ -300,11 +260,12 @@ impl Member {
     /// # Errors
     ///
     /// Returns [`Error::Http`] if the current user lacks necessary permissions.
-    pub async fn edit<F>(&self, http: impl AsRef<Http>, f: F) -> Result<Member>
+    pub async fn edit<F>(&mut self, http: impl AsRef<Http>, f: F) -> Result<()>
     where
         F: FnOnce(&mut EditMember) -> &mut EditMember,
     {
-        self.guild_id.edit_member(http, self.user.id, f).await
+        *self = self.guild_id.edit_member(http, self.user.id, f).await?;
+        Ok(())
     }
 
     /// Allow a user to communicate, removing their timeout, if there is one.
@@ -318,14 +279,11 @@ impl Member {
     /// [Moderate Members]: Permissions::MODERATE_MEMBERS
     #[doc(alias = "timeout")]
     pub async fn enable_communication(&mut self, http: impl AsRef<Http>) -> Result<()> {
-        match self.guild_id.edit_member(&http, self.user.id, EditMember::enable_communication).await
-        {
-            Ok(_) => {
-                self.communication_disabled_until = None;
-                Ok(())
-            },
-            Err(why) => Err(why),
-        }
+        *self = self
+            .guild_id
+            .edit_member(&http, self.user.id, EditMember::enable_communication)
+            .await?;
+        Ok(())
     }
 
     /// Retrieves the ID and position of the member's highest role in the
@@ -522,28 +480,11 @@ impl Member {
         http: impl AsRef<Http>,
         role_id: impl Into<RoleId>,
     ) -> Result<()> {
-        let role_id = role_id.into();
-
-        if !self.roles.contains(&role_id) {
-            return Ok(());
-        }
-
-        match http
-            .as_ref()
-            .remove_member_role(self.guild_id.get(), self.user.id.get(), role_id.get(), None)
-            .await
-        {
-            Ok(()) => {
-                self.roles.retain(|r| r.0 != role_id.0);
-
-                Ok(())
-            },
-            Err(why) => Err(why),
-        }
+        self.remove_roles(http, &[role_id.into()]).await
     }
 
-    /// Removes one or multiple [`Role`]s from the member. Returns the member's
-    /// new roles.
+    /// Removes one or multiple [`Role`]s from the member, editing its roles in-place if the
+    /// request was successful.
     ///
     /// **Note**: Requires the [Manage Roles] permission.
     ///
@@ -557,24 +498,8 @@ impl Member {
         &mut self,
         http: impl AsRef<Http>,
         role_ids: &[RoleId],
-    ) -> Result<Vec<RoleId>> {
-        self.roles.retain(|r| !role_ids.contains(r));
-
-        let mut builder = EditMember::default();
-        builder.roles(&self.roles);
-
-        match http
-            .as_ref()
-            .edit_member(self.guild_id.get(), self.user.id.get(), &builder, None)
-            .await
-        {
-            Ok(member) => Ok(member.roles),
-            Err(why) => {
-                self.roles.extend_from_slice(role_ids);
-
-                Err(why)
-            },
-        }
+    ) -> Result<()> {
+        self.edit(http, |b| b.roles(role_ids)).await
     }
 
     /// Retrieves the full role data for the user's roles.
