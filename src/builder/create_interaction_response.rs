@@ -13,8 +13,8 @@ use crate::model::prelude::*;
 #[derive(Clone, Debug, Serialize)]
 #[must_use]
 pub struct CreateInteractionResponse<'a> {
-    #[serde(skip)]
     #[cfg(feature = "http")]
+    #[serde(skip)]
     id: InteractionId,
     #[serde(skip)]
     #[cfg(feature = "http")]
@@ -283,7 +283,9 @@ pub struct AutocompleteChoice {
 #[must_use]
 pub struct CreateAutocompleteResponse<'a> {
     #[cfg(feature = "http")]
+    #[serde(skip)]
     id: InteractionId,
+    #[serde(skip)]
     #[cfg(feature = "http")]
     token: &'a str,
     #[cfg(not(feature = "http"))]

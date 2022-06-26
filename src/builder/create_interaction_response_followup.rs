@@ -14,8 +14,8 @@ use crate::model::prelude::*;
 #[derive(Clone, Debug, Default, Serialize)]
 #[must_use]
 pub struct CreateInteractionResponseFollowup<'a> {
-    #[serde(skip)]
     #[cfg(feature = "http")]
+    #[serde(skip)]
     id: Option<MessageId>,
     #[serde(skip)]
     #[cfg(feature = "http")]
