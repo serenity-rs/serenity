@@ -1734,7 +1734,7 @@ impl Guild {
                 } else {
                     match &member.nick {
                         Some(nick) => {
-                            if starts_with(prefix, case_sensitive, &nick) {
+                            if starts_with(prefix, case_sensitive, nick) {
                                 Some((member, nick.clone()))
                             } else {
                                 None
@@ -1928,7 +1928,7 @@ impl Guild {
                 let nick = member.nick.as_ref().unwrap_or(&member.user.name);
 
                 if case_sensitive && nick.contains(substring)
-                    || !case_sensitive && contains_case_insensitive(&nick, substring)
+                    || !case_sensitive && contains_case_insensitive(nick, substring)
                 {
                     Some((member, nick.clone()))
                 } else {
