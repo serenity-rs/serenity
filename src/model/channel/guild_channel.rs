@@ -649,26 +649,10 @@ impl GuildChannel {
         self.id.message(&cache_http, message_id).await
     }
 
-    /// Gets messages from the channel.
-    ///
-    /// Refer to the [`GetMessages`]-builder for more information on how to
-    /// use `builder`.
-    ///
-    /// **Note**: Returns an empty [`Vec`] if the current user does not have the
-    /// [Read Message History] permission.
-    ///
-    /// # Errors
-    ///
-    /// Returns [`Error::Http`] if the current user lacks permission to
-    /// view the channel.
-    ///
-    /// [Read Message History]: Permissions::READ_MESSAGE_HISTORY
+    /// Returns a request builder that gets messages from the channel when executed.
     #[inline]
-    pub async fn messages<F>(&self, http: impl AsRef<Http>, builder: F) -> Result<Vec<Message>>
-    where
-        F: FnOnce(&mut GetMessages) -> &mut GetMessages,
-    {
-        self.id.messages(&http, builder).await
+    pub fn messages(&self) -> GetMessages {
+        self.id.messages()
     }
 
     /// Returns the name of the guild channel.

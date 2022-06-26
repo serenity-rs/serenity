@@ -196,19 +196,10 @@ impl PrivateChannel {
         self.id.message(&cache_http, message_id).await
     }
 
-    /// Gets messages from the channel.
-    ///
-    /// Refer to [`GetMessages`] for more information on how to use `builder`.
-    ///
-    /// # Errors
-    ///
-    /// Returns [`Error::Http`] if an invalid value is set in the builder.
+    /// Returns a request builder that gets messages from the channel when executed.
     #[inline]
-    pub async fn messages<F>(&self, http: impl AsRef<Http>, builder: F) -> Result<Vec<Message>>
-    where
-        F: FnOnce(&mut GetMessages) -> &mut GetMessages,
-    {
-        self.id.messages(&http, builder).await
+    pub fn messages(&self) -> GetMessages {
+        self.id.messages()
     }
 
     /// Returns "DM with $username#discriminator".
