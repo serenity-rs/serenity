@@ -476,13 +476,13 @@ impl CurrentUser {
         permissions: Permissions,
         scopes: &[Scope],
     ) -> Result<String> {
-        let mut builder = CreateBotAuthParameters::default();
-
-        builder.permissions(permissions);
-        builder.auto_client_id(http).await?;
-        builder.scopes(scopes);
-
-        Ok(builder.build())
+        let url = CreateBotAuthParameters::default()
+            .permissions(permissions)
+            .scopes(scopes)
+            .auto_client_id(&http)
+            .await?
+            .build();
+        Ok(url)
     }
 
     /// Returns a static formatted URL of the user's icon, if one exists.
