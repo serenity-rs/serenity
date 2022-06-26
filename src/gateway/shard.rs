@@ -298,14 +298,14 @@ impl Shard {
             warn!("[Shard {:?}] Sequence off; them: {}, us: {}", self.shard_info, seq, self.seq);
         }
 
-        match event {
-            Event::Ready(ref ready) => {
+        match &event {
+            Event::Ready(ready) => {
                 debug!("[Shard {:?}] Received Ready", self.shard_info);
 
                 self.session_id = Some(ready.ready.session_id.clone());
                 self.stage = ConnectionStage::Connected;
 
-                if let Some(ref http) = self.http {
+                if let Some(http) = &self.http {
                     http.set_application_id(ready.ready.application.id.get());
                 }
             },
@@ -354,9 +354,9 @@ impl Shard {
     #[instrument(skip(self))]
     fn handle_gateway_closed(
         &mut self,
-        data: &Option<CloseFrame<'static>>,
+        data: Option<&CloseFrame<'static>>,
     ) -> Result<Option<ShardAction>> {
-        let num = data.as_ref().map(|d| d.code.into());
+        let num = data.map(|d| d.code.into());
         let clean = num == Some(1000);
 
         match num {
@@ -423,7 +423,7 @@ impl Shard {
                     "[Shard {:?}] Unknown unclean close {}: {:?}",
                     self.shard_info,
                     other,
-                    data.as_ref().map(|d| &d.reason),
+                    data.map(|d| &d.reason),
                 );
             },
             _ => {},
@@ -468,11 +468,9 @@ impl Shard {
         &mut self,
         event: &Result<GatewayEvent>,
     ) -> Result<Option<ShardAction>> {
-        match *event {
-            Ok(GatewayEvent::Dispatch(seq, ref event)) => {
-                Ok(self.handle_gateway_dispatch(seq, event))
-            },
-            Ok(GatewayEvent::Heartbeat(s)) => Ok(Some(self.handle_heartbeat_event(s))),
+        match event {
+            Ok(GatewayEvent::Dispatch(seq, event)) => Ok(self.handle_gateway_dispatch(*seq, event)),
+            Ok(GatewayEvent::Heartbeat(s)) => Ok(Some(self.handle_heartbeat_event(*s))),
             Ok(GatewayEvent::HeartbeatAck) => {
                 self.heartbeat_instants.1 = Some(Instant::now());
                 self.last_heartbeat_acknowledged = true;
@@ -481,7 +479,7 @@ impl Shard {
 
                 Ok(None)
             },
-            Ok(GatewayEvent::Hello(interval)) => {
+            &Ok(GatewayEvent::Hello(interval)) => {
                 debug!("[Shard {:?}] Received a Hello; interval: {}", self.shard_info, interval);
 
                 if self.stage == ConnectionStage::Resuming {
@@ -500,8 +498,8 @@ impl Shard {
                     ShardAction::Reconnect(self.reconnection_type())
                 }))
             },
-            Ok(GatewayEvent::InvalidateSession(resumable)) => {
-                info!("[Shard {:?}] Received session invalidation", self.shard_info,);
+            &Ok(GatewayEvent::InvalidateSession(resumable)) => {
+                info!("[Shard {:?}] Received session invalidation", self.shard_info);
 
                 Ok(Some(if resumable {
                     ShardAction::Reconnect(ReconnectType::Resume)
@@ -510,14 +508,16 @@ impl Shard {
                 }))
             },
             Ok(GatewayEvent::Reconnect) => Ok(Some(ShardAction::Reconnect(ReconnectType::Resume))),
-            Err(Error::Gateway(GatewayError::Closed(ref data))) => self.handle_gateway_closed(data),
-            Err(Error::Tungstenite(ref why)) => {
+            Err(Error::Gateway(GatewayError::Closed(data))) => {
+                self.handle_gateway_closed(data.as_ref())
+            },
+            Err(Error::Tungstenite(why)) => {
                 warn!("[Shard {:?}] Websocket error: {:?}", self.shard_info, why);
                 info!("[Shard {:?}] Will attempt to auto-reconnect", self.shard_info);
 
                 Ok(Some(ShardAction::Reconnect(self.reconnection_type())))
             },
-            Err(ref why) => {
+            Err(why) => {
                 warn!("[Shard {:?}] Unhandled error: {:?}", self.shard_info, why);
 
                 Ok(None)
@@ -765,7 +765,7 @@ impl Shard {
         self.client = self.initialize().await?;
         self.stage = ConnectionStage::Resuming;
 
-        match self.session_id.as_ref() {
+        match &self.session_id {
             Some(session_id) => {
                 self.client.send_resume(&self.shard_info, session_id, self.seq, &self.token).await
             },

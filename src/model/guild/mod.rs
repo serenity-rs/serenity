@@ -1730,12 +1730,12 @@ impl Guild {
                 let username = &member.user.name;
 
                 if starts_with(prefix, case_sensitive, username) {
-                    Some((member, username.to_string()))
+                    Some((member, username.clone()))
                 } else {
-                    match member.nick {
-                        Some(ref nick) => {
-                            if starts_with(prefix, case_sensitive, nick) {
-                                Some((member, nick.to_string()))
+                    match &member.nick {
+                        Some(nick) => {
+                            if starts_with(prefix, case_sensitive, &nick) {
+                                Some((member, nick.clone()))
                             } else {
                                 None
                             }
@@ -1804,12 +1804,12 @@ impl Guild {
                 let username = &member.user.name;
 
                 if contains(substring, case_sensitive, username) {
-                    Some((member, username.to_string()))
+                    Some((member, username.clone()))
                 } else {
-                    match member.nick {
-                        Some(ref nick) => {
+                    match &member.nick {
+                        Some(nick) => {
                             if contains(substring, case_sensitive, nick) {
-                                Some((member, nick.to_string()))
+                                Some((member, nick.clone()))
                             } else {
                                 None
                             }
@@ -1925,15 +1925,12 @@ impl Guild {
             .members
             .values()
             .filter_map(|member| {
-                let nick = match member.nick {
-                    Some(ref nick) => nick.to_string(),
-                    None => member.user.name.to_string(),
-                };
+                let nick = member.nick.as_ref().unwrap_or(&member.user.name);
 
                 if case_sensitive && nick.contains(substring)
                     || !case_sensitive && contains_case_insensitive(&nick, substring)
                 {
-                    Some((member, nick))
+                    Some((member, nick.clone()))
                 } else {
                     None
                 }

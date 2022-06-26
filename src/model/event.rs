@@ -1118,9 +1118,8 @@ macro_rules! with_related_ids_for_event_types {
             Self::ThreadMembersUpdate, Self::ThreadMembersUpdate(e) => {
                 user_id: Multiple(e.added_members
                         .iter()
-                        .filter_map(|m| m.user_id.as_ref())
-                        .chain(e.removed_members_ids.iter())
-                        .copied()
+                        .filter_map(|m| m.user_id)
+                        .chain(e.removed_members_ids.iter().copied())
                         .collect(),
                     ),
                 guild_id: Some(e.guild_id),

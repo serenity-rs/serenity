@@ -192,7 +192,7 @@ fn try_resolve(
 }
 
 fn loop_resolved(options: &mut CommandDataOption, resolved: &CommandDataResolved) {
-    if let Some(ref value) = options.value {
+    if let Some(value) = &options.value {
         options.resolved = try_resolve(value, options.kind, resolved);
     }
 
@@ -250,7 +250,7 @@ pub mod private_channels {
         deserializer: D,
     ) -> Result<HashMap<ChannelId, Channel>, D::Error> {
         deserializer.deserialize_seq(SequenceToMapVisitor::new(|channel: &Channel| match channel {
-            Channel::Private(ref channel) => channel.id,
+            Channel::Private(channel) => channel.id,
             Channel::Guild(_) => unreachable!("Guild private channel decode"),
             Channel::Category(_) => unreachable!("Channel category private channel decode"),
         }))
