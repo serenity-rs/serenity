@@ -41,6 +41,14 @@ struct ChunkGuildMessage<'a> {
 }
 
 #[derive(Serialize)]
+struct PresenceUpdateMessage<'a> {
+    afk: bool,
+    status: &'a str,
+    since: SystemTime,
+    activities: &'a [&'a ActivityData],
+}
+
+#[derive(Serialize)]
 #[serde(untagged)]
 enum WebSocketMessageData<'a> {
     Heartbeat(Option<u64>),
@@ -52,13 +60,9 @@ enum WebSocketMessageData<'a> {
         shard: &'a ShardInfo,
         intents: GatewayIntents,
         properties: IdentifyProperties,
+        presence: PresenceUpdateMessage<'a>,
     },
-    PresenceUpdate {
-        afk: bool,
-        status: &'a str,
-        since: SystemTime,
-        activities: &'a [&'a ActivityData],
-    },
+    PresenceUpdate(PresenceUpdateMessage<'a>),
     Resume {
         session_id: &'a str,
         token: &'a str,
@@ -199,7 +203,11 @@ impl WsClient {
         shard: &ShardInfo,
         token: &str,
         intents: GatewayIntents,
+        presence: &PresenceData,
     ) -> Result<()> {
+        let activities: Vec<_> = presence.activity.iter().collect();
+        let now = SystemTime::now();
+
         debug!("[{:?}] Identifying", shard);
 
         let msg = WebSocketMessage {
@@ -214,6 +222,12 @@ impl WsClient {
                     browser: "serenity",
                     device: "serenity",
                     os: consts::OS,
+                },
+                presence: PresenceUpdateMessage {
+                    afk: false,
+                    since: now,
+                    status: presence.status.name(),
+                    activities: &activities,
                 },
             },
         };
@@ -234,12 +248,12 @@ impl WsClient {
 
         self.send_json(&WebSocketMessage {
             op: Opcode::PresenceUpdate,
-            d: WebSocketMessageData::PresenceUpdate {
+            d: WebSocketMessageData::PresenceUpdate(PresenceUpdateMessage {
                 afk: false,
                 since: now,
                 status: presence.status.name(),
                 activities: &activities,
-            },
+            }),
         })
         .await
     }

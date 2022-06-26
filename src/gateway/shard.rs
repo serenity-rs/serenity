@@ -137,11 +137,12 @@ impl Shard {
         token: &str,
         shard_info: ShardInfo,
         intents: GatewayIntents,
+        presence: Option<PresenceData>,
     ) -> Result<Shard> {
         let url = ws_url.lock().await.clone();
         let client = connect(&url).await?;
 
-        let presence = PresenceData::default();
+        let presence = presence.unwrap_or_default();
         let heartbeat_instants = (None, None);
         let heartbeat_interval = None;
         let last_heartbeat_acknowledged = true;
@@ -709,7 +710,9 @@ impl Shard {
     /// - the `stage` to [`ConnectionStage::Identifying`]
     #[instrument(skip(self))]
     pub async fn identify(&mut self) -> Result<()> {
-        self.client.send_identify(&self.shard_info, &self.token, self.intents).await?;
+        self.client
+            .send_identify(&self.shard_info, &self.token, self.intents, &self.presence)
+            .await?;
 
         self.heartbeat_instants.0 = Some(Instant::now());
         self.stage = ConnectionStage::Identifying;
