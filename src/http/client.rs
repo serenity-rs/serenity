@@ -22,6 +22,7 @@ use super::{AttachmentType, GuildPagination, HttpError, UserPagination};
 use crate::internal::prelude::*;
 use crate::json::prelude::*;
 use crate::model::application::command::{Command, CommandPermission};
+use crate::model::guild::automod::Rule;
 use crate::model::prelude::*;
 use crate::{constants, utils};
 
@@ -2404,6 +2405,93 @@ impl Http {
                 guild_id,
                 limit,
                 user_id,
+            },
+        })
+        .await
+    }
+
+    /// Retrieves all auto moderation rules in a guild.
+    ///
+    /// This method requires `MANAGE_GUILD` permissions.
+    pub async fn get_automod_rules(&self, guild_id: u64) -> Result<Vec<Rule>> {
+        self.fire(Request {
+            body: None,
+            multipart: None,
+            headers: None,
+            route: RouteInfo::GetAutoModRules {
+                guild_id,
+            },
+        })
+        .await
+    }
+
+    /// Retrieves an auto moderation rule in a guild.
+    ///
+    /// This method requires `MANAGE_GUILD` permissions.
+    pub async fn get_automod_rule(&self, guild_id: u64, rule_id: u64) -> Result<Rule> {
+        self.fire(Request {
+            body: None,
+            multipart: None,
+            headers: None,
+            route: RouteInfo::GetAutoModRule {
+                guild_id,
+                rule_id,
+            },
+        })
+        .await
+    }
+
+    /// Creates an auto moderation rule in a guild.
+    ///
+    /// This method requires `MANAGE_GUILD` permissions.
+    pub async fn create_automod_rule(&self, guild_id: u64, map: &JsonMap) -> Result<Rule> {
+        let body = to_vec(&map)?;
+
+        self.fire(Request {
+            body: Some(&body),
+            multipart: None,
+            headers: None,
+            route: RouteInfo::CreateAutoModRule {
+                guild_id,
+            },
+        })
+        .await
+    }
+
+    /// Retrieves an auto moderation rule in a guild.
+    ///
+    /// This method requires `MANAGE_GUILD` permissions.
+    pub async fn edit_automod_rule(
+        &self,
+        guild_id: u64,
+        rule_id: u64,
+        map: &JsonMap,
+    ) -> Result<Rule> {
+        let body = to_vec(&map)?;
+
+        self.fire(Request {
+            body: Some(&body),
+            multipart: None,
+            headers: None,
+            route: RouteInfo::EditAutoModRule {
+                guild_id,
+                rule_id,
+            },
+        })
+        .await
+    }
+
+    /// Deletes an auto moderation rule in a guild.
+    ///
+    /// This method requires `MANAGE_GUILD` permissions.
+    pub async fn delete_automod_rule(&self, guild_id: u64, rule_id: u64) -> Result<()> {
+        self.wind(204, Request {
+            body: None,
+            multipart: None,
+            headers: None,
+            route: RouteInfo::DeleteAutoModRule {
+                guild_id,
+                rule_id,
             },
         })
         .await
