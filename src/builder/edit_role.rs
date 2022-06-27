@@ -144,8 +144,8 @@ impl EditRole {
     ///
     /// # Errors
     ///
-    /// May error if the icon is a URL and the HTTP request fails, or if the icon is a file
-    /// on a path that doesn't exist.
+    /// May error if a URL is given and the HTTP request fails, or if a path is given to a file
+    /// that does not exist.
     #[cfg(feature = "model")]
     pub async fn icon<'a>(
         &mut self,
@@ -158,5 +158,14 @@ impl EditRole {
         self.unicode_emoji = None;
 
         Ok(self)
+    }
+
+    /// The image to set as the role icon. Requires the input be a base64-encoded image that is in
+    /// either JPG, GIF, or PNG format.
+    #[cfg(not(feature = "model"))]
+    pub fn icon(&mut self, icon: String) -> &mut Self {
+        self.icon = Some(icon);
+        self.unicode_emoji = None;
+        self
     }
 }

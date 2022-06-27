@@ -141,8 +141,8 @@ impl EditScheduledEvent {
     ///
     /// # Errors
     ///
-    /// May error if the icon is a URL and the HTTP request fails, or if the image is a file
-    /// on a path that doesn't exist.
+    /// May error if a URL is given and the HTTP request fails, or if a path is given to a file
+    /// that does not exist.
     #[cfg(feature = "model")]
     pub async fn image<'a>(
         &mut self,
@@ -152,5 +152,13 @@ impl EditScheduledEvent {
         let image_data = image.into().data(&http.as_ref().client).await?;
         self.image = Some(encode_image(&image_data));
         Ok(self)
+    }
+
+    /// Sets the cover image for the scheduled event. Requires the input be a base64-encoded image
+    /// that is in either JPG, GIF, or PNG format.
+    #[cfg(not(feature = "model"))]
+    pub fn image(&mut self, image: String) -> &mut Self {
+        self.image = Some(image);
+        self
     }
 }

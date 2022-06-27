@@ -4,6 +4,8 @@ use crate::http::{CacheHttp, Http};
 use crate::internal::prelude::*;
 #[cfg(feature = "http")]
 use crate::model::prelude::*;
+#[cfg(feature = "http")]
+use crate::utils::encode_image;
 
 #[derive(Clone, Debug, Serialize)]
 #[must_use]
@@ -35,8 +37,26 @@ impl CreateWebhook {
         self
     }
 
+    /// Set the webhook's default avatar.
+    ///
+    /// # Errors
+    ///
+    /// May error if a URL is given and the HTTP request fails, or if a path is given to a file
+    /// that does not exist.
+    #[cfg(feature = "http")]
+    pub async fn avatar<'a>(
+        mut self,
+        http: impl AsRef<Http>,
+        avatar: impl Into<AttachmentType<'a>>,
+    ) -> Result<Self> {
+        let avatar_data = avatar.into().data(&http.as_ref().client).await?;
+        self.avatar = Some(encode_image(&avatar_data));
+        Ok(self)
+    }
+
     /// Set the webhook's default avatar. Requires the input be a base64-encoded image that is in
     /// either JPG, GIF, or PNG format.
+    #[cfg(not(feature = "http"))]
     pub fn avatar(mut self, avatar: String) -> Self {
         self.avatar = Some(avatar);
         self
