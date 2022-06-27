@@ -263,7 +263,6 @@
 <span id="258">258</span>
 <span id="259">259</span>
 <span id="260">260</span>
-<span id="261">261</span>
 </pre><pre class="rust"><code><span class="doccomment">//! The gateway module contains the pieces - primarily the `Shard` -</span>
 <span class="doccomment">//! responsible for maintaining a WebSocket connection with Discord.</span>
 <span class="doccomment">//!</span>
@@ -367,7 +366,6 @@
     <span class="doccomment">/// # Errors</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// Returns an error if the URL parsing fails.</span>
-    <span class="attribute">#[<span class="ident">must_use</span>]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">streaming</span>(<span class="ident">name</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>, <span class="ident">url</span>: <span class="kw">impl</span> <span class="ident">IntoUrl</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
         <span class="prelude-val">Ok</span>(<span class="self">Self</span> {
             <span class="ident">name</span>: <span class="ident">name</span>.<span class="ident">into</span>(),
