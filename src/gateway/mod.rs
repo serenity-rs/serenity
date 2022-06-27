@@ -101,7 +101,6 @@ impl ActivityData {
     /// # Errors
     ///
     /// Returns an error if the URL parsing fails.
-    #[must_use]
     pub fn streaming(name: impl Into<String>, url: impl IntoUrl) -> Result<Self> {
         Ok(Self {
             name: name.into(),
