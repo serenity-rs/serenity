@@ -203,35 +203,33 @@ impl ShardRunner {
         use crate::utils::backports::retain_mut;
 
         match &event {
-            Event::MessageCreate(ref msg_event) => {
+            Event::MessageCreate(msg_event) => {
                 let mut msg = LazyArc::new(&msg_event.message);
                 retain_mut(&mut self.message_filters, |f| f.send_message(&mut msg));
             },
-            Event::ReactionAdd(ref reaction_event) => {
+            Event::ReactionAdd(reaction_event) => {
                 let mut reaction = LazyReactionAction::new(&reaction_event.reaction, true);
                 retain_mut(&mut self.reaction_filters, |f| f.send_reaction(&mut reaction));
             },
-            Event::ReactionRemove(ref reaction_event) => {
+            Event::ReactionRemove(reaction_event) => {
                 let mut reaction = LazyReactionAction::new(&reaction_event.reaction, false);
                 retain_mut(&mut self.reaction_filters, |f| f.send_reaction(&mut reaction));
             },
             #[cfg(feature = "collector")]
-            Event::InteractionCreate(ref interaction_event) => {
-                match &interaction_event.interaction {
-                    Interaction::MessageComponent(interaction) => {
-                        let mut interaction = LazyArc::new(interaction);
-                        retain_mut(&mut self.component_interaction_filters, |f| {
-                            f.send_interaction(&mut interaction)
-                        });
-                    },
-                    Interaction::ModalSubmit(interaction) => {
-                        let mut interaction = LazyArc::new(interaction);
-                        retain_mut(&mut self.modal_interaction_filters, |f| {
-                            f.send_interaction(&mut interaction)
-                        });
-                    },
-                    _ => (),
-                }
+            Event::InteractionCreate(interaction_event) => match &interaction_event.interaction {
+                Interaction::MessageComponent(interaction) => {
+                    let mut interaction = LazyArc::new(interaction);
+                    retain_mut(&mut self.component_interaction_filters, |f| {
+                        f.send_interaction(&mut interaction)
+                    });
+                },
+                Interaction::ModalSubmit(interaction) => {
+                    let mut interaction = LazyArc::new(interaction);
+                    retain_mut(&mut self.modal_interaction_filters, |f| {
+                        f.send_interaction(&mut interaction)
+                    });
+                },
+                _ => (),
             },
             _ => {},
         }
@@ -466,18 +464,18 @@ impl ShardRunner {
     #[instrument(skip(self))]
     async fn handle_voice_event(&self, event: &Event) {
         if let Some(voice_manager) = &self.voice_manager {
-            match *event {
+            match event {
                 Event::Ready(_) => {
                     voice_manager
                         .register_shard(self.shard.shard_info().id, self.runner_tx.clone())
                         .await;
                 },
-                Event::VoiceServerUpdate(ref event) => {
+                Event::VoiceServerUpdate(event) => {
                     if let Some(guild_id) = event.guild_id {
                         voice_manager.server_update(guild_id, &event.endpoint, &event.token).await;
                     }
                 },
-                Event::VoiceStateUpdate(ref event) => {
+                Event::VoiceStateUpdate(event) => {
                     if let Some(guild_id) = event.voice_state.guild_id {
                         voice_manager.state_update(guild_id, &event.voice_state).await;
                     }
