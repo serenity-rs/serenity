@@ -283,9 +283,7 @@ impl StandardFramework {
             {
                 let mut buckets = self.buckets.lock().await;
 
-                if let Some(ref mut bucket) =
-                    command.bucket.as_ref().and_then(|b| buckets.get_mut(*b))
-                {
+                if let Some(bucket) = command.bucket.and_then(|b| buckets.get_mut(b)) {
                     if let Some(rate_limit_info) = bucket.take(ctx, msg).await {
                         duration = match rate_limit_info.action {
                             RateLimitAction::Cancelled | RateLimitAction::FailedDelay => {
@@ -650,7 +648,7 @@ impl Framework for StandardFramework {
             &mut stream,
             &self.groups,
             &self.config,
-            self.help.as_ref().map(|h| h.options.names),
+            self.help.map(|h| h.options.names),
         )
         .await;
 
@@ -761,12 +759,10 @@ impl Framework for StandardFramework {
                 let res = (command.fun)(&mut ctx, &msg, args).await;
 
                 // Check if the command wants to revert the bucket by giving back a ticket.
-                if matches!(res, Err(ref e) if e.is::<RevertBucket>()) {
+                if matches!(&res, Err(e) if e.is::<RevertBucket>()) {
                     let mut buckets = self.buckets.lock().await;
 
-                    if let Some(ref mut bucket) =
-                        command.options.bucket.as_ref().and_then(|b| buckets.get_mut(*b))
-                    {
+                    if let Some(bucket) = command.options.bucket.and_then(|b| buckets.get_mut(b)) {
                         bucket.give(&ctx, &msg).await;
                     }
                 }
