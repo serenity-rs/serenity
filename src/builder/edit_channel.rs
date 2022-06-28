@@ -16,7 +16,8 @@ use crate::model::id::ChannelId;
 /// #     let http = Http::new("token");
 /// #     let mut channel = ChannelId::new(1);
 /// // assuming a channel has already been bound
-/// if let Err(why) = channel.edit(&http, |c| c.name("new name").topic("a test topic")).await {
+/// if let Err(why) = channel.edit(&http, |c| c.name("new name").topic("a test topic"), None).await
+/// {
 ///     // properly handle the error
 /// }
 /// #     Ok(())
@@ -182,7 +183,7 @@ impl EditChannel {
     ///     kind: PermissionOverwriteType::Member(UserId::new(1234)),
     /// }];
     ///
-    /// channel.edit(http, |c| c.name("my_edited_cool_channel").permissions(permissions)).await?;
+    /// channel.edit(http, |c| c.name("my_edited_cool_channel").permissions(permissions), None).await?;
     /// #    Ok(())
     /// # }
     /// ```

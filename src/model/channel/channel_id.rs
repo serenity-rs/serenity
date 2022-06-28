@@ -81,16 +81,29 @@ impl ChannelId {
     /// # Errors
     ///
     /// Returns [`Error::Http`] if the current user lacks permission.
+    /// It may also return [`Error::ExceededLimit`] if `audit_log_reason` is too long.
     ///
     /// [Create Instant Invite]: Permissions::CREATE_INSTANT_INVITE
-    pub async fn create_invite<F>(&self, http: impl AsRef<Http>, f: F) -> Result<RichInvite>
+    pub async fn create_invite<F>(
+        &self,
+        http: impl AsRef<Http>,
+        f: F,
+        audit_log_reason: Option<&str>,
+    ) -> Result<RichInvite>
     where
         F: FnOnce(&mut CreateInvite) -> &mut CreateInvite,
     {
+        match audit_log_reason {
+            Some(reason) if reason.len() > 512 => {
+                return Err(Error::ExceededLimit(reason.to_string(), 512));
+            },
+            _ => {},
+        }
+
         let mut invite = CreateInvite::default();
         f(&mut invite);
 
-        http.as_ref().create_invite(self.get(), &invite, None).await
+        http.as_ref().create_invite(self.get(), &invite, audit_log_reason).await
     }
 
     /// Creates a [permission overwrite][`PermissionOverwrite`] for either a
@@ -312,7 +325,7 @@ impl ChannelId {
     /// #     use serenity::model::id::ChannelId;
     /// #     let http = Http::new("token");
     /// #     let channel_id = ChannelId::new(1234);
-    /// channel_id.edit(&http, |c| c.name("test").bitrate(64000)).await;
+    /// channel_id.edit(&http, |c| c.name("test").bitrate(64000), None).await;
     /// # }
     /// ```
     ///
@@ -320,17 +333,30 @@ impl ChannelId {
     ///
     /// Returns [`Error::Http`] if the current user lacks permission,
     /// or if an invalid value is set.
+    /// It may also return [`Error::ExceededLimit`] if `audit_log_reason` is too long.
     ///
     /// [Manage Channel]: Permissions::MANAGE_CHANNELS
     #[inline]
-    pub async fn edit<F>(self, http: impl AsRef<Http>, f: F) -> Result<GuildChannel>
+    pub async fn edit<F>(
+        self,
+        http: impl AsRef<Http>,
+        f: F,
+        audit_log_reason: Option<&str>,
+    ) -> Result<GuildChannel>
     where
         F: FnOnce(&mut EditChannel) -> &mut EditChannel,
     {
+        match audit_log_reason {
+            Some(reason) if reason.len() > 512 => {
+                return Err(Error::ExceededLimit(reason.to_string(), 512));
+            },
+            _ => {},
+        }
+
         let mut channel = EditChannel::default();
         f(&mut channel);
 
-        http.as_ref().edit_channel(self.get(), &channel, None).await
+        http.as_ref().edit_channel(self.get(), &channel, audit_log_reason).await
     }
 
     /// Edits a [`Message`] in the channel given its Id.
@@ -561,11 +587,23 @@ impl ChannelId {
     ///
     /// Returns [`Error::Http`] if the current user lacks permission,
     /// or if the channel has too many pinned messages.
+    /// It may also return [`Error::ExceededLimit`] if `audit_log_reason` is too long.
     ///
     /// [Manage Messages]: Permissions::MANAGE_MESSAGES
     #[inline]
-    pub async fn pin(self, http: impl AsRef<Http>, message_id: impl Into<MessageId>) -> Result<()> {
-        http.as_ref().pin_message(self.get(), message_id.into().get(), None).await
+    pub async fn pin(
+        self,
+        http: impl AsRef<Http>,
+        message_id: impl Into<MessageId>,
+        audit_log_reason: Option<&str>,
+    ) -> Result<()> {
+        match audit_log_reason {
+            Some(reason) if reason.len() > 512 => {
+                return Err(Error::ExceededLimit(reason.to_string(), 512));
+            },
+            _ => {},
+        }
+        http.as_ref().pin_message(self.get(), message_id.into().get(), audit_log_reason).await
     }
 
     /// Crossposts a [`Message`].
@@ -833,6 +871,7 @@ impl ChannelId {
     /// # Errors
     ///
     /// Returns [`Error::Http`] if the current user lacks permission.
+    /// It may also return [`Error::ExceededLimit`] if `audit_log_reason` is too long.
     ///
     /// [Manage Messages]: Permissions::MANAGE_MESSAGES
     #[inline]
@@ -840,8 +879,9 @@ impl ChannelId {
         self,
         http: impl AsRef<Http>,
         message_id: impl Into<MessageId>,
+        audit_log_reason: Option<&str>,
     ) -> Result<()> {
-        http.as_ref().unpin_message(self.get(), message_id.into().get(), None).await
+        http.as_ref().unpin_message(self.get(), message_id.into().get(), audit_log_reason).await
     }
 
     /// Retrieves the channel's webhooks.
@@ -868,10 +908,23 @@ impl ChannelId {
     /// Returns a [`ModelError::NameTooLong`] if the name of the webhook is
     /// over the limit of 100 characters.
     /// Returns a [`ModelError::InvalidChannelType`] if the channel type is not text.
-    pub async fn create_webhook<F>(&self, http: impl AsRef<Http>, f: F) -> Result<Webhook>
+    /// It may also return [`Error::ExceededLimit`] if `audit_log_reason` is too long.
+    pub async fn create_webhook<F>(
+        &self,
+        http: impl AsRef<Http>,
+        f: F,
+        audit_log_reason: Option<&str>,
+    ) -> Result<Webhook>
     where
         F: FnOnce(&mut CreateWebhook) -> &mut CreateWebhook,
     {
+        match audit_log_reason {
+            Some(reason) if reason.len() > 512 => {
+                return Err(Error::ExceededLimit(reason.to_string(), 512));
+            },
+            _ => {},
+        }
+
         let mut builder = CreateWebhook::default();
         f(&mut builder);
 
@@ -883,7 +936,7 @@ impl ChannelId {
             }
         }
 
-        http.as_ref().create_webhook(self.get(), &builder, None).await
+        http.as_ref().create_webhook(self.get(), &builder, audit_log_reason).await
     }
 
     /// Returns a future that will await one message sent in this channel.

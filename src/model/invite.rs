@@ -74,6 +74,7 @@ impl Invite {
     ///
     /// If the `cache` is enabled, returns a [`ModelError::InvalidPermissions`]
     /// if the current user does not have the required [permission].
+    /// It may also return [`Error::ExceededLimit`] if `audit_log_reason` is too long.
     ///
     /// [Create Instant Invite]: Permissions::CREATE_INSTANT_INVITE
     /// [permission]: super::permissions
@@ -82,10 +83,18 @@ impl Invite {
         cache_http: impl CacheHttp,
         channel_id: impl Into<ChannelId>,
         f: F,
+        audit_log_reason: Option<&str>,
     ) -> Result<RichInvite>
     where
         F: FnOnce(CreateInvite) -> CreateInvite,
     {
+        match audit_log_reason {
+            Some(reason) if reason.len() > 512 => {
+                return Err(Error::ExceededLimit(reason.to_string(), 512));
+            },
+            _ => {},
+        }
+
         let channel_id = channel_id.into();
 
         #[cfg(feature = "cache")]
@@ -102,7 +111,7 @@ impl Invite {
 
         let builder = f(CreateInvite::default());
 
-        cache_http.http().create_invite(channel_id.get(), &builder, None).await
+        cache_http.http().create_invite(channel_id.get(), &builder, audit_log_reason).await
     }
 
     /// Deletes the invite.

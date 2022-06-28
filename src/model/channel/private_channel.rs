@@ -249,13 +249,15 @@ impl PrivateChannel {
     ///
     /// Returns [`Error::Http`] if the number of pinned messages
     /// would exceed the 50 message limit.
+    /// It may also return [`Error::ExceededLimit`] if `audit_log_reason` is too long.
     #[inline]
     pub async fn pin(
         &self,
         http: impl AsRef<Http>,
         message_id: impl Into<MessageId>,
+        audit_log_reason: Option<&str>,
     ) -> Result<()> {
-        self.id.pin(&http, message_id).await
+        self.id.pin(&http, message_id, audit_log_reason).await
     }
 
     /// Retrieves the list of messages that have been pinned in the private
@@ -386,13 +388,15 @@ impl PrivateChannel {
     /// Returns [`Error::Http`] if the current user lacks permission,
     /// if the message was deleted, or if the channel already has the limit of
     /// 50 pinned messages.
+    /// It may also return [`Error::ExceededLimit`] if `audit_log_reason` is too long.
     #[inline]
     pub async fn unpin(
         &self,
         http: impl AsRef<Http>,
         message_id: impl Into<MessageId>,
+        audit_log_reason: Option<&str>,
     ) -> Result<()> {
-        self.id.unpin(&http, message_id).await
+        self.id.unpin(&http, message_id, audit_log_reason).await
     }
 }
 

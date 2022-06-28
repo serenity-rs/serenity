@@ -217,8 +217,9 @@ impl GuildId {
     /// # async fn run() {
     /// # use serenity::http::Http;
     /// # let http = Http::new("token");
-    /// let _channel =
-    ///     GuildId::new(7).create_channel(&http, |c| c.name("test").kind(ChannelType::Voice)).await;
+    /// let _channel = GuildId::new(7)
+    ///     .create_channel(&http, |c| c.name("test").kind(ChannelType::Voice), None)
+    ///     .await;
     /// # }
     /// ```
     ///
@@ -226,6 +227,7 @@ impl GuildId {
     ///
     /// Returns [`Error::Http`] if the current user lacks permission,
     /// or if invalid values are set.
+    ///  It may also return [`Error::ExceededLimit`] if `audit_log_reason` is too long.
     ///
     /// [Manage Channels]: Permissions::MANAGE_CHANNELS
     #[inline]
@@ -233,11 +235,19 @@ impl GuildId {
         self,
         http: impl AsRef<Http>,
         f: impl FnOnce(&mut CreateChannel) -> &mut CreateChannel,
+        audit_log_reason: Option<&str>,
     ) -> Result<GuildChannel> {
+        match audit_log_reason {
+            Some(reason) if reason.len() > 512 => {
+                return Err(Error::ExceededLimit(reason.to_string(), 512));
+            },
+            _ => {},
+        }
+
         let mut builder = CreateChannel::default();
         f(&mut builder);
 
-        http.as_ref().create_channel(self.get(), &builder, None).await
+        http.as_ref().create_channel(self.get(), &builder, audit_log_reason).await
     }
 
     /// Creates an emoji in the guild with a name and base64-encoded image.
@@ -257,6 +267,7 @@ impl GuildId {
     ///
     /// Returns [`Error::Http`] if the current user lacks permission,
     /// if the name is too long, or if the image is too big.
+    ///  It may also return [`Error::ExceededLimit`] if `audit_log_reason` is too long.
     ///
     /// [`EditProfile::avatar`]: crate::builder::EditProfile::avatar
     /// [Manage Emojis and Stickers]: Permissions::MANAGE_EMOJIS_AND_STICKERS
@@ -266,13 +277,21 @@ impl GuildId {
         http: impl AsRef<Http>,
         name: &str,
         image: &str,
+        audit_log_reason: Option<&str>,
     ) -> Result<Emoji> {
+        match audit_log_reason {
+            Some(reason) if reason.len() > 512 => {
+                return Err(Error::ExceededLimit(reason.to_string(), 512));
+            },
+            _ => {},
+        }
+
         let map = json!({
             "name": name,
             "image": image,
         });
 
-        http.as_ref().create_emoji(self.get(), &map, None).await
+        http.as_ref().create_emoji(self.get(), &map, audit_log_reason).await
     }
 
     /// Creates an integration for the guild.
@@ -282,6 +301,7 @@ impl GuildId {
     /// # Errors
     ///
     /// Returns [`Error::Http`] if the current user lacks permission.
+    /// It may also return [`Error::ExceededLimit`] if `audit_log_reason` is too long.
     ///
     /// [Manage Guild]: Permissions::MANAGE_GUILD
     #[inline]
@@ -290,14 +310,24 @@ impl GuildId {
         http: impl AsRef<Http>,
         integration_id: impl Into<IntegrationId>,
         kind: &str,
+        audit_log_reason: Option<&str>,
     ) -> Result<()> {
+        match audit_log_reason {
+            Some(reason) if reason.len() > 512 => {
+                return Err(Error::ExceededLimit(reason.to_string(), 512));
+            },
+            _ => {},
+        }
+
         let integration_id = integration_id.into();
         let map = json!({
             "id": integration_id.0,
             "type": kind,
         });
 
-        http.as_ref().create_guild_integration(self.get(), integration_id.get(), &map, None).await
+        http.as_ref()
+            .create_guild_integration(self.get(), integration_id.get(), &map, audit_log_reason)
+            .await
     }
 
     /// Creates a new role in the guild with the data set, if any.
@@ -310,20 +340,33 @@ impl GuildId {
     ///
     /// Returns [`Error::Http`] if the current user lacks permission,
     /// or if invalid data is given.
+    /// It may also return [`Error::ExceededLimit`] if `audit_log_reason` is too long.
     ///
     /// [Manage Roles]: Permissions::MANAGE_ROLES
     #[inline]
-    pub async fn create_role<F>(self, http: impl AsRef<Http>, f: F) -> Result<Role>
+    pub async fn create_role<F>(
+        self,
+        http: impl AsRef<Http>,
+        f: F,
+        audit_log_reason: Option<&str>,
+    ) -> Result<Role>
     where
         F: FnOnce(&mut EditRole) -> &mut EditRole,
     {
+        match audit_log_reason {
+            Some(reason) if reason.len() > 512 => {
+                return Err(Error::ExceededLimit(reason.to_string(), 512));
+            },
+            _ => {},
+        }
+
         let mut edit_role = EditRole::default();
         f(&mut edit_role);
 
-        let role = http.as_ref().create_role(self.get(), &edit_role, None).await?;
+        let role = http.as_ref().create_role(self.get(), &edit_role, audit_log_reason).await?;
 
         if let Some(position) = edit_role.position {
-            self.edit_role_position(&http, role.id, position as u64).await?;
+            self.edit_role_position(&http, role.id, position as u64, None).await?;
         }
 
         Ok(role)
@@ -336,20 +379,29 @@ impl GuildId {
     /// # Errors
     ///
     /// Returns [`Error::Http`] if the current user lacks permission, or if invalid data is given.
+    /// It may also return [`Error::ExceededLimit`] if `audit_log_reason` is too long.
     ///
     /// [Manage Events]: Permissions::MANAGE_EVENTS
     pub async fn create_scheduled_event<F>(
         &self,
         http: impl AsRef<Http>,
         f: F,
+        audit_log_reason: Option<&str>,
     ) -> Result<ScheduledEvent>
     where
         F: FnOnce(&mut CreateScheduledEvent) -> &mut CreateScheduledEvent,
     {
+        match audit_log_reason {
+            Some(reason) if reason.len() > 512 => {
+                return Err(Error::ExceededLimit(reason.to_string(), 512));
+            },
+            _ => {},
+        }
+
         let mut builder = CreateScheduledEvent::default();
         f(&mut builder);
 
-        http.as_ref().create_scheduled_event(self.get(), &builder, None).await
+        http.as_ref().create_scheduled_event(self.get(), &builder, audit_log_reason).await
     }
 
     /// Creates a new sticker in the guild with the data set, if any.
@@ -360,20 +412,33 @@ impl GuildId {
     ///
     /// Returns [`Error::Http`] if the current user lacks permission,
     /// or if invalid data is given.
+    /// It may also return [`Error::ExceededLimit`] if `audit_log_reason` is too long.
     ///
     /// [Manage Emojis and Stickers]: crate::model::permissions::Permissions::MANAGE_EMOJIS_AND_STICKERS
     #[inline]
-    pub async fn create_sticker<'a, F>(self, http: impl AsRef<Http>, f: F) -> Result<Sticker>
+    pub async fn create_sticker<'a, F>(
+        self,
+        http: impl AsRef<Http>,
+        f: F,
+        audit_log_reason: Option<&str>,
+    ) -> Result<Sticker>
     where
         for<'b> F: FnOnce(&'b mut CreateSticker<'a>) -> &'b mut CreateSticker<'a>,
     {
+        match audit_log_reason {
+            Some(reason) if reason.len() > 512 => {
+                return Err(Error::ExceededLimit(reason.to_string(), 512));
+            },
+            _ => {},
+        }
+
         let mut create_sticker = CreateSticker::default();
         f(&mut create_sticker);
 
         let (map, file) =
             create_sticker.build().ok_or(Error::Model(ModelError::NoStickerFileSet))?;
 
-        http.as_ref().create_sticker(self.get(), map, file, None).await
+        http.as_ref().create_sticker(self.get(), map, file, audit_log_reason).await
     }
 
     /// Deletes the current guild if the current account is the owner of the
@@ -477,6 +542,7 @@ impl GuildId {
     ///
     /// Returns [`Error::Http`] if the current user lacks permission,
     /// or if a sticker with that Id does not exist.
+    /// It may also return [`Error::ExceededLimit`] if `audit_log_reason` is too long.
     ///
     /// [Manage Emojis and Stickers]: crate::model::permissions::Permissions::MANAGE_EMOJIS_AND_STICKERS
     #[inline]
@@ -484,8 +550,16 @@ impl GuildId {
         self,
         http: impl AsRef<Http>,
         sticker_id: impl Into<StickerId>,
+        audit_log_reason: Option<&str>,
     ) -> Result<()> {
-        http.as_ref().delete_sticker(self.get(), sticker_id.into().get(), None).await
+        match audit_log_reason {
+            Some(reason) if reason.len() > 512 => {
+                return Err(Error::ExceededLimit(reason.to_string(), 512));
+            },
+            _ => {},
+        }
+
+        http.as_ref().delete_sticker(self.get(), sticker_id.into().get(), audit_log_reason).await
     }
 
     /// Edits the current guild with new data where specified.
@@ -499,17 +573,30 @@ impl GuildId {
     ///
     /// Returns [`Error::Http`] if the current user lacks permission,
     /// or if an invalid value is set.
+    /// It may also return [`Error::ExceededLimit`] if `audit_log_reason` is too long.
     ///
     /// [Manage Guild]: Permissions::MANAGE_GUILD
     #[inline]
-    pub async fn edit<F>(&mut self, http: impl AsRef<Http>, f: F) -> Result<PartialGuild>
+    pub async fn edit<F>(
+        &mut self,
+        http: impl AsRef<Http>,
+        f: F,
+        audit_log_reason: Option<&str>,
+    ) -> Result<PartialGuild>
     where
         F: FnOnce(&mut EditGuild) -> &mut EditGuild,
     {
+        match audit_log_reason {
+            Some(reason) if reason.len() > 512 => {
+                return Err(Error::ExceededLimit(reason.to_string(), 512));
+            },
+            _ => {},
+        }
+
         let mut edit_guild = EditGuild::default();
         f(&mut edit_guild);
 
-        http.as_ref().edit_guild(self.get(), &edit_guild, None).await
+        http.as_ref().edit_guild(self.get(), &edit_guild, audit_log_reason).await
     }
 
     /// Edits an [`Emoji`]'s name in the guild.
@@ -522,6 +609,7 @@ impl GuildId {
     /// # Errors
     ///
     /// Returns [`Error::Http`] if the current user lacks permission.
+    /// It may also return [`Error::ExceededLimit`] if `audit_log_reason` is too long.
     ///
     /// [Manage Emojis and Stickers]: Permissions::MANAGE_EMOJIS_AND_STICKERS
     /// [`Error::Http`]: crate::error::Error::Http
@@ -531,12 +619,20 @@ impl GuildId {
         http: impl AsRef<Http>,
         emoji_id: impl Into<EmojiId>,
         name: &str,
+        audit_log_reason: Option<&str>,
     ) -> Result<Emoji> {
+        match audit_log_reason {
+            Some(reason) if reason.len() > 512 => {
+                return Err(Error::ExceededLimit(reason.to_string(), 512));
+            },
+            _ => {},
+        }
+
         let map = json!({
             "name": name,
         });
 
-        http.as_ref().edit_emoji(self.get(), emoji_id.into().get(), &map, None).await
+        http.as_ref().edit_emoji(self.get(), emoji_id.into().get(), &map, audit_log_reason).await
     }
 
     /// Edits the properties of member of the guild, such as muting or
@@ -556,6 +652,7 @@ impl GuildId {
     /// # Errors
     ///
     /// Returns [`Error::Http`] if the current user lacks the necessary permissions.
+    /// It may also return [`Error::ExceededLimit`] if `audit_log_reason` is too long.
     ///
     /// [`Error::Http`]: crate::error::Error::Http
     #[inline]
@@ -564,14 +661,24 @@ impl GuildId {
         http: impl AsRef<Http>,
         user_id: impl Into<UserId>,
         f: F,
+        audit_log_reason: Option<&str>,
     ) -> Result<Member>
     where
         F: FnOnce(&mut EditMember) -> &mut EditMember,
     {
+        match audit_log_reason {
+            Some(reason) if reason.len() > 512 => {
+                return Err(Error::ExceededLimit(reason.to_string(), 512));
+            },
+            _ => {},
+        }
+
         let mut edit_member = EditMember::default();
         f(&mut edit_member);
 
-        http.as_ref().edit_member(self.get(), user_id.into().get(), &edit_member, None).await
+        http.as_ref()
+            .edit_member(self.get(), user_id.into().get(), &edit_member, audit_log_reason)
+            .await
     }
 
     /// Edits the current user's nickname for the guild.
@@ -612,6 +719,7 @@ impl GuildId {
     /// # Errors
     ///
     /// Returns [`Error::Http`] if the current user lacks permission.
+    /// It may also return [`Error::ExceededLimit`] if `audit_log_reason` is too long.
     ///
     /// [Manage Roles]: Permissions::MANAGE_ROLES
     /// [`Error::Http`]: crate::error::Error::Http
@@ -621,14 +729,24 @@ impl GuildId {
         http: impl AsRef<Http>,
         role_id: impl Into<RoleId>,
         f: F,
+        audit_log_reason: Option<&str>,
     ) -> Result<Role>
     where
         F: FnOnce(&mut EditRole) -> &mut EditRole,
     {
+        match audit_log_reason {
+            Some(reason) if reason.len() > 512 => {
+                return Err(Error::ExceededLimit(reason.to_string(), 512));
+            },
+            _ => {},
+        }
+
         let mut edit_role = EditRole::default();
         f(&mut edit_role);
 
-        http.as_ref().edit_role(self.get(), role_id.into().get(), &edit_role, None).await
+        http.as_ref()
+            .edit_role(self.get(), role_id.into().get(), &edit_role, audit_log_reason)
+            .await
     }
 
     /// Modifies a scheduled event in the guild with the data set, if any.
@@ -638,6 +756,7 @@ impl GuildId {
     /// # Errors
     ///
     /// Returns [`Error::Http`] if the current user lacks permission, or if invalid data is given.
+    /// It may also return [`Error::ExceededLimit`] if `audit_log_reason` is too long.
     ///
     /// [Manage Events]: Permissions::MANAGE_EVENTS
     pub async fn edit_scheduled_event<F>(
@@ -645,15 +764,28 @@ impl GuildId {
         http: impl AsRef<Http>,
         event_id: impl Into<ScheduledEventId>,
         f: F,
+        audit_log_reason: Option<&str>,
     ) -> Result<ScheduledEvent>
     where
         F: FnOnce(&mut EditScheduledEvent) -> &mut EditScheduledEvent,
     {
+        match audit_log_reason {
+            Some(reason) if reason.len() > 512 => {
+                return Err(Error::ExceededLimit(reason.to_string(), 512));
+            },
+            _ => {},
+        }
+
         let mut edit_scheduled_event = EditScheduledEvent::default();
         f(&mut edit_scheduled_event);
 
         http.as_ref()
-            .edit_scheduled_event(self.get(), event_id.into().get(), &edit_scheduled_event, None)
+            .edit_scheduled_event(
+                self.get(),
+                event_id.into().get(),
+                &edit_scheduled_event,
+                audit_log_reason,
+            )
             .await
     }
 
@@ -681,14 +813,24 @@ impl GuildId {
         http: impl AsRef<Http>,
         sticker_id: impl Into<StickerId>,
         f: F,
+        audit_log_reason: Option<&str>,
     ) -> Result<Sticker>
     where
         F: FnOnce(&mut EditSticker) -> &mut EditSticker,
     {
+        match audit_log_reason {
+            Some(reason) if reason.len() > 512 => {
+                return Err(Error::ExceededLimit(reason.to_string(), 512));
+            },
+            _ => {},
+        }
+
         let mut edit_sticker = EditSticker::default();
         f(&mut edit_sticker);
 
-        http.as_ref().edit_sticker(self.get(), sticker_id.into().get(), &edit_sticker, None).await
+        http.as_ref()
+            .edit_sticker(self.get(), sticker_id.into().get(), &edit_sticker, audit_log_reason)
+            .await
     }
 
     /// Edits the order of [`Role`]s
@@ -706,6 +848,7 @@ impl GuildId {
     /// # Errors
     ///
     /// Returns an [`Error::Http`] if the current user lacks permission.
+    /// It may also return [`Error::ExceededLimit`] if `audit_log_reason` is too long.
     ///
     /// [Manage Roles]: Permissions::MANAGE_ROLES
     /// [`Error::Http`]: crate::error::Error::Http
@@ -715,8 +858,18 @@ impl GuildId {
         http: impl AsRef<Http>,
         role_id: impl Into<RoleId>,
         position: u64,
+        audit_log_reason: Option<&str>,
     ) -> Result<Vec<Role>> {
-        http.as_ref().edit_role_position(self.get(), role_id.into().get(), position, None).await
+        match audit_log_reason {
+            Some(reason) if reason.len() > 512 => {
+                return Err(Error::ExceededLimit(reason.to_string(), 512));
+            },
+            _ => {},
+        }
+
+        http.as_ref()
+            .edit_role_position(self.get(), role_id.into().get(), position, audit_log_reason)
+            .await
     }
 
     /// Edits the [`GuildWelcomeScreen`].
@@ -1032,6 +1185,7 @@ impl GuildId {
     /// Returns an [`Error::Http`] if the current user
     /// lacks permission, or if the member is not currently
     /// in a voice channel for this [`Guild`].
+    /// It may also return [`Error::ExceededLimit`] if `audit_log_reason` is too long.
     ///
     /// [Move Members]: Permissions::MOVE_MEMBERS
     /// [`Error::Http`]: crate::error::Error::Http
@@ -1041,8 +1195,10 @@ impl GuildId {
         http: impl AsRef<Http>,
         user_id: impl Into<UserId>,
         channel_id: impl Into<ChannelId>,
+        audit_log_reason: Option<&str>,
     ) -> Result<Member> {
-        self.edit_member(http, user_id, |m| m.voice_channel(channel_id.into())).await
+        self.edit_member(http, user_id, |m| m.voice_channel(channel_id.into()), audit_log_reason)
+            .await
     }
 
     /// Returns the name of whatever guild this id holds.
@@ -1060,6 +1216,7 @@ impl GuildId {
     ///
     /// Returns [`Error::Http`] if the current user lacks permission,
     /// or if the member is not currently in a voice channel for this guild.
+    /// It may also return [`Error::ExceededLimit`] if `audit_log_reason` is too long.
     ///
     /// [Move Members]: Permissions::MOVE_MEMBERS
     #[inline]
@@ -1067,8 +1224,9 @@ impl GuildId {
         self,
         http: impl AsRef<Http>,
         user_id: impl Into<UserId>,
+        audit_log_reason: Option<&str>,
     ) -> Result<Member> {
-        self.edit_member(http, user_id, EditMember::disconnect_member).await
+        self.edit_member(http, user_id, EditMember::disconnect_member, audit_log_reason).await
     }
 
     /// Gets the number of [`Member`]s that would be pruned with the given
@@ -1304,11 +1462,24 @@ impl GuildId {
     /// # Errors
     ///
     /// Returns [`Error::Http`] if the current user lacks permission.
+    /// It may also return [`Error::ExceededLimit`] if `audit_log_reason` is too long.
     ///
     /// [Kick Members]: Permissions::KICK_MEMBERS
     #[inline]
-    pub async fn start_prune(self, http: impl AsRef<Http>, days: u8) -> Result<GuildPrune> {
-        http.as_ref().start_guild_prune(self.get(), days, None).await
+    pub async fn start_prune(
+        self,
+        http: impl AsRef<Http>,
+        days: u8,
+        audit_log_reason: Option<&str>,
+    ) -> Result<GuildPrune> {
+        match audit_log_reason {
+            Some(reason) if reason.len() > 512 => {
+                return Err(Error::ExceededLimit(reason.to_string(), 512));
+            },
+            _ => {},
+        }
+
+        http.as_ref().start_guild_prune(self.get(), days, audit_log_reason).await
     }
 
     /// Unbans a [`User`] from the guild.
@@ -1318,11 +1489,24 @@ impl GuildId {
     /// # Errors
     ///
     /// Returns [`Error::Http`] if the current user does not have permission.
+    /// It may also return [`Error::ExceededLimit`] if `audit_log_reason` is too long.
     ///
     /// [Ban Members]: Permissions::BAN_MEMBERS
     #[inline]
-    pub async fn unban(self, http: impl AsRef<Http>, user_id: impl Into<UserId>) -> Result<()> {
-        http.as_ref().remove_ban(self.get(), user_id.into().get(), None).await
+    pub async fn unban(
+        self,
+        http: impl AsRef<Http>,
+        user_id: impl Into<UserId>,
+        audit_log_reason: Option<&str>,
+    ) -> Result<()> {
+        match audit_log_reason {
+            Some(reason) if reason.len() > 512 => {
+                return Err(Error::ExceededLimit(reason.to_string(), 512));
+            },
+            _ => {},
+        }
+
+        http.as_ref().remove_ban(self.get(), user_id.into().get(), audit_log_reason).await
     }
 
     /// Retrieve's the guild's vanity URL.

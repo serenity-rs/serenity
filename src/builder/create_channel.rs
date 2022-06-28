@@ -129,7 +129,9 @@ impl CreateChannel {
     ///     kind: PermissionOverwriteType::Member(UserId::new(1234)),
     /// }];
     ///
-    /// guild.create_channel(http, |c| c.name("my_new_cool_channel").permissions(permissions)).await?;
+    /// guild
+    ///     .create_channel(http, |c| c.name("my_new_cool_channel").permissions(permissions), None)
+    ///     .await?;
     /// #    Ok(())
     /// # }
     /// ```

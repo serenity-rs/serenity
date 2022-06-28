@@ -500,9 +500,21 @@ impl Message {
     /// If the `cache` is enabled, returns a
     /// [`ModelError::InvalidPermissions`] if the current user does not have
     /// the required permissions.
+    /// It may also return [`Error::ExceededLimit`] if `audit_log_reason` is too long.
     ///
     /// [Manage Messages]: Permissions::MANAGE_MESSAGES
-    pub async fn pin(&self, cache_http: impl CacheHttp) -> Result<()> {
+    pub async fn pin(
+        &self,
+        cache_http: impl CacheHttp,
+        audit_log_reason: Option<&str>,
+    ) -> Result<()> {
+        match audit_log_reason {
+            Some(reason) if reason.len() > 512 => {
+                return Err(Error::ExceededLimit(reason.to_string(), 512));
+            },
+            _ => {},
+        }
+
         #[cfg(feature = "cache")]
         {
             if let Some(cache) = cache_http.cache() {
@@ -517,7 +529,7 @@ impl Message {
             }
         }
 
-        self.channel_id.pin(cache_http.http(), self.id).await
+        self.channel_id.pin(cache_http.http(), self.id, audit_log_reason).await
     }
 
     /// React to the message with a custom [`Emoji`] or unicode character.
@@ -782,9 +794,21 @@ impl Message {
     /// If the `cache` is enabled, returns a
     /// [`ModelError::InvalidPermissions`] if the current user does not have
     /// the required permissions.
+    /// It may also return [`Error::ExceededLimit`] if `audit_log_reason` is too long.
     ///
     /// [Manage Messages]: Permissions::MANAGE_MESSAGES
-    pub async fn unpin(&self, cache_http: impl CacheHttp) -> Result<()> {
+    pub async fn unpin(
+        &self,
+        cache_http: impl CacheHttp,
+        audit_log_reason: Option<&str>,
+    ) -> Result<()> {
+        match audit_log_reason {
+            Some(reason) if reason.len() > 512 => {
+                return Err(Error::ExceededLimit(reason.to_string(), 512));
+            },
+            _ => {},
+        }
+
         #[cfg(feature = "cache")]
         {
             if let Some(cache) = cache_http.cache() {
@@ -799,7 +823,10 @@ impl Message {
             }
         }
 
-        cache_http.http().unpin_message(self.channel_id.get(), self.id.get(), None).await
+        cache_http
+            .http()
+            .unpin_message(self.channel_id.get(), self.id.get(), audit_log_reason)
+            .await
     }
 
     /// Tries to return author's nickname in the current channel's guild.

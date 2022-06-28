@@ -16,10 +16,16 @@ impl StickerId {
     /// # Errors
     ///
     /// Returns [`Error::Http`] if the current user lacks permission.
+    /// It may also return [`Error::ExceededLimit`] if `audit_log_reason` is too long.
     ///
     /// [Manage Emojis and Stickers]: crate::model::permissions::Permissions::MANAGE_EMOJIS_AND_STICKERS
-    pub async fn delete(&self, http: impl AsRef<Http>, guild_id: impl Into<GuildId>) -> Result<()> {
-        guild_id.into().delete_sticker(http, self).await
+    pub async fn delete(
+        &self,
+        http: impl AsRef<Http>,
+        guild_id: impl Into<GuildId>,
+        audit_log_reason: Option<&str>,
+    ) -> Result<()> {
+        guild_id.into().delete_sticker(http, self, audit_log_reason).await
     }
 
     /// Requests the sticker via the REST API to get a [`Sticker`] with all
@@ -41,6 +47,7 @@ impl StickerId {
     ///
     /// Returns [`Error::Http`] if the current user lacks permission,
     /// or if invalid edits are given.
+    /// It may also return [`Error::ExceededLimit`] if `audit_log_reason` is too long.
     ///
     /// [Manage Emojis and Stickers]: crate::model::permissions::Permissions::MANAGE_EMOJIS_AND_STICKERS
     pub async fn edit<F>(
@@ -48,10 +55,11 @@ impl StickerId {
         http: impl AsRef<Http>,
         guild_id: impl Into<GuildId>,
         f: F,
+        audit_log_reason: Option<&str>,
     ) -> Result<Sticker>
     where
         F: FnOnce(&mut EditSticker) -> &mut EditSticker,
     {
-        guild_id.into().edit_sticker(http, self, f).await
+        guild_id.into().edit_sticker(http, self, f, audit_log_reason).await
     }
 }

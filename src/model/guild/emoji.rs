@@ -110,14 +110,30 @@ impl Emoji {
     ///
     /// Returns [`Error::Http`] if the current user lacks permission,
     /// or if an invalid name is given.
+    /// It may also return [`Error::ExceededLimit`] if `audit_log_reason` is too long.
     ///
     /// [Manage Emojis and Stickers]: crate::model::permissions::Permissions::MANAGE_EMOJIS_AND_STICKERS
     #[cfg(feature = "cache")]
-    pub async fn edit(&mut self, cache_http: impl CacheHttp, name: &str) -> Result<()> {
+    pub async fn edit(
+        &mut self,
+        cache_http: impl CacheHttp,
+        name: &str,
+        audit_log_reason: Option<&str>,
+    ) -> Result<()> {
+        match audit_log_reason {
+            Some(reason) if reason.len() > 512 => {
+                return Err(Error::ExceededLimit(reason.to_string(), 512));
+            },
+            _ => {},
+        }
+
         let guild_id = self.try_find_guild_id(&cache_http)?;
         let map = json!({ "name": name });
 
-        *self = cache_http.http().edit_emoji(guild_id.get(), self.id.get(), &map, None).await?;
+        *self = cache_http
+            .http()
+            .edit_emoji(guild_id.get(), self.id.get(), &map, audit_log_reason)
+            .await?;
 
         Ok(())
     }

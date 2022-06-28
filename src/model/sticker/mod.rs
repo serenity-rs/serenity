@@ -67,12 +67,17 @@ impl Sticker {
     ///
     /// Returns [`Error::Http`] if the current user lacks permission
     /// to delete the sticker.
+    /// It may also return [`Error::ExceededLimit`] if `audit_log_reason` is too long.
     ///
     /// [Manage Emojis and Stickers]: crate::model::permissions::Permissions::MANAGE_EMOJIS_AND_STICKERS
     #[inline]
-    pub async fn delete(&self, http: impl AsRef<Http>) -> Result<()> {
+    pub async fn delete(
+        &self,
+        http: impl AsRef<Http>,
+        audit_log_reason: Option<&str>,
+    ) -> Result<()> {
         if let Some(guild_id) = self.guild_id {
-            guild_id.delete_sticker(&http, self.id).await
+            guild_id.delete_sticker(&http, self.id, audit_log_reason).await
         } else {
             Err(Error::Model(ModelError::DeleteNitroSticker))
         }
@@ -93,16 +98,22 @@ impl Sticker {
     /// # Errors
     ///
     /// Returns [`Error::Http`] if the current user lacks permission.
+    /// It may also return [`Error::ExceededLimit`] if `audit_log_reason` is too long.
     ///
     /// [`Error::Http`]: crate::error::Error::Http
     /// [Manage Emojis and Stickers]: crate::model::permissions::Permissions::MANAGE_EMOJIS_AND_STICKERS
     #[inline]
-    pub async fn edit<F>(&self, http: impl AsRef<Http>, f: F) -> Result<Sticker>
+    pub async fn edit<F>(
+        &self,
+        http: impl AsRef<Http>,
+        f: F,
+        audit_log_reason: Option<&str>,
+    ) -> Result<Sticker>
     where
         F: FnOnce(&mut EditSticker) -> &mut EditSticker,
     {
         if let Some(guild_id) = self.guild_id {
-            guild_id.edit_sticker(&http, self.id, f).await
+            guild_id.edit_sticker(&http, self.id, f, audit_log_reason).await
         } else {
             Err(Error::Model(ModelError::DeleteNitroSticker))
         }

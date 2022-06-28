@@ -107,6 +107,7 @@ impl Member {
     ///
     /// Returns [`Error::Http`] if the current user lacks permission,
     /// or if a role with the given Id does not exist.
+    /// It may also return [`Error::ExceededLimit`] if `audit_log_reason` is too long.
     ///
     /// [Manage Roles]: Permissions::MANAGE_ROLES
     #[inline]
@@ -114,18 +115,36 @@ impl Member {
         &mut self,
         http: impl AsRef<Http>,
         role_id: impl Into<RoleId>,
+        audit_log_reason: Option<&str>,
     ) -> Result<()> {
-        self._add_role(&http, role_id.into()).await
+        self._add_role(&http, role_id.into(), audit_log_reason).await
     }
 
-    async fn _add_role(&mut self, http: impl AsRef<Http>, role_id: RoleId) -> Result<()> {
+    async fn _add_role(
+        &mut self,
+        http: impl AsRef<Http>,
+        role_id: RoleId,
+        audit_log_reason: Option<&str>,
+    ) -> Result<()> {
+        match audit_log_reason {
+            Some(reason) if reason.len() > 512 => {
+                return Err(Error::ExceededLimit(reason.to_string(), 512));
+            },
+            _ => {},
+        }
+
         if self.roles.contains(&role_id) {
             return Ok(());
         }
 
         match http
             .as_ref()
-            .add_member_role(self.guild_id.get(), self.user.id.get(), role_id.get(), None)
+            .add_member_role(
+                self.guild_id.get(),
+                self.user.id.get(),
+                role_id.get(),
+                audit_log_reason,
+            )
             .await
         {
             Ok(()) => {
@@ -146,13 +165,21 @@ impl Member {
     ///
     /// Returns [`Error::Http`] if the current user lacks permission,
     /// or if a role with a given Id does not exist.
+    /// It may also return [`Error::ExceededLimit`] if `audit_log_reason` is too long.
     ///
     /// [Manage Roles]: Permissions::MANAGE_ROLES
     pub async fn add_roles(
         &mut self,
         http: impl AsRef<Http>,
         role_ids: &[RoleId],
+        audit_log_reason: Option<&str>,
     ) -> Result<Vec<RoleId>> {
+        match audit_log_reason {
+            Some(reason) if reason.len() > 512 => {
+                return Err(Error::ExceededLimit(reason.to_string(), 512));
+            },
+            _ => {},
+        }
         self.roles.extend_from_slice(role_ids);
 
         let mut builder = EditMember::default();
@@ -160,7 +187,7 @@ impl Member {
 
         match http
             .as_ref()
-            .edit_member(self.guild_id.get(), self.user.id.get(), &builder, None)
+            .edit_member(self.guild_id.get(), self.user.id.get(), &builder, audit_log_reason)
             .await
         {
             Ok(member) => Ok(member.roles),
@@ -253,6 +280,7 @@ impl Member {
     ///
     /// Returns [`Error::Http`] if the current user lacks permission or if `time` is greater than
     /// 28 days from the current time.
+    /// It may also return [`Error::ExceededLimit`] if `audit_log_reason` is too long.
     ///
     /// [Moderate Members]: Permissions::MODERATE_MEMBERS
     #[doc(alias = "timeout")]
@@ -260,12 +288,16 @@ impl Member {
         &mut self,
         http: impl AsRef<Http>,
         time: Timestamp,
+        audit_log_reason: Option<&str>,
     ) -> Result<()> {
         match self
             .guild_id
-            .edit_member(http, self.user.id, |member| {
-                member.disable_communication_until_datetime(time)
-            })
+            .edit_member(
+                http,
+                self.user.id,
+                |member| member.disable_communication_until_datetime(time),
+                audit_log_reason,
+            )
             .await
         {
             Ok(_) => {
@@ -300,11 +332,17 @@ impl Member {
     /// # Errors
     ///
     /// Returns [`Error::Http`] if the current user lacks necessary permissions.
-    pub async fn edit<F>(&self, http: impl AsRef<Http>, f: F) -> Result<Member>
+    /// It may also return [`Error::ExceededLimit`] if `audit_log_reason` is too long.
+    pub async fn edit<F>(
+        &self,
+        http: impl AsRef<Http>,
+        f: F,
+        audit_log_reason: Option<&str>,
+    ) -> Result<Member>
     where
         F: FnOnce(&mut EditMember) -> &mut EditMember,
     {
-        self.guild_id.edit_member(http, self.user.id, f).await
+        self.guild_id.edit_member(http, self.user.id, f, audit_log_reason).await
     }
 
     /// Allow a user to communicate, removing their timeout, if there is one.
@@ -314,11 +352,19 @@ impl Member {
     /// # Errors
     ///
     /// Returns [`Error::Http`] if the current user lacks permission.
+    /// It may also return [`Error::ExceededLimit`] if `audit_log_reason` is too long.
     ///
     /// [Moderate Members]: Permissions::MODERATE_MEMBERS
     #[doc(alias = "timeout")]
-    pub async fn enable_communication(&mut self, http: impl AsRef<Http>) -> Result<()> {
-        match self.guild_id.edit_member(&http, self.user.id, EditMember::enable_communication).await
+    pub async fn enable_communication(
+        &mut self,
+        http: impl AsRef<Http>,
+        audit_log_reason: Option<&str>,
+    ) -> Result<()> {
+        match self
+            .guild_id
+            .edit_member(&http, self.user.id, EditMember::enable_communication, audit_log_reason)
+            .await
         {
             Ok(_) => {
                 self.communication_disabled_until = None;
@@ -457,14 +503,16 @@ impl Member {
     ///
     /// Returns [`Error::Http`] if the member is not currently in a
     /// voice channel, or if the current user lacks permission.
+    /// It may also return [`Error::ExceededLimit`] if `audit_log_reason` is too long.
     ///
     /// [Move Members]: Permissions::MOVE_MEMBERS
     pub async fn move_to_voice_channel(
         &self,
         http: impl AsRef<Http>,
         channel: impl Into<ChannelId>,
+        audit_log_reason: Option<&str>,
     ) -> Result<Member> {
-        self.guild_id.move_member(http, self.user.id, channel).await
+        self.guild_id.move_member(http, self.user.id, channel, audit_log_reason).await
     }
 
     /// Disconnects the member from their voice channel if any.
@@ -475,10 +523,15 @@ impl Member {
     ///
     /// Returns [`Error::Http`] if the member is not currently in a
     /// voice channel, or if the current user lacks permission.
+    /// It may also return [`Error::ExceededLimit`] if `audit_log_reason` is too long.
     ///
     /// [Move Members]: Permissions::MOVE_MEMBERS
-    pub async fn disconnect_from_voice(&self, http: impl AsRef<Http>) -> Result<Member> {
-        self.guild_id.disconnect_member(http, self.user.id).await
+    pub async fn disconnect_from_voice(
+        &self,
+        http: impl AsRef<Http>,
+        audit_log_reason: Option<&str>,
+    ) -> Result<Member> {
+        self.guild_id.disconnect_member(http, self.user.id, audit_log_reason).await
     }
 
     /// Returns the guild-level permissions for the member.
@@ -515,13 +568,22 @@ impl Member {
     ///
     /// Returns [`Error::Http`] if a role with the given Id does not exist,
     /// or if the current user lacks permission.
+    /// It may also return [`Error::ExceededLimit`] if `audit_log_reason` is too long.
     ///
     /// [Manage Roles]: Permissions::MANAGE_ROLES
     pub async fn remove_role(
         &mut self,
         http: impl AsRef<Http>,
         role_id: impl Into<RoleId>,
+        audit_log_reason: Option<&str>,
     ) -> Result<()> {
+        match audit_log_reason {
+            Some(reason) if reason.len() > 512 => {
+                return Err(Error::ExceededLimit(reason.to_string(), 512));
+            },
+            _ => {},
+        }
+
         let role_id = role_id.into();
 
         if !self.roles.contains(&role_id) {
@@ -530,7 +592,12 @@ impl Member {
 
         match http
             .as_ref()
-            .remove_member_role(self.guild_id.get(), self.user.id.get(), role_id.get(), None)
+            .remove_member_role(
+                self.guild_id.get(),
+                self.user.id.get(),
+                role_id.get(),
+                audit_log_reason,
+            )
             .await
         {
             Ok(()) => {
@@ -551,13 +618,22 @@ impl Member {
     ///
     /// Returns [`Error::Http`] if a role with a given Id does not exist,
     /// or if the current user lacks permission.
+    /// It may also return [`Error::ExceededLimit`] if `audit_log_reason` is too long.
     ///
     /// [Manage Roles]: Permissions::MANAGE_ROLES
     pub async fn remove_roles(
         &mut self,
         http: impl AsRef<Http>,
         role_ids: &[RoleId],
+        audit_log_reason: Option<&str>,
     ) -> Result<Vec<RoleId>> {
+        match audit_log_reason {
+            Some(reason) if reason.len() > 512 => {
+                return Err(Error::ExceededLimit(reason.to_string(), 512));
+            },
+            _ => {},
+        }
+
         self.roles.retain(|r| !role_ids.contains(r));
 
         let mut builder = EditMember::default();
@@ -565,7 +641,7 @@ impl Member {
 
         match http
             .as_ref()
-            .edit_member(self.guild_id.get(), self.user.id.get(), &builder, None)
+            .edit_member(self.guild_id.get(), self.user.id.get(), &builder, audit_log_reason)
             .await
         {
             Ok(member) => Ok(member.roles),
@@ -604,11 +680,23 @@ impl Member {
     ///
     /// If the `cache` is enabled, returns a [`ModelError::InvalidPermissions`]
     /// if the current user does not have permission to perform bans.
+    /// It may also return [`Error::ExceededLimit`] if `audit_log_reason` is too long.
     ///
     /// [Ban Members]: Permissions::BAN_MEMBERS
     #[inline]
-    pub async fn unban(&self, http: impl AsRef<Http>) -> Result<()> {
-        http.as_ref().remove_ban(self.guild_id.get(), self.user.id.get(), None).await
+    pub async fn unban(
+        &self,
+        http: impl AsRef<Http>,
+        audit_log_reason: Option<&str>,
+    ) -> Result<()> {
+        match audit_log_reason {
+            Some(reason) if reason.len() > 512 => {
+                return Err(Error::ExceededLimit(reason.to_string(), 512));
+            },
+            _ => {},
+        }
+
+        http.as_ref().remove_ban(self.guild_id.get(), self.user.id.get(), audit_log_reason).await
     }
 
     /// Returns the formatted URL of the member's per guild avatar, if one exists.

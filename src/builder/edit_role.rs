@@ -35,7 +35,8 @@ use crate::utils::encode_image;
 /// #
 /// // assuming a `channel_id` and `guild_id` has been bound
 ///
-/// let role = guild_id.create_role(&http, |r| r.hoist(true).mentionable(true).name("a test role"));
+/// let role =
+///     guild_id.create_role(&http, |r| r.hoist(true).mentionable(true).name("a test role"), None);
 /// ```
 ///
 /// [`PartialGuild::create_role`]: crate::model::guild::PartialGuild::create_role

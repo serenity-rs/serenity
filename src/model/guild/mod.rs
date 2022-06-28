@@ -582,6 +582,7 @@ impl Guild {
         &self,
         cache_http: impl CacheHttp,
         f: impl FnOnce(&mut CreateChannel) -> &mut CreateChannel,
+        audit_log_reason: Option<&str>,
     ) -> Result<GuildChannel> {
         #[cfg(feature = "cache")]
         {
@@ -594,7 +595,7 @@ impl Guild {
             }
         }
 
-        self.id.create_channel(cache_http.http(), f).await
+        self.id.create_channel(cache_http.http(), f, audit_log_reason).await
     }
 
     /// Creates an emoji in the guild with a name and base64-encoded image. The
@@ -626,8 +627,9 @@ impl Guild {
         http: impl AsRef<Http>,
         name: &str,
         image: &str,
+        audit_log_reason: Option<&str>,
     ) -> Result<Emoji> {
-        self.id.create_emoji(&http, name, image).await
+        self.id.create_emoji(&http, name, image, audit_log_reason).await
     }
 
     /// Creates an integration for the guild.
@@ -645,8 +647,9 @@ impl Guild {
         http: impl AsRef<Http>,
         integration_id: impl Into<IntegrationId>,
         kind: &str,
+        audit_log_reason: Option<&str>,
     ) -> Result<()> {
-        self.id.create_integration(&http, integration_id, kind).await
+        self.id.create_integration(&http, integration_id, kind, audit_log_reason).await
     }
 
     /// Creates a guild specific [`Command`]
@@ -852,7 +855,12 @@ impl Guild {
     /// not have permission.
     ///
     /// [Manage Roles]: Permissions::MANAGE_ROLES
-    pub async fn create_role<F>(&self, cache_http: impl CacheHttp, f: F) -> Result<Role>
+    pub async fn create_role<F>(
+        &self,
+        cache_http: impl CacheHttp,
+        f: F,
+        audit_log_reason: Option<&str>,
+    ) -> Result<Role>
     where
         F: FnOnce(&mut EditRole) -> &mut EditRole,
     {
@@ -867,7 +875,7 @@ impl Guild {
             }
         }
 
-        self.id.create_role(cache_http.http(), f).await
+        self.id.create_role(cache_http.http(), f, audit_log_reason).await
     }
 
     /// Creates a new scheduled event in the guild with the data set, if any.
@@ -886,6 +894,7 @@ impl Guild {
         &self,
         cache_http: impl CacheHttp,
         f: F,
+        audit_log_reason: Option<&str>,
     ) -> Result<ScheduledEvent>
     where
         F: FnOnce(&mut CreateScheduledEvent) -> &mut CreateScheduledEvent,
@@ -901,7 +910,7 @@ impl Guild {
             }
         }
 
-        self.id.create_scheduled_event(cache_http.http(), f).await
+        self.id.create_scheduled_event(cache_http.http(), f, audit_log_reason).await
     }
 
     /// Creates a new sticker in the guild with the data set, if any.
@@ -914,7 +923,12 @@ impl Guild {
     /// if the current user does not have permission to manage roles.
     ///
     /// [Manage Emojis and Stickers]: crate::model::permissions::Permissions::MANAGE_EMOJIS_AND_STICKERS
-    pub async fn create_sticker<'a, F>(&self, cache_http: impl CacheHttp, f: F) -> Result<Sticker>
+    pub async fn create_sticker<'a, F>(
+        &self,
+        cache_http: impl CacheHttp,
+        f: F,
+        audit_log_reason: Option<&str>,
+    ) -> Result<Sticker>
     where
         for<'b> F: FnOnce(&'b mut CreateSticker<'a>) -> &'b mut CreateSticker<'a>,
     {
@@ -929,7 +943,7 @@ impl Guild {
             }
         }
 
-        self.id.create_sticker(cache_http.http(), f).await
+        self.id.create_sticker(cache_http.http(), f, audit_log_reason).await
     }
 
     /// Deletes the current guild if the current user is the owner of the
@@ -1052,8 +1066,9 @@ impl Guild {
         &self,
         http: impl AsRef<Http>,
         sticker_id: impl Into<StickerId>,
+        audit_log_reason: Option<&str>,
     ) -> Result<()> {
-        self.id.delete_sticker(&http, sticker_id).await
+        self.id.delete_sticker(&http, sticker_id, audit_log_reason).await
     }
 
     /// Edits the current guild with new data where specified.
@@ -1086,7 +1101,12 @@ impl Guild {
     /// permission.
     ///
     /// [Manage Guild]: Permissions::MANAGE_GUILD
-    pub async fn edit<F>(&mut self, cache_http: impl CacheHttp, f: F) -> Result<()>
+    pub async fn edit<F>(
+        &mut self,
+        cache_http: impl CacheHttp,
+        f: F,
+        audit_log_reason: Option<&str>,
+    ) -> Result<()>
     where
         F: FnOnce(&mut EditGuild) -> &mut EditGuild,
     {
@@ -1101,7 +1121,7 @@ impl Guild {
             }
         }
 
-        match self.id.edit(cache_http.http(), f).await {
+        match self.id.edit(cache_http.http(), f, audit_log_reason).await {
             Ok(guild) => {
                 self.afk_channel_id = guild.afk_channel_id;
                 self.afk_timeout = guild.afk_timeout;
@@ -1141,8 +1161,9 @@ impl Guild {
         http: impl AsRef<Http>,
         emoji_id: impl Into<EmojiId>,
         name: &str,
+        audit_log_reason: Option<&str>,
     ) -> Result<Emoji> {
-        self.id.edit_emoji(&http, emoji_id, name).await
+        self.id.edit_emoji(&http, emoji_id, name, audit_log_reason).await
     }
 
     /// Edits the properties of member of the guild, such as muting or
@@ -1170,11 +1191,12 @@ impl Guild {
         http: impl AsRef<Http>,
         user_id: impl Into<UserId>,
         f: F,
+        audit_log_reason: Option<&str>,
     ) -> Result<Member>
     where
         F: FnOnce(&mut EditMember) -> &mut EditMember,
     {
-        self.id.edit_member(&http, user_id, f).await
+        self.id.edit_member(&http, user_id, f, audit_log_reason).await
     }
 
     /// Edits the current user's nickname for the guild.
@@ -1235,11 +1257,12 @@ impl Guild {
         http: impl AsRef<Http>,
         role_id: impl Into<RoleId>,
         f: F,
+        audit_log_reason: Option<&str>,
     ) -> Result<Role>
     where
         F: FnOnce(&mut EditRole) -> &mut EditRole,
     {
-        self.id.edit_role(&http, role_id, f).await
+        self.id.edit_role(&http, role_id, f, audit_log_reason).await
     }
 
     /// Edits the order of [`Role`]s
@@ -1266,8 +1289,9 @@ impl Guild {
         http: impl AsRef<Http>,
         role_id: impl Into<RoleId>,
         position: u64,
+        audit_log_reason: Option<&str>,
     ) -> Result<Vec<Role>> {
-        self.id.edit_role_position(&http, role_id, position).await
+        self.id.edit_role_position(&http, role_id, position, audit_log_reason).await
     }
 
     /// Modifies a scheduled event in the guild with the data set, if any.
@@ -1287,11 +1311,12 @@ impl Guild {
         http: impl AsRef<Http>,
         event_id: impl Into<ScheduledEventId>,
         f: F,
+        audit_log_reason: Option<&str>,
     ) -> Result<ScheduledEvent>
     where
         F: FnOnce(&mut EditScheduledEvent) -> &mut EditScheduledEvent,
     {
-        self.id.edit_scheduled_event(&http, event_id, f).await
+        self.id.edit_scheduled_event(&http, event_id, f, audit_log_reason).await
     }
 
     /// Edits a sticker, optionally setting its fields.
@@ -1318,11 +1343,12 @@ impl Guild {
         http: impl AsRef<Http>,
         sticker_id: impl Into<StickerId>,
         f: F,
+        audit_log_reason: Option<&str>,
     ) -> Result<Sticker>
     where
         F: FnOnce(&mut EditSticker) -> &mut EditSticker,
     {
-        self.id.edit_sticker(&http, sticker_id, f).await
+        self.id.edit_sticker(&http, sticker_id, f, audit_log_reason).await
     }
 
     /// Edits the [`GuildWelcomeScreen`].
@@ -2032,8 +2058,9 @@ impl Guild {
         http: impl AsRef<Http>,
         user_id: impl Into<UserId>,
         channel_id: impl Into<ChannelId>,
+        audit_log_reason: Option<&str>,
     ) -> Result<Member> {
-        self.id.move_member(&http, user_id, channel_id).await
+        self.id.move_member(&http, user_id, channel_id, audit_log_reason).await
     }
 
     /// Calculate a [`Member`]'s permissions in a given channel in the guild.
@@ -2472,7 +2499,12 @@ impl Guild {
     /// [Kick Members]: Permissions::KICK_MEMBERS
     /// [`Error::Http`]: crate::error::Error::Http
     /// [`Error::Json`]: crate::error::Error::Json
-    pub async fn start_prune(&self, cache_http: impl CacheHttp, days: u8) -> Result<GuildPrune> {
+    pub async fn start_prune(
+        &self,
+        cache_http: impl CacheHttp,
+        days: u8,
+        audit_log_reason: Option<&str>,
+    ) -> Result<GuildPrune> {
         #[cfg(feature = "cache")]
         {
             if cache_http.cache().is_some() {
@@ -2484,7 +2516,7 @@ impl Guild {
             }
         }
 
-        self.id.start_prune(cache_http.http(), days).await
+        self.id.start_prune(cache_http.http(), days, audit_log_reason).await
     }
 
     /// Unbans the given [`User`] from the guild.
@@ -2505,6 +2537,7 @@ impl Guild {
         &self,
         cache_http: impl CacheHttp,
         user_id: impl Into<UserId>,
+        audit_log_reason: Option<&str>,
     ) -> Result<()> {
         #[cfg(feature = "cache")]
         {
@@ -2517,7 +2550,7 @@ impl Guild {
             }
         }
 
-        self.id.unban(&cache_http.http(), user_id).await
+        self.id.unban(&cache_http.http(), user_id, audit_log_reason).await
     }
 
     /// Retrieve's the guild's vanity URL.

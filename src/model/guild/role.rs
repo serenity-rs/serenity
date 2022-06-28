@@ -162,6 +162,7 @@ impl Role {
     ///
     /// Returns [`Error::Http`] if the current user does not
     /// have permission to Manage Roles.
+    /// It may also return [`Error::ExceededLimit`] if `audit_log_reason` is too long.
     ///
     /// [Manage Roles]: Permissions::MANAGE_ROLES
     #[inline]
@@ -169,8 +170,9 @@ impl Role {
         &self,
         http: impl AsRef<Http>,
         f: impl FnOnce(&mut EditRole) -> &mut EditRole,
+        audit_log_reason: Option<&str>,
     ) -> Result<Role> {
-        self.guild_id.edit_role(http, self.id, f).await
+        self.guild_id.edit_role(http, self.id, f, audit_log_reason).await
     }
 
     /// Check that the role has the given permission.

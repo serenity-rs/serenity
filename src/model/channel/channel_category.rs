@@ -105,7 +105,7 @@ impl ChannelCategory {
     /// #     use serenity::model::id::ChannelId;
     /// #     let http = Http::new("token");
     /// #     let category = ChannelId::new(1234);
-    /// category.edit(&http, |c| c.name("test").bitrate(86400)).await;
+    /// category.edit(&http, |c| c.name("test").bitrate(86400), None).await;
     /// # }
     /// ```
     ///
@@ -113,40 +113,55 @@ impl ChannelCategory {
     ///
     /// Returns [`Error::Http`] if an invalid value is set,
     /// or if the current user lacks the necessary permissions.
+    /// It may also return [`Error::ExceededLimit`] if `audit_log_reason` is too long.
     ///
     /// [Manage Channels]: Permissions::MANAGE_CHANNELS
     /// [Manage Roles]: Permissions::MANAGE_ROLES
-    pub async fn edit<F>(&mut self, cache_http: impl CacheHttp, f: F) -> Result<()>
+    pub async fn edit<F>(
+        &mut self,
+        cache_http: impl CacheHttp,
+        f: F,
+        audit_log_reason: Option<&str>,
+    ) -> Result<()>
     where
         F: FnOnce(&mut EditChannel) -> &mut EditChannel,
     {
+        match audit_log_reason {
+            Some(reason) if reason.len() > 512 => {
+                return Err(Error::ExceededLimit(reason.to_string(), 512));
+            },
+            _ => {},
+        }
+
         let mut edit_channel = EditChannel::default();
         f(&mut edit_channel);
 
-        cache_http.http().edit_channel(self.id.get(), &edit_channel, None).await.map(|channel| {
-            let GuildChannel {
-                id,
-                guild_id,
-                parent_id,
-                position,
-                kind,
-                name,
-                nsfw,
-                permission_overwrites,
-                ..
-            } = channel;
+        cache_http.http().edit_channel(self.id.get(), &edit_channel, audit_log_reason).await.map(
+            |channel| {
+                let GuildChannel {
+                    id,
+                    guild_id,
+                    parent_id,
+                    position,
+                    kind,
+                    name,
+                    nsfw,
+                    permission_overwrites,
+                    ..
+                } = channel;
 
-            *self = ChannelCategory {
-                id,
-                guild_id,
-                parent_id,
-                position,
-                kind,
-                name,
-                nsfw,
-                permission_overwrites,
-            };
-        })
+                *self = ChannelCategory {
+                    id,
+                    guild_id,
+                    parent_id,
+                    position,
+                    kind,
+                    name,
+                    nsfw,
+                    permission_overwrites,
+                };
+            },
+        )
     }
 
     #[inline]

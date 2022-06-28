@@ -33,7 +33,7 @@ use crate::model::invite::InviteTargetType;
 ///             };
 ///
 ///             let creation =
-///                 channel.create_invite(&context, |i| i.max_age(3600).max_uses(10)).await;
+///                 channel.create_invite(&context, |i| i.max_age(3600).max_uses(10), None).await;
 ///
 ///             let invite = match creation {
 ///                 Ok(invite) => invite,
@@ -106,7 +106,7 @@ impl CreateInvite {
     /// # async fn example(context: &Context) -> CommandResult {
     /// #     let channel = context.cache.guild_channel(81384788765712384).unwrap().clone();
     /// #
-    /// let invite = channel.create_invite(context, |i| i.max_age(3600)).await?;
+    /// let invite = channel.create_invite(context, |i| i.max_age(3600), None).await?;
     /// #     Ok(())
     /// # }
     /// ```
@@ -137,7 +137,7 @@ impl CreateInvite {
     /// # async fn example(context: &Context) -> CommandResult {
     /// #     let channel = context.cache.guild_channel(81384788765712384).unwrap().clone();
     /// #
-    /// let invite = channel.create_invite(context, |i| i.max_uses(5)).await?;
+    /// let invite = channel.create_invite(context, |i| i.max_uses(5), None).await?;
     /// #     Ok(())
     /// # }
     /// ```
@@ -166,7 +166,7 @@ impl CreateInvite {
     /// # async fn example(context: &Context) -> CommandResult {
     /// #     let channel = context.cache.guild_channel(81384788765712384).unwrap().clone();
     /// #
-    /// let invite = channel.create_invite(context, |i| i.temporary(true)).await?;
+    /// let invite = channel.create_invite(context, |i| i.temporary(true), None).await?;
     /// #     Ok(())
     /// # }
     /// #
@@ -197,7 +197,7 @@ impl CreateInvite {
     /// # async fn example(context: &Context) -> CommandResult {
     /// #     let channel = context.cache.guild_channel(81384788765712384).unwrap().clone();
     /// #
-    /// let invite = channel.create_invite(context, |i| i.unique(true)).await?;
+    /// let invite = channel.create_invite(context, |i| i.unique(true), None).await?;
     /// #     Ok(())
     /// # }
     /// ```

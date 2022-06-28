@@ -176,16 +176,29 @@ impl GuildChannel {
     ///
     /// If the `cache` is enabled, returns [`ModelError::InvalidPermissions`]
     /// if the current user does not have permission to create invites.
+    /// It may also return [`Error::ExceededLimit`] if `audit_log_reason` is too long.
     ///
     /// Otherwise returns [`Error::Http`] if the current user lacks permission.
     ///
     /// [Create Instant Invite]: Permissions::CREATE_INSTANT_INVITE
     #[inline]
     #[cfg(feature = "utils")]
-    pub async fn create_invite<F>(&self, cache_http: impl CacheHttp, f: F) -> Result<RichInvite>
+    pub async fn create_invite<F>(
+        &self,
+        cache_http: impl CacheHttp,
+        f: F,
+        audit_log_reason: Option<&str>,
+    ) -> Result<RichInvite>
     where
         F: FnOnce(&mut CreateInvite) -> &mut CreateInvite,
     {
+        match audit_log_reason {
+            Some(reason) if reason.len() > 512 => {
+                return Err(Error::ExceededLimit(reason.to_string(), 512));
+            },
+            _ => {},
+        }
+
         #[cfg(feature = "cache")]
         {
             if let Some(cache) = cache_http.cache() {
@@ -198,7 +211,7 @@ impl GuildChannel {
             }
         }
 
-        self.id.create_invite(cache_http.http(), f).await
+        self.id.create_invite(cache_http.http(), f, audit_log_reason).await
     }
 
     /// Creates a [permission overwrite][`PermissionOverwrite`] for either a
@@ -405,12 +418,25 @@ impl GuildChannel {
     ///
     /// If the `cache` is enabled, returns [ModelError::InvalidPermissions]
     /// if the current user lacks permission to edit the channel.
+    /// It may also return [`Error::ExceededLimit`] if `audit_log_reason` is too long.
     ///
     /// Otherwise returns [`Error::Http`] if the current user lacks permission.
-    pub async fn edit<F>(&mut self, cache_http: impl CacheHttp, f: F) -> Result<()>
+    pub async fn edit<F>(
+        &mut self,
+        cache_http: impl CacheHttp,
+        f: F,
+        audit_log_reason: Option<&str>,
+    ) -> Result<()>
     where
         F: FnOnce(&mut EditChannel) -> &mut EditChannel,
     {
+        match audit_log_reason {
+            Some(reason) if reason.len() > 512 => {
+                return Err(Error::ExceededLimit(reason.to_string(), 512));
+            },
+            _ => {},
+        }
+
         #[cfg(feature = "cache")]
         {
             if let Some(cache) = cache_http.cache() {
@@ -426,7 +452,8 @@ impl GuildChannel {
         let mut edit_channel = EditChannel::default();
         f(&mut edit_channel);
 
-        *self = cache_http.http().edit_channel(self.id.get(), &edit_channel, None).await?;
+        *self =
+            cache_http.http().edit_channel(self.id.get(), &edit_channel, audit_log_reason).await?;
 
         Ok(())
     }
@@ -840,6 +867,7 @@ impl GuildChannel {
     ///
     /// Returns [`Error::Http`] if the current user lacks permission,
     /// or if the channel already has too many pinned messages.
+    /// It may also return [`Error::ExceededLimit`] if `audit_log_reason` is too long.
     ///
     /// [Manage Messages]: Permissions::MANAGE_MESSAGES
     #[inline]
@@ -847,8 +875,9 @@ impl GuildChannel {
         &self,
         http: impl AsRef<Http>,
         message_id: impl Into<MessageId>,
+        audit_log_reason: Option<&str>,
     ) -> Result<()> {
-        self.id.pin(&http, message_id).await
+        self.id.pin(&http, message_id, audit_log_reason).await
     }
 
     /// Gets all channel's pins.
@@ -1032,6 +1061,7 @@ impl GuildChannel {
     /// # Errors
     ///
     /// Returns [`Error::Http`] if the current user lacks permission.
+    /// It may also return [`Error::ExceededLimit`] if `audit_log_reason` is too long.
     ///
     /// [Manage Messages]: Permissions::MANAGE_MESSAGES
     #[inline]
@@ -1039,8 +1069,9 @@ impl GuildChannel {
         &self,
         http: impl AsRef<Http>,
         message_id: impl Into<MessageId>,
+        audit_log_reason: Option<&str>,
     ) -> Result<()> {
-        self.id.unpin(&http, message_id).await
+        self.id.unpin(&http, message_id, audit_log_reason).await
     }
 
     /// Retrieves the channel's webhooks.
@@ -1147,12 +1178,18 @@ impl GuildChannel {
     /// Returns a [`ModelError::NameTooLong`] if the name of the webhook is
     /// over the limit of 100 characters.
     /// Returns a [`ModelError::InvalidChannelType`] if the channel type is not text.
-    pub async fn create_webhook<F>(&self, http: impl AsRef<Http>, f: F) -> Result<Webhook>
+    /// It may also return [`Error::ExceededLimit`] if `audit_log_reason` is too long.
+    pub async fn create_webhook<F>(
+        &self,
+        http: impl AsRef<Http>,
+        f: F,
+        audit_log_reason: Option<&str>,
+    ) -> Result<Webhook>
     where
         F: FnOnce(&mut CreateWebhook) -> &mut CreateWebhook,
     {
         if self.is_text_based() {
-            self.id.create_webhook(&http, f).await
+            self.id.create_webhook(&http, f, audit_log_reason).await
         } else {
             Err(Error::Model(ModelError::InvalidChannelType))
         }
