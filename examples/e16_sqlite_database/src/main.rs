@@ -1,3 +1,6 @@
+// It is recommended that you read the README file, it is very important to this example.
+// This example will help us to use a sqlite database with our bot.
+
 use serenity::async_trait;
 use serenity::model::prelude::*;
 use serenity::prelude::*;
@@ -13,12 +16,14 @@ impl EventHandler for Bot {
 
         if let Some(task_description) = msg.content.strip_prefix("~todo add") {
             let task_description = task_description.trim();
+            // That's how we are going to use a sqlite command.
+            // We are inserting into the todo table, our task_description in task column and our user_id in user_Id column.
             sqlx::query!(
                 "INSERT INTO todo (task, user_id) VALUES (?, ?)",
                 task_description,
                 user_id,
             )
-            .execute(&self.database)
+            .execute(&self.database) // < Where the command will be executed
             .await
             .unwrap();
 
@@ -27,15 +32,17 @@ impl EventHandler for Bot {
         } else if let Some(task_index) = msg.content.strip_prefix("~todo remove") {
             let task_index = task_index.trim().parse::<i64>().unwrap() - 1;
 
+            // "SELECT" will return to "entry" the rowid of the todo rows where the user_Id column = user_id.
             let entry = sqlx::query!(
                 "SELECT rowid, task FROM todo WHERE user_id = ? ORDER BY rowid LIMIT 1 OFFSET ?",
                 user_id,
                 task_index,
             )
-            .fetch_one(&self.database)
+            .fetch_one(&self.database) // < Just one data will be sent to entry
             .await
             .unwrap();
 
+            // Every todo row with rowid column = entry.rowid will be deleted.
             sqlx::query!("DELETE FROM todo WHERE rowid = ?", entry.rowid)
                 .execute(&self.database)
                 .await
@@ -44,9 +51,9 @@ impl EventHandler for Bot {
             let response = format!("Successfully completed `{}`!", entry.task);
             msg.channel_id.say(&ctx, response).await.unwrap();
         } else if msg.content.trim() == "~todo list" {
-            let todos =
-                sqlx::query!("SELECT task FROM todo WHERE user_id = ? ORDER BY rowid", user_id)
-                    .fetch_all(&self.database)
+            // "SELECT" will return just the task of all rows where user_Id column = user_id in todo.
+            let todos = sqlx::query!("SELECT task FROM todo WHERE user_id = ? ORDER BY rowid", user_id)
+                    .fetch_all(&self.database) // < All matched data will be sent to todos
                     .await
                     .unwrap();
 
