@@ -642,13 +642,12 @@ impl Shard {
     /// # use std::sync::Arc;
     /// #
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
-    /// #     let mutex = Arc::new(Mutex::new("".to_string()));
     /// #     let shard_info = ShardInfo {
     /// #          id: 0,
     /// #          total: 1,
     /// #     };
     /// #
-    /// #     let mut shard = Shard::new(mutex.clone(), "", shard_info, GatewayIntents::all()).await?;
+    /// #     let mut shard = Shard::new("".to_string(), "", shard_info, GatewayIntents::all()).await?;
     /// #
     /// use serenity::model::id::GuildId;
     ///
@@ -669,13 +668,12 @@ impl Shard {
     /// # use std::sync::Arc;
     /// #
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
-    /// #     let mutex = Arc::new(Mutex::new("".to_string()));
-    /// #
     /// #     let shard_info = ShardInfo {
     /// #          id: 0,
     /// #          total: 1,
     /// #     };
-    /// #     let mut shard = Shard::new(mutex.clone(), "", shard_info, GatewayIntents::all()).await?;
+    /// #
+    /// #     let mut shard = Shard::new("".to_string(), "", shard_info, GatewayIntents::all()).await?;
     /// #
     /// use serenity::model::id::GuildId;
     ///

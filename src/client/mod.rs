@@ -586,7 +586,7 @@ pub struct Client {
     /// tokio::spawn(async move {
     ///     loop {
     ///         let sm = shard_manager.lock().await;
-    ///         let count = sm.shards_instantiated().await.len();
+    ///         let count = sm.shards_instantiated().len();
     ///         println!("Shard count instantiated: {}", count);
     ///
     ///         tokio::time::sleep(Duration::from_millis(5000)).await;
