@@ -690,8 +690,6 @@
 <span id="685">685</span>
 <span id="686">686</span>
 <span id="687">687</span>
-<span id="688">688</span>
-<span id="689">689</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::borrow::Cow</span>;
 <span class="kw">use</span> <span class="ident">std::sync::Arc</span>;
 
@@ -919,35 +917,33 @@
         }
 
         <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="ident">event</span> {
-            <span class="ident">Event::MessageCreate</span>(<span class="kw-2">ref</span> <span class="ident">msg_event</span>) =&gt; {
+            <span class="ident">Event::MessageCreate</span>(<span class="ident">msg_event</span>) =&gt; {
                 <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">msg</span> <span class="op">=</span> <span class="ident">LazyArc::new</span>(<span class="kw-2">&amp;</span><span class="ident">msg_event</span>.<span class="ident">message</span>);
                 <span class="ident">retain</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">message_filters</span>, <span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="ident">f</span>.<span class="ident">send_message</span>(<span class="kw-2">&amp;mut</span> <span class="ident">msg</span>));
             },
-            <span class="ident">Event::ReactionAdd</span>(<span class="kw-2">ref</span> <span class="ident">reaction_event</span>) =&gt; {
+            <span class="ident">Event::ReactionAdd</span>(<span class="ident">reaction_event</span>) =&gt; {
                 <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">reaction</span> <span class="op">=</span> <span class="ident">LazyReactionAction::new</span>(<span class="kw-2">&amp;</span><span class="ident">reaction_event</span>.<span class="ident">reaction</span>, <span class="bool-val">true</span>);
                 <span class="ident">retain</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">reaction_filters</span>, <span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="ident">f</span>.<span class="ident">send_reaction</span>(<span class="kw-2">&amp;mut</span> <span class="ident">reaction</span>));
             },
-            <span class="ident">Event::ReactionRemove</span>(<span class="kw-2">ref</span> <span class="ident">reaction_event</span>) =&gt; {
+            <span class="ident">Event::ReactionRemove</span>(<span class="ident">reaction_event</span>) =&gt; {
                 <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">reaction</span> <span class="op">=</span> <span class="ident">LazyReactionAction::new</span>(<span class="kw-2">&amp;</span><span class="ident">reaction_event</span>.<span class="ident">reaction</span>, <span class="bool-val">false</span>);
                 <span class="ident">retain</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">reaction_filters</span>, <span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="ident">f</span>.<span class="ident">send_reaction</span>(<span class="kw-2">&amp;mut</span> <span class="ident">reaction</span>));
             },
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;collector&quot;</span>)]</span>
-            <span class="ident">Event::InteractionCreate</span>(<span class="kw-2">ref</span> <span class="ident">interaction_event</span>) =&gt; {
-                <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="ident">interaction_event</span>.<span class="ident">interaction</span> {
-                    <span class="ident">Interaction::MessageComponent</span>(<span class="ident">interaction</span>) =&gt; {
-                        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">interaction</span> <span class="op">=</span> <span class="ident">LazyArc::new</span>(<span class="ident">interaction</span>);
-                        <span class="ident">retain</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">component_interaction_filters</span>, <span class="op">|</span><span class="ident">f</span><span class="op">|</span> {
-                            <span class="ident">f</span>.<span class="ident">send_interaction</span>(<span class="kw-2">&amp;mut</span> <span class="ident">interaction</span>)
-                        });
-                    },
-                    <span class="ident">Interaction::ModalSubmit</span>(<span class="ident">interaction</span>) =&gt; {
-                        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">interaction</span> <span class="op">=</span> <span class="ident">LazyArc::new</span>(<span class="ident">interaction</span>);
-                        <span class="ident">retain</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">modal_interaction_filters</span>, <span class="op">|</span><span class="ident">f</span><span class="op">|</span> {
-                            <span class="ident">f</span>.<span class="ident">send_interaction</span>(<span class="kw-2">&amp;mut</span> <span class="ident">interaction</span>)
-                        });
-                    },
-                    <span class="kw">_</span> =&gt; (),
-                }
+            <span class="ident">Event::InteractionCreate</span>(<span class="ident">interaction_event</span>) =&gt; <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="ident">interaction_event</span>.<span class="ident">interaction</span> {
+                <span class="ident">Interaction::MessageComponent</span>(<span class="ident">interaction</span>) =&gt; {
+                    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">interaction</span> <span class="op">=</span> <span class="ident">LazyArc::new</span>(<span class="ident">interaction</span>);
+                    <span class="ident">retain</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">component_interaction_filters</span>, <span class="op">|</span><span class="ident">f</span><span class="op">|</span> {
+                        <span class="ident">f</span>.<span class="ident">send_interaction</span>(<span class="kw-2">&amp;mut</span> <span class="ident">interaction</span>)
+                    });
+                },
+                <span class="ident">Interaction::ModalSubmit</span>(<span class="ident">interaction</span>) =&gt; {
+                    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">interaction</span> <span class="op">=</span> <span class="ident">LazyArc::new</span>(<span class="ident">interaction</span>);
+                    <span class="ident">retain</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">modal_interaction_filters</span>, <span class="op">|</span><span class="ident">f</span><span class="op">|</span> {
+                        <span class="ident">f</span>.<span class="ident">send_interaction</span>(<span class="kw-2">&amp;mut</span> <span class="ident">interaction</span>)
+                    });
+                },
+                <span class="kw">_</span> =&gt; (),
             },
             <span class="kw">_</span> =&gt; {},
         }
@@ -1182,18 +1178,18 @@
     <span class="attribute">#[<span class="ident">instrument</span>(<span class="ident">skip</span>(<span class="self">self</span>))]</span>
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">handle_voice_event</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">event</span>: <span class="kw-2">&amp;</span><span class="ident">Event</span>) {
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">voice_manager</span>) <span class="op">=</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">voice_manager</span> {
-            <span class="kw">match</span> <span class="kw-2">*</span><span class="ident">event</span> {
+            <span class="kw">match</span> <span class="ident">event</span> {
                 <span class="ident">Event::Ready</span>(<span class="kw">_</span>) =&gt; {
                     <span class="ident">voice_manager</span>
                         .<span class="ident">register_shard</span>(<span class="self">self</span>.<span class="ident">shard</span>.<span class="ident">shard_info</span>().<span class="ident">id</span>, <span class="self">self</span>.<span class="ident">runner_tx</span>.<span class="ident">clone</span>())
                         .<span class="kw">await</span>;
                 },
-                <span class="ident">Event::VoiceServerUpdate</span>(<span class="kw-2">ref</span> <span class="ident">event</span>) =&gt; {
+                <span class="ident">Event::VoiceServerUpdate</span>(<span class="ident">event</span>) =&gt; {
                     <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">guild_id</span>) <span class="op">=</span> <span class="ident">event</span>.<span class="ident">guild_id</span> {
                         <span class="ident">voice_manager</span>.<span class="ident">server_update</span>(<span class="ident">guild_id</span>, <span class="kw-2">&amp;</span><span class="ident">event</span>.<span class="ident">endpoint</span>, <span class="kw-2">&amp;</span><span class="ident">event</span>.<span class="ident">token</span>).<span class="kw">await</span>;
                     }
                 },
-                <span class="ident">Event::VoiceStateUpdate</span>(<span class="kw-2">ref</span> <span class="ident">event</span>) =&gt; {
+                <span class="ident">Event::VoiceStateUpdate</span>(<span class="ident">event</span>) =&gt; {
                     <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">guild_id</span>) <span class="op">=</span> <span class="ident">event</span>.<span class="ident">voice_state</span>.<span class="ident">guild_id</span> {
                         <span class="ident">voice_manager</span>.<span class="ident">state_update</span>(<span class="ident">guild_id</span>, <span class="kw-2">&amp;</span><span class="ident">event</span>.<span class="ident">voice_state</span>).<span class="kw">await</span>;
                     }

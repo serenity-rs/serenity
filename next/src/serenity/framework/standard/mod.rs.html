@@ -903,10 +903,6 @@
 <span id="898">898</span>
 <span id="899">899</span>
 <span id="900">900</span>
-<span id="901">901</span>
-<span id="902">902</span>
-<span id="903">903</span>
-<span id="904">904</span>
 </pre><pre class="rust"><code><span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">help_commands</span>;
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">macros</span> {
     <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">command_attr</span>::{<span class="ident">check</span>, <span class="ident">command</span>, <span class="ident">group</span>, <span class="ident">help</span>, <span class="ident">hook</span>};
@@ -1192,9 +1188,7 @@
             {
                 <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">buckets</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">buckets</span>.<span class="ident">lock</span>().<span class="kw">await</span>;
 
-                <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">bucket</span>) <span class="op">=</span>
-                    <span class="ident">command</span>.<span class="ident">bucket</span>.<span class="ident">as_ref</span>().<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">b</span><span class="op">|</span> <span class="ident">buckets</span>.<span class="ident">get_mut</span>(<span class="kw-2">*</span><span class="ident">b</span>))
-                {
+                <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">bucket</span>) <span class="op">=</span> <span class="ident">command</span>.<span class="ident">bucket</span>.<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">b</span><span class="op">|</span> <span class="ident">buckets</span>.<span class="ident">get_mut</span>(<span class="ident">b</span>)) {
                     <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">rate_limit_info</span>) <span class="op">=</span> <span class="ident">bucket</span>.<span class="ident">take</span>(<span class="ident">ctx</span>, <span class="ident">msg</span>).<span class="kw">await</span> {
                         <span class="ident">duration</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">rate_limit_info</span>.<span class="ident">action</span> {
                             <span class="ident">RateLimitAction::Cancelled</span> <span class="op">|</span> <span class="ident">RateLimitAction::FailedDelay</span> =&gt; {
@@ -1559,7 +1553,7 @@
             <span class="kw-2">&amp;mut</span> <span class="ident">stream</span>,
             <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">groups</span>,
             <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">config</span>,
-            <span class="self">self</span>.<span class="ident">help</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">h</span><span class="op">|</span> <span class="ident">h</span>.<span class="ident">options</span>.<span class="ident">names</span>),
+            <span class="self">self</span>.<span class="ident">help</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">h</span><span class="op">|</span> <span class="ident">h</span>.<span class="ident">options</span>.<span class="ident">names</span>),
         )
         .<span class="kw">await</span>;
 
@@ -1670,12 +1664,10 @@
                 <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> (<span class="ident">command</span>.<span class="ident">fun</span>)(<span class="kw-2">&amp;mut</span> <span class="ident">ctx</span>, <span class="kw-2">&amp;</span><span class="ident">msg</span>, <span class="ident">args</span>).<span class="kw">await</span>;
 
                 <span class="comment">// Check if the command wants to revert the bucket by giving back a ticket.</span>
-                <span class="kw">if</span> <span class="macro">matches!</span>(<span class="ident">res</span>, <span class="prelude-val">Err</span>(<span class="kw-2">ref</span> <span class="ident">e</span>) <span class="kw">if</span> <span class="ident">e</span>.<span class="ident">is</span>::<span class="op">&lt;</span><span class="ident">RevertBucket</span><span class="op">&gt;</span>()) {
+                <span class="kw">if</span> <span class="macro">matches!</span>(<span class="kw-2">&amp;</span><span class="ident">res</span>, <span class="prelude-val">Err</span>(<span class="ident">e</span>) <span class="kw">if</span> <span class="ident">e</span>.<span class="ident">is</span>::<span class="op">&lt;</span><span class="ident">RevertBucket</span><span class="op">&gt;</span>()) {
                     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">buckets</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">buckets</span>.<span class="ident">lock</span>().<span class="kw">await</span>;
 
-                    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">bucket</span>) <span class="op">=</span>
-                        <span class="ident">command</span>.<span class="ident">options</span>.<span class="ident">bucket</span>.<span class="ident">as_ref</span>().<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">b</span><span class="op">|</span> <span class="ident">buckets</span>.<span class="ident">get_mut</span>(<span class="kw-2">*</span><span class="ident">b</span>))
-                    {
+                    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">bucket</span>) <span class="op">=</span> <span class="ident">command</span>.<span class="ident">options</span>.<span class="ident">bucket</span>.<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">b</span><span class="op">|</span> <span class="ident">buckets</span>.<span class="ident">get_mut</span>(<span class="ident">b</span>)) {
                         <span class="ident">bucket</span>.<span class="ident">give</span>(<span class="kw-2">&amp;</span><span class="ident">ctx</span>, <span class="kw-2">&amp;</span><span class="ident">msg</span>).<span class="kw">await</span>;
                     }
                 }

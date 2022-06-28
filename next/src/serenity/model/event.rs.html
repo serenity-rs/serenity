@@ -1837,7 +1837,6 @@
 <span id="1832">1832</span>
 <span id="1833">1833</span>
 <span id="1834">1834</span>
-<span id="1835">1835</span>
 </pre><pre class="rust"><code><span class="doccomment">//! All the events this library handles.</span>
 
 <span class="kw">use</span> <span class="ident">std::collections::HashMap</span>;
@@ -2958,9 +2957,8 @@
             <span class="ident"><span class="self">Self</span>::ThreadMembersUpdate</span>, <span class="ident"><span class="self">Self</span>::ThreadMembersUpdate</span>(<span class="ident">e</span>) =&gt; {
                 <span class="ident">user_id</span>: <span class="ident">Multiple</span>(<span class="ident">e</span>.<span class="ident">added_members</span>
                         .<span class="ident">iter</span>()
-                        .<span class="ident">filter_map</span>(<span class="op">|</span><span class="ident">m</span><span class="op">|</span> <span class="ident">m</span>.<span class="ident">user_id</span>.<span class="ident">as_ref</span>())
-                        .<span class="ident">chain</span>(<span class="ident">e</span>.<span class="ident">removed_members_ids</span>.<span class="ident">iter</span>())
-                        .<span class="ident">copied</span>()
+                        .<span class="ident">filter_map</span>(<span class="op">|</span><span class="ident">m</span><span class="op">|</span> <span class="ident">m</span>.<span class="ident">user_id</span>)
+                        .<span class="ident">chain</span>(<span class="ident">e</span>.<span class="ident">removed_members_ids</span>.<span class="ident">iter</span>().<span class="ident">copied</span>())
                         .<span class="ident">collect</span>(),
                     ),
                 <span class="ident">guild_id</span>: <span class="prelude-val">Some</span>(<span class="ident">e</span>.<span class="ident">guild_id</span>),

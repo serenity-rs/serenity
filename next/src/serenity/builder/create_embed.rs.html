@@ -861,10 +861,10 @@
     <span class="doccomment">///                 let _ = channel</span>
     <span class="doccomment">///                     .send_message(&amp;context, |m| {</span>
     <span class="doccomment">///                         m.embed(|e| {</span>
-    <span class="doccomment">///                             if let Some(ref joined_at) = member.joined_at {</span>
+    <span class="doccomment">///                             if let Some(joined_at) = member.joined_at {</span>
     <span class="doccomment">///                                 e.timestamp(joined_at);</span>
     <span class="doccomment">///                             }</span>
-    <span class="doccomment">///                             e.author(|a| a.icon_url(&amp;user.face()).name(&amp;user.name))</span>
+    <span class="doccomment">///                             e.author(|a| a.icon_url(user.face()).name(&amp;user.name))</span>
     <span class="doccomment">///                                 .title(&quot;Member Join&quot;)</span>
     <span class="doccomment">///                         })</span>
     <span class="doccomment">///                     })</span>

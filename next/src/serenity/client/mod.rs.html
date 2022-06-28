@@ -1172,7 +1172,7 @@
     <span class="kw">where</span>
         <span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="kw-2">&amp;mut</span> <span class="ident">CacheSettings</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="ident">CacheSettings</span>,
     {
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">settings</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">cache_settings</span> {
+        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">settings</span>) <span class="op">=</span> <span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">cache_settings</span> {
             <span class="ident">f</span>(<span class="ident">settings</span>);
         }
 
