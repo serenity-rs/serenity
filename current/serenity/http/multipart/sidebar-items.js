@@ -1,1 +1,1 @@
-initSidebarItems({"struct":[["Multipart","Holder for multipart body. Contains files, multipart fields, and payload_json for creating requests with attachments."]]});
+window.SIDEBAR_ITEMS = {"struct":[["Multipart","Holder for multipart body. Contains files, multipart fields, and payload_json for creating requests with attachments."]]};

@@ -1,1 +1,1 @@
-initSidebarItems({"struct":[["EventCollector","An event collector receives events matching the given filter for a set duration."],["EventCollectorBuilder","Future building a stream of events."],["EventFilter","Filters events on the shard’s end and sends them to the collector."]]});
+window.SIDEBAR_ITEMS = {"struct":[["EventCollector","An event collector receives events matching the given filter for a set duration."],["EventCollectorBuilder","Future building a stream of events."],["EventFilter","Filters events on the shard’s end and sends them to the collector."]]};

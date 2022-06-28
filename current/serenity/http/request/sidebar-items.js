@@ -1,1 +1,1 @@
-initSidebarItems({"struct":[["Request",""],["RequestBuilder",""]]});
+window.SIDEBAR_ITEMS = {"struct":[["Request",""],["RequestBuilder",""]]};

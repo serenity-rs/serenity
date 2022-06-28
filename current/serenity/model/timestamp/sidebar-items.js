@@ -1,1 +1,1 @@
-initSidebarItems({"struct":[["InvalidTimestamp",""],["ParseError","Signifies the failure to parse the `Timestamp` from an RFC 3339 string."],["Timestamp","Representation of a Unix timestamp."]]});
+window.SIDEBAR_ITEMS = {"struct":[["InvalidTimestamp",""],["ParseError","Signifies the failure to parse the `Timestamp` from an RFC 3339 string."],["Timestamp","Representation of a Unix timestamp."]]};

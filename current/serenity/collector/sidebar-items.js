@@ -1,1 +1,1 @@
-initSidebarItems({"enum":[["CollectorError","An error that occurred while working with a collector."]],"mod":[["component_interaction_collector",""],["event_collector",""],["message_collector",""],["modal_interaction_collector",""],["reaction_collector",""]]});
+window.SIDEBAR_ITEMS = {"enum":[["CollectorError","An error that occurred while working with a collector."]],"mod":[["component_interaction_collector",""],["event_collector",""],["message_collector",""],["modal_interaction_collector",""],["reaction_collector",""]]};

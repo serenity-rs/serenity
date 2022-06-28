@@ -1,1 +1,1 @@
-initSidebarItems({"enum":[["Route","A representation of all routes registered within the library. These are safe and memory-efficient representations of each path that functions exist for in the `http` module."],["RouteInfo",""]]});
+window.SIDEBAR_ITEMS = {"enum":[["Route","A representation of all routes registered within the library. These are safe and memory-efficient representations of each path that functions exist for in the `http` module."],["RouteInfo",""]]};
