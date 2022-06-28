@@ -130,7 +130,10 @@ impl Member {
     ///
     /// [Manage Roles]: Permissions::MANAGE_ROLES
     pub async fn add_roles(&mut self, http: impl AsRef<Http>, role_ids: &[RoleId]) -> Result<()> {
-        self.edit(http, |b| b.roles(self.roles.iter().chain(role_ids.iter()))).await
+        let mut target_roles = self.roles.clone();
+        target_roles.extend_from_slice(role_ids);
+
+        self.edit(http, |b| b.roles(target_roles)).await
     }
 
     /// Ban a [`User`] from the guild, deleting a number of
@@ -499,7 +502,10 @@ impl Member {
         http: impl AsRef<Http>,
         role_ids: &[RoleId],
     ) -> Result<()> {
-        self.edit(http, |b| b.roles(self.roles.iter().filter(|r| !role_ids.contains(r)))).await
+        let mut target_roles = self.roles.clone();
+        target_roles.retain(|r| !role_ids.contains(r));
+
+        self.edit(http, |b| b.roles(target_roles)).await
     }
 
     /// Retrieves the full role data for the user's roles.
