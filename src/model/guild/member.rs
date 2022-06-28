@@ -499,7 +499,7 @@ impl Member {
         http: impl AsRef<Http>,
         role_ids: &[RoleId],
     ) -> Result<()> {
-        self.edit(http, |b| b.roles(role_ids)).await
+        self.edit(http, |b| b.roles(self.roles.iter().filter(|r| !role_ids.contains(r)))).await
     }
 
     /// Retrieves the full role data for the user's roles.
