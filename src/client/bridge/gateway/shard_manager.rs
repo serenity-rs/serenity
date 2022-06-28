@@ -21,6 +21,7 @@ use crate::client::bridge::voice::VoiceGatewayManager;
 use crate::client::{EventHandler, RawEventHandler};
 #[cfg(feature = "framework")]
 use crate::framework::Framework;
+use crate::gateway::PresenceData;
 use crate::internal::prelude::*;
 use crate::internal::tokio::spawn_named;
 use crate::model::gateway::GatewayIntents;
@@ -89,6 +90,7 @@ use crate::CacheAndHttp;
 ///     ws_url,
 ///     # cache_and_http,
 ///     intents: GatewayIntents::non_privileged(),
+///     presence: None,
 /// });
 /// #     Ok(())
 /// # }
@@ -141,6 +143,7 @@ impl ShardManager {
             ws_url: opt.ws_url,
             cache_and_http: opt.cache_and_http,
             intents: opt.intents,
+            presence: opt.presence,
         };
 
         spawn_named("shard_queuer::run", async move {
@@ -359,4 +362,5 @@ pub struct ShardManagerOptions {
     pub ws_url: Arc<Mutex<String>>,
     pub cache_and_http: Arc<CacheAndHttp>,
     pub intents: GatewayIntents,
+    pub presence: Option<PresenceData>,
 }
