@@ -500,7 +500,6 @@ impl Message {
     /// If the `cache` is enabled, returns a
     /// [`ModelError::InvalidPermissions`] if the current user does not have
     /// the required permissions.
-    /// It may also return [`Error::ExceededLimit`] if `audit_log_reason` is too long.
     ///
     /// [Manage Messages]: Permissions::MANAGE_MESSAGES
     pub async fn pin(
@@ -508,13 +507,6 @@ impl Message {
         cache_http: impl CacheHttp,
         audit_log_reason: Option<&str>,
     ) -> Result<()> {
-        match audit_log_reason {
-            Some(reason) if reason.len() > 512 => {
-                return Err(Error::ExceededLimit(reason.to_string(), 512));
-            },
-            _ => {},
-        }
-
         #[cfg(feature = "cache")]
         {
             if let Some(cache) = cache_http.cache() {

@@ -176,7 +176,6 @@ impl GuildChannel {
     ///
     /// If the `cache` is enabled, returns [`ModelError::InvalidPermissions`]
     /// if the current user does not have permission to create invites.
-    /// It may also return [`Error::ExceededLimit`] if `audit_log_reason` is too long.
     ///
     /// Otherwise returns [`Error::Http`] if the current user lacks permission.
     ///
@@ -192,13 +191,6 @@ impl GuildChannel {
     where
         F: FnOnce(&mut CreateInvite) -> &mut CreateInvite,
     {
-        match audit_log_reason {
-            Some(reason) if reason.len() > 512 => {
-                return Err(Error::ExceededLimit(reason.to_string(), 512));
-            },
-            _ => {},
-        }
-
         #[cfg(feature = "cache")]
         {
             if let Some(cache) = cache_http.cache() {
