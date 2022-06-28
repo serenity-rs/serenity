@@ -403,15 +403,15 @@ impl ReactionType {
     #[inline]
     #[must_use]
     pub fn as_data(&self) -> String {
-        match *self {
+        match self {
             ReactionType::Custom {
                 id,
-                ref name,
+                name,
                 ..
             } => {
-                format!("{}:{}", name.as_ref().map_or("", String::as_str), id)
+                format!("{}:{}", name.as_deref().unwrap_or(""), id)
             },
-            ReactionType::Unicode(ref unicode) => unicode.clone(),
+            ReactionType::Unicode(unicode) => unicode.clone(),
         }
     }
 
@@ -625,23 +625,27 @@ impl fmt::Display for ReactionType {
     /// displayed. Otherwise, if the type is a
     /// [unicode][`ReactionType::Unicode`], then the inner unicode is displayed.
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        match *self {
+        match self {
             ReactionType::Custom {
                 animated,
                 id,
-                ref name,
+                name,
             } => {
-                if animated {
+                if *animated {
                     f.write_str("<a:")?;
                 } else {
                     f.write_str("<:")?;
                 }
-                f.write_str(name.as_ref().map_or("", String::as_str))?;
+
+                if let Some(name) = name {
+                    f.write_str(name)?;
+                }
+
                 f.write_char(':')?;
-                fmt::Display::fmt(&id, f)?;
+                fmt::Display::fmt(id, f)?;
                 f.write_char('>')
             },
-            ReactionType::Unicode(ref unicode) => f.write_str(unicode),
+            ReactionType::Unicode(unicode) => f.write_str(unicode),
         }
     }
 }

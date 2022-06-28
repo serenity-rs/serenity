@@ -187,7 +187,7 @@ impl ClientBuilder {
     where
         F: FnOnce(&mut CacheSettings) -> &mut CacheSettings,
     {
-        if let Some(ref mut settings) = self.cache_settings {
+        if let Some(settings) = &mut self.cache_settings {
             f(settings);
         }
 
