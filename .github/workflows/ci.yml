@@ -280,3 +280,5 @@ jobs:
         run: cargo check -p e16_sqlite_database
       - name: 'Check example 17'
         run: cargo check -p e17_message_components
+      - name: 'Check example 18'
+        run: cargo check -p e18_webhook

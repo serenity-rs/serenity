@@ -362,3 +362,22 @@ args = ["make", "run_example", "e17_message_components"]
 [tasks.dev_build_17]
 command = "cargo"
 args = ["make", "build_example", "e17_message_components"]
+
+[tasks.18]
+alias = "run_18"
+
+[tasks.run_18]
+command = "cargo"
+args = ["make", "run_example_release", "e18_webhook"]
+
+[tasks.build_18]
+command = "cargo"
+args = ["make", "build_example_release", "e18_webhook"]
+
+[tasks.dev_run_18]
+command = "cargo"
+args = ["make", "run_example", "e18_webhook"]
+
+[tasks.dev_build_18]
+command = "cargo"
+args = ["make", "build_example", "e18_webhook"]
