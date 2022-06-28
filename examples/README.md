@@ -46,6 +46,7 @@ To run an example, you have various options:
     15 => Simple Dashboard: A simple dashboard to control and monitor the bot with `rillrate`.
     16 => SQLite Database: How to run an embedded SQLite database alongside the bot using SQLx
     17 => Message Components: How to structure and use buttons and select menus
+    18 => Webhook: How to construct and call a webhook
     ```
 
 2. Manually running:
