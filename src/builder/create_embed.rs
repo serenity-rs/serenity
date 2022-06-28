@@ -279,10 +279,10 @@ impl CreateEmbed {
     ///                 let _ = channel
     ///                     .send_message(&context, |m| {
     ///                         m.embed(|e| {
-    ///                             if let Some(ref joined_at) = member.joined_at {
+    ///                             if let Some(joined_at) = member.joined_at {
     ///                                 e.timestamp(joined_at);
     ///                             }
-    ///                             e.author(|a| a.icon_url(&user.face()).name(&user.name))
+    ///                             e.author(|a| a.icon_url(user.face()).name(&user.name))
     ///                                 .title("Member Join")
     ///                         })
     ///                     })
