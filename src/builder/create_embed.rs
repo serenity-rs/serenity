@@ -282,7 +282,7 @@ impl CreateEmbed {
     ///                             if let Some(joined_at) = member.joined_at {
     ///                                 e.timestamp(joined_at);
     ///                             }
-    ///                             e.author(|a| a.icon_url(user.face()).name(user.name))
+    ///                             e.author(|a| a.icon_url(user.face()).name(&user.name))
     ///                                 .title("Member Join")
     ///                         })
     ///                     })
