@@ -130,7 +130,7 @@ impl Member {
     ///
     /// [Manage Roles]: Permissions::MANAGE_ROLES
     pub async fn add_roles(&mut self, http: impl AsRef<Http>, role_ids: &[RoleId]) -> Result<()> {
-        self.edit(http, |b| b.roles(role_ids)).await
+        self.edit(http, |b| b.roles(self.roles.iter().chain(role_ids.iter()))).await
     }
 
     /// Ban a [`User`] from the guild, deleting a number of
