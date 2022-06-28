@@ -25,12 +25,7 @@ use crate::cache::Cache;
 #[cfg(feature = "collector")]
 use crate::client::bridge::gateway::ShardMessenger;
 #[cfg(feature = "collector")]
-use crate::collector::{
-    CollectReaction,
-    CollectReply,
-    MessageCollectorBuilder,
-    ReactionCollectorBuilder,
-};
+use crate::collector::{MessageCollectorBuilder, ReactionCollectorBuilder};
 #[cfg(feature = "model")]
 use crate::http::{CacheHttp, Http, Typing};
 #[cfg(feature = "model")]
@@ -886,33 +881,21 @@ impl ChannelId {
         http.as_ref().create_webhook(self.get(), &builder, None).await
     }
 
-    /// Returns a future that will await one message sent in this channel.
+    /// Returns a builder which can be awaited to obtain a message or stream of messages in this channel.
     #[cfg(feature = "collector")]
-    pub fn await_reply(&self, shard_messenger: impl AsRef<ShardMessenger>) -> CollectReply {
-        CollectReply::new(shard_messenger).channel_id(self.0)
-    }
-
-    /// Returns a stream builder which can be awaited to obtain a stream of messages in this channel.
-    #[cfg(feature = "collector")]
-    pub fn await_replies(
+    pub fn reply_collector<'a>(
         &self,
-        shard_messenger: impl AsRef<ShardMessenger>,
-    ) -> MessageCollectorBuilder {
+        shard_messenger: &'a ShardMessenger,
+    ) -> MessageCollectorBuilder<'a> {
         MessageCollectorBuilder::new(shard_messenger).channel_id(self.0)
     }
 
-    /// Await a single reaction in this guild.
+    /// Returns a builder which can be awaited to obtain a reaction or stream of reactions sent in this channel.
     #[cfg(feature = "collector")]
-    pub fn await_reaction(&self, shard_messenger: impl AsRef<ShardMessenger>) -> CollectReaction {
-        CollectReaction::new(shard_messenger).channel_id(self.0)
-    }
-
-    /// Returns a stream builder which can be awaited to obtain a stream of reactions sent in this channel.
-    #[cfg(feature = "collector")]
-    pub fn await_reactions(
+    pub fn reaction_collector<'a>(
         &self,
-        shard_messenger: impl AsRef<ShardMessenger>,
-    ) -> ReactionCollectorBuilder {
+        shard_messenger: &'a ShardMessenger,
+    ) -> ReactionCollectorBuilder<'a> {
         ReactionCollectorBuilder::new(shard_messenger).channel_id(self.0)
     }
 
