@@ -263,6 +263,19 @@
 <span id="258">258</span>
 <span id="259">259</span>
 <span id="260">260</span>
+<span id="261">261</span>
+<span id="262">262</span>
+<span id="263">263</span>
+<span id="264">264</span>
+<span id="265">265</span>
+<span id="266">266</span>
+<span id="267">267</span>
+<span id="268">268</span>
+<span id="269">269</span>
+<span id="270">270</span>
+<span id="271">271</span>
+<span id="272">272</span>
+<span id="273">273</span>
 </pre><pre class="rust"><code><span class="doccomment">//! The gateway module contains the pieces - primarily the `Shard` -</span>
 <span class="doccomment">//! responsible for maintaining a WebSocket connection with Discord.</span>
 <span class="doccomment">//!</span>
@@ -317,15 +330,16 @@
 
 <span class="kw">use</span> <span class="ident">std::fmt</span>;
 
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;client&quot;</span>)]</span>
+<span class="kw">use</span> <span class="ident">async_tungstenite::tungstenite</span>;
 <span class="kw">use</span> <span class="ident">reqwest</span>::{<span class="ident">IntoUrl</span>, <span class="ident">Url</span>};
 
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="self">self</span>::error::Error</span> <span class="kw">as</span> <span class="ident">GatewayError</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="self">self</span>::shard::Shard</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="self">self</span>::ws::WsClient</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;client&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::client::bridge::gateway::ShardClientMessage</span>;
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::client::bridge::gateway</span>::{<span class="ident">ShardClientMessage</span>, <span class="ident">ShardRunnerMessage</span>};
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::internal::prelude</span>::<span class="kw-2">*</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::json::Value</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::gateway</span>::{<span class="ident">Activity</span>, <span class="ident">ActivityType</span>};
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::user::OnlineStatus</span>;
 
@@ -503,7 +517,19 @@
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">InterMessage</span> {
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;client&quot;</span>)]</span>
     <span class="ident">Client</span>(<span class="ident">ShardClientMessage</span>),
-    <span class="ident">Json</span>(<span class="ident">Value</span>),
+}
+
+<span class="kw">impl</span> <span class="ident">InterMessage</span> {
+    <span class="doccomment">/// Constructs a custom message which will send the given `value` over the WebSocket.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// This is simply sugar for constructing and nesting [`ShardRunnerMessage::Message`].</span>
+    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;client&quot;</span>)]</span>
+    <span class="attribute">#[<span class="ident">must_use</span>]</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">json</span>(<span class="ident">value</span>: <span class="ident">String</span>) -&gt; <span class="self">Self</span> {
+        <span class="ident"><span class="self">Self</span>::Client</span>(<span class="ident">ShardClientMessage::Runner</span>(<span class="ident">Box::new</span>(<span class="ident">ShardRunnerMessage::Message</span>(
+            <span class="ident">tungstenite::Message::Text</span>(<span class="ident">value</span>),
+        ))))
+    }
 }
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
