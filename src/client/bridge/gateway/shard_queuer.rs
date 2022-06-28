@@ -23,7 +23,7 @@ use crate::client::bridge::voice::VoiceGatewayManager;
 use crate::client::{EventHandler, RawEventHandler};
 #[cfg(feature = "framework")]
 use crate::framework::Framework;
-use crate::gateway::{ConnectionStage, InterMessage, Shard};
+use crate::gateway::{ConnectionStage, InterMessage, PresenceData, Shard};
 use crate::internal::prelude::*;
 use crate::internal::tokio::spawn_named;
 use crate::model::gateway::{GatewayIntents, ShardInfo};
@@ -80,6 +80,7 @@ pub struct ShardQueuer {
     pub ws_url: Arc<Mutex<String>>,
     pub cache_and_http: Arc<CacheAndHttp>,
     pub intents: GatewayIntents,
+    pub presence: Option<PresenceData>,
 }
 
 impl ShardQueuer {
@@ -178,6 +179,7 @@ impl ShardQueuer {
             &self.cache_and_http.http.token,
             shard_info,
             self.intents,
+            self.presence.clone(),
         )
         .await?;
 

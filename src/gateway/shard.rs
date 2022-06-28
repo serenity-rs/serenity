@@ -118,7 +118,7 @@ impl Shard {
     ///
     /// // retrieve the gateway response, which contains the URL to connect to
     /// let gateway = Arc::new(Mutex::new(http.get_gateway().await?.url));
-    /// let shard = Shard::new(gateway, &token, shard_info, GatewayIntents::all()).await?;
+    /// let shard = Shard::new(gateway, &token, shard_info, GatewayIntents::all(), None).await?;
     ///
     /// // at this point, you can create a `loop`, and receive events and match
     /// // their variants
@@ -137,11 +137,12 @@ impl Shard {
         token: &str,
         shard_info: ShardInfo,
         intents: GatewayIntents,
+        presence: Option<PresenceData>,
     ) -> Result<Shard> {
         let url = ws_url.lock().await.clone();
         let client = connect(&url).await?;
 
-        let presence = PresenceData::default();
+        let presence = presence.unwrap_or_default();
         let heartbeat_instants = (None, None);
         let heartbeat_interval = None;
         let last_heartbeat_acknowledged = true;
@@ -644,7 +645,7 @@ impl Shard {
     /// #          total: 1,
     /// #     };
     /// #
-    /// #     let mut shard = Shard::new(mutex.clone(), "", shard_info, GatewayIntents::all()).await?;
+    /// #     let mut shard = Shard::new(mutex.clone(), "", shard_info, GatewayIntents::all(), None).await?;
     /// #
     /// use serenity::model::id::GuildId;
     ///
@@ -671,7 +672,7 @@ impl Shard {
     /// #          id: 0,
     /// #          total: 1,
     /// #     };
-    /// #     let mut shard = Shard::new(mutex.clone(), "", shard_info, GatewayIntents::all()).await?;
+    /// #     let mut shard = Shard::new(mutex.clone(), "", shard_info, GatewayIntents::all(), None).await?;
     /// #
     /// use serenity::model::id::GuildId;
     ///
@@ -709,7 +710,9 @@ impl Shard {
     /// - the `stage` to [`ConnectionStage::Identifying`]
     #[instrument(skip(self))]
     pub async fn identify(&mut self) -> Result<()> {
-        self.client.send_identify(&self.shard_info, &self.token, self.intents).await?;
+        self.client
+            .send_identify(&self.shard_info, &self.token, self.intents, &self.presence)
+            .await?;
 
         self.heartbeat_instants.0 = Some(Instant::now());
         self.stage = ConnectionStage::Identifying;
