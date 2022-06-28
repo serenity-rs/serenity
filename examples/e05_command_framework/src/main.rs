@@ -348,25 +348,33 @@ async fn commands(ctx: &Context, msg: &Message) -> CommandResult {
 // mentions are replaced with a safe textual alternative.
 // In this example channel mentions are excluded via the `ContentSafeOptions`.
 #[command]
-async fn say(ctx: &Context, msg: &Message, args: Args) -> CommandResult {
-    let settings = if let Some(guild_id) = msg.guild_id {
-        // By default roles, users, and channel mentions are cleaned.
-        ContentSafeOptions::default()
-            // We do not want to clean channal mentions as they
-            // do not ping users.
-            .clean_channel(false)
-            // If it's a guild channel, we want mentioned users to be displayed
-            // as their display name.
-            .display_as_member_from(guild_id)
-    } else {
-        ContentSafeOptions::default().clean_channel(false).clean_role(false)
+async fn say(ctx: &Context, msg: &Message, mut args: Args) -> CommandResult {
+    match args.single_quoted::<String>() {
+        Ok(x) => {
+            let settings = if let Some(guild_id) = msg.guild_id {
+                // By default roles, users, and channel mentions are cleaned.
+                ContentSafeOptions::default()
+                    // We do not want to clean channal mentions as they
+                    // do not ping users.
+                    .clean_channel(false)
+                    // If it's a guild channel, we want mentioned users to be displayed
+                    // as their display name.
+                    .display_as_member_from(guild_id)
+            } else {
+                ContentSafeOptions::default().clean_channel(false).clean_role(false)
+            };
+
+            let content = content_safe(&ctx.cache, x, &settings, &msg.mentions);
+
+            msg.channel_id.say(&ctx.http, &content).await?;
+
+            return Ok(());
+        },
+        Err(_) => {
+            msg.reply(ctx, "An argument is required to run this command.").await?;
+            return Ok(());
+        },
     };
-
-    let content = content_safe(&ctx.cache, &args.rest(), &settings, &msg.mentions);
-
-    msg.channel_id.say(&ctx.http, &content).await?;
-
-    Ok(())
 }
 
 // A function which acts as a "check", to determine whether to call a command.
