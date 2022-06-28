@@ -2934,23 +2934,6 @@
 <span id="2929">2929</span>
 <span id="2930">2930</span>
 <span id="2931">2931</span>
-<span id="2932">2932</span>
-<span id="2933">2933</span>
-<span id="2934">2934</span>
-<span id="2935">2935</span>
-<span id="2936">2936</span>
-<span id="2937">2937</span>
-<span id="2938">2938</span>
-<span id="2939">2939</span>
-<span id="2940">2940</span>
-<span id="2941">2941</span>
-<span id="2942">2942</span>
-<span id="2943">2943</span>
-<span id="2944">2944</span>
-<span id="2945">2945</span>
-<span id="2946">2946</span>
-<span id="2947">2947</span>
-<span id="2948">2948</span>
 </pre><pre class="rust"><code><span class="doccomment">//! Models relating to guilds and types that it owns.</span>
 
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">audit_log</span>;
@@ -3012,12 +2995,7 @@
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;collector&quot;</span>)]</span>
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::client::bridge::gateway::ShardMessenger</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;collector&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::collector</span>::{
-    <span class="ident">CollectReaction</span>,
-    <span class="ident">CollectReply</span>,
-    <span class="ident">MessageCollectorBuilder</span>,
-    <span class="ident">ReactionCollectorBuilder</span>,
-};
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::collector</span>::{<span class="ident">MessageCollectorBuilder</span>, <span class="ident">ReactionCollectorBuilder</span>};
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::constants::LARGE_THRESHOLD</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
@@ -5550,33 +5528,21 @@
         <span class="self">self</span>.<span class="ident">roles</span>.<span class="ident">values</span>().<span class="ident">find</span>(<span class="op">|</span><span class="ident">role</span><span class="op">|</span> <span class="ident">role_name</span> <span class="op">==</span> <span class="ident">role</span>.<span class="ident">name</span>)
     }
 
-    <span class="doccomment">/// Returns a future that will await one message sent in this guild.</span>
+    <span class="doccomment">/// Returns a builder which can be awaited to obtain a message or stream of messages in this guild.</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;collector&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">await_reply</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">shard_messenger</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">ShardMessenger</span><span class="op">&gt;</span>) -&gt; <span class="ident">CollectReply</span> {
-        <span class="ident">CollectReply::new</span>(<span class="ident">shard_messenger</span>).<span class="ident">guild_id</span>(<span class="self">self</span>.<span class="ident">id</span>.<span class="number">0</span>)
-    }
-
-    <span class="doccomment">/// Returns a stream builder which can be awaited to obtain a stream of messages in this guild.</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;collector&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">await_replies</span>(
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">reply_collector</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">shard_messenger</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">ShardMessenger</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="ident">MessageCollectorBuilder</span> {
+        <span class="ident">shard_messenger</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">ShardMessenger</span>,
+    ) -&gt; <span class="ident">MessageCollectorBuilder</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
         <span class="ident">MessageCollectorBuilder::new</span>(<span class="ident">shard_messenger</span>).<span class="ident">guild_id</span>(<span class="self">self</span>.<span class="ident">id</span>.<span class="number">0</span>)
     }
 
-    <span class="doccomment">/// Await a single reaction in this guild.</span>
+    <span class="doccomment">/// Returns a builder which can be awaited to obtain a message or stream of reactions sent in this guild.</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;collector&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">await_reaction</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">shard_messenger</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">ShardMessenger</span><span class="op">&gt;</span>) -&gt; <span class="ident">CollectReaction</span> {
-        <span class="ident">CollectReaction::new</span>(<span class="ident">shard_messenger</span>).<span class="ident">guild_id</span>(<span class="self">self</span>.<span class="ident">id</span>.<span class="number">0</span>)
-    }
-
-    <span class="doccomment">/// Returns a stream builder which can be awaited to obtain a stream of reactions sent in this guild.</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;collector&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">await_reactions</span>(
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">reaction_collector</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">shard_messenger</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">ShardMessenger</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="ident">ReactionCollectorBuilder</span> {
+        <span class="ident">shard_messenger</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">ShardMessenger</span>,
+    ) -&gt; <span class="ident">ReactionCollectorBuilder</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
         <span class="ident">ReactionCollectorBuilder::new</span>(<span class="ident">shard_messenger</span>).<span class="ident">guild_id</span>(<span class="self">self</span>.<span class="ident">id</span>.<span class="number">0</span>)
     }
 

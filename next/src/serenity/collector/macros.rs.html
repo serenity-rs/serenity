@@ -51,41 +51,6 @@
 <span id="46">46</span>
 <span id="47">47</span>
 <span id="48">48</span>
-<span id="49">49</span>
-<span id="50">50</span>
-<span id="51">51</span>
-<span id="52">52</span>
-<span id="53">53</span>
-<span id="54">54</span>
-<span id="55">55</span>
-<span id="56">56</span>
-<span id="57">57</span>
-<span id="58">58</span>
-<span id="59">59</span>
-<span id="60">60</span>
-<span id="61">61</span>
-<span id="62">62</span>
-<span id="63">63</span>
-<span id="64">64</span>
-<span id="65">65</span>
-<span id="66">66</span>
-<span id="67">67</span>
-<span id="68">68</span>
-<span id="69">69</span>
-<span id="70">70</span>
-<span id="71">71</span>
-<span id="72">72</span>
-<span id="73">73</span>
-<span id="74">74</span>
-<span id="75">75</span>
-<span id="76">76</span>
-<span id="77">77</span>
-<span id="78">78</span>
-<span id="79">79</span>
-<span id="80">80</span>
-<span id="81">81</span>
-<span id="82">82</span>
-<span id="83">83</span>
 </pre><pre class="rust"><code><span class="macro">macro_rules!</span> <span class="ident">gen_macro</span> {
     (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>:<span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">function</span>:<span class="ident">item</span>) =&gt; {
         <span class="macro">macro_rules!</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span> {
@@ -100,7 +65,7 @@
 <span class="macro">gen_macro!</span>(
     <span class="ident">impl_author_id</span>,
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">author_id</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">author_id</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">filter</span>.<span class="ident">as_mut</span>().<span class="ident">unwrap</span>().<span class="ident">author_id</span> <span class="op">=</span> <span class="ident">std::num::NonZeroU64::new</span>(<span class="ident">author_id</span>.<span class="ident">into</span>());
+        <span class="self">self</span>.<span class="ident">filter_options</span>.<span class="ident">author_id</span> <span class="op">=</span> <span class="ident">std::num::NonZeroU64::new</span>(<span class="ident">author_id</span>.<span class="ident">into</span>());
 
         <span class="self">self</span>
     }
@@ -109,25 +74,7 @@
 <span class="macro">gen_macro!</span>(
     <span class="ident">impl_channel_id</span>,
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">channel_id</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">channel_id</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">filter</span>.<span class="ident">as_mut</span>().<span class="ident">unwrap</span>().<span class="ident">channel_id</span> <span class="op">=</span> <span class="ident">std::num::NonZeroU64::new</span>(<span class="ident">channel_id</span>.<span class="ident">into</span>());
-
-        <span class="self">self</span>
-    }
-);
-
-<span class="macro">gen_macro!</span>(
-    <span class="ident">impl_collect_limit</span>,
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">collect_limit</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">limit</span>: <span class="ident">u32</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">filter</span>.<span class="ident">as_mut</span>().<span class="ident">unwrap</span>().<span class="ident">collect_limit</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">limit</span>);
-
-        <span class="self">self</span>
-    }
-);
-
-<span class="macro">gen_macro!</span>(
-    <span class="ident">impl_filter_limit</span>,
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">filter_limit</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">limit</span>: <span class="ident">u32</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">filter</span>.<span class="ident">as_mut</span>().<span class="ident">unwrap</span>().<span class="ident">filter_limit</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">limit</span>);
+        <span class="self">self</span>.<span class="ident">filter_options</span>.<span class="ident">channel_id</span> <span class="op">=</span> <span class="ident">std::num::NonZeroU64::new</span>(<span class="ident">channel_id</span>.<span class="ident">into</span>());
 
         <span class="self">self</span>
     }
@@ -136,7 +83,7 @@
 <span class="macro">gen_macro!</span>(
     <span class="ident">impl_guild_id</span>,
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">guild_id</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">guild_id</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">filter</span>.<span class="ident">as_mut</span>().<span class="ident">unwrap</span>().<span class="ident">guild_id</span> <span class="op">=</span> <span class="ident">std::num::NonZeroU64::new</span>(<span class="ident">guild_id</span>.<span class="ident">into</span>());
+        <span class="self">self</span>.<span class="ident">filter_options</span>.<span class="ident">guild_id</span> <span class="op">=</span> <span class="ident">std::num::NonZeroU64::new</span>(<span class="ident">guild_id</span>.<span class="ident">into</span>());
 
         <span class="self">self</span>
     }
@@ -145,30 +92,13 @@
 <span class="macro">gen_macro!</span>(
     <span class="ident">impl_message_id</span>,
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">message_id</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">message_id</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">filter</span>.<span class="ident">as_mut</span>().<span class="ident">unwrap</span>().<span class="ident">message_id</span> <span class="op">=</span> <span class="ident">std::num::NonZeroU64::new</span>(<span class="ident">message_id</span>.<span class="ident">into</span>());
+        <span class="self">self</span>.<span class="ident">filter_options</span>.<span class="ident">message_id</span> <span class="op">=</span> <span class="ident">std::num::NonZeroU64::new</span>(<span class="ident">message_id</span>.<span class="ident">into</span>());
 
         <span class="self">self</span>
     }
 );
 
-<span class="macro">gen_macro!</span>(
-    <span class="ident">impl_timeout</span>,
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">timeout</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">duration</span>: <span class="ident">std::time::Duration</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">timeout</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">Box::pin</span>(<span class="ident">tokio::time::sleep</span>(<span class="ident">duration</span>)));
-
-        <span class="self">self</span>
-    }
-);
-
-<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">use</span> {
-    <span class="ident">impl_author_id</span>,
-    <span class="ident">impl_channel_id</span>,
-    <span class="ident">impl_collect_limit</span>,
-    <span class="ident">impl_filter_limit</span>,
-    <span class="ident">impl_guild_id</span>,
-    <span class="ident">impl_message_id</span>,
-    <span class="ident">impl_timeout</span>,
-};
+<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">use</span> {<span class="ident">impl_author_id</span>, <span class="ident">impl_channel_id</span>, <span class="ident">impl_guild_id</span>, <span class="ident">impl_message_id</span>};
 </code></pre></div>
 </section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.61.0-nightly (3c17c84a3 2022-03-21)" ></div>
 </body></html>
