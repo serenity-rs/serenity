@@ -139,8 +139,8 @@ impl<'a> Request<'a> {
             headers.insert(CONTENT_LENGTH, length.unwrap_or_else(|| HeaderValue::from_static("0")));
         }
 
-        if let Some(ref request_headers) = request_headers {
-            headers.extend(request_headers.clone());
+        if let Some(request_headers) = request_headers.clone() {
+            headers.extend(request_headers);
         }
 
         if let Some(bytes) = body {

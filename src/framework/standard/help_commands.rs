@@ -806,7 +806,6 @@ pub fn searched_lowercase<'rec, 'a: 'rec>(
                     help_description: group
                         .options
                         .description
-                        .as_ref()
                         .map(ToString::to_string)
                         .unwrap_or_default(),
                     groups: vec![single_group],
