@@ -180,14 +180,18 @@ impl EventHandler for Handler {
             .unwrap();
 
         // Wait for the user to make a selection
-        let mci =
-            match m.await_component_interaction(&ctx).timeout(Duration::from_secs(60 * 3)).await {
-                Some(ci) => ci,
-                None => {
-                    m.reply(&ctx, "Timed out").await.unwrap();
-                    return;
-                },
-            };
+        let mci = match m
+            .component_interaction_collector(&ctx.shard)
+            .timeout(Duration::from_secs(60 * 3))
+            .collect_single()
+            .await
+        {
+            Some(ci) => ci,
+            None => {
+                m.reply(&ctx, "Timed out").await.unwrap();
+                return;
+            },
+        };
 
         // data.custom_id contains the id of the component (here "animal_select")
         // and should be used to identify if a message has multiple components.
@@ -206,8 +210,10 @@ impl EventHandler for Handler {
 
         // Wait for multiple interactions
 
-        let mut cib =
-            m.await_component_interactions(&ctx).timeout(Duration::from_secs(60 * 3)).build();
+        let mut cib = m
+            .component_interaction_collector(&ctx.shard)
+            .timeout(Duration::from_secs(60 * 3))
+            .build();
 
         while let Some(mci) = cib.next().await {
             let sound = Sound::from_str(&mci.data.custom_id).unwrap();
