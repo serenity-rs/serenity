@@ -243,10 +243,8 @@ impl Webhook {
         EditWebhook::new(self)
     }
 
-    /// Executes a webhook with the fields set via the given builder.
-    ///
-    /// The builder provides a method of setting only the fields you need,
-    /// without needing to pass a long set of arguments.
+    /// Returns a request builder that, when executed, executes the webhook with given content,
+    /// according to what fields are set on it.
     ///
     /// # Examples
     ///
@@ -261,13 +259,13 @@ impl Webhook {
     /// let url = "https://discord.com/api/webhooks/245037420704169985/ig5AO-wdVWpCBtUUMxmgsWryqgsW3DChbKYOINftJ4DCrUbnkedoYZD0VOH1QLr-S3sV";
     /// let mut webhook = Webhook::from_url(&http, url).await?;
     ///
-    /// webhook.execute(&http, false, |w| w.content("test")).await?;
+    /// webhook.execute().content("test").execute(&http).await?;
     /// #     Ok(())
     /// # }
     /// ```
     ///
-    /// Execute a webhook with message content of `test`, overriding the
-    /// username to `serenity`, and sending an embed:
+    /// Execute a webhook with message content of `test`, overriding the username to `serenity`,
+    /// and setting an embed:
     ///
     /// ```rust,no_run
     /// # use serenity::http::Http;
@@ -289,110 +287,18 @@ impl Webhook {
     ///     .url("https://rust-lang.org");
     ///
     /// webhook
-    ///     .execute(&http, false, |w| w.content("test").username("serenity").embeds(vec![embed]))
+    ///     .execute()
+    ///     .content("test")
+    ///     .username("serenity")
+    ///     .embeds(vec![embed])
+    ///     .execute(&http)
     ///     .await?;
     /// #     Ok(())
     /// # }
     /// ```
-    ///
-    /// # Errors
-    ///
-    /// Returns an [`Error::Model`] if the [`Self::token`] is [`None`].
-    ///
-    /// May also return an [`Error::Http`] if the content is malformed, or if the webhook's token is invalid.
-    ///
-    /// Or may return an [`Error::Json`] if there is an error deserialising Discord's response.
-    ///
-    /// [`Error::Model`]: crate::error::Error::Model
-    /// [`Error::Http`]: crate::error::Error::Http
-    /// [`Error::Json`]: crate::error::Error::Json
     #[inline]
-    pub async fn execute<'a, F>(
-        &self,
-        http: impl AsRef<Http>,
-        wait: bool,
-        f: F,
-    ) -> Result<Option<Message>>
-    where
-        for<'b> F: FnOnce(&'b mut ExecuteWebhook<'a>) -> &'b mut ExecuteWebhook<'a>,
-    {
-        self._execute(http, None, wait, f).await
-    }
-
-    /// Executes a webhook with the fields set via the given builder, in the context of the thread
-    /// with the provided Id. If the thread is archived, it will be automatically unarchived.
-    ///
-    /// # Examples
-    ///
-    /// Execute a webhook with message content of `test`:
-    ///
-    /// ```rust,no_run
-    /// # use serenity::http::Http;
-    /// # use serenity::model::webhook::Webhook;
-    /// #
-    /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
-    /// # let http = Http::new("token");
-    /// let url = "https://discord.com/api/webhooks/245037420704169985/ig5AO-wdVWpCBtUUMxmgsWryqgsW3DChbKYOINftJ4DCrUbnkedoYZD0VOH1QLr-S3sV";
-    /// let mut webhook = Webhook::from_url(&http, url).await?;
-    ///
-    /// webhook.execute_in_thread(&http, 12345, false, |w| w.content("test")).await?;
-    /// #     Ok(())
-    /// # }
-    /// ```
-    ///
-    /// # Errors
-    ///
-    /// Returns an [`Error::Model`] if the [`Self::token`] is [`None`].
-    ///
-    /// May also return an [`Error::Http`] if the content is malformed, if the webhook's token is
-    /// invalid. Additionally, this variant is returned if `thread_id` does not refer to a valid
-    /// thread, or if the thread it refers to does not belong to the webhook's associated
-    /// [`Channel`].
-    ///
-    /// Or may return an [`Error::Json`] if there is an error deserialising Discord's response.
-    ///
-    /// [`Error::Model`]: crate::error::Error::Model
-    /// [`Error::Http`]: crate::error::Error::Http
-    /// [`Error::Json`]: crate::error::Error::Json
-    #[inline]
-    pub async fn execute_in_thread<'a, F>(
-        &self,
-        http: impl AsRef<Http>,
-        thread_id: impl Into<ChannelId>,
-        wait: bool,
-        f: F,
-    ) -> Result<Option<Message>>
-    where
-        for<'b> F: FnOnce(&'b mut ExecuteWebhook<'a>) -> &'b mut ExecuteWebhook<'a>,
-    {
-        self._execute(http, Some(thread_id.into()), wait, f).await
-    }
-
-    #[inline]
-    async fn _execute<'a, F>(
-        &self,
-        http: impl AsRef<Http>,
-        thread_id: Option<ChannelId>,
-        wait: bool,
-        f: F,
-    ) -> Result<Option<Message>>
-    where
-        for<'b> F: FnOnce(&'b mut ExecuteWebhook<'a>) -> &'b mut ExecuteWebhook<'a>,
-    {
-        let token = self.token.as_ref().ok_or(ModelError::NoTokenSet)?;
-        let mut builder = ExecuteWebhook::default();
-        f(&mut builder);
-
-        let http = http.as_ref();
-        let thread_id = thread_id.map(ChannelId::get);
-        let files = std::mem::take(&mut builder.files);
-
-        if files.is_empty() {
-            http.execute_webhook(self.id.get(), thread_id, token, wait, &builder).await
-        } else {
-            http.execute_webhook_with_files(self.id.get(), thread_id, token, wait, files, &builder)
-                .await
-        }
+    pub fn execute(&self) -> ExecuteWebhook<'_> {
+        ExecuteWebhook::new(self)
     }
 
     /// Gets a previously sent message from the webhook.

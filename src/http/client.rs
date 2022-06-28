@@ -2178,20 +2178,19 @@ impl Http {
         .await
     }
 
-    /// Executes a webhook, posting a [`Message`] in the webhook's associated
-    /// [`Channel`].
+    /// Executes a webhook, posting a [`Message`] in the webhook's associated [`Channel`].
     ///
     /// This method does _not_ require authentication.
     ///
     /// If `thread_id` is not `None`, then the message will be sent to the thread in the webhook's
     /// associated [`Channel`] with the corresponding Id, which will be automatically unarchived.
     ///
-    /// Pass `true` to `wait` to wait for server confirmation of the message sending
-    /// before receiving a response. From the [Discord docs]:
+    /// Pass `true` to `wait` to wait for server confirmation of the message sending before
+    /// receiving a response. From the [Discord docs]:
     ///
-    /// > waits for server confirmation of message send before response, and returns
-    /// > the created message body (defaults to false; when false a message that is
-    /// > not saved does not return an error)
+    /// > waits for server confirmation of message send before response, and returns the created
+    /// > message body (defaults to false; when false a message that is not saved does not return
+    /// > an error
     ///
     /// The map can _optionally_ contain the following data:
     ///
@@ -2204,9 +2203,9 @@ impl Http {
     /// - `content`: The content of the message.
     /// - `embeds`: An array of rich embeds.
     ///
-    /// **Note**: For embed objects, all fields are registered by Discord except for
-    /// `height`, `provider`, `proxy_url`, `type` (it will always be `rich`),
-    /// `video`, and `width`. The rest will be determined by Discord.
+    /// **Note**: For embed objects, all fields are registered by Discord except for `height`,
+    /// `provider`, `proxy_url`, `type` (it will always be `rich`), `video`, and `width`. The rest
+    /// will be determine by Discord.
     ///
     /// # Examples
     ///
