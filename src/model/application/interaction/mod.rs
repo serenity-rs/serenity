@@ -70,7 +70,7 @@ impl Interaction {
     #[must_use]
     pub fn token(&self) -> &str {
         match self {
-            Self::Ping(ref i) => i.token.as_str(),
+            Self::Ping(i) => i.token.as_str(),
             Self::ApplicationCommand(i) => i.token.as_str(),
             Self::MessageComponent(i) => i.token.as_str(),
             Self::Autocomplete(i) => i.token.as_str(),
