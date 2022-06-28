@@ -93,22 +93,22 @@ impl CacheUpdate for ChannelDeleteEvent {
     type Output = ();
 
     fn update(&mut self, cache: &Cache) -> Option<()> {
-        match self.channel {
-            Channel::Guild(ref channel) => {
+        match &self.channel {
+            Channel::Guild(channel) => {
                 let (guild_id, channel_id) = (channel.guild_id, channel.id);
 
                 cache.channels.remove(&channel_id);
 
                 cache.guilds.get_mut(&guild_id).map(|mut g| g.channels.remove(&channel_id));
             },
-            Channel::Category(ref category) => {
+            Channel::Category(category) => {
                 let (guild_id, channel_id) = (category.guild_id, category.id);
 
                 cache.categories.remove(&channel_id);
 
                 cache.guilds.get_mut(&guild_id).map(|mut g| g.channels.remove(&channel_id));
             },
-            Channel::Private(ref channel) => {
+            Channel::Private(channel) => {
                 let id = { channel.id };
 
                 cache.private_channels.remove(&id);
@@ -126,8 +126,8 @@ impl CacheUpdate for ChannelUpdateEvent {
     type Output = ();
 
     fn update(&mut self, cache: &Cache) -> Option<()> {
-        match self.channel {
-            Channel::Guild(ref channel) => {
+        match &self.channel {
+            Channel::Guild(channel) => {
                 let (guild_id, channel_id) = (channel.guild_id, channel.id);
 
                 cache.channels.insert(channel_id, channel.clone());
@@ -137,12 +137,12 @@ impl CacheUpdate for ChannelUpdateEvent {
                     .get_mut(&guild_id)
                     .map(|mut g| g.channels.insert(channel_id, self.channel.clone()));
             },
-            Channel::Private(ref channel) => {
+            Channel::Private(channel) => {
                 if let Some(mut c) = cache.private_channels.get_mut(&channel.id) {
                     c.clone_from(channel);
                 }
             },
-            Channel::Category(ref category) => {
+            Channel::Category(category) => {
                 let (guild_id, channel_id) = (category.guild_id, category.id);
 
                 cache.categories.insert(channel_id, category.clone());
