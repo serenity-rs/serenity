@@ -177,7 +177,7 @@ impl TicketCounter {
     /// the caller ends up doing, receiving some action eventually means
     /// no ticket can be taken and the duration must elapse.
     pub async fn take(&mut self, ctx: &Context, msg: &Message, id: u64) -> Option<RateLimitInfo> {
-        if let Some(ref check) = self.check {
+        if let Some(check) = &self.check {
             if !(check)(ctx, msg).await {
                 return None;
             }
@@ -293,7 +293,7 @@ impl TicketCounter {
     /// Only call this if the mutable owner already took a ticket in this
     /// atomic execution of calling `take` and `give`.
     pub async fn give(&mut self, ctx: &Context, msg: &Message, id: u64) {
-        if let Some(ref check) = self.check {
+        if let Some(check) = &self.check {
             if !(check)(ctx, msg).await {
                 return;
             }

@@ -2738,7 +2738,7 @@ impl<'a> RouteInfo<'a> {
             } => (
                 LightMethod::Get,
                 Route::ChannelsIdMessages(channel_id),
-                Cow::from(Route::channel_messages(channel_id, Some(query.as_ref()))),
+                Cow::from(Route::channel_messages(channel_id, Some(query))),
             ),
             RouteInfo::GetPins {
                 channel_id,

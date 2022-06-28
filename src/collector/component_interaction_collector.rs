@@ -95,7 +95,7 @@ impl ComponentInteractionFilter {
     fn is_passing_constraints(&self, interaction: &MessageComponentInteraction) -> bool {
         self.options.guild_id.map_or(true, |id| Some(id) == interaction.guild_id.map(|g| g.0))
             && self.options.message_id.map_or(true, |id| interaction.message.id.0 == id)
-            && self.options.channel_id.map_or(true, |id| id == interaction.channel_id.as_ref().0)
+            && self.options.channel_id.map_or(true, |id| id == interaction.channel_id.0)
             && self.options.author_id.map_or(true, |id| id == interaction.user.id.0)
             && self.options.filter.as_ref().map_or(true, |f| f.0(interaction))
     }

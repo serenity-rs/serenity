@@ -968,20 +968,21 @@ impl PartialGuild {
             return Some(rhs_id);
         }
 
-        let lhs = cache
-            .as_ref()
-            .guild(self.id)?
-            .members
-            .get(&lhs_id)?
-            .highest_role_info(&cache)
-            .unwrap_or((RoleId::new(1), 0));
-        let rhs = cache
-            .as_ref()
-            .guild(self.id)?
-            .members
-            .get(&rhs_id)?
-            .highest_role_info(&cache)
-            .unwrap_or((RoleId::new(1), 0));
+        let (lhs, rhs) = {
+            let cache = cache.as_ref();
+            let default = (RoleId::new(1), 0);
+
+            // Clone is necessary, highest_role_info goes into cache.
+            let (lhs, rhs) = {
+                let guild = cache.guild(self.id)?;
+                (guild.members.get(&lhs_id)?.clone(), guild.members.get(&rhs_id)?.clone())
+            };
+
+            (
+                lhs.highest_role_info(cache).unwrap_or(default),
+                rhs.highest_role_info(cache).unwrap_or(default),
+            )
+        };
 
         // If LHS and RHS both have no top position or have the same role ID,
         // then no one wins.

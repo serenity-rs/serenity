@@ -75,75 +75,75 @@ impl DispatchEvent {
     #[instrument(skip(self, cache_and_http))]
     fn update(&mut self, cache_and_http: &Arc<CacheAndHttp>) {
         match self {
-            Self::Model(Event::ChannelCreate(ref mut event)) => {
+            Self::Model(Event::ChannelCreate(event)) => {
                 update(cache_and_http, event);
             },
-            Self::Model(Event::ChannelDelete(ref mut event)) => {
+            Self::Model(Event::ChannelDelete(event)) => {
                 update(cache_and_http, event);
             },
-            Self::Model(Event::ChannelUpdate(ref mut event)) => {
+            Self::Model(Event::ChannelUpdate(event)) => {
                 update(cache_and_http, event);
             },
-            Self::Model(Event::GuildCreate(ref mut event)) => {
+            Self::Model(Event::GuildCreate(event)) => {
                 update(cache_and_http, event);
             },
-            Self::Model(Event::GuildDelete(ref mut event)) => {
+            Self::Model(Event::GuildDelete(event)) => {
                 update(cache_and_http, event);
             },
-            Self::Model(Event::GuildEmojisUpdate(ref mut event)) => {
+            Self::Model(Event::GuildEmojisUpdate(event)) => {
                 update(cache_and_http, event);
             },
-            Self::Model(Event::GuildMemberAdd(ref mut event)) => {
+            Self::Model(Event::GuildMemberAdd(event)) => {
                 update(cache_and_http, event);
             },
-            Self::Model(Event::GuildMemberRemove(ref mut event)) => {
+            Self::Model(Event::GuildMemberRemove(event)) => {
                 update(cache_and_http, event);
             },
-            Self::Model(Event::GuildMemberUpdate(ref mut event)) => {
+            Self::Model(Event::GuildMemberUpdate(event)) => {
                 update(cache_and_http, event);
             },
-            Self::Model(Event::GuildMembersChunk(ref mut event)) => {
+            Self::Model(Event::GuildMembersChunk(event)) => {
                 update(cache_and_http, event);
             },
-            Self::Model(Event::GuildRoleCreate(ref mut event)) => {
+            Self::Model(Event::GuildRoleCreate(event)) => {
                 update(cache_and_http, event);
             },
-            Self::Model(Event::GuildRoleDelete(ref mut event)) => {
+            Self::Model(Event::GuildRoleDelete(event)) => {
                 update(cache_and_http, event);
             },
-            Self::Model(Event::GuildRoleUpdate(ref mut event)) => {
+            Self::Model(Event::GuildRoleUpdate(event)) => {
                 update(cache_and_http, event);
             },
-            Self::Model(Event::GuildStickersUpdate(ref mut event)) => {
+            Self::Model(Event::GuildStickersUpdate(event)) => {
                 update(cache_and_http, event);
             },
             // Already handled by the framework check macro
             Self::Model(Event::MessageCreate(_)) => {},
-            Self::Model(Event::MessageUpdate(ref mut event)) => {
+            Self::Model(Event::MessageUpdate(event)) => {
                 update(cache_and_http, event);
             },
-            Self::Model(Event::PresencesReplace(ref mut event)) => {
+            Self::Model(Event::PresencesReplace(event)) => {
                 update(cache_and_http, event);
             },
-            Self::Model(Event::PresenceUpdate(ref mut event)) => {
+            Self::Model(Event::PresenceUpdate(event)) => {
                 update(cache_and_http, event);
             },
-            Self::Model(Event::Ready(ref mut event)) => {
+            Self::Model(Event::Ready(event)) => {
                 update(cache_and_http, event);
             },
-            Self::Model(Event::UserUpdate(ref mut event)) => {
+            Self::Model(Event::UserUpdate(event)) => {
                 update(cache_and_http, event);
             },
-            Self::Model(Event::VoiceStateUpdate(ref mut event)) => {
+            Self::Model(Event::VoiceStateUpdate(event)) => {
                 update(cache_and_http, event);
             },
-            Self::Model(Event::ThreadCreate(ref mut event)) => {
+            Self::Model(Event::ThreadCreate(event)) => {
                 update(cache_and_http, event);
             },
-            Self::Model(Event::ThreadUpdate(ref mut event)) => {
+            Self::Model(Event::ThreadUpdate(event)) => {
                 update(cache_and_http, event);
             },
-            Self::Model(Event::ThreadDelete(ref mut event)) => {
+            Self::Model(Event::ThreadDelete(event)) => {
                 update(cache_and_http, event);
             },
             _ => (),
@@ -190,7 +190,7 @@ pub(crate) fn dispatch<'rec>(
                     }
                 }
             },
-            (Some(ref h), None) => match event {
+            (Some(h), None) => match event {
                 DispatchEvent::Model(Event::MessageCreate(mut event)) => {
                     update(&cache_and_http, &mut event);
 
@@ -228,7 +228,7 @@ pub(crate) fn dispatch<'rec>(
                     handle_event(other, data, h, runner_tx, shard_id, cache_and_http).await;
                 },
             },
-            (None, Some(ref rh)) => {
+            (None, Some(rh)) => {
                 event.update(&cache_and_http);
 
                 if let DispatchEvent::Model(event) = event {
@@ -253,7 +253,7 @@ pub(crate) fn dispatch<'rec>(
 
                     #[cfg(feature = "framework")]
                     {
-                        if let Event::MessageCreate(ref msg_event) = event {
+                        if let Event::MessageCreate(msg_event) = &event {
                             // Must clone in order to dispatch the framework too.
                             let message = msg_event.message.clone();
                             event_handler.raw_event(context.clone(), event).await;
@@ -274,14 +274,14 @@ pub(crate) fn dispatch<'rec>(
             },
             // We call this function again, passing `None` for each event handler
             // and passing no framework, as we dispatch once we are done right here.
-            (Some(ref handler), Some(ref raw_handler)) => {
+            (Some(handler), Some(raw_handler)) => {
                 #[cfg(not(feature = "cache"))]
                 let context = context(data, runner_tx, shard_id, &cache_and_http.http);
                 #[cfg(feature = "cache")]
                 let context =
                     context(data, runner_tx, shard_id, &cache_and_http.http, &cache_and_http.cache);
 
-                if let DispatchEvent::Model(ref event) = event {
+                if let DispatchEvent::Model(event) = &event {
                     raw_handler.raw_event(context.clone(), event.clone()).await;
                 }
 
@@ -415,7 +415,7 @@ async fn handle_event(
         Event::ChannelUpdate(mut event) => {
             spawn_named("dispatch::event_handler::channel_update", async move {
                 feature_cache! {{
-                    let old_channel = cache_and_http.cache.as_ref().channel(event.channel.id());
+                    let old_channel = cache_and_http.cache.channel(event.channel.id());
                     update(&cache_and_http, &mut event);
 
                     event_handler.channel_update(context, old_channel, event.channel).await;
