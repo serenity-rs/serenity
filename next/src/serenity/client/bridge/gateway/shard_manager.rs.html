@@ -365,6 +365,10 @@
 <span id="360">360</span>
 <span id="361">361</span>
 <span id="362">362</span>
+<span id="363">363</span>
+<span id="364">364</span>
+<span id="365">365</span>
+<span id="366">366</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::collections</span>::{<span class="ident">HashMap</span>, <span class="ident">VecDeque</span>};
 <span class="kw">use</span> <span class="ident">std::sync::Arc</span>;
 
@@ -388,6 +392,7 @@
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::client</span>::{<span class="ident">EventHandler</span>, <span class="ident">RawEventHandler</span>};
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;framework&quot;</span>)]</span>
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::framework::Framework</span>;
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::gateway::PresenceData</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::internal::prelude</span>::<span class="kw-2">*</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::internal::tokio::spawn_named</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::gateway::GatewayIntents</span>;
@@ -456,6 +461,7 @@
 <span class="doccomment">///     ws_url,</span>
 <span class="doccomment">///     # cache_and_http,</span>
 <span class="doccomment">///     intents: GatewayIntents::non_privileged(),</span>
+<span class="doccomment">///     presence: None,</span>
 <span class="doccomment">/// });</span>
 <span class="doccomment">/// #     Ok(())</span>
 <span class="doccomment">/// # }</span>
@@ -508,6 +514,7 @@
             <span class="ident">ws_url</span>: <span class="ident">opt</span>.<span class="ident">ws_url</span>,
             <span class="ident">cache_and_http</span>: <span class="ident">opt</span>.<span class="ident">cache_and_http</span>,
             <span class="ident">intents</span>: <span class="ident">opt</span>.<span class="ident">intents</span>,
+            <span class="ident">presence</span>: <span class="ident">opt</span>.<span class="ident">presence</span>,
         };
 
         <span class="ident">spawn_named</span>(<span class="string">&quot;shard_queuer::run&quot;</span>, <span class="kw">async</span> <span class="kw">move</span> {
@@ -726,6 +733,7 @@
     <span class="kw">pub</span> <span class="ident">ws_url</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Mutex</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span><span class="op">&gt;</span>,
     <span class="kw">pub</span> <span class="ident">cache_and_http</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">CacheAndHttp</span><span class="op">&gt;</span>,
     <span class="kw">pub</span> <span class="ident">intents</span>: <span class="ident">GatewayIntents</span>,
+    <span class="kw">pub</span> <span class="ident">presence</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">PresenceData</span><span class="op">&gt;</span>,
 }
 </code></pre></div>
 </section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.61.0-nightly (3c17c84a3 2022-03-21)" ></div>

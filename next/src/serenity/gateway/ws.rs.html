@@ -270,6 +270,20 @@
 <span id="265">265</span>
 <span id="266">266</span>
 <span id="267">267</span>
+<span id="268">268</span>
+<span id="269">269</span>
+<span id="270">270</span>
+<span id="271">271</span>
+<span id="272">272</span>
+<span id="273">273</span>
+<span id="274">274</span>
+<span id="275">275</span>
+<span id="276">276</span>
+<span id="277">277</span>
+<span id="278">278</span>
+<span id="279">279</span>
+<span id="280">280</span>
+<span id="281">281</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::env::consts</span>;
 <span class="kw">use</span> <span class="ident">std::io::Read</span>;
 <span class="kw">use</span> <span class="ident">std::time::SystemTime</span>;
@@ -313,6 +327,14 @@
 }
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Serialize</span>)]</span>
+<span class="kw">struct</span> <span class="ident">PresenceUpdateMessage</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
+    <span class="ident">afk</span>: <span class="ident">bool</span>,
+    <span class="ident">status</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>,
+    <span class="ident">since</span>: <span class="ident">SystemTime</span>,
+    <span class="ident">activities</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">ActivityData</span>],
+}
+
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Serialize</span>)]</span>
 <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">untagged</span>)]</span>
 <span class="kw">enum</span> <span class="ident">WebSocketMessageData</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
     <span class="ident">Heartbeat</span>(<span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span>),
@@ -324,13 +346,9 @@
         <span class="ident">shard</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">ShardInfo</span>,
         <span class="ident">intents</span>: <span class="ident">GatewayIntents</span>,
         <span class="ident">properties</span>: <span class="ident">IdentifyProperties</span>,
+        <span class="ident">presence</span>: <span class="ident">PresenceUpdateMessage</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
     },
-    <span class="ident">PresenceUpdate</span> {
-        <span class="ident">afk</span>: <span class="ident">bool</span>,
-        <span class="ident">status</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>,
-        <span class="ident">since</span>: <span class="ident">SystemTime</span>,
-        <span class="ident">activities</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">ActivityData</span>],
-    },
+    <span class="ident">PresenceUpdate</span>(<span class="ident">PresenceUpdateMessage</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>),
     <span class="ident">Resume</span> {
         <span class="ident">session_id</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>,
         <span class="ident">token</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>,
@@ -471,7 +489,11 @@
         <span class="ident">shard</span>: <span class="kw-2">&amp;</span><span class="ident">ShardInfo</span>,
         <span class="ident">token</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
         <span class="ident">intents</span>: <span class="ident">GatewayIntents</span>,
+        <span class="ident">presence</span>: <span class="kw-2">&amp;</span><span class="ident">PresenceData</span>,
     ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+        <span class="kw">let</span> <span class="ident">activities</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">presence</span>.<span class="ident">activity</span>.<span class="ident">iter</span>().<span class="ident">collect</span>();
+        <span class="kw">let</span> <span class="ident">now</span> <span class="op">=</span> <span class="ident">SystemTime::now</span>();
+
         <span class="macro">debug!</span>(<span class="string">&quot;[{:?}] Identifying&quot;</span>, <span class="ident">shard</span>);
 
         <span class="kw">let</span> <span class="ident">msg</span> <span class="op">=</span> <span class="ident">WebSocketMessage</span> {
@@ -486,6 +508,12 @@
                     <span class="ident">browser</span>: <span class="string">&quot;serenity&quot;</span>,
                     <span class="ident">device</span>: <span class="string">&quot;serenity&quot;</span>,
                     <span class="ident">os</span>: <span class="ident">consts::OS</span>,
+                },
+                <span class="ident">presence</span>: <span class="ident">PresenceUpdateMessage</span> {
+                    <span class="ident">afk</span>: <span class="bool-val">false</span>,
+                    <span class="ident">since</span>: <span class="ident">now</span>,
+                    <span class="ident">status</span>: <span class="ident">presence</span>.<span class="ident">status</span>.<span class="ident">name</span>(),
+                    <span class="ident">activities</span>: <span class="kw-2">&amp;</span><span class="ident">activities</span>,
                 },
             },
         };
@@ -506,12 +534,12 @@
 
         <span class="self">self</span>.<span class="ident">send_json</span>(<span class="kw-2">&amp;</span><span class="ident">WebSocketMessage</span> {
             <span class="ident">op</span>: <span class="ident">Opcode::PresenceUpdate</span>,
-            <span class="ident">d</span>: <span class="ident">WebSocketMessageData::PresenceUpdate</span> {
+            <span class="ident">d</span>: <span class="ident">WebSocketMessageData::PresenceUpdate</span>(<span class="ident">PresenceUpdateMessage</span> {
                 <span class="ident">afk</span>: <span class="bool-val">false</span>,
                 <span class="ident">since</span>: <span class="ident">now</span>,
                 <span class="ident">status</span>: <span class="ident">presence</span>.<span class="ident">status</span>.<span class="ident">name</span>(),
                 <span class="ident">activities</span>: <span class="kw-2">&amp;</span><span class="ident">activities</span>,
-            },
+            }),
         })
         .<span class="kw">await</span>
     }
