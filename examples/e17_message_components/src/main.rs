@@ -58,14 +58,18 @@ impl EventHandler for Handler {
         // Wait for the user to make a selection
         // This uses a collector to wait for an incoming event without needing to listen for it
         // manually in the EventHandler.
-        let interaction =
-            match m.await_component_interaction(&ctx).timeout(Duration::from_secs(60 * 3)).await {
-                Some(x) => x,
-                None => {
-                    m.reply(&ctx, "Timed out").await.unwrap();
-                    return;
-                },
-            };
+        let interaction = match m
+            .component_interaction_collector(&ctx.shard)
+            .timeout(Duration::from_secs(60 * 3))
+            .collect_single()
+            .await
+        {
+            Some(x) => x,
+            None => {
+                m.reply(&ctx, "Timed out").await.unwrap();
+                return;
+            },
+        };
 
         // data.values contains the selected value from each select menus. We only have one menu,
         // so we retrieve the first
@@ -103,8 +107,10 @@ impl EventHandler for Handler {
             .unwrap();
 
         // Wait for multiple interactions
-        let mut interaction_stream =
-            m.await_component_interactions(&ctx).timeout(Duration::from_secs(60 * 3)).build();
+        let mut interaction_stream = m
+            .component_interaction_collector(&ctx.shard)
+            .timeout(Duration::from_secs(60 * 3))
+            .build();
 
         while let Some(interaction) = interaction_stream.next().await {
             let sound = &interaction.data.custom_id;
