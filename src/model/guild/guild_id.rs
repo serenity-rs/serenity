@@ -317,40 +317,39 @@ impl GuildId {
     ///
     /// Refer to [`Http::create_channel`] for more information.
     ///
-    /// Requires the [Manage Channels] permission.
+    /// **Note**: Requires the [Manage Channels] permission.
     ///
     /// # Examples
     ///
     /// Create a voice channel in a guild with the name `test`:
     ///
     /// ```rust,no_run
+    /// # use serenity::http::Http;
+    /// use serenity::builder::CreateChannel;
     /// use serenity::model::channel::ChannelType;
     /// use serenity::model::id::GuildId;
     ///
-    /// # async fn run() {
-    /// # use serenity::http::Http;
+    /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// # let http = Http::new("token");
-    /// let _channel =
-    ///     GuildId::new(7).create_channel(&http, |c| c.name("test").kind(ChannelType::Voice)).await;
+    /// let builder = CreateChannel::default().name("test").kind(ChannelType::Voice);
+    /// let _channel = GuildId::new(7).create_channel(&http, builder).await?;
+    /// # Ok(())
     /// # }
     /// ```
     ///
     /// # Errors
     ///
-    /// Returns [`Error::Http`] if the current user lacks permission,
-    /// or if invalid values are set.
+    /// If the `cache` is enabled, returns a [`ModelError::InvalidPermissions`] if the current user
+    /// lacks permission. Otherwise returns [`Error::Http`], as well as if invalid data is given.
     ///
     /// [Manage Channels]: Permissions::MANAGE_CHANNELS
     #[inline]
     pub async fn create_channel(
         self,
-        http: impl AsRef<Http>,
-        f: impl FnOnce(&mut CreateChannel) -> &mut CreateChannel,
+        cache_http: impl CacheHttp,
+        builder: CreateChannel,
     ) -> Result<GuildChannel> {
-        let mut builder = CreateChannel::default();
-        f(&mut builder);
-
-        http.as_ref().create_channel(self.get(), &builder, None).await
+        builder.execute(cache_http, self).await
     }
 
     /// Creates an emoji in the guild with a name and base64-encoded image.

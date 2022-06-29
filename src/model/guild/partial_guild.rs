@@ -382,32 +382,42 @@ impl PartialGuild {
     ///
     /// Refer to [`Http::create_channel`] for more information.
     ///
-    /// Requires the [Manage Channels] permission.
+    /// **Note**: Requires the [Manage Channels] permission.
     ///
     /// # Examples
     ///
     /// Create a voice channel in a guild with the name `test`:
     ///
-    /// ```rust,ignore
-    /// use serenity::model::ChannelType;
+    /// ```rust,no_run
+    /// # use serenity::http::Http;
+    /// # use serenity::model::guild::PartialGuild;
+    /// # use serenity::model::id::GuildId;
+    /// use serenity::builder::CreateChannel;
+    /// use serenity::model::channel::ChannelType;
     ///
-    /// guild.create_channel(|c| c.name("test").kind(ChannelType::Voice));
+    /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
+    /// # let http = Http::new("token");
+    /// # let guild = PartialGuild::get(&http, GuildId::new(7)).await?;
+    /// let builder = CreateChannel::default().name("my-test-channel").kind(ChannelType::Text);
+    ///
+    /// // assuming a `guild` has already been bound
+    /// let _channel = guild.create_channel(&http, builder).await?;
+    /// # Ok(())
+    /// # }
     /// ```
     ///
     /// # Errors
     ///
-    /// Returns [`Error::Http`] if the current user lacks permission,
-    /// or if invalid data was given, such as the channel name being
-    /// too long.
+    /// If the `cache` is enabled, returns a [`ModelError::InvalidPermissions`] if the current user
+    /// lacks permission. Otherwise returns [`Error::Http`], as well as if invalid data is given.
     ///
     /// [Manage Channels]: Permissions::MANAGE_CHANNELS
-    #[inline]
     pub async fn create_channel(
         &self,
-        http: impl AsRef<Http>,
-        f: impl FnOnce(&mut CreateChannel) -> &mut CreateChannel,
+        cache_http: impl CacheHttp,
+        builder: CreateChannel,
     ) -> Result<GuildChannel> {
-        self.id.create_channel(&http, f).await
+        self.id.create_channel(cache_http, builder).await
     }
 
     /// Creates an emoji in the guild with a name and base64-encoded image.

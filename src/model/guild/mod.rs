@@ -667,41 +667,36 @@ impl Guild {
     ///
     /// # Examples
     ///
-    /// ```rust,ignore
-    /// use serenity::model::ChannelType;
+    /// ```rust,no_run
+    /// # use serenity::http::Http;
+    /// # use serenity::model::guild::Guild;
+    /// # use serenity::model::id::GuildId;
+    /// use serenity::builder::CreateChannel;
+    /// use serenity::model::channel::ChannelType;
+    ///
+    /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
+    /// # let http = Http::new("token");
+    /// # let guild = Guild::get(&http, GuildId::new(7)).await?;
+    /// let builder = CreateChannel::default().name("my-test-channel").kind(ChannelType::Text);
     ///
     /// // assuming a `guild` has already been bound
-    ///
-    /// let _ = guild
-    ///     .create_channel(&http, |c| c.name("my-test-channel").kind(ChannelType::Text))
-    ///     .await;
+    /// let _channel = guild.create_channel(&http, builder).await?;
+    /// # Ok(())
+    /// # }
     /// ```
     ///
     /// # Errors
     ///
-    /// If the `cache` is enabled, returns a [`ModelError::InvalidPermissions`]
-    /// if the current user does not have permission to manage channels.
-    ///
-    /// Otherwise will return [`Error::Http`] if the current user lacks permission.
+    /// If the `cache` is enabled, returns a [`ModelError::InvalidPermissions`] if the current user
+    /// lacks permission. Otherwise returns [`Error::Http`], as well as if invalid data is given.
     ///
     /// [Manage Channels]: Permissions::MANAGE_CHANNELS
     pub async fn create_channel(
         &self,
         cache_http: impl CacheHttp,
-        f: impl FnOnce(&mut CreateChannel) -> &mut CreateChannel,
+        builder: CreateChannel,
     ) -> Result<GuildChannel> {
-        #[cfg(feature = "cache")]
-        {
-            if cache_http.cache().is_some() {
-                let req = Permissions::MANAGE_CHANNELS;
-
-                if !self.has_perms(&cache_http, req).await {
-                    return Err(Error::Model(ModelError::InvalidPermissions(req)));
-                }
-            }
-        }
-
-        self.id.create_channel(cache_http.http(), f).await
+        self.id.create_channel(cache_http, builder).await
     }
 
     /// Creates an emoji in the guild with a name and base64-encoded image. The
