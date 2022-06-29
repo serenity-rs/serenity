@@ -229,11 +229,8 @@ impl CurrentUser {
         default_avatar_url(self.discriminator)
     }
 
-    /// Edits the current user's profile settings.
-    ///
-    /// This mutates the current user in-place.
-    ///
-    /// Refer to [`EditProfile`]'s documentation for its methods.
+    /// Returns a builder that edits the current user's profile settings when executed, mutating
+    /// the current user in-place.
     ///
     /// # Examples
     ///
@@ -248,30 +245,13 @@ impl CurrentUser {
     /// #     let mut user = CurrentUser::default();
     /// let avatar = serenity::utils::read_image("./avatar.png")?;
     ///
-    /// user.edit(&http, |p| p.avatar(Some(avatar))).await;
+    /// user.edit().avatar(Some(avatar)).execute(&http).await;
     /// #     Ok(())
     /// # }
     /// ```
-    ///
-    /// # Errors
-    ///
-    /// Returns an [`Error::Http`] if an invalid value is set.
-    /// May also return an [`Error::Json`] if there is an error in
-    /// deserializing the API response.
-    ///
-    /// [`Error::Http`]: crate::error::Error::Http
-    /// [`Error::Json`]: crate::error::Error::Json
-    pub async fn edit<F>(&mut self, http: impl AsRef<Http>, f: F) -> Result<()>
-    where
-        F: FnOnce(&mut EditProfile) -> &mut EditProfile,
-    {
-        let mut edit_profile = EditProfile::default();
-        edit_profile.username(self.name.clone());
-        f(&mut edit_profile);
-
-        *self = http.as_ref().edit_profile(&edit_profile).await?;
-
-        Ok(())
+    pub fn edit(&mut self) -> EditProfile<'_> {
+        let name = self.name.clone();
+        EditProfile::new(self).username(name)
     }
 
     /// Retrieves the URL to the current user's avatar, falling back to the
