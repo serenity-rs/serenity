@@ -1837,36 +1837,28 @@
 <span id="1831">1831</span>
 <span id="1832">1832</span>
 <span id="1833">1833</span>
-<span id="1834">1834</span>
-<span id="1835">1835</span>
-<span id="1836">1836</span>
-<span id="1837">1837</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::fmt</span>;
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
 <span class="kw">use</span> <span class="ident">futures::stream::Stream</span>;
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::builder::CreateChannel</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::builder</span>::{
     <span class="ident">AddMember</span>,
+    <span class="ident">CreateApplicationCommand</span>,
+    <span class="ident">CreateApplicationCommandPermissionsData</span>,
+    <span class="ident">CreateApplicationCommands</span>,
+    <span class="ident">CreateApplicationCommandsPermissions</span>,
+    <span class="ident">CreateChannel</span>,
+    <span class="ident">CreateScheduledEvent</span>,
     <span class="ident">CreateSticker</span>,
     <span class="ident">EditGuild</span>,
     <span class="ident">EditGuildWelcomeScreen</span>,
     <span class="ident">EditGuildWidget</span>,
     <span class="ident">EditMember</span>,
     <span class="ident">EditRole</span>,
-    <span class="ident">EditSticker</span>,
-};
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::builder</span>::{
-    <span class="ident">CreateApplicationCommand</span>,
-    <span class="ident">CreateApplicationCommandPermissionsData</span>,
-    <span class="ident">CreateApplicationCommands</span>,
-    <span class="ident">CreateApplicationCommandsPermissions</span>,
-    <span class="ident">CreateScheduledEvent</span>,
     <span class="ident">EditScheduledEvent</span>,
+    <span class="ident">EditSticker</span>,
 };
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>))]</span>
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::cache::Cache</span>;
