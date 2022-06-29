@@ -957,31 +957,15 @@ impl Guild {
     /// # Errors
     ///
     /// If the `cache` is enabled, returns a [`ModelError::InvalidPermissions`] if the current user
-    /// does not have permission to manage scheduled events.
-    ///
-    /// Otherwise will return [`Error::Http`] if the current user does not have permission.
+    /// lacks permission. Otherwise returns [`Error::Http`], as well as if invalid data is given.
     ///
     /// [Manage Events]: Permissions::MANAGE_EVENTS
-    pub async fn create_scheduled_event<F>(
+    pub async fn create_scheduled_event(
         &self,
         cache_http: impl CacheHttp,
-        f: F,
-    ) -> Result<ScheduledEvent>
-    where
-        F: FnOnce(&mut CreateScheduledEvent) -> &mut CreateScheduledEvent,
-    {
-        #[cfg(feature = "cache")]
-        {
-            if cache_http.cache().is_some() {
-                let req = Permissions::MANAGE_EVENTS;
-
-                if !self.has_perms(&cache_http, req).await {
-                    return Err(Error::Model(ModelError::InvalidPermissions(req)));
-                }
-            }
-        }
-
-        self.id.create_scheduled_event(cache_http.http(), f).await
+        builder: CreateScheduledEvent,
+    ) -> Result<ScheduledEvent> {
+        self.id.create_scheduled_event(cache_http, builder).await
     }
 
     /// Creates a new sticker in the guild with the data set, if any.
