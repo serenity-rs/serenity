@@ -231,8 +231,7 @@ pub struct AuditLogs {
 #[non_exhaustive]
 pub struct AuditLogEntry {
     /// Determines to what entity an [`Self::action`] was used on.
-    #[serde(with = "optional_string")]
-    pub target_id: Option<u64>,
+    pub target_id: Option<GenericId>,
     /// Determines what action was done on a [`Self::target_id`]
     #[serde(rename = "action_type")]
     pub action: Action,
