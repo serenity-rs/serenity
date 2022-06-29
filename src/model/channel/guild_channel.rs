@@ -186,7 +186,7 @@ impl GuildChannel {
         #[cfg(feature = "cache")]
         {
             if let Some(cache) = cache_http.cache() {
-                utils::user_has_perms_cache(
+                crate::utils::user_has_perms_cache(
                     cache,
                     self.id,
                     Some(self.guild_id),
@@ -307,7 +307,7 @@ impl GuildChannel {
         #[cfg(feature = "cache")]
         {
             if let Some(cache) = cache_http.cache() {
-                utils::user_has_perms_cache(
+                crate::utils::user_has_perms_cache(
                     cache,
                     self.id,
                     Some(self.guild_id),
@@ -411,7 +411,7 @@ impl GuildChannel {
         #[cfg(feature = "cache")]
         {
             if let Some(cache) = cache_http.cache() {
-                utils::user_has_perms_cache(
+                crate::utils::user_has_perms_cache(
                     cache,
                     self.id,
                     Some(self.guild_id),
@@ -962,10 +962,7 @@ impl GuildChannel {
             if let Some(cache) = cache_http.cache() {
                 let req = Permissions::SEND_MESSAGES;
 
-                if let Ok(false) = utils::user_has_perms(&cache, self.id, Some(self.guild_id), req)
-                {
-                    return Err(Error::Model(ModelError::InvalidPermissions(req)));
-                }
+                crate::utils::user_has_perms_cache(cache, self.id, Some(self.guild_id), req)?;
             }
         }
 
