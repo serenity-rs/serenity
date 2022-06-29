@@ -44,9 +44,11 @@ use crate::builder::{
     CreateApplicationCommandPermissionsData,
     CreateApplicationCommands,
     CreateApplicationCommandsPermissions,
+    CreateAutoModRule,
     CreateChannel,
     CreateScheduledEvent,
     CreateSticker,
+    EditAutoModRule,
     EditGuild,
     EditGuildWelcomeScreen,
     EditGuildWidget,
@@ -74,6 +76,8 @@ use crate::json::prelude::*;
 use crate::json::{from_number, from_value};
 #[cfg(feature = "model")]
 use crate::model::application::command::{Command, CommandPermission};
+#[cfg(feature = "model")]
+use crate::model::guild::automod::Rule;
 use crate::model::prelude::*;
 use crate::model::utils::{emojis, presences, roles, stickers};
 use crate::model::Timestamp;
@@ -263,6 +267,113 @@ pub struct Guild {
 
 #[cfg(feature = "model")]
 impl Guild {
+    /// Gets all auto moderation [`Rule`]s of this guild via HTTP.
+    ///
+    /// **Note**: Requires the [Manage Guild] permission.
+    ///
+    /// # Errors
+    ///
+    /// Returns an [`Error::Http`] if the guild is unavailable.
+    ///
+    /// [Manage Guild]: Permissions::MANAGE_GUILD
+    #[inline]
+    pub async fn automod_rules(self, http: impl AsRef<Http>) -> Result<Vec<Rule>> {
+        self.id.automod_rules(http).await
+    }
+
+    /// Gets an auto moderation [`Rule`] of this guild by its ID via HTTP.
+    ///
+    /// **Note**: Requires the [Manage Guild] permission.
+    ///
+    /// # Errors
+    ///
+    /// Returns an [`Error::Http`] if a rule with the given ID does not exist.
+    ///
+    /// [Manage Guild]: Permissions::MANAGE_GUILD
+    #[inline]
+    pub async fn automod_rule(
+        self,
+        http: impl AsRef<Http>,
+        rule_id: impl Into<RuleId>,
+    ) -> Result<Rule> {
+        self.id.automod_rule(http, rule_id).await
+    }
+
+    /// Creates an auto moderation [`Rule`] in the guild.
+    ///
+    /// **Note**: Requires the [Manage Guild] permission.
+    ///
+    /// # Examples
+    ///
+    /// Create a custom keyword filter to block the message and timeout the author.
+    ///
+    /// ```ignore
+    /// use serenity::model::guild::automod::{Action, Trigger};
+    /// use serenity::model::id::GuildId;
+    ///
+    /// let _rule = guild
+    ///     .create_automod_rule(&http, |r| {
+    ///         r.name("foobar filter")
+    ///             .trigger(Trigger::Keyword(vec!["foo*".to_string(), "*bar".to_string()]))
+    ///             .actions(vec![Action::BlockMessage, Action::Timeout(60)])
+    ///     })
+    ///     .await;
+    /// ```
+    ///
+    /// # Errors
+    ///
+    /// Returns [`Error::Http`] if the current user lacks permission,
+    /// or if invalid values are set.
+    ///
+    /// [Manage Guild]: Permissions::MANAGE_GUILD
+    #[inline]
+    pub async fn create_automod_rule(
+        self,
+        http: impl AsRef<Http>,
+        f: impl FnOnce(&mut CreateAutoModRule) -> &mut CreateAutoModRule,
+    ) -> Result<Rule> {
+        self.id.create_automod_rule(http, f).await
+    }
+
+    /// Edit an auto moderation [`Rule`] by its ID.
+    ///
+    /// **Note**: Requires the [Manage Guild] permission.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`Error::Http`] if the current user lacks permission,
+    /// or if invalid values are set.
+    ///
+    /// [Manage Guild]: Permissions::MANAGE_GUILD
+    #[inline]
+    pub async fn edit_automod_rule(
+        self,
+        http: impl AsRef<Http>,
+        rule_id: impl Into<RuleId>,
+        f: impl FnOnce(&mut EditAutoModRule) -> &mut EditAutoModRule,
+    ) -> Result<Rule> {
+        self.id.edit_automod_rule(http, rule_id, f).await
+    }
+
+    /// Deletes an auto moderation [`Rule`] from the guild.
+    ///
+    /// **Note**: Requires the [Manage Guild] permission.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`Error::Http`] if the current user lacks permission,
+    /// or if a rule with that Id does not exist.
+    ///
+    /// [Manage Guild]: Permissions::MANAGE_GUILD
+    #[inline]
+    pub async fn delete_automod_rule(
+        self,
+        http: impl AsRef<Http>,
+        rule_id: impl Into<RuleId>,
+    ) -> Result<()> {
+        self.id.delete_automod_rule(http, rule_id).await
+    }
+
     #[cfg(feature = "cache")]
     fn check_hierarchy(&self, cache: impl AsRef<Cache>, other_user: UserId) -> Result<()> {
         let current_id = cache.as_ref().current_user().id;
