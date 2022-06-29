@@ -35,6 +35,7 @@ use crate::model::id::{
 };
 use crate::model::user::User;
 use crate::model::utils::deserialize_options_with_resolved;
+use crate::model::Permissions;
 
 /// An interaction when a user invokes a slash command.
 ///
@@ -67,6 +68,8 @@ pub struct ApplicationCommandInteraction {
     pub token: String,
     /// Always `1`.
     pub version: u8,
+    /// Permissions the app or bot has within the channel the interaction was sent from.
+    pub app_permissions: Option<Permissions>,
     /// The selected language of the invoking user.
     pub locale: String,
     /// The guild's preferred locale.
@@ -412,6 +415,12 @@ impl<'de> Deserialize<'de> for ApplicationCommandInteraction {
             .and_then(u8::deserialize)
             .map_err(DeError::custom)?;
 
+        let app_permissions = map
+            .remove("app_permissions")
+            .map(Permissions::deserialize)
+            .transpose()
+            .map_err(DeError::custom)?;
+
         let guild_locale = map
             .remove("guild_locale")
             .map(String::deserialize)
@@ -435,6 +444,7 @@ impl<'de> Deserialize<'de> for ApplicationCommandInteraction {
             user,
             token,
             version,
+            app_permissions,
             locale,
             guild_locale,
         })
