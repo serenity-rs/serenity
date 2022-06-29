@@ -10,9 +10,11 @@ use crate::builder::{
     CreateApplicationCommandPermissionsData,
     CreateApplicationCommands,
     CreateApplicationCommandsPermissions,
+    CreateAutoModRule,
     CreateChannel,
     CreateScheduledEvent,
     CreateSticker,
+    EditAutoModRule,
     EditGuild,
     EditGuildWelcomeScreen,
     EditGuildWidget,
@@ -44,10 +46,133 @@ use crate::json::json;
 use crate::json::prelude::*;
 #[cfg(feature = "model")]
 use crate::model::application::command::{Command, CommandPermission};
+#[cfg(feature = "model")]
+use crate::model::guild::automod::Rule;
 use crate::model::prelude::*;
 
 #[cfg(feature = "model")]
 impl GuildId {
+    /// Gets all auto moderation [`Rule`]s of this guild via HTTP.
+    ///
+    /// **Note**: Requires the [Manage Guild] permission.
+    ///
+    /// # Errors
+    ///
+    /// Returns an [`Error::Http`] if the guild is unavailable.
+    ///
+    /// [Manage Guild]: Permissions::MANAGE_GUILD
+    #[inline]
+    pub async fn automod_rules(self, http: impl AsRef<Http>) -> Result<Vec<Rule>> {
+        http.as_ref().get_automod_rules(self.0).await
+    }
+
+    /// Gets an auto moderation [`Rule`] of this guild by its ID via HTTP.
+    ///
+    /// **Note**: Requires the [Manage Guild] permission.
+    ///
+    /// # Errors
+    ///
+    /// Returns an [`Error::Http`] if a rule with the given ID does not exist.
+    ///
+    /// [Manage Guild]: Permissions::MANAGE_GUILD
+    #[inline]
+    pub async fn automod_rule(
+        self,
+        http: impl AsRef<Http>,
+        rule_id: impl Into<RuleId>,
+    ) -> Result<Rule> {
+        http.as_ref().get_automod_rule(self.0, rule_id.into().0).await
+    }
+
+    /// Creates an auto moderation [`Rule`] in the guild.
+    ///
+    /// **Note**: Requires the [Manage Guild] permission.
+    ///
+    /// # Examples
+    ///
+    /// Create a custom keyword filter to block the message and timeout the author.
+    ///
+    /// ```
+    /// use serenity::model::guild::automod::{Action, Trigger};
+    /// use serenity::model::id::GuildId;
+    ///
+    /// # async fn run() {
+    /// # use serenity::http::Http;
+    /// # let http = Http::new("token");
+    /// let _rule = GuildId(7)
+    ///     .create_automod_rule(&http, |r| {
+    ///         r.name("foobar filter")
+    ///             .trigger(Trigger::Keyword(vec!["foo*".to_string(), "*bar".to_string()]))
+    ///             .actions(vec![Action::BlockMessage, Action::Timeout(60)])
+    ///     })
+    ///     .await;
+    /// # }
+    /// ```
+    ///
+    /// # Errors
+    ///
+    /// Returns [`Error::Http`] if the current user lacks permission,
+    /// or if invalid values are set.
+    ///
+    /// [Manage Guild]: Permissions::MANAGE_GUILD
+    #[inline]
+    pub async fn create_automod_rule(
+        self,
+        http: impl AsRef<Http>,
+        f: impl FnOnce(&mut CreateAutoModRule) -> &mut CreateAutoModRule,
+    ) -> Result<Rule> {
+        let mut builder = CreateAutoModRule::default();
+        f(&mut builder);
+
+        let map = json::hashmap_to_json_map(builder.0);
+
+        http.as_ref().create_automod_rule(self.0, &map).await
+    }
+
+    /// Edit an auto moderation [`Rule`] by its ID.
+    ///
+    /// **Note**: Requires the [Manage Guild] permission.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`Error::Http`] if the current user lacks permission,
+    /// or if invalid values are set.
+    ///
+    /// [Manage Guild]: Permissions::MANAGE_GUILD
+    #[inline]
+    pub async fn edit_automod_rule(
+        self,
+        http: impl AsRef<Http>,
+        rule_id: impl Into<RuleId>,
+        f: impl FnOnce(&mut EditAutoModRule) -> &mut EditAutoModRule,
+    ) -> Result<Rule> {
+        let mut builder = EditAutoModRule::default();
+        f(&mut builder);
+
+        let map = json::hashmap_to_json_map(builder.0);
+
+        http.as_ref().edit_automod_rule(self.0, rule_id.into().0, &map).await
+    }
+
+    /// Deletes an auto moderation [`Rule`] from the guild.
+    ///
+    /// **Note**: Requires the [Manage Guild] permission.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`Error::Http`] if the current user lacks permission,
+    /// or if a rule with that Id does not exist.
+    ///
+    /// [Manage Guild]: Permissions::MANAGE_GUILD
+    #[inline]
+    pub async fn delete_automod_rule(
+        self,
+        http: impl AsRef<Http>,
+        rule_id: impl Into<RuleId>,
+    ) -> Result<()> {
+        http.as_ref().delete_automod_rule(self.0, rule_id.into().0).await
+    }
+
     /// Adds a [`User`] to this guild with a valid OAuth2 access token.
     ///
     /// Returns the created [`Member`] object, or nothing if the user is already a member of the guild.

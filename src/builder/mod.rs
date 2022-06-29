@@ -14,6 +14,7 @@ mod create_application_command_permission;
 mod add_member;
 mod bot_auth_parameters;
 mod create_allowed_mentions;
+mod create_automod_rule;
 mod create_components;
 mod create_interaction_response;
 mod create_interaction_response_followup;
@@ -23,6 +24,7 @@ mod create_scheduled_event;
 mod create_stage_instance;
 mod create_sticker;
 mod create_thread;
+mod edit_automod_rule;
 mod edit_channel;
 mod edit_guild;
 mod edit_guild_welcome_screen;
@@ -55,6 +57,7 @@ pub use self::create_application_command_permission::{
     CreateApplicationCommandPermissionsData,
     CreateApplicationCommandsPermissions,
 };
+pub use self::create_automod_rule::CreateAutoModRule;
 pub use self::create_channel::CreateChannel;
 pub use self::create_components::{
     CreateActionRow,
@@ -78,6 +81,7 @@ pub use self::create_scheduled_event::CreateScheduledEvent;
 pub use self::create_stage_instance::CreateStageInstance;
 pub use self::create_sticker::CreateSticker;
 pub use self::create_thread::CreateThread;
+pub use self::edit_automod_rule::EditAutoModRule;
 pub use self::edit_channel::EditChannel;
 pub use self::edit_guild::EditGuild;
 pub use self::edit_guild_welcome_screen::EditGuildWelcomeScreen;
