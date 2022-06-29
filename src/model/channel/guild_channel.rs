@@ -1217,33 +1217,27 @@ impl GuildChannel {
     ///
     /// # Errors
     ///
-    /// Returns [`Error::Http`] if the current user lacks permission.
-    pub async fn create_public_thread<F>(
+    /// Returns [`Error::Http`] if the current user lacks permission, or if invalid data is given.
+    pub async fn create_public_thread(
         &self,
         http: impl AsRef<Http>,
         message_id: impl Into<MessageId>,
-        f: F,
-    ) -> Result<GuildChannel>
-    where
-        F: FnOnce(&mut CreateThread) -> &mut CreateThread,
-    {
-        self.id.create_public_thread(http, message_id, f).await
+        builder: CreateThread,
+    ) -> Result<GuildChannel> {
+        self.id.create_public_thread(http, message_id, builder).await
     }
 
     /// Creates a private thread.
     ///
     /// # Errors
     ///
-    /// Returns [`Error::Http`] if the current user lacks permission.
-    pub async fn create_private_thread<F>(
+    /// Returns [`Error::Http`] if the current user lacks permission, or if invalid data is given.
+    pub async fn create_private_thread(
         &self,
         http: impl AsRef<Http>,
-        f: F,
-    ) -> Result<GuildChannel>
-    where
-        F: FnOnce(&mut CreateThread) -> &mut CreateThread,
-    {
-        self.id.create_private_thread(http, f).await
+        builder: CreateThread,
+    ) -> Result<GuildChannel> {
+        self.id.create_private_thread(http, builder).await
     }
 }
 

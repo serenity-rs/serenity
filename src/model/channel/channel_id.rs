@@ -978,40 +978,27 @@ impl ChannelId {
     ///
     /// # Errors
     ///
-    /// Returns [`Error::Http`] if the current user lacks permission.
-    pub async fn create_public_thread<F>(
-        &self,
+    /// Returns [`Error::Http`] if the current user lacks permission, or if invalid data is given.
+    pub async fn create_public_thread(
+        self,
         http: impl AsRef<Http>,
         message_id: impl Into<MessageId>,
-        f: F,
-    ) -> Result<GuildChannel>
-    where
-        F: FnOnce(&mut CreateThread) -> &mut CreateThread,
-    {
-        let mut instance = CreateThread::default();
-        f(&mut instance);
-
-        http.as_ref().create_public_thread(self.get(), message_id.into().get(), &instance).await
+        builder: CreateThread,
+    ) -> Result<GuildChannel> {
+        builder.execute(http, self, Some(message_id.into())).await
     }
 
     /// Creates a private thread.
     ///
     /// # Errors
     ///
-    /// Returns [`Error::Http`] if the current user lacks permission.
-    pub async fn create_private_thread<F>(
-        &self,
+    /// Returns [`Error::Http`] if the current user lacks permission, or if invalid data is given.
+    pub async fn create_private_thread(
+        self,
         http: impl AsRef<Http>,
-        f: F,
-    ) -> Result<GuildChannel>
-    where
-        F: FnOnce(&mut CreateThread) -> &mut CreateThread,
-    {
-        let mut instance = CreateThread::default();
-        instance.kind(ChannelType::PrivateThread);
-        f(&mut instance);
-
-        http.as_ref().create_private_thread(self.get(), &instance).await
+        builder: CreateThread,
+    ) -> Result<GuildChannel> {
+        builder.kind(ChannelType::PrivateThread).execute(http, self, None).await
     }
 
     /// Gets the thread members, if this channel is a thread.
