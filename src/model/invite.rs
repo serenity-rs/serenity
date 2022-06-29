@@ -54,9 +54,9 @@ pub struct Invite {
     /// Only shows up if `target_type` is `EmmbeddedApplication`.
     pub target_application: Option<ApplicationId>,
 
-    // /// The expiration date of this invite, returned from `Http::get_invite` when
-    // /// `with_expiration` is true.
-    // pub expires_at: Option<Timestamp>,
+    /// The expiration date of this invite, returned from `Http::get_invite` when
+    /// `with_expiration` is true.
+    pub expires_at: Option<Timestamp>,
     /// The Stage instance data if there is a public Stage instance in the Stage
     /// channel this invite is for.
     pub stage_instance: Option<InviteStageInstance>,
