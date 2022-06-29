@@ -642,26 +642,16 @@ impl PartialGuild {
     ///
     /// # Errors
     ///
-    /// If the `cache` is enabled, returns a [`ModelError::InvalidPermissions`]
-    /// if the current user does not have permission to manage roles.
+    /// If the `cache` is enabled, returns a [`ModelError::InvalidPermissions`] if the current user
+    /// lacks permission. Otherwise returns [`Error::Http`], as well as if invalid data is given.
     ///
-    /// [Manage Emojis and Stickers]: crate::model::permissions::Permissions::MANAGE_EMOJIS_AND_STICKERS
-    pub async fn create_sticker<'a, F>(&self, cache_http: impl CacheHttp, f: F) -> Result<Sticker>
-    where
-        for<'b> F: FnOnce(&'b mut CreateSticker<'a>) -> &'b mut CreateSticker<'a>,
-    {
-        #[cfg(feature = "cache")]
-        {
-            if cache_http.cache().is_some() {
-                let req = Permissions::MANAGE_EMOJIS_AND_STICKERS;
-
-                if !self.has_perms(&cache_http, req).await {
-                    return Err(Error::Model(ModelError::InvalidPermissions(req)));
-                }
-            }
-        }
-
-        self.id.create_sticker(cache_http.http(), f).await
+    /// [Manage Emojis and Stickers]: Permissions::MANAGE_EMOJIS_AND_STICKERS
+    pub async fn create_sticker<'a>(
+        &self,
+        cache_http: impl CacheHttp,
+        builder: CreateSticker<'a>,
+    ) -> Result<Sticker> {
+        self.id.create_sticker(cache_http, builder).await
     }
 
     /// Deletes the current guild if the current user is the owner of the

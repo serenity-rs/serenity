@@ -471,22 +471,17 @@ impl GuildId {
     ///
     /// # Errors
     ///
-    /// Returns [`Error::Http`] if the current user lacks permission,
-    /// or if invalid data is given.
+    /// If the `cache` is enabled, returns a [`ModelError::InvalidPermissions`] if the current user
+    /// lacks permission. Otherwise returns [`Error::Http`], as well as if invalid data is given.
     ///
-    /// [Manage Emojis and Stickers]: crate::model::permissions::Permissions::MANAGE_EMOJIS_AND_STICKERS
+    /// [Manage Emojis and Stickers]: Permissions::MANAGE_EMOJIS_AND_STICKERS
     #[inline]
-    pub async fn create_sticker<'a, F>(self, http: impl AsRef<Http>, f: F) -> Result<Sticker>
-    where
-        for<'b> F: FnOnce(&'b mut CreateSticker<'a>) -> &'b mut CreateSticker<'a>,
-    {
-        let mut create_sticker = CreateSticker::default();
-        f(&mut create_sticker);
-
-        let (map, file) =
-            create_sticker.build().ok_or(Error::Model(ModelError::NoStickerFileSet))?;
-
-        http.as_ref().create_sticker(self.get(), map, file, None).await
+    pub async fn create_sticker<'a>(
+        self,
+        cache_http: impl CacheHttp,
+        builder: CreateSticker<'_>,
+    ) -> Result<Sticker> {
+        builder.execute(cache_http, self).await
     }
 
     /// Deletes the current guild if the current account is the owner of the
