@@ -4,26 +4,22 @@ use std::fmt;
 use futures::stream::Stream;
 
 #[cfg(feature = "model")]
-use crate::builder::CreateChannel;
-#[cfg(feature = "model")]
 use crate::builder::{
     AddMember,
+    CreateApplicationCommand,
+    CreateApplicationCommandPermissionsData,
+    CreateApplicationCommands,
+    CreateApplicationCommandsPermissions,
+    CreateChannel,
+    CreateScheduledEvent,
     CreateSticker,
     EditGuild,
     EditGuildWelcomeScreen,
     EditGuildWidget,
     EditMember,
     EditRole,
-    EditSticker,
-};
-#[cfg(feature = "model")]
-use crate::builder::{
-    CreateApplicationCommand,
-    CreateApplicationCommandPermissionsData,
-    CreateApplicationCommands,
-    CreateApplicationCommandsPermissions,
-    CreateScheduledEvent,
     EditScheduledEvent,
+    EditSticker,
 };
 #[cfg(all(feature = "cache", feature = "model"))]
 use crate::cache::Cache;
