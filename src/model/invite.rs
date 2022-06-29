@@ -59,47 +59,23 @@ pub struct Invite {
 
 #[cfg(feature = "model")]
 impl Invite {
-    /// Creates an invite for a [`GuildChannel`], providing a builder so that
-    /// fields may optionally be set.
+    /// Creates an invite for the given channel.
     ///
-    /// See the documentation for the [`CreateInvite`] builder for information
-    /// on how to use this and the default values that it provides.
-    ///
-    /// Requires the [Create Instant Invite] permission.
+    /// **Note**: Requires the [Create Instant Invite] permission.
     ///
     /// # Errors
     ///
-    /// If the `cache` is enabled, returns a [`ModelError::InvalidPermissions`]
-    /// if the current user does not have the required [permission].
+    /// If the `cache` is enabled, returns [`ModelError::InvalidPermissions`] if the current user
+    /// lacks permission. Otherwise returns [`Error::Http`], as well as if invalid data is given.
     ///
     /// [Create Instant Invite]: Permissions::CREATE_INSTANT_INVITE
-    /// [permission]: super::permissions
     #[inline]
-    pub async fn create<F>(
+    pub async fn create(
         cache_http: impl CacheHttp,
         channel_id: impl Into<ChannelId>,
-        f: F,
-    ) -> Result<RichInvite>
-    where
-        F: FnOnce(CreateInvite) -> CreateInvite,
-    {
-        let channel_id = channel_id.into();
-
-        #[cfg(feature = "cache")]
-        {
-            if let Some(cache) = cache_http.cache() {
-                crate::utils::user_has_perms_cache(
-                    cache,
-                    channel_id,
-                    None,
-                    Permissions::CREATE_INSTANT_INVITE,
-                )?;
-            }
-        }
-
-        let builder = f(CreateInvite::default());
-
-        cache_http.http().create_invite(channel_id.get(), &builder, None).await
+        builder: CreateInvite,
+    ) -> Result<RichInvite> {
+        channel_id.into().create_invite(cache_http, builder).await
     }
 
     /// Deletes the invite.

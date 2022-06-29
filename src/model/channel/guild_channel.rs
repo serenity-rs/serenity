@@ -157,7 +157,7 @@ impl GuildChannel {
         self.id.broadcast_typing(&http).await
     }
 
-    /// Creates an invite leading to the given channel.
+    /// Creates an invite for the given channel.
     ///
     /// **Note**: Requires the [Create Instant Invite] permission.
     ///
@@ -166,36 +166,31 @@ impl GuildChannel {
     /// Create an invite that can only be used 5 times:
     ///
     /// ```rust,ignore
-    /// let invite = channel.create_invite(&context, |i| i.max_uses(5)).await;
+    /// let builder = CreateBuilder::default().max_uses(5);
+    /// let invite = channel.create_invite(&context, builder).await;
     /// ```
     ///
     /// # Errors
     ///
-    /// If the `cache` is enabled, returns [`ModelError::InvalidPermissions`]
-    /// if the current user does not have permission to create invites.
-    ///
-    /// Otherwise returns [`Error::Http`] if the current user lacks permission.
+    /// If the `cache` is enabled, returns [`ModelError::InvalidPermissions`] if the current user
+    /// lacks permission. Otherwise returns [`Error::Http`], as well as if invalid data is given.
     ///
     /// [Create Instant Invite]: Permissions::CREATE_INSTANT_INVITE
     #[inline]
     #[cfg(feature = "utils")]
-    pub async fn create_invite<F>(&self, cache_http: impl CacheHttp, f: F) -> Result<RichInvite>
-    where
-        F: FnOnce(&mut CreateInvite) -> &mut CreateInvite,
-    {
-        #[cfg(feature = "cache")]
-        {
-            if let Some(cache) = cache_http.cache() {
-                crate::utils::user_has_perms_cache(
-                    cache,
-                    self.id,
-                    Some(self.guild_id),
-                    Permissions::CREATE_INSTANT_INVITE,
-                )?;
-            }
-        }
-
-        self.id.create_invite(cache_http.http(), f).await
+    pub async fn create_invite(
+        &self,
+        cache_http: impl CacheHttp,
+        builder: CreateInvite,
+    ) -> Result<RichInvite> {
+        builder
+            .execute(
+                cache_http,
+                self.id,
+                #[cfg(feature = "cache")]
+                Some(self.guild_id),
+            )
+            .await
     }
 
     /// Creates a [permission overwrite][`PermissionOverwrite`] for either a

@@ -69,23 +69,29 @@ impl ChannelId {
         http.as_ref().broadcast_typing(self.get()).await
     }
 
-    /// Creates an invite leading to the given channel.
+    /// Creates an invite for the given channel.
     ///
     /// **Note**: Requires the [Create Instant Invite] permission.
     ///
     /// # Errors
     ///
-    /// Returns [`Error::Http`] if the current user lacks permission.
+    /// If the `cache` is enabled, returns [`ModelError::InvalidPermissions`] if the current user
+    /// lacks permission. Otherwise returns [`Error::Http`], as well as if invalid data is given.
     ///
     /// [Create Instant Invite]: Permissions::CREATE_INSTANT_INVITE
-    pub async fn create_invite<F>(&self, http: impl AsRef<Http>, f: F) -> Result<RichInvite>
-    where
-        F: FnOnce(&mut CreateInvite) -> &mut CreateInvite,
-    {
-        let mut invite = CreateInvite::default();
-        f(&mut invite);
-
-        http.as_ref().create_invite(self.get(), &invite, None).await
+    pub async fn create_invite(
+        self,
+        cache_http: impl CacheHttp,
+        builder: CreateInvite,
+    ) -> Result<RichInvite> {
+        builder
+            .execute(
+                cache_http,
+                self,
+                #[cfg(feature = "cache")]
+                None,
+            )
+            .await
     }
 
     /// Creates a [permission overwrite][`PermissionOverwrite`] for either a
