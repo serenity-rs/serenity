@@ -1011,8 +1011,8 @@ impl Http {
     }
 
     /// Deletes a guild, only if connected account owns it.
-    pub async fn delete_guild(&self, guild_id: u64) -> Result<PartialGuild> {
-        self.fire(Request {
+    pub async fn delete_guild(&self, guild_id: u64) -> Result<()> {
+        self.wind(204, Request {
             body: None,
             multipart: None,
             headers: None,

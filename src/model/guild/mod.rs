@@ -939,7 +939,7 @@ impl Guild {
     ///
     /// Otherwise returns [`Error::Http`] if the current user is not the
     /// owner of the guild.
-    pub async fn delete(&self, cache_http: impl CacheHttp) -> Result<PartialGuild> {
+    pub async fn delete(&self, cache_http: impl CacheHttp) -> Result<()> {
         #[cfg(feature = "cache")]
         {
             if let Some(cache) = cache_http.cache() {

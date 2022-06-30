@@ -592,7 +592,7 @@ impl PartialGuild {
     /// Returns [`Error::Http`] if the current user is not the owner of
     /// the guild.
     #[inline]
-    pub async fn delete(&self, http: impl AsRef<Http>) -> Result<PartialGuild> {
+    pub async fn delete(&self, http: impl AsRef<Http>) -> Result<()> {
         self.id.delete(&http).await
     }
 
