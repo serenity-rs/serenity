@@ -919,20 +919,15 @@ impl ChannelId {
     ///
     /// # Errors
     ///
-    /// Returns [`Error::Http`] if the channel is not a stage channel,
-    /// or if there is already a stage instance currently.
-    pub async fn create_stage_instance<F>(
-        &self,
-        http: impl AsRef<Http>,
-        f: F,
-    ) -> Result<StageInstance>
-    where
-        F: FnOnce(&mut CreateStageInstance) -> &mut CreateStageInstance,
-    {
-        let mut instance = CreateStageInstance::default();
-        f(&mut instance);
-
-        http.as_ref().create_stage_instance(&instance).await
+    /// Returns [`ModelError::InvalidChannelType`] if the channel is not a stage channel.
+    ///
+    /// Returns [`Error::Http`] if there is already a stage instance currently.
+    pub async fn create_stage_instance(
+        self,
+        cache_http: impl CacheHttp,
+        builder: CreateStageInstance,
+    ) -> Result<StageInstance> {
+        builder.channel_id(self).execute(cache_http).await
     }
 
     /// Edits a stage instance.
