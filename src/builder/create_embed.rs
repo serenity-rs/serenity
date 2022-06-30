@@ -226,7 +226,7 @@ impl CreateEmbed {
     ///     async fn message(&self, context: Context, mut msg: Message) {
     ///         if msg.content == "~embed" {
     ///             let timestamp: Timestamp =
-    ///                 "2004-06-08T16:04:23".parse().expect("Invalid timestamp!");
+    ///                 "2004-06-08T16:04:23Z".parse().expect("Invalid timestamp!");
     ///             let _ = msg
     ///                 .channel_id
     ///                 .send_message(&context.http, |m| {
