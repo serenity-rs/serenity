@@ -53,7 +53,7 @@
 #![doc(html_root_url = "https://docs.rs/serenity/*")]
 #![cfg_attr(docsrs, feature(doc_auto_cfg))]
 #![deny(rust_2018_idioms)]
-#![warn(clippy::pedantic)]
+#![warn(clippy::pedantic, clippy::fallible_impl_from)]
 #![allow(
     // Allowed to avoid breaking changes.
     clippy::module_name_repetitions,
