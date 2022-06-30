@@ -6,7 +6,7 @@ use std::fmt::Display;
 use std::fmt::Write;
 
 #[cfg(all(feature = "model", feature = "utils"))]
-use crate::builder::{CreateEmbed, EditMessage};
+use crate::builder::{CreateEmbed, CreateMessage, EditMessage};
 #[cfg(all(feature = "cache", feature = "model"))]
 use crate::cache::{Cache, GuildRef};
 #[cfg(feature = "collector")]
@@ -683,22 +683,18 @@ impl Message {
             }
         }
 
-        self.channel_id
-            .send_message(cache_http.http(), |builder| {
-                if let Some(ping_user) = inlined {
-                    builder.reference_message(self).allowed_mentions(|f| {
-                        f.replied_user(ping_user)
-                            // By providing allowed_mentions, Discord disabled _all_ pings by
-                            // default so we need to re-enable them
-                            .parse(crate::builder::ParseValue::Everyone)
-                            .parse(crate::builder::ParseValue::Users)
-                            .parse(crate::builder::ParseValue::Roles)
-                    });
-                }
-
-                builder.content(content)
-            })
-            .await
+        let mut builder = CreateMessage::default().content(content);
+        if let Some(ping_user) = inlined {
+            builder = builder.reference_message(self).allowed_mentions(|f| {
+                f.replied_user(ping_user)
+                    // By providing allowed_mentions, Discord disabled _all_ pings by default so we
+                    // need to re-enable them
+                    .parse(crate::builder::ParseValue::Everyone)
+                    .parse(crate::builder::ParseValue::Users)
+                    .parse(crate::builder::ParseValue::Roles)
+            });
+        }
+        self.channel_id.send_message(cache_http, builder).await
     }
 
     /// Delete all embeds in this message

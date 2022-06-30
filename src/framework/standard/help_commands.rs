@@ -76,11 +76,11 @@ use super::{
 };
 #[cfg(all(feature = "cache", feature = "http"))]
 use crate::{
-    builder,
+    builder::{CreateEmbed, CreateMessage},
     cache::Cache,
     client::Context,
     framework::standard::CommonOptions,
-    http::Http,
+    http::CacheHttp,
     model::channel::Message,
     model::id::{ChannelId, UserId},
     utils::Colour,
@@ -1012,7 +1012,7 @@ fn flatten_group_to_plain_string(
 /// Sends an embed listing all groups with their commands.
 #[cfg(all(feature = "cache", feature = "http"))]
 async fn send_grouped_commands_embed(
-    http: impl AsRef<Http>,
+    cache_http: impl CacheHttp,
     help_options: &HelpOptions,
     channel_id: ChannelId,
     help_description: &str,
@@ -1022,7 +1022,7 @@ async fn send_grouped_commands_embed(
     // creating embed outside message builder since flatten_group_to_string
     // may return an error.
 
-    let mut embed = builder::CreateEmbed::default();
+    let mut embed = CreateEmbed::default();
     embed.colour(colour);
     embed.description(help_description);
     for group in groups {
@@ -1033,94 +1033,83 @@ async fn send_grouped_commands_embed(
         embed.field(group.name, &embed_text, true);
     }
 
-    channel_id.send_message(&http, |m| m.set_embed(embed)).await
+    let builder = CreateMessage::default().set_embed(embed);
+    channel_id.send_message(cache_http, builder).await
 }
 
 /// Sends embed showcasing information about a single command.
 #[cfg(all(feature = "cache", feature = "http"))]
 async fn send_single_command_embed(
-    http: impl AsRef<Http>,
+    cache_http: impl CacheHttp,
     help_options: &HelpOptions,
     channel_id: ChannelId,
     command: &Command<'_>,
     colour: Colour,
 ) -> Result<Message, Error> {
-    channel_id
-        .send_message(&http, |m| {
-            m.embed(|embed| {
-                embed.title(command.name);
-                embed.colour(colour);
+    let mut embed = CreateEmbed::default();
+    embed.title(command.name);
+    embed.colour(colour);
 
-                if let Some(desc) = command.description {
-                    embed.description(desc);
-                }
+    if let Some(desc) = command.description {
+        embed.description(desc);
+    }
 
-                if let Some(usage) = command.usage {
-                    let full_usage_text = if let Some(first_prefix) = command.group_prefixes.first()
-                    {
-                        format!("`{} {} {}`", first_prefix, command.name, usage)
-                    } else {
-                        format!("`{} {}`", command.name, usage)
-                    };
+    if let Some(usage) = command.usage {
+        let full_usage_text = if let Some(first_prefix) = command.group_prefixes.first() {
+            format!("`{} {} {}`", first_prefix, command.name, usage)
+        } else {
+            format!("`{} {}`", command.name, usage)
+        };
 
-                    embed.field(help_options.usage_label, &full_usage_text, true);
-                }
+        embed.field(help_options.usage_label, &full_usage_text, true);
+    }
 
-                if !command.usage_sample.is_empty() {
-                    let full_example_text = if let Some(first_prefix) =
-                        command.group_prefixes.first()
-                    {
-                        let format_example =
-                            |example| format!("`{} {} {}`\n", first_prefix, command.name, example);
-                        command.usage_sample.iter().map(format_example).collect::<String>()
-                    } else {
-                        let format_example = |example| format!("`{} {}`\n", command.name, example);
-                        command.usage_sample.iter().map(format_example).collect::<String>()
-                    };
-                    embed.field(help_options.usage_sample_label, &full_example_text, true);
-                }
+    if !command.usage_sample.is_empty() {
+        let full_example_text = if let Some(first_prefix) = command.group_prefixes.first() {
+            let format_example =
+                |example| format!("`{} {} {}`\n", first_prefix, command.name, example);
+            command.usage_sample.iter().map(format_example).collect::<String>()
+        } else {
+            let format_example = |example| format!("`{} {}`\n", command.name, example);
+            command.usage_sample.iter().map(format_example).collect::<String>()
+        };
+        embed.field(help_options.usage_sample_label, &full_example_text, true);
+    }
 
-                embed.field(help_options.grouped_label, command.group_name, true);
+    embed.field(help_options.grouped_label, command.group_name, true);
 
-                if !command.aliases.is_empty() {
-                    embed.field(
-                        help_options.aliases_label,
-                        &format!("`{}`", command.aliases.join("`, `")),
-                        true,
-                    );
-                }
+    if !command.aliases.is_empty() {
+        embed.field(
+            help_options.aliases_label,
+            &format!("`{}`", command.aliases.join("`, `")),
+            true,
+        );
+    }
 
-                if !help_options.available_text.is_empty() && !command.availability.is_empty() {
-                    embed.field(help_options.available_text, command.availability, true);
-                }
+    if !help_options.available_text.is_empty() && !command.availability.is_empty() {
+        embed.field(help_options.available_text, command.availability, true);
+    }
 
-                if !command.checks.is_empty() {
-                    embed.field(
-                        help_options.checks_label,
-                        &format!("`{}`", command.checks.join("`, `")),
-                        true,
-                    );
-                }
+    if !command.checks.is_empty() {
+        embed.field(help_options.checks_label, &format!("`{}`", command.checks.join("`, `")), true);
+    }
 
-                if !command.sub_commands.is_empty() {
-                    embed.field(
-                        help_options.sub_commands_label,
-                        &format!("`{}`", command.sub_commands.join("`, `")),
-                        true,
-                    );
-                }
+    if !command.sub_commands.is_empty() {
+        embed.field(
+            help_options.sub_commands_label,
+            &format!("`{}`", command.sub_commands.join("`, `")),
+            true,
+        );
+    }
 
-                embed
-            });
-            m
-        })
-        .await
+    let builder = CreateMessage::default().set_embed(embed);
+    channel_id.send_message(cache_http, builder).await
 }
 
 /// Sends embed listing commands that are similar to the sent one.
 #[cfg(all(feature = "cache", feature = "http"))]
 async fn send_suggestion_embed(
-    http: impl AsRef<Http>,
+    cache_http: impl CacheHttp,
     channel_id: ChannelId,
     help_description: &str,
     suggestions: &Suggestions,
@@ -1128,18 +1117,20 @@ async fn send_suggestion_embed(
 ) -> Result<Message, Error> {
     let text = help_description.replace("{}", &suggestions.join("`, `"));
 
-    channel_id.send_message(&http, |m| m.embed(|e| e.colour(colour).description(text))).await
+    let builder = CreateMessage::default().embed(|e| e.colour(colour).description(text));
+    channel_id.send_message(cache_http, builder).await
 }
 
 /// Sends an embed explaining fetching commands failed.
 #[cfg(all(feature = "cache", feature = "http"))]
 async fn send_error_embed(
-    http: impl AsRef<Http>,
+    cache_http: impl CacheHttp,
     channel_id: ChannelId,
     input: &str,
     colour: Colour,
 ) -> Result<Message, Error> {
-    channel_id.send_message(&http, |m| m.embed(|e| e.colour(colour).description(input))).await
+    let builder = CreateMessage::default().embed(|e| e.colour(colour).description(input));
+    channel_id.send_message(cache_http, builder).await
 }
 
 /// Posts an embed showing each individual command group and its commands.

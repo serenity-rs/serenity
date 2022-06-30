@@ -645,27 +645,28 @@ impl ChannelId {
 
     /// Sends a message with just the given message content in the channel.
     ///
+    /// **Note**: Message content must be under 2000 unicode code points.
+    ///
     /// # Errors
     ///
-    /// Returns a [`ModelError::MessageTooLong`] if the content of the message
-    /// is over the above limit, containing the number of unicode code points
-    /// over the limit.
+    /// Returns a [`ModelError::MessageTooLong`] if the content length is over the above limit. See
+    /// [`CreateMessage::execute`] for more details.
     #[inline]
-    pub async fn say(self, http: impl AsRef<Http>, content: impl Into<String>) -> Result<Message> {
-        self.send_message(&http, |m| m.content(content)).await
+    pub async fn say(
+        self,
+        cache_http: impl CacheHttp,
+        content: impl Into<String>,
+    ) -> Result<Message> {
+        let builder = CreateMessage::default().content(content);
+        self.send_message(cache_http, builder).await
     }
 
-    /// Sends file(s) along with optional message contents. The filename _must_
-    /// be specified.
+    /// Sends file(s) along with optional message contents. The filename _must_ be specified.
     ///
-    /// Message contents may be passed by using the [`CreateMessage::content`]
-    /// method.
+    /// Message contents may be passed using the `builder` argument.
     ///
-    /// The [Attach Files] and [Send Messages] permissions are required.
-    ///
-    /// **Note**: Message contents must be under 2000 unicode code points, and embeds must be under
-    /// 6000 unicode code points.
-    ///
+    /// Refer to the documentation for [`CreateMessage`] for information regarding content
+    /// restrictions and requirements.
     ///
     /// # Examples
     ///
@@ -677,13 +678,15 @@ impl ChannelId {
     /// #
     /// # async fn run() {
     /// # let http = Arc::new(Http::new("token"));
+    /// use serenity::builder::CreateMessage;
     /// use serenity::model::id::ChannelId;
     ///
     /// let channel_id = ChannelId::new(7);
     ///
     /// let paths = vec!["/path/to/file.jpg", "path/to/file2.jpg"];
     ///
-    /// let _ = channel_id.send_files(&http, paths, |m| m.content("a file")).await;
+    /// let builder = CreateMessage::default().content("some files");
+    /// let _ = channel_id.send_files(&http, paths, builder).await;
     /// # }
     /// ```
     ///
@@ -695,6 +698,7 @@ impl ChannelId {
     /// #
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// # let http = Arc::new(Http::new("token"));
+    /// use serenity::builder::CreateMessage;
     /// use serenity::model::id::ChannelId;
     /// use tokio::fs::File;
     ///
@@ -705,83 +709,61 @@ impl ChannelId {
     ///
     /// let files = vec![(&f1, "my_file.jpg"), (&f2, "my_file2.jpg")];
     ///
-    /// let _ = channel_id.send_files(&http, files, |m| m.content("a file")).await;
+    /// let builder = CreateMessage::default().content("some files");
+    /// let _ = channel_id.send_files(&http, files, builder).await;
     /// #    Ok(())
     /// # }
     /// ```
     ///
     /// # Errors
     ///
-    /// If the content of the message is over the above limit, then a
-    /// [`ModelError::MessageTooLong`] will be returned, containing the number
-    /// of unicode code points over the limit.
+    /// See [`CreateMessage::execute`] for a list of possible errors, and their corresponding
+    /// reasons.
     ///
-    /// Returns an
-    /// [`HttpError::UnsuccessfulRequest(ErrorResponse)`][`HttpError::UnsuccessfulRequest`]
-    /// if the file(s) are too large to send.
-    ///
-    /// [`HttpError::UnsuccessfulRequest`]: crate::http::HttpError::UnsuccessfulRequest
-    /// [`CreateMessage::content`]: crate::builder::CreateMessage::content
-    /// [Attach Files]: Permissions::ATTACH_FILES
-    /// [Send Messages]: Permissions::SEND_MESSAGES
     /// [`File`]: tokio::fs::File
-    pub async fn send_files<'a, F, T, It>(
+    pub async fn send_files<'a, T, It>(
         self,
-        http: impl AsRef<Http>,
+        cache_http: impl CacheHttp,
         files: It,
-        f: F,
+        builder: CreateMessage<'a>,
     ) -> Result<Message>
     where
-        for<'b> F: FnOnce(&'b mut CreateMessage<'a>) -> &'b mut CreateMessage<'a>,
         T: Into<AttachmentType<'a>>,
         It: IntoIterator<Item = T>,
     {
-        let mut builder = CreateMessage::default();
-        http.as_ref().send_files(self.get(), files, f(&mut builder)).await
+        builder
+            .files(files)
+            .execute(
+                cache_http,
+                self,
+                #[cfg(feature = "cache")]
+                None,
+            )
+            .await
     }
 
     /// Sends a message to the channel.
     ///
-    /// Refer to the documentation for [`CreateMessage`] for more information
-    /// regarding message restrictions and requirements.
-    ///
-    /// Requires the [Send Messages] permission.
-    ///
-    /// **Note**: Message contents must be under 2000 unicode code points.
+    /// Refer to the documentation for [`CreateMessage`] for information regarding content
+    /// restrictions and requirements.
     ///
     /// # Errors
     ///
-    /// Returns a [`ModelError::MessageTooLong`] if the content of the message
-    /// is over the above limit, containing the number of unicode code points
-    /// over the limit.
-    ///
-    /// Returns [`Error::Http`] if the current user lacks permission to
-    /// send a message in this channel.
-    ///
-    /// [Send Messages]: Permissions::SEND_MESSAGES
-    pub async fn send_message<'a, F>(self, http: impl AsRef<Http>, f: F) -> Result<Message>
-    where
-        for<'b> F: FnOnce(&'b mut CreateMessage<'a>) -> &'b mut CreateMessage<'a>,
-    {
-        let mut create_message = CreateMessage::default();
-        f(&mut create_message);
-        self._send_message(http.as_ref(), create_message).await
-    }
-
-    async fn _send_message<'a>(self, http: &Http, mut msg: CreateMessage<'a>) -> Result<Message> {
-        let files = std::mem::take(&mut msg.files);
-
-        let message = if files.is_empty() {
-            http.as_ref().send_message(self.get(), &msg).await?
-        } else {
-            http.as_ref().send_files(self.get(), files, &msg).await?
-        };
-
-        for reaction in msg.reactions {
-            self.create_reaction(&http, message.id, reaction).await?;
-        }
-
-        Ok(message)
+    /// See [`CreateMessage::execute`] for a list of possible errors, and their corresponding
+    /// reasons.
+    pub async fn send_message<'a>(
+        self,
+        cache_http: impl CacheHttp,
+        builder: CreateMessage<'_>,
+    ) -> Result<Message> {
+        builder
+            .execute(
+                cache_http,
+                self,
+                #[cfg(feature = "cache")]
+                None,
+            )
+            .await
     }
 
     /// Starts typing in the channel for an indefinite period of time.

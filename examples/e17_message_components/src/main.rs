@@ -5,7 +5,7 @@ use std::{env, fmt};
 
 use dotenv::dotenv;
 use serenity::async_trait;
-use serenity::builder::{CreateActionRow, CreateButton, CreateSelectMenu, CreateSelectMenuOption};
+use serenity::builder::*;
 use serenity::client::{Context, EventHandler};
 use serenity::futures::StreamExt;
 use serenity::model::application::component::ButtonStyle;
@@ -170,14 +170,10 @@ impl EventHandler for Handler {
         }
 
         // Ask the user for its favorite animal
-        let m = msg
-            .channel_id
-            .send_message(&ctx, |m| {
-                m.content("Please select your favorite animal")
-                    .components(|c| c.add_action_row(Animal::action_row()))
-            })
-            .await
-            .unwrap();
+        let builder = CreateMessage::default()
+            .content("Please select your favorite animal")
+            .components(|c| c.add_action_row(Animal::action_row()));
+        let m = msg.channel_id.send_message(&ctx, builder).await.unwrap();
 
         // Wait for the user to make a selection
         let mci = match m

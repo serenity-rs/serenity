@@ -14,8 +14,9 @@
 //! [`ExecuteWebhook::embeds`]: crate::builder::ExecuteWebhook::embeds
 //! [here]: https://discord.com/developers/docs/resources/channel#embed-object
 
-use crate::model::channel::{Embed, EmbedField};
-use crate::model::Timestamp;
+#[cfg(feature = "http")]
+use crate::internal::prelude::*;
+use crate::model::prelude::*;
 #[cfg(feature = "utils")]
 use crate::utils::Colour;
 
@@ -215,6 +216,7 @@ impl CreateEmbed {
     /// ```rust,no_run
     /// # #[cfg(feature = "client")]
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
+    /// use serenity::builder::CreateMessage;
     /// use serenity::model::channel::Message;
     /// use serenity::model::Timestamp;
     /// use serenity::prelude::*;
@@ -227,12 +229,9 @@ impl CreateEmbed {
     ///         if msg.content == "~embed" {
     ///             let timestamp: Timestamp =
     ///                 "2004-06-08T16:04:23Z".parse().expect("Invalid timestamp!");
-    ///             let _ = msg
-    ///                 .channel_id
-    ///                 .send_message(&context.http, |m| {
-    ///                     m.embed(|e| e.title("hello").timestamp(timestamp))
-    ///                 })
-    ///                 .await;
+    ///             let builder =
+    ///                 CreateMessage::default().embed(|e| e.title("hello").timestamp(timestamp));
+    ///             let _ = msg.channel_id.send_message(&context.http, builder).await;
     ///         }
     ///     }
     /// }
@@ -252,6 +251,7 @@ impl CreateEmbed {
     /// ```rust,no_run
     /// # #[cfg(all(feature = "cache", feature = "client"))]
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
+    /// use serenity::builder::CreateMessage;
     /// use serenity::model::guild::Member;
     /// use serenity::model::id::GuildId;
     /// use serenity::prelude::*;
@@ -270,17 +270,13 @@ impl CreateEmbed {
     ///             if let Some(channel) = channel_search {
     ///                 let user = &member.user;
     ///
-    ///                 let _ = channel
-    ///                     .send_message(&context, |m| {
-    ///                         m.embed(|e| {
-    ///                             if let Some(joined_at) = member.joined_at {
-    ///                                 e.timestamp(joined_at);
-    ///                             }
-    ///                             e.author(|a| a.icon_url(user.face()).name(&user.name))
-    ///                                 .title("Member Join")
-    ///                         })
-    ///                     })
-    ///                     .await;
+    ///                 let builder = CreateMessage::default().embed(|e| {
+    ///                     if let Some(joined_at) = member.joined_at {
+    ///                         e.timestamp(joined_at);
+    ///                     }
+    ///                     e.author(|a| a.icon_url(user.face()).name(&user.name)).title("Member Join")
+    ///                 });
+    ///                 let _ = channel.send_message(&context, builder).await;
     ///             }
     ///         }
     ///     }
@@ -326,6 +322,43 @@ impl CreateEmbed {
 
         self.image = Some(HoldsUrl::new(filename));
         self
+    }
+
+    #[cfg(feature = "http")]
+    pub(super) fn check_length(&self) -> Result<()> {
+        let mut length = 0;
+        if let Some(ref author) = self.author {
+            if let Some(ref name) = author.name {
+                length += name.chars().count();
+            }
+        }
+
+        if let Some(ref description) = self.description {
+            length += description.chars().count();
+        }
+
+        for field in &self.fields {
+            length += field.name.chars().count();
+            length += field.value.chars().count();
+        }
+
+        if let Some(ref footer) = self.footer {
+            if let Some(ref text) = footer.text {
+                length += text.chars().count();
+            }
+        }
+
+        if let Some(ref title) = self.title {
+            length += title.chars().count();
+        }
+
+        let max_length = crate::constants::EMBED_MAX_LENGTH;
+        if length > max_length {
+            let overflow = length - max_length;
+            return Err(Error::Model(ModelError::EmbedTooLarge(overflow)));
+        }
+
+        Ok(())
     }
 }
 
