@@ -571,20 +571,20 @@ impl Guild {
 
     /// Adds a [`User`] to this guild with a valid OAuth2 access token.
     ///
-    /// Returns the created [`Member`] object, or nothing if the user is already a member of the guild.
+    /// Returns the created [`Member`] object, or nothing if the user is already a member of the
+    /// guild.
     ///
     /// # Errors
     ///
-    /// Returns [`Error::Http`] if the current user lacks permission,
-    /// or if invalid values are set.
+    /// Returns [`Error::Http`] if the current user lacks permission, or if invalid data is given.
     #[inline]
     pub async fn add_member(
         &self,
         http: impl AsRef<Http>,
         user_id: impl Into<UserId>,
-        f: impl FnOnce(&mut AddMember) -> &mut AddMember,
+        builder: AddMember,
     ) -> Result<Option<Member>> {
-        self.id.add_member(http, user_id, f).await
+        self.id.add_member(http, user_id, builder).await
     }
 
     /// Retrieves a list of [`AuditLogs`] for the guild.
