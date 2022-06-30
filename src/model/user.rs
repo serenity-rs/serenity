@@ -1273,7 +1273,11 @@ mod test {
         }
         #[derive(Debug, PartialEq, Deserialize, Serialize)]
         struct UserOpt {
-            #[serde(with = "discriminator::option")]
+            #[serde(
+                default,
+                skip_serializing_if = "Option::is_none",
+                with = "discriminator::option"
+            )]
             discriminator: Option<u16>,
         }
 
@@ -1320,6 +1324,17 @@ mod test {
             Token::Str("discriminator"),
             Token::Some,
             Token::U16(123),
+            Token::StructEnd,
+        ]);
+
+        let user_no_discriminator = UserOpt {
+            discriminator: None,
+        };
+        assert_tokens(&user_no_discriminator, &[
+            Token::Struct {
+                name: "UserOpt",
+                len: 0,
+            },
             Token::StructEnd,
         ]);
     }

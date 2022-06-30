@@ -209,7 +209,7 @@ pub struct PresenceUser {
     pub id: UserId,
     pub avatar: Option<String>,
     pub bot: Option<bool>,
-    #[serde(with = "discriminator::option")]
+    #[serde(default, skip_serializing_if = "Option::is_none", with = "discriminator::option")]
     pub discriminator: Option<u16>,
     pub email: Option<String>,
     pub mfa_enabled: Option<bool>,
