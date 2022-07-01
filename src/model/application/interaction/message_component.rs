@@ -83,36 +83,12 @@ impl MessageComponentInteraction {
     /// May also return an [`Error::Http`] if the API returns an error,
     /// or an [`Error::Json`] if there is an error in deserializing the
     /// API response.
-    pub async fn create_interaction_response<'a, F>(
+    pub async fn create_interaction_response<'a>(
         &self,
         http: impl AsRef<Http>,
-        f: F,
-    ) -> Result<()>
-    where
-        for<'b> F:
-            FnOnce(&'b mut CreateInteractionResponse<'a>) -> &'b mut CreateInteractionResponse<'a>,
-    {
-        let mut interaction_response = CreateInteractionResponse::default();
-        f(&mut interaction_response);
-
-        let http = http.as_ref();
-        let files = interaction_response
-            .data
-            .as_mut()
-            .map_or_else(Vec::new, |d| std::mem::take(&mut d.files));
-
-        if files.is_empty() {
-            http.create_interaction_response(self.id.get(), &self.token, &interaction_response)
-                .await
-        } else {
-            http.create_interaction_response_with_files(
-                self.id.get(),
-                &self.token,
-                &interaction_response,
-                files,
-            )
-            .await
-        }
+        builder: CreateInteractionResponse<'a>,
+    ) -> Result<()> {
+        builder.execute(http, self.id, &self.token).await
     }
 
     /// Edits the initial interaction response.
@@ -235,20 +211,16 @@ impl MessageComponentInteraction {
         http.as_ref().get_followup_message(&self.token, message_id.into().into()).await
     }
 
-    /// Helper function to defer an interaction
+    /// Helper function to defer an interaction.
     ///
     /// # Errors
     ///
-    /// May also return an [`Error::Http`] if the API returns an error,
-    /// or an [`Error::Json`] if there is an error in deserializing the
-    /// API response.
-    ///
-    /// # Errors
+    /// Returns an [`Error::Http`] if the API returns an error, or an [`Error::Json`] if there is
+    /// an error in deserializing the API response.
     pub async fn defer(&self, http: impl AsRef<Http>) -> Result<()> {
-        self.create_interaction_response(http, |f| {
-            f.kind(InteractionResponseType::DeferredUpdateMessage)
-        })
-        .await
+        let builder = CreateInteractionResponse::default()
+            .kind(InteractionResponseType::DeferredUpdateMessage);
+        self.create_interaction_response(http, builder).await
     }
 }
 

@@ -96,42 +96,12 @@ impl ApplicationCommandInteraction {
     /// May also return an [`Error::Http`] if the API returns an error,
     /// or an [`Error::Json`] if there is an error in deserializing the
     /// API response.
-    pub async fn create_interaction_response<'a, F>(
+    pub async fn create_interaction_response<'a>(
         &self,
         http: impl AsRef<Http>,
-        f: F,
-    ) -> Result<()>
-    where
-        for<'b> F:
-            FnOnce(&'b mut CreateInteractionResponse<'a>) -> &'b mut CreateInteractionResponse<'a>,
-    {
-        let mut interaction_response = CreateInteractionResponse::default();
-        f(&mut interaction_response);
-        self._create_interaction_response(http.as_ref(), interaction_response).await
-    }
-
-    async fn _create_interaction_response<'a>(
-        &self,
-        http: &Http,
-        mut interaction_response: CreateInteractionResponse<'a>,
+        builder: CreateInteractionResponse<'a>,
     ) -> Result<()> {
-        let files = interaction_response
-            .data
-            .as_mut()
-            .map_or_else(Vec::new, |d| std::mem::take(&mut d.files));
-
-        if files.is_empty() {
-            http.create_interaction_response(self.id.get(), &self.token, &interaction_response)
-                .await
-        } else {
-            http.create_interaction_response_with_files(
-                self.id.get(),
-                &self.token,
-                &interaction_response,
-                files,
-            )
-            .await
-        }
+        builder.execute(http, self.id, &self.token).await
     }
 
     /// Creates a response to an autocomplete interaction.
@@ -301,18 +271,16 @@ impl ApplicationCommandInteraction {
         http.as_ref().get_followup_message(&self.token, message_id.into().into()).await
     }
 
-    /// Helper function to defer an interaction
+    /// Helper function to defer an interaction.
     ///
     /// # Errors
     ///
-    /// May also return an [`Error::Http`] if the API returns an error,
-    /// or an [`Error::Json`] if there is an error in deserializing the
-    /// API response.
+    /// Returns an [`Error::Http`] if the API returns an error, or an [`Error::Json`] if there is
+    /// an error in deserializing the API response.
     pub async fn defer(&self, http: impl AsRef<Http>) -> Result<()> {
-        self.create_interaction_response(http, |f| {
-            f.kind(InteractionResponseType::DeferredChannelMessageWithSource)
-        })
-        .await
+        let builder = CreateInteractionResponse::default()
+            .kind(InteractionResponseType::DeferredChannelMessageWithSource);
+        self.create_interaction_response(http, builder).await
     }
 }
 

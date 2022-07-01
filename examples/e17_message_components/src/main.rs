@@ -195,14 +195,13 @@ impl EventHandler for Handler {
         let animal = Animal::from_str(mci.data.values.get(0).unwrap()).unwrap();
 
         // Acknowledge the interaction and edit the message
-        mci.create_interaction_response(&ctx, |r| {
-            r.kind(InteractionResponseType::UpdateMessage).interaction_response_data(|d| {
-                d.content(format!("You chose: **{}**\nNow choose a sound!", animal))
-                    .components(|c| c.add_action_row(Sound::action_row()))
-            })
-        })
-        .await
-        .unwrap();
+        let data = CreateInteractionResponseData::default()
+            .content(format!("You chose: **{}**\nNow choose a sound!", animal))
+            .components(|c| c.add_action_row(Sound::action_row()));
+        let builder = CreateInteractionResponse::default()
+            .kind(InteractionResponseType::UpdateMessage)
+            .interaction_response_data(data);
+        mci.create_interaction_response(&ctx, builder).await.unwrap();
 
         // Wait for multiple interactions
 
@@ -214,17 +213,15 @@ impl EventHandler for Handler {
         while let Some(mci) = cib.next().await {
             let sound = Sound::from_str(&mci.data.custom_id).unwrap();
             // Acknowledge the interaction and send a reply
-            mci.create_interaction_response(&ctx, |r| {
-                // This time we dont edit the message but reply to it
-                r.kind(InteractionResponseType::ChannelMessageWithSource).interaction_response_data(
-                    |d| {
-                        // Make the message hidden for other users by setting `ephemeral(true)`.
-                        d.ephemeral(true).content(format!("The **{}** says __{}__", animal, sound))
-                    },
-                )
-            })
-            .await
-            .unwrap();
+            let data = CreateInteractionResponseData::default()
+                .content(format!("The **{}** says __{}__", animal, sound))
+                // Make the message hidden for other users by setting `ephemeral(true)`.
+                .ephemeral(true);
+            let builder = CreateInteractionResponse::default()
+                // This time we don't edit the message, but reply to it.
+                .kind(InteractionResponseType::ChannelMessageWithSource)
+                .interaction_response_data(data);
+            mci.create_interaction_response(&ctx, builder).await.unwrap();
         }
 
         // Delete the orig message or there will be dangling components

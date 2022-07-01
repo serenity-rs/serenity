@@ -1,6 +1,7 @@
 use std::env;
 
 use serenity::async_trait;
+use serenity::builder::{CreateInteractionResponse, CreateInteractionResponseData};
 use serenity::model::application::command::{Command, CommandOptionType};
 use serenity::model::application::interaction::application_command::{
     ResolvedOption,
@@ -48,14 +49,11 @@ impl EventHandler for Handler {
                 _ => "not implemented :(".to_string(),
             };
 
-            if let Err(why) = command
-                .create_interaction_response(&ctx.http, |response| {
-                    response
-                        .kind(InteractionResponseType::ChannelMessageWithSource)
-                        .interaction_response_data(|message| message.content(content))
-                })
-                .await
-            {
+            let data = CreateInteractionResponseData::default().content(content);
+            let builder = CreateInteractionResponse::default()
+                .kind(InteractionResponseType::ChannelMessageWithSource)
+                .interaction_response_data(data);
+            if let Err(why) = command.create_interaction_response(&ctx.http, builder).await {
                 println!("Cannot respond to slash command: {}", why);
             }
         }

@@ -1,35 +1,79 @@
 use super::{CreateAllowedMentions, CreateComponents, CreateEmbed};
-use crate::json::prelude::*;
-use crate::model::application::interaction::{InteractionResponseType, MessageFlags};
-use crate::model::channel::AttachmentType;
+#[cfg(feature = "http")]
+use crate::http::Http;
+use crate::internal::prelude::*;
+use crate::model::application::interaction::InteractionResponseType;
+use crate::model::prelude::*;
 
 #[derive(Clone, Debug, Serialize)]
+#[must_use]
 pub struct CreateInteractionResponse<'a> {
     #[serde(rename = "type")]
     kind: InteractionResponseType,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub(crate) data: Option<CreateInteractionResponseData<'a>>,
+    data: Option<CreateInteractionResponseData<'a>>,
 }
 
 impl<'a> CreateInteractionResponse<'a> {
+    /// Creates a response to the interaction received.
+    ///
+    /// **Note**: Message contents must be under 2000 unicode code points.
+    ///
+    /// # Errors
+    ///
+    /// Returns an [`Error::Model`] if the message content is too long. May also return an
+    /// [`Error::Http`] if the API returns an error, or an [`Error::Json`] if there is an error in
+    /// deserializing the API response.
+    #[cfg(feature = "http")]
+    pub async fn execute(
+        mut self,
+        http: impl AsRef<Http>,
+        interaction_id: InteractionId,
+        token: &str,
+    ) -> Result<()> {
+        self.check_length()?;
+        let files = self.data.as_mut().map_or_else(Vec::new, |d| std::mem::take(&mut d.files));
+
+        if files.is_empty() {
+            http.as_ref().create_interaction_response(interaction_id.into(), token, &self).await
+        } else {
+            http.as_ref()
+                .create_interaction_response_with_files(interaction_id.into(), token, &self, files)
+                .await
+        }
+    }
+
+    #[cfg(feature = "http")]
+    fn check_length(&self) -> Result<()> {
+        if let Some(data) = &self.data {
+            if let Some(content) = &data.content {
+                let length = content.chars().count();
+                let max_length = crate::constants::MESSAGE_CODE_LIMIT;
+                if length > max_length {
+                    return Err(Error::Model(ModelError::MessageTooLong(length - max_length)));
+                }
+            }
+
+            if data.embeds.len() > crate::constants::EMBED_MAX_COUNT {
+                return Err(Error::Model(ModelError::EmbedAmount));
+            }
+            for embed in &data.embeds {
+                embed.check_length()?;
+            }
+        }
+        Ok(())
+    }
+
     /// Sets the InteractionResponseType of the message.
     ///
     /// Defaults to `ChannelMessageWithSource`.
-    pub fn kind(&mut self, kind: InteractionResponseType) -> &mut Self {
+    pub fn kind(mut self, kind: InteractionResponseType) -> Self {
         self.kind = kind;
         self
     }
 
-    /// Sets the `InteractionApplicationCommandCallbackData` for the message.
-    pub fn interaction_response_data<F>(&mut self, f: F) -> &mut Self
-    where
-        for<'b> F: FnOnce(
-            &'b mut CreateInteractionResponseData<'a>,
-        ) -> &'b mut CreateInteractionResponseData<'a>,
-    {
-        let mut data = CreateInteractionResponseData::default();
-        f(&mut data);
-
+    /// Sets the data for the message. See [`CreateInteractionResponseData`] for details on fields.
+    pub fn interaction_response_data(mut self, data: CreateInteractionResponseData<'a>) -> Self {
         self.data = Some(data);
         self
     }
@@ -45,6 +89,7 @@ impl<'a> Default for CreateInteractionResponse<'a> {
 }
 
 #[derive(Clone, Debug, Default, Serialize)]
+#[must_use]
 pub struct CreateInteractionResponseData<'a> {
     embeds: Vec<CreateEmbed>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -63,7 +108,7 @@ pub struct CreateInteractionResponseData<'a> {
     title: Option<String>,
 
     #[serde(skip)]
-    pub(crate) files: Vec<AttachmentType<'a>>,
+    files: Vec<AttachmentType<'a>>,
 }
 
 impl<'a> CreateInteractionResponseData<'a> {
@@ -72,34 +117,34 @@ impl<'a> CreateInteractionResponseData<'a> {
     /// Think carefully before setting this to `true`.
     ///
     /// Defaults to `false`.
-    pub fn tts(&mut self, tts: bool) -> &mut Self {
+    pub fn tts(mut self, tts: bool) -> Self {
         self.tts = Some(tts);
         self
     }
 
     /// Appends a file to the message.
-    pub fn add_file<T: Into<AttachmentType<'a>>>(&mut self, file: T) -> &mut Self {
+    pub fn add_file<T: Into<AttachmentType<'a>>>(mut self, file: T) -> Self {
         self.files.push(file.into());
         self
     }
 
     /// Appends a list of files to the message.
     pub fn add_files<T: Into<AttachmentType<'a>>, It: IntoIterator<Item = T>>(
-        &mut self,
+        mut self,
         files: It,
-    ) -> &mut Self {
+    ) -> Self {
         self.files.extend(files.into_iter().map(Into::into));
         self
     }
 
     /// Sets a list of files to include in the message.
     ///
-    /// Calling this multiple times will overwrite the file list.
-    /// To append files, call [`Self::add_file`] or [`Self::add_files`] instead.
+    /// Calling this multiple times will overwrite the file list. To append files, call
+    /// [`Self::add_file`] or [`Self::add_files`] instead.
     pub fn files<T: Into<AttachmentType<'a>>, It: IntoIterator<Item = T>>(
-        &mut self,
+        mut self,
         files: It,
-    ) -> &mut Self {
+    ) -> Self {
         self.files = files.into_iter().map(Into::into).collect();
         self
     }
@@ -108,13 +153,13 @@ impl<'a> CreateInteractionResponseData<'a> {
     ///
     /// **Note**: Message contents must be under 2000 unicode code points.
     #[inline]
-    pub fn content(&mut self, content: impl Into<String>) -> &mut Self {
+    pub fn content(mut self, content: impl Into<String>) -> Self {
         self.content = Some(content.into());
         self
     }
 
     /// Create an embed for the message.
-    pub fn embed<F>(&mut self, f: F) -> &mut Self
+    pub fn embed<F>(self, f: F) -> Self
     where
         F: FnOnce(&mut CreateEmbed) -> &mut CreateEmbed,
     {
@@ -124,37 +169,36 @@ impl<'a> CreateInteractionResponseData<'a> {
     }
 
     /// Adds an embed to the message.
-    pub fn add_embed(&mut self, embed: CreateEmbed) -> &mut Self {
+    pub fn add_embed(mut self, embed: CreateEmbed) -> Self {
         self.embeds.push(embed);
         self
     }
 
     /// Adds multiple embeds for the message.
-    pub fn add_embeds(&mut self, embeds: Vec<CreateEmbed>) -> &mut Self {
+    pub fn add_embeds(mut self, embeds: Vec<CreateEmbed>) -> Self {
         self.embeds.extend(embeds);
         self
     }
 
     /// Sets a single embed to include in the message
     ///
-    /// Calling this will overwrite the embed list.
-    /// To append embeds, call [`Self::add_embed`] instead.
-    pub fn set_embed(&mut self, embed: CreateEmbed) -> &mut Self {
-        self.set_embeds(vec![embed]);
-        self
+    /// Calling this will overwrite the embed list. To append embeds, call [`Self::add_embed`]
+    /// instead.
+    pub fn set_embed(self, embed: CreateEmbed) -> Self {
+        self.set_embeds(vec![embed])
     }
 
     /// Sets a list of embeds to include in the message.
     ///
-    /// Calling this multiple times will overwrite the embed list.
-    /// To append embeds, call [`Self::add_embed`] instead.
-    pub fn set_embeds(&mut self, embeds: Vec<CreateEmbed>) -> &mut Self {
+    /// Calling this will overwrite the embed list. To append embeds, call [`Self::add_embed`]
+    /// instead.
+    pub fn set_embeds(mut self, embeds: Vec<CreateEmbed>) -> Self {
         self.embeds = embeds.into_iter().collect();
         self
     }
 
     /// Set the allowed mentions for the message.
-    pub fn allowed_mentions<F>(&mut self, f: F) -> &mut Self
+    pub fn allowed_mentions<F>(mut self, f: F) -> Self
     where
         F: FnOnce(&mut CreateAllowedMentions) -> &mut CreateAllowedMentions,
     {
@@ -166,19 +210,19 @@ impl<'a> CreateInteractionResponseData<'a> {
     }
 
     /// Sets the flags for the message.
-    pub fn flags(&mut self, flags: MessageFlags) -> &mut Self {
+    pub fn flags(mut self, flags: MessageFlags) -> Self {
         self.flags = Some(flags);
         self
     }
 
-    /// Adds or removes the ephemeral flag
-    pub fn ephemeral(&mut self, ephemeral: bool) -> &mut Self {
-        let flags = self.flags.unwrap_or_else(MessageFlags::empty);
+    /// Adds or removes the ephemeral flag.
+    pub fn ephemeral(mut self, ephemeral: bool) -> Self {
+        let mut flags = self.flags.unwrap_or_else(MessageFlags::empty);
 
-        let flags = if ephemeral {
-            flags | MessageFlags::EPHEMERAL
+        if ephemeral {
+            flags |= MessageFlags::EPHEMERAL;
         } else {
-            flags & !MessageFlags::EPHEMERAL
+            flags &= !MessageFlags::EPHEMERAL;
         };
 
         self.flags = Some(flags);
@@ -186,7 +230,7 @@ impl<'a> CreateInteractionResponseData<'a> {
     }
 
     /// Creates components for this message.
-    pub fn components<F>(&mut self, f: F) -> &mut Self
+    pub fn components<F>(self, f: F) -> Self
     where
         F: FnOnce(&mut CreateComponents) -> &mut CreateComponents,
     {
@@ -197,19 +241,19 @@ impl<'a> CreateInteractionResponseData<'a> {
     }
 
     /// Sets the components of this message.
-    pub fn set_components(&mut self, components: CreateComponents) -> &mut Self {
+    pub fn set_components(mut self, components: CreateComponents) -> Self {
         self.components = Some(components);
         self
     }
 
-    /// Sets the custom id for modal interactions
-    pub fn custom_id(&mut self, id: impl Into<String>) -> &mut Self {
+    /// Sets the custom id for modal interactions.
+    pub fn custom_id(mut self, id: impl Into<String>) -> Self {
         self.custom_id = Some(id.into());
         self
     }
 
-    /// Sets the title for modal interactions
-    pub fn title(&mut self, title: impl Into<String>) -> &mut Self {
+    /// Sets the title for modal interactions.
+    pub fn title(mut self, title: impl Into<String>) -> Self {
         self.title = Some(title.into());
         self
     }
