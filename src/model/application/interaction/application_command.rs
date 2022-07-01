@@ -108,28 +108,12 @@ impl ApplicationCommandInteraction {
     /// # Errors
     ///
     /// Returns an [`Error::Http`] if the API returns an error.
-    ///
-    /// [`Error::Http`]: crate::error::Error::Http
-    pub async fn create_autocomplete_response<F>(&self, http: impl AsRef<Http>, f: F) -> Result<()>
-    where
-        F: FnOnce(&mut CreateAutocompleteResponse) -> &mut CreateAutocompleteResponse,
-    {
-        #[derive(Serialize)]
-        struct AutocompleteResponse {
-            data: CreateAutocompleteResponse,
-            #[serde(rename = "type")]
-            kind: InteractionResponseType,
-        }
-
-        let mut response = CreateAutocompleteResponse::default();
-        f(&mut response);
-
-        let map = AutocompleteResponse {
-            data: response,
-            kind: InteractionResponseType::Autocomplete,
-        };
-
-        http.as_ref().create_interaction_response(self.id.get(), &self.token, &map).await
+    pub async fn create_autocomplete_response(
+        &self,
+        http: impl AsRef<Http>,
+        builder: CreateAutocompleteResponse,
+    ) -> Result<()> {
+        builder.execute(http, self.id, &self.token).await
     }
 
     /// Edits the initial interaction response. Does not work for ephemeral messages.
