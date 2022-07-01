@@ -136,23 +136,15 @@ impl MessageComponentInteraction {
     ///
     /// # Errors
     ///
-    /// Will return [`Error::Model`] if the content is too long.
-    /// May also return [`Error::Http`] if the API returns an error,
-    /// or a [`Error::Json`] if there is an error in deserializing the response.
-    pub async fn create_followup_message<'a, F>(
+    /// Returns [`Error::Model`] if the content is too long. May also return [`Error::Http`] if the
+    /// API returns an error, or [`Error::Json`] if there is an error in deserializing the
+    /// response.
+    pub async fn create_followup_message<'a>(
         &self,
         http: impl AsRef<Http>,
-        f: F,
-    ) -> Result<Message>
-    where
-        for<'b> F: FnOnce(
-            &'b mut CreateInteractionResponseFollowup<'a>,
-        ) -> &'b mut CreateInteractionResponseFollowup<'a>,
-    {
-        let mut interaction_response = CreateInteractionResponseFollowup::default();
-        f(&mut interaction_response);
-
-        http.as_ref().create_followup_message(&self.token, &interaction_response).await
+        builder: CreateInteractionResponseFollowup<'a>,
+    ) -> Result<Message> {
+        builder.execute(http, None, &self.token).await
     }
 
     /// Edits a followup response to the response sent.
@@ -161,26 +153,16 @@ impl MessageComponentInteraction {
     ///
     /// # Errors
     ///
-    /// Will return [`Error::Model`] if the content is too long.
-    /// May also return [`Error::Http`] if the API returns an error,
-    /// or a [`Error::Json`] if there is an error in deserializing the response.
-    pub async fn edit_followup_message<'a, F, M: Into<MessageId>>(
+    /// Returns [`Error::Model`] if the content is too long. May also return [`Error::Http`] if the
+    /// API returns an error, or [`Error::Json`] if there is an error in deserializing the
+    /// response.
+    pub async fn edit_followup_message<'a>(
         &self,
         http: impl AsRef<Http>,
-        message_id: M,
-        f: F,
-    ) -> Result<Message>
-    where
-        for<'b> F: FnOnce(
-            &'b mut CreateInteractionResponseFollowup<'a>,
-        ) -> &'b mut CreateInteractionResponseFollowup<'a>,
-    {
-        let mut interaction_response = CreateInteractionResponseFollowup::default();
-        f(&mut interaction_response);
-
-        http.as_ref()
-            .edit_followup_message(&self.token, message_id.into().into(), &interaction_response)
-            .await
+        message_id: impl Into<MessageId>,
+        builder: CreateInteractionResponseFollowup<'a>,
+    ) -> Result<Message> {
+        builder.execute(http, Some(message_id.into()), &self.token).await
     }
 
     /// Deletes a followup message.

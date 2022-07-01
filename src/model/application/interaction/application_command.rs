@@ -176,36 +176,15 @@ impl ApplicationCommandInteraction {
     ///
     /// # Errors
     ///
-    /// Will return [`Error::Model`] if the content is too long.
-    /// May also return [`Error::Http`] if the API returns an error,
-    /// or a [`Error::Json`] if there is an error in deserializing the response.
-    pub async fn create_followup_message<'a, F>(
+    /// Returns [`Error::Model`] if the content is too long. May also return [`Error::Http`] if the
+    /// API returns an error, or [`Error::Json`] if there is an error in deserializing the
+    /// response.
+    pub async fn create_followup_message<'a>(
         &self,
         http: impl AsRef<Http>,
-        f: F,
-    ) -> Result<Message>
-    where
-        for<'b> F: FnOnce(
-            &'b mut CreateInteractionResponseFollowup<'a>,
-        ) -> &'b mut CreateInteractionResponseFollowup<'a>,
-    {
-        let mut interaction_response = CreateInteractionResponseFollowup::default();
-        f(&mut interaction_response);
-        self._create_followup_message(http.as_ref(), interaction_response).await
-    }
-
-    async fn _create_followup_message<'a>(
-        &self,
-        http: &Http,
-        mut interaction_response: CreateInteractionResponseFollowup<'a>,
+        builder: CreateInteractionResponseFollowup<'a>,
     ) -> Result<Message> {
-        let files = std::mem::take(&mut interaction_response.files);
-
-        if files.is_empty() {
-            http.create_followup_message(&self.token, &interaction_response).await
-        } else {
-            http.create_followup_message_with_files(&self.token, &interaction_response, files).await
-        }
+        builder.execute(http, None, &self.token).await
     }
 
     /// Edits a followup response to the response sent.
@@ -214,33 +193,16 @@ impl ApplicationCommandInteraction {
     ///
     /// # Errors
     ///
-    /// Will return [`Error::Model`] if the content is too long.
-    /// May also return [`Error::Http`] if the API returns an error,
-    /// or a [`Error::Json`] if there is an error in deserializing the response.
-    pub async fn edit_followup_message<'a, F, M: Into<MessageId>>(
+    /// Returns [`Error::Model`] if the content is too long. May also return [`Error::Http`] if the
+    /// API returns an error, or [`Error::Json`] if there is an error in deserializing the
+    /// response.
+    pub async fn edit_followup_message<'a>(
         &self,
         http: impl AsRef<Http>,
-        message_id: M,
-        f: F,
-    ) -> Result<Message>
-    where
-        for<'b> F: FnOnce(
-            &'b mut CreateInteractionResponseFollowup<'a>,
-        ) -> &'b mut CreateInteractionResponseFollowup<'a>,
-    {
-        let mut builder = CreateInteractionResponseFollowup::default();
-        f(&mut builder);
-
-        let http = http.as_ref();
-        let message_id = message_id.into().into();
-        let files = std::mem::take(&mut builder.files);
-
-        if files.is_empty() {
-            http.edit_followup_message(&self.token, message_id, &builder).await
-        } else {
-            http.edit_followup_message_and_attachments(&self.token, message_id, &builder, files)
-                .await
-        }
+        message_id: impl Into<MessageId>,
+        builder: CreateInteractionResponseFollowup<'a>,
+    ) -> Result<Message> {
+        builder.execute(http, Some(message_id.into()), &self.token).await
     }
 
     /// Deletes a followup message.

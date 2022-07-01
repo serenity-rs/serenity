@@ -17,7 +17,8 @@ pub struct CreateInteractionResponse<'a> {
 impl<'a> CreateInteractionResponse<'a> {
     /// Creates a response to the interaction received.
     ///
-    /// **Note**: Message contents must be under 2000 unicode code points.
+    /// **Note**: Message contents must be under 2000 unicode code points, and embeds must be under
+    /// 6000 code points.
     ///
     /// # Errors
     ///
@@ -193,7 +194,7 @@ impl<'a> CreateInteractionResponseData<'a> {
     /// Calling this will overwrite the embed list. To append embeds, call [`Self::add_embed`]
     /// instead.
     pub fn set_embeds(mut self, embeds: Vec<CreateEmbed>) -> Self {
-        self.embeds = embeds.into_iter().collect();
+        self.embeds = embeds;
         self
     }
 

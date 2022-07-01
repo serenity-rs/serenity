@@ -78,8 +78,8 @@ impl<'a> CreateMessage<'a> {
     /// **Note**: Requires the [Send Messages] permission. Additionally, attaching files requires the
     /// [Attach Files] permission.
     ///
-    /// **Note**: Message contents must be under 2000 code points, and embeds must be under 6000
-    /// code points.
+    /// **Note**: Message contents must be under 2000 unicode code points, and embeds must be under
+    /// 6000 code points.
     ///
     /// # Errors
     ///
