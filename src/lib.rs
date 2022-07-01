@@ -52,6 +52,7 @@
 //! [gateway docs]: crate::gateway
 #![doc(html_root_url = "https://docs.rs/serenity/*")]
 #![cfg_attr(docsrs, feature(doc_auto_cfg))]
+#![feature(generic_associated_types)]
 #![deny(rust_2018_idioms)]
 #![warn(clippy::pedantic)]
 #![allow(
