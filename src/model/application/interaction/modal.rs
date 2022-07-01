@@ -81,10 +81,9 @@ impl ModalSubmitInteraction {
     ///
     /// # Errors
     ///
-    /// Returns an [`Error::Model`] if the message content is too long.
-    /// May also return an [`Error::Http`] if the API returns an error,
-    /// or an [`Error::Json`] if there is an error in deserializing the
-    /// API response.
+    /// Returns an [`Error::Model`] if the message content is too long. May also return an
+    /// [`Error::Http`] if the API returns an error, or an [`Error::Json`] if there is an error in
+    /// deserializing the API response.
     pub async fn create_interaction_response<'a>(
         &self,
         http: impl AsRef<Http>,
@@ -93,33 +92,21 @@ impl ModalSubmitInteraction {
         builder.execute(http, self.id, &self.token).await
     }
 
-    /// Edits the initial interaction response.
+    /// Edits the initial interaction response. Does not work for ephemeral messages.
     ///
-    /// `application_id` will usually be the bot's [`UserId`], except in cases of bots being very old.
-    ///
-    /// Refer to Discord's docs for Edit Webhook Message for field information.
-    ///
-    /// **Note**:   Message contents must be under 2000 unicode code points.
-    ///
-    /// [`UserId`]: crate::model::id::UserId
+    /// **Note**: Message contents must be under 2000 unicode code points.
     ///
     /// # Errors
     ///
-    /// Returns [`Error::Model`] if the edited content is too long.
-    /// May also return [`Error::Http`] if the API returns an error,
-    /// or an [`Error::Json`] if there is an error deserializing the response.
+    /// Returns an [`Error::Model`] if the message content is too long. May also return an
+    /// [`Error::Http`] if the API returns an error, or an [`Error::Json`] if there is an error in
+    /// deserializing the API response.
     pub async fn edit_original_interaction_response<F>(
         &self,
         http: impl AsRef<Http>,
-        f: F,
-    ) -> Result<Message>
-    where
-        F: FnOnce(&mut EditInteractionResponse) -> &mut EditInteractionResponse,
-    {
-        let mut interaction_response = EditInteractionResponse::default();
-        f(&mut interaction_response);
-
-        http.as_ref().edit_original_interaction_response(&self.token, &interaction_response).await
+        builder: EditInteractionResponse,
+    ) -> Result<Message> {
+        builder.execute(http, &self.token).await
     }
 
     /// Deletes the initial interaction response.
