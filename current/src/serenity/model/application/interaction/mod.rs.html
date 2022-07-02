@@ -261,6 +261,19 @@
 <span id="255">255</span>
 <span id="256">256</span>
 <span id="257">257</span>
+<span id="258">258</span>
+<span id="259">259</span>
+<span id="260">260</span>
+<span id="261">261</span>
+<span id="262">262</span>
+<span id="263">263</span>
+<span id="264">264</span>
+<span id="265">265</span>
+<span id="266">266</span>
+<span id="267">267</span>
+<span id="268">268</span>
+<span id="269">269</span>
+<span id="270">270</span>
 </pre><pre class="rust"><code><span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">application_command</span>;
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">autocomplete</span>;
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">message_component</span>;
@@ -278,6 +291,7 @@
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::json</span>::{<span class="ident">from_value</span>, <span class="ident">JsonMap</span>, <span class="ident">Value</span>};
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::id</span>::{<span class="ident">ApplicationId</span>, <span class="ident">InteractionId</span>};
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::user::User</span>;
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::Permissions</span>;
 
 <span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-object)</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>)]</span>
@@ -311,6 +325,18 @@
             <span class="ident"><span class="self">Self</span>::MessageComponent</span>(<span class="kw">_</span>) =&gt; <span class="ident">InteractionType::MessageComponent</span>,
             <span class="ident"><span class="self">Self</span>::Autocomplete</span>(<span class="kw">_</span>) =&gt; <span class="ident">InteractionType::Autocomplete</span>,
             <span class="ident"><span class="self">Self</span>::ModalSubmit</span>(<span class="kw">_</span>) =&gt; <span class="ident">InteractionType::ModalSubmit</span>,
+        }
+    }
+
+    <span class="doccomment">/// Permissions the app or bot has within the channel the interaction was sent from.</span>
+    <span class="attribute">#[<span class="ident">must_use</span>]</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">app_permissions</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Permissions</span><span class="op">&gt;</span> {
+        <span class="kw">match</span> <span class="self">self</span> {
+            <span class="ident"><span class="self">Self</span>::Ping</span>(<span class="kw">_</span>) =&gt; <span class="prelude-val">None</span>,
+            <span class="ident"><span class="self">Self</span>::ApplicationCommand</span>(<span class="ident">i</span>) =&gt; <span class="ident">i</span>.<span class="ident">app_permissions</span>,
+            <span class="ident"><span class="self">Self</span>::MessageComponent</span>(<span class="ident">i</span>) =&gt; <span class="ident">i</span>.<span class="ident">app_permissions</span>,
+            <span class="ident"><span class="self">Self</span>::Autocomplete</span>(<span class="ident">i</span>) =&gt; <span class="ident">i</span>.<span class="ident">app_permissions</span>,
+            <span class="ident"><span class="self">Self</span>::ModalSubmit</span>(<span class="ident">i</span>) =&gt; <span class="ident">i</span>.<span class="ident">app_permissions</span>,
         }
     }
 

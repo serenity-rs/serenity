@@ -417,6 +417,16 @@
 <span id="411">411</span>
 <span id="412">412</span>
 <span id="413">413</span>
+<span id="414">414</span>
+<span id="415">415</span>
+<span id="416">416</span>
+<span id="417">417</span>
+<span id="418">418</span>
+<span id="419">419</span>
+<span id="420">420</span>
+<span id="421">421</span>
+<span id="422">422</span>
+<span id="423">423</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">serde::de</span>::{<span class="ident">Deserialize</span>, <span class="ident">Deserializer</span>, <span class="ident">Error</span> <span class="kw">as</span> <span class="ident">DeError</span>};
 <span class="kw">use</span> <span class="ident">serde::Serialize</span>;
 
@@ -442,6 +452,7 @@
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::id::MessageId</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::id</span>::{<span class="ident">ApplicationId</span>, <span class="ident">ChannelId</span>, <span class="ident">GuildId</span>, <span class="ident">InteractionId</span>};
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::user::User</span>;
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::Permissions</span>;
 
 <span class="doccomment">/// An interaction triggered by a modal submit.</span>
 <span class="doccomment">///</span>
@@ -480,6 +491,8 @@
     <span class="doccomment">/// an application command interaction</span>
     <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;Option::is_none&quot;</span>)]</span>
     <span class="kw">pub</span> <span class="ident">message</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Message</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// Permissions the app or bot has within the channel the interaction was sent from.</span>
+    <span class="kw">pub</span> <span class="ident">app_permissions</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Permissions</span><span class="op">&gt;</span>,
     <span class="doccomment">/// The selected language of the invoking user.</span>
     <span class="kw">pub</span> <span class="ident">locale</span>: <span class="ident">String</span>,
     <span class="doccomment">/// The guild&#39;s preferred locale.</span>
@@ -789,6 +802,12 @@
             .<span class="ident">and_then</span>(<span class="ident">u8::deserialize</span>)
             .<span class="ident">map_err</span>(<span class="ident">DeError::custom</span>)<span class="question-mark">?</span>;
 
+        <span class="kw">let</span> <span class="ident">app_permissions</span> <span class="op">=</span> <span class="ident">map</span>
+            .<span class="ident">remove</span>(<span class="string">&quot;app_permissions&quot;</span>)
+            .<span class="ident">map</span>(<span class="ident">Permissions::deserialize</span>)
+            .<span class="ident">transpose</span>()
+            .<span class="ident">map_err</span>(<span class="ident">DeError::custom</span>)<span class="question-mark">?</span>;
+
         <span class="kw">let</span> <span class="ident">guild_locale</span> <span class="op">=</span> <span class="ident">map</span>
             .<span class="ident">remove</span>(<span class="string">&quot;guild_locale&quot;</span>)
             .<span class="ident">map</span>(<span class="ident">String::deserialize</span>)
@@ -813,6 +832,7 @@
             <span class="ident">token</span>,
             <span class="ident">version</span>,
             <span class="ident">message</span>,
+            <span class="ident">app_permissions</span>,
             <span class="ident">locale</span>,
             <span class="ident">guild_locale</span>,
         })
