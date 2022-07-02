@@ -824,32 +824,17 @@ impl ChannelId {
         http.as_ref().get_channel_webhooks(self.get()).await
     }
 
-    /// Creates a webhook
+    /// Creates a webhook in the channel.
     ///
     /// # Errors
     ///
-    /// Returns a [`Error::Http`] if the current user lacks permission.
-    /// Returns a [`ModelError::NameTooShort`] if the name of the webhook is
-    /// under the limit of 2 characters.
-    /// Returns a [`ModelError::NameTooLong`] if the name of the webhook is
-    /// over the limit of 100 characters.
-    /// Returns a [`ModelError::InvalidChannelType`] if the channel type is not text.
-    pub async fn create_webhook<F>(&self, http: impl AsRef<Http>, f: F) -> Result<Webhook>
-    where
-        F: FnOnce(&mut CreateWebhook) -> &mut CreateWebhook,
-    {
-        let mut builder = CreateWebhook::default();
-        f(&mut builder);
-
-        if let Some(name) = &builder.name {
-            if name.len() < 2 {
-                return Err(Error::Model(ModelError::NameTooShort));
-            } else if name.len() > 100 {
-                return Err(Error::Model(ModelError::NameTooLong));
-            }
-        }
-
-        http.as_ref().create_webhook(self.get(), &builder, None).await
+    /// See [`CreateWebhook::execute`] for a detailed list of possible errors.
+    pub async fn create_webhook(
+        self,
+        cache_http: impl CacheHttp,
+        builder: CreateWebhook,
+    ) -> Result<Webhook> {
+        builder.execute(cache_http, self).await
     }
 
     /// Returns a builder which can be awaited to obtain a message or stream of messages in this channel.

@@ -1105,24 +1105,17 @@ impl GuildChannel {
         ReactionCollectorBuilder::new(shard_messenger).channel_id(self.id.0)
     }
 
-    /// Creates a webhook with only a name.
+    /// Creates a webhook in the channel.
     ///
     /// # Errors
     ///
-    /// Returns a [`ModelError::NameTooShort`] if the name of the webhook is
-    /// under the limit of 2 characters.
-    /// Returns a [`ModelError::NameTooLong`] if the name of the webhook is
-    /// over the limit of 100 characters.
-    /// Returns a [`ModelError::InvalidChannelType`] if the channel type is not text.
-    pub async fn create_webhook<F>(&self, http: impl AsRef<Http>, f: F) -> Result<Webhook>
-    where
-        F: FnOnce(&mut CreateWebhook) -> &mut CreateWebhook,
-    {
-        if self.is_text_based() {
-            self.id.create_webhook(&http, f).await
-        } else {
-            Err(Error::Model(ModelError::InvalidChannelType))
-        }
+    /// See [`CreateWebhook::execute`] for a detailed list of possible errors.
+    pub async fn create_webhook(
+        &self,
+        cache_http: impl CacheHttp,
+        builder: CreateWebhook,
+    ) -> Result<Webhook> {
+        self.id.create_webhook(cache_http, builder).await
     }
 
     /// Gets a stage instance.
