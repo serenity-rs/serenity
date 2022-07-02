@@ -465,11 +465,11 @@ impl CurrentUser {
         permissions: Permissions,
         scopes: &[Scope],
     ) -> Result<String> {
-        let mut builder = CreateBotAuthParameters::default();
-
-        builder.permissions(permissions);
-        builder.auto_client_id(http).await?;
-        builder.scopes(scopes);
+        let builder = CreateBotAuthParameters::default()
+            .permissions(permissions)
+            .scopes(scopes)
+            .auto_client_id(http)
+            .await?;
 
         Ok(builder.build())
     }
