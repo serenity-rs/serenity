@@ -831,7 +831,7 @@ impl Http {
             .await?;
 
         if let Some(map) = value.as_object_mut() {
-            map.insert("guild_id".to_string(), from_number(guild_id));
+            map.insert("guild_id".to_string(), guild_id.into());
         }
 
         from_value(value).map_err(From::from)
@@ -1660,7 +1660,7 @@ impl Http {
             .await?;
 
         if let Some(map) = value.as_object_mut() {
-            map.insert("guild_id".to_string(), from_number(guild_id));
+            map.insert("guild_id".to_string(), guild_id.into());
         }
 
         from_value::<Member>(value).map_err(From::from)
@@ -1862,7 +1862,7 @@ impl Http {
             .await?;
 
         if let Some(map) = value.as_object_mut() {
-            map.insert("guild_id".to_string(), from_number(guild_id));
+            map.insert("guild_id".to_string(), guild_id.into());
         }
 
         from_value(value).map_err(From::from)
@@ -1897,7 +1897,7 @@ impl Http {
         if let Some(array) = value.as_array_mut() {
             for role in array {
                 if let Some(map) = role.as_object_mut() {
-                    map.insert("guild_id".to_string(), from_number(guild_id));
+                    map.insert("guild_id".to_string(), guild_id.into());
                 }
             }
         }
@@ -1958,7 +1958,7 @@ impl Http {
             .await?;
 
         if let Some(map) = value.as_object_mut() {
-            map.insert("guild_id".to_string(), from_number(guild_id));
+            map.insert("guild_id".to_string(), guild_id.into());
         }
 
         from_value(value).map_err(From::from)
@@ -2949,11 +2949,9 @@ impl Http {
             .await?;
 
         if let Some(values) = value.as_array_mut() {
-            let num = from_number(guild_id);
-
             for value in values {
                 if let Some(element) = value.as_object_mut() {
-                    element.insert("guild_id".to_string(), num.clone());
+                    element.insert("guild_id".to_string(), guild_id.into());
                 }
             }
         }
@@ -3007,7 +3005,7 @@ impl Http {
         if let Some(array) = value.as_array_mut() {
             for sticker in array {
                 if let Some(map) = sticker.as_object_mut() {
-                    map.insert("guild_id".to_string(), from_number(guild_id));
+                    map.insert("guild_id".to_string(), guild_id.into());
                 }
             }
         }
@@ -3126,7 +3124,7 @@ impl Http {
         if let Some(array) = value.as_array_mut() {
             for role in array {
                 if let Some(map) = role.as_object_mut() {
-                    map.insert("guild_id".to_string(), from_number(guild_id));
+                    map.insert("guild_id".to_string(), guild_id.into());
                 }
             }
         }
@@ -3151,7 +3149,7 @@ impl Http {
             .await?;
 
         if let Some(map) = value.as_object_mut() {
-            map.insert("guild_id".to_string(), from_number(guild_id));
+            map.insert("guild_id".to_string(), guild_id.into());
         }
 
         from_value(value).map_err(From::from)
@@ -3295,7 +3293,7 @@ impl Http {
             .await?;
 
         if let Some(map) = value.as_object_mut() {
-            map.insert("guild_id".to_string(), from_number(guild_id));
+            map.insert("guild_id".to_string(), guild_id.into());
         }
 
         from_value::<Member>(value).map_err(From::from)
@@ -3769,7 +3767,7 @@ impl Http {
         if let Some(members) = value.as_array_mut() {
             for member in members {
                 if let Some(map) = member.as_object_mut() {
-                    map.insert("guild_id".to_string(), from_number(guild_id));
+                    map.insert("guild_id".to_string(), guild_id.into());
                 }
             }
         }

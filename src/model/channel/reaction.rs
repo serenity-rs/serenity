@@ -14,7 +14,6 @@ use tracing::warn;
 #[cfg(feature = "model")]
 use crate::http::{CacheHttp, Http};
 use crate::internal::prelude::*;
-use crate::json::from_number;
 use crate::model::prelude::*;
 use crate::model::utils::{remove_from_map, remove_from_map_opt};
 
@@ -47,7 +46,7 @@ impl<'de> Deserialize<'de> for Reaction {
         if let Some(id) = guild_id {
             if let Some(member) = map.get_mut("member") {
                 if let Some(object) = member.as_object_mut() {
-                    object.insert("guild_id".to_owned(), from_number(id.get()));
+                    object.insert("guild_id".to_owned(), id.get().into());
                 }
             }
         }
