@@ -149,16 +149,6 @@ impl<'a> CreateInteractionResponseFollowup<'a> {
         self
     }
 
-    /// Create an embed for the message.
-    pub fn embed<F>(self, f: F) -> Self
-    where
-        F: FnOnce(&mut CreateEmbed) -> &mut CreateEmbed,
-    {
-        let mut embed = CreateEmbed::default();
-        f(&mut embed);
-        self.add_embed(embed)
-    }
-
     /// Adds an embed to the message.
     pub fn add_embed(mut self, embed: CreateEmbed) -> Self {
         self.embeds.push(embed);
@@ -171,19 +161,19 @@ impl<'a> CreateInteractionResponseFollowup<'a> {
         self
     }
 
-    /// Sets a single embed to include in the message
+    /// Sets a single embed to include in the message.
     ///
-    /// Calling this will overwrite the embed list.
-    /// To append embeds, call [`Self::add_embed`] instead.
-    pub fn set_embed(self, embed: CreateEmbed) -> Self {
-        self.set_embeds(vec![embed])
+    /// Calling this will overwrite the embed list. To append embeds, call [`Self::add_embed`]
+    /// instead.
+    pub fn embed(self, embed: CreateEmbed) -> Self {
+        self.embeds(vec![embed])
     }
 
     /// Sets a list of embeds to include in the message.
     ///
-    /// Calling this multiple times will overwrite the embed list.
-    /// To append embeds, call [`Self::add_embed`] instead.
-    pub fn set_embeds(mut self, embeds: Vec<CreateEmbed>) -> Self {
+    /// Calling this multiple times will overwrite the embed list. To append embeds, call
+    /// [`Self::add_embeds`] instead.
+    pub fn embeds(mut self, embeds: Vec<CreateEmbed>) -> Self {
         self.embeds = embeds;
         self
     }

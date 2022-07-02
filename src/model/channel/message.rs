@@ -352,8 +352,8 @@ impl Message {
             builder.content(&self.content);
         }
 
-        let embeds: Vec<_> = self.embeds.iter().map(|e| CreateEmbed::from(e.clone())).collect();
-        builder.set_embeds(embeds);
+        let embeds = self.embeds.iter().cloned().map(CreateEmbed::from).collect();
+        builder.embeds(embeds);
 
         for attachment in &self.attachments {
             builder.add_existing_attachment(attachment.id);

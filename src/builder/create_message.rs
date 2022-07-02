@@ -26,7 +26,7 @@ use crate::model::prelude::*;
 /// Sending a message with a content of `"test"` and applying text-to-speech:
 ///
 /// ```rust,no_run
-/// use serenity::builder::CreateMessage;
+/// use serenity::builder::{CreateEmbed, CreateMessage};
 /// use serenity::model::id::ChannelId;
 /// # use serenity::http::Http;
 /// # use std::sync::Arc;
@@ -36,10 +36,8 @@ use crate::model::prelude::*;
 ///
 /// let channel_id = ChannelId::new(7);
 ///
-/// let builder = CreateMessage::default()
-///     .content("test")
-///     .tts(true)
-///     .embed(|e| e.title("This is an embed").description("With a description"));
+/// let embed = CreateEmbed::default().title("This is an embed").description("With a description");
+/// let builder = CreateMessage::default().content("test").tts(true).embed(embed);
 /// let _ = channel_id.send_message(&http, builder).await;
 /// # }
 /// ```
@@ -164,25 +162,16 @@ impl<'a> CreateMessage<'a> {
 
     /// Add an embed for the message.
     ///
-    /// **Note**: This will keep all existing embeds. Use [`Self::set_embed()`] to replace existing
+    /// **Note**: This will keep all existing embeds. Use [`Self::embed()`] to replace existing
     /// embeds.
-    pub fn add_embed<F>(self, f: F) -> Self
-    where
-        F: FnOnce(&mut CreateEmbed) -> &mut CreateEmbed,
-    {
-        let mut embed = CreateEmbed::default();
-        f(&mut embed);
-        self._add_embed(embed)
-    }
-
-    fn _add_embed(mut self, embed: CreateEmbed) -> Self {
+    pub fn add_embed(mut self, embed: CreateEmbed) -> Self {
         self.embeds.push(embed);
         self
     }
 
     /// Add multiple embeds for the message.
     ///
-    /// **Note**: This will keep all existing embeds. Use [`Self::set_embeds()`] to replace existing
+    /// **Note**: This will keep all existing embeds. Use [`Self::embeds()`] to replace existing
     /// embeds.
     pub fn add_embeds(mut self, embeds: Vec<CreateEmbed>) -> Self {
         self.embeds.extend(embeds);
@@ -191,35 +180,17 @@ impl<'a> CreateMessage<'a> {
 
     /// Set an embed for the message.
     ///
-    /// Equivalent to [`Self::set_embed()`].
-    ///
-    /// **Note**: This will replace all existing embeds. Use
-    /// [`Self::add_embed()`] to add an additional embed.
-    pub fn embed<F>(self, f: F) -> Self
-    where
-        F: FnOnce(&mut CreateEmbed) -> &mut CreateEmbed,
-    {
-        let mut embed = CreateEmbed::default();
-        f(&mut embed);
-
-        self.set_embed(embed)
-    }
-
-    /// Set an embed for the message.
-    ///
-    /// Equivalent to [`Self::embed()`].
-    ///
-    /// **Note**: This will replace all existing embeds.
-    /// Use [`Self::add_embed()`] to add an additional embed.
-    pub fn set_embed(self, embed: CreateEmbed) -> Self {
-        self.set_embeds(vec![embed])
+    /// **Note**: This will replace all existing embeds. Use [`Self::add_embed()`] to keep existing
+    /// embeds.
+    pub fn embed(self, embed: CreateEmbed) -> Self {
+        self.embeds(vec![embed])
     }
 
     /// Set multiple embeds for the message.
     ///
     /// **Note**: This will replace all existing embeds. Use [`Self::add_embeds()`] to keep existing
     /// embeds.
-    pub fn set_embeds(mut self, embeds: Vec<CreateEmbed>) -> Self {
+    pub fn embeds(mut self, embeds: Vec<CreateEmbed>) -> Self {
         self.embeds = embeds;
         self
     }

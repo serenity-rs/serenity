@@ -1022,18 +1022,16 @@ async fn send_grouped_commands_embed(
     // creating embed outside message builder since flatten_group_to_string
     // may return an error.
 
-    let mut embed = CreateEmbed::default();
-    embed.colour(colour);
-    embed.description(help_description);
+    let mut embed = CreateEmbed::default().colour(colour).description(help_description);
     for group in groups {
         let mut embed_text = String::default();
 
         flatten_group_to_string(&mut embed_text, group, 0, help_options)?;
 
-        embed.field(group.name, &embed_text, true);
+        embed = embed.field(group.name, &embed_text, true);
     }
 
-    let builder = CreateMessage::default().set_embed(embed);
+    let builder = CreateMessage::default().embed(embed);
     channel_id.send_message(cache_http, builder).await
 }
 
@@ -1046,12 +1044,10 @@ async fn send_single_command_embed(
     command: &Command<'_>,
     colour: Colour,
 ) -> Result<Message, Error> {
-    let mut embed = CreateEmbed::default();
-    embed.title(command.name);
-    embed.colour(colour);
+    let mut embed = CreateEmbed::default().title(command.name).colour(colour);
 
     if let Some(desc) = command.description {
-        embed.description(desc);
+        embed = embed.description(desc);
     }
 
     if let Some(usage) = command.usage {
@@ -1061,7 +1057,7 @@ async fn send_single_command_embed(
             format!("`{} {}`", command.name, usage)
         };
 
-        embed.field(help_options.usage_label, &full_usage_text, true);
+        embed = embed.field(help_options.usage_label, &full_usage_text, true);
     }
 
     if !command.usage_sample.is_empty() {
@@ -1073,13 +1069,13 @@ async fn send_single_command_embed(
             let format_example = |example| format!("`{} {}`\n", command.name, example);
             command.usage_sample.iter().map(format_example).collect::<String>()
         };
-        embed.field(help_options.usage_sample_label, &full_example_text, true);
+        embed = embed.field(help_options.usage_sample_label, &full_example_text, true);
     }
 
-    embed.field(help_options.grouped_label, command.group_name, true);
+    embed = embed.field(help_options.grouped_label, command.group_name, true);
 
     if !command.aliases.is_empty() {
-        embed.field(
+        embed = embed.field(
             help_options.aliases_label,
             &format!("`{}`", command.aliases.join("`, `")),
             true,
@@ -1087,22 +1083,26 @@ async fn send_single_command_embed(
     }
 
     if !help_options.available_text.is_empty() && !command.availability.is_empty() {
-        embed.field(help_options.available_text, command.availability, true);
+        embed = embed.field(help_options.available_text, command.availability, true);
     }
 
     if !command.checks.is_empty() {
-        embed.field(help_options.checks_label, &format!("`{}`", command.checks.join("`, `")), true);
+        embed = embed.field(
+            help_options.checks_label,
+            &format!("`{}`", command.checks.join("`, `")),
+            true,
+        );
     }
 
     if !command.sub_commands.is_empty() {
-        embed.field(
+        embed = embed.field(
             help_options.sub_commands_label,
             &format!("`{}`", command.sub_commands.join("`, `")),
             true,
         );
     }
 
-    let builder = CreateMessage::default().set_embed(embed);
+    let builder = CreateMessage::default().embed(embed);
     channel_id.send_message(cache_http, builder).await
 }
 
@@ -1117,7 +1117,8 @@ async fn send_suggestion_embed(
 ) -> Result<Message, Error> {
     let text = help_description.replace("{}", &suggestions.join("`, `"));
 
-    let builder = CreateMessage::default().embed(|e| e.colour(colour).description(text));
+    let embed = CreateEmbed::default().colour(colour).description(text);
+    let builder = CreateMessage::default().embed(embed);
     channel_id.send_message(cache_http, builder).await
 }
 
@@ -1129,7 +1130,8 @@ async fn send_error_embed(
     input: &str,
     colour: Colour,
 ) -> Result<Message, Error> {
-    let builder = CreateMessage::default().embed(|e| e.colour(colour).description(input));
+    let embed = CreateEmbed::default().colour(colour).description(input);
+    let builder = CreateMessage::default().embed(embed);
     channel_id.send_message(cache_http, builder).await
 }
 
