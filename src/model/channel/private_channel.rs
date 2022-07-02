@@ -198,17 +198,21 @@ impl PrivateChannel {
 
     /// Gets messages from the channel.
     ///
-    /// Refer to [`GetMessages`] for more information on how to use `builder`.
+    /// **Note**: If the user does not have the [Read Message History] permission, returns an empty
+    /// [`Vec`].
     ///
     /// # Errors
     ///
-    /// Returns [`Error::Http`] if an invalid value is set in the builder.
+    /// Returns [`Error::Http`] if the current user lacks permission.
+    ///
+    /// [Read Message History]: Permissions::READ_MESSAGE_HISTORY
     #[inline]
-    pub async fn messages<F>(&self, http: impl AsRef<Http>, builder: F) -> Result<Vec<Message>>
-    where
-        F: FnOnce(&mut GetMessages) -> &mut GetMessages,
-    {
-        self.id.messages(&http, builder).await
+    pub async fn messages(
+        &self,
+        http: impl AsRef<Http>,
+        builder: GetMessages,
+    ) -> Result<Vec<Message>> {
+        self.id.messages(http, builder).await
     }
 
     /// Returns "DM with $username#discriminator".

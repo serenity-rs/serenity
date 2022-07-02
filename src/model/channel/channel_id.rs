@@ -1,6 +1,4 @@
 #[cfg(feature = "model")]
-use std::fmt::Write as _;
-#[cfg(feature = "model")]
 use std::sync::Arc;
 
 #[cfg(feature = "model")]
@@ -18,7 +16,6 @@ use crate::builder::{
     EditStageInstance,
     EditThread,
     GetMessages,
-    SearchFilter,
 };
 #[cfg(all(feature = "cache", feature = "model"))]
 use crate::cache::Cache;
@@ -479,34 +476,20 @@ impl ChannelId {
 
     /// Gets messages from the channel.
     ///
-    /// Refer to [`GetMessages`] for more information on how to use `builder`.
-    ///
-    /// **Note**: Returns an empty [`Vec`] if the current user
-    /// does not have the [Read Message History] permission.
+    /// **Note**: If the user does not have the [Read Message History] permission, returns an empty
+    /// [`Vec`].
     ///
     /// # Errors
     ///
-    /// Returns [`Error::Http`] if the current user does not have
-    /// permission to view the channel.
+    /// Returns [`Error::Http`] if the current user lacks permission.
     ///
     /// [Read Message History]: Permissions::READ_MESSAGE_HISTORY
-    pub async fn messages<F>(self, http: impl AsRef<Http>, builder: F) -> Result<Vec<Message>>
-    where
-        F: FnOnce(&mut GetMessages) -> &mut GetMessages,
-    {
-        let mut get_messages = GetMessages::default();
-        builder(&mut get_messages);
-        let mut query = format!("?limit={}", get_messages.limit.unwrap_or(50));
-
-        if let Some(filter) = get_messages.search_filter {
-            match filter {
-                SearchFilter::After(after) => write!(query, "&after={}", after)?,
-                SearchFilter::Around(around) => write!(query, "&around={}", around)?,
-                SearchFilter::Before(before) => write!(query, "&before={}", before)?,
-            }
-        }
-
-        http.as_ref().get_messages(self.get(), &query).await
+    pub async fn messages(
+        self,
+        http: impl AsRef<Http>,
+        builder: GetMessages,
+    ) -> Result<Vec<Message>> {
+        builder.execute(http, self).await
     }
 
     /// Streams over all the messages in a channel.
@@ -1168,16 +1151,11 @@ impl<H: AsRef<Http>> MessagesIter<H> {
 
         // If `self.before` is not set yet, we can use `.messages` to fetch
         // the last message after very first fetch from last.
-        self.buffer = self
-            .channel_id
-            .messages(&self.http, |b| {
-                if let Some(before) = self.before {
-                    b.before(before);
-                }
-
-                b.limit(grab_size)
-            })
-            .await?;
+        let mut builder = GetMessages::default().limit(grab_size);
+        if let Some(before) = self.before {
+            builder = builder.before(before);
+        }
+        self.buffer = self.channel_id.messages(&self.http, builder).await?;
 
         self.buffer.reverse();
 
