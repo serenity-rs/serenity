@@ -23,6 +23,7 @@ use crate::model::guild::Member;
 use crate::model::id::MessageId;
 use crate::model::id::{ApplicationId, ChannelId, GuildId, InteractionId};
 use crate::model::user::User;
+use crate::model::Permissions;
 
 /// An interaction triggered by a modal submit.
 ///
@@ -61,6 +62,8 @@ pub struct ModalSubmitInteraction {
     /// an application command interaction
     #[serde(skip_serializing_if = "Option::is_none")]
     pub message: Option<Message>,
+    /// Permissions the app or bot has within the channel the interaction was sent from.
+    pub app_permissions: Option<Permissions>,
     /// The selected language of the invoking user.
     pub locale: String,
     /// The guild's preferred locale.
@@ -370,6 +373,12 @@ impl<'de> Deserialize<'de> for ModalSubmitInteraction {
             .and_then(u8::deserialize)
             .map_err(DeError::custom)?;
 
+        let app_permissions = map
+            .remove("app_permissions")
+            .map(Permissions::deserialize)
+            .transpose()
+            .map_err(DeError::custom)?;
+
         let guild_locale = map
             .remove("guild_locale")
             .map(String::deserialize)
@@ -394,6 +403,7 @@ impl<'de> Deserialize<'de> for ModalSubmitInteraction {
             token,
             version,
             message,
+            app_permissions,
             locale,
             guild_locale,
         })

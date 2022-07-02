@@ -23,6 +23,7 @@ use crate::model::guild::Member;
 use crate::model::id::MessageId;
 use crate::model::id::{ApplicationId, ChannelId, GuildId, InteractionId};
 use crate::model::user::User;
+use crate::model::Permissions;
 
 /// An interaction triggered by a message component.
 ///
@@ -58,6 +59,8 @@ pub struct MessageComponentInteraction {
     /// The message this interaction was triggered by, if
     /// it is a component.
     pub message: Message,
+    /// Permissions the app or bot has within the channel the interaction was sent from.
+    pub app_permissions: Option<Permissions>,
     /// The selected language of the invoking user.
     pub locale: String,
     /// The guild's preferred locale.
@@ -385,6 +388,12 @@ impl<'de> Deserialize<'de> for MessageComponentInteraction {
             .and_then(u8::deserialize)
             .map_err(DeError::custom)?;
 
+        let app_permissions = map
+            .remove("app_permissions")
+            .map(Permissions::deserialize)
+            .transpose()
+            .map_err(DeError::custom)?;
+
         let guild_locale = map
             .remove("guild_locale")
             .map(String::deserialize)
@@ -409,6 +418,7 @@ impl<'de> Deserialize<'de> for MessageComponentInteraction {
             token,
             version,
             message,
+            app_permissions,
             locale,
             guild_locale,
         })

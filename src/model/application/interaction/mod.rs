@@ -15,6 +15,7 @@ use self::ping::PingInteraction;
 use crate::json::{from_value, JsonMap, Value};
 use crate::model::id::{ApplicationId, InteractionId};
 use crate::model::user::User;
+use crate::model::Permissions;
 
 /// [Discord docs](https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-object)
 #[derive(Clone, Debug)]
@@ -48,6 +49,18 @@ impl Interaction {
             Self::MessageComponent(_) => InteractionType::MessageComponent,
             Self::Autocomplete(_) => InteractionType::Autocomplete,
             Self::ModalSubmit(_) => InteractionType::ModalSubmit,
+        }
+    }
+
+    /// Permissions the app or bot has within the channel the interaction was sent from.
+    #[must_use]
+    pub fn app_permissions(&self) -> Option<Permissions> {
+        match self {
+            Self::Ping(_) => None,
+            Self::ApplicationCommand(i) => i.app_permissions,
+            Self::MessageComponent(i) => i.app_permissions,
+            Self::Autocomplete(i) => i.app_permissions,
+            Self::ModalSubmit(i) => i.app_permissions,
         }
     }
 
