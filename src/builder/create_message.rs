@@ -7,20 +7,19 @@ use crate::http::{CacheHttp, Http};
 use crate::internal::prelude::*;
 use crate::model::prelude::*;
 
-/// A builder to specify the contents of an [`Http::send_message`] request,
-/// primarily meant for use through [`ChannelId::send_message`].
+/// A builder to specify the contents of an [`Http::send_message`] request, primarily meant for use
+/// through [`ChannelId::send_message`].
 ///
 /// There are three situations where different field requirements are present:
 ///
-/// 1. When sending a message without embeds or stickers, [`Self::content`] is
-///    the only required field that is required to be set.
+/// 1. When sending a message without embeds or stickers, [`Self::content`] is the only required
+///    field that is required to be set.
 /// 2. When sending an [`Self::embed`], no other field is required.
-/// 3. When sending stickers with [`Self::sticker_id`] or other sticker methods,
-///    no other field is required.
+/// 3. When sending stickers with [`Self::sticker_id`] or other sticker methods, no other field is
+///    required.
 ///
-/// Note that if you only need to send the content of a message, without
-/// specifying other fields, then [`ChannelId::say`] may be a more preferable
-/// option.
+/// Note that if you only need to send the content of a message, without specifying other fields,
+/// then [`ChannelId::say`] may be a more preferable option.
 ///
 /// # Examples
 ///
@@ -331,7 +330,7 @@ impl<'a> CreateMessage<'a> {
     /// **Note**: This will replace all existing stickers. Use [`Self::add_sticker_id()`] to keep
     /// existing stickers.
     pub fn sticker_id(self, sticker_id: impl Into<StickerId>) -> Self {
-        self.set_sticker_ids(vec![sticker_id.into()])
+        self.sticker_ids(vec![sticker_id.into()])
     }
 
     /// Sets a list of sticker IDs to include in the message.
@@ -340,7 +339,7 @@ impl<'a> CreateMessage<'a> {
     ///
     /// **Note**: This will replace all existing stickers. Use [`Self::add_sticker_id()`] or
     /// [`Self::add_sticker_ids()`] to keep existing stickers.
-    pub fn set_sticker_ids<T: Into<StickerId>, It: IntoIterator<Item = T>>(
+    pub fn sticker_ids<T: Into<StickerId>, It: IntoIterator<Item = T>>(
         mut self,
         sticker_ids: It,
     ) -> Self {
@@ -363,7 +362,7 @@ impl<'a> CreateMessage<'a> {
     ///
     /// **Note**: There can be a maximum of 3 stickers in a message.
     ///
-    /// **Note**: This will keep all existing stickers. Use [`Self::set_sticker_ids()`] to replace
+    /// **Note**: This will keep all existing stickers. Use [`Self::sticker_ids()`] to replace
     /// existing stickers.
     pub fn add_sticker_ids<T: Into<StickerId>, It: IntoIterator<Item = T>>(
         mut self,
