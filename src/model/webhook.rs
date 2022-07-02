@@ -416,28 +416,25 @@ impl Webhook {
 
     /// Edits a webhook message with the fields set via the given builder.
     ///
+    /// **Note**: Message contents must be under 2000 unicode code points.
+    ///
     /// # Errors
     ///
-    /// Returns an [`Error::Model`] if the [`Self::token`] is [`None`].
+    /// Returns an [`Error::Model`] if [`Self::token`] is [`None`], or if the message content is
+    /// too long.
     ///
-    /// May also return an [`Error::Http`] if the content is malformed, the webhook's token is invalid, or
-    /// the given message Id does not belong to the current webhook.
+    /// May also return an [`Error::Http`] if the content is malformed, the webhook's token is
+    /// invalid, or the given message Id does not belong to the current webhook.
     ///
     /// Or may return an [`Error::Json`] if there is an error deserialising Discord's response.
-    pub async fn edit_message<F>(
+    pub async fn edit_message(
         &self,
         http: impl AsRef<Http>,
         message_id: MessageId,
-        f: F,
-    ) -> Result<Message>
-    where
-        F: FnOnce(&mut EditWebhookMessage) -> &mut EditWebhookMessage,
-    {
+        builder: EditWebhookMessage,
+    ) -> Result<Message> {
         let token = self.token.as_ref().ok_or(ModelError::NoTokenSet)?;
-        let mut builder = EditWebhookMessage::default();
-        f(&mut builder);
-
-        http.as_ref().edit_webhook_message(self.id.get(), token, message_id.get(), &builder).await
+        builder.execute(http, message_id, self.id, token).await
     }
 
     /// Deletes a webhook message.

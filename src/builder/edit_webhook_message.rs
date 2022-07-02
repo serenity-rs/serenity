@@ -1,9 +1,16 @@
 use super::{CreateAllowedMentions, CreateComponents, CreateEmbed};
+#[cfg(feature = "http")]
+use crate::http::Http;
+#[cfg(feature = "http")]
+use crate::internal::prelude::*;
+#[cfg(feature = "http")]
+use crate::model::prelude::*;
 
 /// A builder to specify the fields to edit in an existing [`Webhook`]'s message.
 ///
 /// [`Webhook`]: crate::model::webhook::Webhook
 #[derive(Clone, Debug, Default, Serialize)]
+#[must_use]
 pub struct EditWebhookMessage {
     #[serde(skip_serializing_if = "Option::is_none")]
     content: Option<String>,
@@ -16,11 +23,58 @@ pub struct EditWebhookMessage {
 }
 
 impl EditWebhookMessage {
+    /// Edits the webhook's message.
+    ///
+    /// **Note**: Message contents must be under 2000 unicode code points, and embeds must be under
+    /// 6000 code points.
+    ///
+    /// # Errors
+    ///
+    /// Returns an [`Error::Model`] if the message content is too long.
+    ///
+    /// May also return an [`Error::Http`] if the content is malformed, the webhook's token is
+    /// invalid, or the given message Id does not belong to the webhook.
+    ///
+    /// Or may return an [`Error::Json`] if there is an error deserialising Discord's response.
+    #[cfg(feature = "http")]
+    pub async fn execute(
+        self,
+        http: impl AsRef<Http>,
+        message_id: MessageId,
+        webhook_id: WebhookId,
+        token: &str,
+    ) -> Result<Message> {
+        self.check_length()?;
+        http.as_ref().edit_webhook_message(webhook_id.into(), token, message_id.into(), &self).await
+    }
+
+    #[cfg(feature = "http")]
+    fn check_length(&self) -> Result<()> {
+        if let Some(content) = &self.content {
+            let length = content.chars().count();
+            let max_length = crate::constants::MESSAGE_CODE_LIMIT;
+            if length > max_length {
+                return Err(Error::Model(ModelError::MessageTooLong(length - max_length)));
+            }
+        }
+
+        if let Some(embeds) = &self.embeds {
+            if embeds.len() > crate::constants::EMBED_MAX_COUNT {
+                return Err(Error::Model(ModelError::EmbedAmount));
+            }
+            for embed in embeds {
+                embed.check_length()?;
+            }
+        }
+
+        Ok(())
+    }
+
     /// Set the content of the message.
     ///
     /// **Note**: Message contents must be under 2000 unicode code points.
     #[inline]
-    pub fn content(&mut self, content: impl Into<String>) -> &mut Self {
+    pub fn content(mut self, content: impl Into<String>) -> Self {
         self.content = Some(content.into());
         self
     }
@@ -34,13 +88,13 @@ impl EditWebhookMessage {
     ///
     /// [struct-level documentation of `ExecuteWebhook`]: crate::builder::ExecuteWebhook#examples
     #[inline]
-    pub fn embeds(&mut self, embeds: Vec<CreateEmbed>) -> &mut Self {
+    pub fn embeds(mut self, embeds: Vec<CreateEmbed>) -> Self {
         self.embeds = Some(embeds);
         self
     }
 
     /// Set the allowed mentions for the message.
-    pub fn allowed_mentions<F>(&mut self, f: F) -> &mut Self
+    pub fn allowed_mentions<F>(mut self, f: F) -> Self
     where
         F: FnOnce(&mut CreateAllowedMentions) -> &mut CreateAllowedMentions,
     {
@@ -57,7 +111,7 @@ impl EditWebhookMessage {
     ///
     /// [`WebhookType::Application`]: crate::model::webhook::WebhookType
     /// [`WebhookType::Incoming`]: crate::model::webhook::WebhookType
-    pub fn components<F>(&mut self, f: F) -> &mut Self
+    pub fn components<F>(mut self, f: F) -> Self
     where
         F: FnOnce(&mut CreateComponents) -> &mut CreateComponents,
     {
