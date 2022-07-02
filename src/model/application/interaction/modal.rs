@@ -77,8 +77,6 @@ impl ModalSubmitInteraction {
     /// # Errors
     ///
     /// Returns an [`Error::Http`] if there is no interaction response.
-    ///
-    /// [`Error::Http`]: crate::error::Error::Http
     pub async fn get_interaction_response(&self, http: impl AsRef<Http>) -> Result<Message> {
         http.as_ref().get_original_interaction_response(&self.token).await
     }
@@ -93,10 +91,6 @@ impl ModalSubmitInteraction {
     /// May also return an [`Error::Http`] if the API returns an error,
     /// or an [`Error::Json`] if there is an error in deserializing the
     /// API response.
-    ///
-    /// [`Error::Model`]: crate::error::Error::Model
-    /// [`Error::Http`]: crate::error::Error::Http
-    /// [`Error::Json`]: crate::error::Error::Json
     pub async fn create_interaction_response<'a, F>(
         &self,
         http: impl AsRef<Http>,
@@ -145,10 +139,6 @@ impl ModalSubmitInteraction {
     /// Returns [`Error::Model`] if the edited content is too long.
     /// May also return [`Error::Http`] if the API returns an error,
     /// or an [`Error::Json`] if there is an error deserializing the response.
-    ///
-    /// [`Error::Model`]: crate::error::Error::Model
-    /// [`Error::Http`]: crate::error::Error::Http
-    /// [`Error::Json`]: crate::error::Error::Json
     pub async fn edit_original_interaction_response<F>(
         &self,
         http: impl AsRef<Http>,
@@ -187,10 +177,6 @@ impl ModalSubmitInteraction {
     /// Will return [`Error::Model`] if the content is too long.
     /// May also return [`Error::Http`] if the API returns an error,
     /// or a [`Error::Json`] if there is an error in deserializing the response.
-    ///
-    /// [`Error::Model`]: crate::error::Error::Model
-    /// [`Error::Http`]: crate::error::Error::Http
-    /// [`Error::Json`]: crate::error::Error::Json
     pub async fn create_followup_message<'a, F>(
         &self,
         http: impl AsRef<Http>,
@@ -221,10 +207,6 @@ impl ModalSubmitInteraction {
     /// Will return [`Error::Model`] if the content is too long.
     /// May also return [`Error::Http`] if the API returns an error,
     /// or a [`Error::Json`] if there is an error in deserializing the response.
-    ///
-    /// [`Error::Model`]: crate::error::Error::Model
-    /// [`Error::Http`]: crate::error::Error::Http
-    /// [`Error::Json`]: crate::error::Error::Json
     pub async fn edit_followup_message<'a, F, M: Into<MessageId>>(
         &self,
         http: impl AsRef<Http>,
@@ -269,11 +251,6 @@ impl ModalSubmitInteraction {
     /// May also return an [`Error::Http`] if the API returns an error,
     /// or an [`Error::Json`] if there is an error in deserializing the
     /// API response.
-    ///
-    /// # Errors
-    ///
-    /// [`Error::Http`]: crate::error::Error::Http
-    /// [`Error::Json`]: crate::error::Error::Json
     pub async fn defer(&self, http: impl AsRef<Http>) -> Result<()> {
         self.create_interaction_response(http, |f| {
             f.kind(InteractionResponseType::DeferredUpdateMessage)

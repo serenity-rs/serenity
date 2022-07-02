@@ -121,7 +121,6 @@ impl Invite {
     ///
     /// [Manage Guild]: Permissions::MANAGE_GUILD
     /// [permission]: super::permissions
-    /// [`Error::Http`]: crate::error::Error::Http
     pub async fn delete(&self, cache_http: impl CacheHttp) -> Result<Invite> {
         #[cfg(feature = "cache")]
         {

@@ -128,8 +128,6 @@ impl Attachment {
     /// Returns an [`Error::Http`] when there is a problem retrieving the
     /// attachment.
     ///
-    /// [`Error::Http`]: crate::Error::Http
-    /// [`Error::Io`]: crate::Error::Io
     /// [`Message`]: super::Message
     pub async fn download(&self) -> Result<Vec<u8>> {
         let reqwest = ReqwestClient::new();

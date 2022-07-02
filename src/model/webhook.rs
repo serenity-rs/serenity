@@ -132,9 +132,6 @@ impl Webhook {
     /// not exist.
     ///
     /// May also return an [`Error::Json`] if there is an error in deserialising Discord's response.
-    ///
-    /// [`Error::Http`]: crate::error::Error::Http
-    /// [`Error::Json`]: crate::error::Error::Json
     pub async fn from_id(http: impl AsRef<Http>, webhook_id: impl Into<WebhookId>) -> Result<Self> {
         http.as_ref().get_webhook(webhook_id.into().0).await
     }
@@ -166,9 +163,6 @@ impl Webhook {
     /// Returns an [`Error::Http`] if the webhook does not exist, or if the token is invalid.
     ///
     /// May also return an [`Error::Json`] if there is an error in deserialising Discord's response.
-    ///
-    /// [`Error::Http`]: crate::error::Error::Http
-    /// [`Error::Json`]: crate::error::Error::Json
     pub async fn from_id_with_token(
         http: impl AsRef<Http>,
         webhook_id: impl Into<WebhookId>,
@@ -202,9 +196,6 @@ impl Webhook {
     /// Returns an [`Error::Http`] if the url is malformed, or otherwise if the webhook does not exist, or if the token is invalid.
     ///
     /// May also return an [`Error::Json`] if there is an error in deserialising Discord's response.
-    ///
-    /// [`Error::Http`]: crate::error::Error::Http
-    /// [`Error::Json`]: crate::error::Error::Json
     pub async fn from_url(http: impl AsRef<Http>, url: &str) -> Result<Self> {
         http.as_ref().get_webhook_from_url(url).await
     }
@@ -221,9 +212,6 @@ impl Webhook {
     /// May also return an [`Error::Http`] if the webhook does not exist,
     /// the token is invalid, or if the webhook could not otherwise
     /// be deleted.
-    ///
-    /// [`Error::Model`]: crate::error::Error::Model
-    /// [`Error::Http`]: crate::error::Error::Http
     #[inline]
     pub async fn delete(&self, http: impl AsRef<Http>) -> Result<()> {
         let token = self.token.as_ref().ok_or(ModelError::NoTokenSet)?;
@@ -258,10 +246,6 @@ impl Webhook {
     /// May also return an [`Error::Http`] if the content is malformed, or if the token is invalid.
     ///
     /// Or may return an [`Error::Json`] if there is an error in deserialising Discord's response.
-    ///
-    /// [`Error::Model`]: crate::error::Error::Model
-    /// [`Error::Http`]: crate::error::Error::Http
-    /// [`Error::Json`]: crate::error::Error::Json
     pub async fn edit_name(&mut self, http: impl AsRef<Http>, name: &str) -> Result<()> {
         let token = self.token.as_ref().ok_or(ModelError::NoTokenSet)?;
         let mut map = JsonMap::new();
@@ -298,10 +282,6 @@ impl Webhook {
     /// May also return an [`Error::Http`] if the content is malformed, or if the token is invalid.
     ///
     /// Or may return an [`Error::Json`] if there is an error in deserialising Discord's response.
-    ///
-    /// [`Error::Model`]: crate::error::Error::Model
-    /// [`Error::Http`]: crate::error::Error::Http
-    /// [`Error::Json`]: crate::error::Error::Json
     pub async fn edit_avatar<'a>(
         &mut self,
         http: impl AsRef<Http>,
@@ -343,10 +323,6 @@ impl Webhook {
     /// May also return an [`Error::Http`] if the content is malformed, or if the token is invalid.
     ///
     /// Or may return an [`Error::Json`] if there is an error in deserialising Discord's response.
-    ///
-    /// [`Error::Model`]: crate::error::Error::Model
-    /// [`Error::Http`]: crate::error::Error::Http
-    /// [`Error::Json`]: crate::error::Error::Json
     pub async fn delete_avatar(&mut self, http: impl AsRef<Http>) -> Result<()> {
         let token = self.token.as_ref().ok_or(ModelError::NoTokenSet)?;
         let mut map = JsonMap::new();
@@ -416,10 +392,6 @@ impl Webhook {
     /// May also return an [`Error::Http`] if the content is malformed, or if the webhook's token is invalid.
     ///
     /// Or may return an [`Error::Json`] if there is an error deserialising Discord's response.
-    ///
-    /// [`Error::Model`]: crate::error::Error::Model
-    /// [`Error::Http`]: crate::error::Error::Http
-    /// [`Error::Json`]: crate::error::Error::Json
     #[inline]
     pub async fn execute<'a, F>(
         &self,
@@ -455,10 +427,6 @@ impl Webhook {
     /// the given message Id does not belong to the current webhook.
     ///
     /// Or may return an [`Error::Json`] if there is an error deserialising Discord's response.
-    ///
-    /// [`Error::Model`]: crate::error::Error::Model
-    /// [`Error::Http`]: crate::error::Error::Http
-    /// [`Error::Json`]: crate::error::Error::Json
     pub async fn get_message(
         &self,
         http: impl AsRef<Http>,
@@ -479,10 +447,6 @@ impl Webhook {
     /// the given message Id does not belong to the current webhook.
     ///
     /// Or may return an [`Error::Json`] if there is an error deserialising Discord's response.
-    ///
-    /// [`Error::Model`]: crate::error::Error::Model
-    /// [`Error::Http`]: crate::error::Error::Http
-    /// [`Error::Json`]: crate::error::Error::Json
     pub async fn edit_message<F>(
         &self,
         http: impl AsRef<Http>,
@@ -509,9 +473,6 @@ impl Webhook {
     ///
     /// May also return an [`Error::Http`] if the webhook's token is invalid or
     /// the given message Id does not belong to the current webhook.
-    ///
-    /// [`Error::Model`]: crate::error::Error::Model
-    /// [`Error::Http`]: crate::error::Error::Http
     pub async fn delete_message(
         &self,
         http: impl AsRef<Http>,
@@ -535,10 +496,6 @@ impl Webhook {
     /// Such as if the [`Webhook`] was deleted.
     ///
     /// Or may return an [`Error::Json`] if there is an error deserialising Discord's response.
-    ///
-    /// [`Error::Model`]: crate::error::Error::Model
-    /// [`Error::Http`]: crate::error::Error::Http
-    /// [`Error::Json`]: crate::error::Error::Json
     pub async fn refresh(&mut self, http: impl AsRef<Http>) -> Result<()> {
         let token = self.token.as_ref().ok_or(ModelError::NoTokenSet)?;
         http.as_ref().get_webhook_with_token(self.id.0, token).await.map(|replacement| {
@@ -555,8 +512,6 @@ impl Webhook {
     /// # Errors
     ///
     /// Returns an [`Error::Model`] if the [`Self::token`] is [`None`].
-    ///
-    /// [`Error::Model`]: crate::error::Error::Model
     pub fn url(&self) -> Result<String> {
         let token = self.token.as_ref().ok_or(ModelError::NoTokenSet)?;
         Ok(format!("https://discord.com/api/webhooks/{}/{}", self.id, token))
@@ -577,8 +532,6 @@ impl WebhookId {
     /// May also return an [`Error::Json`] if there is an error in deserialising the response.
     ///
     /// [Manage Webhooks]: super::permissions::Permissions::MANAGE_WEBHOOKS
-    /// [`Error::Http`]: crate::error::Error::Http
-    /// [`Error::Json`]: crate::error::Error::Json
     #[inline]
     pub async fn to_webhook(self, http: impl AsRef<Http>) -> Result<Webhook> {
         http.as_ref().get_webhook(self.0).await
