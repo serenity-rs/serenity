@@ -4011,8 +4011,6 @@
 <span id="4006">4006</span>
 <span id="4007">4007</span>
 <span id="4008">4008</span>
-<span id="4009">4009</span>
-<span id="4010">4010</span>
 </pre><pre class="rust"><code><span class="attribute">#![<span class="ident">allow</span>(<span class="ident">clippy::missing_errors_doc</span>)]</span>
 
 <span class="kw">use</span> <span class="ident">std::borrow::Cow</span>;
@@ -4846,7 +4844,7 @@
             .<span class="kw">await</span><span class="question-mark">?</span>;
 
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">map</span>) <span class="op">=</span> <span class="ident">value</span>.<span class="ident">as_object_mut</span>() {
-            <span class="ident">map</span>.<span class="ident">insert</span>(<span class="string">&quot;guild_id&quot;</span>.<span class="ident">to_string</span>(), <span class="ident">from_number</span>(<span class="ident">guild_id</span>));
+            <span class="ident">map</span>.<span class="ident">insert</span>(<span class="string">&quot;guild_id&quot;</span>.<span class="ident">to_string</span>(), <span class="ident">guild_id</span>.<span class="ident">into</span>());
         }
 
         <span class="ident">from_value</span>(<span class="ident">value</span>).<span class="ident">map_err</span>(<span class="ident">From::from</span>)
@@ -5675,7 +5673,7 @@
             .<span class="kw">await</span><span class="question-mark">?</span>;
 
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">map</span>) <span class="op">=</span> <span class="ident">value</span>.<span class="ident">as_object_mut</span>() {
-            <span class="ident">map</span>.<span class="ident">insert</span>(<span class="string">&quot;guild_id&quot;</span>.<span class="ident">to_string</span>(), <span class="ident">from_number</span>(<span class="ident">guild_id</span>));
+            <span class="ident">map</span>.<span class="ident">insert</span>(<span class="string">&quot;guild_id&quot;</span>.<span class="ident">to_string</span>(), <span class="ident">guild_id</span>.<span class="ident">into</span>());
         }
 
         <span class="ident">from_value</span>::<span class="op">&lt;</span><span class="ident">Member</span><span class="op">&gt;</span>(<span class="ident">value</span>).<span class="ident">map_err</span>(<span class="ident">From::from</span>)
@@ -5877,7 +5875,7 @@
             .<span class="kw">await</span><span class="question-mark">?</span>;
 
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">map</span>) <span class="op">=</span> <span class="ident">value</span>.<span class="ident">as_object_mut</span>() {
-            <span class="ident">map</span>.<span class="ident">insert</span>(<span class="string">&quot;guild_id&quot;</span>.<span class="ident">to_string</span>(), <span class="ident">from_number</span>(<span class="ident">guild_id</span>));
+            <span class="ident">map</span>.<span class="ident">insert</span>(<span class="string">&quot;guild_id&quot;</span>.<span class="ident">to_string</span>(), <span class="ident">guild_id</span>.<span class="ident">into</span>());
         }
 
         <span class="ident">from_value</span>(<span class="ident">value</span>).<span class="ident">map_err</span>(<span class="ident">From::from</span>)
@@ -5912,7 +5910,7 @@
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">array</span>) <span class="op">=</span> <span class="ident">value</span>.<span class="ident">as_array_mut</span>() {
             <span class="kw">for</span> <span class="ident">role</span> <span class="kw">in</span> <span class="ident">array</span> {
                 <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">map</span>) <span class="op">=</span> <span class="ident">role</span>.<span class="ident">as_object_mut</span>() {
-                    <span class="ident">map</span>.<span class="ident">insert</span>(<span class="string">&quot;guild_id&quot;</span>.<span class="ident">to_string</span>(), <span class="ident">from_number</span>(<span class="ident">guild_id</span>));
+                    <span class="ident">map</span>.<span class="ident">insert</span>(<span class="string">&quot;guild_id&quot;</span>.<span class="ident">to_string</span>(), <span class="ident">guild_id</span>.<span class="ident">into</span>());
                 }
             }
         }
@@ -5973,7 +5971,7 @@
             .<span class="kw">await</span><span class="question-mark">?</span>;
 
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">map</span>) <span class="op">=</span> <span class="ident">value</span>.<span class="ident">as_object_mut</span>() {
-            <span class="ident">map</span>.<span class="ident">insert</span>(<span class="string">&quot;guild_id&quot;</span>.<span class="ident">to_string</span>(), <span class="ident">from_number</span>(<span class="ident">guild_id</span>));
+            <span class="ident">map</span>.<span class="ident">insert</span>(<span class="string">&quot;guild_id&quot;</span>.<span class="ident">to_string</span>(), <span class="ident">guild_id</span>.<span class="ident">into</span>());
         }
 
         <span class="ident">from_value</span>(<span class="ident">value</span>).<span class="ident">map_err</span>(<span class="ident">From::from</span>)
@@ -6964,11 +6962,9 @@
             .<span class="kw">await</span><span class="question-mark">?</span>;
 
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">values</span>) <span class="op">=</span> <span class="ident">value</span>.<span class="ident">as_array_mut</span>() {
-            <span class="kw">let</span> <span class="ident">num</span> <span class="op">=</span> <span class="ident">from_number</span>(<span class="ident">guild_id</span>);
-
             <span class="kw">for</span> <span class="ident">value</span> <span class="kw">in</span> <span class="ident">values</span> {
                 <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">element</span>) <span class="op">=</span> <span class="ident">value</span>.<span class="ident">as_object_mut</span>() {
-                    <span class="ident">element</span>.<span class="ident">insert</span>(<span class="string">&quot;guild_id&quot;</span>.<span class="ident">to_string</span>(), <span class="ident">num</span>.<span class="ident">clone</span>());
+                    <span class="ident">element</span>.<span class="ident">insert</span>(<span class="string">&quot;guild_id&quot;</span>.<span class="ident">to_string</span>(), <span class="ident">guild_id</span>.<span class="ident">into</span>());
                 }
             }
         }
@@ -7022,7 +7018,7 @@
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">array</span>) <span class="op">=</span> <span class="ident">value</span>.<span class="ident">as_array_mut</span>() {
             <span class="kw">for</span> <span class="ident">sticker</span> <span class="kw">in</span> <span class="ident">array</span> {
                 <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">map</span>) <span class="op">=</span> <span class="ident">sticker</span>.<span class="ident">as_object_mut</span>() {
-                    <span class="ident">map</span>.<span class="ident">insert</span>(<span class="string">&quot;guild_id&quot;</span>.<span class="ident">to_string</span>(), <span class="ident">from_number</span>(<span class="ident">guild_id</span>));
+                    <span class="ident">map</span>.<span class="ident">insert</span>(<span class="string">&quot;guild_id&quot;</span>.<span class="ident">to_string</span>(), <span class="ident">guild_id</span>.<span class="ident">into</span>());
                 }
             }
         }
@@ -7141,7 +7137,7 @@
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">array</span>) <span class="op">=</span> <span class="ident">value</span>.<span class="ident">as_array_mut</span>() {
             <span class="kw">for</span> <span class="ident">role</span> <span class="kw">in</span> <span class="ident">array</span> {
                 <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">map</span>) <span class="op">=</span> <span class="ident">role</span>.<span class="ident">as_object_mut</span>() {
-                    <span class="ident">map</span>.<span class="ident">insert</span>(<span class="string">&quot;guild_id&quot;</span>.<span class="ident">to_string</span>(), <span class="ident">from_number</span>(<span class="ident">guild_id</span>));
+                    <span class="ident">map</span>.<span class="ident">insert</span>(<span class="string">&quot;guild_id&quot;</span>.<span class="ident">to_string</span>(), <span class="ident">guild_id</span>.<span class="ident">into</span>());
                 }
             }
         }
@@ -7166,7 +7162,7 @@
             .<span class="kw">await</span><span class="question-mark">?</span>;
 
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">map</span>) <span class="op">=</span> <span class="ident">value</span>.<span class="ident">as_object_mut</span>() {
-            <span class="ident">map</span>.<span class="ident">insert</span>(<span class="string">&quot;guild_id&quot;</span>.<span class="ident">to_string</span>(), <span class="ident">from_number</span>(<span class="ident">guild_id</span>));
+            <span class="ident">map</span>.<span class="ident">insert</span>(<span class="string">&quot;guild_id&quot;</span>.<span class="ident">to_string</span>(), <span class="ident">guild_id</span>.<span class="ident">into</span>());
         }
 
         <span class="ident">from_value</span>(<span class="ident">value</span>).<span class="ident">map_err</span>(<span class="ident">From::from</span>)
@@ -7310,7 +7306,7 @@
             .<span class="kw">await</span><span class="question-mark">?</span>;
 
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">map</span>) <span class="op">=</span> <span class="ident">value</span>.<span class="ident">as_object_mut</span>() {
-            <span class="ident">map</span>.<span class="ident">insert</span>(<span class="string">&quot;guild_id&quot;</span>.<span class="ident">to_string</span>(), <span class="ident">from_number</span>(<span class="ident">guild_id</span>));
+            <span class="ident">map</span>.<span class="ident">insert</span>(<span class="string">&quot;guild_id&quot;</span>.<span class="ident">to_string</span>(), <span class="ident">guild_id</span>.<span class="ident">into</span>());
         }
 
         <span class="ident">from_value</span>::<span class="op">&lt;</span><span class="ident">Member</span><span class="op">&gt;</span>(<span class="ident">value</span>).<span class="ident">map_err</span>(<span class="ident">From::from</span>)
@@ -7784,7 +7780,7 @@
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">members</span>) <span class="op">=</span> <span class="ident">value</span>.<span class="ident">as_array_mut</span>() {
             <span class="kw">for</span> <span class="ident">member</span> <span class="kw">in</span> <span class="ident">members</span> {
                 <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">map</span>) <span class="op">=</span> <span class="ident">member</span>.<span class="ident">as_object_mut</span>() {
-                    <span class="ident">map</span>.<span class="ident">insert</span>(<span class="string">&quot;guild_id&quot;</span>.<span class="ident">to_string</span>(), <span class="ident">from_number</span>(<span class="ident">guild_id</span>));
+                    <span class="ident">map</span>.<span class="ident">insert</span>(<span class="string">&quot;guild_id&quot;</span>.<span class="ident">to_string</span>(), <span class="ident">guild_id</span>.<span class="ident">into</span>());
                 }
             }
         }

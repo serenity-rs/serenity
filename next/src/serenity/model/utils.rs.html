@@ -494,7 +494,6 @@
 <span id="489">489</span>
 <span id="490">490</span>
 <span id="491">491</span>
-<span id="492">492</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::collections::HashMap</span>;
 <span class="kw">use</span> <span class="ident">std::fmt</span>;
 <span class="kw">use</span> <span class="ident">std::hash::Hash</span>;
@@ -509,7 +508,6 @@
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::cache::Cache</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::internal::prelude</span>::<span class="kw-2">*</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::json::from_number</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::application::command::CommandOptionType</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::application::interaction::application_command</span>::{
     <span class="ident">CommandDataOption</span>,
@@ -560,7 +558,7 @@
     <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">array</span>) <span class="op">=</span> <span class="ident">map</span>.<span class="ident">get_mut</span>(<span class="ident">key</span>).<span class="ident">and_then</span>(<span class="ident">Value::as_array_mut</span>) {
         <span class="kw">for</span> <span class="ident">value</span> <span class="kw">in</span> <span class="ident">array</span> {
             <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">item</span>) <span class="op">=</span> <span class="ident">value</span>.<span class="ident">as_object_mut</span>() {
-                <span class="ident">item</span>.<span class="ident">insert</span>(<span class="string">&quot;guild_id&quot;</span>.<span class="ident">to_string</span>(), <span class="ident">from_number</span>(<span class="ident">id</span>.<span class="ident">get</span>()));
+                <span class="ident">item</span>.<span class="ident">insert</span>(<span class="string">&quot;guild_id&quot;</span>.<span class="ident">to_string</span>(), <span class="ident">id</span>.<span class="ident">get</span>().<span class="ident">into</span>());
             }
         }
     }
