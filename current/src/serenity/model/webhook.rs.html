@@ -543,53 +543,6 @@
 <span id="537">537</span>
 <span id="538">538</span>
 <span id="539">539</span>
-<span id="540">540</span>
-<span id="541">541</span>
-<span id="542">542</span>
-<span id="543">543</span>
-<span id="544">544</span>
-<span id="545">545</span>
-<span id="546">546</span>
-<span id="547">547</span>
-<span id="548">548</span>
-<span id="549">549</span>
-<span id="550">550</span>
-<span id="551">551</span>
-<span id="552">552</span>
-<span id="553">553</span>
-<span id="554">554</span>
-<span id="555">555</span>
-<span id="556">556</span>
-<span id="557">557</span>
-<span id="558">558</span>
-<span id="559">559</span>
-<span id="560">560</span>
-<span id="561">561</span>
-<span id="562">562</span>
-<span id="563">563</span>
-<span id="564">564</span>
-<span id="565">565</span>
-<span id="566">566</span>
-<span id="567">567</span>
-<span id="568">568</span>
-<span id="569">569</span>
-<span id="570">570</span>
-<span id="571">571</span>
-<span id="572">572</span>
-<span id="573">573</span>
-<span id="574">574</span>
-<span id="575">575</span>
-<span id="576">576</span>
-<span id="577">577</span>
-<span id="578">578</span>
-<span id="579">579</span>
-<span id="580">580</span>
-<span id="581">581</span>
-<span id="582">582</span>
-<span id="583">583</span>
-<span id="584">584</span>
-<span id="585">585</span>
-<span id="586">586</span>
 </pre><pre class="rust"><code><span class="doccomment">//! Webhook model and implementations.</span>
 
 <span class="kw">use</span> <span class="ident">std::fmt</span>;
@@ -724,9 +677,6 @@
     <span class="doccomment">/// not exist.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// May also return an [`Error::Json`] if there is an error in deserialising Discord&#39;s response.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`Error::Http`]: crate::error::Error::Http</span>
-    <span class="doccomment">/// [`Error::Json`]: crate::error::Error::Json</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">from_id</span>(<span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>, <span class="ident">webhook_id</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">WebhookId</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
         <span class="ident">http</span>.<span class="ident">as_ref</span>().<span class="ident">get_webhook</span>(<span class="ident">webhook_id</span>.<span class="ident">into</span>().<span class="number">0</span>).<span class="kw">await</span>
     }
@@ -758,9 +708,6 @@
     <span class="doccomment">/// Returns an [`Error::Http`] if the webhook does not exist, or if the token is invalid.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// May also return an [`Error::Json`] if there is an error in deserialising Discord&#39;s response.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`Error::Http`]: crate::error::Error::Http</span>
-    <span class="doccomment">/// [`Error::Json`]: crate::error::Error::Json</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">from_id_with_token</span>(
         <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>,
         <span class="ident">webhook_id</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">WebhookId</span><span class="op">&gt;</span>,
@@ -794,9 +741,6 @@
     <span class="doccomment">/// Returns an [`Error::Http`] if the url is malformed, or otherwise if the webhook does not exist, or if the token is invalid.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// May also return an [`Error::Json`] if there is an error in deserialising Discord&#39;s response.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`Error::Http`]: crate::error::Error::Http</span>
-    <span class="doccomment">/// [`Error::Json`]: crate::error::Error::Json</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">from_url</span>(<span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>, <span class="ident">url</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
         <span class="ident">http</span>.<span class="ident">as_ref</span>().<span class="ident">get_webhook_from_url</span>(<span class="ident">url</span>).<span class="kw">await</span>
     }
@@ -813,9 +757,6 @@
     <span class="doccomment">/// May also return an [`Error::Http`] if the webhook does not exist,</span>
     <span class="doccomment">/// the token is invalid, or if the webhook could not otherwise</span>
     <span class="doccomment">/// be deleted.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`Error::Model`]: crate::error::Error::Model</span>
-    <span class="doccomment">/// [`Error::Http`]: crate::error::Error::Http</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">delete</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">token</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">token</span>.<span class="ident">as_ref</span>().<span class="ident">ok_or</span>(<span class="ident">ModelError::NoTokenSet</span>)<span class="question-mark">?</span>;
@@ -850,10 +791,6 @@
     <span class="doccomment">/// May also return an [`Error::Http`] if the content is malformed, or if the token is invalid.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// Or may return an [`Error::Json`] if there is an error in deserialising Discord&#39;s response.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`Error::Model`]: crate::error::Error::Model</span>
-    <span class="doccomment">/// [`Error::Http`]: crate::error::Error::Http</span>
-    <span class="doccomment">/// [`Error::Json`]: crate::error::Error::Json</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">edit_name</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>, <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">token</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">token</span>.<span class="ident">as_ref</span>().<span class="ident">ok_or</span>(<span class="ident">ModelError::NoTokenSet</span>)<span class="question-mark">?</span>;
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">map</span> <span class="op">=</span> <span class="ident">JsonMap::new</span>();
@@ -890,10 +827,6 @@
     <span class="doccomment">/// May also return an [`Error::Http`] if the content is malformed, or if the token is invalid.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// Or may return an [`Error::Json`] if there is an error in deserialising Discord&#39;s response.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`Error::Model`]: crate::error::Error::Model</span>
-    <span class="doccomment">/// [`Error::Http`]: crate::error::Error::Http</span>
-    <span class="doccomment">/// [`Error::Json`]: crate::error::Error::Json</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">edit_avatar</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(
         <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
         <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>,
@@ -935,10 +868,6 @@
     <span class="doccomment">/// May also return an [`Error::Http`] if the content is malformed, or if the token is invalid.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// Or may return an [`Error::Json`] if there is an error in deserialising Discord&#39;s response.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`Error::Model`]: crate::error::Error::Model</span>
-    <span class="doccomment">/// [`Error::Http`]: crate::error::Error::Http</span>
-    <span class="doccomment">/// [`Error::Json`]: crate::error::Error::Json</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">delete_avatar</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">token</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">token</span>.<span class="ident">as_ref</span>().<span class="ident">ok_or</span>(<span class="ident">ModelError::NoTokenSet</span>)<span class="question-mark">?</span>;
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">map</span> <span class="op">=</span> <span class="ident">JsonMap::new</span>();
@@ -1008,10 +937,6 @@
     <span class="doccomment">/// May also return an [`Error::Http`] if the content is malformed, or if the webhook&#39;s token is invalid.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// Or may return an [`Error::Json`] if there is an error deserialising Discord&#39;s response.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`Error::Model`]: crate::error::Error::Model</span>
-    <span class="doccomment">/// [`Error::Http`]: crate::error::Error::Http</span>
-    <span class="doccomment">/// [`Error::Json`]: crate::error::Error::Json</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">execute</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">F</span><span class="op">&gt;</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
@@ -1047,10 +972,6 @@
     <span class="doccomment">/// the given message Id does not belong to the current webhook.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// Or may return an [`Error::Json`] if there is an error deserialising Discord&#39;s response.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`Error::Model`]: crate::error::Error::Model</span>
-    <span class="doccomment">/// [`Error::Http`]: crate::error::Error::Http</span>
-    <span class="doccomment">/// [`Error::Json`]: crate::error::Error::Json</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_message</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>,
@@ -1071,10 +992,6 @@
     <span class="doccomment">/// the given message Id does not belong to the current webhook.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// Or may return an [`Error::Json`] if there is an error deserialising Discord&#39;s response.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`Error::Model`]: crate::error::Error::Model</span>
-    <span class="doccomment">/// [`Error::Http`]: crate::error::Error::Http</span>
-    <span class="doccomment">/// [`Error::Json`]: crate::error::Error::Json</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">edit_message</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>,
@@ -1101,9 +1018,6 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// May also return an [`Error::Http`] if the webhook&#39;s token is invalid or</span>
     <span class="doccomment">/// the given message Id does not belong to the current webhook.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`Error::Model`]: crate::error::Error::Model</span>
-    <span class="doccomment">/// [`Error::Http`]: crate::error::Error::Http</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">delete_message</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>,
@@ -1127,10 +1041,6 @@
     <span class="doccomment">/// Such as if the [`Webhook`] was deleted.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// Or may return an [`Error::Json`] if there is an error deserialising Discord&#39;s response.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`Error::Model`]: crate::error::Error::Model</span>
-    <span class="doccomment">/// [`Error::Http`]: crate::error::Error::Http</span>
-    <span class="doccomment">/// [`Error::Json`]: crate::error::Error::Json</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">refresh</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">token</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">token</span>.<span class="ident">as_ref</span>().<span class="ident">ok_or</span>(<span class="ident">ModelError::NoTokenSet</span>)<span class="question-mark">?</span>;
         <span class="ident">http</span>.<span class="ident">as_ref</span>().<span class="ident">get_webhook_with_token</span>(<span class="self">self</span>.<span class="ident">id</span>.<span class="number">0</span>, <span class="ident">token</span>).<span class="kw">await</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">replacement</span><span class="op">|</span> {
@@ -1147,8 +1057,6 @@
     <span class="doccomment">/// # Errors</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// Returns an [`Error::Model`] if the [`Self::token`] is [`None`].</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`Error::Model`]: crate::error::Error::Model</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">url</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">token</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">token</span>.<span class="ident">as_ref</span>().<span class="ident">ok_or</span>(<span class="ident">ModelError::NoTokenSet</span>)<span class="question-mark">?</span>;
         <span class="prelude-val">Ok</span>(<span class="macro">format!</span>(<span class="string">&quot;https://discord.com/api/webhooks/{}/{}&quot;</span>, <span class="self">self</span>.<span class="ident">id</span>, <span class="ident">token</span>))
@@ -1169,8 +1077,6 @@
     <span class="doccomment">/// May also return an [`Error::Json`] if there is an error in deserialising the response.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// [Manage Webhooks]: super::permissions::Permissions::MANAGE_WEBHOOKS</span>
-    <span class="doccomment">/// [`Error::Http`]: crate::error::Error::Http</span>
-    <span class="doccomment">/// [`Error::Json`]: crate::error::Error::Json</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">to_webhook</span>(<span class="self">self</span>, <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Webhook</span><span class="op">&gt;</span> {
         <span class="ident">http</span>.<span class="ident">as_ref</span>().<span class="ident">get_webhook</span>(<span class="self">self</span>.<span class="number">0</span>).<span class="kw">await</span>

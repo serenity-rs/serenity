@@ -141,8 +141,6 @@
 <span id="135">135</span>
 <span id="136">136</span>
 <span id="137">137</span>
-<span id="138">138</span>
-<span id="139">139</span>
 </pre><pre class="rust"><code><span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
 <span class="kw">use</span> <span class="ident">reqwest::Client</span> <span class="kw">as</span> <span class="ident">ReqwestClient</span>;
 
@@ -273,8 +271,6 @@
     <span class="doccomment">/// Returns an [`Error::Http`] when there is a problem retrieving the</span>
     <span class="doccomment">/// attachment.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [`Error::Http`]: crate::Error::Http</span>
-    <span class="doccomment">/// [`Error::Io`]: crate::Error::Io</span>
     <span class="doccomment">/// [`Message`]: super::Message</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">download</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">reqwest</span> <span class="op">=</span> <span class="ident">ReqwestClient::new</span>();
