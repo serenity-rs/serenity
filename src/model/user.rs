@@ -235,34 +235,25 @@ impl CurrentUser {
     /// Change the avatar:
     ///
     /// ```rust,no_run
+    /// # use serenity::builder::EditProfile;
     /// # use serenity::http::Http;
     /// # use serenity::model::user::CurrentUser;
     /// #
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// #     let http = Http::new("token");
     /// #     let mut user = CurrentUser::default();
-    /// let avatar = serenity::utils::read_image("./avatar.png")?;
-    ///
-    /// user.edit(&http, |p| p.avatar(Some(avatar))).await;
+    /// let builder = EditProfile::default().avatar(&http, "./avatar.png").await?;
+    /// user.edit(&http, builder).await;
     /// #     Ok(())
     /// # }
     /// ```
     ///
     /// # Errors
     ///
-    /// Returns an [`Error::Http`] if an invalid value is set.
-    /// May also return an [`Error::Json`] if there is an error in
-    /// deserializing the API response.
-    pub async fn edit<F>(&mut self, http: impl AsRef<Http>, f: F) -> Result<()>
-    where
-        F: FnOnce(&mut EditProfile) -> &mut EditProfile,
-    {
-        let mut edit_profile = EditProfile::default();
-        edit_profile.username(self.name.clone());
-        f(&mut edit_profile);
-
-        *self = http.as_ref().edit_profile(&edit_profile).await?;
-
+    /// Returns an [`Error::Http`] if an invalid value is set. May also return an [`Error::Json`]
+    /// if there is an error in deserializing the API response.
+    pub async fn edit(&mut self, http: impl AsRef<Http>, builder: EditProfile) -> Result<()> {
+        *self = builder.execute(http).await?;
         Ok(())
     }
 
