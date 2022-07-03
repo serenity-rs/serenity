@@ -905,14 +905,12 @@ impl ChannelId {
     /// # Errors
     ///
     /// Returns [`Error::Http`] if the current user lacks permission.
-    pub async fn edit_thread<F>(&self, http: impl AsRef<Http>, f: F) -> Result<GuildChannel>
-    where
-        F: FnOnce(&mut EditThread) -> &mut EditThread,
-    {
-        let mut instance = EditThread::default();
-        f(&mut instance);
-
-        http.as_ref().edit_thread(self.get(), &instance).await
+    pub async fn edit_thread(
+        self,
+        http: impl AsRef<Http>,
+        builder: EditThread,
+    ) -> Result<GuildChannel> {
+        builder.execute(http, self).await
     }
 
     /// Deletes a stage instance.

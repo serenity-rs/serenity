@@ -457,11 +457,9 @@ impl GuildChannel {
     /// # Errors
     ///
     /// Returns [`Error::Http`] if the current user lacks permission.
-    pub async fn edit_thread<F>(&self, http: impl AsRef<Http>, f: F) -> Result<GuildChannel>
-    where
-        F: FnOnce(&mut EditThread) -> &mut EditThread,
-    {
-        self.id.edit_thread(http, f).await
+    pub async fn edit_thread(&mut self, http: impl AsRef<Http>, builder: EditThread) -> Result<()> {
+        *self = self.id.edit_thread(http, builder).await?;
+        Ok(())
     }
 
     /// Edits a voice state in a stage channel. Pass [`None`] for `user_id` to
