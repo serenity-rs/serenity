@@ -5,9 +5,9 @@ use serde::{Deserialize, Serialize};
 #[cfg(feature = "http")]
 use crate::builder::{CreateApplicationCommand, CreateApplicationCommands};
 #[cfg(feature = "http")]
-use crate::error::Result;
-#[cfg(feature = "http")]
 use crate::http::Http;
+#[cfg(feature = "http")]
+use crate::internal::prelude::*;
 use crate::json::Value;
 #[cfg(feature = "http")]
 use crate::json::{self, JsonMap};
@@ -157,8 +157,6 @@ impl Command {
     ///
     /// [`InteractionCreate`]: crate::client::EventHandler::interaction_create
     /// [API Docs]: https://discord.com/developers/docs/interactions/slash-commands
-    /// [`Error::Http`]: crate::error::Error::Http
-    /// [`Error::Json`]: crate::error::Error::Json
     /// [`choices`]: CommandOption::choices
     pub async fn create_global_application_command<F>(
         http: impl AsRef<Http>,
@@ -178,9 +176,6 @@ impl Command {
     /// # Errors
     ///
     /// If there is an error, it will be either [`Error::Http`] or [`Error::Json`].
-    ///
-    /// [`Error::Http`]: crate::error::Error::Http
-    /// [`Error::Json`]: crate::error::Error::Json
     pub async fn set_global_application_commands<F>(
         http: impl AsRef<Http>,
         f: F,
@@ -200,9 +195,6 @@ impl Command {
     /// # Errors
     ///
     /// If there is an error, it will be either [`Error::Http`] or [`Error::Json`].
-    ///
-    /// [`Error::Http`]: crate::error::Error::Http
-    /// [`Error::Json`]: crate::error::Error::Json
     pub async fn edit_global_application_command<F>(
         http: impl AsRef<Http>,
         command_id: CommandId,
@@ -220,9 +212,6 @@ impl Command {
     /// # Errors
     ///
     /// If there is an error, it will be either [`Error::Http`] or [`Error::Json`].
-    ///
-    /// [`Error::Http`]: crate::error::Error::Http
-    /// [`Error::Json`]: crate::error::Error::Json
     pub async fn get_global_application_commands(http: impl AsRef<Http>) -> Result<Vec<Command>> {
         http.as_ref().get_global_application_commands().await
     }
@@ -232,9 +221,6 @@ impl Command {
     /// # Errors
     ///
     /// If there is an error, it will be either [`Error::Http`] or [`Error::Json`].
-    ///
-    /// [`Error::Http`]: crate::error::Error::Http
-    /// [`Error::Json`]: crate::error::Error::Json
     pub async fn get_global_application_command(
         http: impl AsRef<Http>,
         command_id: CommandId,
@@ -247,9 +233,6 @@ impl Command {
     /// # Errors
     ///
     /// If there is an error, it will be either [`Error::Http`] or [`Error::Json`].
-    ///
-    /// [`Error::Http`]: crate::error::Error::Http
-    /// [`Error::Json`]: crate::error::Error::Json
     pub async fn delete_global_application_command(
         http: impl AsRef<Http>,
         command_id: CommandId,

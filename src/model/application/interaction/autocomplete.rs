@@ -64,8 +64,6 @@ impl AutocompleteInteraction {
     /// # Errors
     ///
     /// Returns an [`Error::Http`] if the API returns an error.
-    ///
-    /// [`Error::Http`]: crate::error::Error::Http
     pub async fn create_autocomplete_response<F>(&self, http: impl AsRef<Http>, f: F) -> Result<()>
     where
         F: FnOnce(&mut CreateAutocompleteResponse) -> &mut CreateAutocompleteResponse,

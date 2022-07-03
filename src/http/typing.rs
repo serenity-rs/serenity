@@ -4,8 +4,8 @@ use tokio::sync::oneshot::error::TryRecvError;
 use tokio::sync::oneshot::{self, Sender};
 use tokio::time::{sleep, Duration};
 
-use crate::error::Result;
 use crate::http::Http;
+use crate::internal::prelude::*;
 use crate::internal::tokio::spawn_named;
 
 /// A struct to start typing in a [`Channel`] for an indefinite period of time.
@@ -61,7 +61,6 @@ impl Typing {
     /// Returns an  [`Error::Http`] if there is an error.
     ///
     /// [`Channel`]: crate::model::channel::Channel
-    /// [`Error::Http`]: crate::error::Error::Http
     pub fn start(http: Arc<Http>, channel_id: u64) -> Result<Self> {
         let (sx, mut rx) = oneshot::channel();
 

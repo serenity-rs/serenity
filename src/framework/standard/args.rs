@@ -777,8 +777,6 @@ impl Args {
     /// # Errors
     ///
     /// Returns [`Error::Eos`] if no argument can be parsed.
-    ///
-    /// [`Error::Eos`]: Error::Eos
     pub fn find<T: FromStr>(&mut self) -> Result<T, T::Err> {
         if self.is_empty() {
             return Err(Error::Eos);
@@ -824,8 +822,6 @@ impl Args {
     /// # Errors
     ///
     /// Returns [`Error::Eos`] if no argument can be parsed.
-    ///
-    /// [`Error::Eos`]: Error::Eos
     pub fn find_n<T: FromStr>(&mut self) -> Result<T, T::Err> {
         if self.is_empty() {
             return Err(Error::Eos);

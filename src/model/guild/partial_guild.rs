@@ -377,9 +377,6 @@ impl PartialGuild {
     /// # Errors
     ///
     /// If there is an error, it will be either [`Error::Http`] or [`Error::Json`].
-    ///
-    /// [`Error::Http`]: crate::error::Error::Http
-    /// [`Error::Json`]: crate::error::Error::Json
     pub async fn set_application_commands<F>(
         &self,
         http: impl AsRef<Http>,
@@ -398,9 +395,6 @@ impl PartialGuild {
     /// # Errors
     ///
     /// If there is an error, it will be either [`Error::Http`] or [`Error::Json`].
-    ///
-    /// [`Error::Http`]: crate::error::Error::Http
-    /// [`Error::Json`]: crate::error::Error::Json
     pub async fn create_application_command_permission<F>(
         &self,
         http: impl AsRef<Http>,
@@ -423,9 +417,6 @@ impl PartialGuild {
     /// # Errors
     ///
     /// If there is an error, it will be either [`Error::Http`] or [`Error::Json`].
-    ///
-    /// [`Error::Http`]: crate::error::Error::Http
-    /// [`Error::Json`]: crate::error::Error::Json
     pub async fn set_application_commands_permissions<F>(
         &self,
         http: impl AsRef<Http>,
@@ -444,9 +435,6 @@ impl PartialGuild {
     /// # Errors
     ///
     /// If there is an error, it will be either [`Error::Http`] or [`Error::Json`].
-    ///
-    /// [`Error::Http`]: crate::error::Error::Http
-    /// [`Error::Json`]: crate::error::Error::Json
     pub async fn get_application_commands(&self, http: impl AsRef<Http>) -> Result<Vec<Command>> {
         self.id.get_application_commands(http).await
     }
@@ -456,9 +444,6 @@ impl PartialGuild {
     /// # Errors
     ///
     /// If there is an error, it will be either [`Error::Http`] or [`Error::Json`].
-    ///
-    /// [`Error::Http`]: crate::error::Error::Http
-    /// [`Error::Json`]: crate::error::Error::Json
     pub async fn get_application_command(
         &self,
         http: impl AsRef<Http>,
@@ -472,9 +457,6 @@ impl PartialGuild {
     /// # Errors
     ///
     /// If there is an error, it will be either [`Error::Http`] or [`Error::Json`].
-    ///
-    /// [`Error::Http`]: crate::error::Error::Http
-    /// [`Error::Json`]: crate::error::Error::Json
     pub async fn edit_application_command<F>(
         &self,
         http: impl AsRef<Http>,
@@ -492,9 +474,6 @@ impl PartialGuild {
     /// # Errors
     ///
     /// If there is an error, it will be either [`Error::Http`] or [`Error::Json`].
-    ///
-    /// [`Error::Http`]: crate::error::Error::Http
-    /// [`Error::Json`]: crate::error::Error::Json
     pub async fn delete_application_command(
         &self,
         http: impl AsRef<Http>,
@@ -508,9 +487,6 @@ impl PartialGuild {
     /// # Errors
     ///
     /// If there is an error, it will be either [`Error::Http`] or [`Error::Json`].
-    ///
-    /// [`Error::Http`]: crate::error::Error::Http
-    /// [`Error::Json`]: crate::error::Error::Json
     pub async fn get_application_commands_permissions(
         &self,
         http: impl AsRef<Http>,
@@ -523,9 +499,6 @@ impl PartialGuild {
     /// # Errors
     ///
     /// If there is an error, it will be either [`Error::Http`] or [`Error::Json`].
-    ///
-    /// [`Error::Http`]: crate::error::Error::Http
-    /// [`Error::Json`]: crate::error::Error::Json
     pub async fn get_application_command_permissions(
         &self,
         http: impl AsRef<Http>,
@@ -834,7 +807,6 @@ impl PartialGuild {
     /// Returns [`Error::Http`] if the current user lacks permission.
     ///
     /// [Manage Roles]: Permissions::MANAGE_ROLES
-    /// [`Error::Http`]: crate::error::Error::Http
     #[inline]
     pub async fn edit_role_position(
         &self,
@@ -861,7 +833,6 @@ impl PartialGuild {
     ///
     /// Returns [`Error::Http`] if the current user lacks permission.
     ///
-    /// [`Error::Http`]: crate::error::Error::Http
     /// [Manage Emojis and Stickers]: crate::model::permissions::Permissions::MANAGE_EMOJIS_AND_STICKERS
     #[inline]
     pub async fn edit_sticker<F>(
@@ -881,8 +852,6 @@ impl PartialGuild {
     /// # Errors
     ///
     /// Returns an [`Error::Http`] if some mandatory fields are not provided.
-    ///
-    /// [`Error::Http`]: crate::error::Error::Http
     pub async fn edit_welcome_screen<F>(
         &self,
         http: impl AsRef<Http>,
@@ -900,8 +869,6 @@ impl PartialGuild {
     ///
     /// Returns an [`Error::Http`] if the bot does not have the `MANAGE_GUILD`
     /// permission.
-    ///
-    /// [`Error::Http`]: crate::error::Error::Http
     pub async fn edit_widget<F>(&self, http: impl AsRef<Http>, f: F) -> Result<GuildWidget>
     where
         F: FnOnce(&mut EditGuildWidget) -> &mut EditGuildWidget,
@@ -1075,7 +1042,6 @@ impl PartialGuild {
     /// Returns an [`Error::Http`] if the current user is lacking permission.
     ///
     /// [Manage Channels]: Permissions::MANAGE_CHANNELS
-    /// [`Error::Http`]: crate::error::Error::Http
     #[inline]
     pub async fn reorder_channels<It>(&self, http: impl AsRef<Http>, channels: It) -> Result<()>
     where
@@ -1095,8 +1061,6 @@ impl PartialGuild {
     /// # Errors
     ///
     /// Returns an [`Error::Http`] if the API returns an error.
-    ///
-    /// [`Error::Http`]: crate::error::Error::Http
     #[inline]
     pub async fn search_members(
         &self,
@@ -1125,8 +1089,6 @@ impl PartialGuild {
     /// the API response.
     ///
     /// [Kick Members]: Permissions::KICK_MEMBERS
-    /// [`Error::Http`]: crate::error::Error::Http
-    /// [`Error::Json`]: crate::error::Error::Json
     pub async fn start_prune(&self, cache_http: impl CacheHttp, days: u16) -> Result<GuildPrune> {
         #[cfg(feature = "cache")]
         {

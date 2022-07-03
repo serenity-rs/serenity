@@ -260,9 +260,6 @@ impl CurrentUser {
     /// Returns an [`Error::Http`] if an invalid value is set.
     /// May also return an [`Error::Json`] if there is an error in
     /// deserializing the API response.
-    ///
-    /// [`Error::Http`]: crate::error::Error::Http
-    /// [`Error::Json`]: crate::error::Error::Json
     pub async fn edit<F>(&mut self, http: impl AsRef<Http>, f: F) -> Result<()>
     where
         F: FnOnce(&mut EditProfile) -> &mut EditProfile,
@@ -322,9 +319,6 @@ impl CurrentUser {
     /// May return an [`Error::Http`] if the Discord API returns an error.
     /// Also can return [`Error::Json`] if there is an error in deserializing
     /// the data returned by the API.
-    ///
-    /// [`Error::Http`]: crate::error::Error::Http
-    /// [`Error::Json`]: crate::error::Error::Json
     pub async fn guilds(&self, http: impl AsRef<Http>) -> Result<Vec<GuildInfo>> {
         let mut guilds = Vec::new();
         loop {
@@ -575,8 +569,6 @@ impl DefaultAvatar {
     /// # Errors
     ///
     /// May return a [`Error::Json`] if there is a serialization error.
-    ///
-    /// [`Error::Json`]: crate::error::Error::Json
     pub fn name(self) -> Result<String> {
         to_string(&self).map_err(From::from)
     }
@@ -864,9 +856,6 @@ impl User {
     ///
     /// [`Error::Json`] can also be returned if there is an error deserializing
     /// the API response.
-    ///
-    /// [`Error::Http`]: crate::error::Error::Http
-    /// [`Error::Json`]: crate::error::Error::Json
     pub async fn direct_message<'a, F>(&self, cache_http: impl CacheHttp, f: F) -> Result<Message>
     where
         for<'b> F: FnOnce(&'b mut CreateMessage<'a>) -> &'b mut CreateMessage<'a>,
@@ -920,9 +909,6 @@ impl User {
     ///
     /// May also return an [`Error::Json`] if there is an error in
     /// deserializing the API response.
-    ///
-    /// [`Error::Http`]: crate::error::Error::Http
-    /// [`Error::Json`]: crate::error::Error::Json
     #[inline]
     pub async fn has_role(
         &self,
@@ -1119,9 +1105,6 @@ impl UserId {
     ///
     /// May also return an [`Error::Json`] if there is an error in deserializing
     /// the channel data returned by the Discord API.
-    ///
-    /// [`Error::Http`]: crate::error::Error::Http
-    /// [`Error::Json`]: crate::error::Error::Json
     pub async fn create_dm_channel(self, cache_http: impl CacheHttp) -> Result<PrivateChannel> {
         #[cfg(feature = "cache")]
         {
@@ -1165,9 +1148,6 @@ impl UserId {
     ///
     /// May also return an [`Error::Json`] if there is an error in
     /// deserializing the user.
-    ///
-    /// [`Error::Http`]: crate::error::Error::Http
-    /// [`Error::Json`]: crate::error::Error::Json
     #[inline]
     pub async fn to_user(self, cache_http: impl CacheHttp) -> Result<User> {
         #[cfg(feature = "cache")]

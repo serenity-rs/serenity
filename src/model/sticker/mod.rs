@@ -94,7 +94,6 @@ impl Sticker {
     ///
     /// Returns [`Error::Http`] if the current user lacks permission.
     ///
-    /// [`Error::Http`]: crate::error::Error::Http
     /// [Manage Emojis and Stickers]: crate::model::permissions::Permissions::MANAGE_EMOJIS_AND_STICKERS
     #[inline]
     pub async fn edit<F>(&self, http: impl AsRef<Http>, f: F) -> Result<Sticker>
