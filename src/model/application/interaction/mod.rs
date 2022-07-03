@@ -13,7 +13,7 @@ use self::message_component::MessageComponentInteraction;
 use self::modal::ModalSubmitInteraction;
 use self::ping::PingInteraction;
 use crate::internal::prelude::*;
-use crate::json::{from_number, from_value};
+use crate::json::from_value;
 use crate::model::guild::PartialMember;
 use crate::model::id::{ApplicationId, GuildId, InteractionId};
 use crate::model::user::User;
@@ -253,7 +253,7 @@ impl serde::Serialize for InteractionResponseType {
 
 fn add_guild_id_to_resolved(map: &mut JsonMap, guild_id: GuildId) {
     if let Some(member) = map.get_mut("member").and_then(Value::as_object_mut) {
-        member.insert("guild_id".to_string(), from_number(guild_id.get()));
+        member.insert("guild_id".to_string(), guild_id.get().into());
     }
 
     if let Some(data) = map.get_mut("data") {
@@ -262,7 +262,7 @@ fn add_guild_id_to_resolved(map: &mut JsonMap, guild_id: GuildId) {
                 if let Some(values) = roles.as_object_mut() {
                     for value in values.values_mut() {
                         if let Some(role) = value.as_object_mut() {
-                            role.insert("guild_id".to_string(), from_number(guild_id.get()));
+                            role.insert("guild_id".to_string(), guild_id.get().into());
                         };
                     }
                 }
