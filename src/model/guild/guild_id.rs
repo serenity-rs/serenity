@@ -731,24 +731,17 @@ impl GuildId {
     ///
     /// # Errors
     ///
-    /// Returns [`Error::Http`] if the current user lacks permission, or if invalid data is given.
+    /// If the `cache` is enabled, returns a [`ModelError::InvalidPermissions`] if the current user
+    /// lacks permission. Otherwise returns [`Error::Http`], as well as if invalid data is given.
     ///
     /// [Manage Events]: Permissions::MANAGE_EVENTS
-    pub async fn edit_scheduled_event<F>(
+    pub async fn edit_scheduled_event(
         self,
-        http: impl AsRef<Http>,
+        cache_http: impl CacheHttp,
         event_id: impl Into<ScheduledEventId>,
-        f: F,
-    ) -> Result<ScheduledEvent>
-    where
-        F: FnOnce(&mut EditScheduledEvent) -> &mut EditScheduledEvent,
-    {
-        let mut edit_scheduled_event = EditScheduledEvent::default();
-        f(&mut edit_scheduled_event);
-
-        http.as_ref()
-            .edit_scheduled_event(self.get(), event_id.into().get(), &edit_scheduled_event, None)
-            .await
+        builder: EditScheduledEvent,
+    ) -> Result<ScheduledEvent> {
+        builder.execute(cache_http, self, event_id.into()).await
     }
 
     /// Edits a [`Sticker`], optionally setting its fields.

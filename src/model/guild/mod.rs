@@ -1321,21 +1321,16 @@ impl Guild {
     /// # Errors
     ///
     /// If the `cache` is enabled, returns a [`ModelError::InvalidPermissions`] if the current user
-    /// does not have permission to manage roles.
-    ///
-    /// Otherwise will return [`Error::Http`] if the current user does not have permission.
+    /// lacks permission. Otherwise returns [`Error::Http`], as well as if invalid data is given.
     ///
     /// [Manage Events]: Permissions::MANAGE_EVENTS
-    pub async fn edit_scheduled_event<F>(
+    pub async fn edit_scheduled_event(
         &self,
-        http: impl AsRef<Http>,
+        cache_http: impl CacheHttp,
         event_id: impl Into<ScheduledEventId>,
-        f: F,
-    ) -> Result<ScheduledEvent>
-    where
-        F: FnOnce(&mut EditScheduledEvent) -> &mut EditScheduledEvent,
-    {
-        self.id.edit_scheduled_event(&http, event_id, f).await
+        builder: EditScheduledEvent,
+    ) -> Result<ScheduledEvent> {
+        self.id.edit_scheduled_event(cache_http, event_id, builder).await
     }
 
     /// Edits a sticker, optionally setting its fields.
