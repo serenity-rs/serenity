@@ -744,37 +744,40 @@ impl GuildId {
         builder.execute(cache_http, self, event_id.into()).await
     }
 
-    /// Edits a [`Sticker`], optionally setting its fields.
+    /// Edits a sticker.
     ///
-    /// Requires the [Manage Emojis and Stickers] permission.
+    /// **Note**: Requires the [Manage Emojis and Stickers] permission.
     ///
     /// # Examples
     ///
     /// Rename a sticker:
     ///
-    /// ```rust,ignore
-    /// guild.edit_sticker(&context, StickerId(7), |r| r.name("Bun bun meow"));
+    /// ```rust,no_run
+    /// # use serenity::http::Http;
+    /// use serenity::builder::EditSticker;
+    /// use serenity::model::id::{GuildId, StickerId};
+    ///
+    /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
+    /// # let http = Http::new("token");
+    /// let builder = EditSticker::default().name("Bun bun meow");
+    /// let _ = GuildId::new(7).edit_sticker(&http, StickerId::new(7), builder).await?;
+    /// # Ok(())
+    /// # }
     /// ```
     ///
     /// # Errors
     ///
-    /// Returns [`Error::Http`] if the current user lacks permission.
+    /// Returns [`Error::Http`] if the current user lacks permission, or if invalid data is given.
     ///
-    /// [Manage Emojis and Stickers]: crate::model::permissions::Permissions::MANAGE_EMOJIS_AND_STICKERS
+    /// [Manage Emojis and Stickers]: Permissions::MANAGE_EMOJIS_AND_STICKERS
     #[inline]
-    pub async fn edit_sticker<F>(
-        &self,
+    pub async fn edit_sticker(
+        self,
         http: impl AsRef<Http>,
         sticker_id: impl Into<StickerId>,
-        f: F,
-    ) -> Result<Sticker>
-    where
-        F: FnOnce(&mut EditSticker) -> &mut EditSticker,
-    {
-        let mut edit_sticker = EditSticker::default();
-        f(&mut edit_sticker);
-
-        http.as_ref().edit_sticker(self.get(), sticker_id.into().get(), &edit_sticker, None).await
+        builder: EditSticker,
+    ) -> Result<Sticker> {
+        builder.execute(http, self, sticker_id.into()).await
     }
 
     /// Edits the order of [`Role`]s

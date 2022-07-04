@@ -1333,34 +1333,43 @@ impl Guild {
         self.id.edit_scheduled_event(cache_http, event_id, builder).await
     }
 
-    /// Edits a sticker, optionally setting its fields.
+    /// Edits a sticker.
     ///
-    /// Requires the [Manage Emojis and Stickers] permission.
+    /// **Note**: Requires the [Manage Emojis and Stickers] permission.
     ///
     /// # Examples
     ///
     /// Rename a sticker:
     ///
-    /// ```rust,ignore
-    /// guild.edit_sticker(&context, StickerId(7), |r| r.name("Bun bun meow"));
+    /// ```rust,no_run
+    /// # use serenity::http::Http;
+    /// # use serenity::model::guild::Guild;
+    /// # use serenity::model::id::GuildId;
+    /// use serenity::builder::EditSticker;
+    /// use serenity::model::id::StickerId;
+    ///
+    /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
+    /// # let http = Http::new("token");
+    /// # let guild = Guild::get(&http, GuildId::new(7)).await?;
+    /// let builder = EditSticker::default().name("Bun bun meow");
+    /// guild.edit_sticker(&http, StickerId::new(7), builder).await?;
+    /// # Ok(())
+    /// # }
     /// ```
     ///
     /// # Errors
     ///
-    /// Returns [`Error::Http`] if the current user lacks permission.
+    /// Returns [`Error::Http`] if the current user lacks permission, or if invalid data is given.
     ///
-    /// [Manage Emojis and Stickers]: crate::model::permissions::Permissions::MANAGE_EMOJIS_AND_STICKERS
+    /// [Manage Emojis and Stickers]: Permissions::MANAGE_EMOJIS_AND_STICKERS
     #[inline]
-    pub async fn edit_sticker<F>(
+    pub async fn edit_sticker(
         &self,
         http: impl AsRef<Http>,
         sticker_id: impl Into<StickerId>,
-        f: F,
-    ) -> Result<Sticker>
-    where
-        F: FnOnce(&mut EditSticker) -> &mut EditSticker,
-    {
-        self.id.edit_sticker(&http, sticker_id, f).await
+        builder: EditSticker,
+    ) -> Result<Sticker> {
+        self.id.edit_sticker(http, sticker_id, builder).await
     }
 
     /// Edits the [`GuildWelcomeScreen`].
