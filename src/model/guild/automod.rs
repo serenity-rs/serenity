@@ -3,6 +3,7 @@
 //! [Discord docs](https://discord.com/developers/docs/resources/auto-moderation)
 
 use std::fmt;
+use std::time::Duration;
 
 use serde::de::{Deserializer, Error, IgnoredAny, MapAccess};
 use serde::ser::{SerializeStruct, Serializer};
@@ -416,7 +417,7 @@ pub enum Action {
     ///
     /// [`Keyword`]: TriggerType::Keyword
     /// [`Permissions::MODERATE_MEMBERS`]: crate::model::Permissions::MODERATE_MEMBERS
-    Timeout(u64),
+    Timeout(Duration),
     Unknown(u8),
 }
 
@@ -533,7 +534,7 @@ impl<'de> Deserialize<'de> for Action {
                             .ok_or_else(|| Error::missing_field("metadata"))?
                             .deserialize_into()
                             .map_err(DeserializerError::into_error)?;
-                        Ok(Action::Timeout(timeout.duration))
+                        Ok(Action::Timeout(Duration::from_secs(timeout.duration)))
                     },
                     ActionType::Unknown(unknown) => Ok(Action::Unknown(unknown)),
                 }
@@ -560,7 +561,7 @@ impl Serialize for Action {
             },
             Self::Timeout(duration) => {
                 s.serialize_field("metadata", &Timeout {
-                    duration,
+                    duration: duration.as_secs(),
                 })?;
             },
             _ => {},
@@ -626,6 +627,8 @@ impl From<ActionType> for u8 {
 
 #[cfg(test)]
 mod tests {
+    use std::time::Duration;
+
     use serde_test::Token;
 
     use super::*;
@@ -826,7 +829,7 @@ mod tests {
             Token::StructEnd,
         ]);
 
-        let value = Action::Timeout(1024);
+        let value = Action::Timeout(Duration::from_secs(1024));
         serde_test::assert_tokens(&value, &[
             Token::Struct {
                 name: "Action",
