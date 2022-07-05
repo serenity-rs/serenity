@@ -76,7 +76,7 @@ impl<'de> Deserialize<'de> for Rule {
 
         #[derive(Deserialize)]
         struct TriggerMetadataPresent {
-            presets: Vec<KeywordPresentType>,
+            presets: Vec<KeywordPresetType>,
         }
 
         struct Visitor;
@@ -194,10 +194,10 @@ impl<'de> Deserialize<'de> for Rule {
                     },
                     TriggerType::HarmfulLink => Trigger::HarmfulLink,
                     TriggerType::Spam => Trigger::Spam,
-                    TriggerType::KeywordPresent => {
+                    TriggerType::KeywordPreset => {
                         let value = TriggerMetadataPresent::deserialize(metadata)
                             .map_err(DeserializerError::into_error)?;
-                        Trigger::KeywordPresent(value.presets)
+                        Trigger::KeywordPreset(value.presets)
                     },
                     TriggerType::Unknown(unknown) => Trigger::Unknown(unknown),
                 };
@@ -239,7 +239,7 @@ impl Serialize for Rule {
         #[derive(Serialize)]
         #[serde(rename = "TriggerMetadata")]
         struct TriggerMetadataPresent<'a> {
-            presets: &'a Vec<KeywordPresentType>,
+            presets: &'a Vec<KeywordPresetType>,
         }
 
         #[derive(Serialize)]
@@ -259,8 +259,8 @@ impl Serialize for Rule {
                     keyword_filter,
                 })?;
             },
-            Trigger::KeywordPresent(presets) => {
-                s.serialize_field("trigger_type", &TriggerType::KeywordPresent)?;
+            Trigger::KeywordPreset(presets) => {
+                s.serialize_field("trigger_type", &TriggerType::KeywordPreset)?;
                 s.serialize_field("trigger_metadata", &TriggerMetadataPresent {
                     presets,
                 })?;
@@ -312,7 +312,7 @@ pub enum Trigger {
     Keyword(Vec<String>),
     HarmfulLink,
     Spam,
-    KeywordPresent(Vec<KeywordPresentType>),
+    KeywordPreset(Vec<KeywordPresetType>),
     Unknown(u8),
 }
 
@@ -323,7 +323,7 @@ impl Trigger {
             Self::Keyword(_) => TriggerType::Keyword,
             Self::HarmfulLink => TriggerType::HarmfulLink,
             Self::Spam => TriggerType::Spam,
-            Self::KeywordPresent(_) => TriggerType::KeywordPresent,
+            Self::KeywordPreset(_) => TriggerType::KeywordPreset,
             Self::Unknown(unknown) => TriggerType::Unknown(*unknown),
         }
     }
@@ -337,7 +337,7 @@ pub enum TriggerType {
     Keyword,
     HarmfulLink,
     Spam,
-    KeywordPresent,
+    KeywordPreset,
     Unknown(u8),
 }
 
@@ -347,7 +347,7 @@ impl From<u8> for TriggerType {
             1 => Self::Keyword,
             2 => Self::HarmfulLink,
             3 => Self::Spam,
-            4 => Self::KeywordPresent,
+            4 => Self::KeywordPreset,
             _ => Self::Unknown(value),
         }
     }
@@ -359,7 +359,7 @@ impl From<TriggerType> for u8 {
             TriggerType::Keyword => 1,
             TriggerType::HarmfulLink => 2,
             TriggerType::Spam => 3,
-            TriggerType::KeywordPresent => 4,
+            TriggerType::KeywordPreset => 4,
             TriggerType::Unknown(unknown) => unknown,
         }
     }
@@ -374,21 +374,21 @@ impl From<TriggerType> for u8 {
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
 pub struct TriggerMetadata {
     keyword_filter: Option<Vec<String>>,
-    presets: Option<Vec<KeywordPresentType>>,
+    presets: Option<Vec<KeywordPresetType>>,
 }
 
 /// Internally pre-defined wordsets which will be searched for in content.
 #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
 #[serde(from = "u8", into = "u8")]
 #[non_exhaustive]
-pub enum KeywordPresentType {
+pub enum KeywordPresetType {
     Profanity,
     SexualContent,
     Slurs,
     Unknown(u8),
 }
 
-impl From<u8> for KeywordPresentType {
+impl From<u8> for KeywordPresetType {
     fn from(value: u8) -> Self {
         match value {
             1 => Self::Profanity,
@@ -399,13 +399,13 @@ impl From<u8> for KeywordPresentType {
     }
 }
 
-impl From<KeywordPresentType> for u8 {
-    fn from(value: KeywordPresentType) -> Self {
+impl From<KeywordPresetType> for u8 {
+    fn from(value: KeywordPresetType) -> Self {
         match value {
-            KeywordPresentType::Profanity => 1,
-            KeywordPresentType::SexualContent => 2,
-            KeywordPresentType::Slurs => 3,
-            KeywordPresentType::Unknown(unknown) => unknown,
+            KeywordPresetType::Profanity => 1,
+            KeywordPresetType::SexualContent => 2,
+            KeywordPresetType::Slurs => 3,
+            KeywordPresetType::Unknown(unknown) => unknown,
         }
     }
 }
@@ -764,10 +764,10 @@ mod tests {
 
         serde_test::assert_tokens(&value, &tokens);
 
-        value.trigger = Trigger::KeywordPresent(vec![
-            KeywordPresentType::Profanity,
-            KeywordPresentType::SexualContent,
-            KeywordPresentType::Slurs,
+        value.trigger = Trigger::KeywordPreset(vec![
+            KeywordPresetType::Profanity,
+            KeywordPresetType::SexualContent,
+            KeywordPresetType::Slurs,
         ]);
         let mut tokens = rule_tokens_head.to_vec();
         tokens.extend([
@@ -782,9 +782,9 @@ mod tests {
             Token::Seq {
                 len: Some(3),
             },
-            Token::U8(KeywordPresentType::Profanity.into()),
-            Token::U8(KeywordPresentType::SexualContent.into()),
-            Token::U8(KeywordPresentType::Slurs.into()),
+            Token::U8(KeywordPresetType::Profanity.into()),
+            Token::U8(KeywordPresetType::SexualContent.into()),
+            Token::U8(KeywordPresetType::Slurs.into()),
             Token::SeqEnd,
             Token::StructEnd,
         ]);

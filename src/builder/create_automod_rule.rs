@@ -33,7 +33,7 @@ impl CreateAutoModRule {
                 });
                 self.0.insert("trigger_metadata", value);
             },
-            Trigger::KeywordPresent(presets) => {
+            Trigger::KeywordPreset(presets) => {
                 let value = json!({
                     "presets": presets,
                 });
