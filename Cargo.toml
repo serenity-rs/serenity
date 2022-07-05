@@ -114,6 +114,7 @@ version = "2.1"
 
 [dependencies.moka]
 version = "0.9"
+default-features = false
 features = ["dash"]
 optional = true
 
