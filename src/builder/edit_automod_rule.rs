@@ -4,7 +4,7 @@ use crate::json::{json, Value};
 use crate::model::guild::automod::{Action, EventType, Trigger};
 use crate::model::id::{ChannelId, RoleId};
 
-#[derive(Debug, Default, Clone)]
+#[derive(Clone, Debug)]
 pub struct EditAutoModRule(pub HashMap<&'static str, Value>);
 
 impl EditAutoModRule {
@@ -24,8 +24,10 @@ impl EditAutoModRule {
 
     /// Set the type of content which can trigger the rule.
     ///
-    /// **None**: The trigger type can't be edited. Only its values.
+    /// **None**: The trigger type can't be edited after creation. Only its values.
     pub fn trigger(&mut self, trigger: Trigger) -> &mut Self {
+        self.0.insert("trigger_type", u8::from(trigger.kind()).into());
+
         match trigger {
             Trigger::Keyword(keyword_filter) => {
                 let value = json!({
@@ -118,5 +120,14 @@ impl EditAutoModRule {
         self.0.insert("exempt_channels", ids);
 
         self
+    }
+}
+
+impl Default for EditAutoModRule {
+    fn default() -> Self {
+        let mut builder = Self(HashMap::new());
+        builder.event_type(EventType::MessageSend);
+
+        builder
     }
 }

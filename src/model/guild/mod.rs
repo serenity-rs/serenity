@@ -44,7 +44,6 @@ use crate::builder::{
     CreateApplicationCommandPermissionsData,
     CreateApplicationCommands,
     CreateApplicationCommandsPermissions,
-    CreateAutoModRule,
     CreateChannel,
     CreateScheduledEvent,
     CreateSticker,
@@ -330,7 +329,7 @@ impl Guild {
     pub async fn create_automod_rule(
         self,
         http: impl AsRef<Http>,
-        f: impl FnOnce(&mut CreateAutoModRule) -> &mut CreateAutoModRule,
+        f: impl FnOnce(&mut EditAutoModRule) -> &mut EditAutoModRule,
     ) -> Result<Rule> {
         self.id.create_automod_rule(http, f).await
     }

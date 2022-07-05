@@ -14,7 +14,6 @@ mod create_application_command_permission;
 mod add_member;
 mod bot_auth_parameters;
 mod create_allowed_mentions;
-mod create_automod_rule;
 mod create_components;
 mod create_interaction_response;
 mod create_interaction_response_followup;
@@ -57,7 +56,6 @@ pub use self::create_application_command_permission::{
     CreateApplicationCommandPermissionsData,
     CreateApplicationCommandsPermissions,
 };
-pub use self::create_automod_rule::CreateAutoModRule;
 pub use self::create_channel::CreateChannel;
 pub use self::create_components::{
     CreateActionRow,

@@ -10,7 +10,6 @@ use crate::builder::{
     CreateApplicationCommandPermissionsData,
     CreateApplicationCommands,
     CreateApplicationCommandsPermissions,
-    CreateAutoModRule,
     CreateChannel,
     CreateScheduledEvent,
     CreateSticker,
@@ -121,9 +120,9 @@ impl GuildId {
     pub async fn create_automod_rule(
         self,
         http: impl AsRef<Http>,
-        f: impl FnOnce(&mut CreateAutoModRule) -> &mut CreateAutoModRule,
+        f: impl FnOnce(&mut EditAutoModRule) -> &mut EditAutoModRule,
     ) -> Result<Rule> {
-        let mut builder = CreateAutoModRule::default();
+        let mut builder = EditAutoModRule::default();
         f(&mut builder);
 
         let map = json::hashmap_to_json_map(builder.0);
