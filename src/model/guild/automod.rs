@@ -2,6 +2,7 @@
 //!
 //! [Discord docs](https://discord.com/developers/docs/resources/auto-moderation)
 
+use std::borrow::Cow;
 use std::fmt;
 use std::time::Duration;
 
@@ -13,7 +14,7 @@ use serde_value::{DeserializerError, Value};
 use crate::model::id::{ChannelId, GuildId, MessageId, RoleId, RuleId, UserId};
 
 /// Configured auto moderation rule.
-#[derive(Clone, Debug, PartialEq)]
+#[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
 pub struct Rule {
     /// ID of the rule.
     pub id: RuleId,
@@ -26,6 +27,7 @@ pub struct Rule {
     /// Event context in which the rule should be checked.
     pub event_type: EventType,
     /// Characterizes the type of content which can trigger the rule.
+    #[serde(flatten)]
     pub trigger: Trigger,
     /// Actions which will execute when the rule is triggered.
     pub actions: Vec<Action>,
@@ -39,243 +41,6 @@ pub struct Rule {
     ///
     /// Maximum of 50.
     pub exempt_channels: Vec<ChannelId>,
-}
-
-// The manual implementation combines the fields `trigger_type` and `trigger_metadata` into the
-// [`Trigger`] enum and is required because serde doesn't support integer tags for
-// internally/adjacently tagged enums.
-//
-// See [Integer/boolean tags for internally/adjacently tagged
-// enums](https://github.com/serde-rs/serde/pull/2056).
-//
-// This could potiental be replaced in the future with `#[serde(flatten)]` and
-// an internally/adjacently tagged enum.
-impl<'de> Deserialize<'de> for Rule {
-    fn deserialize<D: Deserializer<'de>>(deserializer: D) -> Result<Self, D::Error> {
-        #[derive(Deserialize)]
-        #[serde(field_identifier, rename_all = "snake_case")]
-        enum Field {
-            Id,
-            GuildId,
-            Name,
-            CreatorId,
-            EventType,
-            TriggerType,
-            TriggerMetadata,
-            Actions,
-            Enabled,
-            ExemptRoles,
-            ExemptChannels,
-            Unknown(String),
-        }
-
-        #[derive(Deserialize)]
-        struct TriggerMetadataKeyword {
-            keyword_filter: Vec<String>,
-        }
-
-        #[derive(Deserialize)]
-        struct TriggerMetadataPresent {
-            presets: Vec<KeywordPresetType>,
-        }
-
-        struct Visitor;
-
-        impl<'de> serde::de::Visitor<'de> for Visitor {
-            type Value = Rule;
-
-            fn expecting(&self, formatter: &mut fmt::Formatter<'_>) -> fmt::Result {
-                formatter.write_str("auto moderation rule")
-            }
-
-            fn visit_map<A: MapAccess<'de>>(self, mut map: A) -> Result<Self::Value, A::Error> {
-                let mut id = None;
-                let mut guild_id = None;
-                let mut name = None;
-                let mut creator_id = None;
-                let mut event_type = None;
-                let mut trigger_type = None;
-                let mut trigger_metadata = None;
-                let mut actions = None;
-                let mut enabled = None;
-                let mut exempt_roles = None;
-                let mut exempt_channels = None;
-
-                while let Some(key) = map.next_key()? {
-                    match key {
-                        Field::Id => {
-                            if id.is_some() {
-                                return Err(Error::duplicate_field("id"));
-                            }
-                            id = Some(map.next_value()?);
-                        },
-                        Field::GuildId => {
-                            if guild_id.is_some() {
-                                return Err(Error::duplicate_field("guild_id"));
-                            }
-                            guild_id = Some(map.next_value()?);
-                        },
-                        Field::Name => {
-                            if name.is_some() {
-                                return Err(Error::duplicate_field("name"));
-                            }
-                            name = Some(map.next_value()?);
-                        },
-                        Field::CreatorId => {
-                            if creator_id.is_some() {
-                                return Err(Error::duplicate_field("creator_id"));
-                            }
-                            creator_id = Some(map.next_value()?);
-                        },
-                        Field::EventType => {
-                            if event_type.is_some() {
-                                return Err(Error::duplicate_field("event_type"));
-                            }
-                            event_type = Some(map.next_value()?);
-                        },
-                        Field::TriggerType => {
-                            if trigger_type.is_some() {
-                                return Err(Error::duplicate_field("trigger_type"));
-                            }
-                            trigger_type = Some(map.next_value()?);
-                        },
-                        Field::TriggerMetadata => {
-                            if trigger_metadata.is_some() {
-                                return Err(Error::duplicate_field("trigger_metadata"));
-                            }
-                            trigger_metadata = Some(map.next_value::<Value>()?);
-                        },
-                        Field::Actions => {
-                            if actions.is_some() {
-                                return Err(Error::duplicate_field("actions"));
-                            }
-                            actions = Some(map.next_value()?);
-                        },
-                        Field::Enabled => {
-                            if enabled.is_some() {
-                                return Err(Error::duplicate_field("enabled"));
-                            }
-                            enabled = Some(map.next_value()?);
-                        },
-                        Field::ExemptRoles => {
-                            if exempt_roles.is_some() {
-                                return Err(Error::duplicate_field("exempt_roles"));
-                            }
-                            exempt_roles = Some(map.next_value()?);
-                        },
-                        Field::ExemptChannels => {
-                            if exempt_channels.is_some() {
-                                return Err(Error::duplicate_field("exempt_channels"));
-                            }
-                            exempt_channels = Some(map.next_value()?);
-                        },
-                        Field::Unknown(_) => {
-                            map.next_value::<IgnoredAny>()?;
-                        },
-                    }
-                }
-
-                let id = id.ok_or_else(|| Error::missing_field("id"))?;
-                let guild_id = guild_id.ok_or_else(|| Error::missing_field("guild_id"))?;
-                let name = name.ok_or_else(|| Error::missing_field("name"))?;
-                let creator_id = creator_id.ok_or_else(|| Error::missing_field("creator_id"))?;
-                let event_type = event_type.ok_or_else(|| Error::missing_field("event_type"))?;
-
-                let trigger_type =
-                    trigger_type.ok_or_else(|| Error::missing_field("trigger_type"))?;
-                let metadata =
-                    trigger_metadata.ok_or_else(|| Error::missing_field("trigger_metadata"))?;
-
-                let trigger = match trigger_type {
-                    TriggerType::Keyword => {
-                        let value = TriggerMetadataKeyword::deserialize(metadata)
-                            .map_err(DeserializerError::into_error)?;
-                        Trigger::Keyword(value.keyword_filter)
-                    },
-                    TriggerType::HarmfulLink => Trigger::HarmfulLink,
-                    TriggerType::Spam => Trigger::Spam,
-                    TriggerType::KeywordPreset => {
-                        let value = TriggerMetadataPresent::deserialize(metadata)
-                            .map_err(DeserializerError::into_error)?;
-                        Trigger::KeywordPreset(value.presets)
-                    },
-                    TriggerType::Unknown(unknown) => Trigger::Unknown(unknown),
-                };
-
-                let actions = actions.ok_or_else(|| Error::missing_field("actions"))?;
-                let enabled = enabled.ok_or_else(|| Error::missing_field("enabled"))?;
-                let exempt_roles =
-                    exempt_roles.ok_or_else(|| Error::missing_field("exempt_roles"))?;
-                let exempt_channels =
-                    exempt_channels.ok_or_else(|| Error::missing_field("exempt_channels"))?;
-
-                Ok(Rule {
-                    id,
-                    guild_id,
-                    name,
-                    creator_id,
-                    event_type,
-                    trigger,
-                    actions,
-                    enabled,
-                    exempt_roles,
-                    exempt_channels,
-                })
-            }
-        }
-
-        deserializer.deserialize_any(Visitor)
-    }
-}
-
-impl Serialize for Rule {
-    fn serialize<S: Serializer>(&self, serializer: S) -> Result<S::Ok, S::Error> {
-        #[derive(Serialize)]
-        #[serde(rename = "TriggerMetadata")]
-        struct TriggerMetadataKeyword<'a> {
-            keyword_filter: &'a Vec<String>,
-        }
-
-        #[derive(Serialize)]
-        #[serde(rename = "TriggerMetadata")]
-        struct TriggerMetadataPresent<'a> {
-            presets: &'a Vec<KeywordPresetType>,
-        }
-
-        #[derive(Serialize)]
-        #[serde(rename = "TriggerMetadata")]
-        struct TriggerMetadataEmpty {}
-
-        let mut s = serializer.serialize_struct("Rule", 11)?;
-        s.serialize_field("id", &self.id)?;
-        s.serialize_field("guild_id", &self.guild_id)?;
-        s.serialize_field("name", &self.name)?;
-        s.serialize_field("creator_id", &self.creator_id)?;
-        s.serialize_field("event_type", &self.event_type)?;
-        match &self.trigger {
-            Trigger::Keyword(keyword_filter) => {
-                s.serialize_field("trigger_type", &TriggerType::Keyword)?;
-                s.serialize_field("trigger_metadata", &TriggerMetadataKeyword {
-                    keyword_filter,
-                })?;
-            },
-            Trigger::KeywordPreset(presets) => {
-                s.serialize_field("trigger_type", &TriggerType::KeywordPreset)?;
-                s.serialize_field("trigger_metadata", &TriggerMetadataPresent {
-                    presets,
-                })?;
-            },
-            trigger => {
-                s.serialize_field("trigger_type", &trigger.kind())?;
-                s.serialize_field("trigger_metadata", &TriggerMetadataEmpty {})?;
-            },
-        }
-        s.serialize_field("actions", &self.actions)?;
-        s.serialize_field("enabled", &self.enabled)?;
-        s.serialize_field("exempt_roles", &self.exempt_roles)?;
-        s.serialize_field("exempt_channels", &self.exempt_channels)?;
-        s.end()
-    }
 }
 
 /// Indicates in what event context a rule should be checked.
@@ -314,6 +79,68 @@ pub enum Trigger {
     Spam,
     KeywordPreset(Vec<KeywordPresetType>),
     Unknown(u8),
+}
+
+/// Helper struct for the (de)serialization of `Trigger`.
+#[derive(Deserialize, Serialize)]
+#[serde(rename = "Trigger")]
+struct InterimTrigger<'a> {
+    #[serde(rename = "trigger_type")]
+    kind: TriggerType,
+    #[serde(rename = "trigger_metadata")]
+    metadata: InterimTriggerMetadata<'a>,
+}
+
+/// Helper struct for the (de)serialization of `Trigger`.
+#[derive(Deserialize, Serialize)]
+#[serde(rename = "TriggerMetadata")]
+struct InterimTriggerMetadata<'a> {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    keyword_filter: Option<Cow<'a, [String]>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    presets: Option<Cow<'a, [KeywordPresetType]>>,
+}
+
+impl<'de> Deserialize<'de> for Trigger {
+    fn deserialize<D: Deserializer<'de>>(deserializer: D) -> Result<Self, D::Error> {
+        let trigger = InterimTrigger::deserialize(deserializer)?;
+        let trigger = match trigger.kind {
+            TriggerType::Keyword => {
+                let keywords = trigger
+                    .metadata
+                    .keyword_filter
+                    .ok_or_else(|| Error::missing_field("keyword_filter"))?;
+                Self::Keyword(keywords.into_owned())
+            },
+            TriggerType::HarmfulLink => Self::HarmfulLink,
+            TriggerType::Spam => Self::Spam,
+            TriggerType::KeywordPreset => {
+                let presets =
+                    trigger.metadata.presets.ok_or_else(|| Error::missing_field("presets"))?;
+                Self::KeywordPreset(presets.into_owned())
+            },
+            TriggerType::Unknown(unknown) => Self::Unknown(unknown),
+        };
+        Ok(trigger)
+    }
+}
+
+impl Serialize for Trigger {
+    fn serialize<S: Serializer>(&self, serializer: S) -> Result<S::Ok, S::Error> {
+        let mut trigger = InterimTrigger {
+            kind: self.kind(),
+            metadata: InterimTriggerMetadata {
+                keyword_filter: None,
+                presets: None,
+            },
+        };
+        match self {
+            Self::Keyword(keywords) => trigger.metadata.keyword_filter = Some(keywords.into()),
+            Self::KeywordPreset(presets) => trigger.metadata.presets = Some(presets.into()),
+            _ => {},
+        }
+        trigger.serialize(serializer)
+    }
 }
 
 impl Trigger {
@@ -652,9 +479,8 @@ mod tests {
     #[test]
     fn rule_trigger_serde() {
         let rule_tokens_head = [
-            Token::Struct {
-                name: "Rule",
-                len: 11,
+            Token::Map {
+                len: None,
             },
             Token::Str("id"),
             Token::NewtypeStruct {
@@ -694,7 +520,7 @@ mod tests {
                 len: Some(0),
             },
             Token::SeqEnd,
-            Token::StructEnd,
+            Token::MapEnd,
         ];
 
         let mut value = Rule {
@@ -720,6 +546,7 @@ mod tests {
                 len: 1,
             },
             Token::Str("keyword_filter"),
+            Token::Some,
             Token::Seq {
                 len: Some(2),
             },
@@ -779,6 +606,7 @@ mod tests {
                 len: 1,
             },
             Token::Str("presets"),
+            Token::Some,
             Token::Seq {
                 len: Some(3),
             },
