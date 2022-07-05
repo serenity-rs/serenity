@@ -16,7 +16,7 @@ use crate::model::id::{ChannelId, GuildId, MessageId, RoleId, RuleId, UserId};
 pub struct Rule {
     /// ID of the rule.
     pub id: RuleId,
-    /// ID of the guild this rule belonfs to.
+    /// ID of the guild this rule belongs to.
     pub guild_id: GuildId,
     /// Name of the rule.
     pub name: String,
