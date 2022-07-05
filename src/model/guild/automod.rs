@@ -41,18 +41,17 @@ pub struct Rule {
     pub exempt_channels: Vec<ChannelId>,
 }
 
+// The manual implementation combines the fields `trigger_type` and `trigger_metadata` into the
+// [`Trigger`] enum and is required because serde doesn't support integer tags for
+// internally/adjacently tagged enums.
+//
+// See [Integer/boolean tags for internally/adjacently tagged
+// enums](https://github.com/serde-rs/serde/pull/2056).
+//
+// This could potiental be replaced in the future with `#[serde(flatten)]` and
+// an internally/adjacently tagged enum.
 impl<'de> Deserialize<'de> for Rule {
     fn deserialize<D: Deserializer<'de>>(deserializer: D) -> Result<Self, D::Error> {
-        #[derive(Deserialize)]
-        struct Keyword {
-            keyword_filter: Vec<String>,
-        }
-
-        #[derive(Deserialize)]
-        struct Present {
-            presets: Vec<KeywordPresentType>,
-        }
-
         #[derive(Deserialize)]
         #[serde(field_identifier, rename_all = "snake_case")]
         enum Field {
@@ -68,6 +67,16 @@ impl<'de> Deserialize<'de> for Rule {
             ExemptRoles,
             ExemptChannels,
             Unknown(String),
+        }
+
+        #[derive(Deserialize)]
+        struct TriggerMetadataKeyword {
+            keyword_filter: Vec<String>,
+        }
+
+        #[derive(Deserialize)]
+        struct TriggerMetadataPresent {
+            presets: Vec<KeywordPresentType>,
         }
 
         struct Visitor;
@@ -179,14 +188,14 @@ impl<'de> Deserialize<'de> for Rule {
 
                 let trigger = match trigger_type {
                     TriggerType::Keyword => {
-                        let value = Keyword::deserialize(metadata)
+                        let value = TriggerMetadataKeyword::deserialize(metadata)
                             .map_err(DeserializerError::into_error)?;
                         Trigger::Keyword(value.keyword_filter)
                     },
                     TriggerType::HarmfulLink => Trigger::HarmfulLink,
                     TriggerType::Spam => Trigger::Spam,
                     TriggerType::KeywordPresent => {
-                        let value = Present::deserialize(metadata)
+                        let value = TriggerMetadataPresent::deserialize(metadata)
                             .map_err(DeserializerError::into_error)?;
                         Trigger::KeywordPresent(value.presets)
                     },
@@ -464,12 +473,14 @@ pub struct ActionExecution {
     pub matched_content: Option<String>,
 }
 
+/// Helper struct for the (de)serialization of `Action`.
 #[derive(Deserialize, Serialize)]
 #[serde(rename = "ActionMetadata")]
 struct Alert {
     channel_id: ChannelId,
 }
 
+/// Helper struct for the (de)serialization of `Action`.
 #[derive(Deserialize, Serialize)]
 #[serde(rename = "ActionMetadata")]
 struct Timeout {
@@ -477,6 +488,11 @@ struct Timeout {
     duration: u64,
 }
 
+// The manual implementation is required because serde doesn't support integer tags for
+// internally/adjacently tagged enums.
+//
+// See [Integer/boolean tags for internally/adjacently tagged
+// enums](https://github.com/serde-rs/serde/pull/2056).
 impl<'de> Deserialize<'de> for Action {
     fn deserialize<D: Deserializer<'de>>(deserializer: D) -> Result<Self, D::Error> {
         #[derive(Deserialize)]
