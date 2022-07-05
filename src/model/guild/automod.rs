@@ -478,66 +478,20 @@ mod tests {
 
     #[test]
     fn rule_trigger_serde() {
-        let rule_tokens_head = [
+        #[derive(Debug, PartialEq, Deserialize, Serialize)]
+        struct Rule {
+            #[serde(flatten)]
+            trigger: Trigger,
+        }
+
+        let value = Rule {
+            trigger: Trigger::Keyword(vec![String::from("foo"), String::from("bar")]),
+        };
+
+        serde_test::assert_tokens(&value, &[
             Token::Map {
                 len: None,
             },
-            Token::Str("id"),
-            Token::NewtypeStruct {
-                name: "RuleId",
-            },
-            Token::Str("1"),
-            Token::Str("guild_id"),
-            Token::NewtypeStruct {
-                name: "GuildId",
-            },
-            Token::Str("2"),
-            Token::Str("name"),
-            Token::Str("foobar"),
-            Token::Str("creator_id"),
-            Token::NewtypeStruct {
-                name: "UserId",
-            },
-            Token::Str("3"),
-            Token::Str("event_type"),
-            Token::U8(1),
-        ];
-        let rule_tokens_tail = [
-            Token::Str("actions"),
-            Token::Seq {
-                len: Some(0),
-            },
-            Token::SeqEnd,
-            Token::Str("enabled"),
-            Token::Bool(true),
-            Token::Str("exempt_roles"),
-            Token::Seq {
-                len: Some(0),
-            },
-            Token::SeqEnd,
-            Token::Str("exempt_channels"),
-            Token::Seq {
-                len: Some(0),
-            },
-            Token::SeqEnd,
-            Token::MapEnd,
-        ];
-
-        let mut value = Rule {
-            id: RuleId(1),
-            guild_id: GuildId(2),
-            name: String::from("foobar"),
-            creator_id: UserId(3),
-            event_type: EventType::MessageSend,
-            trigger: Trigger::Keyword(vec![String::from("foo"), String::from("bar")]),
-            actions: vec![],
-            enabled: true,
-            exempt_roles: vec![],
-            exempt_channels: vec![],
-        };
-
-        let mut tokens = rule_tokens_head.to_vec();
-        tokens.extend([
             Token::Str("trigger_type"),
             Token::U8(1),
             Token::Str("trigger_metadata"),
@@ -554,14 +508,16 @@ mod tests {
             Token::Str("bar"),
             Token::SeqEnd,
             Token::StructEnd,
+            Token::MapEnd,
         ]);
-        tokens.extend_from_slice(&rule_tokens_tail);
 
-        serde_test::assert_tokens(&value, &tokens);
-
-        value.trigger = Trigger::HarmfulLink;
-        let mut tokens = rule_tokens_head.to_vec();
-        tokens.extend([
+        let value = Rule {
+            trigger: Trigger::HarmfulLink,
+        };
+        serde_test::assert_tokens(&value, &[
+            Token::Map {
+                len: None,
+            },
             Token::Str("trigger_type"),
             Token::U8(2),
             Token::Str("trigger_metadata"),
@@ -570,14 +526,16 @@ mod tests {
                 len: 0,
             },
             Token::StructEnd,
+            Token::MapEnd,
         ]);
-        tokens.extend_from_slice(&rule_tokens_tail);
 
-        serde_test::assert_tokens(&value, &tokens);
-
-        value.trigger = Trigger::Spam;
-        let mut tokens = rule_tokens_head.to_vec();
-        tokens.extend([
+        let value = Rule {
+            trigger: Trigger::Spam,
+        };
+        serde_test::assert_tokens(&value, &[
+            Token::Map {
+                len: None,
+            },
             Token::Str("trigger_type"),
             Token::U8(3),
             Token::Str("trigger_metadata"),
@@ -586,18 +544,20 @@ mod tests {
                 len: 0,
             },
             Token::StructEnd,
+            Token::MapEnd,
         ]);
-        tokens.extend_from_slice(&rule_tokens_tail);
 
-        serde_test::assert_tokens(&value, &tokens);
-
-        value.trigger = Trigger::KeywordPreset(vec![
-            KeywordPresetType::Profanity,
-            KeywordPresetType::SexualContent,
-            KeywordPresetType::Slurs,
-        ]);
-        let mut tokens = rule_tokens_head.to_vec();
-        tokens.extend([
+        let value = Rule {
+            trigger: Trigger::KeywordPreset(vec![
+                KeywordPresetType::Profanity,
+                KeywordPresetType::SexualContent,
+                KeywordPresetType::Slurs,
+            ]),
+        };
+        serde_test::assert_tokens(&value, &[
+            Token::Map {
+                len: None,
+            },
             Token::Str("trigger_type"),
             Token::U8(4),
             Token::Str("trigger_metadata"),
@@ -615,14 +575,16 @@ mod tests {
             Token::U8(KeywordPresetType::Slurs.into()),
             Token::SeqEnd,
             Token::StructEnd,
+            Token::MapEnd,
         ]);
-        tokens.extend_from_slice(&rule_tokens_tail);
 
-        serde_test::assert_tokens(&value, &tokens);
-
-        value.trigger = Trigger::Unknown(123);
-        let mut tokens = rule_tokens_head.to_vec();
-        tokens.extend([
+        let value = Rule {
+            trigger: Trigger::Unknown(123),
+        };
+        serde_test::assert_tokens(&value, &[
+            Token::Map {
+                len: None,
+            },
             Token::Str("trigger_type"),
             Token::U8(123),
             Token::Str("trigger_metadata"),
@@ -631,10 +593,8 @@ mod tests {
                 len: 0,
             },
             Token::StructEnd,
+            Token::MapEnd,
         ]);
-        tokens.extend_from_slice(&rule_tokens_tail);
-
-        serde_test::assert_tokens(&value, &tokens);
     }
 
     #[test]
