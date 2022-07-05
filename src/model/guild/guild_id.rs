@@ -93,6 +93,8 @@ impl GuildId {
     /// Create a custom keyword filter to block the message and timeout the author.
     ///
     /// ```
+    /// use std::time::Duration;
+    ///
     /// use serenity::model::guild::automod::{Action, Trigger};
     /// use serenity::model::id::GuildId;
     ///
@@ -103,7 +105,7 @@ impl GuildId {
     ///     .create_automod_rule(&http, |r| {
     ///         r.name("foobar filter")
     ///             .trigger(Trigger::Keyword(vec!["foo*".to_string(), "*bar".to_string()]))
-    ///             .actions(vec![Action::BlockMessage, Action::Timeout(60)])
+    ///             .actions(vec![Action::BlockMessage, Action::Timeout(Duration::from_secs(60))])
     ///     })
     ///     .await;
     /// # }
