@@ -113,7 +113,7 @@ features = ["std"]
 version = "2.1"
 
 [dependencies.moka]
-version = "0.8"
+version = "0.9"
 features = ["dash"]
 optional = true
 
