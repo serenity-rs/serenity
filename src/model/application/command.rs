@@ -322,6 +322,12 @@ pub struct CommandOption {
     /// Maximum permitted value for Integer or Number options
     #[serde(default)]
     pub max_value: Option<serde_json::Number>,
+    /// Minimum permitted length for String options
+    #[serde(default)]
+    pub min_length: Option<u16>,
+    /// Maximum permitted length for String options
+    #[serde(default)]
+    pub max_length: Option<u16>,
     #[serde(default)]
     pub autocomplete: bool,
 }
