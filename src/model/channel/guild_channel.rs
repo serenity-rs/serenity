@@ -381,45 +381,45 @@ impl GuildChannel {
         self.id.delete_reaction(&http, message_id, user_id, reaction_type).await
     }
 
-    /// Modifies a channel's settings, such as its position or name.
+    /// Edits the channel's settings.
     ///
-    /// Refer to [`EditChannel`]s documentation for a full list of methods.
+    /// Refer to the documentation for [`EditChannel`] for a full list of methods.
+    ///
+    /// **Note**: Requires the [Manage Channels] permission. Modifying permissions via
+    /// [`EditChannel::permissions`] also requires the [Manage Roles] permission.
     ///
     /// # Examples
     ///
     /// Change a voice channels name and bitrate:
     ///
-    /// ```rust,ignore
-    /// channel.edit(&context, |c| c.name("test").bitrate(86400)).await;
+    /// ```rust,no_run
+    /// # use serenity::builder::EditChannel;
+    /// # use serenity::http::Http;
+    /// # use serenity::model::id::ChannelId;
+    /// # async fn run() {
+    /// #     let http = Http::new("token");
+    /// #     let channel = ChannelId::new(1234);
+    /// let builder = EditChannel::default().name("test").bitrate(86400);
+    /// channel.edit(&http, builder).await;
+    /// # }
     /// ```
     ///
     /// # Errors
     ///
-    /// If the `cache` is enabled, returns [ModelError::InvalidPermissions]
-    /// if the current user lacks permission to edit the channel.
+    /// If the `cache` is enabled, returns a [`ModelError::InvalidPermissions`] if the current user
+    /// lacks permission. Otherwise returns [`Error::Http`], as well as if invalid data is given.
     ///
-    /// Otherwise returns [`Error::Http`] if the current user lacks permission.
-    pub async fn edit<F>(&mut self, cache_http: impl CacheHttp, f: F) -> Result<()>
-    where
-        F: FnOnce(&mut EditChannel) -> &mut EditChannel,
-    {
-        #[cfg(feature = "cache")]
-        {
-            if let Some(cache) = cache_http.cache() {
-                crate::utils::user_has_perms_cache(
-                    cache,
-                    self.id,
-                    Some(self.guild_id),
-                    Permissions::MANAGE_CHANNELS,
-                )?;
-            }
-        }
-
-        let mut edit_channel = EditChannel::default();
-        f(&mut edit_channel);
-
-        *self = cache_http.http().edit_channel(self.id.get(), &edit_channel, None).await?;
-
+    /// [Manage Channels]: Permissions::MANAGE_CHANNELS
+    /// [Manage Roles]: Permissions::MANAGE_ROLES
+    pub async fn edit(&mut self, cache_http: impl CacheHttp, builder: EditChannel) -> Result<()> {
+        *self = builder
+            .execute(
+                cache_http,
+                self.id,
+                #[cfg(feature = "cache")]
+                Some(self.guild_id),
+            )
+            .await?;
         Ok(())
     }
 

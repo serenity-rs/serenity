@@ -292,43 +292,50 @@ impl ChannelId {
             .await
     }
 
-    /// Edits the settings of a [`Channel`], optionally setting new values.
+    /// Edits a channel's settings.
     ///
-    /// Refer to [`EditChannel`]'s documentation for its methods.
+    /// Refer to the documentation for [`EditChannel`] for a full list of methods.
     ///
-    /// Requires the [Manage Channel] permission.
+    /// **Note**: Requires the [Manage Channels] permission. Modifying permissions via
+    /// [`EditChannel::permissions`] also requires the [Manage Roles] permission.
     ///
     /// # Examples
     ///
     /// Change a voice channel's name and bitrate:
     ///
     /// ```rust,no_run
-    /// // assuming a `channel_id` has been bound
-    ///
+    /// # use serenity::builder::EditChannel;
+    /// # use serenity::http::Http;
+    /// # use serenity::model::id::ChannelId;
     /// # async fn run() {
-    /// #     use serenity::http::Http;
-    /// #     use serenity::model::id::ChannelId;
     /// #     let http = Http::new("token");
     /// #     let channel_id = ChannelId::new(1234);
-    /// channel_id.edit(&http, |c| c.name("test").bitrate(64000)).await;
+    /// let builder = EditChannel::default().name("test").bitrate(64000);
+    /// channel_id.edit(&http, builder).await;
     /// # }
     /// ```
     ///
     /// # Errors
     ///
-    /// Returns [`Error::Http`] if the current user lacks permission,
-    /// or if an invalid value is set.
+    /// If the `cache` is enabled, returns a [`ModelError::InvalidPermissions`] if the current user
+    /// lacks permission. Otherwise returns [`Error::Http`], as well as if invalid data is given.
     ///
-    /// [Manage Channel]: Permissions::MANAGE_CHANNELS
+    /// [Manage Channels]: Permissions::MANAGE_CHANNELS
+    /// [Manage Roles]: Permissions::MANAGE_ROLES
     #[inline]
-    pub async fn edit<F>(self, http: impl AsRef<Http>, f: F) -> Result<GuildChannel>
-    where
-        F: FnOnce(&mut EditChannel) -> &mut EditChannel,
-    {
-        let mut channel = EditChannel::default();
-        f(&mut channel);
-
-        http.as_ref().edit_channel(self.get(), &channel, None).await
+    pub async fn edit(
+        self,
+        cache_http: impl CacheHttp,
+        builder: EditChannel,
+    ) -> Result<GuildChannel> {
+        builder
+            .execute(
+                cache_http,
+                self,
+                #[cfg(feature = "cache")]
+                None,
+            )
+            .await
     }
 
     /// Edits a [`Message`] in the channel given its Id.
