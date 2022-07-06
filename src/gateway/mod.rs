@@ -52,9 +52,9 @@ mod ws;
 
 use std::fmt;
 
-#[cfg(feature = "client")]
-use async_tungstenite::tungstenite;
 use reqwest::{IntoUrl, Url};
+#[cfg(feature = "client")]
+use tokio_tungstenite::tungstenite;
 
 pub use self::error::Error as GatewayError;
 pub use self::shard::Shard;

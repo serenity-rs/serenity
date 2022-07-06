@@ -88,9 +88,7 @@ optional = true
 optional = true
 version = "1.1"
 
-[dependencies.async-tungstenite]
-default-features = false
-features = ["tokio-runtime"]
+[dependencies.tokio-tungstenite]
 optional = true
 version = "0.17"
 
@@ -197,7 +195,7 @@ temp_cache = ["cache", "moka"]
 # - Rustls Backends
 rustls_backend = [
     "reqwest/rustls-tls",
-    "async-tungstenite/tokio-rustls-webpki-roots",
+    "tokio-tungstenite/rustls-tls-webpki-roots",
     "tokio",
     "bytes",
 ]
@@ -205,7 +203,7 @@ rustls_backend = [
 # - Native TLS Backends
 native_tls_backend = [
     "reqwest/native-tls",
-    "async-tungstenite/tokio-native-tls",
+    "tokio-tungstenite/native-tls",
     "tokio",
     "bytes",
 ]
