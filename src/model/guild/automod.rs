@@ -472,195 +472,74 @@ impl From<ActionType> for u8 {
 mod tests {
     use std::time::Duration;
 
-    use serde_test::Token;
-
     use super::*;
 
     #[test]
-    fn rule_trigger_serde() {
+    fn rule_trigger_serde() -> crate::Result<()> {
         #[derive(Debug, PartialEq, Deserialize, Serialize)]
         struct Rule {
             #[serde(flatten)]
             trigger: Trigger,
         }
 
-        let value = Rule {
-            trigger: Trigger::Keyword(vec![String::from("foo"), String::from("bar")]),
-        };
+        assert_eq!(
+            crate::json::to_string(&Rule {
+                trigger: Trigger::Keyword(vec![String::from("foo"), String::from("bar")]),
+            })?,
+            r#"{"trigger_type":1,"trigger_metadata":{"keyword_filter":["foo","bar"]}}"#,
+        );
 
-        serde_test::assert_tokens(&value, &[
-            Token::Map {
-                len: None,
-            },
-            Token::Str("trigger_type"),
-            Token::U8(1),
-            Token::Str("trigger_metadata"),
-            Token::Struct {
-                name: "TriggerMetadata",
-                len: 1,
-            },
-            Token::Str("keyword_filter"),
-            Token::Some,
-            Token::Seq {
-                len: Some(2),
-            },
-            Token::Str("foo"),
-            Token::Str("bar"),
-            Token::SeqEnd,
-            Token::StructEnd,
-            Token::MapEnd,
-        ]);
+        assert_eq!(
+            crate::json::to_string(&Rule {
+                trigger: Trigger::HarmfulLink,
+            })?,
+            r#"{"trigger_type":2,"trigger_metadata":{}}"#,
+        );
 
-        let value = Rule {
-            trigger: Trigger::HarmfulLink,
-        };
-        serde_test::assert_tokens(&value, &[
-            Token::Map {
-                len: None,
-            },
-            Token::Str("trigger_type"),
-            Token::U8(2),
-            Token::Str("trigger_metadata"),
-            Token::Struct {
-                name: "TriggerMetadata",
-                len: 0,
-            },
-            Token::StructEnd,
-            Token::MapEnd,
-        ]);
+        assert_eq!(
+            crate::json::to_string(&Rule {
+                trigger: Trigger::Spam,
+            })?,
+            r#"{"trigger_type":3,"trigger_metadata":{}}"#,
+        );
 
-        let value = Rule {
-            trigger: Trigger::Spam,
-        };
-        serde_test::assert_tokens(&value, &[
-            Token::Map {
-                len: None,
-            },
-            Token::Str("trigger_type"),
-            Token::U8(3),
-            Token::Str("trigger_metadata"),
-            Token::Struct {
-                name: "TriggerMetadata",
-                len: 0,
-            },
-            Token::StructEnd,
-            Token::MapEnd,
-        ]);
+        assert_eq!(
+            crate::json::to_string(&Rule {
+                trigger: Trigger::KeywordPreset(vec![
+                    KeywordPresetType::Profanity,
+                    KeywordPresetType::SexualContent,
+                    KeywordPresetType::Slurs,
+                ]),
+            })?,
+            r#"{"trigger_type":4,"trigger_metadata":{"presets":[1,2,3]}}"#,
+        );
 
-        let value = Rule {
-            trigger: Trigger::KeywordPreset(vec![
-                KeywordPresetType::Profanity,
-                KeywordPresetType::SexualContent,
-                KeywordPresetType::Slurs,
-            ]),
-        };
-        serde_test::assert_tokens(&value, &[
-            Token::Map {
-                len: None,
-            },
-            Token::Str("trigger_type"),
-            Token::U8(4),
-            Token::Str("trigger_metadata"),
-            Token::Struct {
-                name: "TriggerMetadata",
-                len: 1,
-            },
-            Token::Str("presets"),
-            Token::Some,
-            Token::Seq {
-                len: Some(3),
-            },
-            Token::U8(KeywordPresetType::Profanity.into()),
-            Token::U8(KeywordPresetType::SexualContent.into()),
-            Token::U8(KeywordPresetType::Slurs.into()),
-            Token::SeqEnd,
-            Token::StructEnd,
-            Token::MapEnd,
-        ]);
+        assert_eq!(
+            crate::json::to_string(&Rule {
+                trigger: Trigger::Unknown(123),
+            })?,
+            r#"{"trigger_type":123,"trigger_metadata":{}}"#,
+        );
 
-        let value = Rule {
-            trigger: Trigger::Unknown(123),
-        };
-        serde_test::assert_tokens(&value, &[
-            Token::Map {
-                len: None,
-            },
-            Token::Str("trigger_type"),
-            Token::U8(123),
-            Token::Str("trigger_metadata"),
-            Token::Struct {
-                name: "TriggerMetadata",
-                len: 0,
-            },
-            Token::StructEnd,
-            Token::MapEnd,
-        ]);
+        Ok(())
     }
 
     #[test]
-    fn action_serde() {
-        let value = Action::BlockMessage;
+    fn action_serde() -> crate::Result<()> {
+        assert_eq!(crate::json::to_string(&Action::BlockMessage)?, r#"{"type":1}"#);
 
-        serde_test::assert_tokens(&value, &[
-            Token::Struct {
-                name: "Action",
-                len: 1,
-            },
-            Token::Str("type"),
-            Token::U8(1),
-            Token::StructEnd,
-        ]);
+        assert_eq!(
+            crate::json::to_string(&Action::Alert(ChannelId(123)))?,
+            r#"{"type":2,"metadata":{"channel_id":"123"}}"#
+        );
 
-        let value = Action::Alert(ChannelId(123));
-        serde_test::assert_tokens(&value, &[
-            Token::Struct {
-                name: "Action",
-                len: 2,
-            },
-            Token::Str("type"),
-            Token::U8(2),
-            Token::Str("metadata"),
-            Token::Struct {
-                name: "ActionMetadata",
-                len: 1,
-            },
-            Token::Str("channel_id"),
-            Token::NewtypeStruct {
-                name: "ChannelId",
-            },
-            Token::Str("123"),
-            Token::StructEnd,
-            Token::StructEnd,
-        ]);
+        assert_eq!(
+            crate::json::to_string(&Action::Timeout(Duration::from_secs(1024)))?,
+            r#"{"type":3,"metadata":{"duration_seconds":1024}}"#
+        );
 
-        let value = Action::Timeout(Duration::from_secs(1024));
-        serde_test::assert_tokens(&value, &[
-            Token::Struct {
-                name: "Action",
-                len: 2,
-            },
-            Token::Str("type"),
-            Token::U8(3),
-            Token::Str("metadata"),
-            Token::Struct {
-                name: "ActionMetadata",
-                len: 1,
-            },
-            Token::Str("duration_seconds"),
-            Token::U64(1024),
-            Token::StructEnd,
-            Token::StructEnd,
-        ]);
+        assert_eq!(crate::json::to_string(&Action::Unknown(123))?, r#"{"type":123}"#);
 
-        let value = Action::Unknown(123);
-        serde_test::assert_tokens(&value, &[
-            Token::Struct {
-                name: "Action",
-                len: 1,
-            },
-            Token::Str("type"),
-            Token::U8(123),
-            Token::StructEnd,
-        ]);
+        Ok(())
     }
 }
