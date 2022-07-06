@@ -1,11 +1,11 @@
 use std::borrow::Cow;
 use std::sync::Arc;
 
-use async_tungstenite::tungstenite;
-use async_tungstenite::tungstenite::error::Error as TungsteniteError;
-use async_tungstenite::tungstenite::protocol::frame::CloseFrame;
 use futures::channel::mpsc::{self, UnboundedReceiver as Receiver, UnboundedSender as Sender};
 use tokio::sync::RwLock;
+use tokio_tungstenite::tungstenite;
+use tokio_tungstenite::tungstenite::error::Error as TungsteniteError;
+use tokio_tungstenite::tungstenite::protocol::frame::CloseFrame;
 use tracing::{debug, error, info, instrument, trace, warn};
 use typemap_rev::TypeMap;
 
