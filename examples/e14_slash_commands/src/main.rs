@@ -18,9 +18,9 @@ impl EventHandler for Handler {
             println!("Received command interaction: {:#?}", command);
 
             let content = match command.data.name.as_str() {
-                "ping" => commands::ping::run(&command.data.options),
-                "id" => commands::id::run(&command.data.options),
-                "attachmentinput" => commands::attachmentinput::run(&command.data.options),
+                "ping" => commands::ping::run(&command.data.options()),
+                "id" => commands::id::run(&command.data.options()),
+                "attachmentinput" => commands::attachmentinput::run(&command.data.options()),
                 _ => "not implemented :(".to_string(),
             };
 
