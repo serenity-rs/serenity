@@ -1169,34 +1169,10 @@ macro_rules! with_related_ids_for_event_types {
                 message_id: Never,
             },
             Self::InteractionCreate, Self::InteractionCreate(e) => {
-                user_id: match &e.interaction {
-                    Interaction::Ping(_) => None,
-                    Interaction::ApplicationCommand(i) => Some(i.user.id),
-                    Interaction::MessageComponent(i) => Some(i.user.id),
-                    Interaction::Autocomplete(i) => Some(i.user.id),
-                    Interaction::ModalSubmit(i) => Some(i.user.id),
-                },
-                guild_id: match &e.interaction {
-                    Interaction::Ping(_) => None,
-                    Interaction::ApplicationCommand(i) => i.guild_id.into(),
-                    Interaction::MessageComponent(i) => i.guild_id.into(),
-                    Interaction::Autocomplete(i) => i.guild_id.into(),
-                    Interaction::ModalSubmit(i) => i.guild_id.into(),
-                },
-                channel_id: match &e.interaction {
-                    Interaction::Ping(_) => None,
-                    Interaction::ApplicationCommand(i) => Some(i.channel_id),
-                    Interaction::MessageComponent(i) => Some(i.channel_id),
-                    Interaction::Autocomplete(i) => Some(i.channel_id),
-                    Interaction::ModalSubmit(i) => Some(i.channel_id),
-                },
-                message_id: match &e.interaction {
-                    Interaction::Ping(_) => None,
-                    Interaction::ApplicationCommand(_) => None,
-                    Interaction::MessageComponent(i) => Some(i.message.id),
-                    Interaction::Autocomplete(i) => None,
-                    Interaction::ModalSubmit(i) => i.message.as_ref().map(|m| m.id).into(),
-                },
+                user_id: e.interaction.user.as_ref().map(|u| u.id).into(),
+                guild_id: e.interaction.guild_id.into(),
+                channel_id: e.interaction.channel_id.into(),
+                message_id: e.interaction.message.as_ref().map(|m| m.id).into(),
             },
             Self::IntegrationCreate, Self::IntegrationCreate(e) => {
                 user_id: e.integration.user.as_ref().map(|u| u.id).into(),

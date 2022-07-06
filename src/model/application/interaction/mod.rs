@@ -3,163 +3,576 @@ pub mod message_component;
 pub mod modal;
 pub mod ping;
 
-use serde::de::{Deserialize, Deserializer, Error as DeError};
-use serde::ser::{Serialize, Serializer};
+use std::fmt;
 
-use self::application_command::ApplicationCommandInteraction;
-use self::message_component::MessageComponentInteraction;
-use self::modal::ModalSubmitInteraction;
-use self::ping::PingInteraction;
+use serde::de::{Deserialize, Deserializer, Error as DeError, IgnoredAny, MapAccess};
+use serde_value::DeserializerError;
+
+use self::application_command::CommandData;
+use self::message_component::MessageComponentInteractionData;
+use self::modal::ModalSubmitInteractionData;
+#[cfg(feature = "model")]
+use crate::builder::{
+    CreateAutocompleteResponse,
+    CreateInteractionResponse,
+    CreateInteractionResponseFollowup,
+    EditInteractionResponse,
+};
+#[cfg(feature = "model")]
+use crate::http::Http;
 use crate::internal::prelude::*;
-use crate::json::from_value;
+use crate::model::channel::Message;
 use crate::model::guild::PartialMember;
-use crate::model::id::{ApplicationId, GuildId, InteractionId};
+#[cfg(feature = "model")]
+use crate::model::id::MessageId;
+use crate::model::id::{ApplicationId, ChannelId, GuildId, InteractionId};
 use crate::model::user::User;
-use crate::model::utils::deserialize_val;
+use crate::model::Permissions;
 
 /// [Discord docs](https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-object)
-#[derive(Clone, Debug)]
-pub enum Interaction {
-    Ping(PingInteraction),
-    ApplicationCommand(ApplicationCommandInteraction),
-    Autocomplete(ApplicationCommandInteraction),
-    MessageComponent(MessageComponentInteraction),
-    ModalSubmit(ModalSubmitInteraction),
+#[derive(Clone, Debug, Serialize)]
+pub struct Interaction {
+    /// ID of the interaction.
+    pub id: InteractionId,
+    /// ID of the application this interaction is for.
+    pub application_id: ApplicationId,
+    #[serde(rename = "type")]
+    pub kind: InteractionType,
+    pub data: Option<InteractionData>,
+    /// The guild ID this interaction was sent from, if there is one.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub guild_id: Option<GuildId>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub channel_id: Option<ChannelId>,
+    /// The `member` data for the invoking user.
+    ///
+    /// **Note**: It is only present if the interaction is triggered in a guild.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub member: Option<PartialMember>,
+    /// The `user` object for the invoking user.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub user: Option<User>,
+    /// A continuation token for responding to the interaction.
+    pub token: String,
+    /// Always `1`.
+    pub version: u8,
+    /// The message this interaction was triggered by
+    ///
+    /// **Note**: Does not exist if the modal interaction originates from
+    /// an application command interaction
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub message: Option<Message>,
+    /// Permissions the app or bot has within the channel the interaction was sent from.
+    pub app_permissions: Option<Permissions>,
+    /// The selected language of the invoking user.
+    pub locale: String,
+    /// The guild's preferred locale.
+    pub guild_locale: Option<String>,
+}
+
+#[derive(Clone, Debug, Serialize)]
+#[serde(untagged)]
+pub enum InteractionData {
+    ApplicationCommand(CommandData),
+    Autocomplete(CommandData),
+    MessageComponent(MessageComponentInteractionData),
+    ModalSubmit(ModalSubmitInteractionData),
+}
+
+impl<'de> Deserialize<'de> for Interaction {
+    fn deserialize<D: Deserializer<'de>>(deserializer: D) -> StdResult<Self, D::Error> {
+        #[derive(Deserialize)]
+        #[serde(field_identifier, rename_all = "snake_case")]
+        enum Field {
+            Id,
+            ApplicationId,
+            Type,
+            Data,
+            GuildId,
+            ChannelId,
+            Member,
+            User,
+            Token,
+            Version,
+            Message,
+            AppPermissions,
+            Locale,
+            GuildLocale,
+            Unknown(String),
+        }
+
+        struct Visitor;
+
+        impl<'de> serde::de::Visitor<'de> for Visitor {
+            type Value = Interaction;
+
+            fn expecting(&self, formatter: &mut fmt::Formatter<'_>) -> fmt::Result {
+                formatter.write_str("expecting interaction object")
+            }
+
+            fn visit_map<A: MapAccess<'de>>(self, mut map: A) -> StdResult<Self::Value, A::Error> {
+                let mut id = None;
+                let mut application_id = None;
+                let mut kind = None;
+                let mut data: Option<serde_value::Value> = None;
+                let mut guild_id = None;
+                let mut channel_id = None;
+                let mut member = None;
+                let mut user = None;
+                let mut token = None;
+                let mut version = None;
+                let mut message = None;
+                let mut app_permissions = None;
+                let mut locale = None;
+                let mut guild_locale = None;
+
+                macro_rules! next_value {
+                    ($field:ident, $name:literal) => {
+                        if $field.is_some() {
+                            return Err(DeError::duplicate_field($name));
+                        }
+                        $field = Some(map.next_value()?);
+                    };
+                }
+
+                while let Some(key) = map.next_key()? {
+                    match key {
+                        Field::Id => {
+                            next_value!(id, "id");
+                        },
+                        Field::ApplicationId => {
+                            next_value!(application_id, "application_id");
+                        },
+                        Field::Type => {
+                            next_value!(kind, "type");
+                        },
+                        Field::Data => {
+                            next_value!(data, "data");
+                        },
+                        Field::GuildId => {
+                            next_value!(guild_id, "guild_id");
+                        },
+                        Field::ChannelId => {
+                            next_value!(channel_id, "channel_id");
+                        },
+                        Field::Member => {
+                            next_value!(member, "member");
+                        },
+                        Field::User => {
+                            next_value!(user, "user");
+                        },
+                        Field::Token => {
+                            next_value!(token, "token");
+                        },
+                        Field::Version => {
+                            next_value!(version, "version");
+                        },
+                        Field::Message => {
+                            next_value!(message, "message");
+                        },
+                        Field::AppPermissions => {
+                            next_value!(app_permissions, "app_permissions");
+                        },
+                        Field::Locale => {
+                            next_value!(locale, "locale");
+                        },
+                        Field::GuildLocale => {
+                            next_value!(guild_locale, "guild_locale");
+                        },
+                        Field::Unknown(_) => {
+                            map.next_value::<IgnoredAny>()?;
+                        },
+                    }
+                }
+
+                let id = id.ok_or_else(|| DeError::missing_field("id"))?;
+                let application_id =
+                    application_id.ok_or_else(|| DeError::missing_field("application_id"))?;
+                let kind = kind.ok_or_else(|| DeError::missing_field("type"))?;
+
+                macro_rules! data {
+                    () => {
+                        data.ok_or_else(|| DeError::missing_field("data"))?
+                            .deserialize_into()
+                            .map_err(DeserializerError::into_error)?
+                    };
+                }
+                let data = match kind {
+                    InteractionType::ApplicationCommand => {
+                        Some(InteractionData::ApplicationCommand(data!()))
+                    },
+                    InteractionType::Autocomplete => Some(InteractionData::Autocomplete(data!())),
+                    InteractionType::MessageComponent => {
+                        Some(InteractionData::MessageComponent(data!()))
+                    },
+                    InteractionType::ModalSubmit => Some(InteractionData::ModalSubmit(data!())),
+                    _ => None,
+                };
+
+                let token = token.ok_or_else(|| DeError::missing_field("token"))?;
+                let version = version.ok_or_else(|| DeError::missing_field("version"))?;
+                let locale = locale.ok_or_else(|| DeError::missing_field("locale"))?;
+
+                Ok(Self::Value {
+                    id,
+                    application_id,
+                    kind,
+                    data,
+                    guild_id,
+                    channel_id,
+                    member,
+                    user,
+                    token,
+                    version,
+                    message,
+                    app_permissions,
+                    locale,
+                    guild_locale,
+                })
+            }
+        }
+
+        deserializer.deserialize_map(Visitor)
+    }
 }
 
 impl Interaction {
     /// Gets the interaction Id.
+    #[deprecated(note = "use the `id` field")]
     #[must_use]
     pub fn id(&self) -> InteractionId {
-        match self {
-            Self::Ping(i) => i.id,
-            Self::ApplicationCommand(i) | Self::Autocomplete(i) => i.id,
-            Self::MessageComponent(i) => i.id,
-            Self::ModalSubmit(i) => i.id,
-        }
+        self.id
     }
 
     /// Gets the interaction type
+    #[deprecated(note = "use the `kind` field")]
     #[must_use]
     pub fn kind(&self) -> InteractionType {
-        match self {
-            Self::Ping(_) => InteractionType::Ping,
-            Self::ApplicationCommand(_) => InteractionType::ApplicationCommand,
-            Self::MessageComponent(_) => InteractionType::MessageComponent,
-            Self::Autocomplete(_) => InteractionType::Autocomplete,
-            Self::ModalSubmit(_) => InteractionType::ModalSubmit,
-        }
+        self.kind
     }
 
     /// Gets the interaction application Id
+    #[deprecated(note = "use the `application_id` field")]
     #[must_use]
     pub fn application_id(&self) -> ApplicationId {
-        match self {
-            Self::Ping(i) => i.application_id,
-            Self::ApplicationCommand(i) | Self::Autocomplete(i) => i.application_id,
-            Self::MessageComponent(i) => i.application_id,
-            Self::ModalSubmit(i) => i.application_id,
-        }
+        self.application_id
     }
 
     /// Gets the interaction token.
+    #[deprecated(note = "use the `token` field")]
     #[must_use]
     pub fn token(&self) -> &str {
-        match self {
-            Self::Ping(i) => i.token.as_str(),
-            Self::ApplicationCommand(i) | Self::Autocomplete(i) => i.token.as_str(),
-            Self::MessageComponent(i) => i.token.as_str(),
-            Self::ModalSubmit(i) => i.token.as_str(),
-        }
+        &self.token
     }
 
     /// Gets the invoked guild locale.
+    #[deprecated(note = "use the `guild_locale` field")]
     #[must_use]
     pub fn guild_locale(&self) -> Option<&str> {
-        match self {
-            Self::Ping(i) => i.guild_locale.as_deref(),
-            Self::ApplicationCommand(i) | Self::Autocomplete(i) => i.guild_locale.as_deref(),
-            Self::MessageComponent(i) => i.guild_locale.as_deref(),
-            Self::ModalSubmit(i) => i.guild_locale.as_deref(),
-        }
+        self.guild_locale.as_deref()
     }
 
-    /// Converts this to a [`PingInteraction`]
+    /// Gets a [`CommandData`] from this.
     #[must_use]
-    pub fn ping(self) -> Option<PingInteraction> {
-        match self {
-            Self::Ping(i) => Some(i),
+    pub fn application_command(&self) -> Option<&CommandData> {
+        match &self.data {
+            Some(InteractionData::ApplicationCommand(data)) => Some(data),
             _ => None,
         }
     }
 
-    /// Converts this to an [`ApplicationCommandInteraction`]
+    /// Gets a [`CommandData`] from this.
     #[must_use]
-    pub fn application_command(self) -> Option<ApplicationCommandInteraction> {
-        match self {
-            Self::ApplicationCommand(i) => Some(i),
+    pub fn autocomplete(&self) -> Option<&CommandData> {
+        match &self.data {
+            Some(InteractionData::ApplicationCommand(data)) => Some(data),
             _ => None,
         }
     }
 
-    /// Converts this to a [`MessageComponentInteraction`]
+    /// Gets a [`MessageComponentInteractionData`] from this.
     #[must_use]
-    pub fn message_component(self) -> Option<MessageComponentInteraction> {
-        match self {
-            Self::MessageComponent(i) => Some(i),
+    pub fn message_component(&self) -> Option<&MessageComponentInteractionData> {
+        match &self.data {
+            Some(InteractionData::MessageComponent(data)) => Some(data),
             _ => None,
         }
     }
 
-    /// Converts this to a [`ApplicationCommandInteraction`]
+    /// Gets a [`ModalSubmitInteractionData`] from this.
     #[must_use]
-    pub fn autocomplete(self) -> Option<ApplicationCommandInteraction> {
-        match self {
-            Self::Autocomplete(i) => Some(i),
-            _ => None,
-        }
-    }
-
-    /// Converts this to a [`ModalSubmitInteraction`]
-    #[must_use]
-    pub fn modal_submit(self) -> Option<ModalSubmitInteraction> {
-        match self {
-            Self::ModalSubmit(i) => Some(i),
+    pub fn modal_submit(&self) -> Option<&ModalSubmitInteractionData> {
+        match &self.data {
+            Some(InteractionData::ModalSubmit(data)) => Some(data),
             _ => None,
         }
     }
 }
 
-impl<'de> Deserialize<'de> for Interaction {
-    fn deserialize<D: Deserializer<'de>>(deserializer: D) -> std::result::Result<Self, D::Error> {
-        let value = Value::deserialize(deserializer)?;
-        let map = value.as_object().ok_or_else(|| DeError::custom("expected JsonMap"))?;
+/// General interaction response methods.
+#[cfg(feature = "model")]
+impl Interaction {
+    /// Gets the interaction response.
+    ///
+    /// # Errors
+    ///
+    /// Returns an [`Error::Http`] if there is no interaction response.
+    ///
+    /// [`Error::Http`]: crate::error::Error::Http
+    pub async fn get_interaction_response(&self, http: impl AsRef<Http>) -> Result<Message> {
+        http.as_ref().get_original_interaction_response(&self.token).await
+    }
 
-        let raw_kind = map.get("type").ok_or_else(|| DeError::missing_field("type"))?;
-        match deserialize_val(raw_kind.clone())? {
-            InteractionType::ApplicationCommand => {
-                from_value(value).map(Interaction::ApplicationCommand)
-            },
-            InteractionType::MessageComponent => {
-                from_value(value).map(Interaction::MessageComponent)
-            },
-            InteractionType::Autocomplete => from_value(value).map(Interaction::Autocomplete),
-            InteractionType::ModalSubmit => from_value(value).map(Interaction::ModalSubmit),
-            InteractionType::Ping => from_value(value).map(Interaction::Ping),
-            InteractionType::Unknown(_) => return Err(DeError::custom("Unknown interaction type")),
+    /// Creates a response to the interaction received.
+    ///
+    /// **Note**: Message contents must be under 2000 unicode code points.
+    ///
+    /// # Errors
+    ///
+    /// Returns an [`Error::Model`] if the message content is too long.
+    /// May also return an [`Error::Http`] if the API returns an error,
+    /// or an [`Error::Json`] if there is an error in deserializing the
+    /// API response.
+    ///
+    /// [`Error::Model`]: crate::error::Error::Model
+    /// [`Error::Http`]: crate::error::Error::Http
+    /// [`Error::Json`]: crate::error::Error::Json
+    pub async fn create_interaction_response<'a, F>(
+        &self,
+        http: impl AsRef<Http>,
+        f: F,
+    ) -> Result<()>
+    where
+        for<'b> F:
+            FnOnce(&'b mut CreateInteractionResponse<'a>) -> &'b mut CreateInteractionResponse<'a>,
+    {
+        let mut interaction_response = CreateInteractionResponse::default();
+        f(&mut interaction_response);
+        self._create_interaction_response(http.as_ref(), interaction_response).await
+    }
+
+    async fn _create_interaction_response<'a>(
+        &self,
+        http: &Http,
+        mut interaction_response: CreateInteractionResponse<'a>,
+    ) -> Result<()> {
+        let files = interaction_response
+            .data
+            .as_mut()
+            .map_or_else(Vec::new, |d| std::mem::take(&mut d.files));
+
+        if files.is_empty() {
+            http.create_interaction_response(self.id.get(), &self.token, &interaction_response)
+                .await
+        } else {
+            http.create_interaction_response_with_files(
+                self.id.get(),
+                &self.token,
+                &interaction_response,
+                files,
+            )
+            .await
         }
-        .map_err(DeError::custom)
+    }
+
+    /// Edits the initial interaction response.
+    ///
+    /// `application_id` will usually be the bot's [`UserId`], except in cases of bots being very old.
+    ///
+    /// Refer to Discord's docs for Edit Webhook Message for field information.
+    ///
+    /// **Note**:   Message contents must be under 2000 unicode code points, does not work on ephemeral messages.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`Error::Model`] if the edited content is too long.
+    /// May also return [`Error::Http`] if the API returns an error,
+    /// or an [`Error::Json`] if there is an error deserializing the response.
+    ///
+    /// [`Error::Model`]: crate::error::Error::Model
+    /// [`Error::Http`]: crate::error::Error::Http
+    /// [`Error::Json`]: crate::error::Error::Json
+    pub async fn edit_original_interaction_response<F>(
+        &self,
+        http: impl AsRef<Http>,
+        f: F,
+    ) -> Result<Message>
+    where
+        F: FnOnce(&mut EditInteractionResponse) -> &mut EditInteractionResponse,
+    {
+        let mut interaction_response = EditInteractionResponse::default();
+        f(&mut interaction_response);
+
+        http.as_ref().edit_original_interaction_response(&self.token, &interaction_response).await
+    }
+
+    /// Deletes the initial interaction response.
+    ///
+    /// # Errors
+    ///
+    /// May return [`Error::Http`] if the API returns an error.
+    /// Such as if the response was already deleted.
+    pub async fn delete_original_interaction_response(&self, http: impl AsRef<Http>) -> Result<()> {
+        http.as_ref().delete_original_interaction_response(&self.token).await
+    }
+
+    /// Creates a followup response to the response sent.
+    ///
+    /// **Note**: Message contents must be under 2000 unicode code points.
+    ///
+    /// # Errors
+    ///
+    /// Will return [`Error::Model`] if the content is too long.
+    /// May also return [`Error::Http`] if the API returns an error,
+    /// or a [`Error::Json`] if there is an error in deserializing the response.
+    ///
+    /// [`Error::Model`]: crate::error::Error::Model
+    /// [`Error::Http`]: crate::error::Error::Http
+    /// [`Error::Json`]: crate::error::Error::Json
+    pub async fn create_followup_message<'a, F>(
+        &self,
+        http: impl AsRef<Http>,
+        f: F,
+    ) -> Result<Message>
+    where
+        for<'b> F: FnOnce(
+            &'b mut CreateInteractionResponseFollowup<'a>,
+        ) -> &'b mut CreateInteractionResponseFollowup<'a>,
+    {
+        let mut interaction_response = CreateInteractionResponseFollowup::default();
+        f(&mut interaction_response);
+        self._create_followup_message(http.as_ref(), interaction_response).await
+    }
+
+    async fn _create_followup_message<'a>(
+        &self,
+        http: &Http,
+        mut interaction_response: CreateInteractionResponseFollowup<'a>,
+    ) -> Result<Message> {
+        let files = std::mem::take(&mut interaction_response.files);
+
+        if files.is_empty() {
+            http.create_followup_message(&self.token, &interaction_response).await
+        } else {
+            http.create_followup_message_with_files(&self.token, &interaction_response, files).await
+        }
+    }
+
+    /// Edits a followup response to the response sent.
+    ///
+    /// **Note**: Message contents must be under 2000 unicode code points.
+    ///
+    /// # Errors
+    ///
+    /// Will return [`Error::Model`] if the content is too long.
+    /// May also return [`Error::Http`] if the API returns an error,
+    /// or a [`Error::Json`] if there is an error in deserializing the response.
+    ///
+    /// [`Error::Model`]: crate::error::Error::Model
+    /// [`Error::Http`]: crate::error::Error::Http
+    /// [`Error::Json`]: crate::error::Error::Json
+    pub async fn edit_followup_message<'a, F, M: Into<MessageId>>(
+        &self,
+        http: impl AsRef<Http>,
+        message_id: M,
+        f: F,
+    ) -> Result<Message>
+    where
+        for<'b> F: FnOnce(
+            &'b mut CreateInteractionResponseFollowup<'a>,
+        ) -> &'b mut CreateInteractionResponseFollowup<'a>,
+    {
+        let mut builder = CreateInteractionResponseFollowup::default();
+        f(&mut builder);
+
+        let http = http.as_ref();
+        let message_id = message_id.into().into();
+        let files = std::mem::take(&mut builder.files);
+
+        if files.is_empty() {
+            http.edit_followup_message(&self.token, message_id, &builder).await
+        } else {
+            http.edit_followup_message_and_attachments(&self.token, message_id, &builder, files)
+                .await
+        }
+    }
+
+    /// Deletes a followup message.
+    ///
+    /// # Errors
+    ///
+    /// May return [`Error::Http`] if the API returns an error.
+    /// Such as if the response was already deleted.
+    pub async fn delete_followup_message<M: Into<MessageId>>(
+        &self,
+        http: impl AsRef<Http>,
+        message_id: M,
+    ) -> Result<()> {
+        http.as_ref().delete_followup_message(&self.token, message_id.into().into()).await
+    }
+
+    /// Gets a followup message.
+    ///
+    /// # Errors
+    ///
+    /// May return [`Error::Http`] if the API returns an error.
+    /// Such as if the response was deleted.
+    pub async fn get_followup_message<M: Into<MessageId>>(
+        &self,
+        http: impl AsRef<Http>,
+        message_id: M,
+    ) -> Result<Message> {
+        http.as_ref().get_followup_message(&self.token, message_id.into().into()).await
+    }
+
+    /// Helper function to defer an interaction
+    ///
+    /// # Errors
+    ///
+    /// May also return an [`Error::Http`] if the API returns an error,
+    /// or an [`Error::Json`] if there is an error in deserializing the
+    /// API response.
+    ///
+    /// [`Error::Http`]: crate::error::Error::Http
+    /// [`Error::Json`]: crate::error::Error::Json
+    pub async fn defer(&self, http: impl AsRef<Http>) -> Result<()> {
+        self.create_interaction_response(http, |f| {
+            f.kind(InteractionResponseType::DeferredChannelMessageWithSource)
+        })
+        .await
     }
 }
 
-impl Serialize for Interaction {
-    fn serialize<S: Serializer>(&self, serializer: S) -> std::result::Result<S::Ok, S::Error> {
-        match self {
-            Self::Ping(i) => i.serialize(serializer),
-            Self::ApplicationCommand(i) | Self::Autocomplete(i) => i.serialize(serializer),
-            Self::MessageComponent(i) => i.serialize(serializer),
-            Self::ModalSubmit(i) => i.serialize(serializer),
+/// Autocomplete interaction response methods.
+#[cfg(feature = "model")]
+impl Interaction {
+    /// Creates a response to an autocomplete interaction.
+    ///
+    /// # Errors
+    ///
+    /// Returns an [`Error::Http`] if the API returns an error.
+    ///
+    /// [`Error::Http`]: crate::error::Error::Http
+    pub async fn create_autocomplete_response<F>(&self, http: impl AsRef<Http>, f: F) -> Result<()>
+    where
+        F: FnOnce(&mut CreateAutocompleteResponse) -> &mut CreateAutocompleteResponse,
+    {
+        #[derive(Serialize)]
+        struct AutocompleteResponse {
+            data: CreateAutocompleteResponse,
+            #[serde(rename = "type")]
+            kind: InteractionResponseType,
         }
+
+        let mut response = CreateAutocompleteResponse::default();
+        f(&mut response);
+
+        let map = AutocompleteResponse {
+            data: response,
+            kind: InteractionResponseType::Autocomplete,
+        };
+
+        http.as_ref().create_interaction_response(self.id.get(), &self.token, &map).await
     }
 }
 
@@ -241,25 +654,5 @@ impl serde::Serialize for InteractionResponseType {
         S: serde::Serializer,
     {
         serializer.serialize_u8(*self as u8)
-    }
-}
-
-fn add_guild_id_to_resolved(map: &mut JsonMap, guild_id: GuildId) {
-    if let Some(member) = map.get_mut("member").and_then(Value::as_object_mut) {
-        member.insert("guild_id".to_string(), guild_id.get().into());
-    }
-
-    if let Some(data) = map.get_mut("data") {
-        if let Some(resolved) = data.get_mut("resolved") {
-            if let Some(roles) = resolved.get_mut("roles") {
-                if let Some(values) = roles.as_object_mut() {
-                    for value in values.values_mut() {
-                        if let Some(role) = value.as_object_mut() {
-                            role.insert("guild_id".to_string(), guild_id.get().into());
-                        };
-                    }
-                }
-            }
-        }
     }
 }
