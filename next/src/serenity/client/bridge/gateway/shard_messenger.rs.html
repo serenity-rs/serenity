@@ -314,8 +314,8 @@
 <span id="309">309</span>
 <span id="310">310</span>
 <span id="311">311</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">async_tungstenite::tungstenite::Message</span>;
-<span class="kw">use</span> <span class="ident">futures::channel::mpsc</span>::{<span class="ident">TrySendError</span>, <span class="ident">UnboundedSender</span> <span class="kw">as</span> <span class="ident">Sender</span>};
+</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">futures::channel::mpsc</span>::{<span class="ident">TrySendError</span>, <span class="ident">UnboundedSender</span> <span class="kw">as</span> <span class="ident">Sender</span>};
+<span class="kw">use</span> <span class="ident">tokio_tungstenite::tungstenite::Message</span>;
 
 <span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">ChunkGuildFilter</span>, <span class="ident">ShardClientMessage</span>, <span class="ident">ShardRunnerMessage</span>};
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;collector&quot;</span>)]</span>

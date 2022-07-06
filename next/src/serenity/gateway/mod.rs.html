@@ -330,9 +330,9 @@
 
 <span class="kw">use</span> <span class="ident">std::fmt</span>;
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;client&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident">async_tungstenite::tungstenite</span>;
 <span class="kw">use</span> <span class="ident">reqwest</span>::{<span class="ident">IntoUrl</span>, <span class="ident">Url</span>};
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;client&quot;</span>)]</span>
+<span class="kw">use</span> <span class="ident">tokio_tungstenite::tungstenite</span>;
 
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="self">self</span>::error::Error</span> <span class="kw">as</span> <span class="ident">GatewayError</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="self">self</span>::shard::Shard</span>;

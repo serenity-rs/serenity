@@ -804,9 +804,9 @@
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::sync::Arc</span>;
 <span class="kw">use</span> <span class="ident">std::time</span>::{<span class="ident">Duration</span> <span class="kw">as</span> <span class="ident">StdDuration</span>, <span class="ident">Instant</span>};
 
-<span class="kw">use</span> <span class="ident">async_tungstenite::tungstenite::error::Error</span> <span class="kw">as</span> <span class="ident">TungsteniteError</span>;
-<span class="kw">use</span> <span class="ident">async_tungstenite::tungstenite::protocol::frame::CloseFrame</span>;
 <span class="kw">use</span> <span class="ident">tokio::sync::Mutex</span>;
+<span class="kw">use</span> <span class="ident">tokio_tungstenite::tungstenite::error::Error</span> <span class="kw">as</span> <span class="ident">TungsteniteError</span>;
+<span class="kw">use</span> <span class="ident">tokio_tungstenite::tungstenite::protocol::frame::CloseFrame</span>;
 <span class="kw">use</span> <span class="ident">tracing</span>::{<span class="ident">debug</span>, <span class="ident">error</span>, <span class="ident">info</span>, <span class="ident">instrument</span>, <span class="ident">trace</span>, <span class="ident">warn</span>};
 <span class="kw">use</span> <span class="ident">url::Url</span>;
 

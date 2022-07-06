@@ -288,13 +288,13 @@
 <span class="kw">use</span> <span class="ident">std::io::Read</span>;
 <span class="kw">use</span> <span class="ident">std::time::SystemTime</span>;
 
-<span class="kw">use</span> <span class="ident">async_tungstenite::tokio</span>::{<span class="ident">connect_async_with_config</span>, <span class="ident">ConnectStream</span>};
-<span class="kw">use</span> <span class="ident">async_tungstenite::tungstenite::protocol</span>::{<span class="ident">CloseFrame</span>, <span class="ident">WebSocketConfig</span>};
-<span class="kw">use</span> <span class="ident">async_tungstenite::tungstenite</span>::{<span class="ident">Error</span> <span class="kw">as</span> <span class="ident">WsError</span>, <span class="ident">Message</span>};
-<span class="kw">use</span> <span class="ident">async_tungstenite::WebSocketStream</span>;
 <span class="kw">use</span> <span class="ident">flate2::read::ZlibDecoder</span>;
 <span class="kw">use</span> <span class="ident">futures</span>::{<span class="ident">SinkExt</span>, <span class="ident">StreamExt</span>};
+<span class="kw">use</span> <span class="ident">tokio::net::TcpStream</span>;
 <span class="kw">use</span> <span class="ident">tokio::time</span>::{<span class="ident">timeout</span>, <span class="ident">Duration</span>};
+<span class="kw">use</span> <span class="ident">tokio_tungstenite::tungstenite::protocol</span>::{<span class="ident">CloseFrame</span>, <span class="ident">WebSocketConfig</span>};
+<span class="kw">use</span> <span class="ident">tokio_tungstenite::tungstenite</span>::{<span class="ident">Error</span> <span class="kw">as</span> <span class="ident">WsError</span>, <span class="ident">Message</span>};
+<span class="kw">use</span> <span class="ident">tokio_tungstenite</span>::{<span class="ident">connect_async_with_config</span>, <span class="ident">MaybeTlsStream</span>, <span class="ident">WebSocketStream</span>};
 <span class="kw">use</span> <span class="ident">tracing</span>::{<span class="ident">debug</span>, <span class="ident">instrument</span>, <span class="ident">trace</span>, <span class="ident">warn</span>};
 <span class="kw">use</span> <span class="ident">url::Url</span>;
 
@@ -362,7 +362,7 @@
     <span class="ident">d</span>: <span class="ident">WebSocketMessageData</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
 }
 
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">WsClient</span>(<span class="ident">WebSocketStream</span><span class="op">&lt;</span><span class="ident">ConnectStream</span><span class="op">&gt;</span>);
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">WsClient</span>(<span class="ident">WebSocketStream</span><span class="op">&lt;</span><span class="ident">MaybeTlsStream</span><span class="op">&lt;</span><span class="ident">TcpStream</span><span class="op">&gt;</span><span class="op">&gt;</span>);
 
 <span class="kw">const</span> <span class="ident">TIMEOUT</span>: <span class="ident">Duration</span> <span class="op">=</span> <span class="ident">Duration::from_millis</span>(<span class="number">500</span>);
 <span class="kw">const</span> <span class="ident">DECOMPRESSION_MULTIPLIER</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">3</span>;
