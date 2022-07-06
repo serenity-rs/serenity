@@ -2,13 +2,13 @@ use std::env::consts;
 use std::io::Read;
 use std::time::SystemTime;
 
-use async_tungstenite::tokio::{connect_async_with_config, ConnectStream};
-use async_tungstenite::tungstenite::protocol::{CloseFrame, WebSocketConfig};
-use async_tungstenite::tungstenite::{Error as WsError, Message};
-use async_tungstenite::WebSocketStream;
 use flate2::read::ZlibDecoder;
 use futures::{SinkExt, StreamExt};
+use tokio::net::TcpStream;
 use tokio::time::{timeout, Duration};
+use tokio_tungstenite::tungstenite::protocol::{CloseFrame, WebSocketConfig};
+use tokio_tungstenite::tungstenite::{Error as WsError, Message};
+use tokio_tungstenite::{connect_async_with_config, MaybeTlsStream, WebSocketStream};
 use tracing::{debug, instrument, trace, warn};
 use url::Url;
 
@@ -76,7 +76,7 @@ struct WebSocketMessage<'a> {
     d: WebSocketMessageData<'a>,
 }
 
-pub struct WsClient(WebSocketStream<ConnectStream>);
+pub struct WsClient(WebSocketStream<MaybeTlsStream<TcpStream>>);
 
 const TIMEOUT: Duration = Duration::from_millis(500);
 const DECOMPRESSION_MULTIPLIER: usize = 3;
