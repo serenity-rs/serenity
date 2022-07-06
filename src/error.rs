@@ -2,11 +2,11 @@ use std::error::Error as StdError;
 use std::fmt::{self, Error as FormatError};
 use std::io::Error as IoError;
 
-#[cfg(feature = "gateway")]
-use async_tungstenite::tungstenite::error::Error as TungsteniteError;
 #[cfg(feature = "http")]
 use reqwest::{header::InvalidHeaderValue, Error as ReqwestError};
 use serde_json::Error as JsonError;
+#[cfg(feature = "gateway")]
+use tokio_tungstenite::tungstenite::error::Error as TungsteniteError;
 use tracing::instrument;
 
 #[cfg(feature = "client")]
