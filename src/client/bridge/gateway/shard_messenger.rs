@@ -1,5 +1,5 @@
-use async_tungstenite::tungstenite::Message;
 use futures::channel::mpsc::{TrySendError, UnboundedSender as Sender};
+use tokio_tungstenite::tungstenite::Message;
 
 use super::{ChunkGuildFilter, ShardClientMessage, ShardRunnerMessage};
 #[cfg(feature = "collector")]
