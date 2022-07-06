@@ -887,24 +887,20 @@ impl ChannelId {
         builder.channel_id(self).execute(cache_http).await
     }
 
-    /// Edits a stage instance.
+    /// Edits the stage instance
     ///
     /// # Errors
     ///
-    /// Returns [`Error::Http`] if the channel is not a stage channel,
-    /// or if there is not stage instance currently.
-    pub async fn edit_stage_instance<F>(
-        &self,
-        http: impl AsRef<Http>,
-        f: F,
-    ) -> Result<StageInstance>
-    where
-        F: FnOnce(&mut EditStageInstance) -> &mut EditStageInstance,
-    {
-        let mut instance = EditStageInstance::default();
-        f(&mut instance);
-
-        http.as_ref().edit_stage_instance(self.get(), &instance).await
+    /// Returns [`ModelError::InvalidChannelType`] if the channel is not a stage channel.
+    ///
+    /// Returns [`Error::Http`] if the channel is not a stage channel, or there is no stage
+    /// instance currently.
+    pub async fn edit_stage_instance(
+        self,
+        cache_http: impl CacheHttp,
+        builder: EditStageInstance,
+    ) -> Result<StageInstance> {
+        builder.execute(cache_http, self).await
     }
 
     /// Edits a thread.

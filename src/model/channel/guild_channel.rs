@@ -1145,25 +1145,20 @@ impl GuildChannel {
         self.id.create_stage_instance(cache_http, builder).await
     }
 
-    /// Edits a stage instance.
+    /// Edits the stage instance
     ///
     /// # Errors
     ///
     /// Returns [`ModelError::InvalidChannelType`] if the channel is not a stage channel.
-    /// Returns [`Error::Http`] if there is no stage instance currently.
-    pub async fn edit_stage_instance<F>(
+    ///
+    /// Returns [`Error::Http`] if the channel is not a stage channel, or there is no stage
+    /// instance currently.
+    pub async fn edit_stage_instance(
         &self,
-        http: impl AsRef<Http>,
-        f: F,
-    ) -> Result<StageInstance>
-    where
-        F: FnOnce(&mut EditStageInstance) -> &mut EditStageInstance,
-    {
-        if self.kind != ChannelType::Stage {
-            return Err(Error::Model(ModelError::InvalidChannelType));
-        }
-
-        self.id.edit_stage_instance(http, f).await
+        cache_http: impl CacheHttp,
+        builder: EditStageInstance,
+    ) -> Result<StageInstance> {
+        self.id.edit_stage_instance(cache_http, builder).await
     }
 
     /// Deletes a stage instance.

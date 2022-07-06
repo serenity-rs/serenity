@@ -5,8 +5,6 @@ use crate::internal::prelude::*;
 use crate::model::prelude::*;
 
 /// Builder for creating a [`StageInstance`].
-///
-/// [`StageInstance`]: crate::model::channel::StageInstance
 #[derive(Clone, Debug, Default, Serialize)]
 #[must_use]
 pub struct CreateStageInstance {
