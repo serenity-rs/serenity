@@ -31,7 +31,8 @@ pub enum EntityType {
     Str(String),
 }
 
-#[derive(Debug, PartialEq, Eq)]
+#[cfg_attr(not(simd_json), allow(clippy::derive_partial_eq_without_eq))]
+#[derive(Debug, PartialEq)]
 #[non_exhaustive]
 pub enum Change {
     /// AFK channel was changed.
