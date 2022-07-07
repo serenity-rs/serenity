@@ -125,7 +125,7 @@ impl Shard {
     /// #     Ok(())
     /// # }
     /// ```
-    ///
+    /// 
     /// # Errors
     ///
     /// On Error, will return either [`Error::Gateway`], [`Error::Tungstenite`]
