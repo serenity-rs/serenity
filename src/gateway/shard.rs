@@ -1,7 +1,6 @@
 use std::sync::Arc;
 use std::time::{Duration as StdDuration, Instant};
 
-use tokio::sync::Mutex;
 use tokio_tungstenite::tungstenite::error::Error as TungsteniteError;
 use tokio_tungstenite::tungstenite::protocol::frame::CloseFrame;
 use tracing::{debug, error, info, instrument, trace, warn};
