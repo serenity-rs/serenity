@@ -1,7 +1,7 @@
 use std::error::Error as StdError;
 use std::fmt;
 
-use async_tungstenite::tungstenite::protocol::CloseFrame;
+use tokio_tungstenite::tungstenite::protocol::CloseFrame;
 
 /// An error that occurred while attempting to deal with the gateway.
 ///

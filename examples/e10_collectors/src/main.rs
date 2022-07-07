@@ -89,11 +89,11 @@ async fn challenge(ctx: &Context, msg: &Message, _: Args) -> CommandResult {
     let mut score = 0u32;
     let _ = msg.reply(ctx, "How was that crusty crab called again? 10 seconds time!").await;
 
-    // There are methods implemented for some models to conveniently collect replies.
-    // This one returns a future that will await a single message only.
-    // The other method for messages is called `await_replies` and returns a future
-    // which builds a stream to easily handle them.
-    if let Some(answer) = &msg.author.await_reply(&ctx).timeout(Duration::from_secs(10)).await {
+    // There is a method implemented for some models to conveniently collect replies.
+    // They return a builder that can be turned into a Stream, or here, where we can
+    // await a single reply
+    let collector = msg.author.reply_collector(&ctx.shard).timeout(Duration::from_secs(10));
+    if let Some(answer) = collector.collect_single().await {
         if answer.content.to_lowercase() == "ferris" {
             let _ = answer.reply(ctx, "That's correct!").await;
             score += 1;
@@ -109,15 +109,13 @@ async fn challenge(ctx: &Context, msg: &Message, _: Args) -> CommandResult {
         .await
         .unwrap();
 
-    // The message model has a way to collect reactions on it.
-    // Other methods are `await_n_reactions` and `await_all_reactions`.
-    // Same goes for messages!
-    if let Some(reaction) = &react_msg
-        .await_reaction(&ctx)
+    // The message model can also be turned into a Collector to collect reactions on it.
+    let collector = react_msg
+        .reaction_collector(&ctx.shard)
         .timeout(Duration::from_secs(10))
-        .author_id(msg.author.id)
-        .await
-    {
+        .author_id(msg.author.id);
+
+    if let Some(reaction) = collector.collect_single().await {
         // By default, the collector will collect only added reactions.
         // We could also pattern-match the reaction in case we want
         // to handle added or removed reactions.
@@ -138,7 +136,7 @@ async fn challenge(ctx: &Context, msg: &Message, _: Args) -> CommandResult {
     let _ = msg.reply(ctx, "Write 5 messages in 10 seconds").await;
 
     // We can create a collector from scratch too using this builder future.
-    let collector = MessageCollectorBuilder::new(&ctx)
+    let collector = MessageCollectorBuilder::new(&ctx.shard)
     // Only collect messages by this user.
         .author_id(msg.author.id)
         .channel_id(msg.channel_id)
@@ -173,12 +171,13 @@ async fn challenge(ctx: &Context, msg: &Message, _: Args) -> CommandResult {
     // We can also collect arbitrary events using the generic EventCollector. For example, here we
     // collect updates to the messages that the user sent above and check for them updating all 5 of
     // them.
-    let builder = EventCollectorBuilder::new(&ctx)
+    let builder = EventCollectorBuilder::new(&ctx.shard)
         .add_event_type(EventType::MessageUpdate)
         .timeout(Duration::from_secs(20));
+
     // Only collect MessageUpdate events for the 5 MessageIds we're interested in.
     let mut collector =
-        collected.iter().fold(builder, |b, msg| b.add_message_id(msg.id)).build()?;
+        collected.iter().try_fold(builder, |b, msg| b.add_message_id(msg.id))?.build();
 
     let _ = msg.reply(ctx, "Edit each of those 5 messages in 20 seconds").await;
     let mut edited = HashSet::new();

@@ -57,18 +57,20 @@ pub use crate::cache::Cache;
 use crate::cache::Settings as CacheSettings;
 #[cfg(feature = "framework")]
 use crate::framework::Framework;
+use crate::gateway::{ActivityData, PresenceData};
 use crate::http::Http;
 use crate::internal::prelude::*;
 #[cfg(feature = "gateway")]
 use crate::model::gateway::GatewayIntents;
 use crate::model::id::ApplicationId;
+use crate::model::user::OnlineStatus;
 pub use crate::CacheAndHttp;
 
 /// A builder implementing [`Future`] building a [`Client`] to interact with Discord.
 #[cfg(feature = "gateway")]
 #[must_use = "Builders do nothing unless they are awaited"]
 pub struct ClientBuilder {
-    // TODO: data, http and cache_settings are Options in order to take() them out in the Future impl.
+    // TODO: data, http, cache_settings and presence are Options in order to take() them out in the Future impl.
     // This should be changed after the stabilization of std::future::IntoFuture.
     data: Option<TypeMap>,
     http: Option<Http>,
@@ -82,6 +84,7 @@ pub struct ClientBuilder {
     voice_manager: Option<Arc<dyn VoiceGatewayManager + Send + Sync + 'static>>,
     event_handler: Option<Arc<dyn EventHandler>>,
     raw_event_handler: Option<Arc<dyn RawEventHandler>>,
+    presence: Option<PresenceData>,
 }
 
 #[cfg(feature = "gateway")]
@@ -100,6 +103,7 @@ impl ClientBuilder {
             voice_manager: None,
             event_handler: None,
             raw_event_handler: None,
+            presence: Some(PresenceData::default()),
         }
     }
 
@@ -346,6 +350,26 @@ impl ClientBuilder {
     pub fn get_raw_event_handler(&self) -> Option<Arc<dyn RawEventHandler>> {
         self.raw_event_handler.clone()
     }
+
+    /// Sets the initial activity.
+    pub fn activity(mut self, activity: ActivityData) -> Self {
+        self.presence.get_or_insert(PresenceData::default()).activity = Some(activity);
+
+        self
+    }
+
+    /// Sets the initial status.
+    pub fn status(mut self, status: OnlineStatus) -> Self {
+        self.presence.get_or_insert(PresenceData::default()).status = status;
+
+        self
+    }
+
+    /// Gets the initial presence. See [`Self::activity`] and [`Self::status`] for more info.
+    /// This can be unwrapped safely unless used after awaiting the builder.
+    pub fn get_presence(&self) -> Option<&PresenceData> {
+        self.presence.as_ref()
+    }
 }
 
 #[cfg(feature = "gateway")]
@@ -362,6 +386,7 @@ impl Future for ClientBuilder {
             let event_handler = self.event_handler.take();
             let raw_event_handler = self.raw_event_handler.take();
             let intents = self.intents;
+            let presence = self.presence.take();
             let http = Arc::new(self.http.take().unwrap());
 
             #[cfg(feature = "voice")]
@@ -391,6 +416,7 @@ impl Future for ClientBuilder {
                         cache_and_http: cache_and_http.clone(),
                         ws_url: ws_url.clone(),
                         intents,
+                        presence,
                     });
 
                 Ok(Client {

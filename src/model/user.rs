@@ -16,12 +16,7 @@ use crate::cache::{Cache, UserRef};
 #[cfg(feature = "collector")]
 use crate::client::bridge::gateway::ShardMessenger;
 #[cfg(feature = "collector")]
-use crate::collector::{
-    CollectReaction,
-    CollectReply,
-    MessageCollectorBuilder,
-    ReactionCollectorBuilder,
-};
+use crate::collector::{MessageCollectorBuilder, ReactionCollectorBuilder};
 #[cfg(feature = "model")]
 use crate::http::GuildPagination;
 #[cfg(feature = "model")]
@@ -1035,33 +1030,21 @@ impl User {
         guild_id.member(cache_http, &self.id).await.ok().and_then(|member| member.nick)
     }
 
-    /// Returns a future that will await one message by this user.
+    /// Returns a builder which can be awaited to obtain a message or stream of messages sent by this user.
     #[cfg(feature = "collector")]
-    pub fn await_reply(&self, shard_messenger: impl AsRef<ShardMessenger>) -> CollectReply {
-        CollectReply::new(shard_messenger).author_id(self.id.0)
-    }
-
-    /// Returns a stream builder which can be awaited to obtain a stream of messages sent by this user.
-    #[cfg(feature = "collector")]
-    pub fn await_replies(
+    pub fn reply_collector<'a>(
         &self,
-        shard_messenger: impl AsRef<ShardMessenger>,
-    ) -> MessageCollectorBuilder {
+        shard_messenger: &'a ShardMessenger,
+    ) -> MessageCollectorBuilder<'a> {
         MessageCollectorBuilder::new(shard_messenger).author_id(self.id.0)
     }
 
-    /// Await a single reaction by this user.
+    /// Returns a builder which can be awaited to obtain a reaction or stream of reactions sent by this user.
     #[cfg(feature = "collector")]
-    pub fn await_reaction(&self, shard_messenger: impl AsRef<ShardMessenger>) -> CollectReaction {
-        CollectReaction::new(shard_messenger).author_id(self.id.0)
-    }
-
-    /// Returns a stream builder which can be awaited to obtain a stream of reactions sent by this user.
-    #[cfg(feature = "collector")]
-    pub fn await_reactions(
+    pub fn reaction_collector<'a>(
         &self,
-        shard_messenger: impl AsRef<ShardMessenger>,
-    ) -> ReactionCollectorBuilder {
+        shard_messenger: &'a ShardMessenger,
+    ) -> ReactionCollectorBuilder<'a> {
         ReactionCollectorBuilder::new(shard_messenger).author_id(self.id.0)
     }
 }
@@ -1290,7 +1273,11 @@ mod test {
         }
         #[derive(Debug, PartialEq, Deserialize, Serialize)]
         struct UserOpt {
-            #[serde(with = "discriminator::option")]
+            #[serde(
+                default,
+                skip_serializing_if = "Option::is_none",
+                with = "discriminator::option"
+            )]
             discriminator: Option<u16>,
         }
 
@@ -1337,6 +1324,17 @@ mod test {
             Token::Str("discriminator"),
             Token::Some,
             Token::U16(123),
+            Token::StructEnd,
+        ]);
+
+        let user_no_discriminator = UserOpt {
+            discriminator: None,
+        };
+        assert_tokens(&user_no_discriminator, &[
+            Token::Struct {
+                name: "UserOpt",
+                len: 0,
+            },
             Token::StructEnd,
         ]);
     }

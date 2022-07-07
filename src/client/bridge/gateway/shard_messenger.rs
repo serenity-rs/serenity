@@ -1,5 +1,5 @@
-use async_tungstenite::tungstenite::Message;
 use futures::channel::mpsc::{TrySendError, UnboundedSender as Sender};
+use tokio_tungstenite::tungstenite::Message;
 
 use super::{ChunkGuildFilter, ShardClientMessage, ShardRunnerMessage};
 #[cfg(feature = "collector")]
@@ -70,7 +70,7 @@ impl ShardMessenger {
     /// #         total: 1,
     /// #     };
     /// #
-    /// #     let mut shard = Shard::new("".to_string(), "", shard_info, GatewayIntents::all()).await?;
+    /// #     let mut shard = Shard::new("".to_string(), "", shard_info, GatewayIntents::all(), None).await?;
     /// #
     /// use serenity::model::id::GuildId;
     ///
@@ -95,7 +95,7 @@ impl ShardMessenger {
     /// #         total: 1,
     /// #     };
     /// #
-    /// #     let mut shard = Shard::new("".to_string(), "", shard_info, GatewayIntents::all()).await?;;
+    /// #     let mut shard = Shard::new("".to_string(), "", shard_info, GatewayIntents::all(), None).await?;;
     /// #
     /// use serenity::model::id::GuildId;
     ///
@@ -143,7 +143,7 @@ impl ShardMessenger {
     /// #         total: 1,
     /// #     };
     /// #
-    /// #     let mut shard = Shard::new("".to_string(), "", shard_info, GatewayIntents::all()).await?;
+    /// #     let mut shard = Shard::new("".to_string(), "", shard_info, GatewayIntents::all(), None).await?;
     /// use serenity::gateway::ActivityData;
     ///
     /// shard.set_activity(Some(ActivityData::playing("Heroes of the Storm")));
@@ -216,7 +216,7 @@ impl ShardMessenger {
     /// #         total: 1,
     /// #     };
     /// #
-    /// #     let mut shard = Shard::new("".to_string(), "", shard_info, GatewayIntents::all()).await?;
+    /// #     let mut shard = Shard::new("".to_string(), "", shard_info, GatewayIntents::all(), None).await?;
     /// #
     /// use serenity::model::user::OnlineStatus;
     ///

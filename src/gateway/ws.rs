@@ -2,13 +2,13 @@ use std::env::consts;
 use std::io::Read;
 use std::time::SystemTime;
 
-use async_tungstenite::tokio::{connect_async_with_config, ConnectStream};
-use async_tungstenite::tungstenite::protocol::{CloseFrame, WebSocketConfig};
-use async_tungstenite::tungstenite::{Error as WsError, Message};
-use async_tungstenite::WebSocketStream;
 use flate2::read::ZlibDecoder;
 use futures::{SinkExt, StreamExt};
+use tokio::net::TcpStream;
 use tokio::time::{timeout, Duration};
+use tokio_tungstenite::tungstenite::protocol::{CloseFrame, WebSocketConfig};
+use tokio_tungstenite::tungstenite::{Error as WsError, Message};
+use tokio_tungstenite::{connect_async_with_config, MaybeTlsStream, WebSocketStream};
 use tracing::{debug, instrument, trace, warn};
 use url::Url;
 
@@ -41,6 +41,14 @@ struct ChunkGuildMessage<'a> {
 }
 
 #[derive(Serialize)]
+struct PresenceUpdateMessage<'a> {
+    afk: bool,
+    status: &'a str,
+    since: SystemTime,
+    activities: &'a [&'a ActivityData],
+}
+
+#[derive(Serialize)]
 #[serde(untagged)]
 enum WebSocketMessageData<'a> {
     Heartbeat(Option<u64>),
@@ -52,13 +60,9 @@ enum WebSocketMessageData<'a> {
         shard: &'a ShardInfo,
         intents: GatewayIntents,
         properties: IdentifyProperties,
+        presence: PresenceUpdateMessage<'a>,
     },
-    PresenceUpdate {
-        afk: bool,
-        status: &'a str,
-        since: SystemTime,
-        activities: &'a [&'a ActivityData],
-    },
+    PresenceUpdate(PresenceUpdateMessage<'a>),
     Resume {
         session_id: &'a str,
         token: &'a str,
@@ -72,7 +76,7 @@ struct WebSocketMessage<'a> {
     d: WebSocketMessageData<'a>,
 }
 
-pub struct WsClient(WebSocketStream<ConnectStream>);
+pub struct WsClient(WebSocketStream<MaybeTlsStream<TcpStream>>);
 
 const TIMEOUT: Duration = Duration::from_millis(500);
 const DECOMPRESSION_MULTIPLIER: usize = 3;
@@ -199,7 +203,11 @@ impl WsClient {
         shard: &ShardInfo,
         token: &str,
         intents: GatewayIntents,
+        presence: &PresenceData,
     ) -> Result<()> {
+        let activities: Vec<_> = presence.activity.iter().collect();
+        let now = SystemTime::now();
+
         debug!("[{:?}] Identifying", shard);
 
         let msg = WebSocketMessage {
@@ -214,6 +222,12 @@ impl WsClient {
                     browser: "serenity",
                     device: "serenity",
                     os: consts::OS,
+                },
+                presence: PresenceUpdateMessage {
+                    afk: false,
+                    since: now,
+                    status: presence.status.name(),
+                    activities: &activities,
                 },
             },
         };
@@ -234,12 +248,12 @@ impl WsClient {
 
         self.send_json(&WebSocketMessage {
             op: Opcode::PresenceUpdate,
-            d: WebSocketMessageData::PresenceUpdate {
+            d: WebSocketMessageData::PresenceUpdate(PresenceUpdateMessage {
                 afk: false,
                 since: now,
                 status: presence.status.name(),
                 activities: &activities,
-            },
+            }),
         })
         .await
     }

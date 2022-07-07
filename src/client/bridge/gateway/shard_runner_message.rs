@@ -1,4 +1,4 @@
-use async_tungstenite::tungstenite::Message;
+use tokio_tungstenite::tungstenite::Message;
 
 #[cfg(feature = "collector")]
 use crate::collector::{

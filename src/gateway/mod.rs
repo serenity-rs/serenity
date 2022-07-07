@@ -53,14 +53,15 @@ mod ws;
 use std::fmt;
 
 use reqwest::{IntoUrl, Url};
+#[cfg(feature = "client")]
+use tokio_tungstenite::tungstenite;
 
 pub use self::error::Error as GatewayError;
 pub use self::shard::Shard;
 pub use self::ws::WsClient;
 #[cfg(feature = "client")]
-use crate::client::bridge::gateway::ShardClientMessage;
+use crate::client::bridge::gateway::{ShardClientMessage, ShardRunnerMessage};
 use crate::internal::prelude::*;
-use crate::json::Value;
 use crate::model::gateway::{Activity, ActivityType};
 use crate::model::user::OnlineStatus;
 
@@ -238,7 +239,19 @@ impl fmt::Display for ConnectionStage {
 pub enum InterMessage {
     #[cfg(feature = "client")]
     Client(ShardClientMessage),
-    Json(Value),
+}
+
+impl InterMessage {
+    /// Constructs a custom message which will send the given `value` over the WebSocket.
+    ///
+    /// This is simply sugar for constructing and nesting [`ShardRunnerMessage::Message`].
+    #[cfg(feature = "client")]
+    #[must_use]
+    pub fn json(value: String) -> Self {
+        Self::Client(ShardClientMessage::Runner(Box::new(ShardRunnerMessage::Message(
+            tungstenite::Message::Text(value),
+        ))))
+    }
 }
 
 #[derive(Debug)]
