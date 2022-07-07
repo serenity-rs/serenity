@@ -384,7 +384,7 @@ impl From<PermissionOverwrite> for PermissionOverwriteData {
 }
 
 /// A channel-specific permission overwrite for a member or role.
-#[derive(Clone, Debug, PartialEq)]
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub struct PermissionOverwrite {
     pub allow: Permissions,
     pub deny: Permissions,

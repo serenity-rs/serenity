@@ -16,14 +16,14 @@ use crate::model::id::{ApplicationId, ChannelId, GenericId, GuildId, RoleId, Use
 use crate::model::sticker::StickerFormatType;
 use crate::model::{Permissions, Timestamp};
 
-#[derive(Debug, PartialEq, Deserialize, Serialize)]
+#[derive(Debug, PartialEq, Eq, Deserialize, Serialize)]
 #[non_exhaustive]
 pub struct AffectedRole {
     pub id: RoleId,
     pub name: String,
 }
 
-#[derive(Debug, PartialEq, Deserialize, Serialize)]
+#[derive(Debug, PartialEq, Eq, Deserialize, Serialize)]
 #[serde(untagged)]
 #[non_exhaustive]
 pub enum EntityType {
@@ -31,7 +31,7 @@ pub enum EntityType {
     Str(String),
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Eq)]
 #[non_exhaustive]
 pub enum Change {
     /// AFK channel was changed.
