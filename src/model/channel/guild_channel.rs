@@ -462,14 +462,11 @@ impl GuildChannel {
         Ok(())
     }
 
-    /// Edits a voice state in a stage channel. Pass [`None`] for `user_id` to
-    /// edit the current user's voice state.
+    /// Edits the voice state of a given user in a stage channel.
     ///
-    /// Requires the [Mute Members] permission to suppress another user or
-    /// unsuppress the current user. This is not required if suppressing
-    /// the current user.
-    ///
-    /// Requires the [Request to Speak] permission.
+    /// **Note**: Requires the [Request to Speak] permission. Also requires the [Mute Members]
+    /// permission to suppress another user or unsuppress the current user. This is not required if
+    /// suppressing the current user.
     ///
     /// # Example
     ///
@@ -485,41 +482,40 @@ impl GuildChannel {
     /// #     let cache = Cache::default();
     /// #     let (channel_id, user_id) = (ChannelId::new(1), UserId::new(1));
     /// #
+    /// use serenity::builder::EditVoiceState;
     /// use serenity::model::ModelError;
     ///
     /// // assuming the cache has been unlocked
     /// let channel = cache.guild_channel(channel_id).ok_or(ModelError::ItemMissing)?;
     ///
-    /// channel.edit_voice_state(&http, user_id, |v| v.suppress(false)).await?;
+    /// let builder = EditVoiceState::default().suppress(false);
+    /// channel.edit_voice_state(&http, user_id, builder).await?;
     /// #   Ok(())
     /// # }
     /// ```
     ///
     /// # Errors
     ///
-    /// Returns a [`ModelError::InvalidChannelType`] if the channel type is not
-    /// stage.
+    /// If the `cache` is enabled, returns a [`ModelError::InvalidChannelType`] if the channel is
+    /// not a stage channel.
     ///
-    /// [Mute Members]: crate::model::permissions::Permissions::MUTE_MEMBERS
-    /// [Request to Speak]: crate::model::permissions::Permissions::REQUEST_TO_SPEAK
-    pub async fn edit_voice_state<F>(
+    /// Returns [`Error::Http`] if the user lacks permission, or if invalid data is given.
+    ///
+    /// [Request to Speak]: Permissions::REQUEST_TO_SPEAK
+    /// [Mute Members]: Permissions::MUTE_MEMBERS
+    pub async fn edit_voice_state(
         &self,
-        http: impl AsRef<Http>,
+        cache_http: impl CacheHttp,
         user_id: impl Into<UserId>,
-        f: F,
-    ) -> Result<()>
-    where
-        F: FnOnce(&mut EditVoiceState) -> &mut EditVoiceState,
-    {
-        self._edit_voice_state(http, Some(user_id), f).await
+        builder: EditVoiceState,
+    ) -> Result<()> {
+        builder.execute(cache_http, self.guild_id, self.id, Some(user_id.into())).await
     }
 
     /// Edits the current user's voice state in a stage channel.
     ///
-    /// The [Mute Members] permission is **not** required if suppressing the
-    /// current user.
-    ///
-    /// Requires the [Request to Speak] permission.
+    /// **Note**: Requires the [Request to Speak] permission. The [Mute Members] permission is
+    /// **not** required.
     ///
     /// # Example
     ///
@@ -535,57 +531,38 @@ impl GuildChannel {
     /// #     let cache = Cache::default();
     /// #     let channel_id = ChannelId::new(1);
     /// #
+    /// use serenity::builder::EditVoiceState;
     /// use serenity::model::ModelError;
     ///
     /// // assuming the cache has been unlocked
     /// let channel = cache.guild_channel(channel_id).ok_or(ModelError::ItemMissing)?;
     ///
     /// // Send a request to speak
-    /// channel.edit_own_voice_state(&http, |v| v.request_to_speak(true)).await?;
+    /// let builder = EditVoiceState::default().request_to_speak(true);
+    /// channel.edit_own_voice_state(&http, builder.clone()).await?;
     ///
     /// // Clear own request to speak
-    /// channel.edit_own_voice_state(&http, |v| v.request_to_speak(false)).await?;
+    /// let builder = builder.request_to_speak(false);
+    /// channel.edit_own_voice_state(&http, builder).await?;
     /// #   Ok(())
     /// # }
     /// ```
     ///
     /// # Errors
     ///
-    /// Returns a [`ModelError::InvalidChannelType`] if the channel type is not
-    /// stage.
+    /// If the `cache` is enabled, returns a [`ModelError::InvalidChannelType`] if the channel is
+    /// not a stage channel.
     ///
-    /// [Mute Members]: crate::model::permissions::Permissions::MUTE_MEMBERS
-    /// [Request to Speak]: crate::model::permissions::Permissions::REQUEST_TO_SPEAK
-    pub async fn edit_own_voice_state<F>(&self, http: impl AsRef<Http>, f: F) -> Result<()>
-    where
-        F: FnOnce(&mut EditVoiceState) -> &mut EditVoiceState,
-    {
-        self._edit_voice_state(http, None::<UserId>, f).await
-    }
-
-    async fn _edit_voice_state<F>(
+    /// Returns [`Error::Http`] if the user lacks permission, or if invalid data is given.
+    ///
+    /// [Request to Speak]: Permissions::REQUEST_TO_SPEAK
+    /// [Mute Members]: Permissions::MUTE_MEMBERS
+    pub async fn edit_own_voice_state(
         &self,
-        http: impl AsRef<Http>,
-        user_id: Option<impl Into<UserId>>,
-        f: F,
-    ) -> Result<()>
-    where
-        F: FnOnce(&mut EditVoiceState) -> &mut EditVoiceState,
-    {
-        if self.kind != ChannelType::Stage {
-            return Err(Error::from(ModelError::InvalidChannelType));
-        }
-
-        let mut voice_state = EditVoiceState::default();
-        f(&mut voice_state);
-
-        voice_state.channel_id = Some(self.id);
-
-        if let Some(id) = user_id {
-            http.as_ref().edit_voice_state(self.guild_id.get(), id.into().get(), &voice_state).await
-        } else {
-            http.as_ref().edit_voice_state_me(self.guild_id.get(), &voice_state).await
-        }
+        cache_http: impl CacheHttp,
+        builder: EditVoiceState,
+    ) -> Result<()> {
+        builder.execute(cache_http, self.guild_id, self.id, None).await
     }
 
     /// Follows the News Channel
