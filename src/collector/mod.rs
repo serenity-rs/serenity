@@ -90,15 +90,18 @@ mod sealed {
     impl Sealed for interaction::message_component::MessageComponentInteraction {}
 }
 
-pub trait LazyItem<Item> {
+pub trait LazyItem<Item: ?Sized> {
     fn as_arc(&mut self) -> &mut Arc<Item>;
 }
 
+#[nougat::gat]
 pub trait Collectable: sealed::Sealed + Sized {
     type LazyItem<'a>: LazyItem<Self>;
     type FilterOptions: Default;
     type FilterItem;
 }
+
+type LazyItemGat<'a, Item> = nougat::Gat!(<Item as Collectable>::LazyItem<'a>);
 
 #[derive_where(Clone, Debug, Default)]
 pub struct CommonFilterOptions<FilterItem> {
