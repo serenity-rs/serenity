@@ -76,7 +76,6 @@
     clippy::unwrap_used,
     clippy::non_ascii_literal,
     clippy::missing_errors_doc,
-    clippy::let_underscore_must_use,
     clippy::unused_async,
     unused
 )]

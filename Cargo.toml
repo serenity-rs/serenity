@@ -25,8 +25,8 @@ async-trait = "0.1.9"
 git = "https://github.com/danielhenrymantilla/nougat.rs.git"
 optional = true
 
-[dependencies.derive-where]
-version = "1.0.0-rc.3"
+[dependencies.derivative]
+version = "2.2.0"
 optional = true
 
 [dependencies.simd-json]
@@ -174,7 +174,7 @@ default_no_backend = [
 
 builder = ["utils"]
 cache = ["dashmap", "parking_lot"]
-collector = ["gateway", "model", "derive-where", "nougat"]
+collector = ["gateway", "model", "derivative", "nougat"]
 client = ["http", "typemap_rev"]
 extras = []
 framework = ["client", "model", "utils"]

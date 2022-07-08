@@ -7,7 +7,7 @@ use std::pin::Pin;
 use std::sync::Arc;
 use std::time::Duration;
 
-use derive_where::derive_where;
+use derivative::Derivative;
 use futures::StreamExt;
 use tokio::time::Sleep;
 
@@ -36,7 +36,8 @@ pub use message_collector::*;
 pub use modal_interaction_collector::*;
 pub use reaction_collector::*;
 
-#[derive_where(Clone)]
+#[derive(Derivative)]
+#[derivative(Clone(bound = ""))]
 pub struct FilterFn<Arg: ?Sized>(Arc<dyn Fn(&Arg) -> bool + 'static + Send + Sync>);
 impl<Arg> fmt::Debug for FilterFn<Arg> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
@@ -103,7 +104,8 @@ pub trait Collectable: sealed::Sealed + Sized {
 
 type LazyItemGat<'a, Item> = nougat::Gat!(<Item as Collectable>::LazyItem<'a>);
 
-#[derive_where(Clone, Debug, Default)]
+#[derive(Derivative)]
+#[derivative(Clone(bound = ""), Debug(bound = ""), Default(bound = ""))]
 pub struct CommonFilterOptions<FilterItem> {
     filter_limit: Option<u32>,
     collect_limit: Option<u32>,
