@@ -637,37 +637,42 @@ impl GuildId {
         http.as_ref().edit_emoji(self.get(), emoji_id.into().get(), &map, None).await
     }
 
-    /// Edits the properties of member of the guild, such as muting or
-    /// nicknaming them.
+    /// Edits the properties a guild member, such as muting or nicknaming them. Returns the new
+    /// member.
     ///
-    /// Refer to [`EditMember`]'s documentation for a full list of methods and
-    /// permission restrictions.
+    /// Refer to the documentation of [`EditMember`] for a full list of methods and permission
+    /// restrictions.
     ///
     /// # Examples
     ///
     /// Mute a member and set their roles to just one role with a predefined Id:
     ///
-    /// ```rust,ignore
-    /// guild.edit_member(&context, user_id, |m| m.mute(true).roles(&vec![role_id]));
+    /// ```rust,no_run
+    /// # use serenity::builder::EditMember;
+    /// # use serenity::http::Http;
+    /// # use serenity::model::id::{GuildId, RoleId, UserId};
+    /// #
+    /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
+    /// # let http = Http::new("token");
+    /// # let role_id = RoleId::new(7);
+    /// # let user_id = UserId::new(7);
+    /// let builder = EditMember::default().mute(true).roles(vec![role_id]);
+    /// let _ = GuildId::new(7).edit_member(&http, user_id, builder).await?;
+    /// # Ok(())
+    /// # }
     /// ```
     ///
     /// # Errors
     ///
-    /// Returns [`Error::Http`] if the current user lacks the necessary permissions.
+    /// Returns [`Error::Http`] if the current user lacks permission, or if invalid data is given.
     #[inline]
-    pub async fn edit_member<F>(
+    pub async fn edit_member(
         self,
         http: impl AsRef<Http>,
         user_id: impl Into<UserId>,
-        f: F,
-    ) -> Result<Member>
-    where
-        F: FnOnce(&mut EditMember) -> &mut EditMember,
-    {
-        let mut edit_member = EditMember::default();
-        f(&mut edit_member);
-
-        http.as_ref().edit_member(self.get(), user_id.into().get(), &edit_member, None).await
+        builder: EditMember,
+    ) -> Result<Member> {
+        builder.execute(http, self, user_id.into()).await
     }
 
     /// Edits the current user's nickname for the guild.
@@ -1086,13 +1091,12 @@ impl GuildId {
 
     /// Moves a member to a specific voice channel.
     ///
-    /// Requires the [Move Members] permission.
+    /// **Note**: Requires the [Move Members] permission.
     ///
     /// # Errors
     ///
-    /// Returns an [`Error::Http`] if the current user
-    /// lacks permission, or if the member is not currently
-    /// in a voice channel for this [`Guild`].
+    /// Returns [`Error::Http`] if the current user lacks permission, or if the member is not
+    /// currently in a voice channel for this [`Guild`].
     ///
     /// [Move Members]: Permissions::MOVE_MEMBERS
     #[inline]
@@ -1102,7 +1106,8 @@ impl GuildId {
         user_id: impl Into<UserId>,
         channel_id: impl Into<ChannelId>,
     ) -> Result<Member> {
-        self.edit_member(http, user_id, |m| m.voice_channel(channel_id.into())).await
+        let builder = EditMember::default().voice_channel(channel_id.into());
+        self.edit_member(http, user_id, builder).await
     }
 
     /// Returns the name of whatever guild this id holds.
@@ -1114,12 +1119,12 @@ impl GuildId {
 
     /// Disconnects a member from a voice channel in the guild.
     ///
-    /// Requires the [Move Members] permission.
+    /// **Note**: Requires the [Move Members] permission.
     ///
     /// # Errors
     ///
-    /// Returns [`Error::Http`] if the current user lacks permission,
-    /// or if the member is not currently in a voice channel for this guild.
+    /// Returns [`Error::Http`] if the current user lacks permission, or if the member is not
+    /// currently in a voice channel for this [`Guild`].
     ///
     /// [Move Members]: Permissions::MOVE_MEMBERS
     #[inline]
@@ -1128,7 +1133,7 @@ impl GuildId {
         http: impl AsRef<Http>,
         user_id: impl Into<UserId>,
     ) -> Result<Member> {
-        self.edit_member(http, user_id, EditMember::disconnect_member).await
+        self.edit_member(http, user_id, EditMember::default().disconnect_member()).await
     }
 
     /// Gets the number of [`Member`]s that would be pruned with the given

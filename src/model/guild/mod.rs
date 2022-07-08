@@ -1193,34 +1193,27 @@ impl Guild {
         self.id.edit_emoji(&http, emoji_id, name).await
     }
 
-    /// Edits the properties of member of the guild, such as muting or
-    /// nicknaming them. Returns the new member.
+    /// Edits the properties a guild member, such as muting or nicknaming them. Returns the new
+    /// member.
     ///
-    /// Refer to [`EditMember`]'s documentation for a full list of methods and
-    /// permission restrictions.
+    /// Refer to the documentation of [`EditMember`] for a full list of methods and permission
+    /// restrictions.
     ///
     /// # Examples
     ///
-    /// Mute a member and set their roles to just one role with a predefined Id:
-    ///
-    /// ```rust,ignore
-    /// guild.edit_member(user_id, |m| m.mute(true).roles(&vec![role_id]));
-    /// ```
+    /// See [`GuildId::edit_member`] for details.
     ///
     /// # Errors
     ///
-    /// Returns [`Error::Http`] if the current user lacks the necessary permissions.
+    /// Returns [`Error::Http`] if the current user lacks permission, or if invalid data is given.
     #[inline]
-    pub async fn edit_member<F>(
+    pub async fn edit_member(
         &self,
         http: impl AsRef<Http>,
         user_id: impl Into<UserId>,
-        f: F,
-    ) -> Result<Member>
-    where
-        F: FnOnce(&mut EditMember) -> &mut EditMember,
-    {
-        self.id.edit_member(&http, user_id, f).await
+        builder: EditMember,
+    ) -> Result<Member> {
+        self.id.edit_member(http, user_id, builder).await
     }
 
     /// Edits the current user's nickname for the guild.
