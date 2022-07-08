@@ -36,9 +36,12 @@ pub use message_collector::*;
 pub use modal_interaction_collector::*;
 pub use reaction_collector::*;
 
+type FilterFnInner<Arg> = Arc<dyn Fn(&Arg) -> bool + 'static + Send + Sync>;
+
 #[derive(Derivative)]
 #[derivative(Clone(bound = ""))]
-pub struct FilterFn<Arg: ?Sized>(Arc<dyn Fn(&Arg) -> bool + 'static + Send + Sync>);
+pub struct FilterFn<Arg: ?Sized>(FilterFnInner<Arg>);
+
 impl<Arg> fmt::Debug for FilterFn<Arg> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         f.debug_tuple("FilterFn")
@@ -148,8 +151,8 @@ impl<'a, Item: Collectable> CollectorBuilder<'a, Item> {
     /// otherwise the item won't be collected and failed the filter process.
     ///
     /// This is the last instance to pass for an item to count as *collected*.
-    pub fn filter(mut self, function: FilterFn<Item::FilterItem>) -> Self {
-        self.common_options.filter = Some(function);
+    pub fn filter(mut self, function: FilterFnInner<Item::FilterItem>) -> Self {
+        self.common_options.filter = Some(FilterFn(function));
 
         self
     }
