@@ -373,6 +373,7 @@ generate_get_permission_names! {
     kick_members: "Kick Members",
     manage_channels: "Manage Channels",
     manage_emojis_and_stickers: "Manage Emojis and Stickers",
+    manage_events: "Manage Events",
     manage_guild: "Manage Guilds",
     manage_messages: "Manage Messages",
     manage_nicknames: "Manage Nicknames",
@@ -581,6 +582,15 @@ impl Permissions {
     #[must_use]
     pub fn manage_emojis_and_stickers(self) -> bool {
         self.contains(Self::MANAGE_EMOJIS_AND_STICKERS)
+    }
+
+    /// Shorthand for checking that the set of permissions contains the
+    /// [Manage Events] permission.
+    ///
+    /// [Manage Events]: Self::MANAGE_EVENTS
+    #[must_use]
+    pub fn manage_events(self) -> bool {
+        self.contains(Self::MANAGE_EVENTS)
     }
 
     /// Shorthand for checking that the set of permissions contains the
