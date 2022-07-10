@@ -52,7 +52,7 @@ pub struct CreateEmbed {
     #[serde(skip_serializing_if = "Option::is_none")]
     thumbnail: Option<HoldsUrl>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    timestamp: Option<String>,
+    timestamp: Option<Timestamp>,
     #[serde(skip_serializing_if = "Option::is_none")]
     title: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -201,16 +201,7 @@ impl CreateEmbed {
 
     /// Set the timestamp.
     ///
-    /// You may pass a direct string:
-    ///
-    /// - `2017-01-03T23:00:00`
-    /// - `2004-06-08T16:04:23`
-    /// - `2004-06-08T16:04:23`
-    ///
-    /// This timestamp must be in ISO-8601 format. It must also be in UTC format.
-    ///
-    /// You can also pass an instance of `chrono::DateTime<Utc>`,
-    /// which will construct the timestamp string out of it.
+    /// See the documentation of [`Timestamp`] for more information.
     ///
     /// # Examples
     ///
@@ -220,6 +211,7 @@ impl CreateEmbed {
     /// # #[cfg(feature = "client")]
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// use serenity::model::channel::Message;
+    /// use serenity::model::Timestamp;
     /// use serenity::prelude::*;
     ///
     /// struct Handler;
@@ -228,10 +220,12 @@ impl CreateEmbed {
     /// impl EventHandler for Handler {
     ///     async fn message(&self, context: Context, mut msg: Message) {
     ///         if msg.content == "~embed" {
+    ///             let timestamp: Timestamp =
+    ///                 "2004-06-08T16:04:23Z".parse().expect("Invalid timestamp!");
     ///             let _ = msg
     ///                 .channel_id
     ///                 .send_message(&context.http, |m| {
-    ///                     m.embed(|e| e.title("hello").timestamp("2004-06-08T16:04:23"))
+    ///                     m.embed(|e| e.title("hello").timestamp(timestamp))
     ///                 })
     ///                 .await;
     ///         }
@@ -296,7 +290,7 @@ impl CreateEmbed {
     /// ```
     #[inline]
     pub fn timestamp<T: Into<Timestamp>>(&mut self, timestamp: T) -> &mut Self {
-        self.timestamp = Some(timestamp.into().to_string());
+        self.timestamp = Some(timestamp.into());
         self
     }
 
