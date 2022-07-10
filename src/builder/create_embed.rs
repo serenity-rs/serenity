@@ -52,7 +52,7 @@ pub struct CreateEmbed {
     #[serde(skip_serializing_if = "Option::is_none")]
     thumbnail: Option<HoldsUrl>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    timestamp: Option<String>,
+    timestamp: Option<Timestamp>,
     #[serde(skip_serializing_if = "Option::is_none")]
     title: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -201,12 +201,7 @@ impl CreateEmbed {
 
     /// Set the timestamp.
     ///
-    /// You can pass a [`Timestamp`] or anything that converts into it (
-    /// [`chrono::DateTime`] or [`&str`]). If giving a string, it must be in RFC 3339 format:
-    ///
-    /// - `2017-01-03T23:00:00Z`
-    /// - `2004-06-08T16:04:23Z`
-    /// - `2004-06-08T16:04:23Z`
+    /// See the documentation of [`Timestamp`] for more information.
     ///
     /// # Examples
     ///
@@ -214,8 +209,10 @@ impl CreateEmbed {
     ///
     /// ```rust
     /// # use serenity::builder::CreateEmbed;
+    /// # use serenity::model::Timestamp;
+    /// let timestamp: Timestamp = "2004-06-08T16:04:23Z".parse().expect("Invalid timestamp!");
     /// let mut embed = CreateEmbed::default();
-    /// embed.title("hello").timestamp("2004-06-08T16:04:23Z");
+    /// embed.title("hello").timestamp(timestamp);
     /// ```
     ///
     /// Creating a join-log:
@@ -268,7 +265,7 @@ impl CreateEmbed {
     /// ```
     #[inline]
     pub fn timestamp<T: Into<Timestamp>>(&mut self, timestamp: T) -> &mut Self {
-        self.timestamp = Some(timestamp.into().to_string());
+        self.timestamp = Some(timestamp.into());
         self
     }
 
