@@ -11,7 +11,6 @@ mod partial_channel;
 mod private_channel;
 mod reaction;
 
-use std::convert::{TryFrom, TryInto};
 #[cfg(all(feature = "cache", feature = "model", feature = "utils"))]
 use std::error::Error as StdError;
 use std::fmt;
@@ -349,7 +348,13 @@ pub(crate) struct PermissionOverwriteData {
 
 pub(crate) struct InvalidPermissionOverwriteType(u8);
 
-impl TryFrom<PermissionOverwriteData> for PermissionOverwrite {
+impl std::fmt::Display for InvalidPermissionOverwriteType {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "Invalid Permission Overwrite Type: {}", self.0)
+    }
+}
+
+impl std::convert::TryFrom<PermissionOverwriteData> for PermissionOverwrite {
     type Error = InvalidPermissionOverwriteType;
 
     fn try_from(data: PermissionOverwriteData) -> StdResult<Self, Self::Error> {
@@ -384,27 +389,12 @@ impl From<PermissionOverwrite> for PermissionOverwriteData {
 }
 
 /// A channel-specific permission overwrite for a member or role.
-#[derive(Clone, Debug, PartialEq)]
+#[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
+#[serde(try_from = "PermissionOverwriteData", into = "PermissionOverwriteData")]
 pub struct PermissionOverwrite {
     pub allow: Permissions,
     pub deny: Permissions,
     pub kind: PermissionOverwriteType,
-}
-
-impl<'de> Deserialize<'de> for PermissionOverwrite {
-    fn deserialize<D: Deserializer<'de>>(
-        deserializer: D,
-    ) -> StdResult<PermissionOverwrite, D::Error> {
-        let data = PermissionOverwriteData::deserialize(deserializer)?;
-        data.try_into().map_err(|_| DeError::custom("Unknown PermissionOverwriteType"))
-    }
-}
-
-impl Serialize for PermissionOverwrite {
-    fn serialize<S: Serializer>(&self, serializer: S) -> StdResult<S::Ok, S::Error> {
-        let data: PermissionOverwriteData = self.clone().into();
-        data.serialize(serializer)
-    }
 }
 
 /// The type of edit being made to a Channel's permissions.
