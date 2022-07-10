@@ -574,12 +574,6 @@
 <span id="569">569</span>
 <span id="570">570</span>
 <span id="571">571</span>
-<span id="572">572</span>
-<span id="573">573</span>
-<span id="574">574</span>
-<span id="575">575</span>
-<span id="576">576</span>
-<span id="577">577</span>
 </pre><pre class="rust"><code><span class="doccomment">//! Developer note:</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! This is a set of embed builders for rich embeds.</span>
@@ -639,7 +633,7 @@
     <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;Option::is_none&quot;</span>)]</span>
     <span class="ident">thumbnail</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">HoldsUrl</span><span class="op">&gt;</span>,
     <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;Option::is_none&quot;</span>)]</span>
-    <span class="ident">timestamp</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
+    <span class="ident">timestamp</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Timestamp</span><span class="op">&gt;</span>,
     <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;Option::is_none&quot;</span>)]</span>
     <span class="ident">title</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
     <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;Option::is_none&quot;</span>)]</span>
@@ -788,16 +782,7 @@
 
     <span class="doccomment">/// Set the timestamp.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// You may pass a direct string:</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// - `2017-01-03T23:00:00`</span>
-    <span class="doccomment">/// - `2004-06-08T16:04:23`</span>
-    <span class="doccomment">/// - `2004-06-08T16:04:23`</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This timestamp must be in ISO-8601 format. It must also be in UTC format.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// You can also pass an instance of `chrono::DateTime&lt;Utc&gt;`,</span>
-    <span class="doccomment">/// which will construct the timestamp string out of it.</span>
+    <span class="doccomment">/// See the documentation of [`Timestamp`] for more information.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// # Examples</span>
     <span class="doccomment">///</span>
@@ -807,6 +792,7 @@
     <span class="doccomment">/// # #[cfg(feature = &quot;client&quot;)]</span>
     <span class="doccomment">/// # async fn run() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {</span>
     <span class="doccomment">/// use serenity::model::channel::Message;</span>
+    <span class="doccomment">/// use serenity::model::Timestamp;</span>
     <span class="doccomment">/// use serenity::prelude::*;</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// struct Handler;</span>
@@ -815,10 +801,12 @@
     <span class="doccomment">/// impl EventHandler for Handler {</span>
     <span class="doccomment">///     async fn message(&amp;self, context: Context, mut msg: Message) {</span>
     <span class="doccomment">///         if msg.content == &quot;~embed&quot; {</span>
+    <span class="doccomment">///             let timestamp: Timestamp =</span>
+    <span class="doccomment">///                 &quot;2004-06-08T16:04:23Z&quot;.parse().expect(&quot;Invalid timestamp!&quot;);</span>
     <span class="doccomment">///             let _ = msg</span>
     <span class="doccomment">///                 .channel_id</span>
     <span class="doccomment">///                 .send_message(&amp;context.http, |m| {</span>
-    <span class="doccomment">///                     m.embed(|e| e.title(&quot;hello&quot;).timestamp(&quot;2004-06-08T16:04:23&quot;))</span>
+    <span class="doccomment">///                     m.embed(|e| e.title(&quot;hello&quot;).timestamp(timestamp))</span>
     <span class="doccomment">///                 })</span>
     <span class="doccomment">///                 .await;</span>
     <span class="doccomment">///         }</span>
@@ -883,7 +871,7 @@
     <span class="doccomment">/// ```</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">timestamp</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Timestamp</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">timestamp</span>: <span class="ident">T</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">timestamp</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">timestamp</span>.<span class="ident">into</span>().<span class="ident">to_string</span>());
+        <span class="self">self</span>.<span class="ident">timestamp</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">timestamp</span>.<span class="ident">into</span>());
         <span class="self">self</span>
     }
 
