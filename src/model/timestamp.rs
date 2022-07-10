@@ -257,28 +257,18 @@ impl fmt::Display for ParseError {
 impl FromStr for Timestamp {
     type Err = ParseError;
 
+    /// Parses an RFC 3339 date and time string such as `2016-04-30T11:18:25.796Z`.
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         Timestamp::parse(s)
     }
 }
 
-impl From<String> for Timestamp {
-    /// Parses an RFC 3339 date and time string such as `2016-04-30T11:18:25.796Z`.
-    ///
-    /// Panics on invalid value.
-    fn from(s: String) -> Self {
-        #[allow(clippy::unwrap_used)]
-        Timestamp::parse(&s).unwrap()
-    }
-}
+impl<'a> std::convert::TryFrom<&'a str> for Timestamp {
+    type Error = ParseError;
 
-impl<'a> From<&'a str> for Timestamp {
     /// Parses an RFC 3339 date and time string such as `2016-04-30T11:18:25.796Z`.
-    ///
-    /// Panics on invalid value.
-    fn from(s: &'a str) -> Self {
-        #[allow(clippy::unwrap_used)]
-        Timestamp::parse(s).unwrap()
+    fn try_from(s: &'a str) -> Result<Self, Self::Error> {
+        Timestamp::parse(s)
     }
 }
 

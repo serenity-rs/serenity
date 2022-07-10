@@ -1,5 +1,6 @@
 #[cfg(feature = "model")]
 use crate::builder::CreateEmbed;
+use crate::model::Timestamp;
 #[cfg(feature = "utils")]
 use crate::utils::Colour;
 
@@ -51,7 +52,7 @@ pub struct Embed {
     /// Thumbnail information of the embed.
     pub thumbnail: Option<EmbedThumbnail>,
     /// Timestamp information.
-    pub timestamp: Option<String>,
+    pub timestamp: Option<Timestamp>,
     /// The title of the embed.
     pub title: Option<String>,
     /// The URL of the embed.
