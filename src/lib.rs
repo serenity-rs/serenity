@@ -57,6 +57,7 @@
     rust_2018_idioms,
     clippy::unwrap_used,
     clippy::non_ascii_literal,
+    clippy::fallible_impl_from,
     clippy::let_underscore_must_use,
     clippy::pedantic
 )]
