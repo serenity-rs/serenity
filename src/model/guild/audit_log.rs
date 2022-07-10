@@ -37,7 +37,7 @@ pub enum Action {
 
 impl Action {
     #[must_use]
-    pub fn num(self) -> u8 {
+    pub const fn num(self) -> u8 {
         match self {
             Self::GuildUpdate => 1,
             Self::Channel(x) => x as u8,
