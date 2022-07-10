@@ -910,39 +910,16 @@ impl Guild {
     ///
     /// # Examples
     ///
-    /// Create a role which can be mentioned, with the name 'test':
-    ///
-    /// ```rust,ignore
-    /// // assuming a `guild` has been bound
-    ///
-    /// let role = guild.create_role(&http, |r| r.hoist(true).name("role")).await;
-    /// ```
+    /// See the documentation for [`EditRole`] for details.
     ///
     /// # Errors
     ///
-    /// If the `cache` is enabled, returns a [`ModelError::InvalidPermissions`]
-    /// if the current user does not have permission to manage roles.
-    ///
-    /// Otherwise will return [`Error::Http`] if the current user does
-    /// not have permission.
+    /// If the `cache` is enabled, returns a [`ModelError::InvalidPermissions`] if the current user
+    /// lacks permission. Otherwise returns [`Error::Http`], as well as if invalid data is given.
     ///
     /// [Manage Roles]: Permissions::MANAGE_ROLES
-    pub async fn create_role<F>(&self, cache_http: impl CacheHttp, f: F) -> Result<Role>
-    where
-        F: FnOnce(&mut EditRole) -> &mut EditRole,
-    {
-        #[cfg(feature = "cache")]
-        {
-            if cache_http.cache().is_some() {
-                let req = Permissions::MANAGE_ROLES;
-
-                if !self.has_perms(&cache_http, req).await {
-                    return Err(Error::Model(ModelError::InvalidPermissions(req)));
-                }
-            }
-        }
-
-        self.id.create_role(cache_http.http(), f).await
+    pub async fn create_role(&self, cache_http: impl CacheHttp, builder: EditRole) -> Result<Role> {
+        self.id.create_role(cache_http, builder).await
     }
 
     /// Creates a new scheduled event in the guild with the data set, if any.
@@ -1252,32 +1229,26 @@ impl Guild {
 
     /// Edits a role, optionally setting its fields.
     ///
-    /// Requires the [Manage Roles] permission.
+    /// **Note**: Requires the [Manage Roles] permission.
     ///
     /// # Examples
     ///
-    /// Make a role hoisted:
-    ///
-    /// ```rust,ignore
-    /// guild.edit_role(&context, RoleId::new(7), |r| r.hoist(true));
-    /// ```
+    /// See the documentation of [`GuildId::edit_role`] for details.
     ///
     /// # Errors
     ///
-    /// Returns [`Error::Http`] if the current user lacks permission.
+    /// If the `cache` is enabled, returns a [`ModelError::InvalidPermissions`] if the current user
+    /// lacks permission. Otherwise returns [`Error::Http`], as well as if invalid data is given.
     ///
     /// [Manage Roles]: Permissions::MANAGE_ROLES
     #[inline]
-    pub async fn edit_role<F>(
+    pub async fn edit_role(
         &self,
-        http: impl AsRef<Http>,
+        cache_http: impl CacheHttp,
         role_id: impl Into<RoleId>,
-        f: F,
-    ) -> Result<Role>
-    where
-        F: FnOnce(&mut EditRole) -> &mut EditRole,
-    {
-        self.id.edit_role(&http, role_id, f).await
+        builder: EditRole,
+    ) -> Result<Role> {
+        self.id.edit_role(cache_http, role_id, builder).await
     }
 
     /// Edits the order of [`Role`]s

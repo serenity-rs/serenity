@@ -634,16 +634,13 @@ impl PartialGuild {
     ///
     /// # Errors
     ///
-    /// Returns [`Error::Http`] if the current user lacks permission,
-    /// or if an invalid value was set.
+    /// If the `cache` is enabled, returns a [`ModelError::InvalidPermissions`] if the current user
+    /// lacks permission. Otherwise returns [`Error::Http`], as well as if invalid data is given.
     ///
     /// [Manage Roles]: Permissions::MANAGE_ROLES
     #[inline]
-    pub async fn create_role<F>(&self, http: impl AsRef<Http>, f: F) -> Result<Role>
-    where
-        F: FnOnce(&mut EditRole) -> &mut EditRole,
-    {
-        self.id.create_role(&http, f).await
+    pub async fn create_role(&self, cache_http: impl CacheHttp, builder: EditRole) -> Result<Role> {
+        self.id.create_role(cache_http, builder).await
     }
 
     /// Creates a new sticker in the guild with the data set, if any.
@@ -862,32 +859,26 @@ impl PartialGuild {
 
     /// Edits a role, optionally setting its fields.
     ///
-    /// Requires the [Manage Roles] permission.
+    /// **Note**: Requires the [Manage Roles] permission.
     ///
     /// # Examples
     ///
-    /// Make a role hoisted:
-    ///
-    /// ```rust,ignore
-    /// partial_guild.edit_role(&context, RoleId::new(7), |r| r.hoist(true));
-    /// ```
+    /// See the documentation of [`GuildId::edit_role`] for details.
     ///
     /// # Errors
     ///
-    /// Returns [`Error::Http`] if the current user lacks permission.
+    /// If the `cache` is enabled, returns a [`ModelError::InvalidPermissions`] if the current user
+    /// lacks permission. Otherwise returns [`Error::Http`], as well as if invalid data is given.
     ///
     /// [Manage Roles]: Permissions::MANAGE_ROLES
     #[inline]
-    pub async fn edit_role<F>(
+    pub async fn edit_role(
         self,
-        http: impl AsRef<Http>,
+        cache_http: impl CacheHttp,
         role_id: impl Into<RoleId>,
-        f: F,
-    ) -> Result<Role>
-    where
-        F: FnOnce(&mut EditRole) -> &mut EditRole,
-    {
-        self.id.edit_role(http, role_id, f).await
+        builder: EditRole,
+    ) -> Result<Role> {
+        self.id.edit_role(cache_http, role_id, builder).await
     }
 
     /// Edits the order of [`Role`]s

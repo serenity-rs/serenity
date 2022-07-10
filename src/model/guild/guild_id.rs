@@ -417,25 +417,13 @@ impl GuildId {
     ///
     /// # Errors
     ///
-    /// Returns [`Error::Http`] if the current user lacks permission,
-    /// or if invalid data is given.
+    /// If the `cache` is enabled, returns a [`ModelError::InvalidPermissions`] if the current user
+    /// lacks permission. Otherwise returns [`Error::Http`], as well as if invalid data is given.
     ///
     /// [Manage Roles]: Permissions::MANAGE_ROLES
     #[inline]
-    pub async fn create_role<F>(self, http: impl AsRef<Http>, f: F) -> Result<Role>
-    where
-        F: FnOnce(&mut EditRole) -> &mut EditRole,
-    {
-        let mut edit_role = EditRole::default();
-        f(&mut edit_role);
-
-        let role = http.as_ref().create_role(self.get(), &edit_role, None).await?;
-
-        if let Some(position) = edit_role.position {
-            self.edit_role_position(&http, role.id, position as u64).await?;
-        }
-
-        Ok(role)
+    pub async fn create_role(self, cache_http: impl CacheHttp, builder: EditRole) -> Result<Role> {
+        builder.execute(cache_http, self, None).await
     }
 
     /// Creates a new scheduled event in the guild with the data set, if any.
@@ -697,37 +685,44 @@ impl GuildId {
 
     /// Edits a [`Role`], optionally setting its new fields.
     ///
-    /// Requires the [Manage Roles] permission.
+    /// **Note**: Requires the [Manage Roles] permission.
     ///
     /// # Examples
     ///
-    /// Make a role hoisted:
+    /// Make a role hoisted, and change its name:
     ///
-    /// ```rust,ignore
-    /// use serenity::model::{GuildId, RoleId};
-    ///
-    /// GuildId::new(7).edit_role(&context, RoleId::new(8), |r| r.hoist(true));
+    /// ```rust,no_run
+    /// # use serenity::builder::EditRole;
+    /// # use serenity::http::Http;
+    /// # use serenity::model::id::{GuildId, RoleId};
+    /// # use std::sync::Arc;
+    /// #
+    /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
+    /// # let http = Arc::new(Http::new("token"));
+    /// # let guild_id = GuildId::new(2);
+    /// # let role_id = RoleId::new(8);
+    /// #
+    /// // assuming a `role_id` and `guild_id` has been bound
+    /// let builder = EditRole::default().name("a test role").hoist(true);
+    /// let role = guild_id.edit_role(&http, role_id, builder).await?;
+    /// # Ok(())
+    /// # }
     /// ```
     ///
     /// # Errors
     ///
-    /// Returns [`Error::Http`] if the current user lacks permission.
+    /// If the `cache` is enabled, returns a [`ModelError::InvalidPermissions`] if the current user
+    /// lacks permission. Otherwise returns [`Error::Http`], as well as if invalid data is given.
     ///
     /// [Manage Roles]: Permissions::MANAGE_ROLES
     #[inline]
-    pub async fn edit_role<F>(
+    pub async fn edit_role(
         self,
-        http: impl AsRef<Http>,
+        cache_http: impl CacheHttp,
         role_id: impl Into<RoleId>,
-        f: F,
-    ) -> Result<Role>
-    where
-        F: FnOnce(&mut EditRole) -> &mut EditRole,
-    {
-        let mut edit_role = EditRole::default();
-        f(&mut edit_role);
-
-        http.as_ref().edit_role(self.get(), role_id.into().get(), &edit_role, None).await
+        builder: EditRole,
+    ) -> Result<Role> {
+        builder.execute(cache_http, self, Some(role_id.into())).await
     }
 
     /// Modifies a scheduled event in the guild with the data set, if any.
@@ -785,12 +780,11 @@ impl GuildId {
         builder.execute(http, self, sticker_id.into()).await
     }
 
-    /// Edits the order of [`Role`]s
-    /// Requires the [Manage Roles] permission.
+    /// Edit the position of a [`Role`] relative to all others in the [`Guild`].
+    ///
+    /// **Note**: Requires the [Manage Roles] permission.
     ///
     /// # Examples
-    ///
-    /// Change the order of a role:
     ///
     /// ```rust,ignore
     /// use serenity::model::{GuildId, RoleId};
