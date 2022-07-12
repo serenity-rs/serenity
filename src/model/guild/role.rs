@@ -306,8 +306,7 @@ impl FromStrAndCache for Role {
 /// The tags of a [`Role`].
 ///
 /// [Discord docs](https://discord.com/developers/docs/topics/permissions#role-object-role-tags-structure).
-#[derive(Clone, Debug, Default, Deserialize, Serialize)]
-#[cfg_attr(test, derive(PartialEq))]
+#[derive(Clone, Debug, Default, PartialEq, Eq, Deserialize, Serialize)]
 #[non_exhaustive]
 pub struct RoleTags {
     /// The Id of the bot the [`Role`] belongs to.

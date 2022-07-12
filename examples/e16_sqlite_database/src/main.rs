@@ -1,5 +1,6 @@
 // It is recommended that you read the README file, it is very important to this example.
 // This example will help us to use a sqlite database with our bot.
+use std::fmt::Write as _;
 
 use serenity::async_trait;
 use serenity::model::prelude::*;
@@ -59,7 +60,7 @@ impl EventHandler for Bot {
 
             let mut response = format!("You have {} pending tasks:\n", todos.len());
             for (i, todo) in todos.iter().enumerate() {
-                response += &format!("{}. {}\n", i + 1, todo.task);
+                writeln!(response, "{}. {}", i + 1, todo.task).unwrap()
             }
 
             msg.channel_id.say(&ctx, response).await.unwrap();
