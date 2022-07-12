@@ -139,7 +139,7 @@ pub enum HelpBehaviour {
     Hide,
 }
 
-#[derive(Clone, Debug, PartialEq)]
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub struct HelpOptions {
     /// Which names should the help command use for dispatching.
     /// Defaults to `["help"]`

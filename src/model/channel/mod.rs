@@ -389,7 +389,7 @@ impl From<PermissionOverwrite> for PermissionOverwriteData {
 }
 
 /// A channel-specific permission overwrite for a member or role.
-#[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
+#[derive(Clone, Debug, PartialEq, Eq, Deserialize, Serialize)]
 #[serde(try_from = "PermissionOverwriteData", into = "PermissionOverwriteData")]
 pub struct PermissionOverwrite {
     pub allow: Permissions,
