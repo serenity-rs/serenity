@@ -32,6 +32,7 @@ pub enum EntityType {
     Str(String),
 }
 
+#[cfg_attr(not(simd_json), allow(clippy::derive_partial_eq_without_eq))]
 #[derive(Debug, PartialEq)]
 // serde_json's Value impls Eq, simd-json's Value doesn't
 #[cfg_attr(not(feature = "simd-json"), derive(Eq))]
