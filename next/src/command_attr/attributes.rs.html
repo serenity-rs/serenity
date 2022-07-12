@@ -333,7 +333,7 @@
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::structures</span>::{<span class="ident">Checks</span>, <span class="ident">Colour</span>, <span class="ident">HelpBehaviour</span>, <span class="ident">OnlyIn</span>, <span class="ident">Permissions</span>};
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::util</span>::{<span class="ident">AsOption</span>, <span class="ident">LitExt</span>};
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Debug</span>, <span class="ident">PartialEq</span>)]</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Debug</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>)]</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">ValueKind</span> {
     <span class="comment">// #[&lt;name&gt;]</span>
     <span class="ident">Name</span>,

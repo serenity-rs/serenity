@@ -992,7 +992,7 @@
 }
 
 <span class="doccomment">/// A channel-specific permission overwrite for a member or role.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">PartialEq</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
 <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">try_from</span> <span class="op">=</span> <span class="string">&quot;PermissionOverwriteData&quot;</span>, <span class="ident">into</span> <span class="op">=</span> <span class="string">&quot;PermissionOverwriteData&quot;</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">PermissionOverwrite</span> {
     <span class="kw">pub</span> <span class="ident">allow</span>: <span class="ident">Permissions</span>,
