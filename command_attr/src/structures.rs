@@ -24,7 +24,7 @@ use syn::{
 use crate::consts::CHECK;
 use crate::util::{self, Argument, AsOption, IdentExt2, Parenthesised};
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Eq)]
 pub enum OnlyIn {
     Dm,
     Guild,
@@ -369,7 +369,7 @@ impl ToTokens for Permissions {
     }
 }
 
-#[derive(Debug, Default, Clone, Copy, PartialEq)]
+#[derive(Debug, Default, Clone, Copy, PartialEq, Eq)]
 pub struct Colour(pub u32);
 
 impl Colour {
@@ -470,7 +470,7 @@ impl Options {
     }
 }
 
-#[derive(PartialEq, Debug)]
+#[derive(PartialEq, Eq, Debug)]
 pub enum HelpBehaviour {
     Strike,
     Hide,
@@ -499,7 +499,7 @@ impl ToTokens for HelpBehaviour {
     }
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, Eq, PartialEq)]
 pub struct HelpOptions {
     pub suggestion_text: String,
     pub no_help_available_text: String,

@@ -302,8 +302,7 @@ impl FromStrAndCache for Role {
 }
 
 /// The tags of a [`Role`].
-#[derive(Clone, Debug, Default, Deserialize, Serialize)]
-#[cfg_attr(test, derive(PartialEq))]
+#[derive(Clone, Debug, Default, PartialEq, Eq, Deserialize, Serialize)]
 #[non_exhaustive]
 pub struct RoleTags {
     /// The Id of the bot the [`Role`] belongs to.
