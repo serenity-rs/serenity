@@ -414,7 +414,7 @@ impl Permissions {
     ///
     /// [Add Reactions]: Self::ADD_REACTIONS
     #[must_use]
-    pub fn add_reactions(self) -> bool {
+    pub const fn add_reactions(self) -> bool {
         self.contains(Self::ADD_REACTIONS)
     }
 
@@ -423,7 +423,7 @@ impl Permissions {
     ///
     /// [Administrator]: Self::ADMINISTRATOR
     #[must_use]
-    pub fn administrator(self) -> bool {
+    pub const fn administrator(self) -> bool {
         self.contains(Self::ADMINISTRATOR)
     }
 
@@ -432,7 +432,7 @@ impl Permissions {
     ///
     /// [Attach Files]: Self::ATTACH_FILES
     #[must_use]
-    pub fn attach_files(self) -> bool {
+    pub const fn attach_files(self) -> bool {
         self.contains(Self::ATTACH_FILES)
     }
 
@@ -441,7 +441,7 @@ impl Permissions {
     ///
     /// [Ban Members]: Self::BAN_MEMBERS
     #[must_use]
-    pub fn ban_members(self) -> bool {
+    pub const fn ban_members(self) -> bool {
         self.contains(Self::BAN_MEMBERS)
     }
 
@@ -450,7 +450,7 @@ impl Permissions {
     ///
     /// [Change Nickname]: Self::CHANGE_NICKNAME
     #[must_use]
-    pub fn change_nickname(self) -> bool {
+    pub const fn change_nickname(self) -> bool {
         self.contains(Self::CHANGE_NICKNAME)
     }
 
@@ -459,7 +459,7 @@ impl Permissions {
     ///
     /// [Connect]: Self::CONNECT
     #[must_use]
-    pub fn connect(self) -> bool {
+    pub const fn connect(self) -> bool {
         self.contains(Self::CONNECT)
     }
 
@@ -468,7 +468,7 @@ impl Permissions {
     ///
     /// [View Audit Log]: Self::VIEW_AUDIT_LOG
     #[must_use]
-    pub fn view_audit_log(self) -> bool {
+    pub const fn view_audit_log(self) -> bool {
         self.contains(Self::VIEW_AUDIT_LOG)
     }
 
@@ -477,7 +477,7 @@ impl Permissions {
     ///
     /// [View Channel]: Self::VIEW_CHANNEL
     #[must_use]
-    pub fn view_channel(self) -> bool {
+    pub const fn view_channel(self) -> bool {
         self.contains(Self::VIEW_CHANNEL)
     }
 
@@ -486,7 +486,7 @@ impl Permissions {
     ///
     /// [View Guild Insights]: Self::VIEW_GUILD_INSIGHTS
     #[must_use]
-    pub fn view_guild_insights(self) -> bool {
+    pub const fn view_guild_insights(self) -> bool {
         self.contains(Self::VIEW_GUILD_INSIGHTS)
     }
 
@@ -495,7 +495,7 @@ impl Permissions {
     ///
     /// [Priority Speaker]: Self::PRIORITY_SPEAKER
     #[must_use]
-    pub fn priority_speaker(self) -> bool {
+    pub const fn priority_speaker(self) -> bool {
         self.contains(Self::PRIORITY_SPEAKER)
     }
 
@@ -504,7 +504,7 @@ impl Permissions {
     ///
     /// [Stream]: Self::STREAM
     #[must_use]
-    pub fn stream(self) -> bool {
+    pub const fn stream(self) -> bool {
         self.contains(Self::STREAM)
     }
 
@@ -513,7 +513,7 @@ impl Permissions {
     ///
     /// [Create Instant Invite]: Self::CREATE_INSTANT_INVITE
     #[must_use]
-    pub fn create_instant_invite(self) -> bool {
+    pub const fn create_instant_invite(self) -> bool {
         self.contains(Self::CREATE_INSTANT_INVITE)
     }
 
@@ -522,7 +522,7 @@ impl Permissions {
     ///
     /// [Create Private Threads]: Self::CREATE_PRIVATE_THREADS
     #[must_use]
-    pub fn create_private_threads(self) -> bool {
+    pub const fn create_private_threads(self) -> bool {
         self.contains(Self::CREATE_PRIVATE_THREADS)
     }
 
@@ -531,7 +531,7 @@ impl Permissions {
     ///
     /// [Create Public Threads]: Self::CREATE_PUBLIC_THREADS
     #[must_use]
-    pub fn create_public_threads(self) -> bool {
+    pub const fn create_public_threads(self) -> bool {
         self.contains(Self::CREATE_PUBLIC_THREADS)
     }
 
@@ -540,7 +540,7 @@ impl Permissions {
     ///
     /// [Deafen Members]: Self::DEAFEN_MEMBERS
     #[must_use]
-    pub fn deafen_members(self) -> bool {
+    pub const fn deafen_members(self) -> bool {
         self.contains(Self::DEAFEN_MEMBERS)
     }
 
@@ -549,7 +549,7 @@ impl Permissions {
     ///
     /// [Embed Links]: Self::EMBED_LINKS
     #[must_use]
-    pub fn embed_links(self) -> bool {
+    pub const fn embed_links(self) -> bool {
         self.contains(Self::EMBED_LINKS)
     }
 
@@ -558,7 +558,7 @@ impl Permissions {
     ///
     /// [Use External Emojis]: Self::USE_EXTERNAL_EMOJIS
     #[must_use]
-    pub fn external_emojis(self) -> bool {
+    pub const fn external_emojis(self) -> bool {
         self.contains(Self::USE_EXTERNAL_EMOJIS)
     }
 
@@ -567,7 +567,7 @@ impl Permissions {
     ///
     /// [Kick Members]: Self::KICK_MEMBERS
     #[must_use]
-    pub fn kick_members(self) -> bool {
+    pub const fn kick_members(self) -> bool {
         self.contains(Self::KICK_MEMBERS)
     }
 
@@ -576,7 +576,7 @@ impl Permissions {
     ///
     /// [Manage Channels]: Self::MANAGE_CHANNELS
     #[must_use]
-    pub fn manage_channels(self) -> bool {
+    pub const fn manage_channels(self) -> bool {
         self.contains(Self::MANAGE_CHANNELS)
     }
 
@@ -585,7 +585,7 @@ impl Permissions {
     ///
     /// [Manage Emojis and Stickers]: Self::MANAGE_EMOJIS_AND_STICKERS
     #[must_use]
-    pub fn manage_emojis_and_stickers(self) -> bool {
+    pub const fn manage_emojis_and_stickers(self) -> bool {
         self.contains(Self::MANAGE_EMOJIS_AND_STICKERS)
     }
 
@@ -603,7 +603,7 @@ impl Permissions {
     ///
     /// [Manage Guild]: Self::MANAGE_GUILD
     #[must_use]
-    pub fn manage_guild(self) -> bool {
+    pub const fn manage_guild(self) -> bool {
         self.contains(Self::MANAGE_GUILD)
     }
 
@@ -612,7 +612,7 @@ impl Permissions {
     ///
     /// [Manage Messages]: Self::MANAGE_MESSAGES
     #[must_use]
-    pub fn manage_messages(self) -> bool {
+    pub const fn manage_messages(self) -> bool {
         self.contains(Self::MANAGE_MESSAGES)
     }
 
@@ -621,7 +621,7 @@ impl Permissions {
     ///
     /// [Manage Nicknames]: Self::MANAGE_NICKNAMES
     #[must_use]
-    pub fn manage_nicknames(self) -> bool {
+    pub const fn manage_nicknames(self) -> bool {
         self.contains(Self::MANAGE_NICKNAMES)
     }
 
@@ -630,7 +630,7 @@ impl Permissions {
     ///
     /// [Manage Roles]: Self::MANAGE_ROLES
     #[must_use]
-    pub fn manage_roles(self) -> bool {
+    pub const fn manage_roles(self) -> bool {
         self.contains(Self::MANAGE_ROLES)
     }
 
@@ -639,7 +639,7 @@ impl Permissions {
     ///
     /// [Manage Threads]: Self::MANAGE_THREADS
     #[must_use]
-    pub fn manage_threads(self) -> bool {
+    pub const fn manage_threads(self) -> bool {
         self.contains(Self::MANAGE_THREADS)
     }
 
@@ -648,7 +648,7 @@ impl Permissions {
     ///
     /// [Manage Webhooks]: Self::MANAGE_WEBHOOKS
     #[must_use]
-    pub fn manage_webhooks(self) -> bool {
+    pub const fn manage_webhooks(self) -> bool {
         self.contains(Self::MANAGE_WEBHOOKS)
     }
 
@@ -657,7 +657,7 @@ impl Permissions {
     ///
     /// [Mention Everyone]: Self::MENTION_EVERYONE
     #[must_use]
-    pub fn mention_everyone(self) -> bool {
+    pub const fn mention_everyone(self) -> bool {
         self.contains(Self::MENTION_EVERYONE)
     }
 
@@ -666,7 +666,7 @@ impl Permissions {
     ///
     /// [Moderate Members]: Self::MODERATE_MEMBERS
     #[must_use]
-    pub fn moderate_members(self) -> bool {
+    pub const fn moderate_members(self) -> bool {
         self.contains(Self::MODERATE_MEMBERS)
     }
 
@@ -675,7 +675,7 @@ impl Permissions {
     ///
     /// [Move Members]: Self::MOVE_MEMBERS
     #[must_use]
-    pub fn move_members(self) -> bool {
+    pub const fn move_members(self) -> bool {
         self.contains(Self::MOVE_MEMBERS)
     }
 
@@ -684,7 +684,7 @@ impl Permissions {
     ///
     /// [Mute Members]: Self::MUTE_MEMBERS
     #[must_use]
-    pub fn mute_members(self) -> bool {
+    pub const fn mute_members(self) -> bool {
         self.contains(Self::MUTE_MEMBERS)
     }
 
@@ -693,7 +693,7 @@ impl Permissions {
     ///
     /// [Read Message History]: Self::READ_MESSAGE_HISTORY
     #[must_use]
-    pub fn read_message_history(self) -> bool {
+    pub const fn read_message_history(self) -> bool {
         self.contains(Self::READ_MESSAGE_HISTORY)
     }
 
@@ -702,7 +702,7 @@ impl Permissions {
     ///
     /// [Send Messages]: Self::SEND_MESSAGES
     #[must_use]
-    pub fn send_messages(self) -> bool {
+    pub const fn send_messages(self) -> bool {
         self.contains(Self::SEND_MESSAGES)
     }
 
@@ -711,7 +711,7 @@ impl Permissions {
     ///
     /// [Send Messages in Threads]: Self::SEND_MESSAGES_IN_THREADS
     #[must_use]
-    pub fn send_messages_in_threads(self) -> bool {
+    pub const fn send_messages_in_threads(self) -> bool {
         self.contains(Self::SEND_MESSAGES_IN_THREADS)
     }
 
@@ -720,7 +720,7 @@ impl Permissions {
     ///
     /// [Send TTS Messages]: Self::SEND_TTS_MESSAGES
     #[must_use]
-    pub fn send_tts_messages(self) -> bool {
+    pub const fn send_tts_messages(self) -> bool {
         self.contains(Self::SEND_TTS_MESSAGES)
     }
 
@@ -729,7 +729,7 @@ impl Permissions {
     ///
     /// [Speak]: Self::SPEAK
     #[must_use]
-    pub fn speak(self) -> bool {
+    pub const fn speak(self) -> bool {
         self.contains(Self::SPEAK)
     }
 
@@ -738,7 +738,7 @@ impl Permissions {
     ///
     /// [Request To Speak]: Self::REQUEST_TO_SPEAK
     #[must_use]
-    pub fn request_to_speak(self) -> bool {
+    pub const fn request_to_speak(self) -> bool {
         self.contains(Self::REQUEST_TO_SPEAK)
     }
 
@@ -747,7 +747,7 @@ impl Permissions {
     ///
     /// [Use Embedded Activities]: Self::USE_EMBEDDED_ACTIVITIES
     #[must_use]
-    pub fn use_embedded_activities(self) -> bool {
+    pub const fn use_embedded_activities(self) -> bool {
         self.contains(Self::USE_EMBEDDED_ACTIVITIES)
     }
 
@@ -756,7 +756,7 @@ impl Permissions {
     ///
     /// [Use External Emojis]: Self::USE_EXTERNAL_EMOJIS
     #[must_use]
-    pub fn use_external_emojis(self) -> bool {
+    pub const fn use_external_emojis(self) -> bool {
         self.contains(Self::USE_EXTERNAL_EMOJIS)
     }
 
@@ -765,7 +765,7 @@ impl Permissions {
     ///
     /// [Use External Stickers]: Self::USE_EXTERNAL_STICKERS
     #[must_use]
-    pub fn use_external_stickers(self) -> bool {
+    pub const fn use_external_stickers(self) -> bool {
         self.contains(Self::USE_EXTERNAL_STICKERS)
     }
 
@@ -774,7 +774,7 @@ impl Permissions {
     ///
     /// [Use Application Commands]: Self::USE_APPLICATION_COMMANDS
     #[must_use]
-    pub fn use_application_commands(self) -> bool {
+    pub const fn use_application_commands(self) -> bool {
         self.contains(Self::USE_APPLICATION_COMMANDS)
     }
 
@@ -783,7 +783,7 @@ impl Permissions {
     ///
     /// [Use VAD]: Self::USE_VAD
     #[must_use]
-    pub fn use_vad(self) -> bool {
+    pub const fn use_vad(self) -> bool {
         self.contains(Self::USE_VAD)
     }
 }
