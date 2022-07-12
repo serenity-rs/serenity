@@ -199,7 +199,7 @@ impl Channel {
     /// [`PrivateChannel`].
     #[inline]
     #[must_use]
-    pub fn id(&self) -> ChannelId {
+    pub const fn id(&self) -> ChannelId {
         match self {
             Self::Guild(ch) => ch.id,
             Self::Private(ch) => ch.id,
@@ -213,7 +213,7 @@ impl Channel {
     /// If other channel types are used it will return None.
     #[inline]
     #[must_use]
-    pub fn position(&self) -> Option<i64> {
+    pub const fn position(&self) -> Option<i64> {
         match self {
             Self::Guild(channel) => Some(channel.position),
             Self::Category(category) => Some(category.position),
@@ -317,7 +317,7 @@ enum_number! {
 impl ChannelType {
     #[inline]
     #[must_use]
-    pub fn name(&self) -> &str {
+    pub const fn name(&self) -> &str {
         match *self {
             Self::Private => "private",
             Self::Text => "text",
