@@ -1,3 +1,5 @@
+use std::fmt::Write as _;
+
 use serenity::async_trait;
 use serenity::model::prelude::*;
 use serenity::prelude::*;
@@ -52,7 +54,7 @@ impl EventHandler for Bot {
 
             let mut response = format!("You have {} pending tasks:\n", todos.len());
             for (i, todo) in todos.iter().enumerate() {
-                response += &format!("{}. {}\n", i + 1, todo.task);
+                writeln!(response, "{}. {}", i + 1, todo.task).unwrap()
             }
 
             msg.channel_id.say(&ctx, response).await.unwrap();
