@@ -18,23 +18,14 @@ use crate::collector::{
     ReactionCollectorBuilder,
 };
 #[cfg(feature = "model")]
-use crate::http::{CacheHttp, Http};
+use crate::constants;
 #[cfg(feature = "model")]
-use crate::json::prelude::*;
+use crate::http::{CacheHttp, Http};
 use crate::model::application::component::ActionRow;
 use crate::model::application::interaction::MessageInteraction;
 use crate::model::prelude::*;
 #[cfg(all(feature = "cache", feature = "model"))]
 use crate::utils;
-#[cfg(feature = "model")]
-use crate::{
-    constants,
-    model::{
-        id::{ApplicationId, ChannelId, GuildId, MessageId},
-        sticker::StickerItem,
-        timestamp::Timestamp,
-    },
-};
 
 /// A representation of a message over a guild's text channel, a group, or a
 /// private channel.
@@ -799,94 +790,6 @@ impl Message {
     #[cfg(feature = "cache")]
     pub fn category_id(&self, cache: impl AsRef<Cache>) -> Option<ChannelId> {
         cache.as_ref().channel_category_id(self.channel_id)
-    }
-
-    #[allow(dead_code)] // Temporary, will be added back or removed in future
-    pub(crate) fn check_lengths(map: &JsonMap) -> Result<()> {
-        Self::check_content_length(map)?;
-        Self::check_embed_length(map)?;
-        Self::check_sticker_ids_length(map)?;
-
-        Ok(())
-    }
-
-    #[allow(dead_code)] // Temporary, will be added back or removed in future
-    pub(crate) fn check_content_length(map: &JsonMap) -> Result<()> {
-        if let Some(Value::String(content)) = map.get("content") {
-            if let Some(length_over) = Message::overflow_length(content) {
-                return Err(Error::Model(ModelError::MessageTooLong(length_over)));
-            }
-        }
-
-        Ok(())
-    }
-
-    #[allow(dead_code)] // Temporary, will be added back or removed in future
-    pub(crate) fn check_embed_length(map: &JsonMap) -> Result<()> {
-        let embeds = match map.get("embeds") {
-            Some(&Value::Array(ref value)) => value,
-            _ => return Ok(()),
-        };
-
-        if embeds.len() > 10 {
-            return Err(Error::Model(ModelError::EmbedAmount));
-        }
-
-        for embed in embeds {
-            let mut total: usize = 0;
-
-            if let Some(&Value::Object(ref author)) = embed.get("author") {
-                if let Some(&Value::Object(ref name)) = author.get("name") {
-                    total += name.len();
-                }
-            }
-
-            if let Some(&Value::String(ref description)) = embed.get("description") {
-                total += description.len();
-            }
-
-            if let Some(&Value::Array(ref fields)) = embed.get("fields") {
-                for field_as_value in fields {
-                    if let Value::Object(ref field) = *field_as_value {
-                        if let Some(&Value::String(ref field_name)) = field.get("name") {
-                            total += field_name.len();
-                        }
-
-                        if let Some(&Value::String(ref field_value)) = field.get("value") {
-                            total += field_value.len();
-                        }
-                    }
-                }
-            }
-
-            if let Some(&Value::Object(ref footer)) = embed.get("footer") {
-                if let Some(&Value::String(ref text)) = footer.get("text") {
-                    total += text.len();
-                }
-            }
-
-            if let Some(&Value::String(ref title)) = embed.get("title") {
-                total += title.len();
-            }
-
-            if total > constants::EMBED_MAX_LENGTH {
-                let overflow = total - constants::EMBED_MAX_LENGTH;
-                return Err(Error::Model(ModelError::EmbedTooLarge(overflow)));
-            }
-        }
-
-        Ok(())
-    }
-
-    #[allow(dead_code)] // Temporary, will be added back or removed in future
-    pub(crate) fn check_sticker_ids_length(map: &JsonMap) -> Result<()> {
-        if let Some(Value::Array(sticker_ids)) = map.get("sticker_ids") {
-            if sticker_ids.len() > constants::STICKER_MAX_COUNT {
-                return Err(Error::Model(ModelError::StickerAmount));
-            }
-        }
-
-        Ok(())
     }
 }
 
