@@ -403,7 +403,7 @@
 
 <span class="kw">impl</span> <span class="ident">Action</span> {
     <span class="attribute">#[<span class="ident">must_use</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">num</span>(<span class="self">self</span>) -&gt; <span class="ident">u8</span> {
+    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">num</span>(<span class="self">self</span>) -&gt; <span class="ident">u8</span> {
         <span class="kw">match</span> <span class="self">self</span> {
             <span class="ident"><span class="self">Self</span>::GuildUpdate</span> =&gt; <span class="number">1</span>,
             <span class="ident"><span class="self">Self</span>::Channel</span>(<span class="ident">x</span>) =&gt; <span class="ident">x</span> <span class="kw">as</span> <span class="ident">u8</span>,

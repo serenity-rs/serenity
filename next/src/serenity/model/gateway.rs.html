@@ -1247,7 +1247,7 @@
 
     <span class="doccomment">/// Checks if any of the included intents are privileged.</span>
     <span class="attribute">#[<span class="ident">must_use</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_privileged</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
+    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">is_privileged</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="self">self</span>.<span class="ident">intersects</span>(<span class="ident"><span class="self">Self</span>::privileged</span>())
     }
 
@@ -1256,7 +1256,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// [GUILDS]: Self::GUILDS</span>
     <span class="attribute">#[<span class="ident">must_use</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">guilds</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
+    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">guilds</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="self">self</span>.<span class="ident">contains</span>(<span class="ident"><span class="self">Self</span>::GUILDS</span>)
     }
 
@@ -1265,7 +1265,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// [GUILD_MEMBERS]: Self::GUILD_MEMBERS</span>
     <span class="attribute">#[<span class="ident">must_use</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">guild_members</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
+    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">guild_members</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="self">self</span>.<span class="ident">contains</span>(<span class="ident"><span class="self">Self</span>::GUILD_MEMBERS</span>)
     }
 
@@ -1274,7 +1274,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// [GUILD_BANS]: Self::GUILD_BANS</span>
     <span class="attribute">#[<span class="ident">must_use</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">guild_bans</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
+    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">guild_bans</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="self">self</span>.<span class="ident">contains</span>(<span class="ident"><span class="self">Self</span>::GUILD_BANS</span>)
     }
 
@@ -1283,7 +1283,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// [GUILD_EMOJIS_AND_STICKERS]: Self::GUILD_EMOJIS_AND_STICKERS</span>
     <span class="attribute">#[<span class="ident">must_use</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">guild_emojis_and_stickers</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
+    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">guild_emojis_and_stickers</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="self">self</span>.<span class="ident">contains</span>(<span class="ident"><span class="self">Self</span>::GUILD_EMOJIS_AND_STICKERS</span>)
     }
 
@@ -1292,7 +1292,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// [GUILD_INTEGRATIONS]: Self::GUILD_INTEGRATIONS</span>
     <span class="attribute">#[<span class="ident">must_use</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">guild_integrations</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
+    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">guild_integrations</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="self">self</span>.<span class="ident">contains</span>(<span class="ident"><span class="self">Self</span>::GUILD_INTEGRATIONS</span>)
     }
 
@@ -1301,7 +1301,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// [GUILD_WEBHOOKS]: Self::GUILD_WEBHOOKS</span>
     <span class="attribute">#[<span class="ident">must_use</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">guild_webhooks</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
+    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">guild_webhooks</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="self">self</span>.<span class="ident">contains</span>(<span class="ident"><span class="self">Self</span>::GUILD_WEBHOOKS</span>)
     }
 
@@ -1310,7 +1310,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// [GUILD_INVITES]: Self::GUILD_INVITES</span>
     <span class="attribute">#[<span class="ident">must_use</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">guild_invites</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
+    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">guild_invites</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="self">self</span>.<span class="ident">contains</span>(<span class="ident"><span class="self">Self</span>::GUILD_INVITES</span>)
     }
 
@@ -1319,7 +1319,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// [GUILD_VOICE_STATES]: Self::GUILD_VOICE_STATES</span>
     <span class="attribute">#[<span class="ident">must_use</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">guild_voice_states</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
+    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">guild_voice_states</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="self">self</span>.<span class="ident">contains</span>(<span class="ident"><span class="self">Self</span>::GUILD_VOICE_STATES</span>)
     }
 
@@ -1328,7 +1328,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// [GUILD_PRESENCES]: Self::GUILD_PRESENCES</span>
     <span class="attribute">#[<span class="ident">must_use</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">guild_presences</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
+    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">guild_presences</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="self">self</span>.<span class="ident">contains</span>(<span class="ident"><span class="self">Self</span>::GUILD_PRESENCES</span>)
     }
 
@@ -1337,7 +1337,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// [GUILD_MESSAGE_REACTIONS]: Self::GUILD_MESSAGE_REACTIONS</span>
     <span class="attribute">#[<span class="ident">must_use</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">guild_message_reactions</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
+    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">guild_message_reactions</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="self">self</span>.<span class="ident">contains</span>(<span class="ident"><span class="self">Self</span>::GUILD_MESSAGE_REACTIONS</span>)
     }
 
@@ -1346,7 +1346,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// [GUILD_MESSAGE_TYPING]: Self::GUILD_MESSAGE_TYPING</span>
     <span class="attribute">#[<span class="ident">must_use</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">guild_message_typing</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
+    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">guild_message_typing</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="self">self</span>.<span class="ident">contains</span>(<span class="ident"><span class="self">Self</span>::GUILD_MESSAGE_TYPING</span>)
     }
 
@@ -1355,7 +1355,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// [DIRECT_MESSAGES]: Self::DIRECT_MESSAGES</span>
     <span class="attribute">#[<span class="ident">must_use</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">direct_messages</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
+    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">direct_messages</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="self">self</span>.<span class="ident">contains</span>(<span class="ident"><span class="self">Self</span>::DIRECT_MESSAGES</span>)
     }
 
@@ -1364,7 +1364,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// [DIRECT_MESSAGE_REACTIONS]: Self::DIRECT_MESSAGE_REACTIONS</span>
     <span class="attribute">#[<span class="ident">must_use</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">direct_message_reactions</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
+    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">direct_message_reactions</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="self">self</span>.<span class="ident">contains</span>(<span class="ident"><span class="self">Self</span>::DIRECT_MESSAGE_REACTIONS</span>)
     }
 
@@ -1373,7 +1373,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// [DIRECT_MESSAGE_TYPING]: Self::DIRECT_MESSAGE_TYPING</span>
     <span class="attribute">#[<span class="ident">must_use</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">direct_message_typing</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
+    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">direct_message_typing</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="self">self</span>.<span class="ident">contains</span>(<span class="ident"><span class="self">Self</span>::DIRECT_MESSAGE_TYPING</span>)
     }
 
@@ -1382,7 +1382,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// [MESSAGE_CONTENT]: Self::MESSAGE_CONTENT</span>
     <span class="attribute">#[<span class="ident">must_use</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">message_content</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
+    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">message_content</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="self">self</span>.<span class="ident">contains</span>(<span class="ident"><span class="self">Self</span>::MESSAGE_CONTENT</span>)
     }
 
@@ -1391,7 +1391,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// [GUILD_SCHEDULED_EVENTS]: Self::GUILD_SCHEDULED_EVENTS</span>
     <span class="attribute">#[<span class="ident">must_use</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">guild_scheduled_events</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
+    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">guild_scheduled_events</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="self">self</span>.<span class="ident">contains</span>(<span class="ident"><span class="self">Self</span>::GUILD_SCHEDULED_EVENTS</span>)
     }
 }

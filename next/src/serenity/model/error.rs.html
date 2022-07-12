@@ -404,7 +404,7 @@
     <span class="doccomment">/// Return `true` if the model error is related to an item missing in the</span>
     <span class="doccomment">/// cache.</span>
     <span class="attribute">#[<span class="ident">must_use</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_cache_err</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
+    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">is_cache_err</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="macro">matches!</span>(
             <span class="self">self</span>,
             <span class="ident"><span class="self">Self</span>::ItemMissing</span>

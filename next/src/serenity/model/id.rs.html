@@ -372,6 +372,11 @@
 <span id="367">367</span>
 <span id="368">368</span>
 <span id="369">369</span>
+<span id="370">370</span>
+<span id="371">371</span>
+<span id="372">372</span>
+<span id="373">373</span>
+<span id="374">374</span>
 </pre><pre class="rust"><code><span class="doccomment">//! A collection of newtypes defining type-strong IDs.</span>
 
 <span class="kw">use</span> <span class="ident">std::fmt</span>;
@@ -389,8 +394,13 @@
                 <span class="doccomment">/// Panics if the id is zero.</span>
                 <span class="attribute">#[<span class="ident">inline</span>]</span>
                 <span class="attribute">#[<span class="ident">must_use</span>]</span>
+                <span class="attribute">#[<span class="ident">track_caller</span>]</span>
+                <span class="attribute">#[<span class="ident">rustversion::attr</span>(<span class="ident">since</span>(<span class="number">1.57</span>), <span class="kw">const</span>)]</span>
                 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">id</span>: <span class="ident">u64</span>) -&gt; <span class="self">Self</span> {
-                    <span class="self">Self</span>(<span class="ident">NonZeroU64::new</span>(<span class="ident">id</span>).<span class="ident">unwrap</span>())
+                    <span class="kw">match</span> <span class="ident">NonZeroU64::new</span>(<span class="ident">id</span>) {
+                        <span class="prelude-val">Some</span>(<span class="ident">inner</span>) =&gt; <span class="self">Self</span>(<span class="ident">inner</span>),
+                        <span class="prelude-val">None</span> =&gt; <span class="macro">panic!</span>(<span class="string">&quot;Attempted to call Id::new with invalid (0) value&quot;</span>)
+                    }
                 }
 
                 <span class="doccomment">/// Retrieves the inner ID as u64</span>
