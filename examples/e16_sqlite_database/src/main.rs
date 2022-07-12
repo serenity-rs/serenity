@@ -1,6 +1,5 @@
 // It is recommended that you read the README file, it is very important to this example.
 // This example will help us to use a sqlite database with our bot.
-
 use std::fmt::Write as _;
 
 use serenity::async_trait;
