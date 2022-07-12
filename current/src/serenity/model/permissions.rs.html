@@ -845,6 +845,16 @@
 <span id="839">839</span>
 <span id="840">840</span>
 <span id="841">841</span>
+<span id="842">842</span>
+<span id="843">843</span>
+<span id="844">844</span>
+<span id="845">845</span>
+<span id="846">846</span>
+<span id="847">847</span>
+<span id="848">848</span>
+<span id="849">849</span>
+<span id="850">850</span>
+<span id="851">851</span>
 </pre><pre class="rust"><code><span class="doccomment">//! A set of permissions for a role or user. These can be assigned directly</span>
 <span class="doccomment">//! to a role or as a channel&#39;s permission overrides.</span>
 <span class="doccomment">//!</span>
@@ -1220,6 +1230,7 @@
     <span class="ident">kick_members</span>: <span class="string">&quot;Kick Members&quot;</span>,
     <span class="ident">manage_channels</span>: <span class="string">&quot;Manage Channels&quot;</span>,
     <span class="ident">manage_emojis_and_stickers</span>: <span class="string">&quot;Manage Emojis and Stickers&quot;</span>,
+    <span class="ident">manage_events</span>: <span class="string">&quot;Manage Events&quot;</span>,
     <span class="ident">manage_guild</span>: <span class="string">&quot;Manage Guilds&quot;</span>,
     <span class="ident">manage_messages</span>: <span class="string">&quot;Manage Messages&quot;</span>,
     <span class="ident">manage_nicknames</span>: <span class="string">&quot;Manage Nicknames&quot;</span>,
@@ -1428,6 +1439,15 @@
     <span class="attribute">#[<span class="ident">must_use</span>]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">manage_emojis_and_stickers</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="self">self</span>.<span class="ident">contains</span>(<span class="ident"><span class="self">Self</span>::MANAGE_EMOJIS_AND_STICKERS</span>)
+    }
+
+    <span class="doccomment">/// Shorthand for checking that the set of permissions contains the</span>
+    <span class="doccomment">/// [Manage Events] permission.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// [Manage Events]: Self::MANAGE_EVENTS</span>
+    <span class="attribute">#[<span class="ident">must_use</span>]</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">manage_events</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
+        <span class="self">self</span>.<span class="ident">contains</span>(<span class="ident"><span class="self">Self</span>::MANAGE_EVENTS</span>)
     }
 
     <span class="doccomment">/// Shorthand for checking that the set of permissions contains the</span>
