@@ -198,7 +198,7 @@ mod tests {
     #[test]
     fn enum_number() {
         enum_number! {
-            #[derive(Copy, Clone, Debug, PartialEq, Deserialize, Serialize)]
+            #[derive(Copy, Clone, Debug, PartialEq, Eq, Deserialize, Serialize)]
             #[serde(from = "u8", into = "u8")]
             pub enum T {
                 /// AAA
