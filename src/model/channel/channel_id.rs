@@ -340,43 +340,26 @@ impl ChannelId {
 
     /// Edits a [`Message`] in the channel given its Id.
     ///
-    /// Message editing preserves all unchanged message data.
+    /// Message editing preserves all unchanged message data, with some exceptions for embeds and
+    /// attachments.
     ///
-    /// Refer to the documentation for [`EditMessage`] for more information
-    /// regarding message restrictions and requirements.
+    /// **Note**: In most cases requires that the current user be the author of the message.
     ///
-    /// **Note**: Requires that the current user be the author of the message.
+    /// Refer to the documentation for [`EditMessage`] for information regarding content
+    /// restrictions and requirements.
     ///
     /// # Errors
     ///
-    /// Returns a [`ModelError::MessageTooLong`] if the content of the message
-    /// is over the [`the limit`], containing the number of unicode code points
-    /// over the limit.
-    ///
-    /// [`the limit`]: crate::builder::EditMessage::content
+    /// See [`EditMessage::execute`] for a list of possible errors, and their corresponding
+    /// reasons.
     #[inline]
-    pub async fn edit_message<'a, F>(
+    pub async fn edit_message<'a>(
         self,
         http: impl AsRef<Http>,
         message_id: impl Into<MessageId>,
-        f: F,
-    ) -> Result<Message>
-    where
-        F: for<'b> FnOnce(&'b mut EditMessage<'a>) -> &'b mut EditMessage<'a>,
-    {
-        let mut msg = EditMessage::default();
-        f(&mut msg);
-
-        if let Some(content) = &msg.content {
-            if let Some(length_over) = Message::overflow_length(content) {
-                return Err(Error::Model(ModelError::MessageTooLong(length_over)));
-            }
-        }
-
-        let files = std::mem::take(&mut msg.files);
-        http.as_ref()
-            .edit_message_and_attachments(self.get(), message_id.into().get(), &msg, files)
-            .await
+        builder: EditMessage<'_>,
+    ) -> Result<Message> {
+        builder.execute(http, self, message_id.into()).await
     }
 
     /// Follows the News Channel
