@@ -27,7 +27,7 @@ pub struct RequestBuilder<'a> {
 
 impl<'a> RequestBuilder<'a> {
     #[must_use]
-    pub fn new(route_info: RouteInfo<'a>) -> Self {
+    pub const fn new(route_info: RouteInfo<'a>) -> Self {
         Self {
             body: None,
             multipart: None,

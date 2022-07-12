@@ -168,7 +168,7 @@ pub enum LightMethod {
 
 impl LightMethod {
     #[must_use]
-    pub fn reqwest_method(self) -> Method {
+    pub const fn reqwest_method(self) -> Method {
         match self {
             Self::Delete => Method::DELETE,
             Self::Get => Method::GET,
