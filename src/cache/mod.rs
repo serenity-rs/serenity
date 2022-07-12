@@ -98,9 +98,9 @@ impl<K: Eq + Hash, V> std::ops::Deref for CacheRef<'_, K, V> {
     fn deref(&self) -> &Self::Target {
         match &self.inner {
             #[cfg(feature = "temp_cache")]
-            CacheRefInner::Arc(inner) => &*inner,
+            CacheRefInner::Arc(inner) => inner,
             CacheRefInner::DashRef(inner) => inner.value(),
-            CacheRefInner::ReadGuard(inner) => &*inner,
+            CacheRefInner::ReadGuard(inner) => inner,
         }
     }
 }

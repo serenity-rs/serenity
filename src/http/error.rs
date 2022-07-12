@@ -7,7 +7,7 @@ use url::ParseError as UrlError;
 
 use crate::http::utils::deserialize_errors;
 
-#[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
+#[derive(Clone, Debug, PartialEq, Eq, Deserialize, Serialize)]
 #[non_exhaustive]
 pub struct DiscordJsonError {
     /// The error code.
@@ -20,7 +20,7 @@ pub struct DiscordJsonError {
     pub errors: Vec<DiscordJsonSingleError>,
 }
 
-#[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
+#[derive(Clone, Debug, PartialEq, Eq, Deserialize, Serialize)]
 pub struct DiscordJsonSingleError {
     /// The error code.
     pub code: String,
@@ -30,7 +30,7 @@ pub struct DiscordJsonSingleError {
     pub path: String,
 }
 
-#[derive(Clone, Debug, PartialEq)]
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub struct ErrorResponse {
     pub status_code: StatusCode,
     pub url: Url,
