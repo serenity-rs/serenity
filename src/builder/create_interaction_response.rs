@@ -214,19 +214,8 @@ impl<'a> CreateInteractionResponseData<'a> {
         self
     }
 
-    /// Creates components for this message.
-    pub fn components<F>(self, f: F) -> Self
-    where
-        F: FnOnce(&mut CreateComponents) -> &mut CreateComponents,
-    {
-        let mut components = CreateComponents::default();
-        f(&mut components);
-
-        self.set_components(components)
-    }
-
     /// Sets the components of this message.
-    pub fn set_components(mut self, components: CreateComponents) -> Self {
+    pub fn components(mut self, components: CreateComponents) -> Self {
         self.components = Some(components);
         self
     }

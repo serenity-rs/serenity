@@ -242,25 +242,13 @@ impl<'a> ExecuteWebhook<'a> {
         self
     }
 
-    /// Creates components for this message. Requires an application-owned webhook, meaning either
+    /// Sets the components for this message. Requires an application-owned webhook, meaning either
     /// the webhook's `kind` field is set to [`WebhookType::Application`], or it was created by an
     /// application (and has kind [`WebhookType::Incoming`]).
     ///
     /// [`WebhookType::Application`]: crate::model::webhook::WebhookType
     /// [`WebhookType::Incoming`]: crate::model::webhook::WebhookType
-    pub fn components<F>(self, f: F) -> Self
-    where
-        F: FnOnce(&mut CreateComponents) -> &mut CreateComponents,
-    {
-        let mut components = CreateComponents::default();
-        f(&mut components);
-
-        self.set_components(components)
-    }
-
-    /// Sets the components of this message. Requires an application-owned webhook. See
-    /// [`Self::components`] for details.
-    pub fn set_components(mut self, components: CreateComponents) -> Self {
+    pub fn components(mut self, components: CreateComponents) -> Self {
         self.components = Some(components);
         self
     }

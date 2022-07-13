@@ -106,13 +106,7 @@ impl EditInteractionResponse {
     }
 
     /// Sets the components of this message.
-    pub fn components<F>(mut self, f: F) -> Self
-    where
-        F: FnOnce(&mut CreateComponents) -> &mut CreateComponents,
-    {
-        let mut components = CreateComponents::default();
-        f(&mut components);
-
+    pub fn components(mut self, components: CreateComponents) -> Self {
         self.components = Some(components);
         self
     }

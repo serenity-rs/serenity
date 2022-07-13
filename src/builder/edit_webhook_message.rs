@@ -99,19 +99,13 @@ impl EditWebhookMessage {
         self
     }
 
-    /// Creates components for this message. Requires an application-owned webhook, meaning either
+    /// Sets the components for this message. Requires an application-owned webhook, meaning either
     /// the webhook's `kind` field is set to [`WebhookType::Application`], or it was created by an
     /// application (and has kind [`WebhookType::Incoming`]).
     ///
     /// [`WebhookType::Application`]: crate::model::webhook::WebhookType
     /// [`WebhookType::Incoming`]: crate::model::webhook::WebhookType
-    pub fn components<F>(mut self, f: F) -> Self
-    where
-        F: FnOnce(&mut CreateComponents) -> &mut CreateComponents,
-    {
-        let mut components = CreateComponents::default();
-        f(&mut components);
-
+    pub fn components(mut self, components: CreateComponents) -> Self {
         self.components = Some(components);
         self
     }
