@@ -756,38 +756,31 @@ impl PartialGuild {
 
     /// Edits the current guild with new data where specified.
     ///
-    /// **Note**: Requires the current user to have the [Manage Guild]
-    /// permission.
+    /// **Note**: Requires the [Manage Guild] permission.
     ///
     /// # Errors
     ///
-    /// Returns [`Error::Http`] if an invalid value is set, or if the current user
-    /// lacks permission to edit the guild.
+    /// If the `cache` is enabled, returns a [`ModelError::InvalidPermissions`] if the current user
+    /// lacks permission. Otherwise returns [`Error::Http`], as well as if invalid data is given.
     ///
     /// [Manage Guild]: Permissions::MANAGE_GUILD
-    pub async fn edit<F>(&mut self, http: impl AsRef<Http>, f: F) -> Result<()>
-    where
-        F: FnOnce(&mut EditGuild) -> &mut EditGuild,
-    {
-        match self.id.edit(&http, f).await {
-            Ok(guild) => {
-                self.afk_channel_id = guild.afk_channel_id;
-                self.afk_timeout = guild.afk_timeout;
-                self.default_message_notifications = guild.default_message_notifications;
-                self.emojis = guild.emojis;
-                self.features = guild.features;
-                self.icon = guild.icon;
-                self.mfa_level = guild.mfa_level;
-                self.name = guild.name;
-                self.owner_id = guild.owner_id;
-                self.roles = guild.roles;
-                self.splash = guild.splash;
-                self.verification_level = guild.verification_level;
+    pub async fn edit(&mut self, cache_http: impl CacheHttp, builder: EditGuild) -> Result<()> {
+        let guild = self.id.edit(cache_http, builder).await?;
 
-                Ok(())
-            },
-            Err(why) => Err(why),
-        }
+        self.afk_channel_id = guild.afk_channel_id;
+        self.afk_timeout = guild.afk_timeout;
+        self.default_message_notifications = guild.default_message_notifications;
+        self.emojis = guild.emojis;
+        self.features = guild.features;
+        self.icon = guild.icon;
+        self.mfa_level = guild.mfa_level;
+        self.name = guild.name;
+        self.owner_id = guild.owner_id;
+        self.roles = guild.roles;
+        self.splash = guild.splash;
+        self.verification_level = guild.verification_level;
+
+        Ok(())
     }
 
     /// Edits an [`Emoji`]'s name in the guild.

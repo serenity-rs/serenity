@@ -577,26 +577,21 @@ impl GuildId {
 
     /// Edits the current guild with new data where specified.
     ///
-    /// Refer to [`Guild::edit`] for more information.
-    ///
-    /// **Note**: Requires the current user to have the [Manage Guild]
-    /// permission.
+    /// **Note**: Requires the [Manage Guild] permission.
     ///
     /// # Errors
     ///
-    /// Returns [`Error::Http`] if the current user lacks permission,
-    /// or if an invalid value is set.
+    /// If the `cache` is enabled, returns a [`ModelError::InvalidPermissions`] if the current user
+    /// lacks permission. Otherwise returns [`Error::Http`], as well as if invalid data is given.
     ///
     /// [Manage Guild]: Permissions::MANAGE_GUILD
     #[inline]
-    pub async fn edit<F>(&mut self, http: impl AsRef<Http>, f: F) -> Result<PartialGuild>
-    where
-        F: FnOnce(&mut EditGuild) -> &mut EditGuild,
-    {
-        let mut edit_guild = EditGuild::default();
-        f(&mut edit_guild);
-
-        http.as_ref().edit_guild(self.get(), &edit_guild, None).await
+    pub async fn edit(
+        self,
+        cache_http: impl CacheHttp,
+        builder: EditGuild,
+    ) -> Result<PartialGuild> {
+        builder.execute(cache_http, self).await
     }
 
     /// Edits an [`Emoji`]'s name in the guild.

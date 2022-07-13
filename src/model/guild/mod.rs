@@ -1084,68 +1084,51 @@ impl Guild {
 
     /// Edits the current guild with new data where specified.
     ///
-    /// Refer to [`EditGuild`]'s documentation for a full list of methods.
-    ///
-    /// **Note**: Requires the current user to have the [Manage Guild]
-    /// permission.
+    /// **Note**: Requires the [Manage Guild] permission.
     ///
     /// # Examples
     ///
-    /// Change a guild's icon using a file name "icon.png":
+    /// Change a guild's icon using a file named "icon.png":
     ///
-    /// ```rust,ignore
-    /// use serenity::utils;
+    /// ```rust,no_run
+    /// # use serenity::builder::EditGuild;
+    /// # use serenity::{http::Http, model::id::GuildId};
+    /// #
+    /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
+    /// #     let http = Http::new("token");
+    /// #     let mut guild = GuildId::new(1).to_partial_guild(&http).await?;
+    /// let base64_icon = serenity::utils::read_image("./icon.png")?;
     ///
-    /// // We are using read_image helper function from utils.
-    /// let base64_icon = utils::read_image("./icon.png")
-    ///     .expect("Failed to read image");
-    ///
-    /// guild.edit(|g| g.icon(base64_icon));
+    /// // assuming a `guild` has already been bound
+    /// let builder = EditGuild::default().icon(Some(base64_icon));
+    /// guild.edit(&http, builder).await?;
+    /// #     Ok(())
+    /// # }
     /// ```
     ///
     /// # Errors
     ///
-    /// If the `cache` is enabled, returns a [`ModelError::InvalidPermissions`]
-    /// if the current user does not have permission to edit the guild.
-    ///
-    /// Otherwise will return [`Error::Http`] if the current user does not have
-    /// permission.
+    /// If the `cache` is enabled, returns a [`ModelError::InvalidPermissions`] if the current user
+    /// lacks permission. Otherwise returns [`Error::Http`], as well as if invalid data is given.
     ///
     /// [Manage Guild]: Permissions::MANAGE_GUILD
-    pub async fn edit<F>(&mut self, cache_http: impl CacheHttp, f: F) -> Result<()>
-    where
-        F: FnOnce(&mut EditGuild) -> &mut EditGuild,
-    {
-        #[cfg(feature = "cache")]
-        {
-            if cache_http.cache().is_some() {
-                let req = Permissions::MANAGE_GUILD;
+    pub async fn edit(&mut self, cache_http: impl CacheHttp, builder: EditGuild) -> Result<()> {
+        let guild = self.id.edit(cache_http, builder).await?;
 
-                if !self.has_perms(&cache_http, req).await {
-                    return Err(Error::Model(ModelError::InvalidPermissions(req)));
-                }
-            }
-        }
+        self.afk_channel_id = guild.afk_channel_id;
+        self.afk_timeout = guild.afk_timeout;
+        self.default_message_notifications = guild.default_message_notifications;
+        self.emojis = guild.emojis;
+        self.features = guild.features;
+        self.icon = guild.icon;
+        self.mfa_level = guild.mfa_level;
+        self.name = guild.name;
+        self.owner_id = guild.owner_id;
+        self.roles = guild.roles;
+        self.splash = guild.splash;
+        self.verification_level = guild.verification_level;
 
-        match self.id.edit(cache_http.http(), f).await {
-            Ok(guild) => {
-                self.afk_channel_id = guild.afk_channel_id;
-                self.afk_timeout = guild.afk_timeout;
-                self.default_message_notifications = guild.default_message_notifications;
-                self.emojis = guild.emojis;
-                self.features = guild.features;
-                self.icon = guild.icon;
-                self.mfa_level = guild.mfa_level;
-                self.name = guild.name;
-                self.owner_id = guild.owner_id;
-                self.roles = guild.roles;
-                self.splash = guild.splash;
-                self.verification_level = guild.verification_level;
-
-                Ok(())
-            },
-            Err(why) => Err(why),
-        }
+        Ok(())
     }
 
     /// Edits an [`Emoji`]'s name in the guild.
