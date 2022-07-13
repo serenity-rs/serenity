@@ -801,39 +801,38 @@ impl GuildId {
         http.as_ref().edit_role_position(self.get(), role_id.into().get(), position, None).await
     }
 
-    /// Edits the [`GuildWelcomeScreen`].
+    /// Edits the guild's welcome screen.
+    ///
+    /// **Note**: Requires the [Manage Guild] permission.
     ///
     /// # Errors
     ///
-    /// Returns an [`Error::Http`] if some mandatory fields are not provided.
-    pub async fn edit_welcome_screen<F>(
-        &self,
+    /// Returns [`Error::Http`] if the current user lacks permission.
+    ///
+    /// [Manage Guild]: Permissions::MANAGE_GUILD
+    pub async fn edit_welcome_screen(
+        self,
         http: impl AsRef<Http>,
-        f: F,
-    ) -> Result<GuildWelcomeScreen>
-    where
-        F: FnOnce(&mut EditGuildWelcomeScreen) -> &mut EditGuildWelcomeScreen,
-    {
-        let mut map = EditGuildWelcomeScreen::default();
-        f(&mut map);
-
-        http.as_ref().edit_guild_welcome_screen(self.get(), &map).await
+        builder: EditGuildWelcomeScreen,
+    ) -> Result<GuildWelcomeScreen> {
+        builder.execute(http, self).await
     }
 
-    /// Edits the [`GuildWidget`].
+    /// Edits the guild's widget.
+    ///
+    /// **Note**: Requires the [Manage Guild] permission.
     ///
     /// # Errors
     ///
-    /// Returns an [`Error::Http`] if the bot does not have the `MANAGE_GUILD`
-    /// permission.
-    pub async fn edit_widget<F>(&self, http: impl AsRef<Http>, f: F) -> Result<GuildWidget>
-    where
-        F: FnOnce(&mut EditGuildWidget) -> &mut EditGuildWidget,
-    {
-        let mut map = EditGuildWidget::default();
-        f(&mut map);
-
-        http.as_ref().edit_guild_widget(self.get(), &map).await
+    /// Returns [`Error::Http`] if the current user lacks permission.
+    ///
+    /// [Manage Guild]: Permissions::MANAGE_GUILD
+    pub async fn edit_widget(
+        self,
+        http: impl AsRef<Http>,
+        builder: EditGuildWidget,
+    ) -> Result<GuildWidget> {
+        builder.execute(http, self).await
     }
 
     /// Gets all of the guild's roles over the REST API.

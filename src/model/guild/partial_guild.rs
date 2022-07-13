@@ -940,33 +940,38 @@ impl PartialGuild {
         self.id.edit_sticker(http, sticker_id, builder).await
     }
 
-    /// Edits the [`GuildWelcomeScreen`].
+    /// Edits the guild's welcome screen.
+    ///
+    /// **Note**: Requires the [Manage Guild] permission.
     ///
     /// # Errors
     ///
-    /// Returns an [`Error::Http`] if some mandatory fields are not provided.
-    pub async fn edit_welcome_screen<F>(
+    /// Returns [`Error::Http`] if the current user lacks permission.
+    ///
+    /// [Manage Guild]: Permissions::MANAGE_GUILD
+    pub async fn edit_welcome_screen(
         &self,
         http: impl AsRef<Http>,
-        f: F,
-    ) -> Result<GuildWelcomeScreen>
-    where
-        F: FnOnce(&mut EditGuildWelcomeScreen) -> &mut EditGuildWelcomeScreen,
-    {
-        self.id.edit_welcome_screen(http, f).await
+        builder: EditGuildWelcomeScreen,
+    ) -> Result<GuildWelcomeScreen> {
+        self.id.edit_welcome_screen(http, builder).await
     }
 
-    /// Edits the [`GuildWidget`].
+    /// Edits the guild's widget.
+    ///
+    /// **Note**: Requires the [Manage Guild] permission.
     ///
     /// # Errors
     ///
-    /// Returns an [`Error::Http`] if the bot does not have the `MANAGE_GUILD`
-    /// permission.
-    pub async fn edit_widget<F>(&self, http: impl AsRef<Http>, f: F) -> Result<GuildWidget>
-    where
-        F: FnOnce(&mut EditGuildWidget) -> &mut EditGuildWidget,
-    {
-        self.id.edit_widget(http, f).await
+    /// Returns [`Error::Http`] if the current user lacks permission.
+    ///
+    /// [Manage Guild]: Permissions::MANAGE_GUILD
+    pub async fn edit_widget(
+        &self,
+        http: impl AsRef<Http>,
+        builder: EditGuildWidget,
+    ) -> Result<GuildWidget> {
+        self.id.edit_widget(http, builder).await
     }
 
     /// Gets a partial amount of guild data by its Id.
