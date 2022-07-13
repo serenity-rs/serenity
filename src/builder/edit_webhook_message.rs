@@ -94,13 +94,7 @@ impl EditWebhookMessage {
     }
 
     /// Set the allowed mentions for the message.
-    pub fn allowed_mentions<F>(mut self, f: F) -> Self
-    where
-        F: FnOnce(&mut CreateAllowedMentions) -> &mut CreateAllowedMentions,
-    {
-        let mut allowed_mentions = CreateAllowedMentions::default();
-        f(&mut allowed_mentions);
-
+    pub fn allowed_mentions(mut self, allowed_mentions: CreateAllowedMentions) -> Self {
         self.allowed_mentions = Some(allowed_mentions);
         self
     }

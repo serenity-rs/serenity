@@ -6,7 +6,7 @@ use std::fmt::Display;
 use std::fmt::Write;
 
 #[cfg(all(feature = "model", feature = "utils"))]
-use crate::builder::{CreateMessage, EditMessage};
+use crate::builder::{CreateAllowedMentions, CreateMessage, EditMessage, ParseValue};
 #[cfg(all(feature = "cache", feature = "model"))]
 use crate::cache::{Cache, GuildRef};
 #[cfg(feature = "collector")]
@@ -661,14 +661,14 @@ impl Message {
 
         let mut builder = CreateMessage::default().content(content);
         if let Some(ping_user) = inlined {
-            builder = builder.reference_message(self).allowed_mentions(|f| {
-                f.replied_user(ping_user)
-                    // By providing allowed_mentions, Discord disabled _all_ pings by default so we
-                    // need to re-enable them
-                    .parse(crate::builder::ParseValue::Everyone)
-                    .parse(crate::builder::ParseValue::Users)
-                    .parse(crate::builder::ParseValue::Roles)
-            });
+            let allowed_mentions = CreateAllowedMentions::default()
+                .replied_user(ping_user)
+                // By providing allowed_mentions, Discord disabled _all_ pings by default so we
+                // need to re-enable them
+                .parse(ParseValue::Everyone)
+                .parse(ParseValue::Users)
+                .parse(ParseValue::Roles);
+            builder = builder.reference_message(self).allowed_mentions(allowed_mentions);
         }
         self.channel_id.send_message(cache_http, builder).await
     }
