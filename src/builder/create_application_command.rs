@@ -273,6 +273,24 @@ impl CreateApplicationCommandOption {
 
         self
     }
+
+    /// Sets the minimum permitted length for this string option.
+    ///
+    /// The value of `min_length` must be greater or equal to `0`.
+    pub fn min_length(&mut self, value: u16) -> &mut Self {
+        self.0.insert("min_length", value.into());
+
+        self
+    }
+
+    /// Sets the maximum permitted length for this string option.
+    ///
+    /// The value of `max_length` must be greater or equal to `1`.
+    pub fn max_length(&mut self, value: u16) -> &mut Self {
+        self.0.insert("max_length", value.into());
+
+        self
+    }
 }
 
 /// A builder for creating a new [`Command`].
