@@ -459,6 +459,24 @@
 <span id="453">453</span>
 <span id="454">454</span>
 <span id="455">455</span>
+<span id="456">456</span>
+<span id="457">457</span>
+<span id="458">458</span>
+<span id="459">459</span>
+<span id="460">460</span>
+<span id="461">461</span>
+<span id="462">462</span>
+<span id="463">463</span>
+<span id="464">464</span>
+<span id="465">465</span>
+<span id="466">466</span>
+<span id="467">467</span>
+<span id="468">468</span>
+<span id="469">469</span>
+<span id="470">470</span>
+<span id="471">471</span>
+<span id="472">472</span>
+<span id="473">473</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::collections::HashMap</span>;
 
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::json</span>;
@@ -731,6 +749,24 @@
     <span class="doccomment">/// Sets the maximum permitted value for this number option</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">max_number_value</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">value</span>: <span class="ident">f64</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
         <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;max_value&quot;</span>, <span class="ident">Value::from</span>(<span class="ident">value</span>));
+
+        <span class="self">self</span>
+    }
+
+    <span class="doccomment">/// Sets the minimum permitted length for this string option.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// The value of `min_length` must be greater or equal to `0`.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">min_length</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">value</span>: <span class="ident">u16</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
+        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;min_length&quot;</span>, <span class="ident">value</span>.<span class="ident">into</span>());
+
+        <span class="self">self</span>
+    }
+
+    <span class="doccomment">/// Sets the maximum permitted length for this string option.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// The value of `max_length` must be greater or equal to `1`.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">max_length</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">value</span>: <span class="ident">u16</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
+        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;max_length&quot;</span>, <span class="ident">value</span>.<span class="ident">into</span>());
 
         <span class="self">self</span>
     }

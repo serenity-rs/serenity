@@ -481,6 +481,12 @@
 <span id="475">475</span>
 <span id="476">476</span>
 <span id="477">477</span>
+<span id="478">478</span>
+<span id="479">479</span>
+<span id="480">480</span>
+<span id="481">481</span>
+<span id="482">482</span>
+<span id="483">483</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::collections::HashMap</span>;
 
 <span class="kw">use</span> <span class="ident">serde</span>::{<span class="ident">Deserialize</span>, <span class="ident">Serialize</span>};
@@ -805,6 +811,12 @@
     <span class="doccomment">/// Maximum permitted value for Integer or Number options</span>
     <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">default</span>)]</span>
     <span class="kw">pub</span> <span class="ident">max_value</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">serde_json::Number</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// Minimum permitted length for String options</span>
+    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">default</span>)]</span>
+    <span class="kw">pub</span> <span class="ident">min_length</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u16</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// Maximum permitted length for String options</span>
+    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">default</span>)]</span>
+    <span class="kw">pub</span> <span class="ident">max_length</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u16</span><span class="op">&gt;</span>,
     <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">default</span>)]</span>
     <span class="kw">pub</span> <span class="ident">autocomplete</span>: <span class="ident">bool</span>,
 }
