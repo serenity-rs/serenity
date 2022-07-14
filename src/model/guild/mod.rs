@@ -751,80 +751,62 @@ impl Guild {
         self.id.create_integration(&http, integration_id, kind).await
     }
 
-    /// Creates a guild specific [`Command`]
+    /// Create a guild specific application [`Command`].
     ///
-    /// **Note**: Unlike global `Command`s, guild commands will update instantly.
+    /// **Note**: Unlike global commands, guild commands will update instantly.
     ///
     /// # Errors
     ///
-    /// Returns the same possible errors as `create_global_application_command`.
+    /// See [`CreateApplicationCommand::execute`] for a list of possible errors.
     #[inline]
-    pub async fn create_application_command<F>(
+    pub async fn create_application_command(
         &self,
         http: impl AsRef<Http>,
-        f: F,
-    ) -> Result<Command>
-    where
-        F: FnOnce(&mut CreateApplicationCommand) -> &mut CreateApplicationCommand,
-    {
-        self.id.create_application_command(http, f).await
+        builder: CreateApplicationCommand,
+    ) -> Result<Command> {
+        self.id.create_application_command(http, builder).await
     }
 
-    /// Overrides all guild application commands.
-    ///
-    /// [`create_application_command`]: Self::create_application_command
+    /// Override all guild application commands.
     ///
     /// # Errors
     ///
-    /// If there is an error, it will be either [`Error::Http`] or [`Error::Json`].
-    pub async fn set_application_commands<F>(
+    /// See [`CreateApplicationCommands::execute`] for a list of possible errors.
+    pub async fn set_application_commands(
         &self,
         http: impl AsRef<Http>,
-        f: F,
-    ) -> Result<Vec<Command>>
-    where
-        F: FnOnce(&mut CreateApplicationCommands) -> &mut CreateApplicationCommands,
-    {
-        self.id.set_application_commands(http, f).await
+        builder: CreateApplicationCommands,
+    ) -> Result<Vec<Command>> {
+        self.id.set_application_commands(http, builder).await
     }
 
-    /// Creates a guild specific [`CommandPermission`].
+    /// Create a guild specific [`CommandPermission`].
     ///
     /// **Note**: It will update instantly.
     ///
     /// # Errors
     ///
-    /// If there is an error, it will be either [`Error::Http`] or [`Error::Json`].
-    pub async fn create_application_command_permission<F>(
+    /// See [`CreateApplicationCommandPermissionsData::execute`] for a list of possible errors.
+    pub async fn create_application_command_permission(
         &self,
         http: impl AsRef<Http>,
         command_id: CommandId,
-        f: F,
-    ) -> Result<CommandPermission>
-    where
-        F: FnOnce(
-            &mut CreateApplicationCommandPermissionsData,
-        ) -> &mut CreateApplicationCommandPermissionsData,
-    {
-        self.id.create_application_command_permission(http, command_id, f).await
+        builder: CreateApplicationCommandPermissionsData,
+    ) -> Result<CommandPermission> {
+        self.id.create_application_command_permission(http, command_id, builder).await
     }
 
-    /// Overrides all application commands permissions.
+    /// Override permissions for all guild application commands.
     ///
     /// # Errors
     ///
-    /// If there is an error, it will be either [`Error::Http`] or [`Error::Json`].
-    pub async fn set_application_commands_permissions<F>(
+    /// See [`CreateApplicationCommandsPermissions::execute`] for a list of possible errors.
+    pub async fn set_application_commands_permissions(
         &self,
         http: impl AsRef<Http>,
-        f: F,
-    ) -> Result<Vec<CommandPermission>>
-    where
-        F: FnOnce(
-            &mut CreateApplicationCommandsPermissions,
-        ) -> &mut CreateApplicationCommandsPermissions,
-    {
-        self.id.set_application_commands_permissions(http, f).await
+        builder: CreateApplicationCommandsPermissions,
+    ) -> Result<Vec<CommandPermission>> {
+        self.id.set_application_commands_permissions(http, builder).await
     }
 
     /// Get all guild application commands.
@@ -849,21 +831,18 @@ impl Guild {
         self.id.get_application_command(http, command_id).await
     }
 
-    /// Edit guild application command by its Id.
+    /// Edit a guild application command, given its Id.
     ///
     /// # Errors
     ///
-    /// If there is an error, it will be either [`Error::Http`] or [`Error::Json`].
-    pub async fn edit_application_command<F>(
+    /// See [`CreateApplicationCommand::execute`] for a list of possible errors.
+    pub async fn edit_application_command(
         &self,
         http: impl AsRef<Http>,
         command_id: CommandId,
-        f: F,
-    ) -> Result<Command>
-    where
-        F: FnOnce(&mut CreateApplicationCommand) -> &mut CreateApplicationCommand,
-    {
-        self.id.edit_application_command(http, command_id, f).await
+        builder: CreateApplicationCommand,
+    ) -> Result<Command> {
+        self.id.edit_application_command(http, command_id, builder).await
     }
 
     /// Delete guild application command by its Id.

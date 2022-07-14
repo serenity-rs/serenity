@@ -1,7 +1,13 @@
 use std::env;
 
 use serenity::async_trait;
-use serenity::builder::{CreateInteractionResponse, CreateInteractionResponseData};
+use serenity::builder::{
+    CreateApplicationCommand as CreateCommand,
+    CreateApplicationCommandOption as CreateOption,
+    CreateApplicationCommands as CreateCommands,
+    CreateInteractionResponse,
+    CreateInteractionResponseData,
+};
 use serenity::model::application::command::{Command, CommandOptionType};
 use serenity::model::application::interaction::application_command::{
     ResolvedOption,
@@ -69,108 +75,114 @@ impl EventHandler for Handler {
                 .expect("GUILD_ID must be an integer"),
         );
 
-        let commands = GuildId::set_application_commands(&guild_id, &ctx.http, |commands| {
-            commands
-                .create_application_command(|command| {
-                    command.name("ping").description("A ping command")
-                })
-                .create_application_command(|command| {
-                    command.name("id").description("Get a user id").create_option(|option| {
-                        option
+        let commands = guild_id
+            .set_application_commands(
+                &ctx.http,
+                CreateCommands::default()
+                    .add_application_command(
+                        CreateCommand::default().name("ping").description("A ping command"),
+                    )
+                    .add_application_command(
+                        CreateCommand::default()
                             .name("id")
-                            .description("The user to lookup")
-                            .kind(CommandOptionType::User)
-                            .required(true)
-                    })
-                })
-                .create_application_command(|command| {
-                    command
-                        .name("welcome")
-                        .name_localized("de", "begrüßen")
-                        .description("Welcome a user")
-                        .description_localized("de", "Einen Nutzer begrüßen")
-                        .create_option(|option| {
-                            option
-                                .name("user")
-                                .name_localized("de", "nutzer")
-                                .description("The user to welcome")
-                                .description_localized("de", "Der zu begrüßende Nutzer")
-                                .kind(CommandOptionType::User)
-                                .required(true)
-                        })
-                        .create_option(|option| {
-                            option
-                                .name("message")
-                                .name_localized("de", "nachricht")
-                                .description("The message to send")
-                                .description_localized("de", "Die versendete Nachricht")
-                                .kind(CommandOptionType::String)
-                                .required(true)
-                                .add_string_choice_localized(
-                                    "Welcome to our cool server! Ask me if you need help",
-                                    "pizza",
-                                    [("de", "Willkommen auf unserem coolen Server! Frag mich, falls du Hilfe brauchst")]
-                                )
-                                .add_string_choice_localized(
-                                    "Hey, do you want a coffee?",
-                                    "coffee",
-                                    [("de", "Hey, willst du einen Kaffee?")],
-                                )
-                                .add_string_choice_localized(
-                                    "Welcome to the club, you're now a good person. Well, I hope.",
-                                    "club",
-                                    [("de", "Willkommen im Club, du bist jetzt ein guter Mensch. Naja, hoffentlich.")],
-                                )
-                                .add_string_choice_localized(
-                                    "I hope that you brought a controller to play together!",
-                                    "game",
-                                    [("de", "Ich hoffe du hast einen Controller zum Spielen mitgebracht!")],
-                                )
-                        })
-                })
-                .create_application_command(|command| {
-                    command
-                        .name("numberinput")
-                        .description("Test command for number input")
-                        .create_option(|option| {
-                            option
-                                .name("int")
-                                .description("An integer from 5 to 10")
-                                .kind(CommandOptionType::Integer)
-                                .min_int_value(5)
-                                .max_int_value(10)
-                                .required(true)
-                        })
-                        .create_option(|option| {
-                            option
-                                .name("number")
-                                .description("A float from -3.3 to 234.5")
-                                .kind(CommandOptionType::Number)
-                                .min_number_value(-3.3)
-                                .max_number_value(234.5)
-                                .required(true)
-                        })
-                })
-                .create_application_command(|command| {
-                    command
-                        .name("attachmentinput")
-                        .description("Test command for attachment input")
-                        .create_option(|option| {
-                            option
-                                .name("attachment")
-                                .description("A file")
-                                .kind(CommandOptionType::Attachment)
-                                .required(true)
-                        })
-                })
-        })
-        .await;
+                            .description("Get a user id")
+                            .add_option(
+                                CreateOption::default()
+                                    .name("id")
+                                    .description("The user to lookup")
+                                    .kind(CommandOptionType::User)
+                                    .required(true),
+                            ),
+                    )
+                    .add_application_command(
+                        CreateCommand::default()
+                            .name("welcome")
+                            .name_localized("de", "begrüßen")
+                            .description("Welcome a user")
+                            .description_localized("de", "Einen Nutzer begrüßen")
+                            .add_option(
+                                CreateOption::default()
+                                    .name("user")
+                                    .name_localized("de", "nutzer")
+                                    .description("The user to welcome")
+                                    .description_localized("de", "Der zu begrüßende Nutzer")
+                                    .kind(CommandOptionType::User)
+                                    .required(true),
+                            )
+                            .add_option(
+                                CreateOption::default()
+                                    .name("message")
+                                    .name_localized("de", "nachricht")
+                                    .description("The message to send")
+                                    .description_localized("de", "Die versendete Nachricht")
+                                    .kind(CommandOptionType::String)
+                                    .required(true)
+                                    .add_string_choice_localized(
+                                        "Welcome to our cool server! Ask me if you need help",
+                                        "pizza",
+                                        [("de", "Willkommen auf unserem coolen Server! Frag mich, falls du Hilfe brauchst")],
+                                    )
+                                    .add_string_choice_localized(
+                                        "Hey, do you want a coffee?",
+                                        "coffee",
+                                        [("de", "Hey, willst du einen Kaffee?")]
+                                    )
+                                    .add_string_choice_localized(
+                                        "Welcome to the club, you're now a good person. Well, I hope.",
+                                        "club",
+                                        [("de", "Willkommen im Club, du bist jetzt ein guter Mensch. Naja, hoffentlich.")],
+                                    )
+                                    .add_string_choice_localized(
+                                        "I hope that you brought a controller to play together!",
+                                        "game",
+                                        [("de", "Ich hoffe du hast einen Controller zum Spielen mitgebracht!")],
+                                    ),
+                            ),
+                    )
+                    .add_application_command(
+                        CreateCommand::default()
+                            .name("numberinput")
+                            .description("Test command for number input")
+                            .add_option(
+                                CreateOption::default()
+                                    .name("int")
+                                    .description("An integer from 5 to 10")
+                                    .kind(CommandOptionType::Integer)
+                                    .min_int_value(5)
+                                    .max_int_value(10)
+                                    .required(true),
+                            )
+                            .add_option(
+                                CreateOption::default()
+                                    .name("number")
+                                    .description("A float from -3.3 to 234.5")
+                                    .kind(CommandOptionType::Number)
+                                    .min_number_value(-3.3)
+                                    .max_number_value(234.5)
+                                    .required(true),
+                            ),
+                    )
+                    .add_application_command(
+                        CreateCommand::default()
+                            .name("attachmentinput")
+                            .description("Test command for attachment input")
+                            .add_option(
+                                CreateOption::default()
+                                    .name("attachment")
+                                    .description("A file")
+                                    .kind(CommandOptionType::Attachment)
+                                    .required(true),
+                            ),
+                    ),
+            )
+            .await;
 
         println!("I now have the following guild slash commands: {:#?}", commands);
 
-        let guild_command = Command::create_global_application_command(&ctx.http, |command| {
-            command.name("wonderful_command").description("An amazing command")
-        })
+        let guild_command = Command::create_global_application_command(
+            &ctx.http,
+            CreateCommand::default().name("wonderful_command").description("An amazing command"),
+        )
         .await;
 
         println!("I created the following global slash command: {:#?}", guild_command);
@@ -190,8 +202,8 @@ async fn main() {
 
     // Finally, start a single shard, and start listening to events.
     //
-    // Shards will automatically attempt to reconnect, and will perform
-    // exponential backoff until it reconnects.
+    // Shards will automatically attempt to reconnect, and will perform exponential backoff until
+    // it reconnects.
     if let Err(why) = client.start().await {
         println!("Client error: {:?}", why);
     }

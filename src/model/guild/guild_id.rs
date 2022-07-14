@@ -1425,94 +1425,61 @@ impl GuildId {
         ReactionCollectorBuilder::new(shard_messenger).guild_id(self.0)
     }
 
-    /// Creates a guild specific [`Command`]
+    /// Create a guild specific application [`Command`].
     ///
-    /// **Note**: Unlike global `Command`s, guild commands will update instantly.
-    ///
-    /// # Errors
-    ///
-    /// Returns the same possible errors as [`create_global_application_command`].
-    ///
-    /// [`create_global_application_command`]: Command::create_global_application_command
-    pub async fn create_application_command<F>(
-        &self,
-        http: impl AsRef<Http>,
-        f: F,
-    ) -> Result<Command>
-    where
-        F: FnOnce(&mut CreateApplicationCommand) -> &mut CreateApplicationCommand,
-    {
-        let map = Command::build_application_command(f);
-        http.as_ref().create_guild_application_command(self.get(), &map).await
-    }
-
-    /// Overrides all guild application commands.
+    /// **Note**: Unlike global commands, guild commands will update instantly.
     ///
     /// # Errors
     ///
-    /// Returns the same possible errors as [`set_global_application_commands`].
-    ///
-    /// [`set_global_application_commands`]: Command::set_global_application_commands
-    pub async fn set_application_commands<F>(
-        &self,
+    /// See [`CreateApplicationCommand::execute`] for a list of possible errors.
+    pub async fn create_application_command(
+        self,
         http: impl AsRef<Http>,
-        f: F,
-    ) -> Result<Vec<Command>>
-    where
-        F: FnOnce(&mut CreateApplicationCommands) -> &mut CreateApplicationCommands,
-    {
-        let mut array = CreateApplicationCommands::default();
-
-        f(&mut array);
-
-        http.as_ref().create_guild_application_commands(self.get(), &array).await
+        builder: CreateApplicationCommand,
+    ) -> Result<Command> {
+        builder.execute(http, Some(self), None).await
     }
 
-    /// Creates a guild specific [`CommandPermission`].
+    /// Override all guild application commands.
+    ///
+    /// # Errors
+    ///
+    /// See [`CreateApplicationCommands::execute`] for a list of possible errors.
+    pub async fn set_application_commands(
+        self,
+        http: impl AsRef<Http>,
+        builder: CreateApplicationCommands,
+    ) -> Result<Vec<Command>> {
+        builder.execute(http, Some(self)).await
+    }
+
+    /// Create a guild specific [`CommandPermission`].
     ///
     /// **Note**: It will update instantly.
     ///
     /// # Errors
     ///
-    /// If there is an error, it will be either [`Error::Http`] or [`Error::Json`].
-    pub async fn create_application_command_permission<F>(
-        &self,
+    /// See [`CreateApplicationCommandPermissionsData::execute`] for a list of possible errors.
+    pub async fn create_application_command_permission(
+        self,
         http: impl AsRef<Http>,
         command_id: CommandId,
-        f: F,
-    ) -> Result<CommandPermission>
-    where
-        F: FnOnce(
-            &mut CreateApplicationCommandPermissionsData,
-        ) -> &mut CreateApplicationCommandPermissionsData,
-    {
-        let mut map = CreateApplicationCommandPermissionsData::default();
-        f(&mut map);
-
-        http.as_ref()
-            .edit_guild_application_command_permissions(self.get(), command_id.into(), &map)
-            .await
+        builder: CreateApplicationCommandPermissionsData,
+    ) -> Result<CommandPermission> {
+        builder.execute(http, self, command_id).await
     }
 
-    /// Overrides all application commands permissions.
+    /// Override permissions for all guild application commands.
     ///
     /// # Errors
     ///
-    /// If there is an error, it will be either [`Error::Http`] or [`Error::Json`].
-    pub async fn set_application_commands_permissions<F>(
-        &self,
+    /// See [`CreateApplicationCommandsPermissions::execute`] for a list of possible errors.
+    pub async fn set_application_commands_permissions(
+        self,
         http: impl AsRef<Http>,
-        f: F,
-    ) -> Result<Vec<CommandPermission>>
-    where
-        F: FnOnce(
-            &mut CreateApplicationCommandsPermissions,
-        ) -> &mut CreateApplicationCommandsPermissions,
-    {
-        let mut map = CreateApplicationCommandsPermissions::default();
-        f(&mut map);
-
-        http.as_ref().edit_guild_application_commands_permissions(self.get(), &map).await
+        builder: CreateApplicationCommandsPermissions,
+    ) -> Result<Vec<CommandPermission>> {
+        builder.execute(http, self).await
     }
 
     /// Get all guild application commands.
@@ -1537,22 +1504,18 @@ impl GuildId {
         http.as_ref().get_guild_application_command(self.get(), command_id.into()).await
     }
 
-    /// Edit guild application command by its Id.
+    /// Edit a guild application command, given its Id.
     ///
     /// # Errors
     ///
-    /// If there is an error, it will be either [`Error::Http`] or [`Error::Json`].
-    pub async fn edit_application_command<F>(
-        &self,
+    /// See [`CreateApplicationCommand::execute`] for a list of possible errors.
+    pub async fn edit_application_command(
+        self,
         http: impl AsRef<Http>,
         command_id: CommandId,
-        f: F,
-    ) -> Result<Command>
-    where
-        F: FnOnce(&mut CreateApplicationCommand) -> &mut CreateApplicationCommand,
-    {
-        let map = Command::build_application_command(f);
-        http.as_ref().edit_guild_application_command(self.get(), command_id.into(), &map).await
+        builder: CreateApplicationCommand,
+    ) -> Result<Command> {
+        builder.execute(http, Some(self), Some(command_id)).await
     }
 
     /// Delete guild application command by its Id.
