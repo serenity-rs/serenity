@@ -1,7 +1,6 @@
 use std::sync::Arc;
 use std::time::{Duration as StdDuration, Instant};
 
-use tokio::sync::Mutex;
 use tokio_tungstenite::tungstenite::error::Error as TungsteniteError;
 use tokio_tungstenite::tungstenite::protocol::frame::CloseFrame;
 use tracing::{debug, error, info, instrument, trace, warn};
@@ -85,7 +84,7 @@ pub struct Shard {
     // not started within a decent amount of time.
     pub started: Instant,
     pub token: String,
-    ws_url: Arc<Mutex<String>>,
+    ws_url: String,
     pub intents: GatewayIntents,
 }
 
@@ -103,7 +102,7 @@ impl Shard {
     /// use std::sync::Arc;
     ///
     /// use serenity::gateway::Shard;
-    /// use tokio::sync::Mutex;
+    /// use tokio::sync::RwLock;
     /// #
     /// # use serenity::http::Http;
     /// # use serenity::model::gateway::{GatewayIntents, ShardInfo};
@@ -117,7 +116,8 @@ impl Shard {
     /// };
     ///
     /// // retrieve the gateway response, which contains the URL to connect to
-    /// let gateway = Arc::new(Mutex::new(http.get_gateway().await?.url));
+
+    /// let gateway = http.get_gateway().await?.url;
     /// let shard = Shard::new(gateway, &token, shard_info, GatewayIntents::all(), None).await?;
     ///
     /// // at this point, you can create a `loop`, and receive events and match
@@ -125,7 +125,7 @@ impl Shard {
     /// #     Ok(())
     /// # }
     /// ```
-    ///
+    /// 
     /// # Errors
     ///
     /// On Error, will return either [`Error::Gateway`], [`Error::Tungstenite`]
@@ -133,14 +133,13 @@ impl Shard {
     ///
     /// [`Error::Gateway`]: crate::Error::Gateway
     pub async fn new(
-        ws_url: Arc<Mutex<String>>,
+        ws_url: String,
         token: &str,
         shard_info: ShardInfo,
         intents: GatewayIntents,
         presence: Option<PresenceData>,
     ) -> Result<Shard> {
-        let url = ws_url.lock().await.clone();
-        let client = connect(&url).await?;
+        let client = connect(&ws_url).await?;
 
         let presence = presence.unwrap_or_default();
         let heartbeat_instants = (None, None);
@@ -639,13 +638,12 @@ impl Shard {
     /// # use std::sync::Arc;
     /// #
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
-    /// #     let mutex = Arc::new(Mutex::new("".to_string()));
     /// #     let shard_info = ShardInfo {
     /// #          id: 0,
     /// #          total: 1,
     /// #     };
     /// #
-    /// #     let mut shard = Shard::new(mutex.clone(), "", shard_info, GatewayIntents::all(), None).await?;
+    /// #     let mut shard = Shard::new("".to_string(), "", shard_info, GatewayIntents::all(), None).await?;
     /// #
     /// use serenity::model::id::GuildId;
     ///
@@ -666,13 +664,12 @@ impl Shard {
     /// # use std::sync::Arc;
     /// #
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
-    /// #     let mutex = Arc::new(Mutex::new("".to_string()));
-    /// #
     /// #     let shard_info = ShardInfo {
     /// #          id: 0,
     /// #          total: 1,
     /// #     };
-    /// #     let mut shard = Shard::new(mutex.clone(), "", shard_info, GatewayIntents::all(), None).await?;
+    /// #
+    /// #     let mut shard = Shard::new("".to_string(), "", shard_info, GatewayIntents::all(), None).await?;
     /// #
     /// use serenity::model::id::GuildId;
     ///
@@ -738,8 +735,7 @@ impl Shard {
         // accurate when a Hello is received.
         self.stage = ConnectionStage::Connecting;
         self.started = Instant::now();
-        let url = &self.ws_url.lock().await.clone();
-        let client = connect(url).await?;
+        let client = connect(&self.ws_url).await?;
         self.stage = ConnectionStage::Handshake;
 
         Ok(client)

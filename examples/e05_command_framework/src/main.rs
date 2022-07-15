@@ -463,12 +463,11 @@ async fn latency(ctx: &Context, msg: &Message) -> CommandResult {
     };
 
     let manager = shard_manager.lock().await;
-    let runners = manager.runners.lock().await;
 
     // Shards are backed by a "shard runner" responsible for processing events
     // over the shard, so we'll get the information about the shard runner for
     // the shard this command was sent over.
-    let runner = match runners.get(&ShardId(ctx.shard_id)) {
+    let runner = match manager.runners.get(&ShardId(ctx.shard_id)) {
         Some(runner) => runner,
         None => {
             msg.reply(ctx, "No shard found").await?;

@@ -65,9 +65,8 @@ async fn main() {
             sleep(Duration::from_secs(30)).await;
 
             let lock = manager.lock().await;
-            let shard_runners = lock.runners.lock().await;
-
-            for (id, runner) in shard_runners.iter() {
+            for runner in lock.runners.iter() {
+                let (id, runner) = runner.pair();
                 println!(
                     "Shard ID {} is {} with a latency of {:?}",
                     id, runner.stage, runner.latency,
