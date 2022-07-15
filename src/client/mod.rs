@@ -392,14 +392,14 @@ impl Future for ClientBuilder {
             #[cfg(feature = "voice")]
             let voice_manager = self.voice_manager.take();
 
-            let cache_and_http = Arc::new(CacheAndHttp {
+            let cache_and_http = CacheAndHttp {
                 #[cfg(feature = "cache")]
                 cache: Arc::new(Cache::new_with_settings(self.cache_settings.take().unwrap())),
                 http: Arc::clone(&http),
-            });
+            };
 
             self.fut = Some(Box::pin(async move {
-                let ws_url = Arc::new(Mutex::new(http.get_gateway().await?.url));
+                let ws_url = http.get_gateway().await?.url;
 
                 let (shard_manager, shard_manager_worker) =
                     ShardManager::new(ShardManagerOptions {
@@ -412,9 +412,9 @@ impl Future for ClientBuilder {
                         shard_init: 0,
                         shard_total: 0,
                         #[cfg(feature = "voice")]
-                        voice_manager: voice_manager.as_ref().map(Arc::clone),
-                        ws_url: Arc::clone(&ws_url),
-                        cache_and_http: Arc::clone(&cache_and_http),
+                        voice_manager: voice_manager.clone(),
+                        cache_and_http: cache_and_http.clone(),
+                        ws_url: ws_url.clone(),
                         intents,
                         presence,
                     });
@@ -612,7 +612,7 @@ pub struct Client {
     /// tokio::spawn(async move {
     ///     loop {
     ///         let sm = shard_manager.lock().await;
-    ///         let count = sm.shards_instantiated().await.len();
+    ///         let count = sm.shards_instantiated().len();
     ///         println!("Shard count instantiated: {}", count);
     ///
     ///         tokio::time::sleep(Duration::from_millis(5000)).await;
@@ -667,12 +667,9 @@ pub struct Client {
     ///
     /// This is likely not important for production usage and is, at best, used
     /// for debugging.
-    ///
-    /// This is wrapped in an `Arc<Mutex<T>>` so all shards will have an updated
-    /// value available.
-    pub ws_url: Arc<Mutex<String>>,
+    pub ws_url: String,
     /// A container for an optional cache and HTTP client.
-    pub cache_and_http: Arc<CacheAndHttp>,
+    pub cache_and_http: CacheAndHttp,
 }
 
 impl Client {
