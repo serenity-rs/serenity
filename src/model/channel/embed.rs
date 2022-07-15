@@ -1,5 +1,6 @@
 #[cfg(feature = "model")]
 use crate::builder::CreateEmbed;
+use crate::model::Timestamp;
 #[cfg(feature = "utils")]
 use crate::utils::Colour;
 
@@ -51,7 +52,7 @@ pub struct Embed {
     /// Thumbnail information of the embed.
     pub thumbnail: Option<EmbedThumbnail>,
     /// Timestamp information.
-    pub timestamp: Option<String>,
+    pub timestamp: Option<Timestamp>,
     /// The title of the embed.
     pub title: Option<String>,
     /// The URL of the embed.
@@ -142,7 +143,7 @@ impl EmbedField {
         Self::_new(name.into(), value.into(), inline)
     }
 
-    pub(crate) fn _new(name: String, value: String, inline: bool) -> Self {
+    pub(crate) const fn _new(name: String, value: String, inline: bool) -> Self {
         Self {
             name,
             value,

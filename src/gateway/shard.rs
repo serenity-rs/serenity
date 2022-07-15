@@ -1,9 +1,9 @@
 use std::sync::Arc;
 use std::time::{Duration as StdDuration, Instant};
 
-use async_tungstenite::tungstenite::error::Error as TungsteniteError;
-use async_tungstenite::tungstenite::protocol::frame::CloseFrame;
 use tokio::sync::Mutex;
+use tokio_tungstenite::tungstenite::error::Error as TungsteniteError;
+use tokio_tungstenite::tungstenite::protocol::frame::CloseFrame;
 use tracing::{debug, error, info, instrument, trace, warn};
 use url::Url;
 

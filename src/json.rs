@@ -109,28 +109,6 @@ where
     Ok(simd_json::serde::to_owned_value(value)?)
 }
 
-pub trait ToNumber {
-    fn to_number(self) -> Value;
-}
-
-#[cfg(not(feature = "simd-json"))]
-impl<T: Into<serde_json::Number>> ToNumber for T {
-    fn to_number(self) -> Value {
-        Value::Number(self.into())
-    }
-}
-
-#[cfg(feature = "simd-json")]
-impl<T: Into<Value>> ToNumber for T {
-    fn to_number(self) -> Value {
-        self.into()
-    }
-}
-
-pub(crate) fn from_number(n: impl ToNumber) -> Value {
-    n.to_number()
-}
-
 pub mod prelude {
     #[cfg(not(feature = "simd-json"))]
     pub use serde_json::{

@@ -12,13 +12,6 @@ use super::prelude::*;
 use crate::cache::Cache;
 #[cfg(feature = "cache")]
 use crate::internal::prelude::*;
-use crate::json::from_number;
-use crate::model::application::command::CommandOptionType;
-use crate::model::application::interaction::application_command::{
-    CommandDataOption,
-    CommandDataOptionValue,
-    CommandDataResolved,
-};
 
 pub fn default_true() -> bool {
     true
@@ -63,7 +56,7 @@ pub fn add_guild_id_to_map(map: &mut JsonMap, key: &str, id: GuildId) {
     if let Some(array) = map.get_mut(key).and_then(Value::as_array_mut) {
         for value in array {
             if let Some(item) = value.as_object_mut() {
-                item.insert("guild_id".to_string(), from_number(id.get()));
+                item.insert("guild_id".to_string(), id.get().into());
             }
         }
     }
@@ -117,88 +110,6 @@ pub fn deserialize_members<'de, D: Deserializer<'de>>(
     deserializer: D,
 ) -> StdResult<HashMap<UserId, Member>, D::Error> {
     deserializer.deserialize_seq(SequenceToMapVisitor::new(|member: &Member| member.user.id))
-}
-
-pub fn deserialize_options_with_resolved<'de, D: Deserializer<'de>>(
-    deserializer: D,
-    resolved: &CommandDataResolved,
-) -> StdResult<Vec<CommandDataOption>, D::Error> {
-    let mut options = Vec::deserialize(deserializer)?;
-
-    for option in &mut options {
-        loop_resolved(option, resolved);
-    }
-
-    Ok(options)
-}
-
-fn try_resolve(
-    value: &Value,
-    kind: CommandOptionType,
-    resolved: &CommandDataResolved,
-) -> Option<CommandDataOptionValue> {
-    let string = value.as_str();
-
-    match kind {
-        CommandOptionType::User => {
-            let id = &UserId(string?.parse().ok()?);
-
-            let user = resolved.users.get(id)?.clone();
-            let member = resolved.members.get(id).cloned();
-
-            Some(CommandDataOptionValue::User(user, member))
-        },
-        CommandOptionType::Role => {
-            let id = &RoleId(string?.parse().ok()?);
-
-            let role = resolved.roles.get(id)?.clone();
-
-            Some(CommandDataOptionValue::Role(role))
-        },
-        CommandOptionType::Channel => {
-            let id = &ChannelId(string?.parse().ok()?);
-
-            let channel = resolved.channels.get(id)?.clone();
-
-            Some(CommandDataOptionValue::Channel(channel))
-        },
-        CommandOptionType::Mentionable => {
-            let id = UserId(string?.parse().ok()?);
-
-            if let Some(user) = resolved.users.get(&id) {
-                let user = user.clone();
-                let member = resolved.members.get(&id).cloned();
-
-                Some(CommandDataOptionValue::User(user, member))
-            } else {
-                let role = resolved.roles.get(&RoleId(id.0))?.clone();
-
-                Some(CommandDataOptionValue::Role(role))
-            }
-        },
-        CommandOptionType::String => Some(CommandDataOptionValue::String(string?.to_owned())),
-        CommandOptionType::Integer => Some(CommandDataOptionValue::Integer(value.as_i64()?)),
-        CommandOptionType::Boolean => Some(CommandDataOptionValue::Boolean(value.as_bool()?)),
-        CommandOptionType::Number => Some(CommandDataOptionValue::Number(value.as_f64()?)),
-        CommandOptionType::Attachment => {
-            let id = &AttachmentId(string?.parse().ok()?);
-
-            let attachment = resolved.attachments.get(id)?.clone();
-
-            Some(CommandDataOptionValue::Attachment(attachment))
-        },
-        _ => None,
-    }
-}
-
-fn loop_resolved(options: &mut CommandDataOption, resolved: &CommandDataResolved) {
-    if let Some(value) = &options.value {
-        options.resolved = try_resolve(value, options.kind, resolved);
-    }
-
-    for option in &mut options.options {
-        loop_resolved(option, resolved);
-    }
 }
 
 /// Used with `#[serde(with = "presences")]`

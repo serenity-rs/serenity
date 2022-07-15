@@ -766,18 +766,21 @@ pub enum Event {
     /// Fires the [`EventHandler::reaction_add`] event handler.
     ///
     /// [`EventHandler::reaction_add`]: crate::client::EventHandler::reaction_add
+    #[serde(rename = "MESSAGE_REACTION_ADD")]
     ReactionAdd(ReactionAddEvent),
     /// A reaction was removed to a message.
     ///
     /// Fires the [`EventHandler::reaction_remove`] event handler.
     ///
     /// [`EventHandler::reaction_remove`]: crate::client::EventHandler::reaction_remove
+    #[serde(rename = "MESSAGE_REACTION_REMOVE")]
     ReactionRemove(ReactionRemoveEvent),
     /// A request was issued to remove all [`Reaction`]s from a [`Message`].
     ///
     /// Fires the [`EventHandler::reaction_remove_all`] event handler.
     ///
     /// [`EventHandler::reaction_remove_all`]: crate::client::EventHandler::reaction_remove_all
+    #[serde(rename = "MESSAGE_REACTION_REMOVE_ALL")]
     ReactionRemoveAll(ReactionRemoveAllEvent),
     /// The first event in a connection, containing the initial ready cache.
     ///
@@ -841,7 +844,7 @@ pub enum Event {
 }
 
 #[cfg(feature = "model")]
-fn gid_from_channel(c: &Channel) -> RelatedId<GuildId> {
+const fn gid_from_channel(c: &Channel) -> RelatedId<GuildId> {
     match c {
         Channel::Guild(g) => RelatedId::Some(g.guild_id),
         _ => RelatedId::None,
@@ -1292,7 +1295,7 @@ macro_rules! define_event_related_id_methods {
 impl Event {
     /// Return the type of this event.
     #[must_use]
-    pub fn event_type(&self) -> EventType {
+    pub const fn event_type(&self) -> EventType {
         match self {
             Self::ApplicationCommandPermissionsUpdate(_) => {
                 EventType::ApplicationCommandPermissionsUpdate
@@ -1766,7 +1769,7 @@ impl EventType {
     /// the information to recover the original event name for these events, in which
     /// case this method returns [`None`].
     #[must_use]
-    pub fn name(&self) -> Option<&str> {
+    pub const fn name(&self) -> Option<&str> {
         match self {
             Self::ApplicationCommandPermissionsUpdate => {
                 Some(Self::APPLICATION_COMMAND_PERMISSIONS_UPDATE)
