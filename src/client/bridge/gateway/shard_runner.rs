@@ -205,28 +205,28 @@ impl ShardRunner {
         match &event {
             Event::MessageCreate(msg_event) => {
                 let mut msg = LazyArc::new(&msg_event.message);
-                retain_mut(&mut self.message_filters, |f| f.send_message(&mut msg));
+                retain_mut(&mut self.message_filters, |f| f.process_item(&mut msg));
             },
             Event::ReactionAdd(reaction_event) => {
                 let mut reaction = LazyReactionAction::new(&reaction_event.reaction, true);
-                retain_mut(&mut self.reaction_filters, |f| f.send_reaction(&mut reaction));
+                retain_mut(&mut self.reaction_filters, |f| f.process_item(&mut reaction));
             },
             Event::ReactionRemove(reaction_event) => {
                 let mut reaction = LazyReactionAction::new(&reaction_event.reaction, false);
-                retain_mut(&mut self.reaction_filters, |f| f.send_reaction(&mut reaction));
+                retain_mut(&mut self.reaction_filters, |f| f.process_item(&mut reaction));
             },
             #[cfg(feature = "collector")]
             Event::InteractionCreate(interaction_event) => match &interaction_event.interaction {
                 Interaction::MessageComponent(interaction) => {
                     let mut interaction = LazyArc::new(interaction);
                     retain_mut(&mut self.component_interaction_filters, |f| {
-                        f.send_interaction(&mut interaction)
+                        f.process_item(&mut interaction)
                     });
                 },
                 Interaction::ModalSubmit(interaction) => {
                     let mut interaction = LazyArc::new(interaction);
                     retain_mut(&mut self.modal_interaction_filters, |f| {
-                        f.send_interaction(&mut interaction)
+                        f.process_item(&mut interaction)
                     });
                 },
                 _ => (),
@@ -235,7 +235,14 @@ impl ShardRunner {
         }
 
         let mut event = LazyArc::new(event);
-        retain_mut(&mut self.event_filters, |f| f.send_event(&mut event));
+        retain_mut(&mut self.event_filters, |f| {
+            // Only events with matching types count towards the filtered limit.
+            if !f.is_matching_event_type(&event) {
+                return !f.sender.is_closed();
+            }
+
+            f.process_item(&mut event)
+        });
     }
 
     /// Clones the internal copy of the Sender to the shard runner.
