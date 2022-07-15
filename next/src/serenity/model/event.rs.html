@@ -1837,6 +1837,9 @@
 <span id="1832">1832</span>
 <span id="1833">1833</span>
 <span id="1834">1834</span>
+<span id="1835">1835</span>
+<span id="1836">1836</span>
+<span id="1837">1837</span>
 </pre><pre class="rust"><code><span class="doccomment">//! All the events this library handles.</span>
 
 <span class="kw">use</span> <span class="ident">std::collections::HashMap</span>;
@@ -2605,18 +2608,21 @@
     <span class="doccomment">/// Fires the [`EventHandler::reaction_add`] event handler.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// [`EventHandler::reaction_add`]: crate::client::EventHandler::reaction_add</span>
+    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename</span> <span class="op">=</span> <span class="string">&quot;MESSAGE_REACTION_ADD&quot;</span>)]</span>
     <span class="ident">ReactionAdd</span>(<span class="ident">ReactionAddEvent</span>),
     <span class="doccomment">/// A reaction was removed to a message.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// Fires the [`EventHandler::reaction_remove`] event handler.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// [`EventHandler::reaction_remove`]: crate::client::EventHandler::reaction_remove</span>
+    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename</span> <span class="op">=</span> <span class="string">&quot;MESSAGE_REACTION_REMOVE&quot;</span>)]</span>
     <span class="ident">ReactionRemove</span>(<span class="ident">ReactionRemoveEvent</span>),
     <span class="doccomment">/// A request was issued to remove all [`Reaction`]s from a [`Message`].</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// Fires the [`EventHandler::reaction_remove_all`] event handler.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// [`EventHandler::reaction_remove_all`]: crate::client::EventHandler::reaction_remove_all</span>
+    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename</span> <span class="op">=</span> <span class="string">&quot;MESSAGE_REACTION_REMOVE_ALL&quot;</span>)]</span>
     <span class="ident">ReactionRemoveAll</span>(<span class="ident">ReactionRemoveAllEvent</span>),
     <span class="doccomment">/// The first event in a connection, containing the initial ready cache.</span>
     <span class="doccomment">///</span>
