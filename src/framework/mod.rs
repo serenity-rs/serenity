@@ -63,12 +63,13 @@
 //! let token = std::env::var("DISCORD_TOKEN")?;
 //!
 //! let framework = StandardFramework::new()
-//!     .configure(|c| c.prefix("~"))
 //!     // The `#[group]` (and similarly, `#[command]`) macro generates static instances
 //!     // containing any options you gave it. For instance, the group `name` and its `commands`.
 //!     // Their identifiers, names you can use to refer to these instances in code, are an
 //!     // all-uppercased version of the `name` with a `_GROUP` suffix appended at the end.
 //!     .group(&GENERAL_GROUP);
+//!
+//! framework.configure(|c| c.prefix("~"));
 //!
 //! let mut client = Client::builder(&token, GatewayIntents::default())
 //!     .event_handler(Handler)
@@ -93,9 +94,7 @@ use crate::model::channel::Message;
 /// A trait for defining your own framework for serenity to use.
 ///
 /// Should you implement this trait, or define a `message` handler, depends on you.
-/// However, using this will benefit you by abstracting the [`EventHandler`] away,
-/// and providing a reference to serenity's threadpool,
-/// so that you may run your commands in separate threads.
+/// However, using this will benefit you by abstracting the [`EventHandler`] away.
 ///
 /// [`EventHandler`]: crate::client::EventHandler
 #[async_trait]
