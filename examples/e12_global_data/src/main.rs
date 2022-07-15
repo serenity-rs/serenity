@@ -108,10 +108,8 @@ impl EventHandler for Handler {
 async fn main() {
     let token = env::var("DISCORD_TOKEN").expect("Expected a token in the environment");
 
-    let framework = StandardFramework::new()
-        .configure(|c| c.with_whitespace(true).prefix("~"))
-        .before(before)
-        .group(&GENERAL_GROUP);
+    let framework = StandardFramework::new().before(before).group(&GENERAL_GROUP);
+    framework.configure(|c| c.with_whitespace(true).prefix("~"));
 
     let intents = GatewayIntents::GUILD_MESSAGES
         | GatewayIntents::DIRECT_MESSAGES
