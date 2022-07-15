@@ -61,12 +61,11 @@ async fn main() {
         Err(why) => panic!("Could not access user info: {:?}", why),
     };
 
-    let framework = StandardFramework::new()
-        .configure(|c| {
-            c.with_whitespace(true).on_mention(Some(bot_id)).prefix("~").delimiters(vec![", ", ","])
-        })
-        .help(&MY_HELP)
-        .group(&COLLECTOR_GROUP);
+    let framework = StandardFramework::new().help(&MY_HELP).group(&COLLECTOR_GROUP);
+
+    framework.configure(|c| {
+        c.with_whitespace(true).on_mention(Some(bot_id)).prefix("~").delimiters(vec![", ", ","])
+    });
 
     let intents = GatewayIntents::GUILD_MESSAGES
         | GatewayIntents::DIRECT_MESSAGES

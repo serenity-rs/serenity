@@ -241,18 +241,6 @@ async fn main() {
     };
 
     let framework = StandardFramework::new()
-        .configure(|c| c
-                   .with_whitespace(true)
-                   .on_mention(Some(bot_id))
-                   .prefix("~")
-                   // In this case, if "," would be first, a message would never
-                   // be delimited at ", ", forcing you to trim your arguments if you
-                   // want to avoid whitespaces at the start of each.
-                   .delimiters(vec![", ", ","])
-                   // Sets the bot's owners. These will be used for commands that
-                   // are owners only.
-                   .owners(owners))
-
     // Set a function to be called prior to each command execution. This
     // provides the context of the command, the message that was received,
     // and the full name of the command that will be called.
@@ -299,6 +287,20 @@ async fn main() {
         .group(&EMOJI_GROUP)
         .group(&MATH_GROUP)
         .group(&OWNER_GROUP);
+
+    framework.configure(|c| {
+        c
+        .with_whitespace(true)
+        .on_mention(Some(bot_id))
+        .prefix("~")
+        // In this case, if "," would be first, a message would never
+        // be delimited at ", ", forcing you to trim your arguments if you
+        // want to avoid whitespaces at the start of each.
+        .delimiters(vec![", ", ","])
+        // Sets the bot's owners. These will be used for commands that
+        // are owners only.
+        .owners(owners)
+    });
 
     // For this example to run properly, the "Presence Intent" and "Server Members Intent"
     // options need to be enabled.

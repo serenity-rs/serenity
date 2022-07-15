@@ -340,10 +340,9 @@ async fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
     // Because you probably ran this without looking at the source :P
     let _ = webbrowser::open("http://localhost:6361");
 
-    let framework = StandardFramework::new()
-        .configure(|c| c.prefix("~"))
-        .before(before_hook)
-        .group(&GENERAL_GROUP);
+    let framework = StandardFramework::new().before(before_hook).group(&GENERAL_GROUP);
+
+    framework.configure(|c| c.prefix("~"));
 
     let token = env::var("DISCORD_TOKEN")?;
 
