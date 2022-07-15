@@ -903,6 +903,9 @@
 <span id="898">898</span>
 <span id="899">899</span>
 <span id="900">900</span>
+<span id="901">901</span>
+<span id="902">902</span>
+<span id="903">903</span>
 </pre><pre class="rust"><code><span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">help_commands</span>;
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">macros</span> {
     <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">command_attr</span>::{<span class="ident">check</span>, <span class="ident">command</span>, <span class="ident">group</span>, <span class="ident">help</span>, <span class="ident">hook</span>};
@@ -1008,7 +1011,7 @@
     <span class="ident">unrecognised_command</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">UnrecognisedHook</span><span class="op">&gt;</span>,
     <span class="ident">normal_message</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">NormalMessageHook</span><span class="op">&gt;</span>,
     <span class="ident">prefix_only</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">PrefixOnlyHook</span><span class="op">&gt;</span>,
-    <span class="ident">config</span>: <span class="ident">Configuration</span>,
+    <span class="ident">config</span>: <span class="ident">parking_lot::RwLock</span><span class="op">&lt;</span><span class="ident">Configuration</span><span class="op">&gt;</span>,
     <span class="ident">help</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">HelpCommand</span><span class="op">&gt;</span>,
     <span class="doccomment">/// Whether the framework has been &quot;initialized&quot;.</span>
     <span class="doccomment">///</span>
@@ -1035,9 +1038,10 @@
         <span class="ident">StandardFramework::default</span>()
     }
 
-    <span class="doccomment">/// Configures the framework, setting non-default values. All fields are</span>
-    <span class="doccomment">/// optional. Refer to [`Configuration::default`] for more information on</span>
-    <span class="doccomment">/// the default values.</span>
+    <span class="doccomment">/// Configures the framework, setting non-default values.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// This passes a mutable reference to the current configuration,</span>
+    <span class="doccomment">/// allowing for runtime configuration of the Framework.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// # Examples</span>
     <span class="doccomment">///</span>
@@ -1051,9 +1055,10 @@
     <span class="doccomment">/// use serenity::Client;</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// # async fn run() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {</span>
-    <span class="doccomment">/// let token = std::env::var(&quot;DISCORD_TOKEN&quot;)?;</span>
-    <span class="doccomment">/// let framework = StandardFramework::new().configure(|c| c.with_whitespace(true).prefix(&quot;~&quot;));</span>
+    <span class="doccomment">/// let framework = StandardFramework::new();</span>
+    <span class="doccomment">/// framework.configure(|c| c.with_whitespace(true).prefix(&quot;~&quot;));</span>
     <span class="doccomment">///</span>
+    <span class="doccomment">/// let token = std::env::var(&quot;DISCORD_TOKEN&quot;)?;</span>
     <span class="doccomment">/// let mut client = Client::builder(&amp;token, GatewayIntents::default())</span>
     <span class="doccomment">///     .event_handler(Handler)</span>
     <span class="doccomment">///     .framework(framework)</span>
@@ -1065,14 +1070,8 @@
     <span class="doccomment">/// [`Client`]: crate::Client</span>
     <span class="doccomment">/// [`prefix`]: Configuration::prefix</span>
     <span class="doccomment">/// [allowing whitespace between prefixes]: Configuration::with_whitespace</span>
-    <span class="attribute">#[<span class="ident">must_use</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">configure</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">f</span>: <span class="ident">F</span>) -&gt; <span class="self">Self</span>
-    <span class="kw">where</span>
-        <span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="kw-2">&amp;mut</span> <span class="ident">Configuration</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="ident">Configuration</span>,
-    {
-        <span class="ident">f</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">config</span>);
-
-        <span class="self">self</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">configure</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw">impl</span> <span class="ident">FnOnce</span>(<span class="kw-2">&amp;mut</span> <span class="ident">Configuration</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="ident">Configuration</span>) {
+        <span class="ident">f</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">config</span>.<span class="ident">write</span>());
     }
 
     <span class="doccomment">/// Defines a bucket with `delay` between each command, and the `limit` of uses</span>
@@ -1115,8 +1114,10 @@
 
     <span class="doccomment">/// Whether the message should be ignored because it is from a bot or webhook.</span>
     <span class="kw">fn</span> <span class="ident">should_ignore</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">msg</span>: <span class="kw-2">&amp;</span><span class="ident">Message</span>) -&gt; <span class="ident">bool</span> {
-        (<span class="self">self</span>.<span class="ident">config</span>.<span class="ident">ignore_bots</span> <span class="op">&amp;&amp;</span> <span class="ident">msg</span>.<span class="ident">author</span>.<span class="ident">bot</span>)
-            <span class="op">|</span><span class="op">|</span> (<span class="self">self</span>.<span class="ident">config</span>.<span class="ident">ignore_webhooks</span> <span class="op">&amp;&amp;</span> <span class="ident">msg</span>.<span class="ident">webhook_id</span>.<span class="ident">is_some</span>())
+        <span class="kw">let</span> <span class="ident">config</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">config</span>.<span class="ident">read</span>();
+
+        (<span class="ident">config</span>.<span class="ident">ignore_bots</span> <span class="op">&amp;&amp;</span> <span class="ident">msg</span>.<span class="ident">author</span>.<span class="ident">bot</span>)
+            <span class="op">|</span><span class="op">|</span> (<span class="ident">config</span>.<span class="ident">ignore_webhooks</span> <span class="op">&amp;&amp;</span> <span class="ident">msg</span>.<span class="ident">webhook_id</span>.<span class="ident">is_some</span>())
     }
 
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">should_fail</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(
@@ -1145,37 +1146,40 @@
             }
         }
 
-        <span class="kw">if</span> (<span class="ident">group</span>.<span class="ident">owner_privilege</span> <span class="op">&amp;&amp;</span> <span class="ident">command</span>.<span class="ident">owner_privilege</span>)
-            <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">config</span>.<span class="ident">owners</span>.<span class="ident">contains</span>(<span class="kw-2">&amp;</span><span class="ident">msg</span>.<span class="ident">author</span>.<span class="ident">id</span>)
         {
-            <span class="kw">return</span> <span class="prelude-val">None</span>;
-        }
+            <span class="kw">let</span> <span class="ident">config</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">config</span>.<span class="ident">read</span>();
+            <span class="kw">if</span> (<span class="ident">group</span>.<span class="ident">owner_privilege</span> <span class="op">&amp;&amp;</span> <span class="ident">command</span>.<span class="ident">owner_privilege</span>)
+                <span class="op">&amp;&amp;</span> <span class="ident">config</span>.<span class="ident">owners</span>.<span class="ident">contains</span>(<span class="kw-2">&amp;</span><span class="ident">msg</span>.<span class="ident">author</span>.<span class="ident">id</span>)
+            {
+                <span class="kw">return</span> <span class="prelude-val">None</span>;
+            }
 
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">config</span>.<span class="ident">blocked_users</span>.<span class="ident">contains</span>(<span class="kw-2">&amp;</span><span class="ident">msg</span>.<span class="ident">author</span>.<span class="ident">id</span>) {
-            <span class="kw">return</span> <span class="prelude-val">Some</span>(<span class="ident">DispatchError::BlockedUser</span>);
-        }
+            <span class="kw">if</span> <span class="ident">config</span>.<span class="ident">blocked_users</span>.<span class="ident">contains</span>(<span class="kw-2">&amp;</span><span class="ident">msg</span>.<span class="ident">author</span>.<span class="ident">id</span>) {
+                <span class="kw">return</span> <span class="prelude-val">Some</span>(<span class="ident">DispatchError::BlockedUser</span>);
+            }
 
-        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
-        {
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">Channel::Guild</span>(<span class="ident">channel</span>)) <span class="op">=</span> <span class="ident">msg</span>.<span class="ident">channel_id</span>.<span class="ident">to_channel_cached</span>(<span class="kw-2">&amp;</span><span class="ident">ctx</span>) {
-                <span class="kw">let</span> <span class="ident">guild_id</span> <span class="op">=</span> <span class="ident">channel</span>.<span class="ident">guild_id</span>;
+            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
+            {
+                <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">Channel::Guild</span>(<span class="ident">channel</span>)) <span class="op">=</span> <span class="ident">msg</span>.<span class="ident">channel_id</span>.<span class="ident">to_channel_cached</span>(<span class="kw-2">&amp;</span><span class="ident">ctx</span>) {
+                    <span class="kw">let</span> <span class="ident">guild_id</span> <span class="op">=</span> <span class="ident">channel</span>.<span class="ident">guild_id</span>;
 
-                <span class="kw">if</span> <span class="self">self</span>.<span class="ident">config</span>.<span class="ident">blocked_guilds</span>.<span class="ident">contains</span>(<span class="kw-2">&amp;</span><span class="ident">guild_id</span>) {
-                    <span class="kw">return</span> <span class="prelude-val">Some</span>(<span class="ident">DispatchError::BlockedGuild</span>);
-                }
-
-                <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">guild</span>) <span class="op">=</span> <span class="ident">ctx</span>.<span class="ident">cache</span>.<span class="ident">guild</span>(<span class="ident">guild_id</span>) {
-                    <span class="kw">if</span> <span class="self">self</span>.<span class="ident">config</span>.<span class="ident">blocked_users</span>.<span class="ident">contains</span>(<span class="kw-2">&amp;</span><span class="ident">guild</span>.<span class="ident">owner_id</span>) {
+                    <span class="kw">if</span> <span class="ident">config</span>.<span class="ident">blocked_guilds</span>.<span class="ident">contains</span>(<span class="kw-2">&amp;</span><span class="ident">guild_id</span>) {
                         <span class="kw">return</span> <span class="prelude-val">Some</span>(<span class="ident">DispatchError::BlockedGuild</span>);
+                    }
+
+                    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">guild</span>) <span class="op">=</span> <span class="ident">ctx</span>.<span class="ident">cache</span>.<span class="ident">guild</span>(<span class="ident">guild_id</span>) {
+                        <span class="kw">if</span> <span class="ident">config</span>.<span class="ident">blocked_users</span>.<span class="ident">contains</span>(<span class="kw-2">&amp;</span><span class="ident">guild</span>.<span class="ident">owner_id</span>) {
+                            <span class="kw">return</span> <span class="prelude-val">Some</span>(<span class="ident">DispatchError::BlockedGuild</span>);
+                        }
                     }
                 }
             }
-        }
 
-        <span class="kw">if</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">config</span>.<span class="ident">allowed_channels</span>.<span class="ident">is_empty</span>()
-            <span class="op">&amp;&amp;</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">config</span>.<span class="ident">allowed_channels</span>.<span class="ident">contains</span>(<span class="kw-2">&amp;</span><span class="ident">msg</span>.<span class="ident">channel_id</span>)
-        {
-            <span class="kw">return</span> <span class="prelude-val">Some</span>(<span class="ident">DispatchError::BlockedChannel</span>);
+            <span class="kw">if</span> <span class="op">!</span><span class="ident">config</span>.<span class="ident">allowed_channels</span>.<span class="ident">is_empty</span>()
+                <span class="op">&amp;&amp;</span> <span class="op">!</span><span class="ident">config</span>.<span class="ident">allowed_channels</span>.<span class="ident">contains</span>(<span class="kw-2">&amp;</span><span class="ident">msg</span>.<span class="ident">channel_id</span>)
+            {
+                <span class="kw">return</span> <span class="prelude-val">Some</span>(<span class="ident">DispatchError::BlockedChannel</span>);
+            }
         }
 
         <span class="comment">// Try passing the command&#39;s bucket.</span>
@@ -1280,13 +1284,14 @@
     <span class="doccomment">/// Note: does _not_ return [`Self`] like many other commands. This is because</span>
     <span class="doccomment">/// it&#39;s not intended to be chained as the other commands are.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">group_add</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">group</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">CommandGroup</span>) {
+        <span class="kw">let</span> <span class="ident">config</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">config</span>.<span class="ident">read</span>();
         <span class="kw">let</span> <span class="ident">map</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">group</span>.<span class="ident">options</span>.<span class="ident">prefixes</span>.<span class="ident">is_empty</span>() {
             <span class="ident">Map::Prefixless</span>(
-                <span class="ident">GroupMap::new</span>(<span class="ident">group</span>.<span class="ident">options</span>.<span class="ident">sub_groups</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">config</span>),
-                <span class="ident">CommandMap::new</span>(<span class="ident">group</span>.<span class="ident">options</span>.<span class="ident">commands</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">config</span>),
+                <span class="ident">GroupMap::new</span>(<span class="ident">group</span>.<span class="ident">options</span>.<span class="ident">sub_groups</span>, <span class="kw-2">&amp;</span><span class="ident">config</span>),
+                <span class="ident">CommandMap::new</span>(<span class="ident">group</span>.<span class="ident">options</span>.<span class="ident">commands</span>, <span class="kw-2">&amp;</span><span class="ident">config</span>),
             )
         } <span class="kw">else</span> {
-            <span class="ident">Map::WithPrefixes</span>(<span class="ident">GroupMap::new</span>(<span class="kw-2">&amp;</span>[<span class="ident">group</span>], <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">config</span>))
+            <span class="ident">Map::WithPrefixes</span>(<span class="ident">GroupMap::new</span>(<span class="kw-2">&amp;</span>[<span class="ident">group</span>], <span class="kw-2">&amp;</span><span class="ident">config</span>))
         };
 
         <span class="self">self</span>.<span class="ident">groups</span>.<span class="ident">push</span>((<span class="ident">group</span>, <span class="ident">map</span>));
@@ -1440,7 +1445,6 @@
     <span class="doccomment">/// let framework = StandardFramework::new().after(after_hook);</span>
     <span class="doccomment">/// ```</span>
     <span class="attribute">#[<span class="ident">must_use</span>]</span>
-
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">after</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">f</span>: <span class="ident">AfterHook</span>) -&gt; <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">after</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">f</span>);
 
@@ -1529,7 +1533,9 @@
 
         <span class="ident">stream</span>.<span class="ident">take_while_char</span>(<span class="ident">char::is_whitespace</span>);
 
-        <span class="kw">let</span> <span class="ident">prefix</span> <span class="op">=</span> <span class="ident">parse::prefix</span>(<span class="kw-2">&amp;</span><span class="ident">ctx</span>, <span class="kw-2">&amp;</span><span class="ident">msg</span>, <span class="kw-2">&amp;mut</span> <span class="ident">stream</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">config</span>).<span class="kw">await</span>;
+        <span class="kw">let</span> <span class="ident">config</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">config</span>.<span class="ident">read</span>().<span class="ident">clone</span>();
+
+        <span class="kw">let</span> <span class="ident">prefix</span> <span class="op">=</span> <span class="ident">parse::prefix</span>(<span class="kw-2">&amp;</span><span class="ident">ctx</span>, <span class="kw-2">&amp;</span><span class="ident">msg</span>, <span class="kw-2">&amp;mut</span> <span class="ident">stream</span>, <span class="kw-2">&amp;</span><span class="ident">config</span>).<span class="kw">await</span>;
 
         <span class="kw">if</span> <span class="ident">prefix</span>.<span class="ident">is_some</span>() <span class="op">&amp;&amp;</span> <span class="ident">stream</span>.<span class="ident">rest</span>().<span class="ident">is_empty</span>() {
             <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">prefix_only</span>) <span class="op">=</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">prefix_only</span> {
@@ -1539,7 +1545,7 @@
             <span class="kw">return</span>;
         }
 
-        <span class="kw">if</span> <span class="ident">prefix</span>.<span class="ident">is_none</span>() <span class="op">&amp;&amp;</span> <span class="op">!</span>(<span class="self">self</span>.<span class="ident">config</span>.<span class="ident">no_dm_prefix</span> <span class="op">&amp;&amp;</span> <span class="ident">msg</span>.<span class="ident">is_private</span>()) {
+        <span class="kw">if</span> <span class="ident">prefix</span>.<span class="ident">is_none</span>() <span class="op">&amp;&amp;</span> <span class="op">!</span>(<span class="ident">config</span>.<span class="ident">no_dm_prefix</span> <span class="op">&amp;&amp;</span> <span class="ident">msg</span>.<span class="ident">is_private</span>()) {
             <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">normal</span>) <span class="op">=</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">normal_message</span> {
                 <span class="ident">normal</span>(<span class="kw-2">&amp;mut</span> <span class="ident">ctx</span>, <span class="kw-2">&amp;</span><span class="ident">msg</span>).<span class="kw">await</span>;
             }
@@ -1552,7 +1558,7 @@
             <span class="kw-2">&amp;</span><span class="ident">msg</span>,
             <span class="kw-2">&amp;mut</span> <span class="ident">stream</span>,
             <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">groups</span>,
-            <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">config</span>,
+            <span class="kw-2">&amp;</span><span class="ident">config</span>,
             <span class="self">self</span>.<span class="ident">help</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">h</span><span class="op">|</span> <span class="ident">h</span>.<span class="ident">options</span>.<span class="ident">names</span>),
         )
         .<span class="kw">await</span>;
@@ -1586,13 +1592,12 @@
 
         <span class="kw">match</span> <span class="ident">invoke</span> {
             <span class="ident">Invoke::Help</span>(<span class="ident">name</span>) =&gt; {
-                <span class="kw">if</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">config</span>.<span class="ident">allow_dm</span> <span class="op">&amp;&amp;</span> <span class="ident">msg</span>.<span class="ident">is_private</span>() {
+                <span class="kw">if</span> <span class="op">!</span><span class="ident">config</span>.<span class="ident">allow_dm</span> <span class="op">&amp;&amp;</span> <span class="ident">msg</span>.<span class="ident">is_private</span>() {
                     <span class="kw">return</span>;
                 }
 
-                <span class="kw">let</span> <span class="ident">args</span> <span class="op">=</span> <span class="ident">Args::new</span>(<span class="ident">stream</span>.<span class="ident">rest</span>(), <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">config</span>.<span class="ident">delimiters</span>);
+                <span class="kw">let</span> <span class="ident">args</span> <span class="op">=</span> <span class="ident">Args::new</span>(<span class="ident">stream</span>.<span class="ident">rest</span>(), <span class="kw-2">&amp;</span><span class="ident">config</span>.<span class="ident">delimiters</span>);
 
-                <span class="kw">let</span> <span class="ident">owners</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">config</span>.<span class="ident">owners</span>.<span class="ident">clone</span>();
                 <span class="kw">let</span> <span class="ident">groups</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">groups</span>.<span class="ident">iter</span>().<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">g</span>, <span class="kw">_</span>)<span class="op">|</span> <span class="kw-2">*</span><span class="ident">g</span>).<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>();
 
                 <span class="comment">// `parse_command` promises to never return a help invocation if `StandardFramework::help` is `None`.</span>
@@ -1605,7 +1610,8 @@
                     }
                 }
 
-                <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> (<span class="ident">help</span>.<span class="ident">fun</span>)(<span class="kw-2">&amp;mut</span> <span class="ident">ctx</span>, <span class="kw-2">&amp;</span><span class="ident">msg</span>, <span class="ident">args</span>, <span class="ident">help</span>.<span class="ident">options</span>, <span class="kw-2">&amp;</span><span class="ident">groups</span>, <span class="ident">owners</span>).<span class="kw">await</span>;
+                <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span>
+                    (<span class="ident">help</span>.<span class="ident">fun</span>)(<span class="kw-2">&amp;mut</span> <span class="ident">ctx</span>, <span class="kw-2">&amp;</span><span class="ident">msg</span>, <span class="ident">args</span>, <span class="ident">help</span>.<span class="ident">options</span>, <span class="kw-2">&amp;</span><span class="ident">groups</span>, <span class="ident">config</span>.<span class="ident">owners</span>).<span class="kw">await</span>;
 
                 <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">after</span>) <span class="op">=</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">after</span> {
                     <span class="ident">after</span>(<span class="kw-2">&amp;mut</span> <span class="ident">ctx</span>, <span class="kw-2">&amp;</span><span class="ident">msg</span>, <span class="ident">name</span>, <span class="ident">res</span>).<span class="kw">await</span>;
@@ -1618,7 +1624,7 @@
                 <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">args</span> <span class="op">=</span> {
                     <span class="kw">use</span> <span class="ident">std::borrow::Cow</span>;
 
-                    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">delims</span> <span class="op">=</span> <span class="ident">Cow::Borrowed</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">config</span>.<span class="ident">delimiters</span>);
+                    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">delims</span> <span class="op">=</span> <span class="ident">Cow::Borrowed</span>(<span class="kw-2">&amp;</span><span class="ident">config</span>.<span class="ident">delimiters</span>);
 
                     <span class="comment">// If user has configured the command&#39;s own delimiters, use those instead.</span>
                     <span class="kw">if</span> <span class="op">!</span><span class="ident">command</span>.<span class="ident">options</span>.<span class="ident">delimiters</span>.<span class="ident">is_empty</span>() {

@@ -128,7 +128,6 @@
 <span id="123">123</span>
 <span id="124">124</span>
 <span id="125">125</span>
-<span id="126">126</span>
 </pre><pre class="rust"><code><span class="doccomment">//! The framework is a customizable method of separating commands.</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! This is used in combination with [`ClientBuilder::framework`].</span>
@@ -194,12 +193,13 @@
 <span class="doccomment">//! let token = std::env::var(&quot;DISCORD_TOKEN&quot;)?;</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! let framework = StandardFramework::new()</span>
-<span class="doccomment">//!     .configure(|c| c.prefix(&quot;~&quot;))</span>
 <span class="doccomment">//!     // The `#[group]` (and similarly, `#[command]`) macro generates static instances</span>
 <span class="doccomment">//!     // containing any options you gave it. For instance, the group `name` and its `commands`.</span>
 <span class="doccomment">//!     // Their identifiers, names you can use to refer to these instances in code, are an</span>
 <span class="doccomment">//!     // all-uppercased version of the `name` with a `_GROUP` suffix appended at the end.</span>
 <span class="doccomment">//!     .group(&amp;GENERAL_GROUP);</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! framework.configure(|c| c.prefix(&quot;~&quot;));</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! let mut client = Client::builder(&amp;token, GatewayIntents::default())</span>
 <span class="doccomment">//!     .event_handler(Handler)</span>
@@ -224,9 +224,7 @@
 <span class="doccomment">/// A trait for defining your own framework for serenity to use.</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// Should you implement this trait, or define a `message` handler, depends on you.</span>
-<span class="doccomment">/// However, using this will benefit you by abstracting the [`EventHandler`] away,</span>
-<span class="doccomment">/// and providing a reference to serenity&#39;s threadpool,</span>
-<span class="doccomment">/// so that you may run your commands in separate threads.</span>
+<span class="doccomment">/// However, using this will benefit you by abstracting the [`EventHandler`] away.</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// [`EventHandler`]: crate::client::EventHandler</span>
 <span class="attribute">#[<span class="ident">async_trait</span>]</span>
