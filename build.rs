@@ -12,4 +12,10 @@ compile_error!(
     If you are unsure, go with `rustls_backend`."
 );
 
-fn main() {}
+#[cfg_attr(feature="simdjson", deprecated = "The `simdjson` feature name is deprecated and will be removed in the next version of serenity, use `simd_json`.")]
+#[cfg_attr(feature="voice-model", deprecated = "The `voice-model` feature name is deprecated and will be removed in the next version of serenity, use `voice_model`.")]
+fn deprecated_feature() {}
+
+fn main() {
+    deprecated_feature()
+}
