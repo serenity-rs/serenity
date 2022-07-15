@@ -1,76 +1,25 @@
-use std::sync::Arc;
-
-use tokio::sync::mpsc::{
-    unbounded_channel,
-    UnboundedReceiver as Receiver,
-    UnboundedSender as Sender,
-};
-
 use crate::client::bridge::gateway::ShardMessenger;
-use crate::collector::{CollectorError, CommonFilterOptions, LazyArc};
+use crate::collector::{CollectorError, Filter, FilterTrait, LazyArc};
 use crate::model::event::{Event, EventType, RelatedIdsForEventType};
 use crate::model::id::{ChannelId, GuildId, MessageId, UserId};
 use crate::{Error, Result};
 
-/// Filters events on the shard's end and sends them to the collector.
-#[derive(Clone, Debug)]
-pub struct EventFilter {
-    filtered: u32,
-    collected: u32,
-    options: FilterOptions,
-    sender: Sender<Arc<Event>>,
-    common_options: CommonFilterOptions<Event>,
+impl Filter<Event> {
+    /// Checks if the `event` is one of the types we're looking for.
+    pub(crate) fn is_matching_event_type(&self, event: &Event) -> bool {
+        self.options.event_types.contains(&event.event_type())
+    }
 }
 
-impl EventFilter {
-    /// Creates a new filter
-    fn new(
-        options: FilterOptions,
-        common_options: CommonFilterOptions<Event>,
-    ) -> (Self, Receiver<Arc<Event>>) {
-        let (sender, receiver) = unbounded_channel();
-
-        let filter = Self {
-            filtered: 0,
-            collected: 0,
-            sender,
-            options,
-            common_options,
-        };
-
-        (filter, receiver)
-    }
-
-    /// Sends a `event` to the consuming collector if the `event` conforms
-    /// to the constraints and the limits are not reached yet.
-    pub(crate) fn send_event(&mut self, event: &mut LazyArc<'_, Event>) -> bool {
-        // Only events with matching types count towards the filtered limit.
-        if !self.is_matching_event_type(event) {
-            return !self.sender.is_closed();
-        }
-
-        if self.is_passing_constraints(event) {
-            self.collected += 1;
-
-            if self.sender.send(event.as_arc()).is_err() {
-                return false;
-            }
-        }
-
-        self.filtered += 1;
-
-        self.is_within_limits() && !self.sender.is_closed()
-    }
-
-    /// Checks if the `event` is one of the types we're looking for.
-    fn is_matching_event_type(&self, event: &Event) -> bool {
-        self.options.event_types.contains(&event.event_type())
+impl FilterTrait<Event> for Filter<Event> {
+    fn register(self, messenger: &ShardMessenger) {
+        messenger.set_event_filter(self);
     }
 
     /// Checks if the `event` passes set constraints.
     /// Constraints are optional, as it is possible to limit events to
     /// be sent by a specific user or in a specifc guild.
-    fn is_passing_constraints(&self, event: &Event) -> bool {
+    fn is_passing_constraints(&self, event: &mut LazyArc<'_, Event>) -> bool {
         fn empty_or_any<T, F>(slice: &[T], f: F) -> bool
         where
             F: Fn(&T) -> bool,
@@ -83,14 +32,6 @@ impl EventFilter {
             && empty_or_any(&self.options.channel_id, |id| event.channel_id().contains(id))
             && empty_or_any(&self.options.message_id, |id| event.message_id().contains(id))
             && self.common_options.filter.as_ref().map_or(true, |f| f.0(event))
-    }
-
-    /// Checks if the filter is within set receive and collect limits.
-    /// A event is considered *received* even when it does not meet the
-    /// constraints.
-    fn is_within_limits(&self) -> bool {
-        self.common_options.filter_limit.map_or(true, |limit| self.filtered < limit)
-            && self.common_options.collect_limit.map_or(true, |limit| self.collected < limit)
     }
 }
 
@@ -178,26 +119,15 @@ impl super::CollectorBuilder<'_, Event> {
 /// An event collector receives events matching the given filter for a set duration.
 pub type EventCollector = super::Collector<Event>;
 pub type EventCollectorBuilder<'a> = super::CollectorBuilder<'a, Event>;
+pub type EventFilter = super::Filter<Event>;
 
 // No deprecated CollectSingle alias as EventCollector never had a CollectSingle version.
 
-impl super::FilterOptions<Event> for FilterOptions {
-    type FilterItem = Event;
-
-    fn build(
-        self,
-        messenger: &ShardMessenger,
-        common_options: CommonFilterOptions<Self::FilterItem>,
-    ) -> Receiver<Arc<Event>> {
-        let (filter, recv) = EventFilter::new(self, common_options);
-        messenger.set_event_filter(filter);
-
-        recv
-    }
-}
-
+#[nougat::gat]
 impl super::Collectable for Event {
+    type FilterItem = Event;
     type FilterOptions = FilterOptions;
+    type LazyItem<'a> = LazyArc<'a, Event>;
 }
 
 #[cfg(test)]

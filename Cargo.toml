@@ -21,6 +21,14 @@ serde_json = "1.0.75"
 serde-value = "0.7"
 async-trait = "0.1.9"
 
+[dependencies.nougat]
+version = "0.2.0"
+optional = true
+
+[dependencies.derivative]
+version = "2.2.0"
+optional = true
+
 [dependencies.rustversion]
 version = "1.0.7"
 
@@ -167,7 +175,7 @@ default_no_backend = [
 
 builder = ["utils"]
 cache = ["dashmap", "parking_lot"]
-collector = ["gateway", "model"]
+collector = ["gateway", "model", "derivative", "nougat"]
 client = ["http", "typemap_rev", "dashmap"]
 extras = []
 framework = ["client", "model", "utils"]
