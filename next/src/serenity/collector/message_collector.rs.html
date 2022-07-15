@@ -54,146 +54,27 @@
 <span id="49">49</span>
 <span id="50">50</span>
 <span id="51">51</span>
-<span id="52">52</span>
-<span id="53">53</span>
-<span id="54">54</span>
-<span id="55">55</span>
-<span id="56">56</span>
-<span id="57">57</span>
-<span id="58">58</span>
-<span id="59">59</span>
-<span id="60">60</span>
-<span id="61">61</span>
-<span id="62">62</span>
-<span id="63">63</span>
-<span id="64">64</span>
-<span id="65">65</span>
-<span id="66">66</span>
-<span id="67">67</span>
-<span id="68">68</span>
-<span id="69">69</span>
-<span id="70">70</span>
-<span id="71">71</span>
-<span id="72">72</span>
-<span id="73">73</span>
-<span id="74">74</span>
-<span id="75">75</span>
-<span id="76">76</span>
-<span id="77">77</span>
-<span id="78">78</span>
-<span id="79">79</span>
-<span id="80">80</span>
-<span id="81">81</span>
-<span id="82">82</span>
-<span id="83">83</span>
-<span id="84">84</span>
-<span id="85">85</span>
-<span id="86">86</span>
-<span id="87">87</span>
-<span id="88">88</span>
-<span id="89">89</span>
-<span id="90">90</span>
-<span id="91">91</span>
-<span id="92">92</span>
-<span id="93">93</span>
-<span id="94">94</span>
-<span id="95">95</span>
-<span id="96">96</span>
-<span id="97">97</span>
-<span id="98">98</span>
-<span id="99">99</span>
-<span id="100">100</span>
-<span id="101">101</span>
-<span id="102">102</span>
-<span id="103">103</span>
-<span id="104">104</span>
-<span id="105">105</span>
-<span id="106">106</span>
-<span id="107">107</span>
-<span id="108">108</span>
-<span id="109">109</span>
-<span id="110">110</span>
-<span id="111">111</span>
-<span id="112">112</span>
-<span id="113">113</span>
-<span id="114">114</span>
-<span id="115">115</span>
-<span id="116">116</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::num::NonZeroU64</span>;
-<span class="kw">use</span> <span class="ident">std::sync::Arc</span>;
 
-<span class="kw">use</span> <span class="ident">tokio::sync::mpsc</span>::{
-    <span class="ident">unbounded_channel</span>,
-    <span class="ident">UnboundedReceiver</span> <span class="kw">as</span> <span class="ident">Receiver</span>,
-    <span class="ident">UnboundedSender</span> <span class="kw">as</span> <span class="ident">Sender</span>,
-};
-
+<span class="kw">use</span> <span class="ident"><span class="kw">super</span>::Filter</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::client::bridge::gateway::ShardMessenger</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::collector::macros</span>::<span class="kw-2">*</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::collector</span>::{<span class="ident">CommonFilterOptions</span>, <span class="ident">LazyArc</span>};
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::collector::LazyArc</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::channel::Message</span>;
 
-<span class="doccomment">/// Filters events on the shard&#39;s end and sends them to the collector.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">MessageFilter</span> {
-    <span class="ident">filtered</span>: <span class="ident">u32</span>,
-    <span class="ident">collected</span>: <span class="ident">u32</span>,
-    <span class="ident">options</span>: <span class="ident">FilterOptions</span>,
-    <span class="ident">sender</span>: <span class="ident">Sender</span><span class="op">&lt;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Message</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="ident">common_options</span>: <span class="ident">CommonFilterOptions</span><span class="op">&lt;</span><span class="ident">Message</span><span class="op">&gt;</span>,
-}
-
-<span class="kw">impl</span> <span class="ident">MessageFilter</span> {
-    <span class="doccomment">/// Creates a new filter</span>
-    <span class="kw">fn</span> <span class="ident">new</span>(
-        <span class="ident">options</span>: <span class="ident">FilterOptions</span>,
-        <span class="ident">common_options</span>: <span class="ident">CommonFilterOptions</span><span class="op">&lt;</span><span class="ident">Message</span><span class="op">&gt;</span>,
-    ) -&gt; (<span class="self">Self</span>, <span class="ident">Receiver</span><span class="op">&lt;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Message</span><span class="op">&gt;</span><span class="op">&gt;</span>) {
-        <span class="kw">let</span> (<span class="ident">sender</span>, <span class="ident">receiver</span>) <span class="op">=</span> <span class="ident">unbounded_channel</span>();
-
-        <span class="kw">let</span> <span class="ident">filter</span> <span class="op">=</span> <span class="self">Self</span> {
-            <span class="ident">filtered</span>: <span class="number">0</span>,
-            <span class="ident">collected</span>: <span class="number">0</span>,
-            <span class="ident">sender</span>,
-            <span class="ident">options</span>,
-            <span class="ident">common_options</span>,
-        };
-
-        (<span class="ident">filter</span>, <span class="ident">receiver</span>)
-    }
-
-    <span class="doccomment">/// Sends a `message` to the consuming collector if the `message` conforms</span>
-    <span class="doccomment">/// to the constraints and the limits are not reached yet.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">send_message</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">message</span>: <span class="kw-2">&amp;mut</span> <span class="ident">LazyArc</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">Message</span><span class="op">&gt;</span>) -&gt; <span class="ident">bool</span> {
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">is_passing_constraints</span>(<span class="ident">message</span>) {
-            <span class="self">self</span>.<span class="ident">collected</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
-
-            <span class="kw">if</span> <span class="self">self</span>.<span class="ident">sender</span>.<span class="ident">send</span>(<span class="ident">message</span>.<span class="ident">as_arc</span>()).<span class="ident">is_err</span>() {
-                <span class="kw">return</span> <span class="bool-val">false</span>;
-            }
-        }
-
-        <span class="self">self</span>.<span class="ident">filtered</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
-
-        <span class="self">self</span>.<span class="ident">is_within_limits</span>() <span class="op">&amp;&amp;</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">sender</span>.<span class="ident">is_closed</span>()
+<span class="kw">impl</span> <span class="ident"><span class="kw">super</span>::FilterTrait</span><span class="op">&lt;</span><span class="ident">Message</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Filter</span><span class="op">&lt;</span><span class="ident">Message</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">register</span>(<span class="self">self</span>, <span class="ident">messenger</span>: <span class="kw-2">&amp;</span><span class="ident">ShardMessenger</span>) {
+        <span class="ident">messenger</span>.<span class="ident">set_message_filter</span>(<span class="self">self</span>);
     }
 
     <span class="doccomment">/// Checks if the `message` passes set constraints.</span>
     <span class="doccomment">/// Constraints are optional, as it is possible to limit messages to</span>
     <span class="doccomment">/// be sent by a specific author or in a specific guild.</span>
-    <span class="kw">fn</span> <span class="ident">is_passing_constraints</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">message</span>: <span class="kw-2">&amp;</span><span class="ident">Message</span>) -&gt; <span class="ident">bool</span> {
+    <span class="kw">fn</span> <span class="ident">is_passing_constraints</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">message</span>: <span class="kw-2">&amp;mut</span> <span class="ident">LazyArc</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">Message</span><span class="op">&gt;</span>) -&gt; <span class="ident">bool</span> {
         <span class="self">self</span>.<span class="ident">options</span>.<span class="ident">guild_id</span>.<span class="ident">map_or</span>(<span class="bool-val">true</span>, <span class="op">|</span><span class="ident">g</span><span class="op">|</span> <span class="prelude-val">Some</span>(<span class="ident">g</span>) <span class="op">==</span> <span class="ident">message</span>.<span class="ident">guild_id</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">g</span><span class="op">|</span> <span class="ident">g</span>.<span class="number">0</span>))
             <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">options</span>.<span class="ident">channel_id</span>.<span class="ident">map_or</span>(<span class="bool-val">true</span>, <span class="op">|</span><span class="ident">g</span><span class="op">|</span> <span class="ident">g</span> <span class="op">==</span> <span class="ident">message</span>.<span class="ident">channel_id</span>.<span class="number">0</span>)
             <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">options</span>.<span class="ident">author_id</span>.<span class="ident">map_or</span>(<span class="bool-val">true</span>, <span class="op">|</span><span class="ident">g</span><span class="op">|</span> <span class="ident">g</span> <span class="op">==</span> <span class="ident">message</span>.<span class="ident">author</span>.<span class="ident">id</span>.<span class="number">0</span>)
             <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">common_options</span>.<span class="ident">filter</span>.<span class="ident">as_ref</span>().<span class="ident">map_or</span>(<span class="bool-val">true</span>, <span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="ident">f</span>.<span class="number">0</span>(<span class="ident">message</span>))
-    }
-
-    <span class="doccomment">/// Checks if the filter is within set receive and collect limits.</span>
-    <span class="doccomment">/// A message is considered *received* even when it does not meet the</span>
-    <span class="doccomment">/// constraints.</span>
-    <span class="kw">fn</span> <span class="ident">is_within_limits</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">common_options</span>.<span class="ident">filter_limit</span>.<span class="ident">as_ref</span>().<span class="ident">map_or</span>(<span class="bool-val">true</span>, <span class="op">|</span><span class="ident">limit</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">filtered</span> <span class="op">&lt;</span> <span class="kw-2">*</span><span class="ident">limit</span>)
-            <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">common_options</span>.<span class="ident">collect_limit</span>.<span class="ident">map_or</span>(<span class="bool-val">true</span>, <span class="op">|</span><span class="ident">limit</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">collected</span> <span class="op">&lt;</span> <span class="ident">limit</span>)
     }
 }
 
@@ -210,28 +91,17 @@
     <span class="macro">impl_guild_id!</span>(<span class="string">&quot;Sets the required guild ID of a message. If a message does not meet this ID, it won&#39;t be received.&quot;</span>);
 }
 
-<span class="kw">impl</span> <span class="ident"><span class="kw">super</span>::FilterOptions</span><span class="op">&lt;</span><span class="ident">Message</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">FilterOptions</span> {
-    <span class="kw">type</span> <span class="ident">FilterItem</span> <span class="op">=</span> <span class="ident">Message</span>;
-
-    <span class="kw">fn</span> <span class="ident">build</span>(
-        <span class="self">self</span>,
-        <span class="ident">messenger</span>: <span class="kw-2">&amp;</span><span class="ident">ShardMessenger</span>,
-        <span class="ident">common_options</span>: <span class="ident">CommonFilterOptions</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::FilterItem</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="ident">Receiver</span><span class="op">&lt;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Message</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> (<span class="ident">filter</span>, <span class="ident">recv</span>) <span class="op">=</span> <span class="ident">MessageFilter::new</span>(<span class="self">self</span>, <span class="ident">common_options</span>);
-        <span class="ident">messenger</span>.<span class="ident">set_message_filter</span>(<span class="ident">filter</span>);
-
-        <span class="ident">recv</span>
-    }
-}
-
+<span class="attribute">#[<span class="ident">nougat::gat</span>]</span>
 <span class="kw">impl</span> <span class="ident"><span class="kw">super</span>::Collectable</span> <span class="kw">for</span> <span class="ident">Message</span> {
+    <span class="kw">type</span> <span class="ident">FilterItem</span> <span class="op">=</span> <span class="ident">Message</span>;
     <span class="kw">type</span> <span class="ident">FilterOptions</span> <span class="op">=</span> <span class="ident">FilterOptions</span>;
+    <span class="kw">type</span> <span class="ident">LazyItem</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">LazyArc</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">Message</span><span class="op">&gt;</span>;
 }
 
 <span class="doccomment">/// A message collector receives messages matching the given filter for a set duration.</span>
 <span class="kw">pub</span> <span class="kw">type</span> <span class="ident">MessageCollectorBuilder</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident"><span class="kw">super</span>::CollectorBuilder</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">Message</span><span class="op">&gt;</span>;
 <span class="kw">pub</span> <span class="kw">type</span> <span class="ident">MessageCollector</span> <span class="op">=</span> <span class="ident"><span class="kw">super</span>::Collector</span><span class="op">&lt;</span><span class="ident">Message</span><span class="op">&gt;</span>;
+<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">MessageFilter</span> <span class="op">=</span> <span class="ident">Filter</span><span class="op">&lt;</span><span class="ident">Message</span><span class="op">&gt;</span>;
 
 <span class="attribute">#[<span class="ident">deprecated</span> <span class="op">=</span> <span class="string">&quot;Use MessageCollectorBuilder::collect_single&quot;</span>]</span>
 <span class="kw">pub</span> <span class="kw">type</span> <span class="ident">CollectReply</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">MessageCollectorBuilder</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>;

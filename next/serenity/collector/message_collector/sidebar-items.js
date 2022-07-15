@@ -1,1 +1,1 @@
-initSidebarItems({"struct":[["FilterOptions",""],["MessageFilter","Filters events on the shard’s end and sends them to the collector."]],"type":[["CollectReply",""],["MessageCollector",""],["MessageCollectorBuilder","A message collector receives messages matching the given filter for a set duration."]]});
+initSidebarItems({"struct":[["FilterOptions",""]],"type":[["CollectReply",""],["MessageCollector",""],["MessageCollectorBuilder","A message collector receives messages matching the given filter for a set duration."],["MessageFilter",""]]});

@@ -1,1 +1,1 @@
-initSidebarItems({"struct":[["EventFilter","Filters events on the shard’s end and sends them to the collector."],["FilterOptions",""]],"type":[["EventCollector","An event collector receives events matching the given filter for a set duration."],["EventCollectorBuilder",""]]});
+initSidebarItems({"struct":[["FilterOptions",""]],"type":[["EventCollector","An event collector receives events matching the given filter for a set duration."],["EventCollectorBuilder",""],["EventFilter",""]]});

@@ -195,8 +195,6 @@
 <span id="190">190</span>
 <span id="191">191</span>
 <span id="192">192</span>
-<span id="193">193</span>
-<span id="194">194</span>
 </pre><pre class="rust"><code><span class="doccomment">//! Collectors will receive events from the contextual shard, check if the</span>
 <span class="doccomment">//! filter lets them pass, and collects if the receive, collect, or time limits</span>
 <span class="doccomment">//! are not reached yet.</span>
@@ -206,8 +204,8 @@
 <span class="kw">use</span> <span class="ident">std::sync::Arc</span>;
 <span class="kw">use</span> <span class="ident">std::time::Duration</span>;
 
+<span class="kw">use</span> <span class="ident">derivative::Derivative</span>;
 <span class="kw">use</span> <span class="ident">futures::StreamExt</span>;
-<span class="kw">use</span> <span class="ident">tokio::sync::mpsc::UnboundedReceiver</span> <span class="kw">as</span> <span class="ident">Receiver</span>;
 <span class="kw">use</span> <span class="ident">tokio::time::Sleep</span>;
 
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::client::bridge::gateway::ShardMessenger</span>;
@@ -217,7 +215,11 @@
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">error::Error</span> <span class="kw">as</span> <span class="ident">CollectorError</span>;
 
 <span class="kw">mod</span> <span class="ident">base_collector</span>;
+<span class="kw">mod</span> <span class="ident">base_filter</span>;
+
 <span class="kw">use</span> <span class="ident">base_collector::Collector</span>;
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">base_filter::Filter</span>;
+<span class="kw">use</span> <span class="ident">base_filter::FilterTrait</span>;
 
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">component_interaction_collector</span>;
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">event_collector</span>;
@@ -231,8 +233,12 @@
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">modal_interaction_collector</span>::<span class="kw-2">*</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">reaction_collector</span>::<span class="kw-2">*</span>;
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">FilterFn</span><span class="op">&lt;</span><span class="ident">Arg</span>: <span class="question-mark">?</span><span class="ident">Sized</span><span class="op">&gt;</span>(<span class="ident">Arc</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">Fn</span>(<span class="kw-2">&amp;</span><span class="ident">Arg</span>) -&gt; <span class="ident">bool</span> <span class="op">+</span> <span class="lifetime">&#39;static</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span><span class="op">&gt;</span>);
+<span class="kw">type</span> <span class="ident">FilterFnInner</span><span class="op">&lt;</span><span class="ident">Arg</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Arc</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">Fn</span>(<span class="kw-2">&amp;</span><span class="ident">Arg</span>) -&gt; <span class="ident">bool</span> <span class="op">+</span> <span class="lifetime">&#39;static</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span><span class="op">&gt;</span>;
+
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Derivative</span>)]</span>
+<span class="attribute">#[<span class="ident">derivative</span>(<span class="ident">Clone</span>(<span class="ident">bound</span> <span class="op">=</span> <span class="string">&quot;&quot;</span>))]</span>
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">FilterFn</span><span class="op">&lt;</span><span class="ident">Arg</span>: <span class="question-mark">?</span><span class="ident">Sized</span><span class="op">&gt;</span>(<span class="ident">FilterFnInner</span><span class="op">&lt;</span><span class="ident">Arg</span><span class="op">&gt;</span>);
+
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">Arg</span><span class="op">&gt;</span> <span class="ident">fmt::Debug</span> <span class="kw">for</span> <span class="ident">FilterFn</span><span class="op">&lt;</span><span class="ident">Arg</span><span class="op">&gt;</span> {
     <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
         <span class="ident">f</span>.<span class="ident">debug_tuple</span>(<span class="string">&quot;FilterFn&quot;</span>)
@@ -244,7 +250,7 @@
 <span class="doccomment">/// Wraps a &amp;T and clones the value into an Arc&lt;T&gt; lazily. Used with collectors to allow inspecting</span>
 <span class="doccomment">/// the value in filters while only cloning values that actually match.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">LazyArc</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span><span class="op">&gt;</span> {
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">LazyArc</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span><span class="op">&gt;</span> {
     <span class="ident">value</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">T</span>,
     <span class="ident">arc</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span>,
 }
@@ -256,10 +262,12 @@
             <span class="ident">arc</span>: <span class="prelude-val">None</span>,
         }
     }
+}
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_arc</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
+<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">Item</span>: <span class="ident">Clone</span><span class="op">&gt;</span> <span class="ident">LazyItem</span><span class="op">&lt;</span><span class="ident">Item</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">LazyArc</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">Item</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">as_arc</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Item</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">value</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">value</span>;
-        <span class="self">self</span>.<span class="ident">arc</span>.<span class="ident">get_or_insert_with</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">Arc::new</span>(<span class="ident">value</span>.<span class="ident">clone</span>())).<span class="ident">clone</span>()
+        <span class="self">self</span>.<span class="ident">arc</span>.<span class="ident">get_or_insert_with</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">Arc::new</span>(<span class="ident">value</span>.<span class="ident">clone</span>()))
     }
 }
 
@@ -283,47 +291,36 @@
     <span class="kw">impl</span> <span class="ident">Sealed</span> <span class="kw">for</span> <span class="ident">interaction::message_component::MessageComponentInteraction</span> {}
 }
 
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">FilterOptions</span><span class="op">&lt;</span><span class="ident">Item</span>: <span class="question-mark">?</span><span class="ident">Sized</span><span class="op">&gt;</span> {
+<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">LazyItem</span><span class="op">&lt;</span><span class="ident">Item</span>: <span class="question-mark">?</span><span class="ident">Sized</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">as_arc</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Item</span><span class="op">&gt;</span>;
+}
+
+<span class="attribute">#[<span class="ident">nougat::gat</span>]</span>
+<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">Collectable</span>: <span class="ident">sealed::Sealed</span> <span class="op">+</span> <span class="ident">Sized</span> {
+    <span class="kw">type</span> <span class="ident">LazyItem</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>: <span class="ident">LazyItem</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>;
+    <span class="kw">type</span> <span class="ident">FilterOptions</span>: <span class="ident">Default</span>;
     <span class="kw">type</span> <span class="ident">FilterItem</span>;
-
-    <span class="kw">fn</span> <span class="ident">build</span>(
-        <span class="self">self</span>,
-        <span class="ident">messenger</span>: <span class="kw-2">&amp;</span><span class="ident">ShardMessenger</span>,
-        <span class="ident">common</span>: <span class="ident">CommonFilterOptions</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::FilterItem</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="ident">Receiver</span><span class="op">&lt;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Item</span><span class="op">&gt;</span><span class="op">&gt;</span>;
 }
 
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">Collectable</span> {
-    <span class="kw">type</span> <span class="ident">FilterOptions</span>: <span class="ident">FilterOptions</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Default</span>;
-}
+<span class="kw">type</span> <span class="ident">LazyItemGat</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">Item</span><span class="op">&gt;</span> <span class="op">=</span> <span class="macro">nougat::Gat!</span>(<span class="op">&lt;</span><span class="ident">Item</span> <span class="kw">as</span> <span class="ident">Collectable</span><span class="op">&gt;</span><span class="ident">::LazyItem</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>);
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>)]</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Derivative</span>)]</span>
+<span class="attribute">#[<span class="ident">derivative</span>(<span class="ident">Clone</span>(<span class="ident">bound</span> <span class="op">=</span> <span class="string">&quot;&quot;</span>), <span class="ident">Debug</span>(<span class="ident">bound</span> <span class="op">=</span> <span class="string">&quot;&quot;</span>), <span class="ident">Default</span>(<span class="ident">bound</span> <span class="op">=</span> <span class="string">&quot;&quot;</span>))]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">CommonFilterOptions</span><span class="op">&lt;</span><span class="ident">FilterItem</span><span class="op">&gt;</span> {
     <span class="ident">filter_limit</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
     <span class="ident">collect_limit</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
     <span class="ident">filter</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">FilterFn</span><span class="op">&lt;</span><span class="ident">FilterItem</span><span class="op">&gt;</span><span class="op">&gt;</span>,
 }
 
-<span class="comment">// Needed to prevent `FilterItem` needing a `Default` bound, which `derive` adds.</span>
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">FilterItem</span><span class="op">&gt;</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">CommonFilterOptions</span><span class="op">&lt;</span><span class="ident">FilterItem</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">default</span>() -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> {
-            <span class="ident">collect_limit</span>: <span class="prelude-val">None</span>,
-            <span class="ident">filter_limit</span>: <span class="prelude-val">None</span>,
-            <span class="ident">filter</span>: <span class="prelude-val">None</span>,
-        }
-    }
-}
-
 <span class="attribute">#[<span class="ident">must_use</span> <span class="op">=</span> <span class="string">&quot;Builders must be built&quot;</span>]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">CollectorBuilder</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">Item</span>: <span class="ident">Collectable</span> <span class="op">+</span> <span class="ident">sealed::Sealed</span><span class="op">&gt;</span> {
-    <span class="ident">common_options</span>: <span class="ident">CommonFilterOptions</span><span class="op">&lt;</span><span class="op">&lt;</span><span class="ident">Item::FilterOptions</span> <span class="kw">as</span> <span class="ident">FilterOptions</span><span class="op">&lt;</span><span class="ident">Item</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="ident">::FilterItem</span><span class="op">&gt;</span>,
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">CollectorBuilder</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">Item</span>: <span class="ident">Collectable</span><span class="op">&gt;</span> {
+    <span class="ident">common_options</span>: <span class="ident">CommonFilterOptions</span><span class="op">&lt;</span><span class="ident">Item::FilterItem</span><span class="op">&gt;</span>,
     <span class="ident">filter_options</span>: <span class="ident">Item::FilterOptions</span>,
     <span class="ident">shard_messenger</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">ShardMessenger</span>,
     <span class="ident">timeout</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Pin</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="ident">Sleep</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">Item</span>: <span class="ident">Collectable</span> <span class="op">+</span> <span class="ident">sealed::Sealed</span><span class="op">&gt;</span> <span class="ident">CollectorBuilder</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">Item</span><span class="op">&gt;</span> {
+<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">Item</span>: <span class="ident">Collectable</span><span class="op">&gt;</span> <span class="ident">CollectorBuilder</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">Item</span><span class="op">&gt;</span> {
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">shard_messenger</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">ShardMessenger</span>) -&gt; <span class="self">Self</span> {
         <span class="self">Self</span> {
             <span class="ident">shard_messenger</span>,
@@ -334,12 +331,16 @@
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">build</span>(<span class="self">self</span>) -&gt; <span class="ident">Collector</span><span class="op">&lt;</span><span class="ident">Item</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">receiver</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">filter_options</span>.<span class="ident">build</span>(<span class="self">self</span>.<span class="ident">shard_messenger</span>, <span class="self">self</span>.<span class="ident">common_options</span>);
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">build</span>(<span class="self">self</span>) -&gt; <span class="ident">Collector</span><span class="op">&lt;</span><span class="ident">Item</span><span class="op">&gt;</span>
+    <span class="kw">where</span>
+        <span class="ident">Filter</span><span class="op">&lt;</span><span class="ident">Item</span><span class="op">&gt;</span>: <span class="ident">FilterTrait</span><span class="op">&lt;</span><span class="ident">Item</span><span class="op">&gt;</span>,
+    {
+        <span class="kw">let</span> (<span class="ident">filter</span>, <span class="ident">recv</span>) <span class="op">=</span> <span class="ident">Filter::new</span>(<span class="self">self</span>.<span class="ident">filter_options</span>, <span class="self">self</span>.<span class="ident">common_options</span>);
+        <span class="ident">filter</span>.<span class="ident">register</span>(<span class="self">self</span>.<span class="ident">shard_messenger</span>);
 
         <span class="ident">Collector</span> {
             <span class="ident">timeout</span>: <span class="self">self</span>.<span class="ident">timeout</span>,
-            <span class="ident">receiver</span>: <span class="ident">Box::pin</span>(<span class="ident">receiver</span>),
+            <span class="ident">receiver</span>: <span class="ident">Box::pin</span>(<span class="ident">recv</span>),
         }
     }
 
@@ -347,16 +348,8 @@
     <span class="doccomment">/// otherwise the item won&#39;t be collected and failed the filter process.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// This is the last instance to pass for an item to count as *collected*.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">filter</span><span class="op">&lt;</span>
-        <span class="ident">F</span>: <span class="ident">Fn</span>(<span class="kw-2">&amp;</span><span class="op">&lt;</span><span class="ident">Item::FilterOptions</span> <span class="kw">as</span> <span class="ident">FilterOptions</span><span class="op">&lt;</span><span class="ident">Item</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="ident">::FilterItem</span>) -&gt; <span class="ident">bool</span>
-            <span class="op">+</span> <span class="lifetime">&#39;static</span>
-            <span class="op">+</span> <span class="ident">Send</span>
-            <span class="op">+</span> <span class="ident">Sync</span>,
-    <span class="op">&gt;</span>(
-        <span class="kw-2">mut</span> <span class="self">self</span>,
-        <span class="ident">function</span>: <span class="ident">F</span>,
-    ) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">common_options</span>.<span class="ident">filter</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">FilterFn</span>(<span class="ident">Arc::new</span>(<span class="ident">function</span>)));
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">filter</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">function</span>: <span class="ident">FilterFnInner</span><span class="op">&lt;</span><span class="ident">Item::FilterItem</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
+        <span class="self">self</span>.<span class="ident">common_options</span>.<span class="ident">filter</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">FilterFn</span>(<span class="ident">function</span>));
 
         <span class="self">self</span>
     }
@@ -385,7 +378,10 @@
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">Item</span>: <span class="ident">Collectable</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="ident">sealed::Sealed</span> <span class="op">+</span> <span class="lifetime">&#39;static</span><span class="op">&gt;</span> <span class="ident">CollectorBuilder</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">Item</span><span class="op">&gt;</span> {
+<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">Item</span>: <span class="ident">Collectable</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="lifetime">&#39;static</span><span class="op">&gt;</span> <span class="ident">CollectorBuilder</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">Item</span><span class="op">&gt;</span>
+<span class="kw">where</span>
+    <span class="ident">Filter</span><span class="op">&lt;</span><span class="ident">Item</span><span class="op">&gt;</span>: <span class="ident">FilterTrait</span><span class="op">&lt;</span><span class="ident">Item</span><span class="op">&gt;</span>,
+{
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">collect_single</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Item</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">collector</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">build</span>();
         <span class="ident">collector</span>.<span class="ident">next</span>().<span class="kw">await</span>
