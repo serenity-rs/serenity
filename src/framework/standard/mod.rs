@@ -103,7 +103,7 @@ pub struct StandardFramework {
     unrecognised_command: Option<UnrecognisedHook>,
     normal_message: Option<NormalMessageHook>,
     prefix_only: Option<PrefixOnlyHook>,
-    config: Configuration,
+    config: parking_lot::RwLock<Configuration>,
     help: Option<&'static HelpCommand>,
     /// Whether the framework has been "initialized".
     ///
@@ -130,9 +130,10 @@ impl StandardFramework {
         StandardFramework::default()
     }
 
-    /// Configures the framework, setting non-default values. All fields are
-    /// optional. Refer to [`Configuration::default`] for more information on
-    /// the default values.
+    /// Configures the framework, setting non-default values.
+    ///
+    /// This passes a mutable reference to the current configuration,
+    /// allowing for runtime configuration of the Framework.
     ///
     /// # Examples
     ///
@@ -146,9 +147,10 @@ impl StandardFramework {
     /// use serenity::Client;
     ///
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
-    /// let token = std::env::var("DISCORD_TOKEN")?;
-    /// let framework = StandardFramework::new().configure(|c| c.with_whitespace(true).prefix("~"));
+    /// let framework = StandardFramework::new();
+    /// framework.configure(|c| c.with_whitespace(true).prefix("~"));
     ///
+    /// let token = std::env::var("DISCORD_TOKEN")?;
     /// let mut client = Client::builder(&token, GatewayIntents::default())
     ///     .event_handler(Handler)
     ///     .framework(framework)
@@ -160,14 +162,8 @@ impl StandardFramework {
     /// [`Client`]: crate::Client
     /// [`prefix`]: Configuration::prefix
     /// [allowing whitespace between prefixes]: Configuration::with_whitespace
-    #[must_use]
-    pub fn configure<F>(mut self, f: F) -> Self
-    where
-        F: FnOnce(&mut Configuration) -> &mut Configuration,
-    {
-        f(&mut self.config);
-
-        self
+    pub fn configure(&self, f: impl FnOnce(&mut Configuration) -> &mut Configuration) {
+        f(&mut self.config.write());
     }
 
     /// Defines a bucket with `delay` between each command, and the `limit` of uses
@@ -210,8 +206,10 @@ impl StandardFramework {
 
     /// Whether the message should be ignored because it is from a bot or webhook.
     fn should_ignore(&self, msg: &Message) -> bool {
-        (self.config.ignore_bots && msg.author.bot)
-            || (self.config.ignore_webhooks && msg.webhook_id.is_some())
+        let config = self.config.read();
+
+        (config.ignore_bots && msg.author.bot)
+            || (config.ignore_webhooks && msg.webhook_id.is_some())
     }
 
     async fn should_fail<'a>(
@@ -240,37 +238,40 @@ impl StandardFramework {
             }
         }
 
-        if (group.owner_privilege && command.owner_privilege)
-            && self.config.owners.contains(&msg.author.id)
         {
-            return None;
-        }
+            let config = self.config.read();
+            if (group.owner_privilege && command.owner_privilege)
+                && config.owners.contains(&msg.author.id)
+            {
+                return None;
+            }
 
-        if self.config.blocked_users.contains(&msg.author.id) {
-            return Some(DispatchError::BlockedUser);
-        }
+            if config.blocked_users.contains(&msg.author.id) {
+                return Some(DispatchError::BlockedUser);
+            }
 
-        #[cfg(feature = "cache")]
-        {
-            if let Some(Channel::Guild(channel)) = msg.channel_id.to_channel_cached(&ctx) {
-                let guild_id = channel.guild_id;
+            #[cfg(feature = "cache")]
+            {
+                if let Some(Channel::Guild(channel)) = msg.channel_id.to_channel_cached(&ctx) {
+                    let guild_id = channel.guild_id;
 
-                if self.config.blocked_guilds.contains(&guild_id) {
-                    return Some(DispatchError::BlockedGuild);
-                }
-
-                if let Some(guild) = ctx.cache.guild(guild_id) {
-                    if self.config.blocked_users.contains(&guild.owner_id) {
+                    if config.blocked_guilds.contains(&guild_id) {
                         return Some(DispatchError::BlockedGuild);
+                    }
+
+                    if let Some(guild) = ctx.cache.guild(guild_id) {
+                        if config.blocked_users.contains(&guild.owner_id) {
+                            return Some(DispatchError::BlockedGuild);
+                        }
                     }
                 }
             }
-        }
 
-        if !self.config.allowed_channels.is_empty()
-            && !self.config.allowed_channels.contains(&msg.channel_id)
-        {
-            return Some(DispatchError::BlockedChannel);
+            if !config.allowed_channels.is_empty()
+                && !config.allowed_channels.contains(&msg.channel_id)
+            {
+                return Some(DispatchError::BlockedChannel);
+            }
         }
 
         // Try passing the command's bucket.
@@ -375,13 +376,14 @@ impl StandardFramework {
     /// Note: does _not_ return [`Self`] like many other commands. This is because
     /// it's not intended to be chained as the other commands are.
     pub fn group_add(&mut self, group: &'static CommandGroup) {
+        let config = self.config.read();
         let map = if group.options.prefixes.is_empty() {
             Map::Prefixless(
-                GroupMap::new(group.options.sub_groups, &self.config),
-                CommandMap::new(group.options.commands, &self.config),
+                GroupMap::new(group.options.sub_groups, &config),
+                CommandMap::new(group.options.commands, &config),
             )
         } else {
-            Map::WithPrefixes(GroupMap::new(&[group], &self.config))
+            Map::WithPrefixes(GroupMap::new(&[group], &config))
         };
 
         self.groups.push((group, map));
@@ -535,7 +537,6 @@ impl StandardFramework {
     /// let framework = StandardFramework::new().after(after_hook);
     /// ```
     #[must_use]
-
     pub fn after(mut self, f: AfterHook) -> Self {
         self.after = Some(f);
 
@@ -624,7 +625,9 @@ impl Framework for StandardFramework {
 
         stream.take_while_char(char::is_whitespace);
 
-        let prefix = parse::prefix(&ctx, &msg, &mut stream, &self.config).await;
+        let config = self.config.read().clone();
+
+        let prefix = parse::prefix(&ctx, &msg, &mut stream, &config).await;
 
         if prefix.is_some() && stream.rest().is_empty() {
             if let Some(prefix_only) = &self.prefix_only {
@@ -634,7 +637,7 @@ impl Framework for StandardFramework {
             return;
         }
 
-        if prefix.is_none() && !(self.config.no_dm_prefix && msg.is_private()) {
+        if prefix.is_none() && !(config.no_dm_prefix && msg.is_private()) {
             if let Some(normal) = &self.normal_message {
                 normal(&mut ctx, &msg).await;
             }
@@ -647,7 +650,7 @@ impl Framework for StandardFramework {
             &msg,
             &mut stream,
             &self.groups,
-            &self.config,
+            &config,
             self.help.map(|h| h.options.names),
         )
         .await;
@@ -681,13 +684,12 @@ impl Framework for StandardFramework {
 
         match invoke {
             Invoke::Help(name) => {
-                if !self.config.allow_dm && msg.is_private() {
+                if !config.allow_dm && msg.is_private() {
                     return;
                 }
 
-                let args = Args::new(stream.rest(), &self.config.delimiters);
+                let args = Args::new(stream.rest(), &config.delimiters);
 
-                let owners = self.config.owners.clone();
                 let groups = self.groups.iter().map(|(g, _)| *g).collect::<Vec<_>>();
 
                 // `parse_command` promises to never return a help invocation if `StandardFramework::help` is `None`.
@@ -700,7 +702,8 @@ impl Framework for StandardFramework {
                     }
                 }
 
-                let res = (help.fun)(&mut ctx, &msg, args, help.options, &groups, owners).await;
+                let res =
+                    (help.fun)(&mut ctx, &msg, args, help.options, &groups, config.owners).await;
 
                 if let Some(after) = &self.after {
                     after(&mut ctx, &msg, name, res).await;
@@ -713,7 +716,7 @@ impl Framework for StandardFramework {
                 let mut args = {
                     use std::borrow::Cow;
 
-                    let mut delims = Cow::Borrowed(&self.config.delimiters);
+                    let mut delims = Cow::Borrowed(&config.delimiters);
 
                     // If user has configured the command's own delimiters, use those instead.
                     if !command.options.delimiters.is_empty() {

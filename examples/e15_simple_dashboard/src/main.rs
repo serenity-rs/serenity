@@ -269,9 +269,7 @@ impl EventHandler for Handler {
                     let shard_manager = data_read.get::<ShardManagerContainer>().unwrap();
 
                     let manager = shard_manager.lock().await;
-                    let runners = manager.runners.lock().await;
-
-                    let runner = runners.get(&ShardId(ctx.shard_id)).unwrap();
+                    let runner = manager.runners.get(&ShardId(ctx.shard_id)).unwrap();
 
                     if let Some(duration) = runner.latency {
                         duration.as_millis() as f64
@@ -342,10 +340,9 @@ async fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
     // Because you probably ran this without looking at the source :P
     let _ = webbrowser::open("http://localhost:6361");
 
-    let framework = StandardFramework::new()
-        .configure(|c| c.prefix("~"))
-        .before(before_hook)
-        .group(&GENERAL_GROUP);
+    let framework = StandardFramework::new().before(before_hook).group(&GENERAL_GROUP);
+
+    framework.configure(|c| c.prefix("~"));
 
     let token = env::var("DISCORD_TOKEN")?;
 
@@ -465,9 +462,7 @@ async fn ping(ctx: &Context, msg: &Message) -> CommandResult {
         let shard_manager = data_read.get::<ShardManagerContainer>().unwrap();
 
         let manager = shard_manager.lock().await;
-        let runners = manager.runners.lock().await;
-
-        let runner = runners.get(&ShardId(ctx.shard_id)).unwrap();
+        let runner = manager.runners.get(&ShardId(ctx.shard_id)).unwrap();
 
         if let Some(duration) = runner.latency {
             format!("{:.2}ms", duration.as_millis())
