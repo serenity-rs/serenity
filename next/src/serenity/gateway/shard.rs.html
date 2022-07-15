@@ -797,14 +797,9 @@
 <span id="792">792</span>
 <span id="793">793</span>
 <span id="794">794</span>
-<span id="795">795</span>
-<span id="796">796</span>
-<span id="797">797</span>
-<span id="798">798</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::sync::Arc</span>;
 <span class="kw">use</span> <span class="ident">std::time</span>::{<span class="ident">Duration</span> <span class="kw">as</span> <span class="ident">StdDuration</span>, <span class="ident">Instant</span>};
 
-<span class="kw">use</span> <span class="ident">tokio::sync::Mutex</span>;
 <span class="kw">use</span> <span class="ident">tokio_tungstenite::tungstenite::error::Error</span> <span class="kw">as</span> <span class="ident">TungsteniteError</span>;
 <span class="kw">use</span> <span class="ident">tokio_tungstenite::tungstenite::protocol::frame::CloseFrame</span>;
 <span class="kw">use</span> <span class="ident">tracing</span>::{<span class="ident">debug</span>, <span class="ident">error</span>, <span class="ident">info</span>, <span class="ident">instrument</span>, <span class="ident">trace</span>, <span class="ident">warn</span>};
@@ -888,7 +883,7 @@
     <span class="comment">// not started within a decent amount of time.</span>
     <span class="kw">pub</span> <span class="ident">started</span>: <span class="ident">Instant</span>,
     <span class="kw">pub</span> <span class="ident">token</span>: <span class="ident">String</span>,
-    <span class="ident">ws_url</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Mutex</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+    <span class="ident">ws_url</span>: <span class="ident">String</span>,
     <span class="kw">pub</span> <span class="ident">intents</span>: <span class="ident">GatewayIntents</span>,
 }
 
@@ -906,7 +901,7 @@
     <span class="doccomment">/// use std::sync::Arc;</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// use serenity::gateway::Shard;</span>
-    <span class="doccomment">/// use tokio::sync::Mutex;</span>
+    <span class="doccomment">/// use tokio::sync::RwLock;</span>
     <span class="doccomment">/// #</span>
     <span class="doccomment">/// # use serenity::http::Http;</span>
     <span class="doccomment">/// # use serenity::model::gateway::{GatewayIntents, ShardInfo};</span>
@@ -920,7 +915,8 @@
     <span class="doccomment">/// };</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// // retrieve the gateway response, which contains the URL to connect to</span>
-    <span class="doccomment">/// let gateway = Arc::new(Mutex::new(http.get_gateway().await?.url));</span>
+
+    <span class="doccomment">/// let gateway = http.get_gateway().await?.url;</span>
     <span class="doccomment">/// let shard = Shard::new(gateway, &amp;token, shard_info, GatewayIntents::all(), None).await?;</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// // at this point, you can create a `loop`, and receive events and match</span>
@@ -928,7 +924,7 @@
     <span class="doccomment">/// #     Ok(())</span>
     <span class="doccomment">/// # }</span>
     <span class="doccomment">/// ```</span>
-    <span class="doccomment">///</span>
+    <span class="doccomment">/// </span>
     <span class="doccomment">/// # Errors</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// On Error, will return either [`Error::Gateway`], [`Error::Tungstenite`]</span>
@@ -936,14 +932,13 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// [`Error::Gateway`]: crate::Error::Gateway</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">new</span>(
-        <span class="ident">ws_url</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Mutex</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+        <span class="ident">ws_url</span>: <span class="ident">String</span>,
         <span class="ident">token</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
         <span class="ident">shard_info</span>: <span class="ident">ShardInfo</span>,
         <span class="ident">intents</span>: <span class="ident">GatewayIntents</span>,
         <span class="ident">presence</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">PresenceData</span><span class="op">&gt;</span>,
     ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Shard</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">url</span> <span class="op">=</span> <span class="ident">ws_url</span>.<span class="ident">lock</span>().<span class="kw">await</span>.<span class="ident">clone</span>();
-        <span class="kw">let</span> <span class="ident">client</span> <span class="op">=</span> <span class="ident">connect</span>(<span class="kw-2">&amp;</span><span class="ident">url</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+        <span class="kw">let</span> <span class="ident">client</span> <span class="op">=</span> <span class="ident">connect</span>(<span class="kw-2">&amp;</span><span class="ident">ws_url</span>).<span class="kw">await</span><span class="question-mark">?</span>;
 
         <span class="kw">let</span> <span class="ident">presence</span> <span class="op">=</span> <span class="ident">presence</span>.<span class="ident">unwrap_or_default</span>();
         <span class="kw">let</span> <span class="ident">heartbeat_instants</span> <span class="op">=</span> (<span class="prelude-val">None</span>, <span class="prelude-val">None</span>);
@@ -1442,13 +1437,12 @@
     <span class="doccomment">/// # use std::sync::Arc;</span>
     <span class="doccomment">/// #</span>
     <span class="doccomment">/// # async fn run() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {</span>
-    <span class="doccomment">/// #     let mutex = Arc::new(Mutex::new(&quot;&quot;.to_string()));</span>
     <span class="doccomment">/// #     let shard_info = ShardInfo {</span>
     <span class="doccomment">/// #          id: 0,</span>
     <span class="doccomment">/// #          total: 1,</span>
     <span class="doccomment">/// #     };</span>
     <span class="doccomment">/// #</span>
-    <span class="doccomment">/// #     let mut shard = Shard::new(mutex.clone(), &quot;&quot;, shard_info, GatewayIntents::all(), None).await?;</span>
+    <span class="doccomment">/// #     let mut shard = Shard::new(&quot;&quot;.to_string(), &quot;&quot;, shard_info, GatewayIntents::all(), None).await?;</span>
     <span class="doccomment">/// #</span>
     <span class="doccomment">/// use serenity::model::id::GuildId;</span>
     <span class="doccomment">///</span>
@@ -1469,13 +1463,12 @@
     <span class="doccomment">/// # use std::sync::Arc;</span>
     <span class="doccomment">/// #</span>
     <span class="doccomment">/// # async fn run() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {</span>
-    <span class="doccomment">/// #     let mutex = Arc::new(Mutex::new(&quot;&quot;.to_string()));</span>
-    <span class="doccomment">/// #</span>
     <span class="doccomment">/// #     let shard_info = ShardInfo {</span>
     <span class="doccomment">/// #          id: 0,</span>
     <span class="doccomment">/// #          total: 1,</span>
     <span class="doccomment">/// #     };</span>
-    <span class="doccomment">/// #     let mut shard = Shard::new(mutex.clone(), &quot;&quot;, shard_info, GatewayIntents::all(), None).await?;</span>
+    <span class="doccomment">/// #</span>
+    <span class="doccomment">/// #     let mut shard = Shard::new(&quot;&quot;.to_string(), &quot;&quot;, shard_info, GatewayIntents::all(), None).await?;</span>
     <span class="doccomment">/// #</span>
     <span class="doccomment">/// use serenity::model::id::GuildId;</span>
     <span class="doccomment">///</span>
@@ -1541,8 +1534,7 @@
         <span class="comment">// accurate when a Hello is received.</span>
         <span class="self">self</span>.<span class="ident">stage</span> <span class="op">=</span> <span class="ident">ConnectionStage::Connecting</span>;
         <span class="self">self</span>.<span class="ident">started</span> <span class="op">=</span> <span class="ident">Instant::now</span>();
-        <span class="kw">let</span> <span class="ident">url</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">ws_url</span>.<span class="ident">lock</span>().<span class="kw">await</span>.<span class="ident">clone</span>();
-        <span class="kw">let</span> <span class="ident">client</span> <span class="op">=</span> <span class="ident">connect</span>(<span class="ident">url</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+        <span class="kw">let</span> <span class="ident">client</span> <span class="op">=</span> <span class="ident">connect</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">ws_url</span>).<span class="kw">await</span><span class="question-mark">?</span>;
         <span class="self">self</span>.<span class="ident">stage</span> <span class="op">=</span> <span class="ident">ConnectionStage::Handshake</span>;
 
         <span class="prelude-val">Ok</span>(<span class="ident">client</span>)

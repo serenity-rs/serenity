@@ -737,7 +737,7 @@
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">shard</span>: <span class="ident">Shard</span>,
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;voice&quot;</span>)]</span>
     <span class="ident">voice_manager</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">VoiceGatewayManager</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="lifetime">&#39;static</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="ident">cache_and_http</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">CacheAndHttp</span><span class="op">&gt;</span>,
+    <span class="ident">cache_and_http</span>: <span class="ident">CacheAndHttp</span>,
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;collector&quot;</span>)]</span>
     <span class="ident">event_filters</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">EventFilter</span><span class="op">&gt;</span>,
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;collector&quot;</span>)]</span>
@@ -1034,13 +1034,13 @@
         <span class="ident">dispatch</span>(
             <span class="ident">event</span>,
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;framework&quot;</span>)]</span>
-            <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">framework</span>,
+            <span class="self">self</span>.<span class="ident">framework</span>.<span class="ident">as_ref</span>(),
             <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">data</span>,
             <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">event_handler</span>,
             <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">raw_event_handler</span>,
             <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">runner_tx</span>,
             <span class="self">self</span>.<span class="ident">shard</span>.<span class="ident">shard_info</span>().<span class="ident">id</span>,
-            <span class="ident">Arc::clone</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">cache_and_http</span>),
+            <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">cache_and_http</span>,
         )
         .<span class="kw">await</span>;
     }
@@ -1367,7 +1367,7 @@
     <span class="kw">pub</span> <span class="ident">shard</span>: <span class="ident">Shard</span>,
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;voice&quot;</span>)]</span>
     <span class="kw">pub</span> <span class="ident">voice_manager</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">VoiceGatewayManager</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span> <span class="ident">cache_and_http</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">CacheAndHttp</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">cache_and_http</span>: <span class="ident">CacheAndHttp</span>,
 }
 </code></pre></div>
 </section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.61.0-nightly (3c17c84a3 2022-03-21)" ></div>

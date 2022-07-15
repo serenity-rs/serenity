@@ -271,7 +271,7 @@
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::http::Http</span>;
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;client&quot;</span>)]</span>
-<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">CacheAndHttp</span> {
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
     <span class="kw">pub</span> <span class="ident">cache</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Cache</span><span class="op">&gt;</span>,
