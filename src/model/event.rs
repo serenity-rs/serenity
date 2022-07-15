@@ -766,18 +766,21 @@ pub enum Event {
     /// Fires the [`EventHandler::reaction_add`] event handler.
     ///
     /// [`EventHandler::reaction_add`]: crate::client::EventHandler::reaction_add
+    #[serde(rename = "MESSAGE_REACTION_ADD")]
     ReactionAdd(ReactionAddEvent),
     /// A reaction was removed to a message.
     ///
     /// Fires the [`EventHandler::reaction_remove`] event handler.
     ///
     /// [`EventHandler::reaction_remove`]: crate::client::EventHandler::reaction_remove
+    #[serde(rename = "MESSAGE_REACTION_REMOVE")]
     ReactionRemove(ReactionRemoveEvent),
     /// A request was issued to remove all [`Reaction`]s from a [`Message`].
     ///
     /// Fires the [`EventHandler::reaction_remove_all`] event handler.
     ///
     /// [`EventHandler::reaction_remove_all`]: crate::client::EventHandler::reaction_remove_all
+    #[serde(rename = "MESSAGE_REACTION_REMOVE_ALL")]
     ReactionRemoveAll(ReactionRemoveAllEvent),
     /// The first event in a connection, containing the initial ready cache.
     ///
