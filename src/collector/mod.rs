@@ -3,6 +3,7 @@
 //! are not reached yet.
 
 use std::fmt;
+use std::num::NonZeroU32;
 use std::pin::Pin;
 use std::sync::Arc;
 use std::time::Duration;
@@ -110,8 +111,8 @@ type LazyItemGat<'a, Item> = nougat::Gat!(<Item as Collectable>::LazyItem<'a>);
 #[derive(Derivative)]
 #[derivative(Clone(bound = ""), Debug(bound = ""), Default(bound = ""))]
 pub struct CommonFilterOptions<FilterItem> {
-    filter_limit: Option<u32>,
-    collect_limit: Option<u32>,
+    filter_limit: Option<NonZeroU32>,
+    collect_limit: Option<NonZeroU32>,
     filter: Option<FilterFn<FilterItem>>,
 }
 
@@ -161,14 +162,14 @@ impl<'a, Item: Collectable> CollectorBuilder<'a, Item> {
     ///
     /// An item is considered *collected*, if the message passes all the requirements.
     pub fn collect_limit(mut self, limit: u32) -> Self {
-        self.common_options.collect_limit = Some(limit);
+        self.common_options.collect_limit = NonZeroU32::new(limit);
 
         self
     }
 
     /// Limits how many events will attempt to be filtered.
     pub fn filter_limit(mut self, limit: u32) -> Self {
-        self.common_options.filter_limit = Some(limit);
+        self.common_options.filter_limit = NonZeroU32::new(limit);
 
         self
     }
