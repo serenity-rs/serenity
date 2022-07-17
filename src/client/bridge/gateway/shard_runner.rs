@@ -49,7 +49,7 @@ pub struct ShardRunner {
     pub(crate) shard: Shard,
     #[cfg(feature = "voice")]
     voice_manager: Option<Arc<dyn VoiceGatewayManager + Send + Sync + 'static>>,
-    cache_and_http: CacheAndHttp,
+    cache_and_http: Arc<CacheAndHttp>,
     #[cfg(feature = "collector")]
     event_filters: Vec<EventFilter>,
     #[cfg(feature = "collector")]
@@ -353,13 +353,13 @@ impl ShardRunner {
         dispatch(
             event,
             #[cfg(feature = "framework")]
-            self.framework.as_ref(),
+            &self.framework,
             &self.data,
             &self.event_handler,
             &self.raw_event_handler,
             &self.runner_tx,
             self.shard.shard_info().id,
-            &self.cache_and_http,
+            Arc::clone(&self.cache_and_http),
         )
         .await;
     }
@@ -686,5 +686,5 @@ pub struct ShardRunnerOptions {
     pub shard: Shard,
     #[cfg(feature = "voice")]
     pub voice_manager: Option<Arc<dyn VoiceGatewayManager + Send + Sync>>,
-    pub cache_and_http: CacheAndHttp,
+    pub cache_and_http: Arc<CacheAndHttp>,
 }

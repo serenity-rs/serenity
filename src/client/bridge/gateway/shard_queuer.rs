@@ -1,10 +1,9 @@
-use std::collections::VecDeque;
+use std::collections::{HashMap, VecDeque};
 use std::sync::Arc;
 
-use dashmap::DashMap;
 use futures::channel::mpsc::{UnboundedReceiver as Receiver, UnboundedSender as Sender};
 use futures::StreamExt;
-use tokio::sync::RwLock;
+use tokio::sync::{Mutex, RwLock};
 use tokio::time::{sleep, timeout, Duration, Instant};
 use tracing::{debug, info, instrument, warn};
 use typemap_rev::TypeMap;
@@ -71,15 +70,15 @@ pub struct ShardQueuer {
     /// This will typically be filled with previously failed boots.
     pub queue: VecDeque<ShardInfo>,
     /// A copy of the map of shard runners.
-    pub runners: Arc<DashMap<ShardId, ShardRunnerInfo>>,
+    pub runners: Arc<Mutex<HashMap<ShardId, ShardRunnerInfo>>>,
     /// A receiver channel for the shard queuer to be told to start shards.
     pub rx: Receiver<ShardQueuerMessage>,
     /// A copy of the client's voice manager.
     #[cfg(feature = "voice")]
     pub voice_manager: Option<Arc<dyn VoiceGatewayManager + Send + Sync + 'static>>,
     /// A copy of the URL to use to connect to the gateway.
-    pub ws_url: String,
-    pub cache_and_http: CacheAndHttp,
+    pub ws_url: Arc<Mutex<String>>,
+    pub cache_and_http: Arc<CacheAndHttp>,
     pub intents: GatewayIntents,
     pub presence: Option<PresenceData>,
 }
@@ -176,7 +175,7 @@ impl ShardQueuer {
         let shard_info = ShardInfo::new(id, total);
 
         let mut shard = Shard::new(
-            self.ws_url.clone(),
+            Arc::clone(&self.ws_url),
             &self.cache_and_http.http.token,
             shard_info,
             self.intents,
@@ -195,8 +194,8 @@ impl ShardQueuer {
             manager_tx: self.manager_tx.clone(),
             #[cfg(feature = "voice")]
             voice_manager: self.voice_manager.clone(),
-            cache_and_http: self.cache_and_http.clone(),
             shard,
+            cache_and_http: Arc::clone(&self.cache_and_http),
         });
 
         let runner_info = ShardRunnerInfo {
@@ -210,18 +209,22 @@ impl ShardQueuer {
             debug!("[ShardRunner {:?}] Stopping", runner.shard.shard_info());
         });
 
-        self.runners.insert(ShardId(id), runner_info);
+        self.runners.lock().await.insert(ShardId(id), runner_info);
 
         Ok(())
     }
 
     #[instrument(skip(self))]
     async fn shutdown_runners(&mut self) {
-        if self.runners.is_empty() {
-            return;
-        }
+        let keys = {
+            let runners = self.runners.lock().await;
 
-        let keys: Vec<_> = self.runners.iter().map(|r| *r.key()).collect();
+            if runners.is_empty() {
+                return;
+            }
+
+            runners.keys().copied().collect::<Vec<_>>()
+        };
 
         info!("Shutting down all shards");
 
@@ -240,7 +243,7 @@ impl ShardQueuer {
     pub async fn shutdown(&mut self, shard_id: ShardId, code: u16) {
         info!("Shutting down shard {}", shard_id);
 
-        if let Some(runner) = self.runners.get(&shard_id) {
+        if let Some(runner) = self.runners.lock().await.get(&shard_id) {
             let shutdown = ShardManagerMessage::Shutdown(shard_id, code);
             let client_msg = ShardClientMessage::Manager(shutdown);
             let msg = InterMessage::Client(client_msg);

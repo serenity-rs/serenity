@@ -69,10 +69,12 @@ impl ShardManagerMonitor {
                     stage,
                 } => {
                     let manager = self.manager.lock().await;
-                    if let Some(mut runner) = manager.runners.get_mut(&id) {
+                    let mut runners = manager.runners.lock().await;
+
+                    if let Some(runner) = runners.get_mut(&id) {
                         runner.latency = latency;
                         runner.stage = stage;
-                    };
+                    }
                 },
                 ShardManagerMessage::Shutdown(shard_id, code) => {
                     self.manager.lock().await.shutdown(shard_id, code).await;

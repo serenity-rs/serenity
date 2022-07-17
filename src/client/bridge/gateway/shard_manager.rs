@@ -1,7 +1,6 @@
-use std::collections::VecDeque;
+use std::collections::{HashMap, VecDeque};
 use std::sync::Arc;
 
-use dashmap::DashMap;
 use futures::channel::mpsc::{self, UnboundedReceiver as Receiver, UnboundedSender as Sender};
 use futures::StreamExt;
 use tokio::sync::{Mutex, RwLock};
@@ -60,16 +59,16 @@ use crate::CacheAndHttp;
 /// use serenity::model::gateway::GatewayIntents;
 /// use serenity::prelude::*;
 /// use serenity::CacheAndHttp;
-/// use tokio::sync::RwLock;
+/// use tokio::sync::{Mutex, RwLock};
 ///
 /// struct Handler;
 ///
 /// impl EventHandler for Handler {}
 /// impl RawEventHandler for Handler {}
 ///
-/// # let cache_and_http: CacheAndHttp = unimplemented!();
+/// # let cache_and_http: Arc<CacheAndHttp> = unimplemented!();
 /// # let http = &cache_and_http.http;
-/// let ws_url = http.get_gateway().await?.url;
+/// let ws_url = Arc::new(Mutex::new(http.get_gateway().await?.url));
 /// let data = Arc::new(RwLock::new(TypeMap::new()));
 /// let event_handler = Arc::new(Handler) as Arc<dyn EventHandler>;
 /// let framework =
@@ -106,7 +105,7 @@ pub struct ShardManager {
     /// **Note**: It is highly unrecommended to mutate this yourself unless you
     /// need to. Instead prefer to use methods on this struct that are provided
     /// where possible.
-    pub runners: Arc<DashMap<ShardId, ShardRunnerInfo>>,
+    pub runners: Arc<Mutex<HashMap<ShardId, ShardRunnerInfo>>>,
     /// The index of the first shard to initialize, 0-indexed.
     shard_index: u32,
     /// The number of shards to initialize.
@@ -125,7 +124,7 @@ impl ShardManager {
         let (thread_tx, thread_rx) = mpsc::unbounded();
         let (shard_queue_tx, shard_queue_rx) = mpsc::unbounded();
 
-        let runners = Arc::new(DashMap::new());
+        let runners = Arc::new(Mutex::new(HashMap::new()));
         let (shutdown_send, shutdown_recv) = mpsc::unbounded();
 
         let mut shard_queuer = ShardQueuer {
@@ -173,9 +172,8 @@ impl ShardManager {
     ///
     /// If a shard has been queued but has not yet been initiated, then this
     /// will return `false`.
-    #[must_use]
-    pub fn has(&self, shard_id: ShardId) -> bool {
-        self.runners.contains_key(&shard_id)
+    pub async fn has(&self, shard_id: ShardId) -> bool {
+        self.runners.lock().await.contains_key(&shard_id)
     }
 
     /// Initializes all shards that the manager is responsible for.
@@ -260,8 +258,8 @@ impl ShardManager {
     ///
     /// [`ShardRunner`]: super::ShardRunner
     #[instrument(skip(self))]
-    pub fn shards_instantiated(&self) -> Vec<ShardId> {
-        self.runners.iter().map(|r| *r.key()).collect()
+    pub async fn shards_instantiated(&self) -> Vec<ShardId> {
+        self.runners.lock().await.keys().copied().collect()
     }
 
     /// Attempts to shut down the shard runner by Id.
@@ -297,7 +295,7 @@ impl ShardManager {
             },
         }
 
-        self.runners.remove(&shard_id);
+        self.runners.lock().await.remove(&shard_id);
     }
 
     /// Sends a shutdown message for all shards that the manager is responsible
@@ -307,9 +305,19 @@ impl ShardManager {
     /// over the [`Self::shutdown`] method.
     #[instrument(skip(self))]
     pub async fn shutdown_all(&mut self) {
+        let keys = {
+            let runners = self.runners.lock().await;
+
+            if runners.is_empty() {
+                return;
+            }
+
+            runners.keys().copied().collect::<Vec<_>>()
+        };
+
         info!("Shutting down all shards");
 
-        for shard_id in self.shards_instantiated() {
+        for shard_id in keys {
             self.shutdown(shard_id, 1000).await;
         }
 
@@ -351,8 +359,8 @@ pub struct ShardManagerOptions {
     pub shard_total: u32,
     #[cfg(feature = "voice")]
     pub voice_manager: Option<Arc<dyn VoiceGatewayManager + Send + Sync + 'static>>,
-    pub ws_url: String,
-    pub cache_and_http: CacheAndHttp,
+    pub ws_url: Arc<Mutex<String>>,
+    pub cache_and_http: Arc<CacheAndHttp>,
     pub intents: GatewayIntents,
     pub presence: Option<PresenceData>,
 }
