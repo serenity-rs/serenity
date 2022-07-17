@@ -124,7 +124,7 @@ pub use crate::error::{Error, Result};
 use crate::http::Http;
 
 #[cfg(feature = "client")]
-#[derive(Debug, Clone)]
+#[non_exhaustive]
 pub struct CacheAndHttp {
     #[cfg(feature = "cache")]
     pub cache: Arc<Cache>,
