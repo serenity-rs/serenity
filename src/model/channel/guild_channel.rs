@@ -32,14 +32,6 @@ use crate::model::channel::AttachmentType;
 use crate::model::prelude::*;
 use crate::model::Timestamp;
 
-// HACK(Gnome!): Prevent having to change the type of message_count on serenity@current
-fn message_count_patch<'de, D: serde::Deserializer<'de>>(
-    deserializer: D,
-) -> StdResult<Option<u8>, D::Error> {
-    let real_count = Option::<u32>::deserialize(deserializer)?;
-    Ok(real_count.map(u8::try_from).transpose().unwrap_or(Some(u8::MAX)))
-}
-
 /// Represents a guild's text, news, or voice channel. Some methods are available
 /// only for voice channels and some are only available for text channels.
 /// News channels are a subset of text channels and lack slow mode hence
@@ -123,8 +115,7 @@ pub struct GuildChannel {
     /// This is currently saturated at 255 to prevent breaking.
     ///
     /// **Note**: This is only available on thread channels.
-    #[serde(default, deserialize_with = "message_count_patch")]
-    pub message_count: Option<u8>,
+    pub message_count: Option<u32>,
     /// An approximate count of users in a thread, stops counting at 50.
     ///
     /// **Note**: This is only available on thread channels.
