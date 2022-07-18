@@ -110,7 +110,7 @@ pub struct GuildChannel {
     /// An approximate count of messages in the thread, stops counting at 50.
     ///
     /// **Note**: This is only available on thread channels.
-    pub message_count: Option<u8>,
+    pub message_count: Option<u32>,
     /// An approximate count of users in a thread, stops counting at 50.
     ///
     /// **Note**: This is only available on thread channels.
