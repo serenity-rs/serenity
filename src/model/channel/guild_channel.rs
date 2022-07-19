@@ -1,3 +1,4 @@
+use std::convert::TryFrom;
 use std::fmt;
 #[cfg(feature = "model")]
 use std::sync::Arc;
@@ -40,6 +41,14 @@ use crate::json;
 use crate::model::channel::AttachmentType;
 use crate::model::prelude::*;
 use crate::model::Timestamp;
+
+// HACK(Gnome!): Prevent having to change the type of message_count on serenity@current
+fn message_count_patch<'de, D: serde::Deserializer<'de>>(
+    deserializer: D,
+) -> StdResult<Option<u8>, D::Error> {
+    let real_count = Option::<u32>::deserialize(deserializer)?;
+    Ok(real_count.map(u8::try_from).transpose().unwrap_or(Some(u8::MAX)))
+}
 
 /// Represents a guild's text, news, or voice channel. Some methods are available
 /// only for voice channels and some are only available for text channels.
@@ -117,9 +126,12 @@ pub struct GuildChannel {
     pub rtc_region: Option<String>,
     /// The video quality mode for a voice channel.
     pub video_quality_mode: Option<VideoQualityMode>,
-    /// An approximate count of messages in the thread, stops counting at 50.
+    /// An approximate count of messages in the thread.
+    ///
+    /// This is currently saturated at 255 to prevent breaking.
     ///
     /// **Note**: This is only available on thread channels.
+    #[serde(deserialize_with = "message_count_patch")]
     pub message_count: Option<u8>,
     /// An approximate count of users in a thread, stops counting at 50.
     ///
