@@ -126,7 +126,9 @@ pub struct GuildChannel {
     pub rtc_region: Option<String>,
     /// The video quality mode for a voice channel.
     pub video_quality_mode: Option<VideoQualityMode>,
-    /// An approximate count of messages in the thread, stops counting at 50.
+    /// An approximate count of messages in the thread.
+    ///
+    /// This is currently saturated at 255 to prevent breaking.
     ///
     /// **Note**: This is only available on thread channels.
     #[serde(deserialize_with = "message_count_patch")]
