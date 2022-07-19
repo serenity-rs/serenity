@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file.
 This project mostly adheres to [Semantic Versioning][semver].
 
+## [0.11.4] - 2022-07-19
+
+Thanks to the following for their contributions:
+
+- [@anden3]
+
+### Notable changes
+
+- Fix deserialization error of `GuildChannel::message_count` ([@anden3])
+
 ## [0.11.3] - 2022-07-19
 
 Thanks to the following for their contributions:
@@ -4803,6 +4813,7 @@ Initial commit.
 
 <!-- COMPARISONS -->
 
+[0.11.4]: https://github.com/serenity-rs/serenity/compare/v0.11.3...v0.11.4
 [0.11.3]: https://github.com/serenity-rs/serenity/compare/v0.11.2...v0.11.3
 [0.11.2]: https://github.com/serenity-rs/serenity/compare/v0.11.1...v0.11.2
 [0.11.1]: https://github.com/serenity-rs/serenity/compare/v0.11.0...v0.11.1
@@ -4909,6 +4920,7 @@ Initial commit.
 [@acdenisSK]: https://github.com/acdenisSK
 [@adumbidiot]: https://github.com/adumbidiot
 [@almeidx]: https://github.com/almeidx
+[@anden3]: https://github.com/anden3
 [@andreasots]: https://github.com/andreasots
 [@aria-7553]: https://github.com/aria-7553
 [@asherkin]: https://github.com/asherkin
