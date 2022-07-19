@@ -42,11 +42,12 @@ pub enum ActionRowComponent {
 
 impl<'de> Deserialize<'de> for ActionRowComponent {
     fn deserialize<D: Deserializer<'de>>(deserializer: D) -> std::result::Result<Self, D::Error> {
-        let value = Value::deserialize(deserializer)?;
-        let map = value.as_object().ok_or_else(|| DeError::custom("expected JsonMap"))?;
+        let map = JsonMap::deserialize(deserializer)?;
 
-        let raw_kind = map.get("type").ok_or_else(|| DeError::missing_field("type"))?;
-        match deserialize_val(raw_kind.clone())? {
+        let raw_kind = map.get("type").ok_or_else(|| DeError::missing_field("type"))?.clone();
+        let value = Value::from(map);
+
+        match deserialize_val(raw_kind)? {
             ComponentType::Button => from_value(value).map(ActionRowComponent::Button),
             ComponentType::InputText => from_value(value).map(ActionRowComponent::InputText),
             ComponentType::SelectMenu => from_value(value).map(ActionRowComponent::SelectMenu),
