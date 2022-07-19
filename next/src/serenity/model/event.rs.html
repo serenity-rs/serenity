@@ -1839,7 +1839,6 @@
 <span id="1834">1834</span>
 <span id="1835">1835</span>
 <span id="1836">1836</span>
-<span id="1837">1837</span>
 </pre><pre class="rust"><code><span class="doccomment">//! All the events this library handles.</span>
 
 <span class="kw">use</span> <span class="ident">std::collections::HashMap</span>;
@@ -1930,17 +1929,16 @@
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="ident">Deserialize</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">GuildCreateEvent</span> {
     <span class="kw">fn</span> <span class="ident">deserialize</span><span class="op">&lt;</span><span class="ident">D</span>: <span class="ident">Deserializer</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">deserializer</span>: <span class="ident">D</span>) -&gt; <span class="ident">StdResult</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">D::Error</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">value</span> <span class="op">=</span> <span class="ident">Value::deserialize</span>(<span class="ident">deserializer</span>)<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">map</span> <span class="op">=</span> <span class="ident">value</span>.<span class="ident">as_object_mut</span>().<span class="ident">ok_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">DeError::custom</span>(<span class="string">&quot;expected JsonMap&quot;</span>))<span class="question-mark">?</span>;
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">map</span> <span class="op">=</span> <span class="ident">JsonMap::deserialize</span>(<span class="ident">deserializer</span>)<span class="question-mark">?</span>;
 
         <span class="kw">let</span> <span class="ident">id_val</span> <span class="op">=</span> <span class="ident">map</span>.<span class="ident">get</span>(<span class="string">&quot;id&quot;</span>).<span class="ident">ok_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">DeError::missing_field</span>(<span class="string">&quot;id&quot;</span>))<span class="question-mark">?</span>;
         <span class="kw">let</span> <span class="ident">id</span> <span class="op">=</span> <span class="ident">deserialize_val</span>(<span class="ident">id_val</span>.<span class="ident">clone</span>())<span class="question-mark">?</span>;
 
-        <span class="ident">add_guild_id_to_map</span>(<span class="ident">map</span>, <span class="string">&quot;channels&quot;</span>, <span class="ident">id</span>);
-        <span class="ident">add_guild_id_to_map</span>(<span class="ident">map</span>, <span class="string">&quot;members&quot;</span>, <span class="ident">id</span>);
-        <span class="ident">add_guild_id_to_map</span>(<span class="ident">map</span>, <span class="string">&quot;roles&quot;</span>, <span class="ident">id</span>);
+        <span class="ident">add_guild_id_to_map</span>(<span class="kw-2">&amp;mut</span> <span class="ident">map</span>, <span class="string">&quot;channels&quot;</span>, <span class="ident">id</span>);
+        <span class="ident">add_guild_id_to_map</span>(<span class="kw-2">&amp;mut</span> <span class="ident">map</span>, <span class="string">&quot;members&quot;</span>, <span class="ident">id</span>);
+        <span class="ident">add_guild_id_to_map</span>(<span class="kw-2">&amp;mut</span> <span class="ident">map</span>, <span class="string">&quot;roles&quot;</span>, <span class="ident">id</span>);
 
-        <span class="ident">deserialize_val</span>(<span class="ident">value</span>).<span class="ident">map</span>(<span class="op">|</span><span class="ident">guild</span><span class="op">|</span> <span class="self">Self</span> {
+        <span class="ident">deserialize_val</span>(<span class="ident">Value::from</span>(<span class="ident">map</span>)).<span class="ident">map</span>(<span class="op">|</span><span class="ident">guild</span><span class="op">|</span> <span class="self">Self</span> {
             <span class="ident">guild</span>,
         })
     }
@@ -2497,27 +2495,27 @@
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="ident">Deserialize</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">GatewayEvent</span> {
     <span class="kw">fn</span> <span class="ident">deserialize</span><span class="op">&lt;</span><span class="ident">D</span>: <span class="ident">Deserializer</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">deserializer</span>: <span class="ident">D</span>) -&gt; <span class="ident">StdResult</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">D::Error</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">value</span> <span class="op">=</span> <span class="ident">Value::deserialize</span>(<span class="ident">deserializer</span>)<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">map</span> <span class="op">=</span> <span class="ident">value</span>.<span class="ident">as_object_mut</span>().<span class="ident">ok_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">DeError::custom</span>(<span class="string">&quot;expected JsonMap&quot;</span>))<span class="question-mark">?</span>;
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">map</span> <span class="op">=</span> <span class="ident">JsonMap::deserialize</span>(<span class="ident">deserializer</span>)<span class="question-mark">?</span>;
+        <span class="kw">let</span> <span class="ident">seq</span> <span class="op">=</span> <span class="ident">remove_from_map_opt</span>(<span class="kw-2">&amp;mut</span> <span class="ident">map</span>, <span class="string">&quot;s&quot;</span>)<span class="question-mark">?</span>.<span class="ident">flatten</span>();
 
-        <span class="kw">let</span> <span class="ident">seq</span> <span class="op">=</span> <span class="ident">remove_from_map_opt</span>(<span class="ident">map</span>, <span class="string">&quot;s&quot;</span>)<span class="question-mark">?</span>.<span class="ident">flatten</span>();
-
-        <span class="prelude-val">Ok</span>(<span class="kw">match</span> <span class="ident">remove_from_map</span>(<span class="ident">map</span>, <span class="string">&quot;op&quot;</span>)<span class="question-mark">?</span> {
+        <span class="prelude-val">Ok</span>(<span class="kw">match</span> <span class="ident">remove_from_map</span>(<span class="kw-2">&amp;mut</span> <span class="ident">map</span>, <span class="string">&quot;op&quot;</span>)<span class="question-mark">?</span> {
             <span class="ident">Opcode::Dispatch</span> =&gt; <span class="ident"><span class="self">Self</span>::Dispatch</span>(
                 <span class="ident">seq</span>.<span class="ident">ok_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">DeError::missing_field</span>(<span class="string">&quot;s&quot;</span>))<span class="question-mark">?</span>,
-                <span class="ident">deserialize_val</span>(<span class="ident">value</span>)<span class="question-mark">?</span>,
+                <span class="ident">deserialize_val</span>(<span class="ident">Value::from</span>(<span class="ident">map</span>))<span class="question-mark">?</span>,
             ),
             <span class="ident">Opcode::Heartbeat</span> =&gt; {
                 <span class="ident">GatewayEvent::Heartbeat</span>(<span class="ident">seq</span>.<span class="ident">ok_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">DeError::missing_field</span>(<span class="string">&quot;s&quot;</span>))<span class="question-mark">?</span>)
             },
-            <span class="ident">Opcode::InvalidSession</span> =&gt; <span class="ident">GatewayEvent::InvalidateSession</span>(<span class="ident">remove_from_map</span>(<span class="ident">map</span>, <span class="string">&quot;d&quot;</span>)<span class="question-mark">?</span>),
+            <span class="ident">Opcode::InvalidSession</span> =&gt; {
+                <span class="ident">GatewayEvent::InvalidateSession</span>(<span class="ident">remove_from_map</span>(<span class="kw-2">&amp;mut</span> <span class="ident">map</span>, <span class="string">&quot;d&quot;</span>)<span class="question-mark">?</span>)
+            },
             <span class="ident">Opcode::Hello</span> =&gt; {
                 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Deserialize</span>)]</span>
                 <span class="kw">struct</span> <span class="ident">HelloPayload</span> {
                     <span class="ident">heartbeat_interval</span>: <span class="ident">u64</span>,
                 }
 
-                <span class="kw">let</span> <span class="ident">inner</span>: <span class="ident">HelloPayload</span> <span class="op">=</span> <span class="ident">remove_from_map</span>(<span class="ident">map</span>, <span class="string">&quot;d&quot;</span>)<span class="question-mark">?</span>;
+                <span class="kw">let</span> <span class="ident">inner</span>: <span class="ident">HelloPayload</span> <span class="op">=</span> <span class="ident">remove_from_map</span>(<span class="kw-2">&amp;mut</span> <span class="ident">map</span>, <span class="string">&quot;d&quot;</span>)<span class="question-mark">?</span>;
                 <span class="ident">GatewayEvent::Hello</span>(<span class="ident">inner</span>.<span class="ident">heartbeat_interval</span>)
             },
             <span class="ident">Opcode::Reconnect</span> =&gt; <span class="ident">GatewayEvent::Reconnect</span>,

@@ -268,6 +268,7 @@
 <span id="263">263</span>
 <span id="264">264</span>
 <span id="265">265</span>
+<span id="266">266</span>
 </pre><pre class="rust"><code><span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">application_command</span>;
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">message_component</span>;
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">modal</span>;
@@ -402,11 +403,12 @@
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="ident">Deserialize</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Interaction</span> {
     <span class="kw">fn</span> <span class="ident">deserialize</span><span class="op">&lt;</span><span class="ident">D</span>: <span class="ident">Deserializer</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">deserializer</span>: <span class="ident">D</span>) -&gt; <span class="ident">std::result::Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">D::Error</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">value</span> <span class="op">=</span> <span class="ident">Value::deserialize</span>(<span class="ident">deserializer</span>)<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">map</span> <span class="op">=</span> <span class="ident">value</span>.<span class="ident">as_object</span>().<span class="ident">ok_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">DeError::custom</span>(<span class="string">&quot;expected JsonMap&quot;</span>))<span class="question-mark">?</span>;
+        <span class="kw">let</span> <span class="ident">map</span> <span class="op">=</span> <span class="ident">JsonMap::deserialize</span>(<span class="ident">deserializer</span>)<span class="question-mark">?</span>;
 
-        <span class="kw">let</span> <span class="ident">raw_kind</span> <span class="op">=</span> <span class="ident">map</span>.<span class="ident">get</span>(<span class="string">&quot;type&quot;</span>).<span class="ident">ok_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">DeError::missing_field</span>(<span class="string">&quot;type&quot;</span>))<span class="question-mark">?</span>;
-        <span class="kw">match</span> <span class="ident">deserialize_val</span>(<span class="ident">raw_kind</span>.<span class="ident">clone</span>())<span class="question-mark">?</span> {
+        <span class="kw">let</span> <span class="ident">raw_kind</span> <span class="op">=</span> <span class="ident">map</span>.<span class="ident">get</span>(<span class="string">&quot;type&quot;</span>).<span class="ident">ok_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">DeError::missing_field</span>(<span class="string">&quot;type&quot;</span>))<span class="question-mark">?</span>.<span class="ident">clone</span>();
+        <span class="kw">let</span> <span class="ident">value</span> <span class="op">=</span> <span class="ident">Value::from</span>(<span class="ident">map</span>);
+
+        <span class="kw">match</span> <span class="ident">deserialize_val</span>(<span class="ident">raw_kind</span>)<span class="question-mark">?</span> {
             <span class="ident">InteractionType::ApplicationCommand</span> =&gt; {
                 <span class="ident">from_value</span>(<span class="ident">value</span>).<span class="ident">map</span>(<span class="ident">Interaction::ApplicationCommand</span>)
             },
