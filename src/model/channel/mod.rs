@@ -225,8 +225,7 @@ impl Channel {
 
 impl<'de> Deserialize<'de> for Channel {
     fn deserialize<D: Deserializer<'de>>(deserializer: D) -> StdResult<Self, D::Error> {
-        let value = Value::deserialize(deserializer)?;
-        let map = value.as_object().ok_or_else(|| DeError::custom("expected a JsonMap"))?;
+        let map = JsonMap::deserialize(deserializer)?;
 
         let kind = {
             let kind = map.get("type").ok_or_else(|| DeError::missing_field("type"))?;
@@ -238,6 +237,7 @@ impl<'de> Deserialize<'de> for Channel {
             })?
         };
 
+        let value = Value::from(map);
         match kind {
             0 | 2 | 5 | 10 | 11 | 12 | 13 | 14 | 15 => from_value(value).map(Channel::Guild),
             1 => from_value(value).map(Channel::Private),
