@@ -687,6 +687,16 @@ bitflags! {
         /// - GUILD_SCHEDULED_EVENT_USER_ADD
         /// - GUILD_SCHEDULED_EVENT_USER_REMOVE
         const GUILD_SCHEDULED_EVENTS = 1 << 16;
+        /// Enable following gateway events:
+        ///
+        /// - AUTO_MODERATION_RULE_CREATE
+        /// - AUTO_MODERATION_RULE_UPDATE
+        /// - AUTO_MODERATION_RULE_DELETE
+        const AUTO_MODERATION_CONFIGURATION = 1 << 20;
+        /// Enable following gateway events:
+        ///
+        /// - AUTO_MODERATION_ACTION_EXECUTION
+        const AUTO_MODERATION_EXECUTION = 1 << 21;
     }
 }
 
@@ -857,5 +867,23 @@ impl GatewayIntents {
     #[must_use]
     pub fn guild_scheduled_events(self) -> bool {
         self.contains(Self::GUILD_SCHEDULED_EVENTS)
+    }
+
+    /// Shorthand for checking that the set of intents contains the
+    /// [AUTO_MODERATION_CONFIGURATION] intent.
+    ///
+    /// [AUTO_MODERATION_CONFIGURATION]: Self::AUTO_MODERATION_CONFIGURATION
+    #[must_use]
+    pub fn auto_moderation_configuration(self) -> bool {
+        self.contains(Self::AUTO_MODERATION_CONFIGURATION)
+    }
+
+    /// Shorthand for checking that the set of intents contains the
+    /// [AUTO_MODERATION_EXECUTION] intent.
+    ///
+    /// [AUTO_MODERATION_EXECUTION]: Self::AUTO_MODERATION_EXECUTION
+    #[must_use]
+    pub fn auto_moderation_execution(self) -> bool {
+        self.contains(Self::AUTO_MODERATION_EXECUTION)
     }
 }

@@ -171,6 +171,10 @@ pub enum Route {
     ///
     /// [`GuildId`]: crate::model::id::GuildId
     GuildsId(u64),
+    /// Route for the `/guilds/:guild_id/auto-moderation/rules` path.
+    GuildsIdAutoModRules(u64),
+    /// Route for the `/guilds/:guild_id/auto-moderation/rules/:rule_id` path.
+    GuildsIdAutoModRulesId(u64),
     /// Route for the `/guilds/:guild_id/bans` path.
     ///
     /// The data is the relevant [`GuildId`].
@@ -718,6 +722,16 @@ impl Route {
     }
 
     #[must_use]
+    pub fn guild_automod_rule(guild_id: u64, rule_id: u64) -> String {
+        api!("/guilds/{}/auto-moderation/rules/{}", guild_id, rule_id)
+    }
+
+    #[must_use]
+    pub fn guild_automod_rules(guild_id: u64) -> String {
+        api!("/guilds/{}/auto-moderation/rules", guild_id)
+    }
+
+    #[must_use]
     pub fn guild_ban(guild_id: u64, user_id: u64) -> String {
         api!("/guilds/{}/bans/{}", guild_id, user_id)
     }
@@ -1188,6 +1202,9 @@ pub enum RouteInfo<'a> {
     BroadcastTyping {
         channel_id: u64,
     },
+    CreateAutoModRule {
+        guild_id: u64,
+    },
     CreateChannel {
         guild_id: u64,
     },
@@ -1256,6 +1273,10 @@ pub enum RouteInfo<'a> {
     },
     CreateWebhook {
         channel_id: u64,
+    },
+    DeleteAutoModRule {
+        guild_id: u64,
+        rule_id: u64,
     },
     DeleteChannel {
         channel_id: u64,
@@ -1344,6 +1365,10 @@ pub enum RouteInfo<'a> {
         token: &'a str,
         webhook_id: u64,
         message_id: u64,
+    },
+    EditAutoModRule {
+        guild_id: u64,
+        rule_id: u64,
     },
     EditChannel {
         channel_id: u64,
@@ -1483,6 +1508,13 @@ pub enum RouteInfo<'a> {
         guild_id: u64,
         limit: Option<u8>,
         user_id: Option<u64>,
+    },
+    GetAutoModRules {
+        guild_id: u64,
+    },
+    GetAutoModRule {
+        guild_id: u64,
+        rule_id: u64,
     },
     GetBans {
         guild_id: u64,
@@ -1774,6 +1806,13 @@ impl<'a> RouteInfo<'a> {
                 Route::ChannelsIdTyping(channel_id),
                 Cow::from(Route::channel_typing(channel_id)),
             ),
+            RouteInfo::CreateAutoModRule {
+                guild_id,
+            } => (
+                LightMethod::Post,
+                Route::GuildsIdAutoModRules(guild_id),
+                Cow::from(Route::guild_automod_rules(guild_id)),
+            ),
             RouteInfo::CreateChannel {
                 guild_id,
             } => (
@@ -1934,6 +1973,14 @@ impl<'a> RouteInfo<'a> {
                 LightMethod::Post,
                 Route::ChannelsIdWebhooks(channel_id),
                 Cow::from(Route::channel_webhooks(channel_id)),
+            ),
+            RouteInfo::DeleteAutoModRule {
+                guild_id,
+                rule_id,
+            } => (
+                LightMethod::Delete,
+                Route::GuildsIdAutoModRulesId(guild_id),
+                Cow::from(Route::guild_automod_rule(guild_id, rule_id)),
             ),
             RouteInfo::DeleteChannel {
                 channel_id,
@@ -2111,6 +2158,14 @@ impl<'a> RouteInfo<'a> {
                 LightMethod::Delete,
                 Route::WebhooksIdMessagesId(webhook_id),
                 Cow::from(Route::webhook_message(webhook_id, token, message_id)),
+            ),
+            RouteInfo::EditAutoModRule {
+                guild_id,
+                rule_id,
+            } => (
+                LightMethod::Patch,
+                Route::GuildsIdAutoModRulesId(guild_id),
+                Cow::from(Route::guild_automod_rule(guild_id, rule_id)),
             ),
             RouteInfo::EditChannel {
                 channel_id,
@@ -2372,6 +2427,21 @@ impl<'a> RouteInfo<'a> {
                 LightMethod::Get,
                 Route::GuildsIdAuditLogs(guild_id),
                 Cow::from(Route::guild_audit_logs(guild_id, action_type, user_id, before, limit)),
+            ),
+            RouteInfo::GetAutoModRules {
+                guild_id,
+            } => (
+                LightMethod::Get,
+                Route::GuildsIdAutoModRules(guild_id),
+                Cow::from(Route::guild_automod_rules(guild_id)),
+            ),
+            RouteInfo::GetAutoModRule {
+                guild_id,
+                rule_id,
+            } => (
+                LightMethod::Get,
+                Route::GuildsIdAutoModRulesId(guild_id),
+                Cow::from(Route::guild_automod_rule(guild_id, rule_id)),
             ),
             RouteInfo::GetBans {
                 guild_id,
