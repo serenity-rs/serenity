@@ -132,17 +132,16 @@ pub struct GuildCreateEvent {
 /// [Discord docs](https://discord.com/developers/docs/topics/gateway#guild-delete).
 impl<'de> Deserialize<'de> for GuildCreateEvent {
     fn deserialize<D: Deserializer<'de>>(deserializer: D) -> StdResult<Self, D::Error> {
-        let mut value = Value::deserialize(deserializer)?;
-        let map = value.as_object_mut().ok_or_else(|| DeError::custom("expected JsonMap"))?;
+        let mut map = JsonMap::deserialize(deserializer)?;
 
         let id_val = map.get("id").ok_or_else(|| DeError::missing_field("id"))?;
         let id = deserialize_val(id_val.clone())?;
 
-        add_guild_id_to_map(map, "channels", id);
-        add_guild_id_to_map(map, "members", id);
-        add_guild_id_to_map(map, "roles", id);
+        add_guild_id_to_map(&mut map, "channels", id);
+        add_guild_id_to_map(&mut map, "members", id);
+        add_guild_id_to_map(&mut map, "roles", id);
 
-        deserialize_val(value).map(|guild| Self {
+        deserialize_val(Value::from(map)).map(|guild| Self {
             guild,
         })
     }
@@ -754,27 +753,27 @@ pub enum GatewayEvent {
 
 impl<'de> Deserialize<'de> for GatewayEvent {
     fn deserialize<D: Deserializer<'de>>(deserializer: D) -> StdResult<Self, D::Error> {
-        let mut value = Value::deserialize(deserializer)?;
-        let map = value.as_object_mut().ok_or_else(|| DeError::custom("expected JsonMap"))?;
+        let mut map = JsonMap::deserialize(deserializer)?;
+        let seq = remove_from_map_opt(&mut map, "s")?.flatten();
 
-        let seq = remove_from_map_opt(map, "s")?.flatten();
-
-        Ok(match remove_from_map(map, "op")? {
+        Ok(match remove_from_map(&mut map, "op")? {
             Opcode::Dispatch => Self::Dispatch(
                 seq.ok_or_else(|| DeError::missing_field("s"))?,
-                deserialize_val(value)?,
+                deserialize_val(Value::from(map))?,
             ),
             Opcode::Heartbeat => {
                 GatewayEvent::Heartbeat(seq.ok_or_else(|| DeError::missing_field("s"))?)
             },
-            Opcode::InvalidSession => GatewayEvent::InvalidateSession(remove_from_map(map, "d")?),
+            Opcode::InvalidSession => {
+                GatewayEvent::InvalidateSession(remove_from_map(&mut map, "d")?)
+            },
             Opcode::Hello => {
                 #[derive(Deserialize)]
                 struct HelloPayload {
                     heartbeat_interval: u64,
                 }
 
-                let inner: HelloPayload = remove_from_map(map, "d")?;
+                let inner: HelloPayload = remove_from_map(&mut map, "d")?;
                 GatewayEvent::Hello(inner.heartbeat_interval)
             },
             Opcode::Reconnect => GatewayEvent::Reconnect,
