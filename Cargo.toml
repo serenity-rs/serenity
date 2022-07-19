@@ -179,7 +179,7 @@ gateway = ["flate2", "http", "utils"]
 http = []
 absolute_ratelimits = ["http"]
 model = ["builder", "http"]
-voice-model = ["serenity-voice-model"]
+voice_model = ["serenity-voice-model"]
 standard_framework = ["framework", "uwl", "levenshtein", "command_attr", "static_assertions"]
 unstable_discord_api = []
 utils = ["base64"]
@@ -188,7 +188,7 @@ tokio_task_builder = ["tokio/tracing"]
 time = []
 
 # Enables simd accelerated parsing
-simdjson = ["simd-json"]
+simd_json = ["simd-json"]
 
 # Enables temporary caching in functions that retrieve data via the HTTP API.
 temp_cache = ["cache", "moka"]
@@ -209,6 +209,10 @@ native_tls_backend = [
     "tokio",
     "bytes",
 ]
+
+# TODO(next): Remove, these are deprecated aliases
+simdjson = ["simd_json"]
+voice-model = ["voice_model"]
 
 [package.metadata.docs.rs]
 features = ["default", "collector", "unstable_discord_api", "voice", "voice-model"]
