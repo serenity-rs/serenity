@@ -387,6 +387,13 @@
 <span id="381">381</span>
 <span id="382">382</span>
 <span id="383">383</span>
+<span id="384">384</span>
+<span id="385">385</span>
+<span id="386">386</span>
+<span id="387">387</span>
+<span id="388">388</span>
+<span id="389">389</span>
+<span id="390">390</span>
 </pre><pre class="rust"><code><span class="doccomment">//! A collection of newtypes defining type-strong IDs.</span>
 
 <span class="kw">use</span> <span class="ident">std::fmt</span>;
@@ -514,6 +521,12 @@
 )]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">RoleId</span>(<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">with</span> <span class="op">=</span> <span class="string">&quot;snowflake&quot;</span>)]</span> <span class="kw">pub</span> <span class="ident">u64</span>);
 
+<span class="doccomment">/// An identifier for an auto moderation rule</span>
+<span class="attribute">#[<span class="ident">derive</span>(
+    <span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">Default</span>, <span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>, <span class="ident">PartialEq</span>, <span class="ident">PartialOrd</span>, <span class="ident">Ord</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>,
+)]</span>
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">RuleId</span>(<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">with</span> <span class="op">=</span> <span class="string">&quot;snowflake&quot;</span>)]</span> <span class="kw">pub</span> <span class="ident">u64</span>);
+
 <span class="doccomment">/// An identifier for a Scheduled Event</span>
 <span class="attribute">#[<span class="ident">derive</span>(
     <span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">Default</span>, <span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>, <span class="ident">PartialEq</span>, <span class="ident">PartialOrd</span>, <span class="ident">Ord</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>,
@@ -630,6 +643,7 @@
     <span class="ident">CommandVersionId</span>;
     <span class="ident">TargetId</span>;
     <span class="ident">StageInstanceId</span>;
+    <span class="ident">RuleId</span>;
 }
 
 <span class="doccomment">/// Used with `#[serde(with|deserialize_with|serialize_with)]`</span>

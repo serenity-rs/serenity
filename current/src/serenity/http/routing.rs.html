@@ -2918,6 +2918,76 @@
 <span id="2912">2912</span>
 <span id="2913">2913</span>
 <span id="2914">2914</span>
+<span id="2915">2915</span>
+<span id="2916">2916</span>
+<span id="2917">2917</span>
+<span id="2918">2918</span>
+<span id="2919">2919</span>
+<span id="2920">2920</span>
+<span id="2921">2921</span>
+<span id="2922">2922</span>
+<span id="2923">2923</span>
+<span id="2924">2924</span>
+<span id="2925">2925</span>
+<span id="2926">2926</span>
+<span id="2927">2927</span>
+<span id="2928">2928</span>
+<span id="2929">2929</span>
+<span id="2930">2930</span>
+<span id="2931">2931</span>
+<span id="2932">2932</span>
+<span id="2933">2933</span>
+<span id="2934">2934</span>
+<span id="2935">2935</span>
+<span id="2936">2936</span>
+<span id="2937">2937</span>
+<span id="2938">2938</span>
+<span id="2939">2939</span>
+<span id="2940">2940</span>
+<span id="2941">2941</span>
+<span id="2942">2942</span>
+<span id="2943">2943</span>
+<span id="2944">2944</span>
+<span id="2945">2945</span>
+<span id="2946">2946</span>
+<span id="2947">2947</span>
+<span id="2948">2948</span>
+<span id="2949">2949</span>
+<span id="2950">2950</span>
+<span id="2951">2951</span>
+<span id="2952">2952</span>
+<span id="2953">2953</span>
+<span id="2954">2954</span>
+<span id="2955">2955</span>
+<span id="2956">2956</span>
+<span id="2957">2957</span>
+<span id="2958">2958</span>
+<span id="2959">2959</span>
+<span id="2960">2960</span>
+<span id="2961">2961</span>
+<span id="2962">2962</span>
+<span id="2963">2963</span>
+<span id="2964">2964</span>
+<span id="2965">2965</span>
+<span id="2966">2966</span>
+<span id="2967">2967</span>
+<span id="2968">2968</span>
+<span id="2969">2969</span>
+<span id="2970">2970</span>
+<span id="2971">2971</span>
+<span id="2972">2972</span>
+<span id="2973">2973</span>
+<span id="2974">2974</span>
+<span id="2975">2975</span>
+<span id="2976">2976</span>
+<span id="2977">2977</span>
+<span id="2978">2978</span>
+<span id="2979">2979</span>
+<span id="2980">2980</span>
+<span id="2981">2981</span>
+<span id="2982">2982</span>
+<span id="2983">2983</span>
+<span id="2984">2984</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::borrow::Cow</span>;
 <span class="kw">use</span> <span class="ident">std::fmt</span>::{<span class="ident">Display</span>, <span class="ident">Write</span>};
 
@@ -3091,6 +3161,10 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// [`GuildId`]: crate::model::id::GuildId</span>
     <span class="ident">GuildsId</span>(<span class="ident">u64</span>),
+    <span class="doccomment">/// Route for the `/guilds/:guild_id/auto-moderation/rules` path.</span>
+    <span class="ident">GuildsIdAutoModRules</span>(<span class="ident">u64</span>),
+    <span class="doccomment">/// Route for the `/guilds/:guild_id/auto-moderation/rules/:rule_id` path.</span>
+    <span class="ident">GuildsIdAutoModRulesId</span>(<span class="ident">u64</span>),
     <span class="doccomment">/// Route for the `/guilds/:guild_id/bans` path.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// The data is the relevant [`GuildId`].</span>
@@ -3638,6 +3712,16 @@
     }
 
     <span class="attribute">#[<span class="ident">must_use</span>]</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">guild_automod_rule</span>(<span class="ident">guild_id</span>: <span class="ident">u64</span>, <span class="ident">rule_id</span>: <span class="ident">u64</span>) -&gt; <span class="ident">String</span> {
+        <span class="macro">api!</span>(<span class="string">&quot;/guilds/{}/auto-moderation/rules/{}&quot;</span>, <span class="ident">guild_id</span>, <span class="ident">rule_id</span>)
+    }
+
+    <span class="attribute">#[<span class="ident">must_use</span>]</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">guild_automod_rules</span>(<span class="ident">guild_id</span>: <span class="ident">u64</span>) -&gt; <span class="ident">String</span> {
+        <span class="macro">api!</span>(<span class="string">&quot;/guilds/{}/auto-moderation/rules&quot;</span>, <span class="ident">guild_id</span>)
+    }
+
+    <span class="attribute">#[<span class="ident">must_use</span>]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">guild_ban</span>(<span class="ident">guild_id</span>: <span class="ident">u64</span>, <span class="ident">user_id</span>: <span class="ident">u64</span>) -&gt; <span class="ident">String</span> {
         <span class="macro">api!</span>(<span class="string">&quot;/guilds/{}/bans/{}&quot;</span>, <span class="ident">guild_id</span>, <span class="ident">user_id</span>)
     }
@@ -4108,6 +4192,9 @@
     <span class="ident">BroadcastTyping</span> {
         <span class="ident">channel_id</span>: <span class="ident">u64</span>,
     },
+    <span class="ident">CreateAutoModRule</span> {
+        <span class="ident">guild_id</span>: <span class="ident">u64</span>,
+    },
     <span class="ident">CreateChannel</span> {
         <span class="ident">guild_id</span>: <span class="ident">u64</span>,
     },
@@ -4176,6 +4263,10 @@
     },
     <span class="ident">CreateWebhook</span> {
         <span class="ident">channel_id</span>: <span class="ident">u64</span>,
+    },
+    <span class="ident">DeleteAutoModRule</span> {
+        <span class="ident">guild_id</span>: <span class="ident">u64</span>,
+        <span class="ident">rule_id</span>: <span class="ident">u64</span>,
     },
     <span class="ident">DeleteChannel</span> {
         <span class="ident">channel_id</span>: <span class="ident">u64</span>,
@@ -4264,6 +4355,10 @@
         <span class="ident">token</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>,
         <span class="ident">webhook_id</span>: <span class="ident">u64</span>,
         <span class="ident">message_id</span>: <span class="ident">u64</span>,
+    },
+    <span class="ident">EditAutoModRule</span> {
+        <span class="ident">guild_id</span>: <span class="ident">u64</span>,
+        <span class="ident">rule_id</span>: <span class="ident">u64</span>,
     },
     <span class="ident">EditChannel</span> {
         <span class="ident">channel_id</span>: <span class="ident">u64</span>,
@@ -4403,6 +4498,13 @@
         <span class="ident">guild_id</span>: <span class="ident">u64</span>,
         <span class="ident">limit</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>,
         <span class="ident">user_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span>,
+    },
+    <span class="ident">GetAutoModRules</span> {
+        <span class="ident">guild_id</span>: <span class="ident">u64</span>,
+    },
+    <span class="ident">GetAutoModRule</span> {
+        <span class="ident">guild_id</span>: <span class="ident">u64</span>,
+        <span class="ident">rule_id</span>: <span class="ident">u64</span>,
     },
     <span class="ident">GetBans</span> {
         <span class="ident">guild_id</span>: <span class="ident">u64</span>,
@@ -4694,6 +4796,13 @@
                 <span class="ident">Route::ChannelsIdTyping</span>(<span class="ident">channel_id</span>),
                 <span class="ident">Cow::from</span>(<span class="ident">Route::channel_typing</span>(<span class="ident">channel_id</span>)),
             ),
+            <span class="ident">RouteInfo::CreateAutoModRule</span> {
+                <span class="ident">guild_id</span>,
+            } =&gt; (
+                <span class="ident">LightMethod::Post</span>,
+                <span class="ident">Route::GuildsIdAutoModRules</span>(<span class="ident">guild_id</span>),
+                <span class="ident">Cow::from</span>(<span class="ident">Route::guild_automod_rules</span>(<span class="ident">guild_id</span>)),
+            ),
             <span class="ident">RouteInfo::CreateChannel</span> {
                 <span class="ident">guild_id</span>,
             } =&gt; (
@@ -4854,6 +4963,14 @@
                 <span class="ident">LightMethod::Post</span>,
                 <span class="ident">Route::ChannelsIdWebhooks</span>(<span class="ident">channel_id</span>),
                 <span class="ident">Cow::from</span>(<span class="ident">Route::channel_webhooks</span>(<span class="ident">channel_id</span>)),
+            ),
+            <span class="ident">RouteInfo::DeleteAutoModRule</span> {
+                <span class="ident">guild_id</span>,
+                <span class="ident">rule_id</span>,
+            } =&gt; (
+                <span class="ident">LightMethod::Delete</span>,
+                <span class="ident">Route::GuildsIdAutoModRulesId</span>(<span class="ident">guild_id</span>),
+                <span class="ident">Cow::from</span>(<span class="ident">Route::guild_automod_rule</span>(<span class="ident">guild_id</span>, <span class="ident">rule_id</span>)),
             ),
             <span class="ident">RouteInfo::DeleteChannel</span> {
                 <span class="ident">channel_id</span>,
@@ -5031,6 +5148,14 @@
                 <span class="ident">LightMethod::Delete</span>,
                 <span class="ident">Route::WebhooksIdMessagesId</span>(<span class="ident">webhook_id</span>),
                 <span class="ident">Cow::from</span>(<span class="ident">Route::webhook_message</span>(<span class="ident">webhook_id</span>, <span class="ident">token</span>, <span class="ident">message_id</span>)),
+            ),
+            <span class="ident">RouteInfo::EditAutoModRule</span> {
+                <span class="ident">guild_id</span>,
+                <span class="ident">rule_id</span>,
+            } =&gt; (
+                <span class="ident">LightMethod::Patch</span>,
+                <span class="ident">Route::GuildsIdAutoModRulesId</span>(<span class="ident">guild_id</span>),
+                <span class="ident">Cow::from</span>(<span class="ident">Route::guild_automod_rule</span>(<span class="ident">guild_id</span>, <span class="ident">rule_id</span>)),
             ),
             <span class="ident">RouteInfo::EditChannel</span> {
                 <span class="ident">channel_id</span>,
@@ -5292,6 +5417,21 @@
                 <span class="ident">LightMethod::Get</span>,
                 <span class="ident">Route::GuildsIdAuditLogs</span>(<span class="ident">guild_id</span>),
                 <span class="ident">Cow::from</span>(<span class="ident">Route::guild_audit_logs</span>(<span class="ident">guild_id</span>, <span class="ident">action_type</span>, <span class="ident">user_id</span>, <span class="ident">before</span>, <span class="ident">limit</span>)),
+            ),
+            <span class="ident">RouteInfo::GetAutoModRules</span> {
+                <span class="ident">guild_id</span>,
+            } =&gt; (
+                <span class="ident">LightMethod::Get</span>,
+                <span class="ident">Route::GuildsIdAutoModRules</span>(<span class="ident">guild_id</span>),
+                <span class="ident">Cow::from</span>(<span class="ident">Route::guild_automod_rules</span>(<span class="ident">guild_id</span>)),
+            ),
+            <span class="ident">RouteInfo::GetAutoModRule</span> {
+                <span class="ident">guild_id</span>,
+                <span class="ident">rule_id</span>,
+            } =&gt; (
+                <span class="ident">LightMethod::Get</span>,
+                <span class="ident">Route::GuildsIdAutoModRulesId</span>(<span class="ident">guild_id</span>),
+                <span class="ident">Cow::from</span>(<span class="ident">Route::guild_automod_rule</span>(<span class="ident">guild_id</span>, <span class="ident">rule_id</span>)),
             ),
             <span class="ident">RouteInfo::GetBans</span> {
                 <span class="ident">guild_id</span>,

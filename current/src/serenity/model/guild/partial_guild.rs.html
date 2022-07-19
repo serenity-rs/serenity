@@ -1814,6 +1814,115 @@
 <span id="1808">1808</span>
 <span id="1809">1809</span>
 <span id="1810">1810</span>
+<span id="1811">1811</span>
+<span id="1812">1812</span>
+<span id="1813">1813</span>
+<span id="1814">1814</span>
+<span id="1815">1815</span>
+<span id="1816">1816</span>
+<span id="1817">1817</span>
+<span id="1818">1818</span>
+<span id="1819">1819</span>
+<span id="1820">1820</span>
+<span id="1821">1821</span>
+<span id="1822">1822</span>
+<span id="1823">1823</span>
+<span id="1824">1824</span>
+<span id="1825">1825</span>
+<span id="1826">1826</span>
+<span id="1827">1827</span>
+<span id="1828">1828</span>
+<span id="1829">1829</span>
+<span id="1830">1830</span>
+<span id="1831">1831</span>
+<span id="1832">1832</span>
+<span id="1833">1833</span>
+<span id="1834">1834</span>
+<span id="1835">1835</span>
+<span id="1836">1836</span>
+<span id="1837">1837</span>
+<span id="1838">1838</span>
+<span id="1839">1839</span>
+<span id="1840">1840</span>
+<span id="1841">1841</span>
+<span id="1842">1842</span>
+<span id="1843">1843</span>
+<span id="1844">1844</span>
+<span id="1845">1845</span>
+<span id="1846">1846</span>
+<span id="1847">1847</span>
+<span id="1848">1848</span>
+<span id="1849">1849</span>
+<span id="1850">1850</span>
+<span id="1851">1851</span>
+<span id="1852">1852</span>
+<span id="1853">1853</span>
+<span id="1854">1854</span>
+<span id="1855">1855</span>
+<span id="1856">1856</span>
+<span id="1857">1857</span>
+<span id="1858">1858</span>
+<span id="1859">1859</span>
+<span id="1860">1860</span>
+<span id="1861">1861</span>
+<span id="1862">1862</span>
+<span id="1863">1863</span>
+<span id="1864">1864</span>
+<span id="1865">1865</span>
+<span id="1866">1866</span>
+<span id="1867">1867</span>
+<span id="1868">1868</span>
+<span id="1869">1869</span>
+<span id="1870">1870</span>
+<span id="1871">1871</span>
+<span id="1872">1872</span>
+<span id="1873">1873</span>
+<span id="1874">1874</span>
+<span id="1875">1875</span>
+<span id="1876">1876</span>
+<span id="1877">1877</span>
+<span id="1878">1878</span>
+<span id="1879">1879</span>
+<span id="1880">1880</span>
+<span id="1881">1881</span>
+<span id="1882">1882</span>
+<span id="1883">1883</span>
+<span id="1884">1884</span>
+<span id="1885">1885</span>
+<span id="1886">1886</span>
+<span id="1887">1887</span>
+<span id="1888">1888</span>
+<span id="1889">1889</span>
+<span id="1890">1890</span>
+<span id="1891">1891</span>
+<span id="1892">1892</span>
+<span id="1893">1893</span>
+<span id="1894">1894</span>
+<span id="1895">1895</span>
+<span id="1896">1896</span>
+<span id="1897">1897</span>
+<span id="1898">1898</span>
+<span id="1899">1899</span>
+<span id="1900">1900</span>
+<span id="1901">1901</span>
+<span id="1902">1902</span>
+<span id="1903">1903</span>
+<span id="1904">1904</span>
+<span id="1905">1905</span>
+<span id="1906">1906</span>
+<span id="1907">1907</span>
+<span id="1908">1908</span>
+<span id="1909">1909</span>
+<span id="1910">1910</span>
+<span id="1911">1911</span>
+<span id="1912">1912</span>
+<span id="1913">1913</span>
+<span id="1914">1914</span>
+<span id="1915">1915</span>
+<span id="1916">1916</span>
+<span id="1917">1917</span>
+<span id="1918">1918</span>
+<span id="1919">1919</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">serde::de::Error</span> <span class="kw">as</span> <span class="ident">DeError</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
 <span class="kw">use</span> <span class="ident">tracing</span>::{<span class="ident">error</span>, <span class="ident">warn</span>};
@@ -1826,6 +1935,7 @@
     <span class="ident">CreateApplicationCommandsPermissions</span>,
     <span class="ident">CreateChannel</span>,
     <span class="ident">CreateSticker</span>,
+    <span class="ident">EditAutoModRule</span>,
     <span class="ident">EditGuild</span>,
     <span class="ident">EditGuildWelcomeScreen</span>,
     <span class="ident">EditGuildWidget</span>,
@@ -1850,6 +1960,8 @@
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::json</span>::{<span class="ident">from_number</span>, <span class="ident">from_value</span>};
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::application::command</span>::{<span class="ident">Command</span>, <span class="ident">CommandPermission</span>};
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::guild::automod::Rule</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::prelude</span>::<span class="kw-2">*</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::utils</span>::{<span class="ident">emojis</span>, <span class="ident">roles</span>, <span class="ident">stickers</span>};
 
@@ -1965,6 +2077,112 @@
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
 <span class="kw">impl</span> <span class="ident">PartialGuild</span> {
+    <span class="doccomment">/// Gets all auto moderation [`Rule`]s of this guild via HTTP.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// **Note**: Requires the [Manage Guild] permission.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Errors</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// Returns [`Error::Http`] if the guild is unavailable.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// [Manage Guild]: Permissions::MANAGE_GUILD</span>
+    <span class="attribute">#[<span class="ident">inline</span>]</span>
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">automod_rules</span>(<span class="self">self</span>, <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Rule</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+        <span class="self">self</span>.<span class="ident">id</span>.<span class="ident">automod_rules</span>(<span class="ident">http</span>).<span class="kw">await</span>
+    }
+
+    <span class="doccomment">/// Gets an auto moderation [`Rule`] of this guild by its ID via HTTP.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// **Note**: Requires the [Manage Guild] permission.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Errors</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// Returns [`Error::Http`] if a rule with the given ID does not exist.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// [Manage Guild]: Permissions::MANAGE_GUILD</span>
+    <span class="attribute">#[<span class="ident">inline</span>]</span>
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">automod_rule</span>(
+        <span class="self">self</span>,
+        <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>,
+        <span class="ident">rule_id</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">RuleId</span><span class="op">&gt;</span>,
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Rule</span><span class="op">&gt;</span> {
+        <span class="self">self</span>.<span class="ident">id</span>.<span class="ident">automod_rule</span>(<span class="ident">http</span>, <span class="ident">rule_id</span>).<span class="kw">await</span>
+    }
+
+    <span class="doccomment">/// Creates an auto moderation [`Rule`] in the guild.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// **Note**: Requires the [Manage Guild] permission.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Examples</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// Create a custom keyword filter to block the message and timeout the author.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// ```ignore</span>
+    <span class="doccomment">/// use serenity::model::guild::automod::{Action, Trigger};</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// let _rule = guild</span>
+    <span class="doccomment">///     .create_automod_rule(&amp;http, |r| {</span>
+    <span class="doccomment">///         r.name(&quot;foobar filter&quot;)</span>
+    <span class="doccomment">///             .trigger(Trigger::Keyword(vec![&quot;foo*&quot;.to_string(), &quot;*bar&quot;.to_string()]))</span>
+    <span class="doccomment">///             .actions(vec![Action::BlockMessage, Action::Timeout(60)])</span>
+    <span class="doccomment">///     })</span>
+    <span class="doccomment">///     .await;</span>
+    <span class="doccomment">/// ```</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Errors</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// Returns [`Error::Http`] if the current user lacks permission,</span>
+    <span class="doccomment">/// or if invalid values are set.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// [Manage Guild]: Permissions::MANAGE_GUILD</span>
+    <span class="attribute">#[<span class="ident">inline</span>]</span>
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">create_automod_rule</span>(
+        <span class="self">self</span>,
+        <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>,
+        <span class="ident">f</span>: <span class="kw">impl</span> <span class="ident">FnOnce</span>(<span class="kw-2">&amp;mut</span> <span class="ident">EditAutoModRule</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="ident">EditAutoModRule</span>,
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Rule</span><span class="op">&gt;</span> {
+        <span class="self">self</span>.<span class="ident">id</span>.<span class="ident">create_automod_rule</span>(<span class="ident">http</span>, <span class="ident">f</span>).<span class="kw">await</span>
+    }
+
+    <span class="doccomment">/// Edit an auto moderation [`Rule`] by its ID.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// **Note**: Requires the [Manage Guild] permission.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Errors</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// Returns [`Error::Http`] if the current user lacks permission,</span>
+    <span class="doccomment">/// or if invalid values are set.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// [Manage Guild]: Permissions::MANAGE_GUILD</span>
+    <span class="attribute">#[<span class="ident">inline</span>]</span>
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">edit_automod_rule</span>(
+        <span class="self">self</span>,
+        <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>,
+        <span class="ident">rule_id</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">RuleId</span><span class="op">&gt;</span>,
+        <span class="ident">f</span>: <span class="kw">impl</span> <span class="ident">FnOnce</span>(<span class="kw-2">&amp;mut</span> <span class="ident">EditAutoModRule</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="ident">EditAutoModRule</span>,
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Rule</span><span class="op">&gt;</span> {
+        <span class="self">self</span>.<span class="ident">id</span>.<span class="ident">edit_automod_rule</span>(<span class="ident">http</span>, <span class="ident">rule_id</span>, <span class="ident">f</span>).<span class="kw">await</span>
+    }
+
+    <span class="doccomment">/// Deletes an auto moderation [`Rule`] from the guild.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// **Note**: Requires the [Manage Guild] permission.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Errors</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// Returns [`Error::Http`] if the current user lacks permission,</span>
+    <span class="doccomment">/// or if a rule with that Id does not exist.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// [Manage Guild]: Permissions::MANAGE_GUILD</span>
+    <span class="attribute">#[<span class="ident">inline</span>]</span>
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">delete_automod_rule</span>(
+        <span class="self">self</span>,
+        <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>,
+        <span class="ident">rule_id</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">RuleId</span><span class="op">&gt;</span>,
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+        <span class="self">self</span>.<span class="ident">id</span>.<span class="ident">delete_automod_rule</span>(<span class="ident">http</span>, <span class="ident">rule_id</span>).<span class="kw">await</span>
+    }
+
     <span class="doccomment">/// Ban a [`User`] from the guild, deleting a number of</span>
     <span class="doccomment">/// days&#39; worth of messages (`dmd`) between the range 0 and 7.</span>
     <span class="doccomment">///</span>

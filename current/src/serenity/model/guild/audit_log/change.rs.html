@@ -955,6 +955,63 @@
 <span id="949">949</span>
 <span id="950">950</span>
 <span id="951">951</span>
+<span id="952">952</span>
+<span id="953">953</span>
+<span id="954">954</span>
+<span id="955">955</span>
+<span id="956">956</span>
+<span id="957">957</span>
+<span id="958">958</span>
+<span id="959">959</span>
+<span id="960">960</span>
+<span id="961">961</span>
+<span id="962">962</span>
+<span id="963">963</span>
+<span id="964">964</span>
+<span id="965">965</span>
+<span id="966">966</span>
+<span id="967">967</span>
+<span id="968">968</span>
+<span id="969">969</span>
+<span id="970">970</span>
+<span id="971">971</span>
+<span id="972">972</span>
+<span id="973">973</span>
+<span id="974">974</span>
+<span id="975">975</span>
+<span id="976">976</span>
+<span id="977">977</span>
+<span id="978">978</span>
+<span id="979">979</span>
+<span id="980">980</span>
+<span id="981">981</span>
+<span id="982">982</span>
+<span id="983">983</span>
+<span id="984">984</span>
+<span id="985">985</span>
+<span id="986">986</span>
+<span id="987">987</span>
+<span id="988">988</span>
+<span id="989">989</span>
+<span id="990">990</span>
+<span id="991">991</span>
+<span id="992">992</span>
+<span id="993">993</span>
+<span id="994">994</span>
+<span id="995">995</span>
+<span id="996">996</span>
+<span id="997">997</span>
+<span id="998">998</span>
+<span id="999">999</span>
+<span id="1000">1000</span>
+<span id="1001">1001</span>
+<span id="1002">1002</span>
+<span id="1003">1003</span>
+<span id="1004">1004</span>
+<span id="1005">1005</span>
+<span id="1006">1006</span>
+<span id="1007">1007</span>
+<span id="1008">1008</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::borrow::Cow</span>;
 <span class="kw">use</span> <span class="ident">std::fmt</span>;
 
@@ -963,6 +1020,7 @@
 
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::json::Value</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::channel::PermissionOverwrite</span>;
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::guild::automod</span>::{<span class="ident">Action</span>, <span class="ident">EventType</span>, <span class="ident">TriggerMetadata</span>, <span class="ident">TriggerType</span>};
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::guild</span>::{
     <span class="ident">DefaultMessageNotificationLevel</span>,
     <span class="ident">ExplicitContentFilter</span>,
@@ -991,6 +1049,10 @@
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">PartialEq</span>)]</span>
 <span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">Change</span> {
+    <span class="ident">Actions</span> {
+        <span class="ident">old</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Action</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+        <span class="ident">new</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Action</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+    },
     <span class="doccomment">/// AFK channel was changed.</span>
     <span class="ident">AfkChannelId</span> {
         <span class="ident">old</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ChannelId</span><span class="op">&gt;</span>,
@@ -1095,6 +1157,10 @@
         <span class="ident">old</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
         <span class="ident">new</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
     },
+    <span class="ident">Enabled</span> {
+        <span class="ident">old</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span>,
+        <span class="ident">new</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span>,
+    },
     <span class="doccomment">/// Integration emoticons was enabled/disabled.</span>
     <span class="ident">EnableEmoticons</span> {
         <span class="ident">old</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span>,
@@ -1104,6 +1170,18 @@
     <span class="ident">EntityType</span> {
         <span class="ident">old</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span>,
         <span class="ident">new</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span>,
+    },
+    <span class="ident">EventType</span> {
+        <span class="ident">old</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">EventType</span><span class="op">&gt;</span>,
+        <span class="ident">new</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">EventType</span><span class="op">&gt;</span>,
+    },
+    <span class="ident">ExemptChannels</span> {
+        <span class="ident">old</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ChannelId</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+        <span class="ident">new</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ChannelId</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+    },
+    <span class="ident">ExemptRoles</span> {
+        <span class="ident">old</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">RoleId</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+        <span class="ident">new</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">RoleId</span><span class="op">&gt;</span><span class="op">&gt;</span>,
     },
     <span class="doccomment">/// Behavior of the expiration of an integration was changed.</span>
     <span class="ident">ExpireBehavior</span> {
@@ -1305,6 +1383,14 @@
         <span class="ident">old</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
         <span class="ident">new</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
     },
+    <span class="ident">TriggerMetadata</span> {
+        <span class="ident">old</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">TriggerMetadata</span><span class="op">&gt;</span>,
+        <span class="ident">new</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">TriggerMetadata</span><span class="op">&gt;</span>,
+    },
+    <span class="ident">TriggerType</span> {
+        <span class="ident">old</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">TriggerType</span><span class="op">&gt;</span>,
+        <span class="ident">new</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">TriggerType</span><span class="op">&gt;</span>,
+    },
     <span class="doccomment">/// Type of a created entity.</span>
     <span class="ident">Type</span> {
         <span class="ident">old</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">EntityType</span><span class="op">&gt;</span>,
@@ -1366,6 +1452,7 @@
         }
 
         <span class="macro">variant_keys!</span> {
+            <span class="ident">Actions</span>: <span class="string">&quot;actions&quot;</span>,
             <span class="ident">AfkChannelId</span>: <span class="string">&quot;afk_channel_id&quot;</span>,
             <span class="ident">AfkTimeout</span>: <span class="string">&quot;afk_timeout&quot;</span>,
             <span class="ident">Allow</span>: <span class="string">&quot;allow&quot;</span>,
@@ -1387,8 +1474,12 @@
             <span class="ident">Deny</span>: <span class="string">&quot;deny&quot;</span>,
             <span class="ident">Description</span>: <span class="string">&quot;description&quot;</span>,
             <span class="ident">DiscoverySplashHash</span>: <span class="string">&quot;discovery_splash_hash&quot;</span>,
+            <span class="ident">Enabled</span>: <span class="string">&quot;enabled&quot;</span>,
             <span class="ident">EnableEmoticons</span>: <span class="string">&quot;enable_emoticons&quot;</span>,
             <span class="ident">EntityType</span>: <span class="string">&quot;entity_type&quot;</span>,
+            <span class="ident">EventType</span>: <span class="string">&quot;event_type&quot;</span>,
+            <span class="ident">ExemptChannels</span>: <span class="string">&quot;exempt_channels&quot;</span>,
+            <span class="ident">ExemptRoles</span>: <span class="string">&quot;exempt_roles&quot;</span>,
             <span class="ident">ExpireBehavior</span>: <span class="string">&quot;expire_behavior&quot;</span>,
             <span class="ident">ExpireGracePeriod</span>: <span class="string">&quot;expire_grace_period&quot;</span>,
             <span class="ident">ExplicitContentFilter</span>: <span class="string">&quot;explicit_content_filter&quot;</span>,
@@ -1429,6 +1520,8 @@
             <span class="ident">Tags</span>: <span class="string">&quot;tags&quot;</span>,
             <span class="ident">Temporary</span>: <span class="string">&quot;temporary&quot;</span>,
             <span class="ident">Topic</span>: <span class="string">&quot;topic&quot;</span>,
+            <span class="ident">TriggerMetadata</span>: <span class="string">&quot;trigger_metadata&quot;</span>,
+            <span class="ident">TriggerType</span>: <span class="string">&quot;trigger_type&quot;</span>,
             <span class="ident">Type</span>: <span class="string">&quot;type&quot;</span>,
             <span class="ident">UnicodeEmoji</span>: <span class="string">&quot;unicode_emoji&quot;</span>,
             <span class="ident">UserLimit</span>: <span class="string">&quot;user_limit&quot;</span>,
@@ -1473,6 +1566,7 @@
         }
 
         <span class="macro">serialize_variants!</span> {
+            <span class="ident">Actions</span>: <span class="string">&quot;actions&quot;</span>,
             <span class="ident">AfkChannelId</span>: <span class="string">&quot;afk_channel_id&quot;</span>,
             <span class="ident">AfkTimeout</span>: <span class="string">&quot;afk_timeout&quot;</span>,
             <span class="ident">Allow</span>: <span class="string">&quot;allow&quot;</span>,
@@ -1494,8 +1588,12 @@
             <span class="ident">Deny</span>: <span class="string">&quot;deny&quot;</span>,
             <span class="ident">Description</span>: <span class="string">&quot;description&quot;</span>,
             <span class="ident">DiscoverySplashHash</span>: <span class="string">&quot;discovery_splash_hash&quot;</span>,
+            <span class="ident">Enabled</span>: <span class="string">&quot;enabled&quot;</span>,
             <span class="ident">EnableEmoticons</span>: <span class="string">&quot;enable_emoticons&quot;</span>,
             <span class="ident">EntityType</span>: <span class="string">&quot;entity_type&quot;</span>,
+            <span class="ident">EventType</span>: <span class="string">&quot;event_type&quot;</span>,
+            <span class="ident">ExemptChannels</span>: <span class="string">&quot;exempt_channels&quot;</span>,
+            <span class="ident">ExemptRoles</span>: <span class="string">&quot;exempt_roles&quot;</span>,
             <span class="ident">ExpireBehavior</span>: <span class="string">&quot;expire_behavior&quot;</span>,
             <span class="ident">ExpireGracePeriod</span>: <span class="string">&quot;expire_grace_period&quot;</span>,
             <span class="ident">ExplicitContentFilter</span>: <span class="string">&quot;explicit_content_filter&quot;</span>,
@@ -1536,6 +1634,8 @@
             <span class="ident">Tags</span>: <span class="string">&quot;tags&quot;</span>,
             <span class="ident">Temporary</span>: <span class="string">&quot;temporary&quot;</span>,
             <span class="ident">Topic</span>: <span class="string">&quot;topic&quot;</span>,
+            <span class="ident">TriggerMetadata</span>: <span class="string">&quot;trigger_metadata&quot;</span>,
+            <span class="ident">TriggerType</span>: <span class="string">&quot;trigger_type&quot;</span>,
             <span class="ident">Type</span>: <span class="string">&quot;type&quot;</span>,
             <span class="ident">UnicodeEmoji</span>: <span class="string">&quot;unicode_emoji&quot;</span>,
             <span class="ident">UserLimit</span>: <span class="string">&quot;user_limit&quot;</span>,
@@ -1620,6 +1720,7 @@
         }
 
         <span class="kw">let</span> <span class="ident">change</span> <span class="op">=</span> <span class="macro">deserialize_variants!</span> {
+            <span class="ident">Actions</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Action</span><span class="op">&gt;</span>,
             <span class="ident">AfkChannelId</span>: <span class="ident">ChannelId</span>,
             <span class="ident">AfkTimeout</span>: <span class="ident">u64</span>,
             <span class="ident">Allow</span>: <span class="ident">Permissions</span>,
@@ -1641,8 +1742,12 @@
             <span class="ident">Deny</span>: <span class="ident">Permissions</span>,
             <span class="ident">Description</span>: <span class="ident">String</span>,
             <span class="ident">DiscoverySplashHash</span>: <span class="ident">String</span>,
+            <span class="ident">Enabled</span>: <span class="ident">bool</span>,
             <span class="ident">EnableEmoticons</span>: <span class="ident">bool</span>,
             <span class="ident">EntityType</span>: <span class="ident">u64</span>,
+            <span class="ident">EventType</span>: <span class="ident">EventType</span>,
+            <span class="ident">ExemptChannels</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ChannelId</span><span class="op">&gt;</span>,
+            <span class="ident">ExemptRoles</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">RoleId</span><span class="op">&gt;</span>,
             <span class="ident">ExpireBehavior</span>: <span class="ident">u64</span>,
             <span class="ident">ExpireGracePeriod</span>: <span class="ident">u64</span>,
             <span class="ident">ExplicitContentFilter</span>: <span class="ident">ExplicitContentFilter</span>,
@@ -1683,6 +1788,8 @@
             <span class="ident">Tags</span>: <span class="ident">String</span>,
             <span class="ident">Temporary</span>: <span class="ident">bool</span>,
             <span class="ident">Topic</span>: <span class="ident">String</span>,
+            <span class="ident">TriggerMetadata</span>: <span class="ident">TriggerMetadata</span>,
+            <span class="ident">TriggerType</span>: <span class="ident">TriggerType</span>,
             <span class="ident">Type</span>: <span class="ident">EntityType</span>,
             <span class="ident">UnicodeEmoji</span>: <span class="ident">String</span>,
             <span class="ident">UserLimit</span>: <span class="ident">u64</span>,
@@ -1707,6 +1814,7 @@
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Deserialize</span>)]</span>
 <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">field_identifier</span>, <span class="ident">rename_all</span> <span class="op">=</span> <span class="string">&quot;snake_case&quot;</span>)]</span>
 <span class="kw">enum</span> <span class="ident">Key</span> {
+    <span class="ident">Actions</span>,
     <span class="ident">AfkChannelId</span>,
     <span class="ident">AfkTimeout</span>,
     <span class="ident">Allow</span>,
@@ -1729,8 +1837,12 @@
     <span class="ident">Deny</span>,
     <span class="ident">Description</span>,
     <span class="ident">DiscoverySplashHash</span>,
+    <span class="ident">Enabled</span>,
     <span class="ident">EnableEmoticons</span>,
     <span class="ident">EntityType</span>,
+    <span class="ident">EventType</span>,
+    <span class="ident">ExemptChannels</span>,
+    <span class="ident">ExemptRoles</span>,
     <span class="ident">ExpireBehavior</span>,
     <span class="ident">ExpireGracePeriod</span>,
     <span class="ident">ExplicitContentFilter</span>,
@@ -1769,6 +1881,8 @@
     <span class="ident">Tags</span>,
     <span class="ident">Temporary</span>,
     <span class="ident">Topic</span>,
+    <span class="ident">TriggerMetadata</span>,
+    <span class="ident">TriggerType</span>,
     <span class="ident">Type</span>,
     <span class="ident">UnicodeEmoji</span>,
     <span class="ident">UserLimit</span>,
