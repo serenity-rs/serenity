@@ -3,6 +3,47 @@
 All notable changes to this project will be documented in this file.
 This project mostly adheres to [Semantic Versioning][semver].
 
+## [0.11.3] - 2022-07-19
+
+Thanks to the following for their contributions:
+
+- [@AlexisTM]
+- [@aawilson]
+- [@acdenisSK]
+- [@bumblepie]
+- [@DRuppFv]
+- [@FallenWarrior2k]
+- [@GnomedDev]
+- [@kangalioo]
+- [@Milo123459]
+- [@mkrasnitski]
+- [@NotNorom]
+- [@nickelc]
+- [@SimonZehetner]
+
+### Notable changes
+
+- Temporarily fix `GuildChannel::message_count` in a non-breaking way ([@GnomedDev])
+- Add support for `Auto Moderation` feature ([@nickelc])
+- Add optional min/max length fields for application command string options ([@nickelc])
+- Allow select menu response for modals ([@AlexisTM])
+- Add `app_permissions` field on interactions ([@nickelc])
+- Enable `Invite::expires_at` field ([@mkrasnitski])
+- Fix "missing field `discriminator`" serde error for presence updates ([@nickelc])
+- Add webhook example ([@NotNorom])
+- Introduce `rustversion` dependency and `backports` module ([@GnomedDev])
+- Add `MessageType::AutoModerationAction` enum variant ([@nickelc])
+- Attempt to fix lifetime bug around `CustomisedHelpData` ([@mkrasnitski])
+- Auto-impl `CacheHttp` for `Arc<T>` if `T` also implements it ([@mkrasnitski])
+- Add audit log action types for scheduled events ([@nickelc])
+- Fill gaps in all `model::application` types ([@kangalioo])
+- Add support for slash command localization ([@kangalioo])
+- Implement announcement channel following ([@GnomedDev])
+- Add event handler methods for scheduled events ([@nickelc])
+- Add methods to `Webhook` to enable direct creation ([@mkrasnitski])
+- Consolidate `interactions` & `oauth2` model types into the `application` module ([@nickelc])
+- Fix compile errors in builders when the `model` feature is disabled ([@FallenWarrior2k])
+
 ## [0.11.2] - 2022-05-08
 
 Thanks to the following for their contributions:
@@ -4762,6 +4803,7 @@ Initial commit.
 
 <!-- COMPARISONS -->
 
+[0.11.3]: https://github.com/serenity-rs/serenity/compare/v0.11.2...v0.11.3
 [0.11.2]: https://github.com/serenity-rs/serenity/compare/v0.11.1...v0.11.2
 [0.11.1]: https://github.com/serenity-rs/serenity/compare/v0.11.0...v0.11.1
 [0.11.0]: https://github.com/serenity-rs/serenity/compare/v0.10.10...v0.11.0
@@ -4855,12 +4897,14 @@ Initial commit.
 [@AgathaSorceress]: https://github.com/AgathaSorceress
 [@Alch-Emi]: https://github.com/Alch-Emi
 [@AldanTanneo]: https://github.com/AldanTanneo
+[@AlexisTM]: https://github.com/AlexisTM
 [@AngelOnFira]: https://github.com/AngelOnFira
 [@AnnikaCodes]: https://github.com/AnnikaCodes
 [@Arcterus]: https://github.com/Arcterus
 [@AregevDev]: https://github.com/AregevDev
 [@AriusX7]: https://github.com/AriusX7
 [@Atakku]: https://github.com/Atakku
+[@aawilson]: https://github.com/aawilson
 [@abalabahaha]: https://github.com/abalabahaha
 [@acdenisSK]: https://github.com/acdenisSK
 [@adumbidiot]: https://github.com/adumbidiot
@@ -4879,6 +4923,7 @@ Initial commit.
 [@bikeshedder]: https://github.com/bikeshedder
 [@bippum]: https://github.com/bippum
 [@blaenk]: https://github.com/blaenk
+[@bumblepie]: https://github.com/bumblepie
 [@Caemor]: https://github.com/Caemor
 [@CarlGroth]: https://github.com/CarlGroth
 [@Celti]: https://github.com/Celti
@@ -4894,6 +4939,7 @@ Initial commit.
 [@DimiDimit]: https://github.com/DimiDimit
 [@Dinnerbone]: https://github.com/Dinnerbone
 [@DoumanAsh]: https://github.com/DoumanAsh
+[@DRuppFv]: https://github.com/DRuppFv
 [@DrBluefall]: https://github.com/DrBluefall
 [@dapper-gh]: https://github.com/dapper-gh
 [@devtomio]: https://github.com/devtomio
@@ -4976,7 +5022,6 @@ Initial commit.
 [@mattico]: https://github.com/mattico
 [@mbenoukaiss]: https://github.com/mbenoukaiss
 [@mdonoughe]: https://github.com/mdonoughe
-[@mkrasnitski]: https://github.com/mkrasnitski
 [@megumisonoda]: https://github.com/megumisonoda
 [@mendess]: https://github.com/mendess
 [@merlleu]: https://github.com/merlleu
@@ -5014,6 +5059,7 @@ Initial commit.
 [@Sei4or]: https://github.com/Sei4or
 [@SadiinsoSnowfall]: https://github.com/SadiinsoSnowfall
 [@Scetch]: https://github.com/Scetch
+[@SimonZehetner]: https://github.com/SimonZehetner
 [@SinsofSloth]: https://github.com/SinsofSloth
 [@Some-Dood]: https://github.com/Some-Dood
 [@Splingush]: https://github.com/Splingush
