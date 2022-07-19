@@ -131,7 +131,7 @@ pub struct GuildChannel {
     /// This is currently saturated at 255 to prevent breaking.
     ///
     /// **Note**: This is only available on thread channels.
-    #[serde(deserialize_with = "message_count_patch")]
+    #[serde(default, deserialize_with = "message_count_patch")]
     pub message_count: Option<u8>,
     /// An approximate count of users in a thread, stops counting at 50.
     ///
