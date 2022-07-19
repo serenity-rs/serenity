@@ -1477,7 +1477,7 @@
     <span class="doccomment">/// This is currently saturated at 255 to prevent breaking.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// **Note**: This is only available on thread channels.</span>
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">deserialize_with</span> <span class="op">=</span> <span class="string">&quot;message_count_patch&quot;</span>)]</span>
+    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">default</span>, <span class="ident">deserialize_with</span> <span class="op">=</span> <span class="string">&quot;message_count_patch&quot;</span>)]</span>
     <span class="kw">pub</span> <span class="ident">message_count</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>,
     <span class="doccomment">/// An approximate count of users in a thread, stops counting at 50.</span>
     <span class="doccomment">///</span>
