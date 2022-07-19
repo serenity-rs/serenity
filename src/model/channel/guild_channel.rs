@@ -1,7 +1,7 @@
+use std::convert::TryFrom;
 use std::fmt;
 #[cfg(feature = "model")]
 use std::sync::Arc;
-use std::convert::TryFrom;
 
 #[cfg(feature = "cache")]
 use futures::stream::StreamExt;
@@ -43,7 +43,9 @@ use crate::model::prelude::*;
 use crate::model::Timestamp;
 
 // HACK(Gnome!): Prevent having to change the type of message_count on serenity@current
-fn message_count_patch<'de, D: serde::Deserializer<'de>>(deserializer: D) -> StdResult<Option<u8>, D::Error> {
+fn message_count_patch<'de, D: serde::Deserializer<'de>>(
+    deserializer: D,
+) -> StdResult<Option<u8>, D::Error> {
     let real_count = Option::<u32>::deserialize(deserializer)?;
     Ok(real_count.map(u8::try_from).transpose().unwrap_or(Some(u8::MAX)))
 }
