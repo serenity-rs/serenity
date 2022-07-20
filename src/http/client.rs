@@ -2446,8 +2446,8 @@ impl Http {
     /// Creates an auto moderation rule in a guild.
     ///
     /// This method requires `MANAGE_GUILD` permissions.
-    pub async fn create_automod_rule(&self, guild_id: u64, map: &JsonMap) -> Result<Rule> {
-        let body = to_vec(&map)?;
+    pub async fn create_automod_rule(&self, guild_id: u64, map: &impl serde::Serialize) -> Result<Rule> {
+        let body = to_vec(map)?;
 
         self.fire(Request {
             body: Some(body),
@@ -2467,9 +2467,9 @@ impl Http {
         &self,
         guild_id: u64,
         rule_id: u64,
-        map: &JsonMap,
+        map: &impl serde::Serialize,
     ) -> Result<Rule> {
-        let body = to_vec(&map)?;
+        let body = to_vec(map)?;
 
         self.fire(Request {
             body: Some(body),
