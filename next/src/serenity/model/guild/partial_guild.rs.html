@@ -1,9 +1,10 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/model/guild/partial_guild.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>partial_guild.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script src="../../../../crates.js"></script><script defer src="../../../../main.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script>
-    <noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../serenity/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/model/guild/partial_guild.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>partial_guild.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../serenity/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div>
         </a><h2 class="location"></h2>
     </nav>
     <nav class="sidebar"><a class="sidebar-logo" href="../../../../serenity/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div>
-        </a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../serenity/index.html"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><div class="theme-picker hidden"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="22" height="22" alt="Pick another theme!" src="../../../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+        </a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../serenity/index.html"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><button type="button" id="help-button" title="help">?</button><div id="settings-menu" tabindex="-1">
+                                <a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div>
+                        </div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -1683,6 +1684,79 @@
 <span id="1678">1678</span>
 <span id="1679">1679</span>
 <span id="1680">1680</span>
+<span id="1681">1681</span>
+<span id="1682">1682</span>
+<span id="1683">1683</span>
+<span id="1684">1684</span>
+<span id="1685">1685</span>
+<span id="1686">1686</span>
+<span id="1687">1687</span>
+<span id="1688">1688</span>
+<span id="1689">1689</span>
+<span id="1690">1690</span>
+<span id="1691">1691</span>
+<span id="1692">1692</span>
+<span id="1693">1693</span>
+<span id="1694">1694</span>
+<span id="1695">1695</span>
+<span id="1696">1696</span>
+<span id="1697">1697</span>
+<span id="1698">1698</span>
+<span id="1699">1699</span>
+<span id="1700">1700</span>
+<span id="1701">1701</span>
+<span id="1702">1702</span>
+<span id="1703">1703</span>
+<span id="1704">1704</span>
+<span id="1705">1705</span>
+<span id="1706">1706</span>
+<span id="1707">1707</span>
+<span id="1708">1708</span>
+<span id="1709">1709</span>
+<span id="1710">1710</span>
+<span id="1711">1711</span>
+<span id="1712">1712</span>
+<span id="1713">1713</span>
+<span id="1714">1714</span>
+<span id="1715">1715</span>
+<span id="1716">1716</span>
+<span id="1717">1717</span>
+<span id="1718">1718</span>
+<span id="1719">1719</span>
+<span id="1720">1720</span>
+<span id="1721">1721</span>
+<span id="1722">1722</span>
+<span id="1723">1723</span>
+<span id="1724">1724</span>
+<span id="1725">1725</span>
+<span id="1726">1726</span>
+<span id="1727">1727</span>
+<span id="1728">1728</span>
+<span id="1729">1729</span>
+<span id="1730">1730</span>
+<span id="1731">1731</span>
+<span id="1732">1732</span>
+<span id="1733">1733</span>
+<span id="1734">1734</span>
+<span id="1735">1735</span>
+<span id="1736">1736</span>
+<span id="1737">1737</span>
+<span id="1738">1738</span>
+<span id="1739">1739</span>
+<span id="1740">1740</span>
+<span id="1741">1741</span>
+<span id="1742">1742</span>
+<span id="1743">1743</span>
+<span id="1744">1744</span>
+<span id="1745">1745</span>
+<span id="1746">1746</span>
+<span id="1747">1747</span>
+<span id="1748">1748</span>
+<span id="1749">1749</span>
+<span id="1750">1750</span>
+<span id="1751">1751</span>
+<span id="1752">1752</span>
+<span id="1753">1753</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">serde::de::Error</span> <span class="kw">as</span> <span class="ident">DeError</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
 <span class="kw">use</span> <span class="ident">tracing</span>::{<span class="ident">error</span>, <span class="ident">warn</span>};
@@ -1695,6 +1769,7 @@
     <span class="ident">CreateApplicationCommandsPermissions</span>,
     <span class="ident">CreateChannel</span>,
     <span class="ident">CreateSticker</span>,
+    <span class="ident">EditAutoModRule</span>,
     <span class="ident">EditGuild</span>,
     <span class="ident">EditGuildWelcomeScreen</span>,
     <span class="ident">EditGuildWidget</span>,
@@ -1713,6 +1788,8 @@
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::json::prelude</span>::<span class="kw-2">*</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::application::command</span>::{<span class="ident">Command</span>, <span class="ident">CommandPermission</span>};
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::guild::automod::Rule</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::prelude</span>::<span class="kw-2">*</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::utils</span>::{
     <span class="ident">add_guild_id_to_map</span>,
@@ -1835,6 +1912,112 @@
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
 <span class="kw">impl</span> <span class="ident">PartialGuild</span> {
+    <span class="doccomment">/// Gets all auto moderation [`Rule`]s of this guild via HTTP.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// **Note**: Requires the [Manage Guild] permission.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Errors</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// Returns [`Error::Http`] if the guild is unavailable.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// [Manage Guild]: Permissions::MANAGE_GUILD</span>
+    <span class="attribute">#[<span class="ident">inline</span>]</span>
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">automod_rules</span>(<span class="self">self</span>, <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Rule</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+        <span class="self">self</span>.<span class="ident">id</span>.<span class="ident">automod_rules</span>(<span class="ident">http</span>).<span class="kw">await</span>
+    }
+
+    <span class="doccomment">/// Gets an auto moderation [`Rule`] of this guild by its ID via HTTP.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// **Note**: Requires the [Manage Guild] permission.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Errors</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// Returns [`Error::Http`] if a rule with the given ID does not exist.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// [Manage Guild]: Permissions::MANAGE_GUILD</span>
+    <span class="attribute">#[<span class="ident">inline</span>]</span>
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">automod_rule</span>(
+        <span class="self">self</span>,
+        <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>,
+        <span class="ident">rule_id</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">RuleId</span><span class="op">&gt;</span>,
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Rule</span><span class="op">&gt;</span> {
+        <span class="self">self</span>.<span class="ident">id</span>.<span class="ident">automod_rule</span>(<span class="ident">http</span>, <span class="ident">rule_id</span>).<span class="kw">await</span>
+    }
+
+    <span class="doccomment">/// Creates an auto moderation [`Rule`] in the guild.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// **Note**: Requires the [Manage Guild] permission.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Examples</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// Create a custom keyword filter to block the message and timeout the author.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// ```ignore</span>
+    <span class="doccomment">/// use serenity::model::guild::automod::{Action, Trigger};</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// let _rule = guild</span>
+    <span class="doccomment">///     .create_automod_rule(&amp;http, |r| {</span>
+    <span class="doccomment">///         r.name(&quot;foobar filter&quot;)</span>
+    <span class="doccomment">///             .trigger(Trigger::Keyword(vec![&quot;foo*&quot;.to_string(), &quot;*bar&quot;.to_string()]))</span>
+    <span class="doccomment">///             .actions(vec![Action::BlockMessage, Action::Timeout(60)])</span>
+    <span class="doccomment">///     })</span>
+    <span class="doccomment">///     .await;</span>
+    <span class="doccomment">/// ```</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Errors</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// Returns [`Error::Http`] if the current user lacks permission,</span>
+    <span class="doccomment">/// or if invalid values are set.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// [Manage Guild]: Permissions::MANAGE_GUILD</span>
+    <span class="attribute">#[<span class="ident">inline</span>]</span>
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">create_automod_rule</span>(
+        <span class="self">self</span>,
+        <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>,
+        <span class="ident">f</span>: <span class="kw">impl</span> <span class="ident">FnOnce</span>(<span class="kw-2">&amp;mut</span> <span class="ident">EditAutoModRule</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="ident">EditAutoModRule</span>,
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Rule</span><span class="op">&gt;</span> {
+        <span class="self">self</span>.<span class="ident">id</span>.<span class="ident">create_automod_rule</span>(<span class="ident">http</span>, <span class="ident">f</span>).<span class="kw">await</span>
+    }
+
+    <span class="doccomment">/// Edit an auto moderation [`Rule`] by its ID.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// **Note**: Requires the [Manage Guild] permission.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Errors</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// Returns [`Error::Http`] if the current user lacks permission,</span>
+    <span class="doccomment">/// or if invalid values are set.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// [Manage Guild]: Permissions::MANAGE_GUILD</span>
+    <span class="attribute">#[<span class="ident">inline</span>]</span>
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">edit_automod_rule</span>(
+        <span class="self">self</span>,
+        <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>,
+        <span class="ident">rule_id</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">RuleId</span><span class="op">&gt;</span>,
+        <span class="ident">f</span>: <span class="kw">impl</span> <span class="ident">FnOnce</span>(<span class="kw-2">&amp;mut</span> <span class="ident">EditAutoModRule</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="ident">EditAutoModRule</span>,
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Rule</span><span class="op">&gt;</span> {
+        <span class="self">self</span>.<span class="ident">id</span>.<span class="ident">edit_automod_rule</span>(<span class="ident">http</span>, <span class="ident">rule_id</span>, <span class="ident">f</span>).<span class="kw">await</span>
+    }
+
+    <span class="doccomment">/// Deletes an auto moderation [`Rule`] from the guild.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// **Note**: Requires the [Manage Guild] permission.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Errors</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// Returns [`Error::Http`] if the current user lacks permission,</span>
+    <span class="doccomment">/// or if a rule with that Id does not exist.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// [Manage Guild]: Permissions::MANAGE_GUILD</span>
+    <span class="attribute">#[<span class="ident">inline</span>]</span>
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">delete_automod_rule</span>(
+        <span class="self">self</span>,
+        <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>,
+        <span class="ident">rule_id</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">RuleId</span><span class="op">&gt;</span>,
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+        <span class="self">self</span>.<span class="ident">id</span>.<span class="ident">delete_automod_rule</span>(<span class="ident">http</span>, <span class="ident">rule_id</span>).<span class="kw">await</span>
+    }
+
     <span class="doccomment">/// Ban a [`User`] from the guild, deleting a number of</span>
     <span class="doccomment">/// days&#39; worth of messages (`dmd`) between the range 0 and 7.</span>
     <span class="doccomment">///</span>
@@ -2062,9 +2245,6 @@
     <span class="doccomment">/// # Errors</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// If there is an error, it will be either [`Error::Http`] or [`Error::Json`].</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`Error::Http`]: crate::error::Error::Http</span>
-    <span class="doccomment">/// [`Error::Json`]: crate::error::Error::Json</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">set_application_commands</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>,
@@ -2083,9 +2263,6 @@
     <span class="doccomment">/// # Errors</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// If there is an error, it will be either [`Error::Http`] or [`Error::Json`].</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`Error::Http`]: crate::error::Error::Http</span>
-    <span class="doccomment">/// [`Error::Json`]: crate::error::Error::Json</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">create_application_command_permission</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>,
@@ -2108,9 +2285,6 @@
     <span class="doccomment">/// # Errors</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// If there is an error, it will be either [`Error::Http`] or [`Error::Json`].</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`Error::Http`]: crate::error::Error::Http</span>
-    <span class="doccomment">/// [`Error::Json`]: crate::error::Error::Json</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">set_application_commands_permissions</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>,
@@ -2129,9 +2303,6 @@
     <span class="doccomment">/// # Errors</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// If there is an error, it will be either [`Error::Http`] or [`Error::Json`].</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`Error::Http`]: crate::error::Error::Http</span>
-    <span class="doccomment">/// [`Error::Json`]: crate::error::Error::Json</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_application_commands</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Command</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">id</span>.<span class="ident">get_application_commands</span>(<span class="ident">http</span>).<span class="kw">await</span>
     }
@@ -2141,9 +2312,6 @@
     <span class="doccomment">/// # Errors</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// If there is an error, it will be either [`Error::Http`] or [`Error::Json`].</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`Error::Http`]: crate::error::Error::Http</span>
-    <span class="doccomment">/// [`Error::Json`]: crate::error::Error::Json</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_application_command</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>,
@@ -2157,9 +2325,6 @@
     <span class="doccomment">/// # Errors</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// If there is an error, it will be either [`Error::Http`] or [`Error::Json`].</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`Error::Http`]: crate::error::Error::Http</span>
-    <span class="doccomment">/// [`Error::Json`]: crate::error::Error::Json</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">edit_application_command</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>,
@@ -2177,9 +2342,6 @@
     <span class="doccomment">/// # Errors</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// If there is an error, it will be either [`Error::Http`] or [`Error::Json`].</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`Error::Http`]: crate::error::Error::Http</span>
-    <span class="doccomment">/// [`Error::Json`]: crate::error::Error::Json</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">delete_application_command</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>,
@@ -2193,9 +2355,6 @@
     <span class="doccomment">/// # Errors</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// If there is an error, it will be either [`Error::Http`] or [`Error::Json`].</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`Error::Http`]: crate::error::Error::Http</span>
-    <span class="doccomment">/// [`Error::Json`]: crate::error::Error::Json</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_application_commands_permissions</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>,
@@ -2208,9 +2367,6 @@
     <span class="doccomment">/// # Errors</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// If there is an error, it will be either [`Error::Http`] or [`Error::Json`].</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`Error::Http`]: crate::error::Error::Http</span>
-    <span class="doccomment">/// [`Error::Json`]: crate::error::Error::Json</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_application_command_permissions</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>,
@@ -2519,7 +2675,6 @@
     <span class="doccomment">/// Returns [`Error::Http`] if the current user lacks permission.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// [Manage Roles]: Permissions::MANAGE_ROLES</span>
-    <span class="doccomment">/// [`Error::Http`]: crate::error::Error::Http</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">edit_role_position</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
@@ -2546,7 +2701,6 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// Returns [`Error::Http`] if the current user lacks permission.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [`Error::Http`]: crate::error::Error::Http</span>
     <span class="doccomment">/// [Manage Emojis and Stickers]: crate::model::permissions::Permissions::MANAGE_EMOJIS_AND_STICKERS</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">edit_sticker</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(
@@ -2566,8 +2720,6 @@
     <span class="doccomment">/// # Errors</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// Returns an [`Error::Http`] if some mandatory fields are not provided.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`Error::Http`]: crate::error::Error::Http</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">edit_welcome_screen</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>,
@@ -2585,8 +2737,6 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// Returns an [`Error::Http`] if the bot does not have the `MANAGE_GUILD`</span>
     <span class="doccomment">/// permission.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`Error::Http`]: crate::error::Error::Http</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">edit_widget</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>, <span class="ident">f</span>: <span class="ident">F</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">GuildWidget</span><span class="op">&gt;</span>
     <span class="kw">where</span>
         <span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="kw-2">&amp;mut</span> <span class="ident">EditGuildWidget</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="ident">EditGuildWidget</span>,
@@ -2761,7 +2911,6 @@
     <span class="doccomment">/// Returns an [`Error::Http`] if the current user is lacking permission.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// [Manage Channels]: Permissions::MANAGE_CHANNELS</span>
-    <span class="doccomment">/// [`Error::Http`]: crate::error::Error::Http</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">reorder_channels</span><span class="op">&lt;</span><span class="ident">It</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>, <span class="ident">channels</span>: <span class="ident">It</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span>
     <span class="kw">where</span>
@@ -2781,8 +2930,6 @@
     <span class="doccomment">/// # Errors</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// Returns an [`Error::Http`] if the API returns an error.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`Error::Http`]: crate::error::Error::Http</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">search_members</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
@@ -3364,5 +3511,5 @@
     }
 }
 </code></pre></div>
-</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.61.0-nightly (3c17c84a3 2022-03-21)" ></div>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.63.0-nightly (10f4ce324 2022-06-22)" ></div>
 </body></html>

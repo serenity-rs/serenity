@@ -1,1 +1,1 @@
-initSidebarItems({"struct":[["StickerPack","A sticker sent with a message."]]});
+window.SIDEBAR_ITEMS = {"struct":[["StickerPack","A sticker sent with a message."]]};

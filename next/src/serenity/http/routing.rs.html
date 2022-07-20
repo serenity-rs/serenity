@@ -1,9 +1,10 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/http/routing.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>routing.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script src="../../../crates.js"></script><script defer src="../../../main.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script>
-    <noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../serenity/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/http/routing.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>routing.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../serenity/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div>
         </a><h2 class="location"></h2>
     </nav>
     <nav class="sidebar"><a class="sidebar-logo" href="../../../serenity/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div>
-        </a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../serenity/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><div class="theme-picker hidden"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="22" height="22" alt="Pick another theme!" src="../../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+        </a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../serenity/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><button type="button" id="help-button" title="help">?</button><div id="settings-menu" tabindex="-1">
+                                <a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div>
+                        </div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -2930,6 +2931,76 @@
 <span id="2925">2925</span>
 <span id="2926">2926</span>
 <span id="2927">2927</span>
+<span id="2928">2928</span>
+<span id="2929">2929</span>
+<span id="2930">2930</span>
+<span id="2931">2931</span>
+<span id="2932">2932</span>
+<span id="2933">2933</span>
+<span id="2934">2934</span>
+<span id="2935">2935</span>
+<span id="2936">2936</span>
+<span id="2937">2937</span>
+<span id="2938">2938</span>
+<span id="2939">2939</span>
+<span id="2940">2940</span>
+<span id="2941">2941</span>
+<span id="2942">2942</span>
+<span id="2943">2943</span>
+<span id="2944">2944</span>
+<span id="2945">2945</span>
+<span id="2946">2946</span>
+<span id="2947">2947</span>
+<span id="2948">2948</span>
+<span id="2949">2949</span>
+<span id="2950">2950</span>
+<span id="2951">2951</span>
+<span id="2952">2952</span>
+<span id="2953">2953</span>
+<span id="2954">2954</span>
+<span id="2955">2955</span>
+<span id="2956">2956</span>
+<span id="2957">2957</span>
+<span id="2958">2958</span>
+<span id="2959">2959</span>
+<span id="2960">2960</span>
+<span id="2961">2961</span>
+<span id="2962">2962</span>
+<span id="2963">2963</span>
+<span id="2964">2964</span>
+<span id="2965">2965</span>
+<span id="2966">2966</span>
+<span id="2967">2967</span>
+<span id="2968">2968</span>
+<span id="2969">2969</span>
+<span id="2970">2970</span>
+<span id="2971">2971</span>
+<span id="2972">2972</span>
+<span id="2973">2973</span>
+<span id="2974">2974</span>
+<span id="2975">2975</span>
+<span id="2976">2976</span>
+<span id="2977">2977</span>
+<span id="2978">2978</span>
+<span id="2979">2979</span>
+<span id="2980">2980</span>
+<span id="2981">2981</span>
+<span id="2982">2982</span>
+<span id="2983">2983</span>
+<span id="2984">2984</span>
+<span id="2985">2985</span>
+<span id="2986">2986</span>
+<span id="2987">2987</span>
+<span id="2988">2988</span>
+<span id="2989">2989</span>
+<span id="2990">2990</span>
+<span id="2991">2991</span>
+<span id="2992">2992</span>
+<span id="2993">2993</span>
+<span id="2994">2994</span>
+<span id="2995">2995</span>
+<span id="2996">2996</span>
+<span id="2997">2997</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::borrow::Cow</span>;
 <span class="kw">use</span> <span class="ident">std::fmt</span>::{<span class="ident">Display</span>, <span class="ident">Write</span>};
 
@@ -3103,6 +3174,10 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// [`GuildId`]: crate::model::id::GuildId</span>
     <span class="ident">GuildsId</span>(<span class="ident">u64</span>),
+    <span class="doccomment">/// Route for the `/guilds/:guild_id/auto-moderation/rules` path.</span>
+    <span class="ident">GuildsIdAutoModRules</span>(<span class="ident">u64</span>),
+    <span class="doccomment">/// Route for the `/guilds/:guild_id/auto-moderation/rules/:rule_id` path.</span>
+    <span class="ident">GuildsIdAutoModRulesId</span>(<span class="ident">u64</span>),
     <span class="doccomment">/// Route for the `/guilds/:guild_id/bans` path.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// The data is the relevant [`GuildId`].</span>
@@ -3650,6 +3725,16 @@
     }
 
     <span class="attribute">#[<span class="ident">must_use</span>]</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">guild_automod_rule</span>(<span class="ident">guild_id</span>: <span class="ident">u64</span>, <span class="ident">rule_id</span>: <span class="ident">u64</span>) -&gt; <span class="ident">String</span> {
+        <span class="macro">api!</span>(<span class="string">&quot;/guilds/{}/auto-moderation/rules/{}&quot;</span>, <span class="ident">guild_id</span>, <span class="ident">rule_id</span>)
+    }
+
+    <span class="attribute">#[<span class="ident">must_use</span>]</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">guild_automod_rules</span>(<span class="ident">guild_id</span>: <span class="ident">u64</span>) -&gt; <span class="ident">String</span> {
+        <span class="macro">api!</span>(<span class="string">&quot;/guilds/{}/auto-moderation/rules&quot;</span>, <span class="ident">guild_id</span>)
+    }
+
+    <span class="attribute">#[<span class="ident">must_use</span>]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">guild_ban</span>(<span class="ident">guild_id</span>: <span class="ident">u64</span>, <span class="ident">user_id</span>: <span class="ident">u64</span>) -&gt; <span class="ident">String</span> {
         <span class="macro">api!</span>(<span class="string">&quot;/guilds/{}/bans/{}&quot;</span>, <span class="ident">guild_id</span>, <span class="ident">user_id</span>)
     }
@@ -4131,6 +4216,9 @@
     <span class="ident">BroadcastTyping</span> {
         <span class="ident">channel_id</span>: <span class="ident">u64</span>,
     },
+    <span class="ident">CreateAutoModRule</span> {
+        <span class="ident">guild_id</span>: <span class="ident">u64</span>,
+    },
     <span class="ident">CreateChannel</span> {
         <span class="ident">guild_id</span>: <span class="ident">u64</span>,
     },
@@ -4199,6 +4287,10 @@
     },
     <span class="ident">CreateWebhook</span> {
         <span class="ident">channel_id</span>: <span class="ident">u64</span>,
+    },
+    <span class="ident">DeleteAutoModRule</span> {
+        <span class="ident">guild_id</span>: <span class="ident">u64</span>,
+        <span class="ident">rule_id</span>: <span class="ident">u64</span>,
     },
     <span class="ident">DeleteChannel</span> {
         <span class="ident">channel_id</span>: <span class="ident">u64</span>,
@@ -4287,6 +4379,10 @@
         <span class="ident">token</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>,
         <span class="ident">webhook_id</span>: <span class="ident">u64</span>,
         <span class="ident">message_id</span>: <span class="ident">u64</span>,
+    },
+    <span class="ident">EditAutoModRule</span> {
+        <span class="ident">guild_id</span>: <span class="ident">u64</span>,
+        <span class="ident">rule_id</span>: <span class="ident">u64</span>,
     },
     <span class="ident">EditChannel</span> {
         <span class="ident">channel_id</span>: <span class="ident">u64</span>,
@@ -4427,6 +4523,13 @@
         <span class="ident">guild_id</span>: <span class="ident">u64</span>,
         <span class="ident">limit</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>,
         <span class="ident">user_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span>,
+    },
+    <span class="ident">GetAutoModRules</span> {
+        <span class="ident">guild_id</span>: <span class="ident">u64</span>,
+    },
+    <span class="ident">GetAutoModRule</span> {
+        <span class="ident">guild_id</span>: <span class="ident">u64</span>,
+        <span class="ident">rule_id</span>: <span class="ident">u64</span>,
     },
     <span class="ident">GetBans</span> {
         <span class="ident">guild_id</span>: <span class="ident">u64</span>,
@@ -4718,6 +4821,13 @@
                 <span class="ident">Route::ChannelsIdTyping</span>(<span class="ident">channel_id</span>),
                 <span class="ident">Cow::from</span>(<span class="ident">Route::channel_typing</span>(<span class="ident">channel_id</span>)),
             ),
+            <span class="ident">RouteInfo::CreateAutoModRule</span> {
+                <span class="ident">guild_id</span>,
+            } =&gt; (
+                <span class="ident">LightMethod::Post</span>,
+                <span class="ident">Route::GuildsIdAutoModRules</span>(<span class="ident">guild_id</span>),
+                <span class="ident">Cow::from</span>(<span class="ident">Route::guild_automod_rules</span>(<span class="ident">guild_id</span>)),
+            ),
             <span class="ident">RouteInfo::CreateChannel</span> {
                 <span class="ident">guild_id</span>,
             } =&gt; (
@@ -4878,6 +4988,14 @@
                 <span class="ident">LightMethod::Post</span>,
                 <span class="ident">Route::ChannelsIdWebhooks</span>(<span class="ident">channel_id</span>),
                 <span class="ident">Cow::from</span>(<span class="ident">Route::channel_webhooks</span>(<span class="ident">channel_id</span>)),
+            ),
+            <span class="ident">RouteInfo::DeleteAutoModRule</span> {
+                <span class="ident">guild_id</span>,
+                <span class="ident">rule_id</span>,
+            } =&gt; (
+                <span class="ident">LightMethod::Delete</span>,
+                <span class="ident">Route::GuildsIdAutoModRulesId</span>(<span class="ident">guild_id</span>),
+                <span class="ident">Cow::from</span>(<span class="ident">Route::guild_automod_rule</span>(<span class="ident">guild_id</span>, <span class="ident">rule_id</span>)),
             ),
             <span class="ident">RouteInfo::DeleteChannel</span> {
                 <span class="ident">channel_id</span>,
@@ -5055,6 +5173,14 @@
                 <span class="ident">LightMethod::Delete</span>,
                 <span class="ident">Route::WebhooksIdMessagesId</span>(<span class="ident">webhook_id</span>),
                 <span class="ident">Cow::from</span>(<span class="ident">Route::webhook_message</span>(<span class="ident">webhook_id</span>, <span class="ident">token</span>, <span class="ident">message_id</span>)),
+            ),
+            <span class="ident">RouteInfo::EditAutoModRule</span> {
+                <span class="ident">guild_id</span>,
+                <span class="ident">rule_id</span>,
+            } =&gt; (
+                <span class="ident">LightMethod::Patch</span>,
+                <span class="ident">Route::GuildsIdAutoModRulesId</span>(<span class="ident">guild_id</span>),
+                <span class="ident">Cow::from</span>(<span class="ident">Route::guild_automod_rule</span>(<span class="ident">guild_id</span>, <span class="ident">rule_id</span>)),
             ),
             <span class="ident">RouteInfo::EditChannel</span> {
                 <span class="ident">channel_id</span>,
@@ -5317,6 +5443,21 @@
                 <span class="ident">LightMethod::Get</span>,
                 <span class="ident">Route::GuildsIdAuditLogs</span>(<span class="ident">guild_id</span>),
                 <span class="ident">Cow::from</span>(<span class="ident">Route::guild_audit_logs</span>(<span class="ident">guild_id</span>, <span class="ident">action_type</span>, <span class="ident">user_id</span>, <span class="ident">before</span>, <span class="ident">limit</span>)),
+            ),
+            <span class="ident">RouteInfo::GetAutoModRules</span> {
+                <span class="ident">guild_id</span>,
+            } =&gt; (
+                <span class="ident">LightMethod::Get</span>,
+                <span class="ident">Route::GuildsIdAutoModRules</span>(<span class="ident">guild_id</span>),
+                <span class="ident">Cow::from</span>(<span class="ident">Route::guild_automod_rules</span>(<span class="ident">guild_id</span>)),
+            ),
+            <span class="ident">RouteInfo::GetAutoModRule</span> {
+                <span class="ident">guild_id</span>,
+                <span class="ident">rule_id</span>,
+            } =&gt; (
+                <span class="ident">LightMethod::Get</span>,
+                <span class="ident">Route::GuildsIdAutoModRulesId</span>(<span class="ident">guild_id</span>),
+                <span class="ident">Cow::from</span>(<span class="ident">Route::guild_automod_rule</span>(<span class="ident">guild_id</span>, <span class="ident">rule_id</span>)),
             ),
             <span class="ident">RouteInfo::GetBans</span> {
                 <span class="ident">guild_id</span>,
@@ -5858,5 +5999,5 @@
     }
 }
 </code></pre></div>
-</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.61.0-nightly (3c17c84a3 2022-03-21)" ></div>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.63.0-nightly (10f4ce324 2022-06-22)" ></div>
 </body></html>

@@ -1,9 +1,10 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/model/guild/audit_log.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>audit_log.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script src="../../../../crates.js"></script><script defer src="../../../../main.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script>
-    <noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../serenity/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/model/guild/audit_log.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>audit_log.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../serenity/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div>
         </a><h2 class="location"></h2>
     </nav>
     <nav class="sidebar"><a class="sidebar-logo" href="../../../../serenity/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div>
-        </a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../serenity/index.html"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><div class="theme-picker hidden"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="22" height="22" alt="Pick another theme!" src="../../../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+        </a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../serenity/index.html"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><button type="button" id="help-button" title="help">?</button><div id="settings-menu" tabindex="-1">
+                                <a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div>
+                        </div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -364,6 +365,23 @@
 <span id="359">359</span>
 <span id="360">360</span>
 <span id="361">361</span>
+<span id="362">362</span>
+<span id="363">363</span>
+<span id="364">364</span>
+<span id="365">365</span>
+<span id="366">366</span>
+<span id="367">367</span>
+<span id="368">368</span>
+<span id="369">369</span>
+<span id="370">370</span>
+<span id="371">371</span>
+<span id="372">372</span>
+<span id="373">373</span>
+<span id="374">374</span>
+<span id="375">375</span>
+<span id="376">376</span>
+<span id="377">377</span>
+<span id="378">378</span>
 </pre><pre class="rust"><code><span class="doccomment">//! Audit log types for administrative actions within guilds.</span>
 
 <span class="kw">use</span> <span class="ident">std::collections::HashMap</span>;
@@ -398,6 +416,7 @@
     <span class="ident">Sticker</span>(<span class="ident">StickerAction</span>),
     <span class="ident">ScheduledEvent</span>(<span class="ident">ScheduledEventAction</span>),
     <span class="ident">Thread</span>(<span class="ident">ThreadAction</span>),
+    <span class="ident">AutoModeration</span>(<span class="ident">AutoModerationAction</span>),
     <span class="ident">Unknown</span>(<span class="ident">u8</span>),
 }
 
@@ -419,6 +438,7 @@
             <span class="ident"><span class="self">Self</span>::Sticker</span>(<span class="ident">x</span>) =&gt; <span class="ident">x</span> <span class="kw">as</span> <span class="ident">u8</span>,
             <span class="ident"><span class="self">Self</span>::ScheduledEvent</span>(<span class="ident">x</span>) =&gt; <span class="ident">x</span> <span class="kw">as</span> <span class="ident">u8</span>,
             <span class="ident"><span class="self">Self</span>::Thread</span>(<span class="ident">x</span>) =&gt; <span class="ident">x</span> <span class="kw">as</span> <span class="ident">u8</span>,
+            <span class="ident"><span class="self">Self</span>::AutoModeration</span>(<span class="ident">x</span>) =&gt; <span class="ident">x</span> <span class="kw">as</span> <span class="ident">u8</span>,
             <span class="ident"><span class="self">Self</span>::Unknown</span>(<span class="ident">x</span>) =&gt; <span class="ident">x</span>,
         }
     }
@@ -440,6 +460,7 @@
             <span class="number">90</span>..<span class="op">=</span><span class="number">92</span> =&gt; <span class="ident">Action::Sticker</span>(<span class="kw">unsafe</span> { <span class="ident">transmute</span>(<span class="ident">value</span>) }),
             <span class="number">100</span>..<span class="op">=</span><span class="number">102</span> =&gt; <span class="ident">Action::ScheduledEvent</span>(<span class="kw">unsafe</span> { <span class="ident">transmute</span>(<span class="ident">value</span>) }),
             <span class="number">110</span>..<span class="op">=</span><span class="number">112</span> =&gt; <span class="ident">Action::Thread</span>(<span class="kw">unsafe</span> { <span class="ident">transmute</span>(<span class="ident">value</span>) }),
+            <span class="number">140</span>..<span class="op">=</span><span class="number">143</span> =&gt; <span class="ident">Action::AutoModeration</span>(<span class="kw">unsafe</span> { <span class="ident">transmute</span>(<span class="ident">value</span>) }),
             <span class="kw">_</span> =&gt; <span class="ident">Action::Unknown</span>(<span class="ident">value</span>),
         }
     }
@@ -582,6 +603,16 @@
     <span class="ident">Delete</span> <span class="op">=</span> <span class="number">112</span>,
 }
 
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">Debug</span>)]</span>
+<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
+<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">u8</span>)]</span>
+<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">AutoModerationAction</span> {
+    <span class="ident">RuleCreate</span> <span class="op">=</span> <span class="number">140</span>,
+    <span class="ident">RuleUpdate</span> <span class="op">=</span> <span class="number">141</span>,
+    <span class="ident">RuleDelete</span> <span class="op">=</span> <span class="number">142</span>,
+    <span class="ident">BlockMessage</span> <span class="op">=</span> <span class="number">143</span>,
+}
+
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
 <span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">AuditLogs</span> {
@@ -703,6 +734,10 @@
         <span class="macro">assert_action!</span>(<span class="ident">Action::Thread</span>(<span class="ident">ThreadAction::Create</span>), <span class="number">110</span>);
         <span class="macro">assert_action!</span>(<span class="ident">Action::Thread</span>(<span class="ident">ThreadAction::Update</span>), <span class="number">111</span>);
         <span class="macro">assert_action!</span>(<span class="ident">Action::Thread</span>(<span class="ident">ThreadAction::Delete</span>), <span class="number">112</span>);
+        <span class="macro">assert_action!</span>(<span class="ident">Action::AutoModeration</span>(<span class="ident">AutoModerationAction::RuleCreate</span>), <span class="number">140</span>);
+        <span class="macro">assert_action!</span>(<span class="ident">Action::AutoModeration</span>(<span class="ident">AutoModerationAction::RuleUpdate</span>), <span class="number">141</span>);
+        <span class="macro">assert_action!</span>(<span class="ident">Action::AutoModeration</span>(<span class="ident">AutoModerationAction::RuleDelete</span>), <span class="number">142</span>);
+        <span class="macro">assert_action!</span>(<span class="ident">Action::AutoModeration</span>(<span class="ident">AutoModerationAction::BlockMessage</span>), <span class="number">143</span>);
         <span class="macro">assert_action!</span>(<span class="ident">Action::Unknown</span>(<span class="number">234</span>), <span class="number">234</span>);
     }
 
@@ -726,5 +761,5 @@
     }
 }
 </code></pre></div>
-</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.61.0-nightly (3c17c84a3 2022-03-21)" ></div>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.63.0-nightly (10f4ce324 2022-06-22)" ></div>
 </body></html>

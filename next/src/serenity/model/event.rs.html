@@ -1,9 +1,10 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/model/event.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>event.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script src="../../../crates.js"></script><script defer src="../../../main.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script>
-    <noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../serenity/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/model/event.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>event.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../serenity/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div>
         </a><h2 class="location"></h2>
     </nav>
     <nav class="sidebar"><a class="sidebar-logo" href="../../../serenity/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div>
-        </a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../serenity/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><div class="theme-picker hidden"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="22" height="22" alt="Pick another theme!" src="../../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+        </a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../serenity/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><button type="button" id="help-button" title="help">?</button><div id="settings-menu" tabindex="-1">
+                                <a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div>
+                        </div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -1839,6 +1840,115 @@
 <span id="1834">1834</span>
 <span id="1835">1835</span>
 <span id="1836">1836</span>
+<span id="1837">1837</span>
+<span id="1838">1838</span>
+<span id="1839">1839</span>
+<span id="1840">1840</span>
+<span id="1841">1841</span>
+<span id="1842">1842</span>
+<span id="1843">1843</span>
+<span id="1844">1844</span>
+<span id="1845">1845</span>
+<span id="1846">1846</span>
+<span id="1847">1847</span>
+<span id="1848">1848</span>
+<span id="1849">1849</span>
+<span id="1850">1850</span>
+<span id="1851">1851</span>
+<span id="1852">1852</span>
+<span id="1853">1853</span>
+<span id="1854">1854</span>
+<span id="1855">1855</span>
+<span id="1856">1856</span>
+<span id="1857">1857</span>
+<span id="1858">1858</span>
+<span id="1859">1859</span>
+<span id="1860">1860</span>
+<span id="1861">1861</span>
+<span id="1862">1862</span>
+<span id="1863">1863</span>
+<span id="1864">1864</span>
+<span id="1865">1865</span>
+<span id="1866">1866</span>
+<span id="1867">1867</span>
+<span id="1868">1868</span>
+<span id="1869">1869</span>
+<span id="1870">1870</span>
+<span id="1871">1871</span>
+<span id="1872">1872</span>
+<span id="1873">1873</span>
+<span id="1874">1874</span>
+<span id="1875">1875</span>
+<span id="1876">1876</span>
+<span id="1877">1877</span>
+<span id="1878">1878</span>
+<span id="1879">1879</span>
+<span id="1880">1880</span>
+<span id="1881">1881</span>
+<span id="1882">1882</span>
+<span id="1883">1883</span>
+<span id="1884">1884</span>
+<span id="1885">1885</span>
+<span id="1886">1886</span>
+<span id="1887">1887</span>
+<span id="1888">1888</span>
+<span id="1889">1889</span>
+<span id="1890">1890</span>
+<span id="1891">1891</span>
+<span id="1892">1892</span>
+<span id="1893">1893</span>
+<span id="1894">1894</span>
+<span id="1895">1895</span>
+<span id="1896">1896</span>
+<span id="1897">1897</span>
+<span id="1898">1898</span>
+<span id="1899">1899</span>
+<span id="1900">1900</span>
+<span id="1901">1901</span>
+<span id="1902">1902</span>
+<span id="1903">1903</span>
+<span id="1904">1904</span>
+<span id="1905">1905</span>
+<span id="1906">1906</span>
+<span id="1907">1907</span>
+<span id="1908">1908</span>
+<span id="1909">1909</span>
+<span id="1910">1910</span>
+<span id="1911">1911</span>
+<span id="1912">1912</span>
+<span id="1913">1913</span>
+<span id="1914">1914</span>
+<span id="1915">1915</span>
+<span id="1916">1916</span>
+<span id="1917">1917</span>
+<span id="1918">1918</span>
+<span id="1919">1919</span>
+<span id="1920">1920</span>
+<span id="1921">1921</span>
+<span id="1922">1922</span>
+<span id="1923">1923</span>
+<span id="1924">1924</span>
+<span id="1925">1925</span>
+<span id="1926">1926</span>
+<span id="1927">1927</span>
+<span id="1928">1928</span>
+<span id="1929">1929</span>
+<span id="1930">1930</span>
+<span id="1931">1931</span>
+<span id="1932">1932</span>
+<span id="1933">1933</span>
+<span id="1934">1934</span>
+<span id="1935">1935</span>
+<span id="1936">1936</span>
+<span id="1937">1937</span>
+<span id="1938">1938</span>
+<span id="1939">1939</span>
+<span id="1940">1940</span>
+<span id="1941">1941</span>
+<span id="1942">1942</span>
+<span id="1943">1943</span>
+<span id="1944">1944</span>
+<span id="1945">1945</span>
 </pre><pre class="rust"><code><span class="doccomment">//! All the events this library handles.</span>
 
 <span class="kw">use</span> <span class="ident">std::collections::HashMap</span>;
@@ -1862,12 +1972,41 @@
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::internal::prelude</span>::<span class="kw-2">*</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::application::command::CommandPermission</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::application::interaction::Interaction</span>;
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::guild::automod</span>::{<span class="ident">ActionExecution</span>, <span class="ident">Rule</span>};
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
 <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">transparent</span>)]</span>
 <span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ApplicationCommandPermissionsUpdateEvent</span> {
     <span class="kw">pub</span> <span class="ident">permission</span>: <span class="ident">CommandPermission</span>,
+}
+
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
+<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">transparent</span>)]</span>
+<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">AutoModerationRuleCreateEvent</span> {
+    <span class="kw">pub</span> <span class="ident">rule</span>: <span class="ident">Rule</span>,
+}
+
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
+<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">transparent</span>)]</span>
+<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">AutoModerationRuleUpdateEvent</span> {
+    <span class="kw">pub</span> <span class="ident">rule</span>: <span class="ident">Rule</span>,
+}
+
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
+<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">transparent</span>)]</span>
+<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">AutoModerationRuleDeleteEvent</span> {
+    <span class="kw">pub</span> <span class="ident">rule</span>: <span class="ident">Rule</span>,
+}
+
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
+<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">transparent</span>)]</span>
+<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">AutoModerationActionExecutionEvent</span> {
+    <span class="kw">pub</span> <span class="ident">execution</span>: <span class="ident">ActionExecution</span>,
 }
 
 <span class="doccomment">/// Event data for the channel creation event.</span>
@@ -2539,6 +2678,34 @@
     <span class="doccomment">/// [`Command`]: crate::model::application::command::Command</span>
     <span class="doccomment">/// [`EventHandler::application_command_permissions_update`]: crate::client::EventHandler::application_command_permissions_update</span>
     <span class="ident">ApplicationCommandPermissionsUpdate</span>(<span class="ident">ApplicationCommandPermissionsUpdateEvent</span>),
+    <span class="doccomment">/// A [`Rule`] was created.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// Fires the [`EventHandler::auto_moderation_rule_create`] event.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// [`EventHandler::auto_moderation_rule_create`]:</span>
+    <span class="doccomment">/// crate::client::EventHandler::auto_moderation_rule_create</span>
+    <span class="ident">AutoModerationRuleCreate</span>(<span class="ident">AutoModerationRuleCreateEvent</span>),
+    <span class="doccomment">/// A [`Rule`] has been updated.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// Fires the [`EventHandler::auto_moderation_rule_update`] event.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// [`EventHandler::auto_moderation_rule_update`]:</span>
+    <span class="doccomment">/// crate::client::EventHandler::auto_moderation_rule_update</span>
+    <span class="ident">AutoModerationRuleUpdate</span>(<span class="ident">AutoModerationRuleUpdateEvent</span>),
+    <span class="doccomment">/// A [`Rule`] was deleted.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// Fires the [`EventHandler::auto_moderation_rule_delete`] event.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// [`EventHandler::auto_moderation_rule_delete`]:</span>
+    <span class="doccomment">/// crate::client::EventHandler::auto_moderation_rule_delete</span>
+    <span class="ident">AutoModerationRuleDelete</span>(<span class="ident">AutoModerationRuleDeleteEvent</span>),
+    <span class="doccomment">/// A [`Rule`] was triggered and an action was executed.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// Fires the [`EventHandler::auto_moderation_action_execution`] event.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// [`EventHandler::auto_moderation_action_execution`]:</span>
+    <span class="doccomment">/// crate::client::EventHandler::auto_moderation_action_execution</span>
+    <span class="ident">AutoModerationActionExecution</span>(<span class="ident">AutoModerationActionExecutionEvent</span>),
     <span class="doccomment">/// A [`Channel`] was created.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// Fires the [`EventHandler::channel_create`] event.</span>
@@ -2699,6 +2866,30 @@
                 <span class="ident">guild_id</span>: <span class="prelude-val">Some</span>(<span class="ident">e</span>.<span class="ident">permission</span>.<span class="ident">guild_id</span>),
                 <span class="ident">channel_id</span>: <span class="ident">Never</span>,
                 <span class="ident">message_id</span>: <span class="ident">Never</span>,
+            },
+            <span class="ident"><span class="self">Self</span>::AutoModerationRuleCreate</span>, <span class="ident"><span class="self">Self</span>::AutoModerationRuleCreate</span>(<span class="ident">e</span>) =&gt; {
+                <span class="ident">user_id</span>: <span class="prelude-val">Some</span>(<span class="ident">e</span>.<span class="ident">rule</span>.<span class="ident">creator_id</span>),
+                <span class="ident">guild_id</span>: <span class="prelude-val">Some</span>(<span class="ident">e</span>.<span class="ident">rule</span>.<span class="ident">guild_id</span>),
+                <span class="ident">channel_id</span>: <span class="ident">Never</span>,
+                <span class="ident">message_id</span>: <span class="ident">Never</span>,
+            },
+            <span class="ident"><span class="self">Self</span>::AutoModerationRuleUpdate</span>, <span class="ident"><span class="self">Self</span>::AutoModerationRuleUpdate</span>(<span class="ident">e</span>) =&gt; {
+                <span class="ident">user_id</span>: <span class="prelude-val">Some</span>(<span class="ident">e</span>.<span class="ident">rule</span>.<span class="ident">creator_id</span>),
+                <span class="ident">guild_id</span>: <span class="prelude-val">Some</span>(<span class="ident">e</span>.<span class="ident">rule</span>.<span class="ident">guild_id</span>),
+                <span class="ident">channel_id</span>: <span class="ident">Never</span>,
+                <span class="ident">message_id</span>: <span class="ident">Never</span>,
+            },
+            <span class="ident"><span class="self">Self</span>::AutoModerationRuleDelete</span>, <span class="ident"><span class="self">Self</span>::AutoModerationRuleDelete</span>(<span class="ident">e</span>) =&gt; {
+                <span class="ident">user_id</span>: <span class="prelude-val">Some</span>(<span class="ident">e</span>.<span class="ident">rule</span>.<span class="ident">creator_id</span>),
+                <span class="ident">guild_id</span>: <span class="prelude-val">Some</span>(<span class="ident">e</span>.<span class="ident">rule</span>.<span class="ident">guild_id</span>),
+                <span class="ident">channel_id</span>: <span class="ident">Never</span>,
+                <span class="ident">message_id</span>: <span class="ident">Never</span>,
+            },
+            <span class="ident"><span class="self">Self</span>::AutoModerationActionExecution</span>, <span class="ident"><span class="self">Self</span>::AutoModerationActionExecution</span>(<span class="ident">e</span>) =&gt; {
+                <span class="ident">user_id</span>: <span class="prelude-val">Some</span>(<span class="ident">e</span>.<span class="ident">execution</span>.<span class="ident">user_id</span>),
+                <span class="ident">guild_id</span>: <span class="prelude-val">Some</span>(<span class="ident">e</span>.<span class="ident">execution</span>.<span class="ident">guild_id</span>),
+                <span class="ident">channel_id</span>: <span class="ident">e</span>.<span class="ident">execution</span>.<span class="ident">channel_id</span>.<span class="ident">into</span>(),
+                <span class="ident">message_id</span>: <span class="ident">e</span>.<span class="ident">execution</span>.<span class="ident">message_id</span>.<span class="ident">into</span>(),
             },
             <span class="ident"><span class="self">Self</span>::ChannelCreate</span>, <span class="ident"><span class="self">Self</span>::ChannelCreate</span>(<span class="ident">e</span>) =&gt; {
                 <span class="ident">user_id</span>: <span class="ident">Never</span>,
@@ -3140,6 +3331,10 @@
             <span class="ident"><span class="self">Self</span>::ApplicationCommandPermissionsUpdate</span>(<span class="kw">_</span>) =&gt; {
                 <span class="ident">EventType::ApplicationCommandPermissionsUpdate</span>
             },
+            <span class="ident"><span class="self">Self</span>::AutoModerationRuleCreate</span>(<span class="kw">_</span>) =&gt; <span class="ident">EventType::AutoModerationRuleCreate</span>,
+            <span class="ident"><span class="self">Self</span>::AutoModerationRuleUpdate</span>(<span class="kw">_</span>) =&gt; <span class="ident">EventType::AutoModerationRuleUpdate</span>,
+            <span class="ident"><span class="self">Self</span>::AutoModerationRuleDelete</span>(<span class="kw">_</span>) =&gt; <span class="ident">EventType::AutoModerationRuleDelete</span>,
+            <span class="ident"><span class="self">Self</span>::AutoModerationActionExecution</span>(<span class="kw">_</span>) =&gt; <span class="ident">EventType::AutoModerationActionExecution</span>,
             <span class="ident"><span class="self">Self</span>::ChannelCreate</span>(<span class="kw">_</span>) =&gt; <span class="ident">EventType::ChannelCreate</span>,
             <span class="ident"><span class="self">Self</span>::ChannelDelete</span>(<span class="kw">_</span>) =&gt; <span class="ident">EventType::ChannelDelete</span>,
             <span class="ident"><span class="self">Self</span>::ChannelPinsUpdate</span>(<span class="kw">_</span>) =&gt; <span class="ident">EventType::ChannelPinsUpdate</span>,
@@ -3264,6 +3459,22 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// This maps to [`ApplicationCommandPermissionsUpdateEvent`].</span>
     <span class="ident">ApplicationCommandPermissionsUpdate</span>,
+    <span class="doccomment">/// Indicator that an auto moderation rule create payload was received.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// This maps to [`AutoModerationRuleCreateEvent`].</span>
+    <span class="ident">AutoModerationRuleCreate</span>,
+    <span class="doccomment">/// Indicator that an auto moderation rule update payload was received.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// This maps to [`AutoModerationRuleCreateEvent`].</span>
+    <span class="ident">AutoModerationRuleUpdate</span>,
+    <span class="doccomment">/// Indicator that an auto moderation rule delete payload was received.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// This maps to [`AutoModerationRuleDeleteEvent`].</span>
+    <span class="ident">AutoModerationRuleDelete</span>,
+    <span class="doccomment">/// Indicator that an auto moderation action execution payload was received.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// This maps to [`AutoModerationActionExecutionEvent`].</span>
+    <span class="ident">AutoModerationActionExecution</span>,
     <span class="doccomment">/// Indicator that a channel create payload was received.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// This maps to [`ChannelCreateEvent`].</span>
@@ -3549,6 +3760,10 @@
 <span class="kw">impl</span> <span class="ident">EventType</span> {
     <span class="kw">const</span> <span class="ident">APPLICATION_COMMAND_PERMISSIONS_UPDATE</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> <span class="op">=</span>
         <span class="string">&quot;APPLICATION_COMMAND_PERMISSIONS_UPDATE&quot;</span>;
+    <span class="kw">const</span> <span class="ident">AUTO_MODERATION_RULE_CREATE</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;AUTO_MODERATION_RULE_CREATE&quot;</span>;
+    <span class="kw">const</span> <span class="ident">AUTO_MODERATION_RULE_UPDATE</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;AUTO_MODERATION_RULE_UPDATE&quot;</span>;
+    <span class="kw">const</span> <span class="ident">AUTO_MODERATION_RULE_DELETE</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;AUTO_MODERATION_RULE_DELETE&quot;</span>;
+    <span class="kw">const</span> <span class="ident">AUTO_MODERATION_ACTION_EXECUTION</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;AUTO_MODERATION_ACTION_EXECUTION&quot;</span>;
     <span class="kw">const</span> <span class="ident">CHANNEL_CREATE</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;CHANNEL_CREATE&quot;</span>;
     <span class="kw">const</span> <span class="ident">CHANNEL_DELETE</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;CHANNEL_DELETE&quot;</span>;
     <span class="kw">const</span> <span class="ident">CHANNEL_PINS_UPDATE</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;CHANNEL_PINS_UPDATE&quot;</span>;
@@ -3614,6 +3829,10 @@
             <span class="ident"><span class="self">Self</span>::ApplicationCommandPermissionsUpdate</span> =&gt; {
                 <span class="prelude-val">Some</span>(<span class="ident"><span class="self">Self</span>::APPLICATION_COMMAND_PERMISSIONS_UPDATE</span>)
             },
+            <span class="ident"><span class="self">Self</span>::AutoModerationRuleCreate</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident"><span class="self">Self</span>::AUTO_MODERATION_RULE_CREATE</span>),
+            <span class="ident"><span class="self">Self</span>::AutoModerationRuleUpdate</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident"><span class="self">Self</span>::AUTO_MODERATION_RULE_UPDATE</span>),
+            <span class="ident"><span class="self">Self</span>::AutoModerationRuleDelete</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident"><span class="self">Self</span>::AUTO_MODERATION_RULE_DELETE</span>),
+            <span class="ident"><span class="self">Self</span>::AutoModerationActionExecution</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident"><span class="self">Self</span>::AUTO_MODERATION_ACTION_EXECUTION</span>),
             <span class="ident"><span class="self">Self</span>::ChannelCreate</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident"><span class="self">Self</span>::CHANNEL_CREATE</span>),
             <span class="ident"><span class="self">Self</span>::ChannelDelete</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident"><span class="self">Self</span>::CHANNEL_DELETE</span>),
             <span class="ident"><span class="self">Self</span>::ChannelPinsUpdate</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident"><span class="self">Self</span>::CHANNEL_PINS_UPDATE</span>),
@@ -3676,5 +3895,5 @@
     <span class="macro">with_related_ids_for_event_types!</span>(<span class="ident">define_related_ids_for_event_type</span>);
 }
 </code></pre></div>
-</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.61.0-nightly (3c17c84a3 2022-03-21)" ></div>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.63.0-nightly (10f4ce324 2022-06-22)" ></div>
 </body></html>

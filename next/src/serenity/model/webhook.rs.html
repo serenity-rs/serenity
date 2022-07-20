@@ -1,9 +1,10 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/model/webhook.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>webhook.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script src="../../../crates.js"></script><script defer src="../../../main.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script>
-    <noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../serenity/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/model/webhook.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>webhook.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../serenity/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div>
         </a><h2 class="location"></h2>
     </nav>
     <nav class="sidebar"><a class="sidebar-logo" href="../../../serenity/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div>
-        </a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../serenity/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><div class="theme-picker hidden"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="22" height="22" alt="Pick another theme!" src="../../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+        </a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../serenity/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><button type="button" id="help-button" title="help">?</button><div id="settings-menu" tabindex="-1">
+                                <a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div>
+                        </div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -526,41 +527,6 @@
 <span id="521">521</span>
 <span id="522">522</span>
 <span id="523">523</span>
-<span id="524">524</span>
-<span id="525">525</span>
-<span id="526">526</span>
-<span id="527">527</span>
-<span id="528">528</span>
-<span id="529">529</span>
-<span id="530">530</span>
-<span id="531">531</span>
-<span id="532">532</span>
-<span id="533">533</span>
-<span id="534">534</span>
-<span id="535">535</span>
-<span id="536">536</span>
-<span id="537">537</span>
-<span id="538">538</span>
-<span id="539">539</span>
-<span id="540">540</span>
-<span id="541">541</span>
-<span id="542">542</span>
-<span id="543">543</span>
-<span id="544">544</span>
-<span id="545">545</span>
-<span id="546">546</span>
-<span id="547">547</span>
-<span id="548">548</span>
-<span id="549">549</span>
-<span id="550">550</span>
-<span id="551">551</span>
-<span id="552">552</span>
-<span id="553">553</span>
-<span id="554">554</span>
-<span id="555">555</span>
-<span id="556">556</span>
-<span id="557">557</span>
-<span id="558">558</span>
 </pre><pre class="rust"><code><span class="doccomment">//! Webhook model and implementations.</span>
 
 <span class="kw">use</span> <span class="ident">std::fmt</span>;
@@ -687,9 +653,6 @@
     <span class="doccomment">/// not exist.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// May also return an [`Error::Json`] if there is an error in deserialising Discord&#39;s response.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`Error::Http`]: crate::error::Error::Http</span>
-    <span class="doccomment">/// [`Error::Json`]: crate::error::Error::Json</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">from_id</span>(<span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>, <span class="ident">webhook_id</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">WebhookId</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
         <span class="ident">http</span>.<span class="ident">as_ref</span>().<span class="ident">get_webhook</span>(<span class="ident">webhook_id</span>.<span class="ident">into</span>().<span class="ident">get</span>()).<span class="kw">await</span>
     }
@@ -721,9 +684,6 @@
     <span class="doccomment">/// Returns an [`Error::Http`] if the webhook does not exist, or if the token is invalid.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// May also return an [`Error::Json`] if there is an error in deserialising Discord&#39;s response.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`Error::Http`]: crate::error::Error::Http</span>
-    <span class="doccomment">/// [`Error::Json`]: crate::error::Error::Json</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">from_id_with_token</span>(
         <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>,
         <span class="ident">webhook_id</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">WebhookId</span><span class="op">&gt;</span>,
@@ -757,9 +717,6 @@
     <span class="doccomment">/// Returns an [`Error::Http`] if the url is malformed, or otherwise if the webhook does not exist, or if the token is invalid.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// May also return an [`Error::Json`] if there is an error in deserialising Discord&#39;s response.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`Error::Http`]: crate::error::Error::Http</span>
-    <span class="doccomment">/// [`Error::Json`]: crate::error::Error::Json</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">from_url</span>(<span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>, <span class="ident">url</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
         <span class="ident">http</span>.<span class="ident">as_ref</span>().<span class="ident">get_webhook_from_url</span>(<span class="ident">url</span>).<span class="kw">await</span>
     }
@@ -776,9 +733,6 @@
     <span class="doccomment">/// May also return an [`Error::Http`] if the webhook does not exist,</span>
     <span class="doccomment">/// the token is invalid, or if the webhook could not otherwise</span>
     <span class="doccomment">/// be deleted.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`Error::Model`]: crate::error::Error::Model</span>
-    <span class="doccomment">/// [`Error::Http`]: crate::error::Error::Http</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">delete</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">token</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">token</span>.<span class="ident">as_ref</span>().<span class="ident">ok_or</span>(<span class="ident">ModelError::NoTokenSet</span>)<span class="question-mark">?</span>;
@@ -889,10 +843,6 @@
     <span class="doccomment">/// May also return an [`Error::Http`] if the content is malformed, or if the webhook&#39;s token is invalid.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// Or may return an [`Error::Json`] if there is an error deserialising Discord&#39;s response.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`Error::Model`]: crate::error::Error::Model</span>
-    <span class="doccomment">/// [`Error::Http`]: crate::error::Error::Http</span>
-    <span class="doccomment">/// [`Error::Json`]: crate::error::Error::Json</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">execute</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">F</span><span class="op">&gt;</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
@@ -992,10 +942,6 @@
     <span class="doccomment">/// the given message Id does not belong to the current webhook.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// Or may return an [`Error::Json`] if there is an error deserialising Discord&#39;s response.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`Error::Model`]: crate::error::Error::Model</span>
-    <span class="doccomment">/// [`Error::Http`]: crate::error::Error::Http</span>
-    <span class="doccomment">/// [`Error::Json`]: crate::error::Error::Json</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_message</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>,
@@ -1016,10 +962,6 @@
     <span class="doccomment">/// the given message Id does not belong to the current webhook.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// Or may return an [`Error::Json`] if there is an error deserialising Discord&#39;s response.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`Error::Model`]: crate::error::Error::Model</span>
-    <span class="doccomment">/// [`Error::Http`]: crate::error::Error::Http</span>
-    <span class="doccomment">/// [`Error::Json`]: crate::error::Error::Json</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">edit_message</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>,
@@ -1044,9 +986,6 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// May also return an [`Error::Http`] if the webhook&#39;s token is invalid or</span>
     <span class="doccomment">/// the given message Id does not belong to the current webhook.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`Error::Model`]: crate::error::Error::Model</span>
-    <span class="doccomment">/// [`Error::Http`]: crate::error::Error::Http</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">delete_message</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>,
@@ -1070,10 +1009,6 @@
     <span class="doccomment">/// Such as if the [`Webhook`] was deleted.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// Or may return an [`Error::Json`] if there is an error deserialising Discord&#39;s response.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`Error::Model`]: crate::error::Error::Model</span>
-    <span class="doccomment">/// [`Error::Http`]: crate::error::Error::Http</span>
-    <span class="doccomment">/// [`Error::Json`]: crate::error::Error::Json</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">refresh</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">token</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">token</span>.<span class="ident">as_ref</span>().<span class="ident">ok_or</span>(<span class="ident">ModelError::NoTokenSet</span>)<span class="question-mark">?</span>;
         <span class="ident">http</span>.<span class="ident">as_ref</span>().<span class="ident">get_webhook_with_token</span>(<span class="self">self</span>.<span class="ident">id</span>.<span class="ident">get</span>(), <span class="ident">token</span>).<span class="kw">await</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">replacement</span><span class="op">|</span> {
@@ -1090,8 +1025,6 @@
     <span class="doccomment">/// # Errors</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// Returns an [`Error::Model`] if the [`Self::token`] is [`None`].</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`Error::Model`]: crate::error::Error::Model</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">url</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">token</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">token</span>.<span class="ident">as_ref</span>().<span class="ident">ok_or</span>(<span class="ident">ModelError::NoTokenSet</span>)<span class="question-mark">?</span>;
         <span class="prelude-val">Ok</span>(<span class="macro">format!</span>(<span class="string">&quot;https://discord.com/api/webhooks/{}/{}&quot;</span>, <span class="self">self</span>.<span class="ident">id</span>, <span class="ident">token</span>))
@@ -1112,13 +1045,11 @@
     <span class="doccomment">/// May also return an [`Error::Json`] if there is an error in deserialising the response.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// [Manage Webhooks]: super::permissions::Permissions::MANAGE_WEBHOOKS</span>
-    <span class="doccomment">/// [`Error::Http`]: crate::error::Error::Http</span>
-    <span class="doccomment">/// [`Error::Json`]: crate::error::Error::Json</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">to_webhook</span>(<span class="self">self</span>, <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Webhook</span><span class="op">&gt;</span> {
         <span class="ident">http</span>.<span class="ident">as_ref</span>().<span class="ident">get_webhook</span>(<span class="self">self</span>.<span class="ident">get</span>()).<span class="kw">await</span>
     }
 }
 </code></pre></div>
-</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.61.0-nightly (3c17c84a3 2022-03-21)" ></div>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.63.0-nightly (10f4ce324 2022-06-22)" ></div>
 </body></html>

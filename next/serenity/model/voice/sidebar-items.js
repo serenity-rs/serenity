@@ -1,1 +1,1 @@
-initSidebarItems({"struct":[["VoiceRegion","Information about an available voice region."],["VoiceState","A user’s state within a voice channel."]]});
+window.SIDEBAR_ITEMS = {"struct":[["VoiceRegion","Information about an available voice region."],["VoiceState","A user’s state within a voice channel."]]};

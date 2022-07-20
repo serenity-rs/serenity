@@ -1,1 +1,1 @@
-initSidebarItems({"mod":[["standard",""]],"trait":[["Framework","A trait for defining your own framework for serenity to use."]]});
+window.SIDEBAR_ITEMS = {"mod":[["standard",""]],"trait":[["Framework","A trait for defining your own framework for serenity to use."]]};
