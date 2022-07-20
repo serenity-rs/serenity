@@ -611,7 +611,7 @@ mod tests {
             Token::StructEnd,
         ]);
 
-        let value = Action::Alert(ChannelId(123));
+        let value = Action::Alert(ChannelId::new(123));
         serde_test::assert_tokens(&value, &[
             Token::Struct {
                 name: "Action",

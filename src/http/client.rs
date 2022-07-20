@@ -2450,7 +2450,7 @@ impl Http {
         let body = to_vec(&map)?;
 
         self.fire(Request {
-            body: Some(&body),
+            body: Some(body),
             multipart: None,
             headers: None,
             route: RouteInfo::CreateAutoModRule {
@@ -2472,7 +2472,7 @@ impl Http {
         let body = to_vec(&map)?;
 
         self.fire(Request {
-            body: Some(&body),
+            body: Some(body),
             multipart: None,
             headers: None,
             route: RouteInfo::EditAutoModRule {

@@ -144,10 +144,8 @@ pub struct MessageId(#[serde(with = "snowflake")] pub NonZeroU64);
 pub struct RoleId(#[serde(with = "snowflake")] pub NonZeroU64);
 
 /// An identifier for an auto moderation rule
-#[derive(
-    Copy, Clone, Default, Debug, Eq, Hash, PartialEq, PartialOrd, Ord, Deserialize, Serialize,
-)]
-pub struct RuleId(#[serde(with = "snowflake")] pub u64);
+#[derive(Copy, Clone, Debug, Eq, Hash, PartialEq, PartialOrd, Ord, Deserialize, Serialize)]
+pub struct RuleId(#[serde(with = "snowflake")] pub NonZeroU64);
 
 /// An identifier for a Scheduled Event
 #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
