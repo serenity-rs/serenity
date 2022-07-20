@@ -54,8 +54,11 @@ impl EditAutoModRule {
     /// Set roles that should not be affected by the rule.
     ///
     /// Maximum of 20.
-    pub fn exempt_roles(&mut self, roles: Vec<RoleId>) -> &mut Self {
-        self.exempt_roles = Some(roles);
+    pub fn exempt_roles(
+        &mut self,
+        roles: impl IntoIterator<Item = impl Into<RoleId>>,
+    ) -> &mut Self {
+        self.exempt_roles = Some(roles.into_iter().map(Into::into).collect());
         self
     }
 
