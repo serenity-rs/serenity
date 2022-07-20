@@ -1,4 +1,3 @@
-use std::convert::TryFrom;
 use std::fmt;
 #[cfg(feature = "model")]
 use std::sync::Arc;

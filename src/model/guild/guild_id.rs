@@ -91,7 +91,7 @@ impl GuildId {
     /// # async fn run() {
     /// # use serenity::http::Http;
     /// # let http = Http::new("token");
-    /// let _rule = GuildId(7)
+    /// let _rule = GuildId::new(7)
     ///     .create_automod_rule(&http, |r| {
     ///         r.name("foobar filter")
     ///             .trigger(Trigger::Keyword(vec!["foo*".to_string(), "*bar".to_string()]))
