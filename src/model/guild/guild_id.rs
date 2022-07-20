@@ -33,7 +33,7 @@ use crate::http::{CacheHttp, Http, UserPagination};
 #[cfg(feature = "model")]
 use crate::internal::prelude::*;
 #[cfg(feature = "model")]
-use crate::json::json;
+use crate::json::{self, json};
 #[cfg(feature = "model")]
 use crate::model::application::command::{Command, CommandPermission};
 #[cfg(feature = "model")]
@@ -53,7 +53,7 @@ impl GuildId {
     /// [Manage Guild]: Permissions::MANAGE_GUILD
     #[inline]
     pub async fn automod_rules(self, http: impl AsRef<Http>) -> Result<Vec<Rule>> {
-        http.as_ref().get_automod_rules(self.0).await
+        http.as_ref().get_automod_rules(self.get()).await
     }
 
     /// Gets an auto moderation [`Rule`] of this guild by its ID via HTTP.
@@ -71,7 +71,7 @@ impl GuildId {
         http: impl AsRef<Http>,
         rule_id: impl Into<RuleId>,
     ) -> Result<Rule> {
-        http.as_ref().get_automod_rule(self.0, rule_id.into().0).await
+        http.as_ref().get_automod_rule(self.get(), rule_id.into().0.get()).await
     }
 
     /// Creates an auto moderation [`Rule`] in the guild.
@@ -91,7 +91,7 @@ impl GuildId {
     /// # async fn run() {
     /// # use serenity::http::Http;
     /// # let http = Http::new("token");
-    /// let _rule = GuildId(7)
+    /// let _rule = GuildId::new(7)
     ///     .create_automod_rule(&http, |r| {
     ///         r.name("foobar filter")
     ///             .trigger(Trigger::Keyword(vec!["foo*".to_string(), "*bar".to_string()]))
@@ -118,7 +118,7 @@ impl GuildId {
 
         let map = json::hashmap_to_json_map(builder.0);
 
-        http.as_ref().create_automod_rule(self.0, &map).await
+        http.as_ref().create_automod_rule(self.get(), &map).await
     }
 
     /// Edit an auto moderation [`Rule`] by its ID.
@@ -143,7 +143,7 @@ impl GuildId {
 
         let map = json::hashmap_to_json_map(builder.0);
 
-        http.as_ref().edit_automod_rule(self.0, rule_id.into().0, &map).await
+        http.as_ref().edit_automod_rule(self.get(), rule_id.into().0.get(), &map).await
     }
 
     /// Deletes an auto moderation [`Rule`] from the guild.
@@ -162,7 +162,7 @@ impl GuildId {
         http: impl AsRef<Http>,
         rule_id: impl Into<RuleId>,
     ) -> Result<()> {
-        http.as_ref().delete_automod_rule(self.0, rule_id.into().0).await
+        http.as_ref().delete_automod_rule(self.get(), rule_id.into().0.get()).await
     }
 
     /// Adds a [`User`] to this guild with a valid OAuth2 access token.
