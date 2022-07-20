@@ -117,24 +117,14 @@ pub struct CommonFilterOptions<FilterItem> {
 }
 
 #[must_use = "Builders must be built"]
-pub struct CollectorBuilder<'a, Item: Collectable> {
+pub struct CollectorBuilder<'a, Item: Collectable, const CAN_COLLECT_SINGLE: bool> {
     common_options: CommonFilterOptions<Item::FilterItem>,
     filter_options: Item::FilterOptions,
     shard_messenger: &'a ShardMessenger,
     timeout: Option<Pin<Box<Sleep>>>,
 }
 
-impl<'a, Item: Collectable> CollectorBuilder<'a, Item> {
-    pub fn new(shard_messenger: &'a ShardMessenger) -> Self {
-        Self {
-            shard_messenger,
-
-            timeout: None,
-            common_options: CommonFilterOptions::default(),
-            filter_options: Item::FilterOptions::default(),
-        }
-    }
-
+impl<'a, Item: Collectable, const S: bool> CollectorBuilder<'a, Item, S> {
     pub fn build(self) -> Collector<Item>
     where
         Filter<Item>: FilterTrait<Item>,
@@ -160,11 +150,16 @@ impl<'a, Item: Collectable> CollectorBuilder<'a, Item> {
 
     /// Limits how many items can be collected.
     ///
-    /// An item is considered *collected*, if the message passes all the requirements.
-    pub fn collect_limit(mut self, limit: u32) -> Self {
+    /// An item is considered *collected*, if the item passes all the requirements.
+    pub fn collect_limit(mut self, limit: u32) -> CollectorBuilder<'a, Item, false> {
         self.common_options.collect_limit = NonZeroU32::new(limit);
 
-        self
+        CollectorBuilder {
+            timeout: self.timeout,
+            common_options: self.common_options,
+            filter_options: self.filter_options,
+            shard_messenger: self.shard_messenger,
+        }
     }
 
     /// Limits how many events will attempt to be filtered.
@@ -182,10 +177,21 @@ impl<'a, Item: Collectable> CollectorBuilder<'a, Item> {
     }
 }
 
-impl<Item: Collectable + Send + Sync + 'static> CollectorBuilder<'_, Item>
+impl<'a, Item> CollectorBuilder<'a, Item, true>
 where
+    Item: Collectable + Send + Sync + 'static,
     Filter<Item>: FilterTrait<Item>,
 {
+    pub fn new(shard_messenger: &'a ShardMessenger) -> Self {
+        Self {
+            shard_messenger,
+
+            timeout: None,
+            common_options: CommonFilterOptions::default(),
+            filter_options: Item::FilterOptions::default(),
+        }
+    }
+
     pub async fn collect_single(self) -> Option<Arc<Item>> {
         let mut collector = self.build();
         collector.next().await

@@ -33,7 +33,7 @@ pub struct FilterOptions {
     message_id: Option<NonZeroU64>,
 }
 
-impl super::CollectorBuilder<'_, ModalSubmitInteraction> {
+impl<const S: bool> super::CollectorBuilder<'_, ModalSubmitInteraction, S> {
     impl_channel_id!("Sets the channel on which the interaction must occur. If an interaction is not on a message with this channel ID, it won't be received.");
     impl_guild_id!("Sets the guild in which the interaction must occur. If an interaction is not on a message with this guild ID, it won't be received.");
     impl_message_id!("Sets the message on which the interaction must occur. If an interaction is not on a message with this ID, it won't be received.");
@@ -49,8 +49,9 @@ impl super::Collectable for ModalSubmitInteraction {
 
 /// A modal interaction collector receives interactions matching a the given filter for a set duration.
 pub type ModalInteractionCollector = super::Collector<ModalSubmitInteraction>;
-pub type ModalInteractionCollectorBuilder<'a> = super::CollectorBuilder<'a, ModalSubmitInteraction>;
+pub type ModalInteractionCollectorBuilder<'a, const S: bool> =
+    super::CollectorBuilder<'a, ModalSubmitInteraction, S>;
 pub type ModalInteractionFilter = Filter<ModalSubmitInteraction>;
 
 #[deprecated = "Use ModalInteractionCollectorBuilder::collect_single"]
-pub type CollectModalInteraction<'a> = ModalInteractionCollectorBuilder<'a>;
+pub type CollectModalInteraction<'a> = ModalInteractionCollectorBuilder<'a, true>;

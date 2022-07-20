@@ -1436,12 +1436,13 @@ impl GuildId {
     pub async fn webhooks(self, http: impl AsRef<Http>) -> Result<Vec<Webhook>> {
         http.as_ref().get_guild_webhooks(self.get()).await
     }
+
     /// Returns a builder which can be awaited to obtain a message or stream of messages in this guild.
     #[cfg(feature = "collector")]
     pub fn reply_collector<'a>(
         &self,
         shard_messenger: &'a ShardMessenger,
-    ) -> MessageCollectorBuilder<'a> {
+    ) -> MessageCollectorBuilder<'a, true> {
         MessageCollectorBuilder::new(shard_messenger).guild_id(self.0)
     }
 
@@ -1450,7 +1451,7 @@ impl GuildId {
     pub fn reaction_collector<'a>(
         &self,
         shard_messenger: &'a ShardMessenger,
-    ) -> ReactionCollectorBuilder<'a> {
+    ) -> ReactionCollectorBuilder<'a, true> {
         ReactionCollectorBuilder::new(shard_messenger).guild_id(self.0)
     }
 

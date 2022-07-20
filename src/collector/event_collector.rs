@@ -44,7 +44,7 @@ pub struct FilterOptions {
     message_id: Vec<MessageId>,
 }
 
-impl super::CollectorBuilder<'_, Event> {
+impl<const S: bool> super::CollectorBuilder<'_, Event, S> {
     fn validate_related_ids(self) -> Result<Self> {
         let related = self.filter_options.event_types.iter().map(EventType::related_ids).fold(
             RelatedIdsForEventType::default(),
@@ -118,7 +118,7 @@ impl super::CollectorBuilder<'_, Event> {
 
 /// An event collector receives events matching the given filter for a set duration.
 pub type EventCollector = super::Collector<Event>;
-pub type EventCollectorBuilder<'a> = super::CollectorBuilder<'a, Event>;
+pub type EventCollectorBuilder<'a, const S: bool> = super::CollectorBuilder<'a, Event, S>;
 pub type EventFilter = super::Filter<Event>;
 
 // No deprecated CollectSingle alias as EventCollector never had a CollectSingle version.

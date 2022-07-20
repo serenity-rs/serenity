@@ -29,7 +29,7 @@ pub struct FilterOptions {
     author_id: Option<NonZeroU64>,
 }
 
-impl super::CollectorBuilder<'_, Message> {
+impl<const S: bool> super::CollectorBuilder<'_, Message, S> {
     impl_channel_id!("Sets the required channel ID of a message. If a message does not meet this ID, it won't be received.");
     impl_author_id!("Sets the required author ID of a message. If a message does not meet this ID, it won't be received.");
     impl_guild_id!("Sets the required guild ID of a message. If a message does not meet this ID, it won't be received.");
@@ -43,9 +43,9 @@ impl super::Collectable for Message {
 }
 
 /// A message collector receives messages matching the given filter for a set duration.
-pub type MessageCollectorBuilder<'a> = super::CollectorBuilder<'a, Message>;
+pub type MessageCollectorBuilder<'a, const S: bool> = super::CollectorBuilder<'a, Message, S>;
 pub type MessageCollector = super::Collector<Message>;
 pub type MessageFilter = Filter<Message>;
 
 #[deprecated = "Use MessageCollectorBuilder::collect_single"]
-pub type CollectReply<'a> = MessageCollectorBuilder<'a>;
+pub type CollectReply<'a> = MessageCollectorBuilder<'a, true>;

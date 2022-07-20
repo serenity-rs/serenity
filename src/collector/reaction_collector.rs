@@ -121,7 +121,7 @@ impl Default for FilterOptions {
     }
 }
 
-impl super::CollectorBuilder<'_, ReactionAction> {
+impl<const S: bool> super::CollectorBuilder<'_, ReactionAction, S> {
     /// If set to `true`, added reactions will be collected.
     ///
     /// Set to `true` by default.
@@ -155,8 +155,9 @@ impl super::Collectable for ReactionAction {
 
 /// A reaction collector receives reactions matching a the given filter for a set duration.
 pub type ReactionCollector = super::Collector<ReactionAction>;
-pub type ReactionCollectorBuilder<'a> = super::CollectorBuilder<'a, ReactionAction>;
+pub type ReactionCollectorBuilder<'a, const S: bool> =
+    super::CollectorBuilder<'a, ReactionAction, S>;
 pub type ReactionFilter = Filter<ReactionAction>;
 
 #[deprecated = "Use ReactionCollectorBuilder::collect_single"]
-pub type CollectReaction<'a> = ReactionCollectorBuilder<'a>;
+pub type CollectReaction<'a> = ReactionCollectorBuilder<'a, true>;

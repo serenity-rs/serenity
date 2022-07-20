@@ -829,7 +829,7 @@ impl Message {
     pub fn reaction_collector<'a>(
         &self,
         shard_messenger: &'a ShardMessenger,
-    ) -> ReactionCollectorBuilder<'a> {
+    ) -> ReactionCollectorBuilder<'a, true> {
         ReactionCollectorBuilder::new(shard_messenger).message_id(self.id.0)
     }
 
@@ -838,7 +838,7 @@ impl Message {
     pub fn component_interaction_collector<'a>(
         &self,
         shard_messenger: &'a ShardMessenger,
-    ) -> ComponentInteractionCollectorBuilder<'a> {
+    ) -> ComponentInteractionCollectorBuilder<'a, true> {
         ComponentInteractionCollectorBuilder::new(shard_messenger).message_id(self.id.0)
     }
 
@@ -847,7 +847,7 @@ impl Message {
     pub fn modal_interaction_collector<'a>(
         &self,
         shard_messenger: &'a ShardMessenger,
-    ) -> ModalInteractionCollectorBuilder<'a> {
+    ) -> ModalInteractionCollectorBuilder<'a, true> {
         ModalInteractionCollectorBuilder::new(shard_messenger).message_id(self.id.0)
     }
 

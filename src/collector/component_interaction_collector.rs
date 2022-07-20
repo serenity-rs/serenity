@@ -33,7 +33,7 @@ pub struct FilterOptions {
     message_id: Option<NonZeroU64>,
 }
 
-impl super::CollectorBuilder<'_, MessageComponentInteraction> {
+impl<const S: bool> super::CollectorBuilder<'_, MessageComponentInteraction, S> {
     impl_channel_id!("Sets the channel on which the interaction must occur. If an interaction is not on a message with this channel ID, it won't be received.");
     impl_guild_id!("Sets the guild in which the interaction must occur. If an interaction is not on a message with this guild ID, it won't be received.");
     impl_message_id!("Sets the message on which the interaction must occur. If an interaction is not on a message with this ID, it won't be received.");
@@ -50,8 +50,8 @@ impl super::Collectable for MessageComponentInteraction {
 /// A component interaction collector receives interactions matching a the given filter for a set duration.
 pub type ComponentInteractionCollector = super::Collector<MessageComponentInteraction>;
 pub type ComponentInteractionFilter = Filter<MessageComponentInteraction>;
-pub type ComponentInteractionCollectorBuilder<'a> =
-    super::CollectorBuilder<'a, MessageComponentInteraction>;
+pub type ComponentInteractionCollectorBuilder<'a, const S: bool> =
+    super::CollectorBuilder<'a, MessageComponentInteraction, S>;
 
 #[deprecated = "Use ComponentInteractionCollectorBuilder::collect_single"]
-pub type CollectComponentInteraction<'a> = ComponentInteractionCollectorBuilder<'a>;
+pub type CollectComponentInteraction<'a> = ComponentInteractionCollectorBuilder<'a, true>;

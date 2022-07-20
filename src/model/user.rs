@@ -1021,7 +1021,7 @@ impl User {
     pub fn reply_collector<'a>(
         &self,
         shard_messenger: &'a ShardMessenger,
-    ) -> MessageCollectorBuilder<'a> {
+    ) -> MessageCollectorBuilder<'a, true> {
         MessageCollectorBuilder::new(shard_messenger).author_id(self.id.0)
     }
 
@@ -1030,7 +1030,7 @@ impl User {
     pub fn reaction_collector<'a>(
         &self,
         shard_messenger: &'a ShardMessenger,
-    ) -> ReactionCollectorBuilder<'a> {
+    ) -> ReactionCollectorBuilder<'a, true> {
         ReactionCollectorBuilder::new(shard_messenger).author_id(self.id.0)
     }
 }
