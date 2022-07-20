@@ -4,18 +4,18 @@ use crate::model::id::{ChannelId, RoleId};
 #[derive(Clone, Debug, Serialize)]
 pub struct EditAutoModRule {
     event_type: EventType,
-    #[serde(skip_serializing_if="Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     name: Option<String>,
-    #[serde(flatten, skip_serializing_if="Option::is_none")]
+    #[serde(flatten, skip_serializing_if = "Option::is_none")]
     trigger: Option<Trigger>,
-    #[serde(skip_serializing_if="Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     actions: Option<Vec<Action>>,
-    #[serde(skip_serializing_if="Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     enabled: Option<bool>,
-    #[serde(skip_serializing_if="Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     exempt_roles: Option<Vec<RoleId>>,
-    #[serde(skip_serializing_if="Option::is_none")]
-    exempt_channels: Option<Vec<ChannelId>>
+    #[serde(skip_serializing_if = "Option::is_none")]
+    exempt_channels: Option<Vec<ChannelId>>,
 }
 
 impl EditAutoModRule {
