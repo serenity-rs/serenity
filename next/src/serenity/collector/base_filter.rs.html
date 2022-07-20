@@ -118,8 +118,8 @@
     }
 
     <span class="kw">fn</span> <span class="ident">is_within_limits</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">common_options</span>.<span class="ident">filter_limit</span>.<span class="ident">as_ref</span>().<span class="ident">map_or</span>(<span class="bool-val">true</span>, <span class="op">|</span><span class="ident">limit</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">filtered</span> <span class="op">&lt;</span> <span class="kw-2">*</span><span class="ident">limit</span>)
-            <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">common_options</span>.<span class="ident">collect_limit</span>.<span class="ident">map_or</span>(<span class="bool-val">true</span>, <span class="op">|</span><span class="ident">limit</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">collected</span> <span class="op">&lt;</span> <span class="ident">limit</span>)
+        <span class="self">self</span>.<span class="ident">common_options</span>.<span class="ident">filter_limit</span>.<span class="ident">map_or</span>(<span class="bool-val">true</span>, <span class="op">|</span><span class="ident">limit</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">filtered</span> <span class="op">&lt;</span> <span class="ident">limit</span>.<span class="ident">get</span>())
+            <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">common_options</span>.<span class="ident">collect_limit</span>.<span class="ident">map_or</span>(<span class="bool-val">true</span>, <span class="op">|</span><span class="ident">limit</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">collected</span> <span class="op">&lt;</span> <span class="ident">limit</span>.<span class="ident">get</span>())
     }
 }
 
