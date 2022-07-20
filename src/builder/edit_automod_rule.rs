@@ -65,8 +65,11 @@ impl EditAutoModRule {
     /// Set channels that should not be affected by the rule.
     ///
     /// Maximum of 50.
-    pub fn exempt_channels(&mut self, channels: Vec<ChannelId>) -> &mut Self {
-        self.exempt_channels = Some(channels);
+    pub fn exempt_channels(
+        &mut self,
+        channels: impl IntoIterator<Item = impl Into<ChannelId>>,
+    ) -> &mut Self {
+        self.exempt_channels = Some(channels.into_iter().map(Into::into).collect());
         self
     }
 }
