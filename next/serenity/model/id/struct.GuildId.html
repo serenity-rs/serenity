@@ -24,7 +24,7 @@
 <span class="kw">use</span> <span class="ident">serenity::model::guild::automod</span>::{<span class="ident">Action</span>, <span class="ident">Trigger</span>};
 <span class="kw">use</span> <span class="ident">serenity::model::id::GuildId</span>;
 
-<span class="kw">let</span> <span class="ident">_rule</span> <span class="op">=</span> <span class="ident">GuildId</span>(<span class="number">7</span>)
+<span class="kw">let</span> <span class="ident">_rule</span> <span class="op">=</span> <span class="ident">GuildId::new</span>(<span class="number">7</span>)
     .<span class="ident">create_automod_rule</span>(<span class="kw-2">&amp;</span><span class="ident">http</span>, <span class="op">|</span><span class="ident">r</span><span class="op">|</span> {
         <span class="ident">r</span>.<span class="ident">name</span>(<span class="string">&quot;foobar filter&quot;</span>)
             .<span class="ident">trigger</span>(<span class="ident">Trigger::Keyword</span>(<span class="macro">vec!</span>[<span class="string">&quot;foo*&quot;</span>.<span class="ident">to_string</span>(), <span class="string">&quot;*bar&quot;</span>.<span class="ident">to_string</span>()]))
