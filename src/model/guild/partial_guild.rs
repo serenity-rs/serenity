@@ -191,53 +191,39 @@ impl PartialGuild {
     ///
     /// # Examples
     ///
-    /// Create a custom keyword filter to block the message and timeout the author.
-    ///
-    /// ```ignore
-    /// use serenity::model::guild::automod::{Action, Trigger};
-    ///
-    /// let _rule = guild
-    ///     .create_automod_rule(&http, |r| {
-    ///         r.name("foobar filter")
-    ///             .trigger(Trigger::Keyword(vec!["foo*".to_string(), "*bar".to_string()]))
-    ///             .actions(vec![Action::BlockMessage, Action::Timeout(60)])
-    ///     })
-    ///     .await;
-    /// ```
+    /// See [`GuildId::create_automod_rule`] for details.
     ///
     /// # Errors
     ///
-    /// Returns [`Error::Http`] if the current user lacks permission,
-    /// or if invalid values are set.
+    /// Returns [`Error::Http`] if the current user lacks permission, or if invalid data is given.
     ///
     /// [Manage Guild]: Permissions::MANAGE_GUILD
     #[inline]
     pub async fn create_automod_rule(
-        self,
+        &self,
         http: impl AsRef<Http>,
-        f: impl FnOnce(&mut EditAutoModRule) -> &mut EditAutoModRule,
+        builder: EditAutoModRule,
     ) -> Result<Rule> {
-        self.id.create_automod_rule(http, f).await
+        self.id.create_automod_rule(http, builder).await
     }
 
-    /// Edit an auto moderation [`Rule`] by its ID.
+    /// Edit an auto moderation [`Rule`], given its Id.
     ///
     /// **Note**: Requires the [Manage Guild] permission.
     ///
     /// # Errors
     ///
-    /// Returns [`Error::Http`] if the current user lacks permission,
-    /// or if invalid values are set.
+    /// Returns [`Error::Http`] if the current user lacks permission, or if invalid data is given.
     ///
     /// [Manage Guild]: Permissions::MANAGE_GUILD
     #[inline]
     pub async fn edit_automod_rule(
-        self,
+        &self,
         http: impl AsRef<Http>,
         rule_id: impl Into<RuleId>,
-        f: impl FnOnce(&mut EditAutoModRule) -> &mut EditAutoModRule,
+        builder: EditAutoModRule,
     ) -> Result<Rule> {
-        self.id.edit_automod_rule(http, rule_id, f).await
+        self.id.edit_automod_rule(http, rule_id, builder).await
     }
 
     /// Deletes an auto moderation [`Rule`] from the guild.

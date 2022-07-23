@@ -85,48 +85,42 @@ impl GuildId {
     /// ```
     /// use std::time::Duration;
     ///
+    /// use serenity::builder::EditAutoModRule;
     /// use serenity::model::guild::automod::{Action, Trigger};
     /// use serenity::model::id::GuildId;
     ///
     /// # async fn run() {
     /// # use serenity::http::Http;
     /// # let http = Http::new("token");
-    /// let _rule = GuildId::new(7)
-    ///     .create_automod_rule(&http, |r| {
-    ///         r.name("foobar filter")
-    ///             .trigger(Trigger::Keyword(vec!["foo*".to_string(), "*bar".to_string()]))
-    ///             .actions(vec![Action::BlockMessage, Action::Timeout(Duration::from_secs(60))])
-    ///     })
-    ///     .await;
+    /// let builder = EditAutoModRule::default()
+    ///     .name("foobar filter")
+    ///     .trigger(Trigger::Keyword(vec!["foo*".to_string(), "*bar".to_string()]))
+    ///     .actions(vec![Action::BlockMessage, Action::Timeout(Duration::from_secs(60))]);
+    /// let _rule = GuildId::new(7).create_automod_rule(&http, builder).await;
     /// # }
     /// ```
     ///
     /// # Errors
     ///
-    /// Returns [`Error::Http`] if the current user lacks permission,
-    /// or if invalid values are set.
+    /// Returns [`Error::Http`] if the current user lacks permission, or if invalid data is given.
     ///
     /// [Manage Guild]: Permissions::MANAGE_GUILD
     #[inline]
     pub async fn create_automod_rule(
         self,
         http: impl AsRef<Http>,
-        f: impl FnOnce(&mut EditAutoModRule) -> &mut EditAutoModRule,
+        builder: EditAutoModRule,
     ) -> Result<Rule> {
-        let mut builder = EditAutoModRule::default();
-        f(&mut builder);
-
-        http.as_ref().create_automod_rule(self.get(), &builder).await
+        builder.execute(http, self, None).await
     }
 
-    /// Edit an auto moderation [`Rule`] by its ID.
+    /// Edit an auto moderation [`Rule`], given its Id.
     ///
     /// **Note**: Requires the [Manage Guild] permission.
     ///
     /// # Errors
     ///
-    /// Returns [`Error::Http`] if the current user lacks permission,
-    /// or if invalid values are set.
+    /// Returns [`Error::Http`] if the current user lacks permission, or if invalid data is given.
     ///
     /// [Manage Guild]: Permissions::MANAGE_GUILD
     #[inline]
@@ -134,12 +128,9 @@ impl GuildId {
         self,
         http: impl AsRef<Http>,
         rule_id: impl Into<RuleId>,
-        f: impl FnOnce(&mut EditAutoModRule) -> &mut EditAutoModRule,
+        builder: EditAutoModRule,
     ) -> Result<Rule> {
-        let mut builder = EditAutoModRule::default();
-        f(&mut builder);
-
-        http.as_ref().edit_automod_rule(self.get(), rule_id.into().0.get(), &builder).await
+        builder.execute(http, self, Some(rule_id.into())).await
     }
 
     /// Deletes an auto moderation [`Rule`] from the guild.
