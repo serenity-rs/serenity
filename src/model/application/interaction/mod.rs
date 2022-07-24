@@ -57,9 +57,8 @@ impl Interaction {
     pub fn app_permissions(&self) -> Option<Permissions> {
         match self {
             Self::Ping(_) => None,
-            Self::ApplicationCommand(i) => i.app_permissions,
+            Self::ApplicationCommand(i) | Self::Autocomplete(i) => i.app_permissions,
             Self::MessageComponent(i) => i.app_permissions,
-            Self::Autocomplete(i) => i.app_permissions,
             Self::ModalSubmit(i) => i.app_permissions,
         }
     }
