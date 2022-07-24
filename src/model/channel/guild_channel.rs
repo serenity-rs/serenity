@@ -190,7 +190,7 @@ impl GuildChannel {
         self.id.broadcast_typing(&http).await
     }
 
-    /// Creates an invite leading to the given channel.
+    /// Creates an invite for the given channel.
     ///
     /// **Note**: Requires the [Create Instant Invite] permission.
     ///
@@ -199,36 +199,31 @@ impl GuildChannel {
     /// Create an invite that can only be used 5 times:
     ///
     /// ```rust,ignore
-    /// let invite = channel.create_invite(&context, |i| i.max_uses(5)).await;
+    /// let builder = CreateBuilder::default().max_uses(5);
+    /// let invite = channel.create_invite(&context, builder).await;
     /// ```
     ///
     /// # Errors
     ///
-    /// If the `cache` is enabled, returns [`ModelError::InvalidPermissions`]
-    /// if the current user does not have permission to create invites.
-    ///
-    /// Otherwise returns [`Error::Http`] if the current user lacks permission.
+    /// If the `cache` is enabled, returns [`ModelError::InvalidPermissions`] if the current user
+    /// lacks permission. Otherwise returns [`Error::Http`], as well as if invalid data is given.
     ///
     /// [Create Instant Invite]: Permissions::CREATE_INSTANT_INVITE
     #[inline]
     #[cfg(feature = "utils")]
-    pub async fn create_invite<F>(&self, cache_http: impl CacheHttp, f: F) -> Result<RichInvite>
-    where
-        F: FnOnce(&mut CreateInvite) -> &mut CreateInvite,
-    {
-        #[cfg(feature = "cache")]
-        {
-            if let Some(cache) = cache_http.cache() {
-                utils::user_has_perms_cache(
-                    cache,
-                    self.id,
-                    Some(self.guild_id),
-                    Permissions::CREATE_INSTANT_INVITE,
-                )?;
-            }
-        }
-
-        self.id.create_invite(cache_http.http(), f).await
+    pub async fn create_invite(
+        &self,
+        cache_http: impl CacheHttp,
+        builder: CreateInvite,
+    ) -> Result<RichInvite> {
+        builder
+            .execute(
+                cache_http,
+                self.id,
+                #[cfg(feature = "cache")]
+                Some(self.guild_id),
+            )
+            .await
     }
 
     /// Creates a [permission overwrite][`PermissionOverwrite`] for either a
@@ -340,7 +335,7 @@ impl GuildChannel {
         #[cfg(feature = "cache")]
         {
             if let Some(cache) = cache_http.cache() {
-                utils::user_has_perms_cache(
+                crate::utils::user_has_perms_cache(
                     cache,
                     self.id,
                     Some(self.guild_id),
@@ -419,75 +414,70 @@ impl GuildChannel {
         self.id.delete_reaction(&http, message_id, user_id, reaction_type).await
     }
 
-    /// Modifies a channel's settings, such as its position or name.
+    /// Edits the channel's settings.
     ///
-    /// Refer to [`EditChannel`]s documentation for a full list of methods.
+    /// Refer to the documentation for [`EditChannel`] for a full list of methods.
+    ///
+    /// **Note**: Requires the [Manage Channels] permission. Modifying permissions via
+    /// [`EditChannel::permissions`] also requires the [Manage Roles] permission.
     ///
     /// # Examples
     ///
     /// Change a voice channels name and bitrate:
     ///
-    /// ```rust,ignore
-    /// channel.edit(&context, |c| c.name("test").bitrate(86400)).await;
+    /// ```rust,no_run
+    /// # use serenity::builder::EditChannel;
+    /// # use serenity::http::Http;
+    /// # use serenity::model::id::ChannelId;
+    /// # async fn run() {
+    /// #     let http = Http::new("token");
+    /// #     let channel = ChannelId::new(1234);
+    /// let builder = EditChannel::default().name("test").bitrate(86400);
+    /// channel.edit(&http, builder).await;
+    /// # }
     /// ```
     ///
     /// # Errors
     ///
-    /// If the `cache` is enabled, returns [ModelError::InvalidPermissions]
-    /// if the current user lacks permission to edit the channel.
+    /// If the `cache` is enabled, returns a [`ModelError::InvalidPermissions`] if the current user
+    /// lacks permission. Otherwise returns [`Error::Http`], as well as if invalid data is given.
     ///
-    /// Otherwise returns [`Error::Http`] if the current user lacks permission.
-    pub async fn edit<F>(&mut self, cache_http: impl CacheHttp, f: F) -> Result<()>
-    where
-        F: FnOnce(&mut EditChannel) -> &mut EditChannel,
-    {
-        #[cfg(feature = "cache")]
-        {
-            if let Some(cache) = cache_http.cache() {
-                utils::user_has_perms_cache(
-                    cache,
-                    self.id,
-                    Some(self.guild_id),
-                    Permissions::MANAGE_CHANNELS,
-                )?;
-            }
-        }
-
-        let mut edit_channel = EditChannel::default();
-        f(&mut edit_channel);
-
-        *self = cache_http.http().edit_channel(self.id.get(), &edit_channel, None).await?;
-
+    /// [Manage Channels]: Permissions::MANAGE_CHANNELS
+    /// [Manage Roles]: Permissions::MANAGE_ROLES
+    pub async fn edit(&mut self, cache_http: impl CacheHttp, builder: EditChannel) -> Result<()> {
+        *self = builder
+            .execute(
+                cache_http,
+                self.id,
+                #[cfg(feature = "cache")]
+                Some(self.guild_id),
+            )
+            .await?;
         Ok(())
     }
 
     /// Edits a [`Message`] in the channel given its Id.
     ///
-    /// Message editing preserves all unchanged message data.
+    /// Message editing preserves all unchanged message data, with some exceptions for embeds and
+    /// attachments.
     ///
-    /// Refer to the documentation for [`EditMessage`] for more information
-    /// regarding message restrictions and requirements.
+    /// **Note**: In most cases requires that the current user be the author of the message.
     ///
-    /// **Note**: Requires that the current user be the author of the message.
+    /// Refer to the documentation for [`EditMessage`] for information regarding content
+    /// restrictions and requirements.
     ///
     /// # Errors
     ///
-    /// Returns a [`ModelError::MessageTooLong`] if the content of the message
-    /// is over the [`the limit`], containing the number of unicode code points
-    /// over the limit.
-    ///
-    /// [`the limit`]: crate::builder::EditMessage::content
+    /// See [`EditMessage::execute`] for a list of possible errors, and their corresponding
+    /// reasons.
     #[inline]
-    pub async fn edit_message<'a, F>(
+    pub async fn edit_message<'a>(
         &self,
         http: impl AsRef<Http>,
         message_id: impl Into<MessageId>,
-        f: F,
-    ) -> Result<Message>
-    where
-        F: for<'b> FnOnce(&'b mut EditMessage<'a>) -> &'b mut EditMessage<'a>,
-    {
-        self.id.edit_message(&http, message_id, f).await
+        builder: EditMessage<'a>,
+    ) -> Result<Message> {
+        self.id.edit_message(http, message_id, builder).await
     }
 
     /// Edits a thread.
@@ -495,21 +485,16 @@ impl GuildChannel {
     /// # Errors
     ///
     /// Returns [`Error::Http`] if the current user lacks permission.
-    pub async fn edit_thread<F>(&self, http: impl AsRef<Http>, f: F) -> Result<GuildChannel>
-    where
-        F: FnOnce(&mut EditThread) -> &mut EditThread,
-    {
-        self.id.edit_thread(http, f).await
+    pub async fn edit_thread(&mut self, http: impl AsRef<Http>, builder: EditThread) -> Result<()> {
+        *self = self.id.edit_thread(http, builder).await?;
+        Ok(())
     }
 
-    /// Edits a voice state in a stage channel. Pass [`None`] for `user_id` to
-    /// edit the current user's voice state.
+    /// Edits the voice state of a given user in a stage channel.
     ///
-    /// Requires the [Mute Members] permission to suppress another user or
-    /// unsuppress the current user. This is not required if suppressing
-    /// the current user.
-    ///
-    /// Requires the [Request to Speak] permission.
+    /// **Note**: Requires the [Request to Speak] permission. Also requires the [Mute Members]
+    /// permission to suppress another user or unsuppress the current user. This is not required if
+    /// suppressing the current user.
     ///
     /// # Example
     ///
@@ -525,41 +510,40 @@ impl GuildChannel {
     /// #     let cache = Cache::default();
     /// #     let (channel_id, user_id) = (ChannelId::new(1), UserId::new(1));
     /// #
+    /// use serenity::builder::EditVoiceState;
     /// use serenity::model::ModelError;
     ///
     /// // assuming the cache has been unlocked
     /// let channel = cache.guild_channel(channel_id).ok_or(ModelError::ItemMissing)?;
     ///
-    /// channel.edit_voice_state(&http, user_id, |v| v.suppress(false)).await?;
+    /// let builder = EditVoiceState::default().suppress(false);
+    /// channel.edit_voice_state(&http, user_id, builder).await?;
     /// #   Ok(())
     /// # }
     /// ```
     ///
     /// # Errors
     ///
-    /// Returns a [`ModelError::InvalidChannelType`] if the channel type is not
-    /// stage.
+    /// If the `cache` is enabled, returns a [`ModelError::InvalidChannelType`] if the channel is
+    /// not a stage channel.
     ///
-    /// [Mute Members]: crate::model::permissions::Permissions::MUTE_MEMBERS
-    /// [Request to Speak]: crate::model::permissions::Permissions::REQUEST_TO_SPEAK
-    pub async fn edit_voice_state<F>(
+    /// Returns [`Error::Http`] if the user lacks permission, or if invalid data is given.
+    ///
+    /// [Request to Speak]: Permissions::REQUEST_TO_SPEAK
+    /// [Mute Members]: Permissions::MUTE_MEMBERS
+    pub async fn edit_voice_state(
         &self,
-        http: impl AsRef<Http>,
+        cache_http: impl CacheHttp,
         user_id: impl Into<UserId>,
-        f: F,
-    ) -> Result<()>
-    where
-        F: FnOnce(&mut EditVoiceState) -> &mut EditVoiceState,
-    {
-        self._edit_voice_state(http, Some(user_id), f).await
+        builder: EditVoiceState,
+    ) -> Result<()> {
+        builder.execute(cache_http, self.guild_id, self.id, Some(user_id.into())).await
     }
 
     /// Edits the current user's voice state in a stage channel.
     ///
-    /// The [Mute Members] permission is **not** required if suppressing the
-    /// current user.
-    ///
-    /// Requires the [Request to Speak] permission.
+    /// **Note**: Requires the [Request to Speak] permission. The [Mute Members] permission is
+    /// **not** required.
     ///
     /// # Example
     ///
@@ -575,57 +559,38 @@ impl GuildChannel {
     /// #     let cache = Cache::default();
     /// #     let channel_id = ChannelId::new(1);
     /// #
+    /// use serenity::builder::EditVoiceState;
     /// use serenity::model::ModelError;
     ///
     /// // assuming the cache has been unlocked
     /// let channel = cache.guild_channel(channel_id).ok_or(ModelError::ItemMissing)?;
     ///
     /// // Send a request to speak
-    /// channel.edit_own_voice_state(&http, |v| v.request_to_speak(true)).await?;
+    /// let builder = EditVoiceState::default().request_to_speak(true);
+    /// channel.edit_own_voice_state(&http, builder.clone()).await?;
     ///
     /// // Clear own request to speak
-    /// channel.edit_own_voice_state(&http, |v| v.request_to_speak(false)).await?;
+    /// let builder = builder.request_to_speak(false);
+    /// channel.edit_own_voice_state(&http, builder).await?;
     /// #   Ok(())
     /// # }
     /// ```
     ///
     /// # Errors
     ///
-    /// Returns a [`ModelError::InvalidChannelType`] if the channel type is not
-    /// stage.
+    /// If the `cache` is enabled, returns a [`ModelError::InvalidChannelType`] if the channel is
+    /// not a stage channel.
     ///
-    /// [Mute Members]: crate::model::permissions::Permissions::MUTE_MEMBERS
-    /// [Request to Speak]: crate::model::permissions::Permissions::REQUEST_TO_SPEAK
-    pub async fn edit_own_voice_state<F>(&self, http: impl AsRef<Http>, f: F) -> Result<()>
-    where
-        F: FnOnce(&mut EditVoiceState) -> &mut EditVoiceState,
-    {
-        self._edit_voice_state(http, None::<UserId>, f).await
-    }
-
-    async fn _edit_voice_state<F>(
+    /// Returns [`Error::Http`] if the user lacks permission, or if invalid data is given.
+    ///
+    /// [Request to Speak]: Permissions::REQUEST_TO_SPEAK
+    /// [Mute Members]: Permissions::MUTE_MEMBERS
+    pub async fn edit_own_voice_state(
         &self,
-        http: impl AsRef<Http>,
-        user_id: Option<impl Into<UserId>>,
-        f: F,
-    ) -> Result<()>
-    where
-        F: FnOnce(&mut EditVoiceState) -> &mut EditVoiceState,
-    {
-        if self.kind != ChannelType::Stage {
-            return Err(Error::from(ModelError::InvalidChannelType));
-        }
-
-        let mut voice_state = EditVoiceState::default();
-        f(&mut voice_state);
-
-        voice_state.channel_id = Some(self.id);
-
-        if let Some(id) = user_id {
-            http.as_ref().edit_voice_state(self.guild_id.get(), id.into().get(), &voice_state).await
-        } else {
-            http.as_ref().edit_voice_state_me(self.guild_id.get(), &voice_state).await
-        }
+        cache_http: impl CacheHttp,
+        builder: EditVoiceState,
+    ) -> Result<()> {
+        builder.execute(cache_http, self.guild_id, self.id, None).await
     }
 
     /// Follows the News Channel
@@ -699,24 +664,21 @@ impl GuildChannel {
 
     /// Gets messages from the channel.
     ///
-    /// Refer to the [`GetMessages`]-builder for more information on how to
-    /// use `builder`.
-    ///
-    /// **Note**: Returns an empty [`Vec`] if the current user does not have the
-    /// [Read Message History] permission.
+    /// **Note**: If the user does not have the [Read Message History] permission, returns an empty
+    /// [`Vec`].
     ///
     /// # Errors
     ///
-    /// Returns [`Error::Http`] if the current user lacks permission to
-    /// view the channel.
+    /// Returns [`Error::Http`] if the current user lacks permission.
     ///
     /// [Read Message History]: Permissions::READ_MESSAGE_HISTORY
     #[inline]
-    pub async fn messages<F>(&self, http: impl AsRef<Http>, builder: F) -> Result<Vec<Message>>
-    where
-        F: FnOnce(&mut GetMessages) -> &mut GetMessages,
-    {
-        self.id.messages(&http, builder).await
+    pub async fn messages(
+        &self,
+        http: impl AsRef<Http>,
+        builder: GetMessages,
+    ) -> Result<Vec<Message>> {
+        self.id.messages(http, builder).await
     }
 
     /// Returns the name of the guild channel.
@@ -768,6 +730,7 @@ impl GuildChannel {
     /// for demonstrative purposes):
     ///
     /// ```rust,no_run
+    /// use serenity::builder::CreateMessage;
     /// use serenity::model::channel::Channel;
     /// use serenity::model::prelude::*;
     /// use serenity::prelude::*;
@@ -798,11 +761,10 @@ impl GuildChannel {
     ///                 },
     ///             };
     ///
+    ///             let builder = CreateMessage::default().content("here's a cat");
     ///             let _ = msg
     ///                 .channel_id
-    ///                 .send_files(&context.http, vec![(&file, "cat.png")], |m| {
-    ///                     m.content("here's a cat")
-    ///                 })
+    ///                 .send_files(&context.http, vec![(&file, "cat.png")], builder)
     ///                 .await;
     ///         }
     ///     }
@@ -930,82 +892,73 @@ impl GuildChannel {
 
     /// Sends a message with just the given message content in the channel.
     ///
+    /// **Note**: Message content must be under 2000 unicode code points.
+    ///
     /// # Errors
     ///
-    /// Returns a [`ModelError::MessageTooLong`] if the content of the message
-    /// is over the above limit, containing the number of unicode code points
-    /// over the limit.
-    ///
-    /// May also return [`Error::Http`] if the current user lacks permission
-    /// to send a message to the channel.
+    /// Returns a [`ModelError::MessageTooLong`] if the content length is over the above limit. See
+    /// [`CreateMessage::execute`] for more details.
     #[inline]
-    pub async fn say(&self, http: impl AsRef<Http>, content: impl Into<String>) -> Result<Message> {
-        self.id.say(&http, content).await
+    pub async fn say(
+        &self,
+        cache_http: impl CacheHttp,
+        content: impl Into<String>,
+    ) -> Result<Message> {
+        self.id.say(cache_http, content).await
     }
 
-    /// Sends (a) file(s) along with optional message contents.
+    /// Sends file(s) along with optional message contents.
     ///
     /// Refer to [`ChannelId::send_files`] for examples and more information.
     ///
-    /// The [Attach Files] and [Send Messages] permissions are required.
-    ///
-    /// **Note**: Message contents must be under 2000 unicode code points.
-    ///
     /// # Errors
     ///
-    /// If the content of the message is over the above limit, then a
-    /// [`ModelError::MessageTooLong`] will be returned, containing the number
-    /// of unicode code points over the limit.
-    ///
-    /// [Attach Files]: Permissions::ATTACH_FILES
-    /// [Send Messages]: Permissions::SEND_MESSAGES
+    /// See [`CreateMessage::execute`] for a list of possible errors, and their corresponding
+    /// reasons.
     #[inline]
-    pub async fn send_files<'a, F, T, It>(
+    pub async fn send_files<'a, T, It>(
         &self,
-        http: impl AsRef<Http>,
+        cache_http: impl CacheHttp,
         files: It,
-        f: F,
+        builder: CreateMessage<'a>,
     ) -> Result<Message>
     where
-        for<'b> F: FnOnce(&'b mut CreateMessage<'a>) -> &'b mut CreateMessage<'a>,
         T: Into<AttachmentType<'a>>,
         It: IntoIterator<Item = T>,
     {
-        self.id.send_files(&http, files, f).await
+        builder
+            .files(files)
+            .execute(
+                cache_http,
+                self.id,
+                #[cfg(feature = "cache")]
+                Some(self.guild_id),
+            )
+            .await
     }
 
-    /// Sends a message to the channel with the given content.
+    /// Sends a message to the channel.
     ///
-    /// **Note**: Requires the [Send Messages] permission.
+    /// Refer to the documentation for [`CreateMessage`] for information regarding content
+    /// restrictions and requirements.
     ///
     /// # Errors
     ///
-    /// Returns a [`ModelError::MessageTooLong`] if the content of the message
-    /// is over the above limit, containing the number of unicode code points
-    /// over the limit.
-    ///
-    /// If the `cache` is enabled, returns a [`ModelError::InvalidPermissions`] if the current user does
-    /// not have the required permissions.
-    ///
-    /// Otherwise will return [`Error::Http`] if the current user lacks permission.
-    ///
-    /// [Send Messages]: Permissions::SEND_MESSAGES
-    pub async fn send_message<'a, F>(&self, cache_http: impl CacheHttp, f: F) -> Result<Message>
-    where
-        for<'b> F: FnOnce(&'b mut CreateMessage<'a>) -> &'b mut CreateMessage<'a>,
-    {
-        #[cfg(feature = "cache")]
-        {
-            if let Some(cache) = cache_http.cache() {
-                let req = Permissions::SEND_MESSAGES;
-
-                if let Ok(false) = utils::user_has_perms(cache, self.id, Some(self.guild_id), req) {
-                    return Err(Error::Model(ModelError::InvalidPermissions(req)));
-                }
-            }
-        }
-
-        self.id.send_message(&cache_http.http(), f).await
+    /// See [`CreateMessage::execute`] for a list of possible errors, and their corresponding
+    /// reasons.
+    pub async fn send_message<'a>(
+        &self,
+        cache_http: impl CacheHttp,
+        builder: CreateMessage<'a>,
+    ) -> Result<Message> {
+        builder
+            .execute(
+                cache_http,
+                self.id,
+                #[cfg(feature = "cache")]
+                Some(self.guild_id),
+            )
+            .await
     }
 
     /// Starts typing in the channel for an indefinite period of time.
@@ -1159,24 +1112,17 @@ impl GuildChannel {
         ReactionCollectorBuilder::new(shard_messenger).channel_id(self.id.0)
     }
 
-    /// Creates a webhook with only a name.
+    /// Creates a webhook in the channel.
     ///
     /// # Errors
     ///
-    /// Returns a [`ModelError::NameTooShort`] if the name of the webhook is
-    /// under the limit of 2 characters.
-    /// Returns a [`ModelError::NameTooLong`] if the name of the webhook is
-    /// over the limit of 100 characters.
-    /// Returns a [`ModelError::InvalidChannelType`] if the channel type is not text.
-    pub async fn create_webhook<F>(&self, http: impl AsRef<Http>, f: F) -> Result<Webhook>
-    where
-        F: FnOnce(&mut CreateWebhook) -> &mut CreateWebhook,
-    {
-        if self.is_text_based() {
-            self.id.create_webhook(&http, f).await
-        } else {
-            Err(Error::Model(ModelError::InvalidChannelType))
-        }
+    /// See [`CreateWebhook::execute`] for a detailed list of possible errors.
+    pub async fn create_webhook(
+        &self,
+        cache_http: impl CacheHttp,
+        builder: CreateWebhook,
+    ) -> Result<Webhook> {
+        self.id.create_webhook(cache_http, builder).await
     }
 
     /// Gets a stage instance.
@@ -1198,41 +1144,30 @@ impl GuildChannel {
     /// # Errors
     ///
     /// Returns [`ModelError::InvalidChannelType`] if the channel is not a stage channel.
+    ///
     /// Returns [`Error::Http`] if there is already a stage instance currently.
-    pub async fn create_stage_instance<F>(
+    pub async fn create_stage_instance(
         &self,
-        http: impl AsRef<Http>,
-        f: F,
-    ) -> Result<StageInstance>
-    where
-        F: FnOnce(&mut CreateStageInstance) -> &mut CreateStageInstance,
-    {
-        if self.kind != ChannelType::Stage {
-            return Err(Error::Model(ModelError::InvalidChannelType));
-        }
-
-        self.id.create_stage_instance(http, f).await
+        cache_http: impl CacheHttp,
+        builder: CreateStageInstance,
+    ) -> Result<StageInstance> {
+        self.id.create_stage_instance(cache_http, builder).await
     }
 
-    /// Edits a stage instance.
+    /// Edits the stage instance
     ///
     /// # Errors
     ///
     /// Returns [`ModelError::InvalidChannelType`] if the channel is not a stage channel.
-    /// Returns [`Error::Http`] if there is no stage instance currently.
-    pub async fn edit_stage_instance<F>(
+    ///
+    /// Returns [`Error::Http`] if the channel is not a stage channel, or there is no stage
+    /// instance currently.
+    pub async fn edit_stage_instance(
         &self,
-        http: impl AsRef<Http>,
-        f: F,
-    ) -> Result<StageInstance>
-    where
-        F: FnOnce(&mut EditStageInstance) -> &mut EditStageInstance,
-    {
-        if self.kind != ChannelType::Stage {
-            return Err(Error::Model(ModelError::InvalidChannelType));
-        }
-
-        self.id.edit_stage_instance(http, f).await
+        cache_http: impl CacheHttp,
+        builder: EditStageInstance,
+    ) -> Result<StageInstance> {
+        self.id.edit_stage_instance(cache_http, builder).await
     }
 
     /// Deletes a stage instance.
@@ -1253,33 +1188,27 @@ impl GuildChannel {
     ///
     /// # Errors
     ///
-    /// Returns [`Error::Http`] if the current user lacks permission.
-    pub async fn create_public_thread<F>(
+    /// Returns [`Error::Http`] if the current user lacks permission, or if invalid data is given.
+    pub async fn create_public_thread(
         &self,
         http: impl AsRef<Http>,
         message_id: impl Into<MessageId>,
-        f: F,
-    ) -> Result<GuildChannel>
-    where
-        F: FnOnce(&mut CreateThread) -> &mut CreateThread,
-    {
-        self.id.create_public_thread(http, message_id, f).await
+        builder: CreateThread,
+    ) -> Result<GuildChannel> {
+        self.id.create_public_thread(http, message_id, builder).await
     }
 
     /// Creates a private thread.
     ///
     /// # Errors
     ///
-    /// Returns [`Error::Http`] if the current user lacks permission.
-    pub async fn create_private_thread<F>(
+    /// Returns [`Error::Http`] if the current user lacks permission, or if invalid data is given.
+    pub async fn create_private_thread(
         &self,
         http: impl AsRef<Http>,
-        f: F,
-    ) -> Result<GuildChannel>
-    where
-        F: FnOnce(&mut CreateThread) -> &mut CreateThread,
-    {
-        self.id.create_private_thread(http, f).await
+        builder: CreateThread,
+    ) -> Result<GuildChannel> {
+        self.id.create_private_thread(http, builder).await
     }
 }
 

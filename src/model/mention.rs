@@ -23,6 +23,7 @@ pub trait Mentionable {
     ///
     /// ```
     /// # #[cfg(feature = "client")] {
+    /// # use serenity::builder::CreateMessage;
     /// # use serenity::model::guild::Member;
     /// # use serenity::model::channel::GuildChannel;
     /// # use serenity::model::id::ChannelId;
@@ -35,18 +36,14 @@ pub trait Mentionable {
     ///     to_channel: GuildChannel,
     ///     rules_channel: ChannelId,
     /// ) -> Result<(), Error> {
-    ///     to_channel
-    ///         .id
-    ///         .send_message(ctx, |m| {
-    ///             m.content(format!(
-    ///                 "Hi {member}, welcome to the server! \
-    ///                 Please refer to {rules} for our code of conduct, \
-    ///                 and enjoy your stay.",
-    ///                 member = member.mention(),
-    ///                 rules = rules_channel.mention(),
-    ///             ))
-    ///         })
-    ///         .await?;
+    ///     let builder = CreateMessage::default().content(format!(
+    ///         "Hi {member}, welcome to the server! \
+    ///         Please refer to {rules} for our code of conduct, \
+    ///         and enjoy your stay.",
+    ///         member = member.mention(),
+    ///         rules = rules_channel.mention(),
+    ///     ));
+    ///     to_channel.id.send_message(ctx, builder).await?;
     ///     Ok(())
     /// }
     /// # }
