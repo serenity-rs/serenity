@@ -32,7 +32,6 @@ use crate::collector::{MessageCollectorBuilder, ReactionCollectorBuilder};
 use crate::http::{CacheHttp, Http, UserPagination};
 #[cfg(feature = "model")]
 use crate::internal::prelude::*;
-use crate::json;
 #[cfg(feature = "model")]
 use crate::json::json;
 #[cfg(feature = "model")]
@@ -117,9 +116,7 @@ impl GuildId {
         let mut builder = EditAutoModRule::default();
         f(&mut builder);
 
-        let map = json::hashmap_to_json_map(builder.0);
-
-        http.as_ref().create_automod_rule(self.get(), &map).await
+        http.as_ref().create_automod_rule(self.get(), &builder).await
     }
 
     /// Edit an auto moderation [`Rule`] by its ID.
@@ -142,9 +139,7 @@ impl GuildId {
         let mut builder = EditAutoModRule::default();
         f(&mut builder);
 
-        let map = json::hashmap_to_json_map(builder.0);
-
-        http.as_ref().edit_automod_rule(self.get(), rule_id.into().get(), &map).await
+        http.as_ref().edit_automod_rule(self.get(), rule_id.into().get(), &builder).await
     }
 
     /// Deletes an auto moderation [`Rule`] from the guild.
