@@ -5,40 +5,30 @@ use crate::model::channel::ReactionType;
 ///
 /// [`ActionRow`]: crate::model::application::component::ActionRow
 #[derive(Clone, Debug, Default, Serialize)]
+#[must_use]
 pub struct CreateComponents(pub Vec<CreateActionRow>);
 
 impl CreateComponents {
-    /// Creates an action row.
-    pub fn create_action_row<F>(&mut self, f: F) -> &mut Self
-    where
-        F: FnOnce(&mut CreateActionRow) -> &mut CreateActionRow,
-    {
-        let mut data = CreateActionRow::default();
-        f(&mut data);
-
-        self.add_action_row(data);
-
-        self
-    }
-
     /// Adds an action row.
-    pub fn add_action_row(&mut self, row: CreateActionRow) -> &mut Self {
+    pub fn add_action_row(mut self, row: CreateActionRow) -> Self {
         self.0.push(row);
-
         self
     }
 
-    /// Set a single action row.
-    /// Calling this will overwrite all action rows.
-    pub fn set_action_row(&mut self, row: CreateActionRow) -> &mut Self {
-        self.0 = vec![row];
-
-        self
-    }
-
-    /// Sets all the action rows.
-    pub fn set_action_rows(&mut self, rows: Vec<CreateActionRow>) -> &mut Self {
+    pub fn add_action_rows(mut self, rows: Vec<CreateActionRow>) -> Self {
         self.0.extend(rows);
+        self
+    }
+
+    /// Set a single action row. Calling this will overwrite all action rows.
+    pub fn set_action_row(mut self, row: CreateActionRow) -> Self {
+        self.0 = vec![row];
+        self
+    }
+
+    /// Sets all the action rows. Calling this will overwrite all action rows.
+    pub fn set_action_rows(mut self, rows: Vec<CreateActionRow>) -> Self {
+        self.0 = rows;
         self
     }
 }
@@ -55,6 +45,7 @@ enum ComponentBuilder {
 ///
 /// [`ActionRow`]: crate::model::application::component::ActionRow
 #[derive(Clone, Debug, Serialize)]
+#[must_use]
 pub struct CreateActionRow {
     components: Vec<ComponentBuilder>,
     #[serde(rename = "type")]
@@ -71,59 +62,20 @@ impl Default for CreateActionRow {
 }
 
 impl CreateActionRow {
-    /// Creates a button.
-    pub fn create_button<F>(&mut self, f: F) -> &mut Self
-    where
-        F: FnOnce(&mut CreateButton) -> &mut CreateButton,
-    {
-        let mut data = CreateButton::default();
-        f(&mut data);
-
-        self.add_button(data);
-
-        self
-    }
-
     /// Adds a button.
-    pub fn add_button(&mut self, button: CreateButton) -> &mut Self {
+    pub fn add_button(mut self, button: CreateButton) -> Self {
         self.components.push(ComponentBuilder::Button(button));
         self
     }
 
-    /// Creates a select menu.
-    pub fn create_select_menu<F>(&mut self, f: F) -> &mut Self
-    where
-        F: FnOnce(&mut CreateSelectMenu) -> &mut CreateSelectMenu,
-    {
-        let mut data = CreateSelectMenu::default();
-        f(&mut data);
-
-        self.add_select_menu(data);
-
-        self
-    }
-
     /// Adds a select menu.
-    pub fn add_select_menu(&mut self, menu: CreateSelectMenu) -> &mut Self {
+    pub fn add_select_menu(mut self, menu: CreateSelectMenu) -> Self {
         self.components.push(ComponentBuilder::SelectMenu(menu));
         self
     }
 
-    /// Creates an input text.
-    pub fn create_input_text<F>(&mut self, f: F) -> &mut Self
-    where
-        F: FnOnce(&mut CreateInputText) -> &mut CreateInputText,
-    {
-        let mut data = CreateInputText::default();
-        f(&mut data);
-
-        self.add_input_text(data);
-
-        self
-    }
-
     /// Adds an input text.
-    pub fn add_input_text(&mut self, input_text: CreateInputText) -> &mut Self {
+    pub fn add_input_text(mut self, input_text: CreateInputText) -> Self {
         self.components.push(ComponentBuilder::InputText(input_text));
         self
     }
@@ -133,6 +85,7 @@ impl CreateActionRow {
 ///
 /// [`Button`]: crate::model::application::component::Button
 #[derive(Clone, Debug, Serialize)]
+#[must_use]
 pub struct CreateButton {
     #[serde(skip_serializing_if = "Option::is_none")]
     label: Option<String>,
@@ -167,37 +120,37 @@ impl Default for CreateButton {
 
 impl CreateButton {
     /// Sets the style of the button.
-    pub fn style(&mut self, kind: ButtonStyle) -> &mut Self {
+    pub fn style(mut self, kind: ButtonStyle) -> Self {
         self.style = kind;
         self
     }
 
     /// The label of the button.
-    pub fn label(&mut self, label: impl Into<String>) -> &mut Self {
+    pub fn label(mut self, label: impl Into<String>) -> Self {
         self.label = Some(label.into());
         self
     }
 
     /// Sets the custom id of the button, a developer-defined identifier.
-    pub fn custom_id(&mut self, id: impl Into<String>) -> &mut Self {
+    pub fn custom_id(mut self, id: impl Into<String>) -> Self {
         self.custom_id = Some(id.into());
         self
     }
 
     /// The url for url style button.
-    pub fn url(&mut self, url: impl Into<String>) -> &mut Self {
+    pub fn url(mut self, url: impl Into<String>) -> Self {
         self.url = Some(url.into());
         self
     }
 
     /// Sets emoji of the button.
-    pub fn emoji<R: Into<ReactionType>>(&mut self, emoji: R) -> &mut Self {
+    pub fn emoji(mut self, emoji: impl Into<ReactionType>) -> Self {
         self.emoji = Some(emoji.into());
         self
     }
 
     /// Sets the disabled state for the button.
-    pub fn disabled(&mut self, disabled: bool) -> &mut Self {
+    pub fn disabled(mut self, disabled: bool) -> Self {
         self.disabled = Some(disabled);
         self
     }
@@ -207,6 +160,7 @@ impl CreateButton {
 ///
 /// [`SelectMenu`]: crate::model::application::component::SelectMenu
 #[derive(Clone, Debug, Serialize)]
+#[must_use]
 pub struct CreateSelectMenu {
     #[serde(skip_serializing_if = "Option::is_none")]
     placeholder: Option<String>,
@@ -241,42 +195,36 @@ impl Default for CreateSelectMenu {
 
 impl CreateSelectMenu {
     /// The placeholder of the select menu.
-    pub fn placeholder(&mut self, label: impl Into<String>) -> &mut Self {
+    pub fn placeholder(mut self, label: impl Into<String>) -> Self {
         self.placeholder = Some(label.into());
         self
     }
 
     /// Sets the custom id of the select menu, a developer-defined identifier.
-    pub fn custom_id(&mut self, id: impl Into<String>) -> &mut Self {
+    pub fn custom_id(mut self, id: impl Into<String>) -> Self {
         self.custom_id = Some(id.into());
         self
     }
 
     /// Sets the minimum values for the user to select.
-    pub fn min_values(&mut self, min: u64) -> &mut Self {
+    pub fn min_values(mut self, min: u64) -> Self {
         self.min_values = Some(min);
         self
     }
 
     /// Sets the maximum values for the user to select.
-    pub fn max_values(&mut self, max: u64) -> &mut Self {
+    pub fn max_values(mut self, max: u64) -> Self {
         self.max_values = Some(max);
         self
     }
 
     /// Sets the disabled state for the button.
-    pub fn disabled(&mut self, disabled: bool) -> &mut Self {
+    pub fn disabled(mut self, disabled: bool) -> Self {
         self.disabled = Some(disabled);
         self
     }
 
-    pub fn options<F>(&mut self, f: F) -> &mut Self
-    where
-        F: FnOnce(&mut CreateSelectMenuOptions) -> &mut CreateSelectMenuOptions,
-    {
-        let mut options = CreateSelectMenuOptions::default();
-        f(&mut options);
-
+    pub fn options(mut self, options: CreateSelectMenuOptions) -> Self {
         self.options = Some(options);
         self
     }
@@ -286,33 +234,19 @@ impl CreateSelectMenu {
 ///
 /// [`SelectMenuOption`]: crate::model::application::component::SelectMenuOption
 #[derive(Clone, Debug, Default, Serialize)]
+#[must_use]
 pub struct CreateSelectMenuOptions(pub Vec<CreateSelectMenuOption>);
 
 impl CreateSelectMenuOptions {
-    /// Creates an option.
-    pub fn create_option<F>(&mut self, f: F) -> &mut Self
-    where
-        F: FnOnce(&mut CreateSelectMenuOption) -> &mut CreateSelectMenuOption,
-    {
-        let mut data = CreateSelectMenuOption::default();
-        f(&mut data);
-
-        self.add_option(data);
-
-        self
-    }
-
     /// Adds an option.
-    pub fn add_option(&mut self, option: CreateSelectMenuOption) -> &mut Self {
+    pub fn add_option(mut self, option: CreateSelectMenuOption) -> Self {
         self.0.push(option);
-
         self
     }
 
     /// Sets all the options.
-    pub fn set_options(&mut self, options: Vec<CreateSelectMenuOption>) -> &mut Self {
+    pub fn set_options(mut self, options: Vec<CreateSelectMenuOption>) -> Self {
         self.0.extend(options);
-
         self
     }
 }
@@ -321,6 +255,7 @@ impl CreateSelectMenuOptions {
 ///
 /// [`SelectMenuOption`]: crate::model::application::component::SelectMenuOption
 #[derive(Clone, Debug, Default, Serialize)]
+#[must_use]
 pub struct CreateSelectMenuOption {
     #[serde(skip_serializing_if = "Option::is_none")]
     label: Option<String>,
@@ -337,37 +272,35 @@ pub struct CreateSelectMenuOption {
 impl CreateSelectMenuOption {
     /// Creates an option.
     pub fn new(label: impl Into<String>, value: impl Into<String>) -> Self {
-        let mut opt = Self::default();
-        opt.label(label).value(value);
-        opt
+        Self::default().label(label).value(value)
     }
 
     /// Sets the label of this option.
-    pub fn label(&mut self, label: impl Into<String>) -> &mut Self {
+    pub fn label(mut self, label: impl Into<String>) -> Self {
         self.label = Some(label.into());
         self
     }
 
     /// Sets the value of this option.
-    pub fn value(&mut self, value: impl Into<String>) -> &mut Self {
+    pub fn value(mut self, value: impl Into<String>) -> Self {
         self.value = Some(value.into());
         self
     }
 
     /// Sets the description shown on this option.
-    pub fn description(&mut self, description: impl Into<String>) -> &mut Self {
+    pub fn description(mut self, description: impl Into<String>) -> Self {
         self.description = Some(description.into());
         self
     }
 
     /// Sets emoji of the option.
-    pub fn emoji<R: Into<ReactionType>>(&mut self, emoji: R) -> &mut Self {
+    pub fn emoji(mut self, emoji: impl Into<ReactionType>) -> Self {
         self.emoji = Some(emoji.into());
         self
     }
 
     /// Sets this option as selected by default.
-    pub fn default_selection(&mut self, default: bool) -> &mut Self {
+    pub fn default_selection(mut self, default: bool) -> Self {
         self.default = Some(default);
         self
     }
@@ -377,6 +310,7 @@ impl CreateSelectMenuOption {
 ///
 /// [`InputText`]: crate::model::application::component::InputText
 #[derive(Clone, Debug, Serialize)]
+#[must_use]
 pub struct CreateInputText {
     #[serde(skip_serializing_if = "Option::is_none")]
     custom_id: Option<String>,
@@ -417,49 +351,49 @@ impl Default for CreateInputText {
 
 impl CreateInputText {
     /// Sets the custom id of the input text, a developer-defined identifier.
-    pub fn custom_id(&mut self, id: impl Into<String>) -> &mut Self {
+    pub fn custom_id(mut self, id: impl Into<String>) -> Self {
         self.custom_id = Some(id.into());
         self
     }
 
     /// Sets the style of this input text
-    pub fn style(&mut self, kind: InputTextStyle) -> &mut Self {
+    pub fn style(mut self, kind: InputTextStyle) -> Self {
         self.style = Some(kind);
         self
     }
 
     /// Sets the label of this input text.
-    pub fn label(&mut self, label: impl Into<String>) -> &mut Self {
+    pub fn label(mut self, label: impl Into<String>) -> Self {
         self.label = Some(label.into());
         self
     }
 
     /// Sets the placeholder of this input text.
-    pub fn placeholder(&mut self, label: impl Into<String>) -> &mut Self {
+    pub fn placeholder(mut self, label: impl Into<String>) -> Self {
         self.placeholder = Some(label.into());
         self
     }
 
     /// Sets the minimum length required for the input text
-    pub fn min_length(&mut self, min: u64) -> &mut Self {
+    pub fn min_length(mut self, min: u64) -> Self {
         self.min_length = Some(min);
         self
     }
 
     /// Sets the maximum length required for the input text
-    pub fn max_length(&mut self, max: u64) -> &mut Self {
+    pub fn max_length(mut self, max: u64) -> Self {
         self.max_length = Some(max);
         self
     }
 
     /// Sets the value of this input text.
-    pub fn value(&mut self, value: impl Into<String>) -> &mut Self {
+    pub fn value(mut self, value: impl Into<String>) -> Self {
         self.value = Some(value.into());
         self
     }
 
     /// Sets if the input text is required
-    pub fn required(&mut self, required: bool) -> &mut Self {
+    pub fn required(mut self, required: bool) -> Self {
         self.required = Some(required);
         self
     }
