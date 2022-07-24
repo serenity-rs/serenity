@@ -1,6 +1,4 @@
 #[cfg(feature = "model")]
-use std::fmt::Write as _;
-#[cfg(feature = "model")]
 use std::sync::Arc;
 
 #[cfg(feature = "model")]
@@ -18,7 +16,6 @@ use crate::builder::{
     EditStageInstance,
     EditThread,
     GetMessages,
-    SearchFilter,
 };
 #[cfg(all(feature = "cache", feature = "model"))]
 use crate::cache::Cache;
@@ -69,23 +66,29 @@ impl ChannelId {
         http.as_ref().broadcast_typing(self.get()).await
     }
 
-    /// Creates an invite leading to the given channel.
+    /// Creates an invite for the given channel.
     ///
     /// **Note**: Requires the [Create Instant Invite] permission.
     ///
     /// # Errors
     ///
-    /// Returns [`Error::Http`] if the current user lacks permission.
+    /// If the `cache` is enabled, returns [`ModelError::InvalidPermissions`] if the current user
+    /// lacks permission. Otherwise returns [`Error::Http`], as well as if invalid data is given.
     ///
     /// [Create Instant Invite]: Permissions::CREATE_INSTANT_INVITE
-    pub async fn create_invite<F>(&self, http: impl AsRef<Http>, f: F) -> Result<RichInvite>
-    where
-        F: FnOnce(&mut CreateInvite) -> &mut CreateInvite,
-    {
-        let mut invite = CreateInvite::default();
-        f(&mut invite);
-
-        http.as_ref().create_invite(self.get(), &invite, None).await
+    pub async fn create_invite(
+        self,
+        cache_http: impl CacheHttp,
+        builder: CreateInvite,
+    ) -> Result<RichInvite> {
+        builder
+            .execute(
+                cache_http,
+                self,
+                #[cfg(feature = "cache")]
+                None,
+            )
+            .await
     }
 
     /// Creates a [permission overwrite][`PermissionOverwrite`] for either a
@@ -289,84 +292,74 @@ impl ChannelId {
             .await
     }
 
-    /// Edits the settings of a [`Channel`], optionally setting new values.
+    /// Edits a channel's settings.
     ///
-    /// Refer to [`EditChannel`]'s documentation for its methods.
+    /// Refer to the documentation for [`EditChannel`] for a full list of methods.
     ///
-    /// Requires the [Manage Channel] permission.
+    /// **Note**: Requires the [Manage Channels] permission. Modifying permissions via
+    /// [`EditChannel::permissions`] also requires the [Manage Roles] permission.
     ///
     /// # Examples
     ///
     /// Change a voice channel's name and bitrate:
     ///
     /// ```rust,no_run
-    /// // assuming a `channel_id` has been bound
-    ///
+    /// # use serenity::builder::EditChannel;
+    /// # use serenity::http::Http;
+    /// # use serenity::model::id::ChannelId;
     /// # async fn run() {
-    /// #     use serenity::http::Http;
-    /// #     use serenity::model::id::ChannelId;
     /// #     let http = Http::new("token");
     /// #     let channel_id = ChannelId::new(1234);
-    /// channel_id.edit(&http, |c| c.name("test").bitrate(64000)).await;
+    /// let builder = EditChannel::default().name("test").bitrate(64000);
+    /// channel_id.edit(&http, builder).await;
     /// # }
     /// ```
     ///
     /// # Errors
     ///
-    /// Returns [`Error::Http`] if the current user lacks permission,
-    /// or if an invalid value is set.
+    /// If the `cache` is enabled, returns a [`ModelError::InvalidPermissions`] if the current user
+    /// lacks permission. Otherwise returns [`Error::Http`], as well as if invalid data is given.
     ///
-    /// [Manage Channel]: Permissions::MANAGE_CHANNELS
+    /// [Manage Channels]: Permissions::MANAGE_CHANNELS
+    /// [Manage Roles]: Permissions::MANAGE_ROLES
     #[inline]
-    pub async fn edit<F>(self, http: impl AsRef<Http>, f: F) -> Result<GuildChannel>
-    where
-        F: FnOnce(&mut EditChannel) -> &mut EditChannel,
-    {
-        let mut channel = EditChannel::default();
-        f(&mut channel);
-
-        http.as_ref().edit_channel(self.get(), &channel, None).await
+    pub async fn edit(
+        self,
+        cache_http: impl CacheHttp,
+        builder: EditChannel,
+    ) -> Result<GuildChannel> {
+        builder
+            .execute(
+                cache_http,
+                self,
+                #[cfg(feature = "cache")]
+                None,
+            )
+            .await
     }
 
     /// Edits a [`Message`] in the channel given its Id.
     ///
-    /// Message editing preserves all unchanged message data.
+    /// Message editing preserves all unchanged message data, with some exceptions for embeds and
+    /// attachments.
     ///
-    /// Refer to the documentation for [`EditMessage`] for more information
-    /// regarding message restrictions and requirements.
+    /// **Note**: In most cases requires that the current user be the author of the message.
     ///
-    /// **Note**: Requires that the current user be the author of the message.
+    /// Refer to the documentation for [`EditMessage`] for information regarding content
+    /// restrictions and requirements.
     ///
     /// # Errors
     ///
-    /// Returns a [`ModelError::MessageTooLong`] if the content of the message
-    /// is over the [`the limit`], containing the number of unicode code points
-    /// over the limit.
-    ///
-    /// [`the limit`]: crate::builder::EditMessage::content
+    /// See [`EditMessage::execute`] for a list of possible errors, and their corresponding
+    /// reasons.
     #[inline]
-    pub async fn edit_message<'a, F>(
+    pub async fn edit_message<'a>(
         self,
         http: impl AsRef<Http>,
         message_id: impl Into<MessageId>,
-        f: F,
-    ) -> Result<Message>
-    where
-        F: for<'b> FnOnce(&'b mut EditMessage<'a>) -> &'b mut EditMessage<'a>,
-    {
-        let mut msg = EditMessage::default();
-        f(&mut msg);
-
-        if let Some(content) = &msg.content {
-            if let Some(length_over) = Message::overflow_length(content) {
-                return Err(Error::Model(ModelError::MessageTooLong(length_over)));
-            }
-        }
-
-        let files = std::mem::take(&mut msg.files);
-        http.as_ref()
-            .edit_message_and_attachments(self.get(), message_id.into().get(), &msg, files)
-            .await
+        builder: EditMessage<'_>,
+    ) -> Result<Message> {
+        builder.execute(http, self, message_id.into()).await
     }
 
     /// Follows the News Channel
@@ -473,34 +466,20 @@ impl ChannelId {
 
     /// Gets messages from the channel.
     ///
-    /// Refer to [`GetMessages`] for more information on how to use `builder`.
-    ///
-    /// **Note**: Returns an empty [`Vec`] if the current user
-    /// does not have the [Read Message History] permission.
+    /// **Note**: If the user does not have the [Read Message History] permission, returns an empty
+    /// [`Vec`].
     ///
     /// # Errors
     ///
-    /// Returns [`Error::Http`] if the current user does not have
-    /// permission to view the channel.
+    /// Returns [`Error::Http`] if the current user lacks permission.
     ///
     /// [Read Message History]: Permissions::READ_MESSAGE_HISTORY
-    pub async fn messages<F>(self, http: impl AsRef<Http>, builder: F) -> Result<Vec<Message>>
-    where
-        F: FnOnce(&mut GetMessages) -> &mut GetMessages,
-    {
-        let mut get_messages = GetMessages::default();
-        builder(&mut get_messages);
-        let mut query = format!("?limit={}", get_messages.limit.unwrap_or(50));
-
-        if let Some(filter) = get_messages.search_filter {
-            match filter {
-                SearchFilter::After(after) => write!(query, "&after={}", after)?,
-                SearchFilter::Around(around) => write!(query, "&around={}", around)?,
-                SearchFilter::Before(before) => write!(query, "&before={}", before)?,
-            }
-        }
-
-        http.as_ref().get_messages(self.get(), &query).await
+    pub async fn messages(
+        self,
+        http: impl AsRef<Http>,
+        builder: GetMessages,
+    ) -> Result<Vec<Message>> {
+        builder.execute(http, self).await
     }
 
     /// Streams over all the messages in a channel.
@@ -644,27 +623,28 @@ impl ChannelId {
 
     /// Sends a message with just the given message content in the channel.
     ///
+    /// **Note**: Message content must be under 2000 unicode code points.
+    ///
     /// # Errors
     ///
-    /// Returns a [`ModelError::MessageTooLong`] if the content of the message
-    /// is over the above limit, containing the number of unicode code points
-    /// over the limit.
+    /// Returns a [`ModelError::MessageTooLong`] if the content length is over the above limit. See
+    /// [`CreateMessage::execute`] for more details.
     #[inline]
-    pub async fn say(self, http: impl AsRef<Http>, content: impl Into<String>) -> Result<Message> {
-        self.send_message(&http, |m| m.content(content)).await
+    pub async fn say(
+        self,
+        cache_http: impl CacheHttp,
+        content: impl Into<String>,
+    ) -> Result<Message> {
+        let builder = CreateMessage::default().content(content);
+        self.send_message(cache_http, builder).await
     }
 
-    /// Sends file(s) along with optional message contents. The filename _must_
-    /// be specified.
+    /// Sends file(s) along with optional message contents. The filename _must_ be specified.
     ///
-    /// Message contents may be passed by using the [`CreateMessage::content`]
-    /// method.
+    /// Message contents may be passed using the `builder` argument.
     ///
-    /// The [Attach Files] and [Send Messages] permissions are required.
-    ///
-    /// **Note**: Message contents must be under 2000 unicode code points, and embeds must be under
-    /// 6000 unicode code points.
-    ///
+    /// Refer to the documentation for [`CreateMessage`] for information regarding content
+    /// restrictions and requirements.
     ///
     /// # Examples
     ///
@@ -676,13 +656,15 @@ impl ChannelId {
     /// #
     /// # async fn run() {
     /// # let http = Arc::new(Http::new("token"));
+    /// use serenity::builder::CreateMessage;
     /// use serenity::model::id::ChannelId;
     ///
     /// let channel_id = ChannelId::new(7);
     ///
     /// let paths = vec!["/path/to/file.jpg", "path/to/file2.jpg"];
     ///
-    /// let _ = channel_id.send_files(&http, paths, |m| m.content("a file")).await;
+    /// let builder = CreateMessage::default().content("some files");
+    /// let _ = channel_id.send_files(&http, paths, builder).await;
     /// # }
     /// ```
     ///
@@ -694,6 +676,7 @@ impl ChannelId {
     /// #
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// # let http = Arc::new(Http::new("token"));
+    /// use serenity::builder::CreateMessage;
     /// use serenity::model::id::ChannelId;
     /// use tokio::fs::File;
     ///
@@ -704,83 +687,61 @@ impl ChannelId {
     ///
     /// let files = vec![(&f1, "my_file.jpg"), (&f2, "my_file2.jpg")];
     ///
-    /// let _ = channel_id.send_files(&http, files, |m| m.content("a file")).await;
+    /// let builder = CreateMessage::default().content("some files");
+    /// let _ = channel_id.send_files(&http, files, builder).await;
     /// #    Ok(())
     /// # }
     /// ```
     ///
     /// # Errors
     ///
-    /// If the content of the message is over the above limit, then a
-    /// [`ModelError::MessageTooLong`] will be returned, containing the number
-    /// of unicode code points over the limit.
+    /// See [`CreateMessage::execute`] for a list of possible errors, and their corresponding
+    /// reasons.
     ///
-    /// Returns an
-    /// [`HttpError::UnsuccessfulRequest(ErrorResponse)`][`HttpError::UnsuccessfulRequest`]
-    /// if the file(s) are too large to send.
-    ///
-    /// [`HttpError::UnsuccessfulRequest`]: crate::http::HttpError::UnsuccessfulRequest
-    /// [`CreateMessage::content`]: crate::builder::CreateMessage::content
-    /// [Attach Files]: Permissions::ATTACH_FILES
-    /// [Send Messages]: Permissions::SEND_MESSAGES
     /// [`File`]: tokio::fs::File
-    pub async fn send_files<'a, F, T, It>(
+    pub async fn send_files<'a, T, It>(
         self,
-        http: impl AsRef<Http>,
+        cache_http: impl CacheHttp,
         files: It,
-        f: F,
+        builder: CreateMessage<'a>,
     ) -> Result<Message>
     where
-        for<'b> F: FnOnce(&'b mut CreateMessage<'a>) -> &'b mut CreateMessage<'a>,
         T: Into<AttachmentType<'a>>,
         It: IntoIterator<Item = T>,
     {
-        let mut builder = CreateMessage::default();
-        http.as_ref().send_files(self.get(), files, f(&mut builder)).await
+        builder
+            .files(files)
+            .execute(
+                cache_http,
+                self,
+                #[cfg(feature = "cache")]
+                None,
+            )
+            .await
     }
 
     /// Sends a message to the channel.
     ///
-    /// Refer to the documentation for [`CreateMessage`] for more information
-    /// regarding message restrictions and requirements.
-    ///
-    /// Requires the [Send Messages] permission.
-    ///
-    /// **Note**: Message contents must be under 2000 unicode code points.
+    /// Refer to the documentation for [`CreateMessage`] for information regarding content
+    /// restrictions and requirements.
     ///
     /// # Errors
     ///
-    /// Returns a [`ModelError::MessageTooLong`] if the content of the message
-    /// is over the above limit, containing the number of unicode code points
-    /// over the limit.
-    ///
-    /// Returns [`Error::Http`] if the current user lacks permission to
-    /// send a message in this channel.
-    ///
-    /// [Send Messages]: Permissions::SEND_MESSAGES
-    pub async fn send_message<'a, F>(self, http: impl AsRef<Http>, f: F) -> Result<Message>
-    where
-        for<'b> F: FnOnce(&'b mut CreateMessage<'a>) -> &'b mut CreateMessage<'a>,
-    {
-        let mut create_message = CreateMessage::default();
-        f(&mut create_message);
-        self._send_message(http.as_ref(), create_message).await
-    }
-
-    async fn _send_message<'a>(self, http: &Http, mut msg: CreateMessage<'a>) -> Result<Message> {
-        let files = std::mem::take(&mut msg.files);
-
-        let message = if files.is_empty() {
-            http.as_ref().send_message(self.get(), &msg).await?
-        } else {
-            http.as_ref().send_files(self.get(), files, &msg).await?
-        };
-
-        for reaction in msg.reactions {
-            self.create_reaction(&http, message.id, reaction).await?;
-        }
-
-        Ok(message)
+    /// See [`CreateMessage::execute`] for a list of possible errors, and their corresponding
+    /// reasons.
+    pub async fn send_message<'a>(
+        self,
+        cache_http: impl CacheHttp,
+        builder: CreateMessage<'_>,
+    ) -> Result<Message> {
+        builder
+            .execute(
+                cache_http,
+                self,
+                #[cfg(feature = "cache")]
+                None,
+            )
+            .await
     }
 
     /// Starts typing in the channel for an indefinite period of time.
@@ -858,32 +819,17 @@ impl ChannelId {
         http.as_ref().get_channel_webhooks(self.get()).await
     }
 
-    /// Creates a webhook
+    /// Creates a webhook in the channel.
     ///
     /// # Errors
     ///
-    /// Returns a [`Error::Http`] if the current user lacks permission.
-    /// Returns a [`ModelError::NameTooShort`] if the name of the webhook is
-    /// under the limit of 2 characters.
-    /// Returns a [`ModelError::NameTooLong`] if the name of the webhook is
-    /// over the limit of 100 characters.
-    /// Returns a [`ModelError::InvalidChannelType`] if the channel type is not text.
-    pub async fn create_webhook<F>(&self, http: impl AsRef<Http>, f: F) -> Result<Webhook>
-    where
-        F: FnOnce(&mut CreateWebhook) -> &mut CreateWebhook,
-    {
-        let mut builder = CreateWebhook::default();
-        f(&mut builder);
-
-        if let Some(name) = &builder.name {
-            if name.len() < 2 {
-                return Err(Error::Model(ModelError::NameTooShort));
-            } else if name.len() > 100 {
-                return Err(Error::Model(ModelError::NameTooLong));
-            }
-        }
-
-        http.as_ref().create_webhook(self.get(), &builder, None).await
+    /// See [`CreateWebhook::execute`] for a detailed list of possible errors.
+    pub async fn create_webhook(
+        self,
+        cache_http: impl CacheHttp,
+        builder: CreateWebhook,
+    ) -> Result<Webhook> {
+        builder.execute(cache_http, self).await
     }
 
     /// Returns a builder which can be awaited to obtain a message or stream of messages in this channel.
@@ -918,40 +864,31 @@ impl ChannelId {
     ///
     /// # Errors
     ///
-    /// Returns [`Error::Http`] if the channel is not a stage channel,
-    /// or if there is already a stage instance currently.
-    pub async fn create_stage_instance<F>(
-        &self,
-        http: impl AsRef<Http>,
-        f: F,
-    ) -> Result<StageInstance>
-    where
-        F: FnOnce(&mut CreateStageInstance) -> &mut CreateStageInstance,
-    {
-        let mut instance = CreateStageInstance::default();
-        f(&mut instance);
-
-        http.as_ref().create_stage_instance(&instance).await
+    /// Returns [`ModelError::InvalidChannelType`] if the channel is not a stage channel.
+    ///
+    /// Returns [`Error::Http`] if there is already a stage instance currently.
+    pub async fn create_stage_instance(
+        self,
+        cache_http: impl CacheHttp,
+        builder: CreateStageInstance,
+    ) -> Result<StageInstance> {
+        builder.channel_id(self).execute(cache_http).await
     }
 
-    /// Edits a stage instance.
+    /// Edits the stage instance
     ///
     /// # Errors
     ///
-    /// Returns [`Error::Http`] if the channel is not a stage channel,
-    /// or if there is not stage instance currently.
-    pub async fn edit_stage_instance<F>(
-        &self,
-        http: impl AsRef<Http>,
-        f: F,
-    ) -> Result<StageInstance>
-    where
-        F: FnOnce(&mut EditStageInstance) -> &mut EditStageInstance,
-    {
-        let mut instance = EditStageInstance::default();
-        f(&mut instance);
-
-        http.as_ref().edit_stage_instance(self.get(), &instance).await
+    /// Returns [`ModelError::InvalidChannelType`] if the channel is not a stage channel.
+    ///
+    /// Returns [`Error::Http`] if the channel is not a stage channel, or there is no stage
+    /// instance currently.
+    pub async fn edit_stage_instance(
+        self,
+        cache_http: impl CacheHttp,
+        builder: EditStageInstance,
+    ) -> Result<StageInstance> {
+        builder.execute(cache_http, self).await
     }
 
     /// Edits a thread.
@@ -959,14 +896,12 @@ impl ChannelId {
     /// # Errors
     ///
     /// Returns [`Error::Http`] if the current user lacks permission.
-    pub async fn edit_thread<F>(&self, http: impl AsRef<Http>, f: F) -> Result<GuildChannel>
-    where
-        F: FnOnce(&mut EditThread) -> &mut EditThread,
-    {
-        let mut instance = EditThread::default();
-        f(&mut instance);
-
-        http.as_ref().edit_thread(self.get(), &instance).await
+    pub async fn edit_thread(
+        self,
+        http: impl AsRef<Http>,
+        builder: EditThread,
+    ) -> Result<GuildChannel> {
+        builder.execute(http, self).await
     }
 
     /// Deletes a stage instance.
@@ -983,42 +918,29 @@ impl ChannelId {
     ///
     /// # Errors
     ///
-    /// Returns [`Error::Http`] if the current user lacks permission.
+    /// Returns [`Error::Http`] if the current user lacks permission, or if invalid data is given.
     #[doc(alias = "create_thread")]
-    pub async fn create_public_thread<F>(
-        &self,
+    pub async fn create_public_thread(
+        self,
         http: impl AsRef<Http>,
         message_id: impl Into<MessageId>,
-        f: F,
-    ) -> Result<GuildChannel>
-    where
-        F: FnOnce(&mut CreateThread) -> &mut CreateThread,
-    {
-        let mut instance = CreateThread::default();
-        f(&mut instance);
-
-        http.as_ref().create_public_thread(self.get(), message_id.into().get(), &instance).await
+        builder: CreateThread,
+    ) -> Result<GuildChannel> {
+        builder.execute(http, self, Some(message_id.into())).await
     }
 
     /// Creates a private thread.
     ///
     /// # Errors
     ///
-    /// Returns [`Error::Http`] if the current user lacks permission.
+    /// Returns [`Error::Http`] if the current user lacks permission, or if invalid data is given.
     #[doc(alias = "create_thread")]
-    pub async fn create_private_thread<F>(
-        &self,
+    pub async fn create_private_thread(
+        self,
         http: impl AsRef<Http>,
-        f: F,
-    ) -> Result<GuildChannel>
-    where
-        F: FnOnce(&mut CreateThread) -> &mut CreateThread,
-    {
-        let mut instance = CreateThread::default();
-        instance.kind(ChannelType::PrivateThread);
-        f(&mut instance);
-
-        http.as_ref().create_private_thread(self.get(), &instance).await
+        builder: CreateThread,
+    ) -> Result<GuildChannel> {
+        builder.kind(ChannelType::PrivateThread).execute(http, self, None).await
     }
 
     /// Gets the thread members, if this channel is a thread.
@@ -1205,16 +1127,11 @@ impl<H: AsRef<Http>> MessagesIter<H> {
 
         // If `self.before` is not set yet, we can use `.messages` to fetch
         // the last message after very first fetch from last.
-        self.buffer = self
-            .channel_id
-            .messages(&self.http, |b| {
-                if let Some(before) = self.before {
-                    b.before(before);
-                }
-
-                b.limit(grab_size)
-            })
-            .await?;
+        let mut builder = GetMessages::default().limit(grab_size);
+        if let Some(before) = self.before {
+            builder = builder.before(before);
+        }
+        self.buffer = self.channel_id.messages(&self.http, builder).await?;
 
         self.buffer.reverse();
 

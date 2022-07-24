@@ -4,6 +4,7 @@ use serde::Serialize;
 #[cfg(feature = "http")]
 use crate::builder::{
     CreateInteractionResponse,
+    CreateInteractionResponseData,
     CreateInteractionResponseFollowup,
     EditInteractionResponse,
 };
@@ -79,69 +80,32 @@ impl MessageComponentInteraction {
     ///
     /// # Errors
     ///
-    /// Returns an [`Error::Model`] if the message content is too long.
-    /// May also return an [`Error::Http`] if the API returns an error,
-    /// or an [`Error::Json`] if there is an error in deserializing the
-    /// API response.
-    pub async fn create_interaction_response<'a, F>(
+    /// Returns an [`Error::Model`] if the message content is too long. May also return an
+    /// [`Error::Http`] if the API returns an error, or an [`Error::Json`] if there is an error in
+    /// deserializing the API response.
+    pub async fn create_interaction_response<'a>(
         &self,
         http: impl AsRef<Http>,
-        f: F,
-    ) -> Result<()>
-    where
-        for<'b> F:
-            FnOnce(&'b mut CreateInteractionResponse<'a>) -> &'b mut CreateInteractionResponse<'a>,
-    {
-        let mut interaction_response = CreateInteractionResponse::default();
-        f(&mut interaction_response);
-
-        let http = http.as_ref();
-        let files = interaction_response
-            .data
-            .as_mut()
-            .map_or_else(Vec::new, |d| std::mem::take(&mut d.files));
-
-        if files.is_empty() {
-            http.create_interaction_response(self.id.get(), &self.token, &interaction_response)
-                .await
-        } else {
-            http.create_interaction_response_with_files(
-                self.id.get(),
-                &self.token,
-                &interaction_response,
-                files,
-            )
-            .await
-        }
+        builder: CreateInteractionResponse<'a>,
+    ) -> Result<()> {
+        builder.execute(http, self.id, &self.token).await
     }
 
-    /// Edits the initial interaction response.
-    ///
-    /// `application_id` will usually be the bot's [`UserId`], except in cases of bots being very old.
-    ///
-    /// Refer to Discord's docs for Edit Webhook Message for field information.
+    /// Edits the initial interaction response. Does not work for ephemeral messages.
     ///
     /// **Note**: Message contents must be under 2000 unicode code points.
     ///
-    /// [`UserId`]: crate::model::id::UserId
-    ///
     /// # Errors
     ///
-    /// Returns [`Error::Model`] if the edited content is too long.
-    /// May also return [`Error::Http`] if the API returns an error,
-    /// or an [`Error::Json`] if there is an error deserializing the response.
+    /// Returns an [`Error::Model`] if the message content is too long. May also return an
+    /// [`Error::Http`] if the API returns an error, or an [`Error::Json`] if there is an error in
+    /// deserializing the API response.
     pub async fn edit_original_interaction_response<F>(
         &self,
         http: impl AsRef<Http>,
-        f: F,
-    ) -> Result<Message>
-    where
-        F: FnOnce(&mut EditInteractionResponse) -> &mut EditInteractionResponse,
-    {
-        let mut interaction_response = EditInteractionResponse::default();
-        f(&mut interaction_response);
-
-        http.as_ref().edit_original_interaction_response(&self.token, &interaction_response).await
+        builder: EditInteractionResponse,
+    ) -> Result<Message> {
+        builder.execute(http, &self.token).await
     }
 
     /// Deletes the initial interaction response.
@@ -162,23 +126,15 @@ impl MessageComponentInteraction {
     ///
     /// # Errors
     ///
-    /// Will return [`Error::Model`] if the content is too long.
-    /// May also return [`Error::Http`] if the API returns an error,
-    /// or a [`Error::Json`] if there is an error in deserializing the response.
-    pub async fn create_followup_message<'a, F>(
+    /// Returns [`Error::Model`] if the content is too long. May also return [`Error::Http`] if the
+    /// API returns an error, or [`Error::Json`] if there is an error in deserializing the
+    /// response.
+    pub async fn create_followup_message<'a>(
         &self,
         http: impl AsRef<Http>,
-        f: F,
-    ) -> Result<Message>
-    where
-        for<'b> F: FnOnce(
-            &'b mut CreateInteractionResponseFollowup<'a>,
-        ) -> &'b mut CreateInteractionResponseFollowup<'a>,
-    {
-        let mut interaction_response = CreateInteractionResponseFollowup::default();
-        f(&mut interaction_response);
-
-        http.as_ref().create_followup_message(&self.token, &interaction_response).await
+        builder: CreateInteractionResponseFollowup<'a>,
+    ) -> Result<Message> {
+        builder.execute(http, None, &self.token).await
     }
 
     /// Edits a followup response to the response sent.
@@ -187,26 +143,16 @@ impl MessageComponentInteraction {
     ///
     /// # Errors
     ///
-    /// Will return [`Error::Model`] if the content is too long.
-    /// May also return [`Error::Http`] if the API returns an error,
-    /// or a [`Error::Json`] if there is an error in deserializing the response.
-    pub async fn edit_followup_message<'a, F, M: Into<MessageId>>(
+    /// Returns [`Error::Model`] if the content is too long. May also return [`Error::Http`] if the
+    /// API returns an error, or [`Error::Json`] if there is an error in deserializing the
+    /// response.
+    pub async fn edit_followup_message<'a>(
         &self,
         http: impl AsRef<Http>,
-        message_id: M,
-        f: F,
-    ) -> Result<Message>
-    where
-        for<'b> F: FnOnce(
-            &'b mut CreateInteractionResponseFollowup<'a>,
-        ) -> &'b mut CreateInteractionResponseFollowup<'a>,
-    {
-        let mut interaction_response = CreateInteractionResponseFollowup::default();
-        f(&mut interaction_response);
-
-        http.as_ref()
-            .edit_followup_message(&self.token, message_id.into().into(), &interaction_response)
-            .await
+        message_id: impl Into<MessageId>,
+        builder: CreateInteractionResponseFollowup<'a>,
+    ) -> Result<Message> {
+        builder.execute(http, Some(message_id.into()), &self.token).await
     }
 
     /// Deletes a followup message.
@@ -237,20 +183,16 @@ impl MessageComponentInteraction {
         http.as_ref().get_followup_message(&self.token, message_id.into().into()).await
     }
 
-    /// Helper function to defer an interaction
+    /// Helper function to defer an interaction.
     ///
     /// # Errors
     ///
-    /// May also return an [`Error::Http`] if the API returns an error,
-    /// or an [`Error::Json`] if there is an error in deserializing the
-    /// API response.
-    ///
-    /// # Errors
+    /// Returns an [`Error::Http`] if the API returns an error, or an [`Error::Json`] if there is
+    /// an error in deserializing the API response.
     pub async fn defer(&self, http: impl AsRef<Http>) -> Result<()> {
-        self.create_interaction_response(http, |f| {
-            f.kind(InteractionResponseType::DeferredUpdateMessage)
-        })
-        .await
+        let builder = CreateInteractionResponse::default()
+            .kind(InteractionResponseType::DeferredUpdateMessage);
+        self.create_interaction_response(http, builder).await
     }
 
     /// Helper function to defer an interaction ephemerally
@@ -261,10 +203,14 @@ impl MessageComponentInteraction {
     /// or an [`Error::Json`] if there is an error in deserializing the
     /// API response.
     pub async fn defer_ephemeral(&self, http: impl AsRef<Http>) -> Result<()> {
-        self.create_interaction_response(http, |f| {
-            f.kind(InteractionResponseType::DeferredChannelMessageWithSource)
-                .interaction_response_data(|f| f.ephemeral(true))
-        })
+        self.create_interaction_response(
+            http,
+            CreateInteractionResponse::default()
+                .kind(InteractionResponseType::DeferredChannelMessageWithSource)
+                .interaction_response_data(
+                    CreateInteractionResponseData::default().ephemeral(true),
+                ),
+        )
         .await
     }
 }

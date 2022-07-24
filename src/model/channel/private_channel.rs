@@ -143,33 +143,26 @@ impl PrivateChannel {
 
     /// Edits a [`Message`] in the channel given its Id.
     ///
-    /// Message editing preserves all unchanged message data.
+    /// Message editing preserves all unchanged message data, with some exceptions for embeds and
+    /// attachments.
     ///
-    /// Refer to the documentation for [`EditMessage`] for more information
-    /// regarding message restrictions and requirements.
+    /// **Note**: In most cases requires that the current user be the author of the message.
     ///
-    /// **Note**: Requires that the current user be the author of the message.
+    /// Refer to the documentation for [`EditMessage`] for information regarding content
+    /// restrictions and requirements.
     ///
     /// # Errors
     ///
-    /// Returns a [`ModelError::MessageTooLong`] if the content of the message
-    /// is over the [`the limit`], containing the number of unicode code points
-    /// over the limit.
-    ///
-    /// Returns [`Error::Http`] if the current user is not the owner of the message.
-    ///
-    /// [`the limit`]: crate::builder::EditMessage::content
+    /// See [`EditMessage::execute`] for a list of possible errors, and their corresponding
+    /// reasons.
     #[inline]
-    pub async fn edit_message<'a, F>(
+    pub async fn edit_message<'a>(
         &self,
         http: impl AsRef<Http>,
         message_id: impl Into<MessageId>,
-        f: F,
-    ) -> Result<Message>
-    where
-        F: for<'b> FnOnce(&'b mut EditMessage<'a>) -> &'b mut EditMessage<'a>,
-    {
-        self.id.edit_message(&http, message_id, f).await
+        builder: EditMessage<'a>,
+    ) -> Result<Message> {
+        self.id.edit_message(http, message_id, builder).await
     }
 
     /// Determines if the channel is NSFW.
@@ -200,17 +193,21 @@ impl PrivateChannel {
 
     /// Gets messages from the channel.
     ///
-    /// Refer to [`GetMessages`] for more information on how to use `builder`.
+    /// **Note**: If the user does not have the [Read Message History] permission, returns an empty
+    /// [`Vec`].
     ///
     /// # Errors
     ///
-    /// Returns [`Error::Http`] if an invalid value is set in the builder.
+    /// Returns [`Error::Http`] if the current user lacks permission.
+    ///
+    /// [Read Message History]: Permissions::READ_MESSAGE_HISTORY
     #[inline]
-    pub async fn messages<F>(&self, http: impl AsRef<Http>, builder: F) -> Result<Vec<Message>>
-    where
-        F: FnOnce(&mut GetMessages) -> &mut GetMessages,
-    {
-        self.id.messages(&http, builder).await
+    pub async fn messages(
+        &self,
+        http: impl AsRef<Http>,
+        builder: GetMessages,
+    ) -> Result<Vec<Message>> {
+        self.id.messages(http, builder).await
     }
 
     /// Returns "DM with $username#discriminator".
@@ -270,62 +267,59 @@ impl PrivateChannel {
 
     /// Sends a message with just the given message content in the channel.
     ///
+    /// **Note**: Message content must be under 2000 unicode code points.
+    ///
     /// # Errors
     ///
-    /// Returns a [`ModelError::MessageTooLong`] if the content of the message
-    /// is over the above limit, containing the number of unicode code points
-    /// over the limit.
+    /// Returns a [`ModelError::MessageTooLong`] if the content length is over the above limit. See
+    /// [`CreateMessage::execute`] for more details.
     #[inline]
-    pub async fn say(&self, http: impl AsRef<Http>, content: impl Into<String>) -> Result<Message> {
-        self.id.say(&http, content).await
+    pub async fn say(
+        &self,
+        cache_http: impl CacheHttp,
+        content: impl Into<String>,
+    ) -> Result<Message> {
+        self.id.say(cache_http, content).await
     }
 
-    /// Sends (a) file(s) along with optional message contents.
+    /// Sends file(s) along with optional message contents.
     ///
     /// Refer to [`ChannelId::send_files`] for examples and more information.
     ///
-    /// The [Attach Files] and [Send Messages] permissions are required.
-    ///
-    /// **Note**: Message contents must be under 2000 unicode code points.
-    ///
     /// # Errors
     ///
-    /// If the content of the message is over the above limit, then a
-    /// [`ModelError::MessageTooLong`] will be returned, containing the number
-    /// of unicode code points over the limit.
-    ///
-    /// [Send Messages]: Permissions::SEND_MESSAGES
+    /// See [`CreateMessage::execute`] for a list of possible errors, and their corresponding
+    /// reasons.
     #[inline]
-    pub async fn send_files<'a, F, T, It>(
+    pub async fn send_files<'a, T, It>(
         &self,
-        http: impl AsRef<Http>,
+        cache_http: impl CacheHttp,
         files: It,
-        f: F,
+        builder: CreateMessage<'a>,
     ) -> Result<Message>
     where
-        for<'b> F: FnOnce(&'b mut CreateMessage<'a>) -> &'b mut CreateMessage<'a>,
         T: Into<AttachmentType<'a>>,
         It: IntoIterator<Item = T>,
     {
-        self.id.send_files(&http, files, f).await
+        self.id.send_files(cache_http, files, builder).await
     }
 
-    /// Sends a message to the channel with the given content.
+    /// Sends a message to the channel.
     ///
-    /// Refer to the documentation for [`CreateMessage`] for more information
-    /// regarding message restrictions and requirements.
+    /// Refer to the documentation for [`CreateMessage`] for information regarding content
+    /// restrictions and requirements.
     ///
     /// # Errors
     ///
-    /// Returns a [`ModelError::MessageTooLong`] if the content of the message
-    /// is over the above limit, containing the number of unicode code points
-    /// over the limit.
+    /// See [`CreateMessage::execute`] for a list of possible errors, and their corresponding
+    /// reasons.
     #[inline]
-    pub async fn send_message<'a, F>(&self, http: impl AsRef<Http>, f: F) -> Result<Message>
-    where
-        for<'b> F: FnOnce(&'b mut CreateMessage<'a>) -> &'b mut CreateMessage<'a>,
-    {
-        self.id.send_message(&http, f).await
+    pub async fn send_message<'a>(
+        &self,
+        cache_http: impl CacheHttp,
+        builder: CreateMessage<'a>,
+    ) -> Result<Message> {
+        self.id.send_message(cache_http, builder).await
     }
 
     /// Starts typing in the channel for an indefinite period of time.
