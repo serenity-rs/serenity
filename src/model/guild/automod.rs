@@ -14,7 +14,7 @@ use serde_value::{DeserializerError, Value};
 use crate::model::id::{ChannelId, GuildId, MessageId, RoleId, RuleId, UserId};
 
 /// Configured auto moderation rule.
-#[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
+#[derive(Clone, Debug, PartialEq, Eq, Deserialize, Serialize)]
 pub struct Rule {
     /// ID of the rule.
     pub id: RuleId,
@@ -71,7 +71,7 @@ impl From<EventType> for u8 {
 }
 
 /// Characterizes the type of content which can trigger the rule.
-#[derive(Clone, Debug, PartialEq)]
+#[derive(Clone, Debug, PartialEq, Eq)]
 #[non_exhaustive]
 pub enum Trigger {
     Keyword(Vec<String>),
@@ -198,7 +198,7 @@ impl From<TriggerType> for u8 {
 /// See [`Change::TriggerMetadata`].
 ///
 /// [`Change::TriggerMetadata`]: crate::model::guild::audit_log::Change::TriggerMetadata
-#[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
+#[derive(Clone, Debug, PartialEq, Eq, Deserialize, Serialize)]
 pub struct TriggerMetadata {
     keyword_filter: Option<Vec<String>>,
     presets: Option<Vec<KeywordPresetType>>,
@@ -238,7 +238,7 @@ impl From<KeywordPresetType> for u8 {
 }
 
 /// An action which will execute whenever a rule is triggered.
-#[derive(Clone, Debug, PartialEq)]
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub enum Action {
     /// Blocks the content of a message according to the rule.
     BlockMessage,
