@@ -1838,10 +1838,6 @@
 <span id="1832">1832</span>
 <span id="1833">1833</span>
 <span id="1834">1834</span>
-<span id="1835">1835</span>
-<span id="1836">1836</span>
-<span id="1837">1837</span>
-<span id="1838">1838</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::fmt</span>;
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
@@ -1877,7 +1873,7 @@
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::internal::prelude</span>::<span class="kw-2">*</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::json</span>::{<span class="self">self</span>, <span class="ident">json</span>};
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::json::json</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::application::command</span>::{<span class="ident">Command</span>, <span class="ident">CommandPermission</span>};
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
@@ -1960,9 +1956,7 @@
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">builder</span> <span class="op">=</span> <span class="ident">EditAutoModRule::default</span>();
         <span class="ident">f</span>(<span class="kw-2">&amp;mut</span> <span class="ident">builder</span>);
 
-        <span class="kw">let</span> <span class="ident">map</span> <span class="op">=</span> <span class="ident">json::hashmap_to_json_map</span>(<span class="ident">builder</span>.<span class="number">0</span>);
-
-        <span class="ident">http</span>.<span class="ident">as_ref</span>().<span class="ident">create_automod_rule</span>(<span class="self">self</span>.<span class="ident">get</span>(), <span class="kw-2">&amp;</span><span class="ident">map</span>).<span class="kw">await</span>
+        <span class="ident">http</span>.<span class="ident">as_ref</span>().<span class="ident">create_automod_rule</span>(<span class="self">self</span>.<span class="ident">get</span>(), <span class="kw-2">&amp;</span><span class="ident">builder</span>).<span class="kw">await</span>
     }
 
     <span class="doccomment">/// Edit an auto moderation [`Rule`] by its ID.</span>
@@ -1985,9 +1979,7 @@
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">builder</span> <span class="op">=</span> <span class="ident">EditAutoModRule::default</span>();
         <span class="ident">f</span>(<span class="kw-2">&amp;mut</span> <span class="ident">builder</span>);
 
-        <span class="kw">let</span> <span class="ident">map</span> <span class="op">=</span> <span class="ident">json::hashmap_to_json_map</span>(<span class="ident">builder</span>.<span class="number">0</span>);
-
-        <span class="ident">http</span>.<span class="ident">as_ref</span>().<span class="ident">edit_automod_rule</span>(<span class="self">self</span>.<span class="ident">get</span>(), <span class="ident">rule_id</span>.<span class="ident">into</span>().<span class="number">0</span>.<span class="ident">get</span>(), <span class="kw-2">&amp;</span><span class="ident">map</span>).<span class="kw">await</span>
+        <span class="ident">http</span>.<span class="ident">as_ref</span>().<span class="ident">edit_automod_rule</span>(<span class="self">self</span>.<span class="ident">get</span>(), <span class="ident">rule_id</span>.<span class="ident">into</span>().<span class="number">0</span>.<span class="ident">get</span>(), <span class="kw-2">&amp;</span><span class="ident">builder</span>).<span class="kw">await</span>
     }
 
     <span class="doccomment">/// Deletes an auto moderation [`Rule`] from the guild.</span>

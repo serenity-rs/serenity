@@ -4094,6 +4094,10 @@
 <span id="4088">4088</span>
 <span id="4089">4089</span>
 <span id="4090">4090</span>
+<span id="4091">4091</span>
+<span id="4092">4092</span>
+<span id="4093">4093</span>
+<span id="4094">4094</span>
 </pre><pre class="rust"><code><span class="attribute">#![<span class="ident">allow</span>(<span class="ident">clippy::missing_errors_doc</span>)]</span>
 
 <span class="kw">use</span> <span class="ident">std::borrow::Cow</span>;
@@ -6542,8 +6546,12 @@
     <span class="doccomment">/// Creates an auto moderation rule in a guild.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// This method requires `MANAGE_GUILD` permissions.</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">create_automod_rule</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">guild_id</span>: <span class="ident">u64</span>, <span class="ident">map</span>: <span class="kw-2">&amp;</span><span class="ident">JsonMap</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Rule</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">body</span> <span class="op">=</span> <span class="ident">to_vec</span>(<span class="kw-2">&amp;</span><span class="ident">map</span>)<span class="question-mark">?</span>;
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">create_automod_rule</span>(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        <span class="ident">guild_id</span>: <span class="ident">u64</span>,
+        <span class="ident">map</span>: <span class="kw-2">&amp;</span><span class="kw">impl</span> <span class="ident">serde::Serialize</span>,
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Rule</span><span class="op">&gt;</span> {
+        <span class="kw">let</span> <span class="ident">body</span> <span class="op">=</span> <span class="ident">to_vec</span>(<span class="ident">map</span>)<span class="question-mark">?</span>;
 
         <span class="self">self</span>.<span class="ident">fire</span>(<span class="ident">Request</span> {
             <span class="ident">body</span>: <span class="prelude-val">Some</span>(<span class="ident">body</span>),
@@ -6563,9 +6571,9 @@
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">guild_id</span>: <span class="ident">u64</span>,
         <span class="ident">rule_id</span>: <span class="ident">u64</span>,
-        <span class="ident">map</span>: <span class="kw-2">&amp;</span><span class="ident">JsonMap</span>,
+        <span class="ident">map</span>: <span class="kw-2">&amp;</span><span class="kw">impl</span> <span class="ident">serde::Serialize</span>,
     ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Rule</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">body</span> <span class="op">=</span> <span class="ident">to_vec</span>(<span class="kw-2">&amp;</span><span class="ident">map</span>)<span class="question-mark">?</span>;
+        <span class="kw">let</span> <span class="ident">body</span> <span class="op">=</span> <span class="ident">to_vec</span>(<span class="ident">map</span>)<span class="question-mark">?</span>;
 
         <span class="self">self</span>.<span class="ident">fire</span>(<span class="ident">Request</span> {
             <span class="ident">body</span>: <span class="prelude-val">Some</span>(<span class="ident">body</span>),

@@ -686,7 +686,7 @@
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::id</span>::{<span class="ident">ChannelId</span>, <span class="ident">GuildId</span>, <span class="ident">MessageId</span>, <span class="ident">RoleId</span>, <span class="ident">RuleId</span>, <span class="ident">UserId</span>};
 
 <span class="doccomment">/// Configured auto moderation rule.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">PartialEq</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Rule</span> {
     <span class="doccomment">/// ID of the rule.</span>
     <span class="kw">pub</span> <span class="ident">id</span>: <span class="ident">RuleId</span>,
@@ -743,7 +743,7 @@
 }
 
 <span class="doccomment">/// Characterizes the type of content which can trigger the rule.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">PartialEq</span>)]</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>)]</span>
 <span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">Trigger</span> {
     <span class="ident">Keyword</span>(<span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>),
@@ -870,7 +870,7 @@
 <span class="doccomment">/// See [`Change::TriggerMetadata`].</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// [`Change::TriggerMetadata`]: crate::model::guild::audit_log::Change::TriggerMetadata</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">PartialEq</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">TriggerMetadata</span> {
     <span class="ident">keyword_filter</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span><span class="op">&gt;</span>,
     <span class="ident">presets</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">KeywordPresetType</span><span class="op">&gt;</span><span class="op">&gt;</span>,
@@ -910,7 +910,7 @@
 }
 
 <span class="doccomment">/// An action which will execute whenever a rule is triggered.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">PartialEq</span>)]</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>)]</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">Action</span> {
     <span class="doccomment">/// Blocks the content of a message according to the rule.</span>
     <span class="ident">BlockMessage</span>,

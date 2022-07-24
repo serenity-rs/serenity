@@ -282,7 +282,6 @@
 <span id="276">276</span>
 <span id="277">277</span>
 <span id="278">278</span>
-<span id="279">279</span>
 </pre><pre class="rust"><code><span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">application_command</span>;
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">message_component</span>;
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">modal</span>;
@@ -342,9 +341,8 @@
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">app_permissions</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Permissions</span><span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="self">self</span> {
             <span class="ident"><span class="self">Self</span>::Ping</span>(<span class="kw">_</span>) =&gt; <span class="prelude-val">None</span>,
-            <span class="ident"><span class="self">Self</span>::ApplicationCommand</span>(<span class="ident">i</span>) =&gt; <span class="ident">i</span>.<span class="ident">app_permissions</span>,
+            <span class="ident"><span class="self">Self</span>::ApplicationCommand</span>(<span class="ident">i</span>) <span class="op">|</span> <span class="ident"><span class="self">Self</span>::Autocomplete</span>(<span class="ident">i</span>) =&gt; <span class="ident">i</span>.<span class="ident">app_permissions</span>,
             <span class="ident"><span class="self">Self</span>::MessageComponent</span>(<span class="ident">i</span>) =&gt; <span class="ident">i</span>.<span class="ident">app_permissions</span>,
-            <span class="ident"><span class="self">Self</span>::Autocomplete</span>(<span class="ident">i</span>) =&gt; <span class="ident">i</span>.<span class="ident">app_permissions</span>,
             <span class="ident"><span class="self">Self</span>::ModalSubmit</span>(<span class="ident">i</span>) =&gt; <span class="ident">i</span>.<span class="ident">app_permissions</span>,
         }
     }
