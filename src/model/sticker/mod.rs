@@ -78,30 +78,38 @@ impl Sticker {
         }
     }
 
-    /// Edits a sticker, optionally setting its fields.
+    /// Edits the sticker.
     ///
-    /// Requires the [Manage Emojis and Stickers] permission.
+    /// **Note**: Requires the [Manage Emojis and Stickers] permission.
     ///
     /// # Examples
     ///
     /// Rename a sticker:
     ///
-    /// ```rust,ignore
-    /// guild.edit_sticker(&context, StickerId(7), |r| r.name("Bun bun meow"));
+    /// ```rust,no_run
+    /// # use serenity::http::Http;
+    /// # use serenity::model::id::{GuildId, StickerId};
+    /// use serenity::builder::EditSticker;
+    ///
+    /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
+    /// # let http = Http::new("token");
+    /// # let mut sticker = GuildId::new(7).sticker(&http, StickerId::new(7)).await?;
+    /// let builder = EditSticker::default().name("Bun bun meow");
+    /// sticker.edit(&http, builder).await?;
+    /// # Ok(())
+    /// # }
     /// ```
     ///
     /// # Errors
     ///
     /// Returns [`Error::Http`] if the current user lacks permission.
     ///
-    /// [Manage Emojis and Stickers]: crate::model::permissions::Permissions::MANAGE_EMOJIS_AND_STICKERS
+    /// [Manage Emojis and Stickers]: Permissions::MANAGE_EMOJIS_AND_STICKERS
     #[inline]
-    pub async fn edit<F>(&self, http: impl AsRef<Http>, f: F) -> Result<Sticker>
-    where
-        F: FnOnce(&mut EditSticker) -> &mut EditSticker,
-    {
+    pub async fn edit(&mut self, http: impl AsRef<Http>, builder: EditSticker) -> Result<()> {
         if let Some(guild_id) = self.guild_id {
-            guild_id.edit_sticker(&http, self.id, f).await
+            *self = self.id.edit(http, guild_id, builder).await?;
+            Ok(())
         } else {
             Err(Error::Model(ModelError::DeleteNitroSticker))
         }

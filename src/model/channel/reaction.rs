@@ -111,7 +111,7 @@ impl Reaction {
                 }
 
                 if user_id.is_some() {
-                    utils::user_has_perms_cache(
+                    crate::utils::user_has_perms_cache(
                         cache,
                         self.channel_id,
                         self.guild_id,
@@ -150,7 +150,7 @@ impl Reaction {
         #[cfg(feature = "cache")]
         {
             if let Some(cache) = cache_http.cache() {
-                utils::user_has_perms_cache(
+                crate::utils::user_has_perms_cache(
                     cache,
                     self.channel_id,
                     self.guild_id,

@@ -1,15 +1,12 @@
+#[cfg(feature = "http")]
+use crate::http::{CacheHttp, Http};
+#[cfg(feature = "http")]
+use crate::internal::prelude::*;
 use crate::model::prelude::*;
 
-/// A builder to optionally edit certain fields of a [`Guild`]. This is meant
-/// for usage with [`Guild::edit`].
-///
-/// **Note**: Editing a guild requires that the current user have the
-/// [Manage Guild] permission.
-///
-/// [`Guild::edit`]: crate::model::guild::Guild::edit
-/// [`Guild`]: crate::model::guild::Guild
-/// [Manage Guild]: crate::model::permissions::Permissions::MANAGE_GUILD
+/// A builder to optionally edit certain fields of a [`Guild`].
 #[derive(Clone, Debug, Default, Serialize)]
+#[must_use]
 pub struct EditGuild {
     #[serde(skip_serializing_if = "Option::is_none")]
     afk_channel_id: Option<Option<ChannelId>>,
@@ -50,21 +47,54 @@ pub struct EditGuild {
 }
 
 impl EditGuild {
-    /// Set the "AFK voice channel" that users are to move to if they have been
-    /// AFK for an amount of time, configurable by [`Self::afk_timeout`].
+    /// Edits the given guild.
     ///
-    /// The given channel must be either some valid voice channel, or [`None`] to
-    /// not set an AFK channel. The library does not check if a channel is
-    /// valid.
+    /// **Note**: Requires the [Manage Guild] permission.
+    ///
+    /// # Errors
+    ///
+    /// If the `cache` is enabled, returns a [`ModelError::InvalidPermissions`] if the current user
+    /// lacks permission. Otherwise returns [`Error::Http`], as well as if invalid data is given.
+    ///
+    /// [Manage Guild]: Permissions::MANAGE_GUILD
+    #[cfg(feature = "http")]
+    pub async fn execute(
+        self,
+        cache_http: impl CacheHttp,
+        guild_id: GuildId,
+    ) -> Result<PartialGuild> {
+        #[cfg(feature = "cache")]
+        {
+            if let Some(cache) = cache_http.cache() {
+                if let Some(guild) = cache.guild(guild_id) {
+                    let req = Permissions::MANAGE_GUILD;
+
+                    if !guild.has_perms(&cache_http, req).await {
+                        return Err(Error::Model(ModelError::InvalidPermissions(req)));
+                    }
+                }
+            }
+        }
+
+        self._execute(cache_http.http(), guild_id).await
+    }
+
+    #[cfg(feature = "http")]
+    async fn _execute(self, http: &Http, guild_id: GuildId) -> Result<PartialGuild> {
+        http.as_ref().edit_guild(guild_id.into(), &self, None).await
+    }
+
+    /// Set the "AFK voice channel" that users are to move to if they have been AFK for an amount
+    /// of time, configurable by [`Self::afk_timeout`]. Pass [`None`] to unset the current value.
     #[inline]
-    pub fn afk_channel<C: Into<ChannelId>>(&mut self, channel: Option<C>) -> &mut Self {
-        self.afk_channel_id = Some(channel.map(Into::into));
+    pub fn afk_channel(mut self, channel: Option<ChannelId>) -> Self {
+        self.afk_channel_id = Some(channel);
         self
     }
 
-    /// Set the amount of time a user is to be moved to the AFK channel -
-    /// configured via [`Self::afk_channel`] - after being AFK.
-    pub fn afk_timeout(&mut self, timeout: u64) -> &mut Self {
+    /// Set the amount of time a user is to be moved to the AFK channel - configured via
+    /// [`Self::afk_channel`] - after being AFK.
+    pub fn afk_timeout(mut self, timeout: u64) -> Self {
         self.afk_timeout = Some(timeout);
         self
     }
@@ -73,58 +103,63 @@ impl EditGuild {
     ///
     /// # Examples
     ///
-    /// Using the utility function - [`utils::read_image`] - to read an image
-    /// from the cwd and encode it in base64 to send to Discord.
+    /// Using the utility function - [`utils::read_image`] - to read an image and encode it in
+    /// base64, to then set as the guild icon.
     ///
     /// ```rust,no_run
+    /// # use serenity::builder::EditGuild;
     /// # use serenity::{http::Http, model::id::GuildId};
     /// #
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// #     let http = Http::new("token");
     /// #     let mut guild = GuildId::new(1).to_partial_guild(&http).await?;
-    /// use serenity::utils;
+    /// let base64_icon = serenity::utils::read_image("./guild_icon.png")?;
     ///
     /// // assuming a `guild` has already been bound
-    ///
-    /// let base64_icon = utils::read_image("./guild_icon.png")?;
-    ///
-    /// guild.edit(&http, |g| g.icon(Some(base64_icon))).await?;
+    /// let builder = EditGuild::default().icon(Some(base64_icon));
+    /// guild.edit(&http, builder).await?;
     /// #     Ok(())
     /// # }
     /// ```
     ///
     /// [`utils::read_image`]: crate::utils::read_image
-    pub fn icon(&mut self, icon: Option<String>) -> &mut Self {
+    pub fn icon(mut self, icon: Option<String>) -> Self {
         self.icon = Some(icon);
+        self
+    }
+
+    /// Clear the current guild icon, resetting it to the default logo.
+    pub fn delete_icon(mut self) -> Self {
+        self.icon = Some(None);
         self
     }
 
     /// Set the name of the guild.
     ///
     /// **Note**: Must be between (and including) 2-100 characters.
-    pub fn name(&mut self, name: impl Into<String>) -> &mut Self {
+    pub fn name(mut self, name: impl Into<String>) -> Self {
         self.name = Some(name.into());
         self
     }
 
     /// Set the description of the guild.
     ///
-    /// **Note**: Requires that the guild have the `DISCOVERABLE` feature enabled.
-    /// You can check this through a guild's [`features`] list.
+    /// **Note**: Requires that the guild have the `DISCOVERABLE` feature enabled. You can check
+    /// this through a guild's [`features`] list.
     ///
-    /// [`features`]: crate::model::guild::Guild::features
-    pub fn description(&mut self, name: impl Into<String>) -> &mut Self {
+    /// [`features`]: Guild::features
+    pub fn description(mut self, name: impl Into<String>) -> Self {
         self.description = Some(name.into());
         self
     }
 
     /// Set the features of the guild.
     ///
-    /// **Note**: Requires that the guild have the `DISCOVERABLE` feature enabled.
-    /// You can check this through a guild's [`features`] list.
+    /// **Note**: Requires that the guild have the `DISCOVERABLE` feature enabled. You can check
+    /// this through a guild's [`features`] list.
     ///
-    /// [`features`]: crate::model::guild::Guild::features
-    pub fn features(&mut self, features: Vec<String>) -> &mut Self {
+    /// [`features`]: Guild::features
+    pub fn features(mut self, features: Vec<String>) -> Self {
         self.features = Some(features);
         self
     }
@@ -133,7 +168,7 @@ impl EditGuild {
     ///
     /// **Note**: The current user must be the owner of the guild.
     #[inline]
-    pub fn owner<U: Into<UserId>>(&mut self, user_id: U) -> &mut Self {
+    pub fn owner(mut self, user_id: impl Into<UserId>) -> Self {
         self.owner_id = Some(user_id.into());
         self
     }
@@ -142,11 +177,11 @@ impl EditGuild {
     ///
     /// The `splash` must be base64-encoded 1024x1024 png/jpeg/gif image-data.
     ///
-    /// Requires that the guild have the `INVITE_SPLASH` feature enabled.
-    /// You can check this through a guild's [`features`] list.
+    /// Requires that the guild have the `INVITE_SPLASH` feature enabled. You can check this
+    /// through a guild's [`features`] list.
     ///
-    /// [`features`]: crate::model::guild::Guild::features
-    pub fn splash(&mut self, splash: Option<String>) -> &mut Self {
+    /// [`features`]: Guild::features
+    pub fn splash(mut self, splash: Option<String>) -> Self {
         self.splash = Some(splash);
         self
     }
@@ -155,11 +190,11 @@ impl EditGuild {
     ///
     /// The `splash` must be base64-encoded 1024x1024 png/jpeg/gif image-data.
     ///
-    /// Requires that the guild have the `DISCOVERABLE` feature enabled.
-    /// You can check this through a guild's [`features`] list.
+    /// Requires that the guild have the `DISCOVERABLE` feature enabled. You can check this through
+    /// a guild's [`features`] list.
     ///
-    /// [`features`]: crate::model::guild::Guild::features
-    pub fn discovery_splash(&mut self, splash: Option<String>) -> &mut Self {
+    /// [`features`]: Guild::features
+    pub fn discovery_splash(mut self, splash: Option<String>) -> Self {
         self.discovery_splash = Some(splash);
         self
     }
@@ -168,18 +203,17 @@ impl EditGuild {
     ///
     /// The `banner` must be base64-encoded 16:9 png/jpeg image data.
     ///
-    /// Requires that the guild have the `BANNER` feature enabled.
-    /// You can check this through a guild's [`features`] list.
+    /// Requires that the guild have the `BANNER` feature enabled. You can check this through a
+    /// guild's [`features`] list.
     ///
-    /// [`features`]: crate::model::guild::Guild::features
-    pub fn banner(&mut self, banner: Option<String>) -> &mut Self {
+    /// [`features`]: Guild::features
+    pub fn banner(mut self, banner: Option<String>) -> Self {
         self.banner = Some(banner);
         self
     }
 
-    /// Set the channel ID where welcome messages and boost events will be
-    /// posted.
-    pub fn system_channel_id(&mut self, channel_id: Option<ChannelId>) -> &mut Self {
+    /// Set the channel ID where welcome messages and boost events will be posted.
+    pub fn system_channel_id(mut self, channel_id: Option<ChannelId>) -> Self {
         self.system_channel_id = Some(channel_id);
         self
     }
@@ -188,60 +222,57 @@ impl EditGuild {
     ///
     /// **Note**:
     /// This feature is for Community guilds only.
-    pub fn rules_channel_id(&mut self, channel_id: Option<ChannelId>) -> &mut Self {
+    pub fn rules_channel_id(mut self, channel_id: Option<ChannelId>) -> Self {
         self.rules_channel_id = Some(channel_id);
         self
     }
 
-    /// Set the channel ID where admins and moderators receive update messages
-    /// from Discord.
+    /// Set the channel ID where admins and moderators receive update messages from Discord.
     ///
     /// **Note**:
     /// This feature is for Community guilds only.
-    pub fn public_updates_channel_id(&mut self, channel_id: Option<ChannelId>) -> &mut Self {
+    pub fn public_updates_channel_id(mut self, channel_id: Option<ChannelId>) -> Self {
         self.public_updates_channel_id = Some(channel_id);
         self
     }
 
-    /// Set the preferred locale used in Server Discovery and update messages
-    /// from Discord.
+    /// Set the preferred locale used in Server Discovery and update messages from Discord.
     ///
     /// If this is not set, the locale will default to "en-US";
     ///
     /// **Note**:
     /// This feature is for Community guilds only.
-    pub fn preferred_locale(&mut self, locale: Option<String>) -> &mut Self {
+    pub fn preferred_locale(mut self, locale: Option<String>) -> Self {
         self.preferred_locale = Some(locale);
         self
     }
 
     /// Set the content filter level.
-    pub fn explicit_content_filter(&mut self, level: Option<ExplicitContentFilter>) -> &mut Self {
+    pub fn explicit_content_filter(mut self, level: Option<ExplicitContentFilter>) -> Self {
         self.explicit_content_filter = Some(level);
         self
     }
 
     /// Set the default message notification level.
     pub fn default_message_notifications(
-        &mut self,
+        mut self,
         level: Option<DefaultMessageNotificationLevel>,
-    ) -> &mut Self {
+    ) -> Self {
         self.default_message_notifications = Some(level);
         self
     }
 
-    /// Set the verification level of the guild. This can restrict what a
-    /// user must have prior to being able to send messages in a guild.
+    /// Set the verification level of the guild. This can restrict what a user must have prior to
+    /// being able to send messages in a guild.
     ///
-    /// Refer to the documentation for [`VerificationLevel`] for more
-    /// information on each variant.
-    ///
+    /// Refer to the documentation for [`VerificationLevel`] for more information on each variant.
     ///
     /// # Examples
     ///
     /// Setting the verification level to [`High`][`VerificationLevel::High`]:
     ///
     /// ```rust,no_run
+    /// # use serenity::builder::EditGuild;
     /// # use serenity::{http::Http, model::id::GuildId};
     /// #
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
@@ -249,10 +280,10 @@ impl EditGuild {
     /// #     let mut guild = GuildId::new(1).to_partial_guild(&http).await?;
     /// use serenity::model::guild::VerificationLevel;
     ///
+    /// let builder = EditGuild::default().verification_level(VerificationLevel::High);
+    ///
     /// // assuming a `guild` has already been bound
-    ///
-    /// let edit = guild.edit(&http, |g| g.verification_level(VerificationLevel::High)).await;
-    ///
+    /// let edit = guild.edit(&http, builder).await;
     /// if let Err(why) = edit {
     ///     println!("Error setting verification level: {:?}", why);
     /// }
@@ -260,10 +291,7 @@ impl EditGuild {
     /// # }
     /// ```
     #[inline]
-    pub fn verification_level<V>(&mut self, verification_level: V) -> &mut Self
-    where
-        V: Into<VerificationLevel>,
-    {
+    pub fn verification_level(mut self, verification_level: impl Into<VerificationLevel>) -> Self {
         self.verification_level = Some(verification_level.into());
         self
     }
@@ -271,6 +299,7 @@ impl EditGuild {
     /// Modifies the notifications that are sent by discord to the configured system channel.
     ///
     /// ```rust,no_run
+    /// # use serenity::builder::EditGuild;
     /// # use serenity::{http::Http, model::id::GuildId};
     /// #
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
@@ -278,24 +307,20 @@ impl EditGuild {
     /// #     let mut guild = GuildId::new(1).to_partial_guild(&http).await?;
     /// use serenity::model::guild::SystemChannelFlags;
     ///
+    /// let builder = EditGuild::default().system_channel_flags(
+    ///     SystemChannelFlags::SUPPRESS_JOIN_NOTIFICATIONS
+    ///         | SystemChannelFlags::SUPPRESS_GUILD_REMINDER_NOTIFICATIONS,
+    /// );
+    ///
     /// // assuming a `guild` has already been bound
-    ///
-    /// let edit = guild
-    ///     .edit(&http, |g| {
-    ///         g.system_channel_flags(
-    ///             SystemChannelFlags::SUPPRESS_JOIN_NOTIFICATIONS
-    ///                 | SystemChannelFlags::SUPPRESS_GUILD_REMINDER_NOTIFICATIONS,
-    ///         )
-    ///     })
-    ///     .await;
-    ///
+    /// let edit = guild.edit(&http, builder).await;
     /// if let Err(why) = edit {
-    ///     println!("Error setting verification level: {:?}", why);
+    ///     println!("Error setting system channel flags: {:?}", why);
     /// }
     /// #     Ok(())
     /// # }
     /// ```
-    pub fn system_channel_flags(&mut self, system_channel_flags: SystemChannelFlags) -> &mut Self {
+    pub fn system_channel_flags(mut self, system_channel_flags: SystemChannelFlags) -> Self {
         self.system_channel_flags = Some(system_channel_flags);
         self
     }
