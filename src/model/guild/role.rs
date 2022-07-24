@@ -151,14 +151,7 @@ impl Role {
     ///
     /// # Examples
     ///
-    /// Make a role hoisted:
-    ///
-    /// ```rust,ignore
-    /// # use serenity::model::id::RoleId;
-    /// # let role = RoleId::new(7).to_role_cached(&cache).unwrap();
-    /// // assuming a `role` has already been bound
-    /// role.edit(|r| r.hoist(true));
-    /// ```
+    /// See the documentation of [`EditRole`] for details.
     ///
     /// # Errors
     ///
@@ -167,12 +160,9 @@ impl Role {
     ///
     /// [Manage Roles]: Permissions::MANAGE_ROLES
     #[inline]
-    pub async fn edit(
-        &self,
-        http: impl AsRef<Http>,
-        f: impl FnOnce(&mut EditRole) -> &mut EditRole,
-    ) -> Result<Role> {
-        self.guild_id.edit_role(http, self.id, f).await
+    pub async fn edit(&mut self, http: impl AsRef<Http>, builder: EditRole) -> Result<()> {
+        *self = self.guild_id.edit_role(http.as_ref(), self.id, builder).await?;
+        Ok(())
     }
 
     /// Check that the role has the given permission.

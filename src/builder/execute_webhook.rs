@@ -1,27 +1,21 @@
-#[cfg(not(feature = "model"))]
-use std::marker::PhantomData;
-
 use super::{CreateAllowedMentions, CreateComponents, CreateEmbed};
-#[cfg(feature = "model")]
-use crate::model::channel::AttachmentType;
-use crate::model::channel::MessageFlags;
+#[cfg(feature = "http")]
+use crate::http::Http;
+#[cfg(feature = "http")]
+use crate::internal::prelude::*;
+use crate::model::prelude::*;
 
-/// A builder to create the inner content of a [`Webhook`]'s execution.
+/// A builder to create the content for a [`Webhook`]'s execution.
 ///
-/// This is a structured way of cleanly creating the inner execution payload,
-/// to reduce potential argument counts.
-///
-/// Refer to the documentation for [`execute_webhook`] on restrictions with
-/// execution payloads and its fields.
+/// Refer to [`Http::execute_webhook`] for restrictions and requirements on the execution payload.
 ///
 /// # Examples
 ///
-/// Creating two embeds, and then sending them as part of the delivery
-/// payload of [`Webhook::execute`]:
+/// Creating two embeds, and then sending them as part of the payload using [`Webhook::execute`]:
 ///
 /// ```rust,no_run
+/// use serenity::builder::{CreateEmbed, ExecuteWebhook};
 /// use serenity::http::Http;
-/// use serenity::model::channel::Embed;
 /// use serenity::model::webhook::Webhook;
 /// use serenity::utils::Colour;
 ///
@@ -30,33 +24,27 @@ use crate::model::channel::MessageFlags;
 /// let url = "https://discord.com/api/webhooks/245037420704169985/ig5AO-wdVWpCBtUUMxmgsWryqgsW3DChbKYOINftJ4DCrUbnkedoYZD0VOH1QLr-S3sV";
 /// let webhook = Webhook::from_url(&http, url).await?;
 ///
-/// let website = Embed::fake(|e| {
-///     e.title("The Rust Language Website")
-///         .description("Rust is a systems programming language.")
-///         .colour(Colour::from_rgb(222, 165, 132))
-/// });
+/// let website = CreateEmbed::default()
+///     .title("The Rust Language Website")
+///     .description("Rust is a systems programming language.")
+///     .colour(Colour::from_rgb(222, 165, 132));
 ///
-/// let resources = Embed::fake(|e| {
-///     e.title("Rust Resources")
-///         .description("A few resources to help with learning Rust")
-///         .colour(0xDEA584)
-///         .field("The Rust Book", "A comprehensive resource for Rust.", false)
-///         .field("Rust by Example", "A collection of Rust examples", false)
-/// });
+/// let resources = CreateEmbed::default()
+///     .title("Rust Resources")
+///     .description("A few resources to help with learning Rust")
+///     .colour(0xDEA584)
+///     .field("The Rust Book", "A comprehensive resource for Rust.", false)
+///     .field("Rust by Example", "A collection of Rust examples", false);
 ///
-/// webhook
-///     .execute(&http, false, |w| {
-///         w.content("Here's some information on Rust:").embeds(vec![website, resources])
-///     })
-///     .await?;
+/// let builder = ExecuteWebhook::default()
+///     .content("Here's some information on Rust:")
+///     .embeds(vec![website, resources]);
+/// webhook.execute(&http, false, builder).await?;
 /// #     Ok(())
 /// # }
 /// ```
-///
-/// [`Webhook`]: crate::model::webhook::Webhook
-/// [`Webhook::execute`]: crate::model::webhook::Webhook::execute
-/// [`execute_webhook`]: crate::http::client::Http::execute_webhook
 #[derive(Clone, Debug, Default, Serialize)]
+#[must_use]
 pub struct ExecuteWebhook<'a> {
     tts: bool,
     embeds: Vec<CreateEmbed>,
@@ -74,13 +62,65 @@ pub struct ExecuteWebhook<'a> {
     flags: Option<MessageFlags>,
 
     #[serde(skip)]
-    #[cfg(feature = "model")]
-    pub(crate) files: Vec<AttachmentType<'a>>,
-    #[cfg(not(feature = "model"))]
-    files: PhantomData<&'a ()>,
+    thread_id: Option<ChannelId>,
+    #[serde(skip)]
+    files: Vec<AttachmentType<'a>>,
 }
 
 impl<'a> ExecuteWebhook<'a> {
+    /// Executes the webhook with the given content.
+    ///
+    /// If `wait` is set to false, this function will return `Ok(None)` on success. Otherwise,
+    /// Discord will wait for confirmation that the message was sent, and this function will
+    /// instead return `Ok(Some(Message))`.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`Error::Http`] if the content is malformed, if the token is invalid, or if
+    /// execution is attempted in a thread not belonging to the webhook's [`Channel`].
+    ///
+    /// Returns [`Error::Json`] if there is an error in deserialising Discord's response.
+    #[cfg(feature = "http")]
+    pub async fn execute(
+        mut self,
+        http: impl AsRef<Http>,
+        webhook_id: WebhookId,
+        token: &str,
+        wait: bool,
+    ) -> Result<Option<Message>> {
+        self.check_length()?;
+        let webhook_id = webhook_id.into();
+        let thread_id = self.thread_id.map(Into::into);
+        let files = std::mem::take(&mut self.files);
+
+        if files.is_empty() {
+            http.as_ref().execute_webhook(webhook_id, thread_id, token, wait, &self).await
+        } else {
+            http.as_ref()
+                .execute_webhook_with_files(webhook_id, thread_id, token, wait, files, &self)
+                .await
+        }
+    }
+
+    #[cfg(feature = "http")]
+    fn check_length(&self) -> Result<()> {
+        if let Some(content) = &self.content {
+            let length = content.chars().count();
+            let max_length = crate::constants::MESSAGE_CODE_LIMIT;
+            if length > max_length {
+                return Err(Error::Model(ModelError::MessageTooLong(length - max_length)));
+            }
+        }
+
+        if self.embeds.len() > crate::constants::EMBED_MAX_COUNT {
+            return Err(Error::Model(ModelError::EmbedAmount));
+        }
+        for embed in &self.embeds {
+            embed.check_length()?;
+        }
+        Ok(())
+    }
+
     /// Override the default avatar of the webhook with an image URL.
     ///
     /// # Examples
@@ -88,6 +128,7 @@ impl<'a> ExecuteWebhook<'a> {
     /// Overriding the default avatar:
     ///
     /// ```rust,no_run
+    /// # use serenity::builder::ExecuteWebhook;
     /// # use serenity::http::Http;
     /// # use serenity::model::webhook::Webhook;
     /// #
@@ -95,13 +136,14 @@ impl<'a> ExecuteWebhook<'a> {
     /// # let http = Http::new("token");
     /// # let webhook = Webhook::from_id_with_token(&http, 0, "").await?;
     /// #
-    /// let avatar_url = "https://i.imgur.com/KTs6whd.jpg";
-    ///
-    /// webhook.execute(&http, false, |w| w.avatar_url(avatar_url).content("Here's a webhook")).await?;
+    /// let builder = ExecuteWebhook::default()
+    ///     .avatar_url("https://i.imgur.com/KTs6whd.jpg")
+    ///     .content("Here's a webhook");
+    /// webhook.execute(&http, false, builder).await?;
     /// #     Ok(())
     /// # }
     /// ```
-    pub fn avatar_url(&mut self, avatar_url: impl Into<String>) -> &mut Self {
+    pub fn avatar_url(mut self, avatar_url: impl Into<String>) -> Self {
         self.avatar_url = Some(avatar_url.into());
         self
     }
@@ -116,6 +158,7 @@ impl<'a> ExecuteWebhook<'a> {
     /// Sending a webhook with a content of `"foo"`:
     ///
     /// ```rust,no_run
+    /// # use serenity::builder::ExecuteWebhook;
     /// # use serenity::http::Http;
     /// # use serenity::model::webhook::Webhook;
     /// #
@@ -123,7 +166,8 @@ impl<'a> ExecuteWebhook<'a> {
     /// # let http = Http::new("token");
     /// # let webhook = Webhook::from_id_with_token(&http, 0, "").await?;
     /// #
-    /// let execution = webhook.execute(&http, false, |w| w.content("foo")).await;
+    /// let builder = ExecuteWebhook::default().content("foo");
+    /// let execution = webhook.execute(&http, false, builder).await;
     ///
     /// if let Err(why) = execution {
     ///     println!("Err sending webhook: {:?}", why);
@@ -131,87 +175,95 @@ impl<'a> ExecuteWebhook<'a> {
     /// #     Ok(())
     /// # }
     /// ```
-    pub fn content(&mut self, content: impl Into<String>) -> &mut Self {
+    pub fn content(mut self, content: impl Into<String>) -> Self {
         self.content = Some(content.into());
         self
     }
 
+    /// Execute within a given thread. If the provided thread Id doesn't belong to the current
+    /// webhook, the API will return an error.
+    ///
+    /// **Note**: If the given thread is archived, it will automatically be unarchived.
+    ///
+    /// # Examples
+    ///
+    /// Execute a webhook with message content of `test`, in a thread with Id `12345678`:
+    ///
+    /// ```rust,no_run
+    /// # use serenity::builder::ExecuteWebhook;
+    /// # use serenity::http::Http;
+    /// # use serenity::model::webhook::Webhook;
+    /// #
+    /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
+    /// # let http = Http::new("token");
+    /// let url = "https://discord.com/api/webhooks/245037420704169985/ig5AO-wdVWpCBtUUMxmgsWryqgsW3DChbKYOINftJ4DCrUbnkedoYZD0VOH1QLr-S3sV";
+    /// let mut webhook = Webhook::from_url(&http, url).await?;
+    ///
+    /// let builder = ExecuteWebhook::default().in_thread(12345678).content("test");
+    /// webhook.execute(&http, false, builder).await?;
+    /// #     Ok(())
+    /// # }
+    /// ```
+    pub fn in_thread(mut self, thread_id: impl Into<ChannelId>) -> Self {
+        self.thread_id = Some(thread_id.into());
+        self
+    }
+
     /// Appends a file to the webhook message.
-    #[cfg(feature = "model")]
-    pub fn add_file<T: Into<AttachmentType<'a>>>(&mut self, file: T) -> &mut Self {
+    pub fn add_file(mut self, file: impl Into<AttachmentType<'a>>) -> Self {
         self.files.push(file.into());
         self
     }
 
     /// Appends a list of files to the webhook message.
-    #[cfg(feature = "model")]
     pub fn add_files<T: Into<AttachmentType<'a>>, It: IntoIterator<Item = T>>(
-        &mut self,
+        mut self,
         files: It,
-    ) -> &mut Self {
+    ) -> Self {
         self.files.extend(files.into_iter().map(Into::into));
         self
     }
 
     /// Sets a list of files to include in the webhook message.
     ///
-    /// Calling this multiple times will overwrite the file list.
-    /// To append files, call [`Self::add_file`] or [`Self::add_files`] instead.
-    #[cfg(feature = "model")]
+    /// Calling this multiple times will overwrite the file list. To append files, call
+    /// [`Self::add_file`] or [`Self::add_files`] instead.
     pub fn files<T: Into<AttachmentType<'a>>, It: IntoIterator<Item = T>>(
-        &mut self,
+        mut self,
         files: It,
-    ) -> &mut Self {
+    ) -> Self {
         self.files = files.into_iter().map(Into::into).collect();
         self
     }
 
     /// Set the allowed mentions for the message.
-    pub fn allowed_mentions<F>(&mut self, f: F) -> &mut Self
-    where
-        F: FnOnce(&mut CreateAllowedMentions) -> &mut CreateAllowedMentions,
-    {
-        let mut allowed_mentions = CreateAllowedMentions::default();
-        f(&mut allowed_mentions);
-
+    pub fn allowed_mentions(mut self, allowed_mentions: CreateAllowedMentions) -> Self {
         self.allowed_mentions = Some(allowed_mentions);
         self
     }
 
-    /// Creates components for this message. Requires an application-owned webhook, meaning either
+    /// Sets the components for this message. Requires an application-owned webhook, meaning either
     /// the webhook's `kind` field is set to [`WebhookType::Application`], or it was created by an
     /// application (and has kind [`WebhookType::Incoming`]).
     ///
     /// [`WebhookType::Application`]: crate::model::webhook::WebhookType
     /// [`WebhookType::Incoming`]: crate::model::webhook::WebhookType
-    pub fn components<F>(&mut self, f: F) -> &mut Self
-    where
-        F: FnOnce(&mut CreateComponents) -> &mut CreateComponents,
-    {
-        let mut components = CreateComponents::default();
-        f(&mut components);
-
-        self.set_components(components)
-    }
-
-    /// Sets the components of this message. Requires an application-owned webhook. See
-    /// [`components`] for details.
-    ///
-    /// [`components`]: crate::builder::ExecuteWebhook::components
-    pub fn set_components(&mut self, components: CreateComponents) -> &mut Self {
+    pub fn components(mut self, components: CreateComponents) -> Self {
         self.components = Some(components);
         self
     }
 
-    /// Set the embeds associated with the message.
+    /// Set an embed for the message.
     ///
-    /// # Examples
-    ///
-    /// Refer to the [struct-level documentation] for an example on how to use
-    /// embeds.
+    /// Refer to the [struct-level documentation] for an example on how to use embeds.
     ///
     /// [struct-level documentation]: #examples
-    pub fn embeds(&mut self, embeds: Vec<CreateEmbed>) -> &mut Self {
+    pub fn embed(self, embed: CreateEmbed) -> Self {
+        self.embeds(vec![embed])
+    }
+
+    /// Set multiple embeds for the message.
+    pub fn embeds(mut self, embeds: Vec<CreateEmbed>) -> Self {
         self.embeds = embeds;
         self
     }
@@ -223,6 +275,7 @@ impl<'a> ExecuteWebhook<'a> {
     /// Sending a webhook with text-to-speech enabled:
     ///
     /// ```rust,no_run
+    /// # use serenity::builder::ExecuteWebhook;
     /// # use serenity::http::Http;
     /// # use serenity::model::webhook::Webhook;
     /// #
@@ -230,7 +283,8 @@ impl<'a> ExecuteWebhook<'a> {
     /// # let http = Http::new("token");
     /// # let webhook = Webhook::from_id_with_token(&http, 0, "").await?;
     /// #
-    /// let execution = webhook.execute(&http, false, |w| w.content("hello").tts(true)).await;
+    /// let builder = ExecuteWebhook::default().content("hello").tts(true);
+    /// let execution = webhook.execute(&http, false, builder).await;
     ///
     /// if let Err(why) = execution {
     ///     println!("Err sending webhook: {:?}", why);
@@ -238,7 +292,7 @@ impl<'a> ExecuteWebhook<'a> {
     /// #     Ok(())
     /// # }
     /// ```
-    pub fn tts(&mut self, tts: bool) -> &mut Self {
+    pub fn tts(mut self, tts: bool) -> Self {
         self.tts = tts;
         self
     }
@@ -250,6 +304,7 @@ impl<'a> ExecuteWebhook<'a> {
     /// Overriding the username to `"hakase"`:
     ///
     /// ```rust,no_run
+    /// # use serenity::builder::ExecuteWebhook;
     /// # use serenity::http::Http;
     /// # use serenity::model::webhook::Webhook;
     /// #
@@ -257,7 +312,8 @@ impl<'a> ExecuteWebhook<'a> {
     /// # let http = Http::new("token");
     /// # let webhook = Webhook::from_id_with_token(&http, 0, "").await?;
     /// #
-    /// let execution = webhook.execute(&http, false, |w| w.content("hello").username("hakase")).await;
+    /// let builder = ExecuteWebhook::default().content("hello").username("hakase");
+    /// let execution = webhook.execute(&http, false, builder).await;
     ///
     /// if let Err(why) = execution {
     ///     println!("Err sending webhook: {:?}", why);
@@ -265,7 +321,7 @@ impl<'a> ExecuteWebhook<'a> {
     /// #     Ok(())
     /// # }
     /// ```
-    pub fn username(&mut self, username: impl Into<String>) -> &mut Self {
+    pub fn username(mut self, username: impl Into<String>) -> Self {
         self.username = Some(username.into());
         self
     }
@@ -277,6 +333,7 @@ impl<'a> ExecuteWebhook<'a> {
     /// Suppressing an embed on the message.
     ///
     /// ```rust,no_run
+    /// # use serenity::builder::ExecuteWebhook;
     /// # use serenity::http::Http;
     /// # use serenity::model::channel::MessageFlags;
     /// # use serenity::model::webhook::Webhook;
@@ -285,12 +342,10 @@ impl<'a> ExecuteWebhook<'a> {
     /// # let http = Http::new("token");
     /// # let webhook = Webhook::from_id_with_token(&http, 0, "").await?;
     /// #
-    /// let execution = webhook
-    ///     .execute(&http, false, |w| {
-    ///         w.content("https://docs.rs/serenity/latest/serenity/")
-    ///             .flags(MessageFlags::SUPPRESS_EMBEDS)
-    ///     })
-    ///     .await;
+    /// let builder = ExecuteWebhook::default()
+    ///     .content("https://docs.rs/serenity/latest/serenity/")
+    ///     .flags(MessageFlags::SUPPRESS_EMBEDS);
+    /// let execution = webhook.execute(&http, false, builder).await;
     ///
     /// if let Err(why) = execution {
     ///     println!("Err sending webhook: {:?}", why);
@@ -298,7 +353,7 @@ impl<'a> ExecuteWebhook<'a> {
     /// #     Ok(())
     /// # }
     /// ```
-    pub fn flags(&mut self, flags: MessageFlags) -> &mut Self {
+    pub fn flags(mut self, flags: MessageFlags) -> Self {
         self.flags = Some(flags);
         self
     }
