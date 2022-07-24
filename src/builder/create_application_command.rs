@@ -340,8 +340,8 @@ impl CreateApplicationCommand {
             (Some(guild_id), None) => {
                 http.create_guild_application_command(guild_id.into(), &self).await
             },
-            (None, Some(channel_id)) => {
-                http.edit_global_application_command(channel_id.into(), &self).await
+            (None, Some(command_id)) => {
+                http.edit_global_application_command(command_id.into(), &self).await
             },
             (None, None) => http.create_global_application_command(&self).await,
         }
