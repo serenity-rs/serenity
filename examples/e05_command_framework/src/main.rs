@@ -14,6 +14,7 @@ use std::fmt::Write;
 use std::sync::Arc;
 
 use serenity::async_trait;
+use serenity::builder::EditChannel;
 use serenity::client::bridge::gateway::{ShardId, ShardManager};
 use serenity::framework::standard::buckets::{LimitedFor, RevertBucket};
 use serenity::framework::standard::macros::{check, command, group, help, hook};
@@ -564,9 +565,8 @@ async fn am_i_admin(ctx: &Context, msg: &Message, _args: Args) -> CommandResult 
 #[command]
 async fn slow_mode(ctx: &Context, msg: &Message, mut args: Args) -> CommandResult {
     let say_content = if let Ok(slow_mode_rate_seconds) = args.single::<u64>() {
-        if let Err(why) =
-            msg.channel_id.edit(&ctx.http, |c| c.rate_limit_per_user(slow_mode_rate_seconds)).await
-        {
+        let builder = EditChannel::default().rate_limit_per_user(slow_mode_rate_seconds);
+        if let Err(why) = msg.channel_id.edit(&ctx.http, builder).await {
             println!("Error setting channel's slow mode rate: {:?}", why);
 
             format!("Failed to set slow mode to `{}` seconds.", slow_mode_rate_seconds)

@@ -1,9 +1,12 @@
 use std::collections::HashMap;
 
-use crate::json::prelude::*;
+#[cfg(feature = "http")]
+use crate::http::Http;
+use crate::internal::prelude::*;
+#[cfg(feature = "http")]
+use crate::model::application::command::Command;
 use crate::model::application::command::{CommandOptionType, CommandType};
-use crate::model::channel::ChannelType;
-use crate::model::Permissions;
+use crate::model::prelude::*;
 
 #[derive(Clone, Debug, Serialize)]
 pub struct CommandOptionChoice {
@@ -24,10 +27,8 @@ enum Number {
 /// [`Self::kind`], [`Self::name`], and [`Self::description`] are required fields.
 ///
 /// [`CommandOption`]: crate::model::application::command::CommandOption
-/// [`kind`]: Self::kind
-/// [`name`]: Self::name
-/// [`description`]: Self::description
 #[derive(Clone, Debug, Default, Serialize)]
+#[must_use]
 pub struct CreateApplicationCommandOption {
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "type")]
@@ -60,7 +61,7 @@ pub struct CreateApplicationCommandOption {
 
 impl CreateApplicationCommandOption {
     /// Sets the `CommandOptionType`.
-    pub fn kind(&mut self, kind: CommandOptionType) -> &mut Self {
+    pub fn kind(mut self, kind: CommandOptionType) -> Self {
         self.kind = Some(kind);
         self
     }
@@ -68,7 +69,7 @@ impl CreateApplicationCommandOption {
     /// Sets the name of the option.
     ///
     /// **Note**: Must be between 1 and 32 lowercase characters, matching `r"^[\w-]{1,32}$"`.
-    pub fn name(&mut self, name: impl Into<String>) -> &mut Self {
+    pub fn name(mut self, name: impl Into<String>) -> Self {
         self.name = Some(name.into());
         self
     }
@@ -81,11 +82,7 @@ impl CreateApplicationCommandOption {
     /// .name_localized("zh-CN", "岁数")
     /// # ;
     /// ```
-    pub fn name_localized(
-        &mut self,
-        locale: impl Into<String>,
-        name: impl Into<String>,
-    ) -> &mut Self {
+    pub fn name_localized(mut self, locale: impl Into<String>, name: impl Into<String>) -> Self {
         self.name_localizations.insert(locale.into(), name.into());
         self
     }
@@ -93,7 +90,7 @@ impl CreateApplicationCommandOption {
     /// Sets the description for the option.
     ///
     /// **Note**: Must be between 1 and 100 characters.
-    pub fn description(&mut self, description: impl Into<String>) -> &mut Self {
+    pub fn description(mut self, description: impl Into<String>) -> Self {
         self.description = Some(description.into());
         self
     }
@@ -107,10 +104,10 @@ impl CreateApplicationCommandOption {
     /// # ;
     /// ```
     pub fn description_localized(
-        &mut self,
+        mut self,
         locale: impl Into<String>,
         description: impl Into<String>,
-    ) -> &mut Self {
+    ) -> Self {
         self.description_localizations.insert(locale.into(), description.into());
         self
     }
@@ -118,7 +115,7 @@ impl CreateApplicationCommandOption {
     /// The first required option for the user to complete.
     ///
     /// **Note**: Only one option can be `default`.
-    pub fn default_option(&mut self, default: bool) -> &mut Self {
+    pub fn default_option(mut self, default: bool) -> Self {
         self.default = Some(default);
         self
     }
@@ -126,15 +123,16 @@ impl CreateApplicationCommandOption {
     /// Sets if this option is required or optional.
     ///
     /// **Note**: This defaults to `false`.
-    pub fn required(&mut self, required: bool) -> &mut Self {
+    pub fn required(mut self, required: bool) -> Self {
         self.required = Some(required);
         self
     }
 
     /// Adds an optional int-choice.
     ///
-    /// **Note**: There can be no more than 25 choices set. Name must be between 1 and 100 characters. Value must be between -2^53 and 2^53.
-    pub fn add_int_choice(&mut self, name: impl Into<String>, value: i32) -> &mut Self {
+    /// **Note**: There can be no more than 25 choices set. Name must be between 1 and 100
+    /// characters. Value must be between -2^53 and 2^53.
+    pub fn add_int_choice(self, name: impl Into<String>, value: i32) -> Self {
         self.add_choice(CommandOptionChoice {
             name: name.into(),
             value: Value::from(value),
@@ -144,11 +142,11 @@ impl CreateApplicationCommandOption {
 
     /// Adds a localized optional int-choice. See [`Self::add_int_choice`] for more info.
     pub fn add_int_choice_localized(
-        &mut self,
+        self,
         name: impl Into<String>,
         value: i32,
         locales: impl IntoIterator<Item = (impl Into<String>, impl Into<String>)>,
-    ) -> &mut Self {
+    ) -> Self {
         self.add_choice(CommandOptionChoice {
             name: name.into(),
             value: Value::from(value),
@@ -158,12 +156,9 @@ impl CreateApplicationCommandOption {
 
     /// Adds an optional string-choice.
     ///
-    /// **Note**: There can be no more than 25 choices set. Name must be between 1 and 100 characters. Value must be up to 100 characters.
-    pub fn add_string_choice(
-        &mut self,
-        name: impl Into<String>,
-        value: impl Into<String>,
-    ) -> &mut Self {
+    /// **Note**: There can be no more than 25 choices set. Name must be between 1 and 100
+    /// characters. Value must be up to 100 characters.
+    pub fn add_string_choice(self, name: impl Into<String>, value: impl Into<String>) -> Self {
         self.add_choice(CommandOptionChoice {
             name: name.into(),
             value: Value::String(value.into()),
@@ -173,11 +168,11 @@ impl CreateApplicationCommandOption {
 
     /// Adds a localized optional string-choice. See [`Self::add_string_choice`] for more info.
     pub fn add_string_choice_localized(
-        &mut self,
+        self,
         name: impl Into<String>,
         value: impl Into<String>,
         locales: impl IntoIterator<Item = (impl Into<String>, impl Into<String>)>,
-    ) -> &mut Self {
+    ) -> Self {
         self.add_choice(CommandOptionChoice {
             name: name.into(),
             value: Value::String(value.into()),
@@ -187,8 +182,9 @@ impl CreateApplicationCommandOption {
 
     /// Adds an optional number-choice.
     ///
-    /// **Note**: There can be no more than 25 choices set. Name must be between 1 and 100 characters. Value must be between -2^53 and 2^53.
-    pub fn add_number_choice(&mut self, name: impl Into<String>, value: f64) -> &mut Self {
+    /// **Note**: There can be no more than 25 choices set. Name must be between 1 and 100
+    /// characters. Value must be between -2^53 and 2^53.
+    pub fn add_number_choice(self, name: impl Into<String>, value: f64) -> Self {
         self.add_choice(CommandOptionChoice {
             name: name.into(),
             value: Value::from(value),
@@ -198,11 +194,11 @@ impl CreateApplicationCommandOption {
 
     /// Adds a localized optional number-choice. See [`Self::add_number_choice`] for more info.
     pub fn add_number_choice_localized(
-        &mut self,
+        self,
         name: impl Into<String>,
         value: f64,
         locales: impl IntoIterator<Item = (impl Into<String>, impl Into<String>)>,
-    ) -> &mut Self {
+    ) -> Self {
         self.add_choice(CommandOptionChoice {
             name: name.into(),
             value: Value::from(value),
@@ -210,7 +206,7 @@ impl CreateApplicationCommandOption {
         })
     }
 
-    fn add_choice(&mut self, value: CommandOptionChoice) -> &mut Self {
+    fn add_choice(mut self, value: CommandOptionChoice) -> Self {
         self.choices.push(value);
         self
     }
@@ -220,73 +216,52 @@ impl CreateApplicationCommandOption {
     /// **Notes**:
     /// - May not be set to `true` if `choices` are set
     /// - Options using `autocomplete` are not confined to only use given choices
-    pub fn set_autocomplete(&mut self, value: bool) -> &mut Self {
+    pub fn set_autocomplete(mut self, value: bool) -> Self {
         self.autocomplete = Some(value);
-
         self
     }
 
     /// If the option is a [`SubCommandGroup`] or [`SubCommand`], nested options are its parameters.
     ///
-    /// **Note**: A command can have up to 25 subcommand groups, or subcommands. A subcommand group can have up to 25 subcommands. A subcommand can have up to 25 options.
+    /// **Note**: A command can have up to 25 subcommand groups, or subcommands. A subcommand group
+    /// can have up to 25 subcommands. A subcommand can have up to 25 options.
     ///
     /// [`SubCommandGroup`]: crate::model::application::command::CommandOptionType::SubCommandGroup
     /// [`SubCommand`]: crate::model::application::command::CommandOptionType::SubCommand
-    pub fn create_sub_option<F>(&mut self, f: F) -> &mut Self
-    where
-        F: FnOnce(&mut CreateApplicationCommandOption) -> &mut CreateApplicationCommandOption,
-    {
-        let mut data = CreateApplicationCommandOption::default();
-        f(&mut data);
-        self.add_sub_option(data)
-    }
-
-    /// If the option is a [`SubCommandGroup`] or [`SubCommand`], nested options are its parameters.
-    ///
-    /// **Note**: A command can have up to 25 subcommand groups, or subcommands. A subcommand group can have up to 25 subcommands. A subcommand can have up to 25 options.
-    ///
-    /// [`SubCommandGroup`]: crate::model::application::command::CommandOptionType::SubCommandGroup
-    /// [`SubCommand`]: crate::model::application::command::CommandOptionType::SubCommand
-    pub fn add_sub_option(&mut self, sub_option: CreateApplicationCommandOption) -> &mut Self {
+    pub fn add_sub_option(mut self, sub_option: CreateApplicationCommandOption) -> Self {
         self.options.push(sub_option);
-
         self
     }
 
     /// If the option is a [`Channel`], it will only be able to show these types.
     ///
     /// [`Channel`]: crate::model::application::command::CommandOptionType::Channel
-    pub fn channel_types(&mut self, channel_types: Vec<ChannelType>) -> &mut Self {
+    pub fn channel_types(mut self, channel_types: Vec<ChannelType>) -> Self {
         self.channel_types = channel_types;
-
         self
     }
 
     /// Sets the minimum permitted value for this integer option
-    pub fn min_int_value(&mut self, value: u64) -> &mut Self {
+    pub fn min_int_value(mut self, value: u64) -> Self {
         self.min_value = Some(Number::Integer(value));
-
         self
     }
 
     /// Sets the maximum permitted value for this integer option
-    pub fn max_int_value(&mut self, value: u64) -> &mut Self {
+    pub fn max_int_value(mut self, value: u64) -> Self {
         self.max_value = Some(Number::Integer(value));
-
         self
     }
 
     /// Sets the minimum permitted value for this number option
-    pub fn min_number_value(&mut self, value: f64) -> &mut Self {
+    pub fn min_number_value(mut self, value: f64) -> Self {
         self.min_value = Some(Number::Float(value));
-
         self
     }
 
     /// Sets the maximum permitted value for this number option
-    pub fn max_number_value(&mut self, value: f64) -> &mut Self {
+    pub fn max_number_value(mut self, value: f64) -> Self {
         self.max_value = Some(Number::Float(value));
-
         self
     }
 
@@ -315,6 +290,7 @@ impl CreateApplicationCommandOption {
 ///
 /// [`Command`]: crate::model::application::command::Command
 #[derive(Clone, Debug, Default, Serialize)]
+#[must_use]
 pub struct CreateApplicationCommand {
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "type")]
@@ -335,10 +311,48 @@ pub struct CreateApplicationCommand {
 }
 
 impl CreateApplicationCommand {
+    /// Create a [`Command`], overriding an existing one with the same name if it exists.
+    ///
+    /// Providing a `command_id` will edit the corresponding command.
+    ///
+    /// Providing a `guild_id` will create a command in the corresponding [`Guild`]. Otherwise, a
+    /// global command will be created.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`Error::Http`] if invalid data is given. See [Discord's docs] for more details.
+    ///
+    /// May also return [`Error::Json`] if there is an error in deserializing the API response.
+    ///
+    /// [Discord's docs]: https://discord.com/developers/docs/interactions/slash-commands
+    #[cfg(feature = "http")]
+    pub async fn execute(
+        self,
+        http: impl AsRef<Http>,
+        guild_id: Option<GuildId>,
+        command_id: Option<CommandId>,
+    ) -> Result<Command> {
+        let http = http.as_ref();
+        match (guild_id, command_id) {
+            (Some(guild_id), Some(command_id)) => {
+                http.edit_guild_application_command(guild_id.into(), command_id.into(), &self).await
+            },
+            (Some(guild_id), None) => {
+                http.create_guild_application_command(guild_id.into(), &self).await
+            },
+            (None, Some(command_id)) => {
+                http.edit_global_application_command(command_id.into(), &self).await
+            },
+            (None, None) => http.create_global_application_command(&self).await,
+        }
+    }
+
     /// Specifies the name of the application command.
     ///
-    /// **Note**: Must be between 1 and 32 lowercase characters, matching `r"^[\w-]{1,32}$"`. Two global commands of the same app cannot have the same name. Two guild-specific commands of the same app cannot have the same name.
-    pub fn name(&mut self, name: impl Into<String>) -> &mut Self {
+    /// **Note**: Must be between 1 and 32 lowercase characters, matching `r"^[\w-]{1,32}$"`. Two
+    /// global commands of the same app cannot have the same name. Two guild-specific commands of
+    /// the same app cannot have the same name.
+    pub fn name(mut self, name: impl Into<String>) -> Self {
         self.name = Some(name.into());
         self
     }
@@ -352,29 +366,25 @@ impl CreateApplicationCommand {
     /// .name_localized("el", "γενέθλια")
     /// # ;
     /// ```
-    pub fn name_localized(
-        &mut self,
-        locale: impl Into<String>,
-        name: impl Into<String>,
-    ) -> &mut Self {
+    pub fn name_localized(mut self, locale: impl Into<String>, name: impl Into<String>) -> Self {
         self.name_localizations.insert(locale.into(), name.into());
         self
     }
 
     /// Specifies the type of the application command.
-    pub fn kind(&mut self, kind: CommandType) -> &mut Self {
+    pub fn kind(mut self, kind: CommandType) -> Self {
         self.kind = Some(kind);
         self
     }
 
     /// Specifies the default permissions required to execute the command.
-    pub fn default_member_permissions(&mut self, permissions: Permissions) -> &mut Self {
+    pub fn default_member_permissions(mut self, permissions: Permissions) -> Self {
         self.default_member_permissions = Some(permissions.bits().to_string());
         self
     }
 
     /// Specifies if the command is available in DMs.
-    pub fn dm_permission(&mut self, enabled: bool) -> &mut Self {
+    pub fn dm_permission(mut self, enabled: bool) -> Self {
         self.dm_permission = Some(enabled);
 
         self
@@ -383,7 +393,7 @@ impl CreateApplicationCommand {
     /// Specifies the description of the application command.
     ///
     /// **Note**: Must be between 1 and 100 characters long.
-    pub fn description(&mut self, description: impl Into<String>) -> &mut Self {
+    pub fn description(mut self, description: impl Into<String>) -> Self {
         self.description = Some(description.into());
         self
     }
@@ -397,75 +407,71 @@ impl CreateApplicationCommand {
     /// # ;
     /// ```
     pub fn description_localized(
-        &mut self,
+        mut self,
         locale: impl Into<String>,
+
         description: impl Into<String>,
-    ) -> &mut Self {
+    ) -> Self {
         self.description_localizations.insert(locale.into(), description.into());
         self
-    }
-
-    /// Creates an application command option for the application command.
-    ///
-    /// **Note**: Application commands can have up to 25 options.
-    pub fn create_option<F>(&mut self, f: F) -> &mut Self
-    where
-        F: FnOnce(&mut CreateApplicationCommandOption) -> &mut CreateApplicationCommandOption,
-    {
-        let mut data = CreateApplicationCommandOption::default();
-        f(&mut data);
-        self.add_option(data)
     }
 
     /// Adds an application command option for the application command.
     ///
     /// **Note**: Application commands can have up to 25 options.
-    pub fn add_option(&mut self, option: CreateApplicationCommandOption) -> &mut Self {
+    pub fn add_option(mut self, option: CreateApplicationCommandOption) -> Self {
         self.options.push(option);
-
         self
     }
 
     /// Sets all the application command options for the application command.
     ///
     /// **Note**: Application commands can have up to 25 options.
-    pub fn set_options(&mut self, options: Vec<CreateApplicationCommandOption>) -> &mut Self {
+    pub fn set_options(mut self, options: Vec<CreateApplicationCommandOption>) -> Self {
         self.options = options;
         self
     }
 }
 
 #[derive(Clone, Debug, Default, Serialize)]
+#[must_use]
 pub struct CreateApplicationCommands(pub Vec<CreateApplicationCommand>);
 
 impl CreateApplicationCommands {
-    /// Creates a new application command.
-    pub fn create_application_command<F>(&mut self, f: F) -> &mut Self
-    where
-        F: FnOnce(&mut CreateApplicationCommand) -> &mut CreateApplicationCommand,
-    {
-        let mut data = CreateApplicationCommand::default();
-        f(&mut data);
-
-        self.add_application_command(data);
-
-        self
+    /// Create multiple application commands in bulk, overwriting the existing command list.
+    ///
+    /// Providing a `guild_id` will overwrite all application commands in the corresponding
+    /// [`Guild`]. Otherwise, will overwrite all global application commands.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`Error::Http`] if invalid data is given. See [Discord's docs] for more details.
+    ///
+    /// May also return [`Error::Json`] if there is an error in deserializing the API response.
+    ///
+    /// [Discord's docs]: https://discord.com/developers/docs/interactions/slash-commands
+    #[cfg(feature = "http")]
+    pub async fn execute(
+        self,
+        http: impl AsRef<Http>,
+        guild_id: Option<GuildId>,
+    ) -> Result<Vec<Command>> {
+        let http = http.as_ref();
+        match guild_id {
+            Some(guild_id) => http.create_guild_application_commands(guild_id.into(), &self).await,
+            None => http.create_global_application_commands(&self).await,
+        }
     }
 
     /// Adds a new application command.
-    pub fn add_application_command(&mut self, command: CreateApplicationCommand) -> &mut Self {
+    pub fn add_application_command(mut self, command: CreateApplicationCommand) -> Self {
         self.0.push(command);
-
         self
     }
 
     /// Sets all the application commands.
-    pub fn set_application_commands(
-        &mut self,
-        commands: Vec<CreateApplicationCommand>,
-    ) -> &mut Self {
+    pub fn set_application_commands(mut self, commands: Vec<CreateApplicationCommand>) -> Self {
         self.0.extend(commands);
-
         self
     }
 }

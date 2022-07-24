@@ -81,8 +81,7 @@ pub struct Command {
 
 #[cfg(feature = "http")]
 impl Command {
-    /// Creates a global [`Command`],
-    /// overriding an existing one with the same name if it exists.
+    /// Create a global [`Command`], overriding an existing one with the same name if it exists.
     ///
     /// When a created [`Command`] is used, the [`InteractionCreate`] event will be emitted.
     ///
@@ -102,13 +101,13 @@ impl Command {
     /// #
     /// # async fn run() {
     /// # let http = Arc::new(Http::new("token"));
+    /// use serenity::builder::CreateApplicationCommand;
     /// use serenity::model::application::command::Command;
     /// use serenity::model::id::ApplicationId;
     ///
-    /// let _ = Command::create_global_application_command(&http, |command| {
-    ///     command.name("ping").description("A simple ping command")
-    /// })
-    /// .await;
+    /// let builder =
+    ///     CreateApplicationCommand::default().name("ping").description("A simple ping command");
+    /// let _ = Command::create_global_application_command(&http, builder).await;
     /// # }
     /// ```
     ///
@@ -120,80 +119,62 @@ impl Command {
     /// #
     /// # async fn run() {
     /// # let http = Arc::new(Http::new("token"));
+    /// use serenity::builder::{
+    ///     CreateApplicationCommand,
+    ///     CreateApplicationCommandOption as CreateOption,
+    /// };
     /// use serenity::model::application::command::{Command, CommandOptionType};
     /// use serenity::model::id::ApplicationId;
     ///
-    /// let _ = Command::create_global_application_command(&http, |command| {
-    ///     command.name("echo").description("Makes the bot send a message").create_option(|option| {
-    ///         option
+    /// let builder = CreateApplicationCommand::default()
+    ///     .name("echo")
+    ///     .description("Makes the bot send a message")
+    ///     .add_option(
+    ///         CreateOption::default()
     ///             .name("message")
     ///             .description("The message to send")
     ///             .kind(CommandOptionType::String)
-    ///             .required(true)
-    ///     })
-    /// })
-    /// .await;
+    ///             .required(true),
+    ///     );
+    /// let _ = Command::create_global_application_command(&http, builder).await;
     /// # }
     /// ```
     ///
     /// # Errors
     ///
-    /// May return an [`Error::Http`] if the [`Command`] is illformed,
-    /// such as if more than 10 [`choices`] are set. See the [API Docs] for further details.
-    ///
-    /// Can also return an [`Error::Json`] if there is an error in deserializing
-    /// the response.
+    /// See [`CreateApplicationCommand::execute`] for a list of possible errors.
     ///
     /// [`InteractionCreate`]: crate::client::EventHandler::interaction_create
-    /// [API Docs]: https://discord.com/developers/docs/interactions/slash-commands
-    /// [`choices`]: CommandOption::choices
-    pub async fn create_global_application_command<F>(
+    pub async fn create_global_application_command(
         http: impl AsRef<Http>,
-        f: F,
-    ) -> Result<Command>
-    where
-        F: FnOnce(&mut CreateApplicationCommand) -> &mut CreateApplicationCommand,
-    {
-        let map = Command::build_application_command(f);
-        http.as_ref().create_global_application_command(&map).await
+        builder: CreateApplicationCommand,
+    ) -> Result<Command> {
+        builder.execute(http, None, None).await
     }
 
-    /// Overrides all global application commands.
-    ///
-    /// [`create_global_application_command`]: Self::create_global_application_command
+    /// Override all global application commands.
     ///
     /// # Errors
     ///
-    /// If there is an error, it will be either [`Error::Http`] or [`Error::Json`].
-    pub async fn set_global_application_commands<F>(
+    /// See [`CreateApplicationCommands::execute`] for a list of possible errors.
+    pub async fn set_global_application_commands(
         http: impl AsRef<Http>,
-        f: F,
-    ) -> Result<Vec<Command>>
-    where
-        F: FnOnce(&mut CreateApplicationCommands) -> &mut CreateApplicationCommands,
-    {
-        let mut array = CreateApplicationCommands::default();
-
-        f(&mut array);
-
-        http.as_ref().create_global_application_commands(&array).await
+        builder: CreateApplicationCommands,
+    ) -> Result<Vec<Command>> {
+        builder.execute(http, None).await
     }
 
-    /// Edits a global command by its Id.
+    /// Edit a global command, given its Id.
     ///
     /// # Errors
     ///
-    /// If there is an error, it will be either [`Error::Http`] or [`Error::Json`].
-    pub async fn edit_global_application_command<F>(
+    /// See [`CreateApplicationCommand::execute`] for a list of possible errors.
+    pub async fn edit_global_application_command(
         http: impl AsRef<Http>,
         command_id: CommandId,
-        f: F,
-    ) -> Result<Command>
-    where
-        F: FnOnce(&mut CreateApplicationCommand) -> &mut CreateApplicationCommand,
-    {
-        let map = Command::build_application_command(f);
-        http.as_ref().edit_global_application_command(command_id.into(), &map).await
+        builder: CreateApplicationCommand,
+    ) -> Result<Command> {
+        builder.execute(http, None, Some(command_id)).await
     }
 
     /// Gets all global commands.
@@ -238,19 +219,6 @@ impl Command {
         command_id: CommandId,
     ) -> Result<()> {
         http.as_ref().delete_global_application_command(command_id.into()).await
-    }
-}
-
-#[cfg(feature = "http")]
-impl Command {
-    #[inline]
-    pub(crate) fn build_application_command<F>(f: F) -> CreateApplicationCommand
-    where
-        F: FnOnce(&mut CreateApplicationCommand) -> &mut CreateApplicationCommand,
-    {
-        let mut create_application_command = CreateApplicationCommand::default();
-        f(&mut create_application_command);
-        create_application_command
     }
 }
 
