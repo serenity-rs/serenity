@@ -238,34 +238,25 @@ impl CurrentUser {
     /// Change the avatar:
     ///
     /// ```rust,no_run
+    /// # use serenity::builder::EditProfile;
     /// # use serenity::http::Http;
     /// # use serenity::model::user::CurrentUser;
     /// #
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// #     let http = Http::new("token");
     /// #     let mut user = CurrentUser::default();
-    /// let avatar = serenity::utils::read_image("./avatar.png")?;
-    ///
-    /// user.edit(&http, |p| p.avatar(Some(avatar))).await;
+    /// let builder = EditProfile::default().avatar(&http, "./avatar.png").await?;
+    /// user.edit(&http, builder).await;
     /// #     Ok(())
     /// # }
     /// ```
     ///
     /// # Errors
     ///
-    /// Returns an [`Error::Http`] if an invalid value is set.
-    /// May also return an [`Error::Json`] if there is an error in
-    /// deserializing the API response.
-    pub async fn edit<F>(&mut self, http: impl AsRef<Http>, f: F) -> Result<()>
-    where
-        F: FnOnce(&mut EditProfile) -> &mut EditProfile,
-    {
-        let mut edit_profile = EditProfile::default();
-        edit_profile.username(self.name.clone());
-        f(&mut edit_profile);
-
-        *self = http.as_ref().edit_profile(&edit_profile).await?;
-
+    /// Returns an [`Error::Http`] if an invalid value is set. May also return an [`Error::Json`]
+    /// if there is an error in deserializing the API response.
+    pub async fn edit(&mut self, http: impl AsRef<Http>, builder: EditProfile) -> Result<()> {
+        *self = builder.execute(http).await?;
         Ok(())
     }
 
@@ -468,11 +459,11 @@ impl CurrentUser {
         permissions: Permissions,
         scopes: &[Scope],
     ) -> Result<String> {
-        let mut builder = CreateBotAuthParameters::default();
-
-        builder.permissions(permissions);
-        builder.auto_client_id(http).await?;
-        builder.scopes(scopes);
+        let builder = CreateBotAuthParameters::default()
+            .permissions(permissions)
+            .scopes(scopes)
+            .auto_client_id(http)
+            .await?;
 
         Ok(builder.build())
     }
@@ -793,8 +784,8 @@ impl User {
         default_avatar_url(self.discriminator)
     }
 
-    /// Sends a message to a user through a direct message channel. This is a
-    /// channel that can only be accessed by you and the recipient.
+    /// Sends a message to a user through a direct message channel. This is a channel that can only
+    /// be accessed by you and the recipient.
     ///
     /// # Examples
     ///
@@ -802,10 +793,11 @@ impl User {
     /// help message, and then react with `'👌'` to verify message sending:
     ///
     /// ```rust,no_run
-    /// # #[cfg(feature="client")] {
+    /// # #[cfg(feature = "client")] {
     /// # use serenity::prelude::*;
     /// # use serenity::model::prelude::*;
     /// #
+    /// use serenity::builder::CreateMessage;
     /// use serenity::model::Permissions;
     ///
     /// struct Handler;
@@ -820,14 +812,14 @@ impl User {
     ///                 Ok(v) => v,
     ///                 Err(why) => {
     ///                     println!("Error creating invite url: {:?}", why);
-    ///
     ///                     return;
     ///                 },
     ///             };
     ///
-    ///             let help = format!("Helpful info here. Invite me with this link: <{}>", url,);
+    ///             let help = format!("Helpful info here. Invite me with this link: <{}>", url);
     ///
-    ///             let dm = msg.author.direct_message(&ctx, |m| m.content(&help)).await;
+    ///             let builder = CreateMessage::default().content(help);
+    ///             let dm = msg.author.direct_message(&ctx, builder).await;
     ///
     ///             match dm {
     ///                 Ok(_) => {
@@ -853,29 +845,28 @@ impl User {
     ///
     /// # Errors
     ///
-    /// Returns a [`ModelError::MessagingBot`] if the user being direct messaged
-    /// is a bot user.
+    /// Returns a [`ModelError::MessagingBot`] if the user being direct messaged is a bot user.
     ///
-    /// May also return an [`Error::Http`] if the message was illformed, or if the
-    /// user cannot be sent a direct message.
+    /// May also return an [`Error::Http`] if the user cannot be sent a direct message.
     ///
-    /// [`Error::Json`] can also be returned if there is an error deserializing
-    /// the API response.
-    pub async fn direct_message<'a, F>(&self, cache_http: impl CacheHttp, f: F) -> Result<Message>
-    where
-        for<'b> F: FnOnce(&'b mut CreateMessage<'a>) -> &'b mut CreateMessage<'a>,
-    {
-        self.create_dm_channel(&cache_http).await?.send_message(&cache_http.http(), f).await
+    /// Returns an [`Error::Json`] if there is an error deserializing the API response.
+    pub async fn direct_message<'a>(
+        &self,
+        cache_http: impl CacheHttp,
+        builder: CreateMessage<'a>,
+    ) -> Result<Message> {
+        self.create_dm_channel(&cache_http).await?.send_message(cache_http, builder).await
     }
 
     /// This is an alias of [`Self::direct_message`].
     #[allow(clippy::missing_errors_doc)]
     #[inline]
-    pub async fn dm<'a, F>(&self, cache_http: impl CacheHttp, f: F) -> Result<Message>
-    where
-        for<'b> F: FnOnce(&'b mut CreateMessage<'a>) -> &'b mut CreateMessage<'a>,
-    {
-        self.direct_message(cache_http, f).await
+    pub async fn dm<'a>(
+        &self,
+        cache_http: impl CacheHttp,
+        builder: CreateMessage<'a>,
+    ) -> Result<Message> {
+        self.direct_message(cache_http, builder).await
     }
 
     /// Retrieves the URL to the user's avatar, falling back to the default

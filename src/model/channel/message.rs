@@ -6,7 +6,7 @@ use std::fmt::Display;
 use std::fmt::Write;
 
 #[cfg(all(feature = "model", feature = "utils"))]
-use crate::builder::{CreateEmbed, EditMessage};
+use crate::builder::{CreateAllowedMentions, CreateMessage, EditMessage, ParseValue};
 #[cfg(all(feature = "cache", feature = "model"))]
 use crate::cache::{Cache, GuildRef};
 #[cfg(feature = "collector")]
@@ -18,21 +18,14 @@ use crate::collector::{
     ReactionCollectorBuilder,
 };
 #[cfg(feature = "model")]
-use crate::http::{CacheHttp, Http};
+use crate::constants;
 #[cfg(feature = "model")]
-use crate::json::prelude::*;
+use crate::http::{CacheHttp, Http};
 use crate::model::application::component::ActionRow;
 use crate::model::application::interaction::MessageInteraction;
 use crate::model::prelude::*;
-#[cfg(feature = "model")]
-use crate::{
-    constants,
-    model::{
-        id::{ApplicationId, ChannelId, GuildId, MessageId},
-        sticker::StickerItem,
-        timestamp::Timestamp,
-    },
-};
+#[cfg(all(feature = "cache", feature = "model"))]
+use crate::utils;
 
 /// A representation of a message over a guild's text channel, a group, or a
 /// private channel.
@@ -301,37 +294,47 @@ impl Message {
 
     /// Edits this message, replacing the original content with new content.
     ///
-    /// Message editing preserves all unchanged message data.
+    /// Message editing preserves all unchanged message data, with some exceptions for embeds and
+    /// attachments.
     ///
-    /// Refer to the documentation for [`EditMessage`] for more information
-    /// regarding message restrictions and requirements.
+    /// **Note**: In most cases requires that the current user be the author of the message.
     ///
-    /// **Note**: Requires that the current user be the author of the message.
+    /// Refer to the documentation for [`EditMessage`] for information regarding content
+    /// restrictions and requirements.
     ///
     /// # Examples
     ///
     /// Edit a message with new content:
     ///
-    /// ```rust,ignore
+    /// ```rust,no_run
+    /// # use serenity::builder::EditMessage;
+    /// # use serenity::model::id::{ChannelId, MessageId};
+    /// # use serenity::http::Http;
+    /// #
+    /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
+    /// # let http = Http::new("token");
+    /// # let mut message = ChannelId::new(7).message(&http, MessageId::new(8)).await?;
     /// // assuming a `message` has already been bound
-    ///
-    /// message.edit(&context, |m| m.content("new content"));
+    /// let builder = EditMessage::default().content("new content");
+    /// message.edit(&http, builder).await?;
+    /// # Ok(())
+    /// # }
     /// ```
     ///
     /// # Errors
     ///
-    /// If the `cache` is enabled, returns a [`ModelError::InvalidUser`] if the
-    /// current user is not the author.
+    /// If the `cache` is enabled, returns a [`ModelError::InvalidUser`] if the current user is not
+    /// the author. Otherwise returns [`Error::Http`] if the user lacks permission, as well as if
+    /// invalid data is given.
     ///
-    /// Returns a [`ModelError::MessageTooLong`] if the content of the message
-    /// is over [`the limit`], containing the number of unicode code points
-    /// over the limit.
+    /// Returns a [`ModelError::MessageTooLong`] if the message contents are too long.
     ///
-    /// [`the limit`]: crate::builder::EditMessage::content
-    pub async fn edit<'a, F>(&mut self, cache_http: impl CacheHttp, f: F) -> Result<()>
-    where
-        F: for<'b> FnOnce(&'b mut EditMessage<'a>) -> &'b mut EditMessage<'a>,
-    {
+    /// [Manage Messages]: Permissions::MANAGE_MESSAGES
+    pub async fn edit<'a>(
+        &mut self,
+        cache_http: impl CacheHttp,
+        builder: EditMessage<'a>,
+    ) -> Result<()> {
         #[cfg(feature = "cache")]
         {
             if let Some(cache) = cache_http.cache() {
@@ -340,33 +343,8 @@ impl Message {
                 }
             }
         }
-        let mut builder = self._prepare_edit_builder();
-        f(&mut builder);
-        self._send_edit(cache_http.http(), builder).await
-    }
 
-    fn _prepare_edit_builder<'a>(&self) -> EditMessage<'a> {
-        let mut builder = EditMessage::default();
-
-        if !self.content.is_empty() {
-            builder.content(&self.content);
-        }
-
-        let embeds: Vec<_> = self.embeds.iter().map(|e| CreateEmbed::from(e.clone())).collect();
-        builder.set_embeds(embeds);
-
-        for attachment in &self.attachments {
-            builder.add_existing_attachment(attachment.id);
-        }
-        builder
-    }
-
-    async fn _send_edit<'a>(&mut self, http: &Http, mut builder: EditMessage<'a>) -> Result<()> {
-        let files = std::mem::take(&mut builder.files);
-
-        *self = http
-            .edit_message_and_attachments(self.channel_id.get(), self.id.get(), &builder, files)
-            .await?;
+        *self = builder.execute(cache_http.http(), self.channel_id, self.id).await?;
         Ok(())
     }
 
@@ -683,61 +661,18 @@ impl Message {
             }
         }
 
-        self.channel_id
-            .send_message(cache_http.http(), |builder| {
-                if let Some(ping_user) = inlined {
-                    builder.reference_message(self).allowed_mentions(|f| {
-                        f.replied_user(ping_user)
-                            // By providing allowed_mentions, Discord disabled _all_ pings by
-                            // default so we need to re-enable them
-                            .parse(crate::builder::ParseValue::Everyone)
-                            .parse(crate::builder::ParseValue::Users)
-                            .parse(crate::builder::ParseValue::Roles)
-                    });
-                }
-
-                builder.content(content)
-            })
-            .await
-    }
-
-    /// Delete all embeds in this message
-    /// **Note**: The logged in user must either be the author of the message or
-    /// have the [Manage Messages] permission.
-    ///
-    /// # Errors
-    ///
-    /// If the `cache` feature is enabled, then returns a
-    /// [`ModelError::InvalidPermissions`] if the current user does not have
-    /// the required permissions.
-    ///
-    /// Otherwise returns [`Error::Http`] if the current user lacks permission.
-    ///
-    /// [Manage Messages]: Permissions::MANAGE_MESSAGES
-    pub async fn suppress_embeds(&mut self, cache_http: impl CacheHttp) -> Result<()> {
-        #[cfg(feature = "cache")]
-        {
-            if let Some(cache) = cache_http.cache() {
-                utils::user_has_perms_cache(
-                    cache,
-                    self.channel_id,
-                    self.guild_id,
-                    Permissions::MANAGE_MESSAGES,
-                )?;
-
-                if self.author.id != cache.current_user().id {
-                    return Err(Error::Model(ModelError::NotAuthor));
-                }
-            }
+        let mut builder = CreateMessage::default().content(content);
+        if let Some(ping_user) = inlined {
+            let allowed_mentions = CreateAllowedMentions::default()
+                .replied_user(ping_user)
+                // By providing allowed_mentions, Discord disabled _all_ pings by default so we
+                // need to re-enable them
+                .parse(ParseValue::Everyone)
+                .parse(ParseValue::Users)
+                .parse(ParseValue::Roles);
+            builder = builder.reference_message(self).allowed_mentions(allowed_mentions);
         }
-
-        let mut suppress = EditMessage::default();
-        suppress.suppress_embeds(true);
-
-        *self =
-            cache_http.http().edit_message(self.channel_id.get(), self.id.get(), &suppress).await?;
-
-        Ok(())
+        self.channel_id.send_message(cache_http, builder).await
     }
 
     /// Checks whether the message mentions passed [`UserId`].
@@ -857,94 +792,6 @@ impl Message {
     #[cfg(feature = "cache")]
     pub fn category_id(&self, cache: impl AsRef<Cache>) -> Option<ChannelId> {
         cache.as_ref().channel_category_id(self.channel_id)
-    }
-
-    #[allow(dead_code)] // Temporary, will be added back or removed in future
-    pub(crate) fn check_lengths(map: &JsonMap) -> Result<()> {
-        Self::check_content_length(map)?;
-        Self::check_embed_length(map)?;
-        Self::check_sticker_ids_length(map)?;
-
-        Ok(())
-    }
-
-    #[allow(dead_code)] // Temporary, will be added back or removed in future
-    pub(crate) fn check_content_length(map: &JsonMap) -> Result<()> {
-        if let Some(Value::String(content)) = map.get("content") {
-            if let Some(length_over) = Message::overflow_length(content) {
-                return Err(Error::Model(ModelError::MessageTooLong(length_over)));
-            }
-        }
-
-        Ok(())
-    }
-
-    #[allow(dead_code)] // Temporary, will be added back or removed in future
-    pub(crate) fn check_embed_length(map: &JsonMap) -> Result<()> {
-        let embeds = match map.get("embeds") {
-            Some(&Value::Array(ref value)) => value,
-            _ => return Ok(()),
-        };
-
-        if embeds.len() > 10 {
-            return Err(Error::Model(ModelError::EmbedAmount));
-        }
-
-        for embed in embeds {
-            let mut total: usize = 0;
-
-            if let Some(&Value::Object(ref author)) = embed.get("author") {
-                if let Some(&Value::Object(ref name)) = author.get("name") {
-                    total += name.len();
-                }
-            }
-
-            if let Some(&Value::String(ref description)) = embed.get("description") {
-                total += description.len();
-            }
-
-            if let Some(&Value::Array(ref fields)) = embed.get("fields") {
-                for field_as_value in fields {
-                    if let Value::Object(ref field) = *field_as_value {
-                        if let Some(&Value::String(ref field_name)) = field.get("name") {
-                            total += field_name.len();
-                        }
-
-                        if let Some(&Value::String(ref field_value)) = field.get("value") {
-                            total += field_value.len();
-                        }
-                    }
-                }
-            }
-
-            if let Some(&Value::Object(ref footer)) = embed.get("footer") {
-                if let Some(&Value::String(ref text)) = footer.get("text") {
-                    total += text.len();
-                }
-            }
-
-            if let Some(&Value::String(ref title)) = embed.get("title") {
-                total += title.len();
-            }
-
-            if total > constants::EMBED_MAX_LENGTH {
-                let overflow = total - constants::EMBED_MAX_LENGTH;
-                return Err(Error::Model(ModelError::EmbedTooLarge(overflow)));
-            }
-        }
-
-        Ok(())
-    }
-
-    #[allow(dead_code)] // Temporary, will be added back or removed in future
-    pub(crate) fn check_sticker_ids_length(map: &JsonMap) -> Result<()> {
-        if let Some(Value::Array(sticker_ids)) = map.get("sticker_ids") {
-            if sticker_ids.len() > constants::STICKER_MAX_COUNT {
-                return Err(Error::Model(ModelError::StickerAmount));
-            }
-        }
-
-        Ok(())
     }
 }
 
