@@ -1,4 +1,4 @@
-use serenity::builder::CreateApplicationCommand;
+use serenity::builder::{CreateApplicationCommand, CreateApplicationCommandOption};
 use serenity::model::prelude::command::CommandOptionType;
 use serenity::model::prelude::interaction::application_command::{ResolvedOption, ResolvedValue};
 
@@ -13,12 +13,12 @@ pub fn run(options: &[ResolvedOption]) -> String {
     }
 }
 
-pub fn register(command: &mut CreateApplicationCommand) -> &mut CreateApplicationCommand {
-    command.name("id").description("Get a user id").create_option(|option| {
-        option
+pub fn register() -> CreateApplicationCommand {
+    CreateApplicationCommand::default().name("id").description("Get a user id").add_option(
+        CreateApplicationCommandOption::default()
             .name("id")
             .description("The user to lookup")
             .kind(CommandOptionType::User)
-            .required(true)
-    })
+            .required(true),
+    )
 }

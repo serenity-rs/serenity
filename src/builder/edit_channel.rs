@@ -1,31 +1,32 @@
-use crate::model::channel::{PermissionOverwrite, PermissionOverwriteData, VideoQualityMode};
-use crate::model::id::ChannelId;
+#[cfg(feature = "http")]
+use crate::http::{CacheHttp, Http};
+#[cfg(feature = "http")]
+use crate::internal::prelude::*;
+use crate::model::prelude::*;
 
-/// A builder to edit a [`GuildChannel`] for use via [`GuildChannel::edit`]
-///
-/// Defaults are not directly provided by the builder itself.
+/// A builder to edit a [`GuildChannel`] for use via [`GuildChannel::edit`].
 ///
 /// # Examples
 ///
 /// Edit a channel, providing a new name and topic:
 ///
 /// ```rust,no_run
-/// # use serenity::{http::Http, model::id::ChannelId};
+/// # use serenity::builder::EditChannel;
+/// # use serenity::http::Http;
+/// # use serenity::model::id::ChannelId;
 /// #
 /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
 /// #     let http = Http::new("token");
 /// #     let mut channel = ChannelId::new(1);
-/// // assuming a channel has already been bound
-/// if let Err(why) = channel.edit(&http, |c| c.name("new name").topic("a test topic")).await {
+/// let builder = EditChannel::default().name("new name").topic("a test topic");
+/// if let Err(why) = channel.edit(&http, builder).await {
 ///     // properly handle the error
 /// }
 /// #     Ok(())
 /// # }
 /// ```
-///
-/// [`GuildChannel`]: crate::model::channel::GuildChannel
-/// [`GuildChannel::edit`]: crate::model::channel::GuildChannel::edit
 #[derive(Clone, Debug, Default, Serialize)]
+#[must_use]
 pub struct EditChannel {
     #[serde(skip_serializing_if = "Option::is_none")]
     bitrate: Option<u32>,
@@ -52,12 +53,59 @@ pub struct EditChannel {
 }
 
 impl EditChannel {
+    /// Edits the channel's settings.
+    ///
+    /// **Note**: Requires the [Manage Channels] permission. Modifying permissions via
+    /// [`Self::permissions`] also requires the [Manage Roles] permission.
+    ///
+    /// # Errors
+    ///
+    /// If the `cache` is enabled, returns a [`ModelError::InvalidPermissions`] if the current user
+    /// lacks permission. Otherwise returns [`Error::Http`], as well as if invalid data is given.
+    ///
+    /// [Manage Channels]: Permissions::MANAGE_CHANNELS
+    /// [Manage Roles]: Permissions::MANAGE_ROLES
+    #[cfg(feature = "http")]
+    pub async fn execute(
+        self,
+        cache_http: impl CacheHttp,
+        channel_id: ChannelId,
+        #[cfg(feature = "cache")] guild_id: Option<GuildId>,
+    ) -> Result<GuildChannel> {
+        #[cfg(feature = "cache")]
+        {
+            if let Some(cache) = cache_http.cache() {
+                crate::utils::user_has_perms_cache(
+                    cache,
+                    channel_id,
+                    guild_id,
+                    Permissions::MANAGE_CHANNELS,
+                )?;
+                if self.permission_overwrites.is_some() {
+                    crate::utils::user_has_perms_cache(
+                        cache,
+                        channel_id,
+                        guild_id,
+                        Permissions::MANAGE_ROLES,
+                    )?;
+                }
+            }
+        }
+
+        self._execute(cache_http.http(), channel_id).await
+    }
+
+    #[cfg(feature = "http")]
+    async fn _execute(self, http: &Http, channel_id: ChannelId) -> Result<GuildChannel> {
+        http.edit_channel(channel_id.into(), &self, None).await
+    }
+
     /// The bitrate of the channel in bits.
     ///
     /// This is for [voice] channels only.
     ///
-    /// [voice]: crate::model::channel::ChannelType::Voice
-    pub fn bitrate(&mut self, bitrate: u32) -> &mut Self {
+    /// [voice]: ChannelType::Voice
+    pub fn bitrate(mut self, bitrate: u32) -> Self {
         self.bitrate = Some(bitrate);
         self
     }
@@ -66,19 +114,18 @@ impl EditChannel {
     ///
     /// This is for [voice] channels only.
     ///
-    /// [voice]: crate::model::channel::ChannelType::Voice
-    pub fn video_quality_mode(&mut self, quality: VideoQualityMode) -> &mut Self {
+    /// [voice]: ChannelType::Voice
+    pub fn video_quality_mode(mut self, quality: VideoQualityMode) -> Self {
         self.video_quality_mode = Some(quality);
         self
     }
 
-    /// The voice region of the channel.
-    /// It is automatic when `None`.
+    /// The voice region of the channel. It is automatic when `None`.
     ///
     /// This is for [voice] channels only.
     ///
-    /// [voice]: crate::model::channel::ChannelType::Voice
-    pub fn voice_region(&mut self, id: Option<String>) -> &mut Self {
+    /// [voice]: ChannelType::Voice
+    pub fn voice_region(mut self, id: Option<String>) -> Self {
         self.rtc_region = id;
         self
     }
@@ -86,13 +133,13 @@ impl EditChannel {
     /// The name of the channel.
     ///
     /// Must be between 2 and 100 characters long.
-    pub fn name(&mut self, name: impl Into<String>) -> &mut Self {
+    pub fn name(mut self, name: impl Into<String>) -> Self {
         self.name = Some(name.into());
         self
     }
 
     /// The position of the channel in the channel list.
-    pub fn position(&mut self, position: u32) -> &mut Self {
+    pub fn position(mut self, position: u32) -> Self {
         self.position = Some(position);
         self
     }
@@ -103,8 +150,8 @@ impl EditChannel {
     ///
     /// This is for [text] channels only.
     ///
-    /// [text]: crate::model::channel::ChannelType::Text
-    pub fn topic(&mut self, topic: impl Into<String>) -> &mut Self {
+    /// [text]: ChannelType::Text
+    pub fn topic(mut self, topic: impl Into<String>) -> Self {
         self.topic = Some(topic.into());
         self
     }
@@ -113,8 +160,8 @@ impl EditChannel {
     ///
     /// This is for [text] channels only.
     ///
-    /// [text]: crate::model::channel::ChannelType::Text
-    pub fn nsfw(&mut self, nsfw: bool) -> &mut Self {
+    /// [text]: ChannelType::Text
+    pub fn nsfw(mut self, nsfw: bool) -> Self {
         self.nsfw = Some(nsfw);
         self
     }
@@ -123,8 +170,8 @@ impl EditChannel {
     ///
     /// This is for [voice] channels only.
     ///
-    /// [voice]: crate::model::channel::ChannelType::Voice
-    pub fn user_limit(&mut self, user_limit: u32) -> &mut Self {
+    /// [voice]: ChannelType::Voice
+    pub fn user_limit(mut self, user_limit: u32) -> Self {
         self.user_limit = Some(user_limit);
         self
     }
@@ -133,39 +180,39 @@ impl EditChannel {
     ///
     /// This is for [text] and [voice] channels only.
     ///
-    /// [text]: crate::model::channel::ChannelType::Text
-    /// [voice]: crate::model::channel::ChannelType::Voice
+    /// [text]: ChannelType::Text
+    /// [voice]: ChannelType::Voice
     #[inline]
-    pub fn category<C: Into<Option<ChannelId>>>(&mut self, category: C) -> &mut Self {
+    pub fn category<C: Into<Option<ChannelId>>>(mut self, category: C) -> Self {
         self.parent_id = category.into();
         self
     }
 
     /// How many seconds must a user wait before sending another message.
     ///
-    /// Bots, or users with the [`MANAGE_MESSAGES`] and/or [`MANAGE_CHANNELS`] permissions are exempt
-    /// from this restriction.
+    /// Bots, or users with the [`MANAGE_MESSAGES`] and/or [`MANAGE_CHANNELS`] permissions are
+    /// exempt from this restriction.
     ///
     /// **Note**: Must be between 0 and 21600 seconds (360 minutes or 6 hours).
     ///
-    /// [`MANAGE_MESSAGES`]: crate::model::permissions::Permissions::MANAGE_MESSAGES
-    /// [`MANAGE_CHANNELS`]: crate::model::permissions::Permissions::MANAGE_CHANNELS
+    /// [`MANAGE_MESSAGES`]: Permissions::MANAGE_MESSAGES
+    /// [`MANAGE_CHANNELS`]: Permissions::MANAGE_CHANNELS
     #[doc(alias = "slowmode")]
-    pub fn rate_limit_per_user(&mut self, seconds: u64) -> &mut Self {
+    pub fn rate_limit_per_user(mut self, seconds: u64) -> Self {
         self.rate_limit_per_user = Some(seconds);
-
         self
     }
 
-    /// A set of overwrites defining what a user or a user carrying a certain role can
-    /// and cannot do.
+    /// A set of overwrites defining what a user or a user carrying a certain role can or can't do.
     ///
     /// # Example
     ///
     /// Inheriting permissions from an existing channel:
     ///
     /// ```rust,no_run
-    /// # use serenity::{http::Http, model::id::ChannelId};
+    /// # use serenity::builder::EditChannel;
+    /// # use serenity::http::Http;
+    /// # use serenity::model::id::ChannelId;
     /// # use std::sync::Arc;
     /// #
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
@@ -182,11 +229,12 @@ impl EditChannel {
     ///     kind: PermissionOverwriteType::Member(UserId::new(1234)),
     /// }];
     ///
-    /// channel.edit(http, |c| c.name("my_edited_cool_channel").permissions(permissions)).await?;
+    /// let builder = EditChannel::default().name("my_edited_cool_channel").permissions(permissions);
+    /// channel.edit(http, builder).await?;
     /// #    Ok(())
     /// # }
     /// ```
-    pub fn permissions<I>(&mut self, perms: I) -> &mut Self
+    pub fn permissions<I>(mut self, perms: I) -> Self
     where
         I: IntoIterator<Item = PermissionOverwrite>,
     {

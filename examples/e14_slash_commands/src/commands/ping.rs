@@ -5,6 +5,6 @@ pub fn run(_options: &[ResolvedOption]) -> String {
     "Hey, I'm alive!".to_string()
 }
 
-pub fn register(command: &mut CreateApplicationCommand) -> &mut CreateApplicationCommand {
-    command.name("ping").description("A ping command")
+pub fn register() -> CreateApplicationCommand {
+    CreateApplicationCommand::default().name("ping").description("A ping command")
 }

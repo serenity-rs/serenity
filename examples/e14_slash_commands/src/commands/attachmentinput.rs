@@ -1,4 +1,4 @@
-use serenity::builder::CreateApplicationCommand;
+use serenity::builder::{CreateApplicationCommand, CreateApplicationCommandOption};
 use serenity::model::prelude::command::CommandOptionType;
 use serenity::model::prelude::interaction::application_command::{ResolvedOption, ResolvedValue};
 
@@ -13,14 +13,15 @@ pub fn run(options: &[ResolvedOption]) -> String {
     }
 }
 
-pub fn register(command: &mut CreateApplicationCommand) -> &mut CreateApplicationCommand {
-    command.name("attachmentinput").description("Test command for attachment input").create_option(
-        |option| {
-            option
+pub fn register() -> CreateApplicationCommand {
+    CreateApplicationCommand::default()
+        .name("attachmentinput")
+        .description("Test command for attachment input")
+        .add_option(
+            CreateApplicationCommandOption::default()
                 .name("attachment")
                 .description("A file")
                 .kind(CommandOptionType::Attachment)
-                .required(true)
-        },
-    )
+                .required(true),
+        )
 }

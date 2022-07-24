@@ -89,66 +89,61 @@ impl ChannelCategory {
         self.id.delete(&cache_http.http()).await.map(|_| ())
     }
 
-    /// Modifies the category's settings, such as its position or name.
+    /// Edits the category's settings.
     ///
-    /// Refer to [`EditChannel`]s documentation for a full list of methods.
+    /// Refer to the documentation for [`EditChannel`] for a full list of methods.
     ///
-    /// **Note**: Requires the [Manage Channels] permission,
-    /// also requires the [Manage Roles] permission if modifying
-    /// permissions for the category.
+    /// **Note**: Requires the [Manage Channels] permission. Modifying permissions via
+    /// [`EditChannel::permissions`] also requires the [Manage Roles] permission.
     ///
     /// # Examples
     ///
-    /// Change a voice channels name and bitrate:
+    /// Change a category's name:
     ///
     /// ```rust,no_run
+    /// # use serenity::builder::EditChannel;
+    /// # use serenity::http::Http;
+    /// # use serenity::model::id::ChannelId;
     /// # async fn run() {
-    /// #     use serenity::http::Http;
-    /// #     use serenity::model::id::ChannelId;
     /// #     let http = Http::new("token");
     /// #     let category = ChannelId::new(1234);
-    /// category.edit(&http, |c| c.name("test").bitrate(86400)).await;
+    /// let builder = EditChannel::default().name("test");
+    /// category.edit(&http, builder).await;
     /// # }
     /// ```
     ///
     /// # Errors
     ///
-    /// Returns [`Error::Http`] if an invalid value is set,
-    /// or if the current user lacks the necessary permissions.
+    /// If the `cache` is enabled, returns a [`ModelError::InvalidPermissions`] if the current user
+    /// lacks permission. Otherwise returns [`Error::Http`], as well as if invalid data is given.
     ///
     /// [Manage Channels]: Permissions::MANAGE_CHANNELS
     /// [Manage Roles]: Permissions::MANAGE_ROLES
-    pub async fn edit<F>(&mut self, cache_http: impl CacheHttp, f: F) -> Result<()>
-    where
-        F: FnOnce(&mut EditChannel) -> &mut EditChannel,
-    {
-        let mut edit_channel = EditChannel::default();
-        f(&mut edit_channel);
+    pub async fn edit(&mut self, cache_http: impl CacheHttp, builder: EditChannel) -> Result<()> {
+        let GuildChannel {
+            id,
+            guild_id,
+            parent_id,
+            position,
+            kind,
+            name,
+            nsfw,
+            permission_overwrites,
+            ..
+        } = self.id.edit(cache_http, builder).await?;
 
-        cache_http.http().edit_channel(self.id.get(), &edit_channel, None).await.map(|channel| {
-            let GuildChannel {
-                id,
-                guild_id,
-                parent_id,
-                position,
-                kind,
-                name,
-                nsfw,
-                permission_overwrites,
-                ..
-            } = channel;
+        *self = ChannelCategory {
+            id,
+            guild_id,
+            parent_id,
+            position,
+            kind,
+            name,
+            nsfw,
+            permission_overwrites,
+        };
 
-            *self = ChannelCategory {
-                id,
-                guild_id,
-                parent_id,
-                position,
-                kind,
-                name,
-                nsfw,
-                permission_overwrites,
-            };
-        })
+        Ok(())
     }
 
     #[inline]
