@@ -864,19 +864,21 @@ impl Http {
     /// **Note**: Requires the [Manage Emojis and Stickers] permission.
     ///
     /// [Manage Emojis and Stickers]: Permissions::MANAGE_EMOJIS_AND_STICKERS
-    // Manual async fn to decorate the lifetime manually, avoiding a compiler bug
-    pub fn create_sticker<'a>(
-        &'a self,
+    // We take a `Vec<(String, String)>` rather than `Vec<(&'static str, String)>` to avoid a compiler
+    // bug around `async fn` and lifetime unification. TODO: change this back once MSRV is on 1.58.
+    // Relevant issue: https://github.com/rust-lang/rust/issues/63033
+    pub async fn create_sticker<'a>(
+        &self,
         guild_id: u64,
-        map: Vec<(Cow<'static, str>, Cow<'static, str>)>,
+        map: Vec<(String, String)>,
         file: impl Into<AttachmentType<'a>>,
         audit_log_reason: Option<&str>,
-    ) -> impl std::future::Future<Output = Result<Sticker>> + 'a {
+    ) -> Result<Sticker> {
         self.fire(Request {
             body: None,
             multipart: Some(Multipart {
                 files: vec![file.into()],
-                fields: map,
+                fields: map.into_iter().map(|(k, v)| (k.into(), v.into())).collect(),
                 payload_json: None,
             }),
             headers: audit_log_reason.map(reason_into_header),
@@ -884,6 +886,7 @@ impl Http {
                 guild_id,
             },
         })
+        .await
     }
 
     /// Creates a webhook for the given [channel][`GuildChannel`]'s Id, passing in
@@ -2171,20 +2174,19 @@ impl Http {
         .await
     }
 
-    /// Executes a webhook, posting a [`Message`] in the webhook's associated
-    /// [`Channel`].
+    /// Executes a webhook, posting a [`Message`] in the webhook's associated [`Channel`].
     ///
     /// This method does _not_ require authentication.
     ///
     /// If `thread_id` is not `None`, then the message will be sent to the thread in the webhook's
     /// associated [`Channel`] with the corresponding Id, which will be automatically unarchived.
     ///
-    /// Pass `true` to `wait` to wait for server confirmation of the message sending
-    /// before receiving a response. From the [Discord docs]:
+    /// Pass `true` to `wait` to wait for server confirmation of the message sending before
+    /// receiving a response. From the [Discord docs]:
     ///
-    /// > waits for server confirmation of message send before response, and returns
-    /// > the created message body (defaults to false; when false a message that is
-    /// > not saved does not return an error)
+    /// > waits for server confirmation of message send before response, and returns the created
+    /// > message body (defaults to false; when false a message that is not saved does not return
+    /// > an error)
     ///
     /// The map can _optionally_ contain the following data:
     ///
@@ -2197,9 +2199,9 @@ impl Http {
     /// - `content`: The content of the message.
     /// - `embeds`: An array of rich embeds.
     ///
-    /// **Note**: For embed objects, all fields are registered by Discord except for
-    /// `height`, `provider`, `proxy_url`, `type` (it will always be `rich`),
-    /// `video`, and `width`. The rest will be determined by Discord.
+    /// **Note**: For embed objects, all fields are registered by Discord except for `height`,
+    /// `provider`, `proxy_url`, `type` (it will always be `rich`), `video`, and `width`. The rest
+    /// will be determined by Discord.
     ///
     /// # Examples
     ///
@@ -2257,9 +2259,7 @@ impl Http {
     ///
     /// # Errors
     ///
-    /// Returns an
-    /// [`HttpError::UnsuccessfulRequest(ErrorResponse)`][`HttpError::UnsuccessfulRequest`]
-    /// if the files are too large to send.
+    /// Returns an [`HttpError::UnsuccessfulRequest`] if the files are too large to send.
     pub async fn execute_webhook_with_files<'a>(
         &self,
         webhook_id: u64,

@@ -1,3 +1,10 @@
+#[cfg(feature = "http")]
+use crate::http::Http;
+#[cfg(feature = "http")]
+use crate::internal::prelude::*;
+#[cfg(feature = "http")]
+use crate::model::prelude::*;
+
 /// A builder to create or edit a [`Sticker`] for use via a number of model methods.
 ///
 /// These are:
@@ -13,6 +20,7 @@
 /// [`GuildId::edit_sticker`]: crate::model::id::GuildId::edit_sticker
 /// [`Sticker::edit`]: crate::model::sticker::Sticker::edit
 #[derive(Clone, Debug, Default, Serialize)]
+#[must_use]
 pub struct EditSticker {
     #[serde(skip_serializing_if = "Option::is_none")]
     name: Option<String>,
@@ -23,10 +31,29 @@ pub struct EditSticker {
 }
 
 impl EditSticker {
+    /// Edits the sticker.
+    ///
+    /// **Note**: Requires the [Manage Emojis and Stickers] permission.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`Error::Http`] if the current user lacks permission, or if invalid data is given.
+    ///
+    /// [Manage Emojis and Stickers]: Permissions::MANAGE_EMOJIS_AND_STICKERS
+    #[cfg(feature = "http")]
+    pub async fn execute(
+        self,
+        http: impl AsRef<Http>,
+        guild_id: GuildId,
+        sticker_id: StickerId,
+    ) -> Result<Sticker> {
+        http.as_ref().edit_sticker(guild_id.into(), sticker_id.into(), &self, None).await
+    }
+
     /// The name of the sticker to set.
     ///
     /// **Note**: Must be between 2 and 30 characters long.
-    pub fn name(&mut self, name: impl Into<String>) -> &mut Self {
+    pub fn name(mut self, name: impl Into<String>) -> Self {
         self.name = Some(name.into());
         self
     }
@@ -34,7 +61,7 @@ impl EditSticker {
     /// The description of the sticker.
     ///
     /// **Note**: If not empty, must be between 2 and 100 characters long.
-    pub fn description(&mut self, description: impl Into<String>) -> &mut Self {
+    pub fn description(mut self, description: impl Into<String>) -> Self {
         self.description = Some(description.into());
         self
     }
@@ -42,7 +69,7 @@ impl EditSticker {
     /// The Discord name of a unicode emoji representing the sticker's expression.
     ///
     /// **Note**: Must be between 2 and 200 characters long.
-    pub fn tags(&mut self, tags: impl Into<String>) -> &mut Self {
+    pub fn tags(mut self, tags: impl Into<String>) -> Self {
         self.tags = Some(tags.into());
         self
     }

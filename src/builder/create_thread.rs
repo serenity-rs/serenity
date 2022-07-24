@@ -1,6 +1,11 @@
-use crate::model::channel::ChannelType;
+#[cfg(feature = "http")]
+use crate::http::Http;
+#[cfg(feature = "http")]
+use crate::internal::prelude::*;
+use crate::model::prelude::*;
 
 #[derive(Clone, Debug, Default, Serialize)]
+#[must_use]
 pub struct CreateThread {
     #[serde(skip_serializing_if = "Option::is_none")]
     name: Option<String>,
@@ -15,10 +20,31 @@ pub struct CreateThread {
 }
 
 impl CreateThread {
+    /// Creates a thread, either private or public. Public threads require a message to connect the
+    /// thread to.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`Error::Http`] if the current user lacks permission, or if invalid data is given.
+    #[cfg(feature = "http")]
+    pub async fn execute(
+        self,
+        http: impl AsRef<Http>,
+        channel_id: ChannelId,
+        message_id: Option<MessageId>,
+    ) -> Result<GuildChannel> {
+        match message_id {
+            Some(msg_id) => {
+                http.as_ref().create_public_thread(channel_id.into(), msg_id.into(), &self).await
+            },
+            None => http.as_ref().create_private_thread(channel_id.into(), &self).await,
+        }
+    }
+
     /// The name of the thread.
     ///
     /// **Note**: Must be between 2 and 100 characters long.
-    pub fn name(&mut self, name: impl Into<String>) -> &mut Self {
+    pub fn name(mut self, name: impl Into<String>) -> Self {
         self.name = Some(name.into());
 
         self
@@ -27,7 +53,7 @@ impl CreateThread {
     /// Duration in minutes to automatically archive the thread after recent activity.
     ///
     /// **Note**: Can only be set to 60, 1440, 4320, 10080 currently.
-    pub fn auto_archive_duration(&mut self, duration: u16) -> &mut Self {
+    pub fn auto_archive_duration(mut self, duration: u16) -> Self {
         self.auto_archive_duration = Some(duration);
 
         self
@@ -35,7 +61,8 @@ impl CreateThread {
 
     /// How many seconds must a user wait before sending another message.
     ///
-    /// Bots, or users with the [`MANAGE_MESSAGES`] and/or [`MANAGE_CHANNELS`] permissions are exempt
+    /// Bots, or users with the [`MANAGE_MESSAGES`] and/or [`MANAGE_CHANNELS`] permissions are
+    /// exempt from this restriction.
     /// from this restriction.
     ///
     /// **Note**: Must be between 0 and 21600 seconds (360 minutes or 6 hours).
@@ -43,7 +70,7 @@ impl CreateThread {
     /// [`MANAGE_MESSAGES`]: crate::model::permissions::Permissions::MANAGE_MESSAGES
     /// [`MANAGE_CHANNELS`]: crate::model::permissions::Permissions::MANAGE_CHANNELS
     #[doc(alias = "slowmode")]
-    pub fn rate_limit_per_user(&mut self, seconds: u16) -> &mut Self {
+    pub fn rate_limit_per_user(mut self, seconds: u16) -> Self {
         self.rate_limit_per_user = Some(seconds);
 
         self
@@ -55,7 +82,7 @@ impl CreateThread {
     /// when thread documentation was first published. This is a bit of a weird default though,
     /// and thus is highly likely to change in the future, so it is recommended to always
     /// explicitly setting it to avoid any breaking change.
-    pub fn kind(&mut self, kind: ChannelType) -> &mut Self {
+    pub fn kind(mut self, kind: ChannelType) -> Self {
         self.kind = Some(kind);
 
         self
