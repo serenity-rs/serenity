@@ -92,46 +92,15 @@ impl ApplicationCommandInteraction {
     ///
     /// # Errors
     ///
-    /// Returns an [`Error::Model`] if the message content is too long.
-    /// May also return an [`Error::Http`] if the API returns an error,
-    /// or an [`Error::Json`] if there is an error in deserializing the
-    /// API response.
-    pub async fn create_interaction_response<'a, F>(
+    /// Returns an [`Error::Model`] if the message content is too long. May also return an
+    /// [`Error::Http`] if the API returns an error, or an [`Error::Json`] if there is an error in
+    /// deserializing the API response.
+    pub async fn create_interaction_response<'a>(
         &self,
         http: impl AsRef<Http>,
-        f: F,
-    ) -> Result<()>
-    where
-        for<'b> F:
-            FnOnce(&'b mut CreateInteractionResponse<'a>) -> &'b mut CreateInteractionResponse<'a>,
-    {
-        let mut interaction_response = CreateInteractionResponse::default();
-        f(&mut interaction_response);
-        self._create_interaction_response(http.as_ref(), interaction_response).await
-    }
-
-    async fn _create_interaction_response<'a>(
-        &self,
-        http: &Http,
-        mut interaction_response: CreateInteractionResponse<'a>,
+        builder: CreateInteractionResponse<'a>,
     ) -> Result<()> {
-        let files = interaction_response
-            .data
-            .as_mut()
-            .map_or_else(Vec::new, |d| std::mem::take(&mut d.files));
-
-        if files.is_empty() {
-            http.create_interaction_response(self.id.get(), &self.token, &interaction_response)
-                .await
-        } else {
-            http.create_interaction_response_with_files(
-                self.id.get(),
-                &self.token,
-                &interaction_response,
-                files,
-            )
-            .await
-        }
+        builder.execute(http, self.id, &self.token).await
     }
 
     /// Creates a response to an autocomplete interaction.
@@ -139,55 +108,29 @@ impl ApplicationCommandInteraction {
     /// # Errors
     ///
     /// Returns an [`Error::Http`] if the API returns an error.
-    ///
-    /// [`Error::Http`]: crate::error::Error::Http
-    pub async fn create_autocomplete_response<F>(&self, http: impl AsRef<Http>, f: F) -> Result<()>
-    where
-        F: FnOnce(&mut CreateAutocompleteResponse) -> &mut CreateAutocompleteResponse,
-    {
-        #[derive(Serialize)]
-        struct AutocompleteResponse {
-            data: CreateAutocompleteResponse,
-            #[serde(rename = "type")]
-            kind: InteractionResponseType,
-        }
-
-        let mut response = CreateAutocompleteResponse::default();
-        f(&mut response);
-
-        let map = AutocompleteResponse {
-            data: response,
-            kind: InteractionResponseType::Autocomplete,
-        };
-
-        http.as_ref().create_interaction_response(self.id.get(), &self.token, &map).await
+    pub async fn create_autocomplete_response(
+        &self,
+        http: impl AsRef<Http>,
+        builder: CreateAutocompleteResponse,
+    ) -> Result<()> {
+        builder.execute(http, self.id, &self.token).await
     }
 
-    /// Edits the initial interaction response.
+    /// Edits the initial interaction response. Does not work for ephemeral messages.
     ///
-    /// `application_id` will usually be the bot's [`UserId`], except in cases of bots being very old.
-    ///
-    /// Refer to Discord's docs for Edit Webhook Message for field information.
-    ///
-    /// **Note**:   Message contents must be under 2000 unicode code points, does not work on ephemeral messages.
+    /// **Note**: Message contents must be under 2000 unicode code points.
     ///
     /// # Errors
     ///
-    /// Returns [`Error::Model`] if the edited content is too long.
-    /// May also return [`Error::Http`] if the API returns an error,
-    /// or an [`Error::Json`] if there is an error deserializing the response.
+    /// Returns an [`Error::Model`] if the message content is too long. May also return an
+    /// [`Error::Http`] if the API returns an error, or an [`Error::Json`] if there is an error in
+    /// deserializing the API response.
     pub async fn edit_original_interaction_response<F>(
         &self,
         http: impl AsRef<Http>,
-        f: F,
-    ) -> Result<Message>
-    where
-        F: FnOnce(&mut EditInteractionResponse) -> &mut EditInteractionResponse,
-    {
-        let mut interaction_response = EditInteractionResponse::default();
-        f(&mut interaction_response);
-
-        http.as_ref().edit_original_interaction_response(&self.token, &interaction_response).await
+        builder: EditInteractionResponse,
+    ) -> Result<Message> {
+        builder.execute(http, &self.token).await
     }
 
     /// Deletes the initial interaction response.
@@ -206,36 +149,15 @@ impl ApplicationCommandInteraction {
     ///
     /// # Errors
     ///
-    /// Will return [`Error::Model`] if the content is too long.
-    /// May also return [`Error::Http`] if the API returns an error,
-    /// or a [`Error::Json`] if there is an error in deserializing the response.
-    pub async fn create_followup_message<'a, F>(
+    /// Returns [`Error::Model`] if the content is too long. May also return [`Error::Http`] if the
+    /// API returns an error, or [`Error::Json`] if there is an error in deserializing the
+    /// response.
+    pub async fn create_followup_message<'a>(
         &self,
         http: impl AsRef<Http>,
-        f: F,
-    ) -> Result<Message>
-    where
-        for<'b> F: FnOnce(
-            &'b mut CreateInteractionResponseFollowup<'a>,
-        ) -> &'b mut CreateInteractionResponseFollowup<'a>,
-    {
-        let mut interaction_response = CreateInteractionResponseFollowup::default();
-        f(&mut interaction_response);
-        self._create_followup_message(http.as_ref(), interaction_response).await
-    }
-
-    async fn _create_followup_message<'a>(
-        &self,
-        http: &Http,
-        mut interaction_response: CreateInteractionResponseFollowup<'a>,
+        builder: CreateInteractionResponseFollowup<'a>,
     ) -> Result<Message> {
-        let files = std::mem::take(&mut interaction_response.files);
-
-        if files.is_empty() {
-            http.create_followup_message(&self.token, &interaction_response).await
-        } else {
-            http.create_followup_message_with_files(&self.token, &interaction_response, files).await
-        }
+        builder.execute(http, None, &self.token).await
     }
 
     /// Edits a followup response to the response sent.
@@ -244,33 +166,16 @@ impl ApplicationCommandInteraction {
     ///
     /// # Errors
     ///
-    /// Will return [`Error::Model`] if the content is too long.
-    /// May also return [`Error::Http`] if the API returns an error,
-    /// or a [`Error::Json`] if there is an error in deserializing the response.
-    pub async fn edit_followup_message<'a, F, M: Into<MessageId>>(
+    /// Returns [`Error::Model`] if the content is too long. May also return [`Error::Http`] if the
+    /// API returns an error, or [`Error::Json`] if there is an error in deserializing the
+    /// response.
+    pub async fn edit_followup_message<'a>(
         &self,
         http: impl AsRef<Http>,
-        message_id: M,
-        f: F,
-    ) -> Result<Message>
-    where
-        for<'b> F: FnOnce(
-            &'b mut CreateInteractionResponseFollowup<'a>,
-        ) -> &'b mut CreateInteractionResponseFollowup<'a>,
-    {
-        let mut builder = CreateInteractionResponseFollowup::default();
-        f(&mut builder);
-
-        let http = http.as_ref();
-        let message_id = message_id.into().into();
-        let files = std::mem::take(&mut builder.files);
-
-        if files.is_empty() {
-            http.edit_followup_message(&self.token, message_id, &builder).await
-        } else {
-            http.edit_followup_message_and_attachments(&self.token, message_id, &builder, files)
-                .await
-        }
+        message_id: impl Into<MessageId>,
+        builder: CreateInteractionResponseFollowup<'a>,
+    ) -> Result<Message> {
+        builder.execute(http, Some(message_id.into()), &self.token).await
     }
 
     /// Deletes a followup message.
@@ -301,18 +206,16 @@ impl ApplicationCommandInteraction {
         http.as_ref().get_followup_message(&self.token, message_id.into().into()).await
     }
 
-    /// Helper function to defer an interaction
+    /// Helper function to defer an interaction.
     ///
     /// # Errors
     ///
-    /// May also return an [`Error::Http`] if the API returns an error,
-    /// or an [`Error::Json`] if there is an error in deserializing the
-    /// API response.
+    /// Returns an [`Error::Http`] if the API returns an error, or an [`Error::Json`] if there is
+    /// an error in deserializing the API response.
     pub async fn defer(&self, http: impl AsRef<Http>) -> Result<()> {
-        self.create_interaction_response(http, |f| {
-            f.kind(InteractionResponseType::DeferredChannelMessageWithSource)
-        })
-        .await
+        let builder = CreateInteractionResponse::default()
+            .kind(InteractionResponseType::DeferredChannelMessageWithSource);
+        self.create_interaction_response(http, builder).await
     }
 }
 
