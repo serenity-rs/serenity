@@ -5,7 +5,7 @@ use std::sync::Arc;
 use futures::channel::mpsc::UnboundedSender as Sender;
 use futures::future::{BoxFuture, FutureExt};
 use tokio::sync::RwLock;
-use tracing::{debug, instrument, warn};
+use tracing::{debug, instrument};
 use typemap_rev::TypeMap;
 
 #[cfg(feature = "gateway")]
