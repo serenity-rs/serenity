@@ -1,23 +1,23 @@
-use serenity::builder::CreateApplicationCommand;
+use serenity::builder::{CreateApplicationCommand, CreateApplicationCommandOption};
 use serenity::model::prelude::command::CommandOptionType;
 
-pub fn register(command: &mut CreateApplicationCommand) -> &mut CreateApplicationCommand {
-    command
+pub fn register() -> CreateApplicationCommand {
+    CreateApplicationCommand::default()
         .name("welcome")
         .name_localized("de", "begrüßen")
         .description("Welcome a user")
         .description_localized("de", "Einen Nutzer begrüßen")
-        .create_option(|option| {
-            option
+        .add_option(
+            CreateApplicationCommandOption::default()
                 .name("user")
                 .name_localized("de", "nutzer")
                 .description("The user to welcome")
                 .description_localized("de", "Der zu begrüßende Nutzer")
                 .kind(CommandOptionType::User)
-                .required(true)
-        })
-        .create_option(|option| {
-            option
+                .required(true),
+        )
+        .add_option(
+            CreateApplicationCommandOption::default()
                 .name("message")
                 .name_localized("de", "nachricht")
                 .description("The message to send")
@@ -48,6 +48,6 @@ pub fn register(command: &mut CreateApplicationCommand) -> &mut CreateApplicatio
                     "I hope that you brought a controller to play together!",
                     "game",
                     [("de", "Ich hoffe du hast einen Controller zum Spielen mitgebracht!")],
-                )
-        })
+                ),
+        )
 }

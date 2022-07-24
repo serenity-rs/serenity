@@ -1,7 +1,19 @@
+#[cfg(feature = "http")]
+use crate::http::Http;
+#[cfg(feature = "http")]
+use crate::internal::prelude::*;
+#[cfg(feature = "http")]
+use crate::model::guild::automod::Rule;
 use crate::model::guild::automod::{Action, EventType, Trigger};
-use crate::model::id::{ChannelId, RoleId};
+use crate::model::prelude::*;
 
 #[derive(Clone, Debug, Serialize)]
+#[must_use]
+/// A builder for creating or editing guild automoderation rules.
+///
+/// # Examples
+///
+/// See [`GuildId::create_automod_rule`] for details.
 pub struct EditAutoModRule {
     event_type: EventType,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -19,14 +31,38 @@ pub struct EditAutoModRule {
 }
 
 impl EditAutoModRule {
+    /// Creates or edits an automoderation [`Rule`] in a guild. Passing `Some(rule_id)` will edit
+    /// that corresponding rule, otherwise a new rule will be created.
+    ///
+    /// **Note**: Requires the [Manage Guild] permission.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`Error::Http`] if the current user lacks permission, or if invalid data is given.
+    ///
+    /// [Manage Guild]: Permissions::MANAGE_GUILD
+    #[cfg(feature = "http")]
+    pub async fn execute(
+        self,
+        http: impl AsRef<Http>,
+        guild_id: GuildId,
+        rule_id: Option<RuleId>,
+    ) -> Result<Rule> {
+        let http = http.as_ref();
+        match rule_id {
+            Some(rule_id) => http.edit_automod_rule(guild_id.into(), rule_id.into(), &self).await,
+            None => http.create_automod_rule(guild_id.into(), &self).await,
+        }
+    }
+
     /// The display name of the rule.
-    pub fn name(&mut self, name: impl Into<String>) -> &mut Self {
+    pub fn name(mut self, name: impl Into<String>) -> Self {
         self.name = Some(name.into());
         self
     }
 
     /// Set the event context the rule should be checked.
-    pub fn event_type(&mut self, event_type: EventType) -> &mut Self {
+    pub fn event_type(mut self, event_type: EventType) -> Self {
         self.event_type = event_type;
         self
     }
@@ -34,19 +70,19 @@ impl EditAutoModRule {
     /// Set the type of content which can trigger the rule.
     ///
     /// **None**: The trigger type can't be edited after creation. Only its values.
-    pub fn trigger(&mut self, trigger: Trigger) -> &mut Self {
+    pub fn trigger(mut self, trigger: Trigger) -> Self {
         self.trigger = Some(trigger);
         self
     }
 
     /// Set the actions which will execute when the rule is triggered.
-    pub fn actions(&mut self, actions: Vec<Action>) -> &mut Self {
+    pub fn actions(mut self, actions: Vec<Action>) -> Self {
         self.actions = Some(actions);
         self
     }
 
     /// Set whether the rule is enabled.
-    pub fn enabled(&mut self, enabled: bool) -> &mut Self {
+    pub fn enabled(mut self, enabled: bool) -> Self {
         self.enabled = Some(enabled);
         self
     }
@@ -54,10 +90,7 @@ impl EditAutoModRule {
     /// Set roles that should not be affected by the rule.
     ///
     /// Maximum of 20.
-    pub fn exempt_roles(
-        &mut self,
-        roles: impl IntoIterator<Item = impl Into<RoleId>>,
-    ) -> &mut Self {
+    pub fn exempt_roles(mut self, roles: impl IntoIterator<Item = impl Into<RoleId>>) -> Self {
         self.exempt_roles = Some(roles.into_iter().map(Into::into).collect());
         self
     }
@@ -66,9 +99,9 @@ impl EditAutoModRule {
     ///
     /// Maximum of 50.
     pub fn exempt_channels(
-        &mut self,
+        mut self,
         channels: impl IntoIterator<Item = impl Into<ChannelId>>,
-    ) -> &mut Self {
+    ) -> Self {
         self.exempt_channels = Some(channels.into_iter().map(Into::into).collect());
         self
     }
