@@ -133,7 +133,8 @@ impl Member {
         let mut target_roles = self.roles.clone();
         target_roles.extend_from_slice(role_ids);
 
-        self.edit(http, |b| b.roles(target_roles)).await
+        let builder = EditMember::default().roles(target_roles);
+        self.edit(http, builder).await
     }
 
     /// Ban a [`User`] from the guild, deleting a number of
@@ -225,13 +226,8 @@ impl Member {
         http: impl AsRef<Http>,
         time: Timestamp,
     ) -> Result<()> {
-        match self
-            .guild_id
-            .edit_member(http, self.user.id, |member| {
-                member.disable_communication_until_datetime(time)
-            })
-            .await
-        {
+        let builder = EditMember::default().disable_communication_until_datetime(time);
+        match self.guild_id.edit_member(http, self.user.id, builder).await {
             Ok(_) => {
                 self.communication_disabled_until = Some(time);
                 Ok(())
@@ -257,17 +253,18 @@ impl Member {
 
     /// Edits the member in place with the given data.
     ///
-    /// See [`EditMember`] for the permission(s) required for separate builder
-    /// methods, as well as usage of this.
+    /// See [`EditMember`] for the permission(s) required for separate builder methods, as well as
+    /// usage of this.
+    ///
+    /// # Examples
+    ///
+    /// See [`GuildId::edit_member`] for details.
     ///
     /// # Errors
     ///
     /// Returns [`Error::Http`] if the current user lacks necessary permissions.
-    pub async fn edit<F>(&mut self, http: impl AsRef<Http>, f: F) -> Result<()>
-    where
-        F: FnOnce(&mut EditMember) -> &mut EditMember,
-    {
-        *self = self.guild_id.edit_member(http, self.user.id, f).await?;
+    pub async fn edit(&mut self, http: impl AsRef<Http>, builder: EditMember) -> Result<()> {
+        *self = self.guild_id.edit_member(http, self.user.id, builder).await?;
         Ok(())
     }
 
@@ -282,10 +279,8 @@ impl Member {
     /// [Moderate Members]: Permissions::MODERATE_MEMBERS
     #[doc(alias = "timeout")]
     pub async fn enable_communication(&mut self, http: impl AsRef<Http>) -> Result<()> {
-        *self = self
-            .guild_id
-            .edit_member(&http, self.user.id, EditMember::enable_communication)
-            .await?;
+        let builder = EditMember::default().enable_communication();
+        *self = self.guild_id.edit_member(http, self.user.id, builder).await?;
         Ok(())
     }
 
@@ -505,7 +500,8 @@ impl Member {
         let mut target_roles = self.roles.clone();
         target_roles.retain(|r| !role_ids.contains(r));
 
-        self.edit(http, |b| b.roles(target_roles)).await
+        let builder = EditMember::default().roles(target_roles);
+        self.edit(http, builder).await
     }
 
     /// Retrieves the full role data for the user's roles.

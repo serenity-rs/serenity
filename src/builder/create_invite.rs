@@ -1,10 +1,12 @@
-use crate::model::id::{ApplicationId, UserId};
-use crate::model::invite::InviteTargetType;
+#[cfg(feature = "http")]
+use crate::http::{CacheHttp, Http};
+#[cfg(feature = "http")]
+use crate::internal::prelude::*;
+use crate::model::prelude::*;
 
 /// A builder to create a [`RichInvite`] for use via [`GuildChannel::create_invite`].
 ///
-/// This is a structured and cleaner way of creating an invite, as all
-/// parameters are optional.
+/// This is a structured and cleaner way of creating an invite, as all parameters are optional.
 ///
 /// # Examples
 ///
@@ -16,6 +18,7 @@ use crate::model::invite::InviteTargetType;
 /// # use serenity::prelude::*;
 /// # use serenity::model::prelude::*;
 /// # use serenity::model::channel::Channel;
+/// use serenity::builder::CreateInvite;
 ///
 /// struct Handler;
 ///
@@ -32,8 +35,8 @@ use crate::model::invite::InviteTargetType;
 ///                 },
 ///             };
 ///
-///             let creation =
-///                 channel.create_invite(&context, |i| i.max_age(3600).max_uses(10)).await;
+///             let builder = CreateInvite::default().max_age(3600).max_uses(10);
+///             let creation = channel.create_invite(&context, builder).await;
 ///
 ///             let invite = match creation {
 ///                 Ok(invite) => invite,
@@ -62,10 +65,8 @@ use crate::model::invite::InviteTargetType;
 /// #     Ok(())
 /// # }
 /// ```
-///
-/// [`GuildChannel::create_invite`]: crate::model::channel::GuildChannel::create_invite
-/// [`RichInvite`]: crate::model::invite::RichInvite
 #[derive(Clone, Debug, Default, Serialize)]
+#[must_use]
 pub struct CreateInvite {
     #[serde(skip_serializing_if = "Option::is_none")]
     max_age: Option<u64>,
@@ -84,6 +85,44 @@ pub struct CreateInvite {
 }
 
 impl CreateInvite {
+    /// Creates an invite for the given channel.
+    ///
+    /// **Note**: Requires the [Create Instant Invite] permission.
+    ///
+    /// # Errors
+    ///
+    /// If the `cache` is enabled, returns [`ModelError::InvalidPermissions`] if the current user
+    /// lacks permission. Otherwise returns [`Error::Http`], as well as if invalid data is given.
+    ///
+    /// [Create Instant Invite]: Permissions::CREATE_INSTANT_INVITE
+    #[cfg(feature = "http")]
+    #[inline]
+    pub async fn execute(
+        self,
+        cache_http: impl CacheHttp,
+        channel_id: ChannelId,
+        #[cfg(feature = "cache")] guild_id: Option<GuildId>,
+    ) -> Result<RichInvite> {
+        #[cfg(feature = "cache")]
+        {
+            if let Some(cache) = cache_http.cache() {
+                crate::utils::user_has_perms_cache(
+                    cache,
+                    channel_id,
+                    guild_id,
+                    Permissions::CREATE_INSTANT_INVITE,
+                )?;
+            }
+        }
+
+        self._execute(cache_http.http(), channel_id).await
+    }
+
+    #[cfg(feature = "http")]
+    async fn _execute(self, http: &Http, channel_id: ChannelId) -> Result<RichInvite> {
+        http.create_invite(channel_id.into(), &self, None).await
+    }
+
     /// The duration that the invite will be valid for.
     ///
     /// Set to `0` for an invite which does not expire after an amount of time.
@@ -100,17 +139,19 @@ impl CreateInvite {
     /// # #[cfg(feature = "framework")]
     /// # use serenity::framework::standard::{CommandResult, macros::command};
     /// # use serenity::model::id::ChannelId;
+    /// # use serenity::builder::CreateInvite;
     /// #
     /// # #[cfg(all(feature = "cache", feature = "client", feature = "framework", feature = "http"))]
     /// # #[command]
     /// # async fn example(context: &Context) -> CommandResult {
     /// #     let channel = context.cache.guild_channel(81384788765712384).unwrap().clone();
     /// #
-    /// let invite = channel.create_invite(context, |i| i.max_age(3600)).await?;
+    /// let builder = CreateInvite::default().max_age(3600);
+    /// let invite = channel.create_invite(context, builder).await?;
     /// #     Ok(())
     /// # }
     /// ```
-    pub fn max_age(&mut self, max_age: u64) -> &mut Self {
+    pub fn max_age(mut self, max_age: u64) -> Self {
         self.max_age = Some(max_age);
         self
     }
@@ -131,17 +172,19 @@ impl CreateInvite {
     /// # #[cfg(feature = "framework")]
     /// # use serenity::framework::standard::{CommandResult, macros::command};
     /// # use serenity::model::id::ChannelId;
+    /// # use serenity::builder::CreateInvite;
     /// #
     /// # #[cfg(all(feature = "cache", feature = "client", feature = "framework", feature = "http"))]
     /// # #[command]
     /// # async fn example(context: &Context) -> CommandResult {
     /// #     let channel = context.cache.guild_channel(81384788765712384).unwrap().clone();
     /// #
-    /// let invite = channel.create_invite(context, |i| i.max_uses(5)).await?;
+    /// let builder = CreateInvite::default().max_uses(5);
+    /// let invite = channel.create_invite(context, builder).await?;
     /// #     Ok(())
     /// # }
     /// ```
-    pub fn max_uses(&mut self, max_uses: u64) -> &mut Self {
+    pub fn max_uses(mut self, max_uses: u64) -> Self {
         self.max_uses = Some(max_uses);
         self
     }
@@ -160,19 +203,21 @@ impl CreateInvite {
     /// # #[cfg(feature = "framework")]
     /// # use serenity::framework::standard::{CommandResult, macros::command};
     /// # use serenity::model::id::ChannelId;
+    /// # use serenity::builder::CreateInvite;
     /// #
     /// # #[cfg(all(feature = "cache", feature = "client", feature = "framework", feature = "http"))]
     /// # #[command]
     /// # async fn example(context: &Context) -> CommandResult {
     /// #     let channel = context.cache.guild_channel(81384788765712384).unwrap().clone();
     /// #
-    /// let invite = channel.create_invite(context, |i| i.temporary(true)).await?;
+    /// let builder = CreateInvite::default().temporary(true);
+    /// let invite = channel.create_invite(context, builder).await?;
     /// #     Ok(())
     /// # }
     /// #
     /// # fn main() {}
     /// ```
-    pub fn temporary(&mut self, temporary: bool) -> &mut Self {
+    pub fn temporary(mut self, temporary: bool) -> Self {
         self.temporary = Some(temporary);
         self
     }
@@ -191,23 +236,25 @@ impl CreateInvite {
     /// # #[cfg(feature = "framework")]
     /// # use serenity::framework::standard::{CommandResult, macros::command};
     /// # use serenity::model::id::ChannelId;
+    /// # use serenity::builder::CreateInvite;
     /// #
     /// # #[cfg(all(feature = "cache", feature = "client", feature = "framework", feature = "http"))]
     /// # #[command]
     /// # async fn example(context: &Context) -> CommandResult {
     /// #     let channel = context.cache.guild_channel(81384788765712384).unwrap().clone();
     /// #
-    /// let invite = channel.create_invite(context, |i| i.unique(true)).await?;
+    /// let builder = CreateInvite::default().unique(true);
+    /// let invite = channel.create_invite(context, builder).await?;
     /// #     Ok(())
     /// # }
     /// ```
-    pub fn unique(&mut self, unique: bool) -> &mut Self {
+    pub fn unique(mut self, unique: bool) -> Self {
         self.unique = Some(unique);
         self
     }
 
     /// The type of target for this voice channel invite.
-    pub fn target_type(&mut self, target_type: InviteTargetType) -> &mut Self {
+    pub fn target_type(mut self, target_type: InviteTargetType) -> Self {
         self.target_type = Some(target_type);
         self
     }
@@ -215,7 +262,7 @@ impl CreateInvite {
     /// The ID of the user whose stream to display for this invite, required if `target_type` is
     /// `Stream`
     /// The user must be streaming in the channel.
-    pub fn target_user_id(&mut self, target_user_id: UserId) -> &mut Self {
+    pub fn target_user_id(mut self, target_user_id: UserId) -> Self {
         self.target_user_id = Some(target_user_id);
         self
     }
@@ -234,7 +281,7 @@ impl CreateInvite {
     /// fishing: `814288819477020702`
     /// poker: `755827207812677713`
     /// chess: `832012774040141894`
-    pub fn target_application_id(&mut self, target_application_id: ApplicationId) -> &mut Self {
+    pub fn target_application_id(mut self, target_application_id: ApplicationId) -> Self {
         self.target_application_id = Some(target_application_id);
         self
     }
