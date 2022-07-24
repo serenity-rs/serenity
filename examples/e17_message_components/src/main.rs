@@ -3,7 +3,17 @@ use std::time::Duration;
 
 use dotenv::dotenv;
 use serenity::async_trait;
-use serenity::builder::CreateButton;
+use serenity::builder::{
+    CreateActionRow,
+    CreateButton,
+    CreateComponents,
+    CreateInteractionResponse,
+    CreateInteractionResponseData,
+    CreateMessage,
+    CreateSelectMenu,
+    CreateSelectMenuOption,
+    CreateSelectMenuOptions,
+};
 use serenity::client::{Context, EventHandler};
 use serenity::futures::StreamExt;
 use serenity::model::application::component::ButtonStyle;
@@ -11,15 +21,10 @@ use serenity::model::prelude::*;
 use serenity::prelude::*;
 
 fn sound_button(name: &str, emoji: ReactionType) -> CreateButton {
-    let mut b = CreateButton::default();
-    b.custom_id(name);
     // To add an emoji to buttons, use .emoji(). The method accepts anything ReactionType or
     // anything that can be converted to it. For a list of that, search Trait Implementations in the
     // docs for From<...>.
-    b.emoji(emoji);
-    b.label(name);
-    b.style(ButtonStyle::Primary);
-    b
+    CreateButton::default().custom_id(name).emoji(emoji).label(name).style(ButtonStyle::Primary)
 }
 
 struct Handler;
@@ -34,24 +39,25 @@ impl EventHandler for Handler {
         // Ask the user for its favorite animal
         let m = msg
             .channel_id
-            .send_message(&ctx, |m| {
-                m.content("Please select your favorite animal").components(|c| {
-                    c.create_action_row(|row| {
+            .send_message(
+                &ctx,
+                CreateMessage::default().content("Please select your favorite animal").components(
+                    CreateComponents::default().set_action_row(CreateActionRow::default()
                         // An action row can only contain one select menu!
-                        row.create_select_menu(|menu| {
-                            menu.custom_id("animal_select");
-                            menu.placeholder("No animal selected");
-                            menu.options(|f| {
-                                f.create_option(|o| o.label("🐈 meow").value("Cat"));
-                                f.create_option(|o| o.label("🐕 woof").value("Dog"));
-                                f.create_option(|o| o.label("🐎 neigh").value("Horse"));
-                                f.create_option(|o| o.label("🦙 hoooooooonk").value("Alpaca"));
-                                f.create_option(|o| o.label("🦀 crab rave").value("Ferris"))
-                            })
-                        })
-                    })
-                })
-            })
+                        .add_select_menu(CreateSelectMenu::default()
+                            .custom_id("animal_select")
+                            .placeholder("No animal selected")
+                            .options(CreateSelectMenuOptions::default().set_options(vec![
+                                CreateSelectMenuOption::default().label("🐈 meow").value("Cat"),
+                                CreateSelectMenuOption::default().label("🐕 woof").value("Dog"),
+                                CreateSelectMenuOption::default().label("🐎 neigh").value("Horse"),
+                                CreateSelectMenuOption::default().label("🦙 hoooooooonk").value("Alpaca"),
+                                CreateSelectMenuOption::default().label("🦀 crab rave").value("Ferris"),
+                            ]))
+                        )
+                    )
+                ),
+            )
             .await
             .unwrap();
 
@@ -77,32 +83,39 @@ impl EventHandler for Handler {
 
         // Acknowledge the interaction and edit the message
         interaction
-            .create_interaction_response(&ctx, |r| {
-                r.kind(InteractionResponseType::UpdateMessage).interaction_response_data(|d| {
-                    d.content(format!("You chose: **{}**\nNow choose a sound!", animal)).components(
-                        |c| {
-                            c.create_action_row(|r| {
-                                // add_XXX methods are an alternative to create_XXX methods
-                                r.add_button(sound_button("meow", "🐈".parse().unwrap()));
-                                r.add_button(sound_button("woof", "🐕".parse().unwrap()));
-                                r.add_button(sound_button("neigh", "🐎".parse().unwrap()));
-                                r.add_button(sound_button("hoooooooonk", "🦙".parse().unwrap()));
-                                r.add_button(sound_button(
-                                    "crab rave",
-                                    // Custom emojis in Discord are represented with
-                                    // `<:EMOJI_NAME:EMOJI_ID>`. You can see this by
-                                    // posting an emoji in your server and putting a backslash
-                                    // before the emoji.
-                                    //
-                                    // Because ReactionType implements FromStr, we can use .parse()
-                                    // to convert the textual emoji representation to ReactionType
-                                    "<:ferris:381919740114763787>".parse().unwrap(),
-                                ))
-                            })
-                        },
-                    )
-                })
-            })
+            .create_interaction_response(
+                &ctx,
+                CreateInteractionResponse::default()
+                    .kind(InteractionResponseType::UpdateMessage)
+                    .interaction_response_data(
+                        CreateInteractionResponseData::default()
+                            .content(format!("You chose: **{}**\nNow choose a sound!", animal))
+                            .components(
+                                CreateComponents::default().set_action_row(
+                                    CreateActionRow::default()
+                                        // add_XXX methods are an alternative to create_XXX methods
+                                        .add_button(sound_button("meow", "🐈".parse().unwrap()))
+                                        .add_button(sound_button("woof", "🐕".parse().unwrap()))
+                                        .add_button(sound_button("neigh", "🐎".parse().unwrap()))
+                                        .add_button(sound_button(
+                                            "hoooooooonk",
+                                            "🦙".parse().unwrap(),
+                                        ))
+                                        .add_button(sound_button(
+                                            "crab rave",
+                                            // Custom emojis in Discord are represented with
+                                            // `<:EMOJI_NAME:EMOJI_ID>`. You can see this by
+                                            // posting an emoji in your server and putting a backslash
+                                            // before the emoji.
+                                            //
+                                            // Because ReactionType implements FromStr, we can use .parse()
+                                            // to convert the textual emoji representation to ReactionType
+                                            "<:ferris:381919740114763787>".parse().unwrap(),
+                                        )),
+                                ),
+                            ),
+                    ),
+            )
             .await
             .unwrap();
 
@@ -116,15 +129,18 @@ impl EventHandler for Handler {
             let sound = &interaction.data.custom_id;
             // Acknowledge the interaction and send a reply
             interaction
-                .create_interaction_response(&ctx, |r| {
-                    // This time we dont edit the message but reply to it
-                    r.kind(InteractionResponseType::ChannelMessageWithSource)
-                        .interaction_response_data(|d| {
-                            // Make the message hidden for other users by setting `ephemeral(true)`.
-                            d.ephemeral(true)
+                .create_interaction_response(
+                    &ctx,
+                    CreateInteractionResponse::default()
+                        // This time we dont edit the message but reply to it
+                        .kind(InteractionResponseType::ChannelMessageWithSource)
+                        .interaction_response_data(
+                            CreateInteractionResponseData::default()
+                                // Make the message hidden for other users by setting `ephemeral(true)`.
+                                .ephemeral(true)
                                 .content(format!("The **{}** says __{}__", animal, sound))
-                        })
-                })
+                        ),
+                )
                 .await
                 .unwrap();
         }

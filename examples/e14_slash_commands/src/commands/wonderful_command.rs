@@ -1,5 +1,5 @@
 use serenity::builder::CreateApplicationCommand;
 
-pub fn register(command: &mut CreateApplicationCommand) -> &mut CreateApplicationCommand {
-    command.name("wonderful_command").description("An amazing command")
+pub fn register() -> CreateApplicationCommand {
+    CreateApplicationCommand::default().name("wonderful_command").description("An amazing command")
 }
