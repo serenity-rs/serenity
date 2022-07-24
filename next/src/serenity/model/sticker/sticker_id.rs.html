@@ -57,10 +57,6 @@
 <span id="51">51</span>
 <span id="52">52</span>
 <span id="53">53</span>
-<span id="54">54</span>
-<span id="55">55</span>
-<span id="56">56</span>
-<span id="57">57</span>
 </pre><pre class="rust"><code><span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::builder::EditSticker</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
@@ -90,32 +86,28 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// # Errors</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// Returns [`Error::Http`] if a [`Sticker`] with that [`StickerId`] does</span>
-    <span class="doccomment">/// not exist, or is otherwise unavailable.</span>
+    <span class="doccomment">/// Returns [`Error::Http`] if a [`Sticker`] with that [`StickerId`] does not exist, or is</span>
+    <span class="doccomment">/// otherwise unavailable.</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">to_sticker</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Sticker</span><span class="op">&gt;</span> {
         <span class="ident">http</span>.<span class="ident">as_ref</span>().<span class="ident">get_sticker</span>(<span class="self">self</span>.<span class="ident">get</span>()).<span class="kw">await</span>
     }
 
     <span class="doccomment">/// Edits the sticker.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// **Note**: The [Manage Emojis and Stickers] permission is required.</span>
+    <span class="doccomment">/// **Note**: Requires the [Manage Emojis and Stickers] permission.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// # Errors</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// Returns [`Error::Http`] if the current user lacks permission,</span>
-    <span class="doccomment">/// or if invalid edits are given.</span>
+    <span class="doccomment">/// Returns [`Error::Http`] if the current user lacks permission, or if invalid data is given.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [Manage Emojis and Stickers]: crate::model::permissions::Permissions::MANAGE_EMOJIS_AND_STICKERS</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">edit</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(
+    <span class="doccomment">/// [Manage Emojis and Stickers]: Permissions::MANAGE_EMOJIS_AND_STICKERS</span>
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">edit</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>,
         <span class="ident">guild_id</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">GuildId</span><span class="op">&gt;</span>,
-        <span class="ident">f</span>: <span class="ident">F</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Sticker</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="kw-2">&amp;mut</span> <span class="ident">EditSticker</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="ident">EditSticker</span>,
-    {
-        <span class="ident">guild_id</span>.<span class="ident">into</span>().<span class="ident">edit_sticker</span>(<span class="ident">http</span>, <span class="self">self</span>, <span class="ident">f</span>).<span class="kw">await</span>
+        <span class="ident">builder</span>: <span class="ident">EditSticker</span>,
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Sticker</span><span class="op">&gt;</span> {
+        <span class="ident">guild_id</span>.<span class="ident">into</span>().<span class="ident">edit_sticker</span>(<span class="ident">http</span>, <span class="self">self</span>, <span class="ident">builder</span>).<span class="kw">await</span>
     }
 }
 </code></pre></div>

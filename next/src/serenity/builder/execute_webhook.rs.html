@@ -309,30 +309,79 @@
 <span id="303">303</span>
 <span id="304">304</span>
 <span id="305">305</span>
-</pre><pre class="rust"><code><span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>))]</span>
-<span class="kw">use</span> <span class="ident">std::marker::PhantomData</span>;
+<span id="306">306</span>
+<span id="307">307</span>
+<span id="308">308</span>
+<span id="309">309</span>
+<span id="310">310</span>
+<span id="311">311</span>
+<span id="312">312</span>
+<span id="313">313</span>
+<span id="314">314</span>
+<span id="315">315</span>
+<span id="316">316</span>
+<span id="317">317</span>
+<span id="318">318</span>
+<span id="319">319</span>
+<span id="320">320</span>
+<span id="321">321</span>
+<span id="322">322</span>
+<span id="323">323</span>
+<span id="324">324</span>
+<span id="325">325</span>
+<span id="326">326</span>
+<span id="327">327</span>
+<span id="328">328</span>
+<span id="329">329</span>
+<span id="330">330</span>
+<span id="331">331</span>
+<span id="332">332</span>
+<span id="333">333</span>
+<span id="334">334</span>
+<span id="335">335</span>
+<span id="336">336</span>
+<span id="337">337</span>
+<span id="338">338</span>
+<span id="339">339</span>
+<span id="340">340</span>
+<span id="341">341</span>
+<span id="342">342</span>
+<span id="343">343</span>
+<span id="344">344</span>
+<span id="345">345</span>
+<span id="346">346</span>
+<span id="347">347</span>
+<span id="348">348</span>
+<span id="349">349</span>
+<span id="350">350</span>
+<span id="351">351</span>
+<span id="352">352</span>
+<span id="353">353</span>
+<span id="354">354</span>
+<span id="355">355</span>
+<span id="356">356</span>
+<span id="357">357</span>
+<span id="358">358</span>
+<span id="359">359</span>
+<span id="360">360</span>
+</pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">CreateAllowedMentions</span>, <span class="ident">CreateComponents</span>, <span class="ident">CreateEmbed</span>};
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http&quot;</span>)]</span>
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::http::Http</span>;
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http&quot;</span>)]</span>
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::internal::prelude</span>::<span class="kw-2">*</span>;
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::prelude</span>::<span class="kw-2">*</span>;
 
-<span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">CreateAllowedMentions</span>, <span class="ident">CreateComponents</span>, <span class="ident">CreateEmbed</span>};
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::channel::AttachmentType</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::channel::MessageFlags</span>;
-
-<span class="doccomment">/// A builder to create the inner content of a [`Webhook`]&#39;s execution.</span>
+<span class="doccomment">/// A builder to create the content for a [`Webhook`]&#39;s execution.</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// This is a structured way of cleanly creating the inner execution payload,</span>
-<span class="doccomment">/// to reduce potential argument counts.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Refer to the documentation for [`execute_webhook`] on restrictions with</span>
-<span class="doccomment">/// execution payloads and its fields.</span>
+<span class="doccomment">/// Refer to [`Http::execute_webhook`] for restrictions and requirements on the execution payload.</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// # Examples</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// Creating two embeds, and then sending them as part of the delivery</span>
-<span class="doccomment">/// payload of [`Webhook::execute`]:</span>
+<span class="doccomment">/// Creating two embeds, and then sending them as part of the payload using [`Webhook::execute`]:</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// ```rust,no_run</span>
+<span class="doccomment">/// use serenity::builder::{CreateEmbed, ExecuteWebhook};</span>
 <span class="doccomment">/// use serenity::http::Http;</span>
-<span class="doccomment">/// use serenity::model::channel::Embed;</span>
 <span class="doccomment">/// use serenity::model::webhook::Webhook;</span>
 <span class="doccomment">/// use serenity::utils::Colour;</span>
 <span class="doccomment">///</span>
@@ -341,33 +390,27 @@
 <span class="doccomment">/// let url = &quot;https://discord.com/api/webhooks/245037420704169985/ig5AO-wdVWpCBtUUMxmgsWryqgsW3DChbKYOINftJ4DCrUbnkedoYZD0VOH1QLr-S3sV&quot;;</span>
 <span class="doccomment">/// let webhook = Webhook::from_url(&amp;http, url).await?;</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// let website = Embed::fake(|e| {</span>
-<span class="doccomment">///     e.title(&quot;The Rust Language Website&quot;)</span>
-<span class="doccomment">///         .description(&quot;Rust is a systems programming language.&quot;)</span>
-<span class="doccomment">///         .colour(Colour::from_rgb(222, 165, 132))</span>
-<span class="doccomment">/// });</span>
+<span class="doccomment">/// let website = CreateEmbed::default()</span>
+<span class="doccomment">///     .title(&quot;The Rust Language Website&quot;)</span>
+<span class="doccomment">///     .description(&quot;Rust is a systems programming language.&quot;)</span>
+<span class="doccomment">///     .colour(Colour::from_rgb(222, 165, 132));</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// let resources = Embed::fake(|e| {</span>
-<span class="doccomment">///     e.title(&quot;Rust Resources&quot;)</span>
-<span class="doccomment">///         .description(&quot;A few resources to help with learning Rust&quot;)</span>
-<span class="doccomment">///         .colour(0xDEA584)</span>
-<span class="doccomment">///         .field(&quot;The Rust Book&quot;, &quot;A comprehensive resource for Rust.&quot;, false)</span>
-<span class="doccomment">///         .field(&quot;Rust by Example&quot;, &quot;A collection of Rust examples&quot;, false)</span>
-<span class="doccomment">/// });</span>
+<span class="doccomment">/// let resources = CreateEmbed::default()</span>
+<span class="doccomment">///     .title(&quot;Rust Resources&quot;)</span>
+<span class="doccomment">///     .description(&quot;A few resources to help with learning Rust&quot;)</span>
+<span class="doccomment">///     .colour(0xDEA584)</span>
+<span class="doccomment">///     .field(&quot;The Rust Book&quot;, &quot;A comprehensive resource for Rust.&quot;, false)</span>
+<span class="doccomment">///     .field(&quot;Rust by Example&quot;, &quot;A collection of Rust examples&quot;, false);</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// webhook</span>
-<span class="doccomment">///     .execute(&amp;http, false, |w| {</span>
-<span class="doccomment">///         w.content(&quot;Here&#39;s some information on Rust:&quot;).embeds(vec![website, resources])</span>
-<span class="doccomment">///     })</span>
-<span class="doccomment">///     .await?;</span>
+<span class="doccomment">/// let builder = ExecuteWebhook::default()</span>
+<span class="doccomment">///     .content(&quot;Here&#39;s some information on Rust:&quot;)</span>
+<span class="doccomment">///     .embeds(vec![website, resources]);</span>
+<span class="doccomment">/// webhook.execute(&amp;http, false, builder).await?;</span>
 <span class="doccomment">/// #     Ok(())</span>
 <span class="doccomment">/// # }</span>
 <span class="doccomment">/// ```</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [`Webhook`]: crate::model::webhook::Webhook</span>
-<span class="doccomment">/// [`Webhook::execute`]: crate::model::webhook::Webhook::execute</span>
-<span class="doccomment">/// [`execute_webhook`]: crate::http::client::Http::execute_webhook</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Default</span>, <span class="ident">Serialize</span>)]</span>
+<span class="attribute">#[<span class="ident">must_use</span>]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ExecuteWebhook</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
     <span class="ident">tts</span>: <span class="ident">bool</span>,
     <span class="ident">embeds</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">CreateEmbed</span><span class="op">&gt;</span>,
@@ -385,13 +428,65 @@
     <span class="ident">flags</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">MessageFlags</span><span class="op">&gt;</span>,
 
     <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip</span>)]</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">files</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">AttachmentType</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>))]</span>
-    <span class="ident">files</span>: <span class="ident">PhantomData</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> ()<span class="op">&gt;</span>,
+    <span class="ident">thread_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ChannelId</span><span class="op">&gt;</span>,
+    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip</span>)]</span>
+    <span class="ident">files</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">AttachmentType</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>,
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">ExecuteWebhook</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
+    <span class="doccomment">/// Executes the webhook with the given content.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// If `wait` is set to false, this function will return `Ok(None)` on success. Otherwise,</span>
+    <span class="doccomment">/// Discord will wait for confirmation that the message was sent, and this function will</span>
+    <span class="doccomment">/// instead return `Ok(Some(Message))`.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Errors</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// Returns [`Error::Http`] if the content is malformed, if the token is invalid, or if</span>
+    <span class="doccomment">/// execution is attempted in a thread not belonging to the webhook&#39;s [`Channel`].</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// Returns [`Error::Json`] if there is an error in deserialising Discord&#39;s response.</span>
+    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http&quot;</span>)]</span>
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">execute</span>(
+        <span class="kw-2">mut</span> <span class="self">self</span>,
+        <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>,
+        <span class="ident">webhook_id</span>: <span class="ident">WebhookId</span>,
+        <span class="ident">token</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
+        <span class="ident">wait</span>: <span class="ident">bool</span>,
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Message</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+        <span class="self">self</span>.<span class="ident">check_length</span>()<span class="question-mark">?</span>;
+        <span class="kw">let</span> <span class="ident">webhook_id</span> <span class="op">=</span> <span class="ident">webhook_id</span>.<span class="ident">into</span>();
+        <span class="kw">let</span> <span class="ident">thread_id</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">thread_id</span>.<span class="ident">map</span>(<span class="ident">Into::into</span>);
+        <span class="kw">let</span> <span class="ident">files</span> <span class="op">=</span> <span class="ident">std::mem::take</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">files</span>);
+
+        <span class="kw">if</span> <span class="ident">files</span>.<span class="ident">is_empty</span>() {
+            <span class="ident">http</span>.<span class="ident">as_ref</span>().<span class="ident">execute_webhook</span>(<span class="ident">webhook_id</span>, <span class="ident">thread_id</span>, <span class="ident">token</span>, <span class="ident">wait</span>, <span class="kw-2">&amp;</span><span class="self">self</span>).<span class="kw">await</span>
+        } <span class="kw">else</span> {
+            <span class="ident">http</span>.<span class="ident">as_ref</span>()
+                .<span class="ident">execute_webhook_with_files</span>(<span class="ident">webhook_id</span>, <span class="ident">thread_id</span>, <span class="ident">token</span>, <span class="ident">wait</span>, <span class="ident">files</span>, <span class="kw-2">&amp;</span><span class="self">self</span>)
+                .<span class="kw">await</span>
+        }
+    }
+
+    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http&quot;</span>)]</span>
+    <span class="kw">fn</span> <span class="ident">check_length</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">content</span>) <span class="op">=</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">content</span> {
+            <span class="kw">let</span> <span class="ident">length</span> <span class="op">=</span> <span class="ident">content</span>.<span class="ident">chars</span>().<span class="ident">count</span>();
+            <span class="kw">let</span> <span class="ident">max_length</span> <span class="op">=</span> <span class="ident"><span class="kw">crate</span>::constants::MESSAGE_CODE_LIMIT</span>;
+            <span class="kw">if</span> <span class="ident">length</span> <span class="op">&gt;</span> <span class="ident">max_length</span> {
+                <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::Model</span>(<span class="ident">ModelError::MessageTooLong</span>(<span class="ident">length</span> <span class="op">-</span> <span class="ident">max_length</span>)));
+            }
+        }
+
+        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">embeds</span>.<span class="ident">len</span>() <span class="op">&gt;</span> <span class="ident"><span class="kw">crate</span>::constants::EMBED_MAX_COUNT</span> {
+            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::Model</span>(<span class="ident">ModelError::EmbedAmount</span>));
+        }
+        <span class="kw">for</span> <span class="ident">embed</span> <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">embeds</span> {
+            <span class="ident">embed</span>.<span class="ident">check_length</span>()<span class="question-mark">?</span>;
+        }
+        <span class="prelude-val">Ok</span>(())
+    }
+
     <span class="doccomment">/// Override the default avatar of the webhook with an image URL.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// # Examples</span>
@@ -399,6 +494,7 @@
     <span class="doccomment">/// Overriding the default avatar:</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// ```rust,no_run</span>
+    <span class="doccomment">/// # use serenity::builder::ExecuteWebhook;</span>
     <span class="doccomment">/// # use serenity::http::Http;</span>
     <span class="doccomment">/// # use serenity::model::webhook::Webhook;</span>
     <span class="doccomment">/// #</span>
@@ -406,13 +502,14 @@
     <span class="doccomment">/// # let http = Http::new(&quot;token&quot;);</span>
     <span class="doccomment">/// # let webhook = Webhook::from_id_with_token(&amp;http, 0, &quot;&quot;).await?;</span>
     <span class="doccomment">/// #</span>
-    <span class="doccomment">/// let avatar_url = &quot;https://i.imgur.com/KTs6whd.jpg&quot;;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// webhook.execute(&amp;http, false, |w| w.avatar_url(avatar_url).content(&quot;Here&#39;s a webhook&quot;)).await?;</span>
+    <span class="doccomment">/// let builder = ExecuteWebhook::default()</span>
+    <span class="doccomment">///     .avatar_url(&quot;https://i.imgur.com/KTs6whd.jpg&quot;)</span>
+    <span class="doccomment">///     .content(&quot;Here&#39;s a webhook&quot;);</span>
+    <span class="doccomment">/// webhook.execute(&amp;http, false, builder).await?;</span>
     <span class="doccomment">/// #     Ok(())</span>
     <span class="doccomment">/// # }</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">avatar_url</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">avatar_url</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">avatar_url</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">avatar_url</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">avatar_url</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">avatar_url</span>.<span class="ident">into</span>());
         <span class="self">self</span>
     }
@@ -427,6 +524,7 @@
     <span class="doccomment">/// Sending a webhook with a content of `&quot;foo&quot;`:</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// ```rust,no_run</span>
+    <span class="doccomment">/// # use serenity::builder::ExecuteWebhook;</span>
     <span class="doccomment">/// # use serenity::http::Http;</span>
     <span class="doccomment">/// # use serenity::model::webhook::Webhook;</span>
     <span class="doccomment">/// #</span>
@@ -434,7 +532,8 @@
     <span class="doccomment">/// # let http = Http::new(&quot;token&quot;);</span>
     <span class="doccomment">/// # let webhook = Webhook::from_id_with_token(&amp;http, 0, &quot;&quot;).await?;</span>
     <span class="doccomment">/// #</span>
-    <span class="doccomment">/// let execution = webhook.execute(&amp;http, false, |w| w.content(&quot;foo&quot;)).await;</span>
+    <span class="doccomment">/// let builder = ExecuteWebhook::default().content(&quot;foo&quot;);</span>
+    <span class="doccomment">/// let execution = webhook.execute(&amp;http, false, builder).await;</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// if let Err(why) = execution {</span>
     <span class="doccomment">///     println!(&quot;Err sending webhook: {:?}&quot;, why);</span>
@@ -442,87 +541,95 @@
     <span class="doccomment">/// #     Ok(())</span>
     <span class="doccomment">/// # }</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">content</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">content</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">content</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">content</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">content</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">content</span>.<span class="ident">into</span>());
         <span class="self">self</span>
     }
 
+    <span class="doccomment">/// Execute within a given thread. If the provided thread Id doesn&#39;t belong to the current</span>
+    <span class="doccomment">/// webhook, the API will return an error.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// **Note**: If the given thread is archived, it will automatically be unarchived.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Examples</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// Execute a webhook with message content of `test`, in a thread with Id `12345678`:</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// ```rust,no_run</span>
+    <span class="doccomment">/// # use serenity::builder::ExecuteWebhook;</span>
+    <span class="doccomment">/// # use serenity::http::Http;</span>
+    <span class="doccomment">/// # use serenity::model::webhook::Webhook;</span>
+    <span class="doccomment">/// #</span>
+    <span class="doccomment">/// # async fn run() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {</span>
+    <span class="doccomment">/// # let http = Http::new(&quot;token&quot;);</span>
+    <span class="doccomment">/// let url = &quot;https://discord.com/api/webhooks/245037420704169985/ig5AO-wdVWpCBtUUMxmgsWryqgsW3DChbKYOINftJ4DCrUbnkedoYZD0VOH1QLr-S3sV&quot;;</span>
+    <span class="doccomment">/// let mut webhook = Webhook::from_url(&amp;http, url).await?;</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// let builder = ExecuteWebhook::default().in_thread(12345678).content(&quot;test&quot;);</span>
+    <span class="doccomment">/// webhook.execute(&amp;http, false, builder).await?;</span>
+    <span class="doccomment">/// #     Ok(())</span>
+    <span class="doccomment">/// # }</span>
+    <span class="doccomment">/// ```</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">in_thread</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">thread_id</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">ChannelId</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
+        <span class="self">self</span>.<span class="ident">thread_id</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">thread_id</span>.<span class="ident">into</span>());
+        <span class="self">self</span>
+    }
+
     <span class="doccomment">/// Appends a file to the webhook message.</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">add_file</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">AttachmentType</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">file</span>: <span class="ident">T</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">add_file</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">file</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">AttachmentType</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">files</span>.<span class="ident">push</span>(<span class="ident">file</span>.<span class="ident">into</span>());
         <span class="self">self</span>
     }
 
     <span class="doccomment">/// Appends a list of files to the webhook message.</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">add_files</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">AttachmentType</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>, <span class="ident">It</span>: <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span>(
-        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
+        <span class="kw-2">mut</span> <span class="self">self</span>,
         <span class="ident">files</span>: <span class="ident">It</span>,
-    ) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
+    ) -&gt; <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">files</span>.<span class="ident">extend</span>(<span class="ident">files</span>.<span class="ident">into_iter</span>().<span class="ident">map</span>(<span class="ident">Into::into</span>));
         <span class="self">self</span>
     }
 
     <span class="doccomment">/// Sets a list of files to include in the webhook message.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// Calling this multiple times will overwrite the file list.</span>
-    <span class="doccomment">/// To append files, call [`Self::add_file`] or [`Self::add_files`] instead.</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
+    <span class="doccomment">/// Calling this multiple times will overwrite the file list. To append files, call</span>
+    <span class="doccomment">/// [`Self::add_file`] or [`Self::add_files`] instead.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">files</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">AttachmentType</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>, <span class="ident">It</span>: <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span>(
-        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
+        <span class="kw-2">mut</span> <span class="self">self</span>,
         <span class="ident">files</span>: <span class="ident">It</span>,
-    ) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
+    ) -&gt; <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">files</span> <span class="op">=</span> <span class="ident">files</span>.<span class="ident">into_iter</span>().<span class="ident">map</span>(<span class="ident">Into::into</span>).<span class="ident">collect</span>();
         <span class="self">self</span>
     }
 
     <span class="doccomment">/// Set the allowed mentions for the message.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">allowed_mentions</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">f</span>: <span class="ident">F</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span>
-    <span class="kw">where</span>
-        <span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="kw-2">&amp;mut</span> <span class="ident">CreateAllowedMentions</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="ident">CreateAllowedMentions</span>,
-    {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">allowed_mentions</span> <span class="op">=</span> <span class="ident">CreateAllowedMentions::default</span>();
-        <span class="ident">f</span>(<span class="kw-2">&amp;mut</span> <span class="ident">allowed_mentions</span>);
-
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">allowed_mentions</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">allowed_mentions</span>: <span class="ident">CreateAllowedMentions</span>) -&gt; <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">allowed_mentions</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">allowed_mentions</span>);
         <span class="self">self</span>
     }
 
-    <span class="doccomment">/// Creates components for this message. Requires an application-owned webhook, meaning either</span>
+    <span class="doccomment">/// Sets the components for this message. Requires an application-owned webhook, meaning either</span>
     <span class="doccomment">/// the webhook&#39;s `kind` field is set to [`WebhookType::Application`], or it was created by an</span>
     <span class="doccomment">/// application (and has kind [`WebhookType::Incoming`]).</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// [`WebhookType::Application`]: crate::model::webhook::WebhookType</span>
     <span class="doccomment">/// [`WebhookType::Incoming`]: crate::model::webhook::WebhookType</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">components</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">f</span>: <span class="ident">F</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span>
-    <span class="kw">where</span>
-        <span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="kw-2">&amp;mut</span> <span class="ident">CreateComponents</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="ident">CreateComponents</span>,
-    {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">components</span> <span class="op">=</span> <span class="ident">CreateComponents::default</span>();
-        <span class="ident">f</span>(<span class="kw-2">&amp;mut</span> <span class="ident">components</span>);
-
-        <span class="self">self</span>.<span class="ident">set_components</span>(<span class="ident">components</span>)
-    }
-
-    <span class="doccomment">/// Sets the components of this message. Requires an application-owned webhook. See</span>
-    <span class="doccomment">/// [`components`] for details.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`components`]: crate::builder::ExecuteWebhook::components</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_components</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">components</span>: <span class="ident">CreateComponents</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">components</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">components</span>: <span class="ident">CreateComponents</span>) -&gt; <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">components</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">components</span>);
         <span class="self">self</span>
     }
 
-    <span class="doccomment">/// Set the embeds associated with the message.</span>
+    <span class="doccomment">/// Set an embed for the message.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Refer to the [struct-level documentation] for an example on how to use</span>
-    <span class="doccomment">/// embeds.</span>
+    <span class="doccomment">/// Refer to the [struct-level documentation] for an example on how to use embeds.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// [struct-level documentation]: #examples</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">embeds</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">embeds</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">CreateEmbed</span><span class="op">&gt;</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">embed</span>(<span class="self">self</span>, <span class="ident">embed</span>: <span class="ident">CreateEmbed</span>) -&gt; <span class="self">Self</span> {
+        <span class="self">self</span>.<span class="ident">embeds</span>(<span class="macro">vec!</span>[<span class="ident">embed</span>])
+    }
+
+    <span class="doccomment">/// Set multiple embeds for the message.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">embeds</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">embeds</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">CreateEmbed</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">embeds</span> <span class="op">=</span> <span class="ident">embeds</span>;
         <span class="self">self</span>
     }
@@ -534,6 +641,7 @@
     <span class="doccomment">/// Sending a webhook with text-to-speech enabled:</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// ```rust,no_run</span>
+    <span class="doccomment">/// # use serenity::builder::ExecuteWebhook;</span>
     <span class="doccomment">/// # use serenity::http::Http;</span>
     <span class="doccomment">/// # use serenity::model::webhook::Webhook;</span>
     <span class="doccomment">/// #</span>
@@ -541,7 +649,8 @@
     <span class="doccomment">/// # let http = Http::new(&quot;token&quot;);</span>
     <span class="doccomment">/// # let webhook = Webhook::from_id_with_token(&amp;http, 0, &quot;&quot;).await?;</span>
     <span class="doccomment">/// #</span>
-    <span class="doccomment">/// let execution = webhook.execute(&amp;http, false, |w| w.content(&quot;hello&quot;).tts(true)).await;</span>
+    <span class="doccomment">/// let builder = ExecuteWebhook::default().content(&quot;hello&quot;).tts(true);</span>
+    <span class="doccomment">/// let execution = webhook.execute(&amp;http, false, builder).await;</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// if let Err(why) = execution {</span>
     <span class="doccomment">///     println!(&quot;Err sending webhook: {:?}&quot;, why);</span>
@@ -549,7 +658,7 @@
     <span class="doccomment">/// #     Ok(())</span>
     <span class="doccomment">/// # }</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">tts</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">tts</span>: <span class="ident">bool</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">tts</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">tts</span>: <span class="ident">bool</span>) -&gt; <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">tts</span> <span class="op">=</span> <span class="ident">tts</span>;
         <span class="self">self</span>
     }
@@ -561,6 +670,7 @@
     <span class="doccomment">/// Overriding the username to `&quot;hakase&quot;`:</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// ```rust,no_run</span>
+    <span class="doccomment">/// # use serenity::builder::ExecuteWebhook;</span>
     <span class="doccomment">/// # use serenity::http::Http;</span>
     <span class="doccomment">/// # use serenity::model::webhook::Webhook;</span>
     <span class="doccomment">/// #</span>
@@ -568,7 +678,8 @@
     <span class="doccomment">/// # let http = Http::new(&quot;token&quot;);</span>
     <span class="doccomment">/// # let webhook = Webhook::from_id_with_token(&amp;http, 0, &quot;&quot;).await?;</span>
     <span class="doccomment">/// #</span>
-    <span class="doccomment">/// let execution = webhook.execute(&amp;http, false, |w| w.content(&quot;hello&quot;).username(&quot;hakase&quot;)).await;</span>
+    <span class="doccomment">/// let builder = ExecuteWebhook::default().content(&quot;hello&quot;).username(&quot;hakase&quot;);</span>
+    <span class="doccomment">/// let execution = webhook.execute(&amp;http, false, builder).await;</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// if let Err(why) = execution {</span>
     <span class="doccomment">///     println!(&quot;Err sending webhook: {:?}&quot;, why);</span>
@@ -576,7 +687,7 @@
     <span class="doccomment">/// #     Ok(())</span>
     <span class="doccomment">/// # }</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">username</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">username</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">username</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">username</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">username</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">username</span>.<span class="ident">into</span>());
         <span class="self">self</span>
     }
@@ -588,6 +699,7 @@
     <span class="doccomment">/// Suppressing an embed on the message.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// ```rust,no_run</span>
+    <span class="doccomment">/// # use serenity::builder::ExecuteWebhook;</span>
     <span class="doccomment">/// # use serenity::http::Http;</span>
     <span class="doccomment">/// # use serenity::model::channel::MessageFlags;</span>
     <span class="doccomment">/// # use serenity::model::webhook::Webhook;</span>
@@ -596,12 +708,10 @@
     <span class="doccomment">/// # let http = Http::new(&quot;token&quot;);</span>
     <span class="doccomment">/// # let webhook = Webhook::from_id_with_token(&amp;http, 0, &quot;&quot;).await?;</span>
     <span class="doccomment">/// #</span>
-    <span class="doccomment">/// let execution = webhook</span>
-    <span class="doccomment">///     .execute(&amp;http, false, |w| {</span>
-    <span class="doccomment">///         w.content(&quot;https://docs.rs/serenity/latest/serenity/&quot;)</span>
-    <span class="doccomment">///             .flags(MessageFlags::SUPPRESS_EMBEDS)</span>
-    <span class="doccomment">///     })</span>
-    <span class="doccomment">///     .await;</span>
+    <span class="doccomment">/// let builder = ExecuteWebhook::default()</span>
+    <span class="doccomment">///     .content(&quot;https://docs.rs/serenity/latest/serenity/&quot;)</span>
+    <span class="doccomment">///     .flags(MessageFlags::SUPPRESS_EMBEDS);</span>
+    <span class="doccomment">/// let execution = webhook.execute(&amp;http, false, builder).await;</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// if let Err(why) = execution {</span>
     <span class="doccomment">///     println!(&quot;Err sending webhook: {:?}&quot;, why);</span>
@@ -609,7 +719,7 @@
     <span class="doccomment">/// #     Ok(())</span>
     <span class="doccomment">/// # }</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">flags</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">flags</span>: <span class="ident">MessageFlags</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">flags</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">flags</span>: <span class="ident">MessageFlags</span>) -&gt; <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">flags</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">flags</span>);
         <span class="self">self</span>
     }

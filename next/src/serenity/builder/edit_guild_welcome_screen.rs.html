@@ -104,13 +104,25 @@
 <span id="98">98</span>
 <span id="99">99</span>
 <span id="100">100</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::guild::GuildWelcomeChannelEmoji</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::id</span>::{<span class="ident">ChannelId</span>, <span class="ident">EmojiId</span>};
+<span id="101">101</span>
+<span id="102">102</span>
+<span id="103">103</span>
+<span id="104">104</span>
+<span id="105">105</span>
+<span id="106">106</span>
+<span id="107">107</span>
+<span id="108">108</span>
+</pre><pre class="rust"><code><span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http&quot;</span>)]</span>
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::http::Http</span>;
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http&quot;</span>)]</span>
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::internal::prelude</span>::<span class="kw-2">*</span>;
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::prelude</span>::<span class="kw-2">*</span>;
 
 <span class="doccomment">/// A builder to specify the fields to edit in a [`GuildWelcomeScreen`].</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// [`GuildWelcomeScreen`]: crate::model::guild::GuildWelcomeScreen</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Default</span>, <span class="ident">Serialize</span>)]</span>
+<span class="attribute">#[<span class="ident">must_use</span>]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">EditGuildWelcomeScreen</span> {
     <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;Option::is_none&quot;</span>)]</span>
     <span class="ident">enabled</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span>,
@@ -121,36 +133,42 @@
 }
 
 <span class="kw">impl</span> <span class="ident">EditGuildWelcomeScreen</span> {
-    <span class="doccomment">/// Whether the welcome screen is enabled or not.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">enabled</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">enabled</span>: <span class="ident">bool</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">enabled</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">enabled</span>);
+    <span class="doccomment">/// Edits the guild&#39;s welcome screen.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// **Note**: Requires the [Manage Guild] permission.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Errors</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// Returns [`Error::Http`] if the current user lacks permission.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// [Manage Guild]: Permissions::MANAGE_GUILD</span>
+    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http&quot;</span>)]</span>
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">execute</span>(
+        <span class="self">self</span>,
+        <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>,
+        <span class="ident">guild_id</span>: <span class="ident">GuildId</span>,
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">GuildWelcomeScreen</span><span class="op">&gt;</span> {
+        <span class="ident">http</span>.<span class="ident">as_ref</span>().<span class="ident">edit_guild_welcome_screen</span>(<span class="ident">guild_id</span>.<span class="ident">into</span>(), <span class="kw-2">&amp;</span><span class="self">self</span>).<span class="kw">await</span>
+    }
 
+    <span class="doccomment">/// Whether the welcome screen is enabled or not.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">enabled</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">enabled</span>: <span class="ident">bool</span>) -&gt; <span class="self">Self</span> {
+        <span class="self">self</span>.<span class="ident">enabled</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">enabled</span>);
         <span class="self">self</span>
     }
 
     <span class="doccomment">/// The server description shown in the welcome screen.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">description</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">description</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">description</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">description</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">description</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">description</span>.<span class="ident">into</span>());
-
         <span class="self">self</span>
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">create_welcome_channel</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">f</span>: <span class="ident">F</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span>
-    <span class="kw">where</span>
-        <span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="kw-2">&amp;mut</span> <span class="ident">CreateGuildWelcomeChannel</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="ident">CreateGuildWelcomeChannel</span>,
-    {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">data</span> <span class="op">=</span> <span class="ident">CreateGuildWelcomeChannel::default</span>();
-        <span class="ident">f</span>(<span class="kw-2">&amp;mut</span> <span class="ident">data</span>);
-
-        <span class="self">self</span>.<span class="ident">add_welcome_channel</span>(<span class="ident">data</span>)
-    }
-
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">add_welcome_channel</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">channel</span>: <span class="ident">CreateGuildWelcomeChannel</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">add_welcome_channel</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">channel</span>: <span class="ident">CreateGuildWelcomeChannel</span>) -&gt; <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">welcome_channels</span>.<span class="ident">push</span>(<span class="ident">channel</span>);
         <span class="self">self</span>
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_welcome_channels</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">channels</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">CreateGuildWelcomeChannel</span><span class="op">&gt;</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_welcome_channels</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">channels</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">CreateGuildWelcomeChannel</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">welcome_channels</span> <span class="op">=</span> <span class="ident">channels</span>;
         <span class="self">self</span>
     }
@@ -173,21 +191,19 @@
 
 <span class="kw">impl</span> <span class="ident">CreateGuildWelcomeChannel</span> {
     <span class="doccomment">/// The Id of the channel to show. It is required.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">id</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">id</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">ChannelId</span><span class="op">&gt;</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">id</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">id</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">ChannelId</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">channel_id</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">id</span>.<span class="ident">into</span>());
-
         <span class="self">self</span>
     }
 
     <span class="doccomment">/// The description shown for the channel. It is required.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">description</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">description</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">description</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">description</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">description</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">description</span>.<span class="ident">into</span>());
-
         <span class="self">self</span>
     }
 
     <span class="doccomment">/// The emoji shown for the channel.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">emoji</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">emoji</span>: <span class="ident">GuildWelcomeChannelEmoji</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">emoji</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">emoji</span>: <span class="ident">GuildWelcomeChannelEmoji</span>) -&gt; <span class="self">Self</span> {
         <span class="kw">match</span> <span class="ident">emoji</span> {
             <span class="ident">GuildWelcomeChannelEmoji::Unicode</span>(<span class="ident">name</span>) =&gt; {
                 <span class="self">self</span>.<span class="ident">emoji_name</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">name</span>);

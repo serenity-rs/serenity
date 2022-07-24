@@ -202,34 +202,83 @@
 <span id="196">196</span>
 <span id="197">197</span>
 <span id="198">198</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::channel</span>::{<span class="ident">PermissionOverwrite</span>, <span class="ident">PermissionOverwriteData</span>, <span class="ident">VideoQualityMode</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::id::ChannelId</span>;
+<span id="199">199</span>
+<span id="200">200</span>
+<span id="201">201</span>
+<span id="202">202</span>
+<span id="203">203</span>
+<span id="204">204</span>
+<span id="205">205</span>
+<span id="206">206</span>
+<span id="207">207</span>
+<span id="208">208</span>
+<span id="209">209</span>
+<span id="210">210</span>
+<span id="211">211</span>
+<span id="212">212</span>
+<span id="213">213</span>
+<span id="214">214</span>
+<span id="215">215</span>
+<span id="216">216</span>
+<span id="217">217</span>
+<span id="218">218</span>
+<span id="219">219</span>
+<span id="220">220</span>
+<span id="221">221</span>
+<span id="222">222</span>
+<span id="223">223</span>
+<span id="224">224</span>
+<span id="225">225</span>
+<span id="226">226</span>
+<span id="227">227</span>
+<span id="228">228</span>
+<span id="229">229</span>
+<span id="230">230</span>
+<span id="231">231</span>
+<span id="232">232</span>
+<span id="233">233</span>
+<span id="234">234</span>
+<span id="235">235</span>
+<span id="236">236</span>
+<span id="237">237</span>
+<span id="238">238</span>
+<span id="239">239</span>
+<span id="240">240</span>
+<span id="241">241</span>
+<span id="242">242</span>
+<span id="243">243</span>
+<span id="244">244</span>
+<span id="245">245</span>
+<span id="246">246</span>
+</pre><pre class="rust"><code><span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http&quot;</span>)]</span>
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::http</span>::{<span class="ident">CacheHttp</span>, <span class="ident">Http</span>};
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http&quot;</span>)]</span>
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::internal::prelude</span>::<span class="kw-2">*</span>;
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::prelude</span>::<span class="kw-2">*</span>;
 
-<span class="doccomment">/// A builder to edit a [`GuildChannel`] for use via [`GuildChannel::edit`]</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Defaults are not directly provided by the builder itself.</span>
+<span class="doccomment">/// A builder to edit a [`GuildChannel`] for use via [`GuildChannel::edit`].</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// # Examples</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// Edit a channel, providing a new name and topic:</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// ```rust,no_run</span>
-<span class="doccomment">/// # use serenity::{http::Http, model::id::ChannelId};</span>
+<span class="doccomment">/// # use serenity::builder::EditChannel;</span>
+<span class="doccomment">/// # use serenity::http::Http;</span>
+<span class="doccomment">/// # use serenity::model::id::ChannelId;</span>
 <span class="doccomment">/// #</span>
 <span class="doccomment">/// # async fn run() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {</span>
 <span class="doccomment">/// #     let http = Http::new(&quot;token&quot;);</span>
 <span class="doccomment">/// #     let mut channel = ChannelId::new(1);</span>
-<span class="doccomment">/// // assuming a channel has already been bound</span>
-<span class="doccomment">/// if let Err(why) = channel.edit(&amp;http, |c| c.name(&quot;new name&quot;).topic(&quot;a test topic&quot;)).await {</span>
+<span class="doccomment">/// let builder = EditChannel::default().name(&quot;new name&quot;).topic(&quot;a test topic&quot;);</span>
+<span class="doccomment">/// if let Err(why) = channel.edit(&amp;http, builder).await {</span>
 <span class="doccomment">///     // properly handle the error</span>
 <span class="doccomment">/// }</span>
 <span class="doccomment">/// #     Ok(())</span>
 <span class="doccomment">/// # }</span>
 <span class="doccomment">/// ```</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [`GuildChannel`]: crate::model::channel::GuildChannel</span>
-<span class="doccomment">/// [`GuildChannel::edit`]: crate::model::channel::GuildChannel::edit</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Default</span>, <span class="ident">Serialize</span>)]</span>
+<span class="attribute">#[<span class="ident">must_use</span>]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">EditChannel</span> {
     <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;Option::is_none&quot;</span>)]</span>
     <span class="ident">bitrate</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
@@ -256,12 +305,59 @@
 }
 
 <span class="kw">impl</span> <span class="ident">EditChannel</span> {
+    <span class="doccomment">/// Edits the channel&#39;s settings.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// **Note**: Requires the [Manage Channels] permission. Modifying permissions via</span>
+    <span class="doccomment">/// [`Self::permissions`] also requires the [Manage Roles] permission.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Errors</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// If the `cache` is enabled, returns a [`ModelError::InvalidPermissions`] if the current user</span>
+    <span class="doccomment">/// lacks permission. Otherwise returns [`Error::Http`], as well as if invalid data is given.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// [Manage Channels]: Permissions::MANAGE_CHANNELS</span>
+    <span class="doccomment">/// [Manage Roles]: Permissions::MANAGE_ROLES</span>
+    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http&quot;</span>)]</span>
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">execute</span>(
+        <span class="self">self</span>,
+        <span class="ident">cache_http</span>: <span class="kw">impl</span> <span class="ident">CacheHttp</span>,
+        <span class="ident">channel_id</span>: <span class="ident">ChannelId</span>,
+        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span> <span class="ident">guild_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">GuildId</span><span class="op">&gt;</span>,
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">GuildChannel</span><span class="op">&gt;</span> {
+        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
+        {
+            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">cache</span>) <span class="op">=</span> <span class="ident">cache_http</span>.<span class="ident">cache</span>() {
+                <span class="ident"><span class="kw">crate</span>::utils::user_has_perms_cache</span>(
+                    <span class="ident">cache</span>,
+                    <span class="ident">channel_id</span>,
+                    <span class="ident">guild_id</span>,
+                    <span class="ident">Permissions::MANAGE_CHANNELS</span>,
+                )<span class="question-mark">?</span>;
+                <span class="kw">if</span> <span class="self">self</span>.<span class="ident">permission_overwrites</span>.<span class="ident">is_some</span>() {
+                    <span class="ident"><span class="kw">crate</span>::utils::user_has_perms_cache</span>(
+                        <span class="ident">cache</span>,
+                        <span class="ident">channel_id</span>,
+                        <span class="ident">guild_id</span>,
+                        <span class="ident">Permissions::MANAGE_ROLES</span>,
+                    )<span class="question-mark">?</span>;
+                }
+            }
+        }
+
+        <span class="self">self</span>.<span class="ident">_execute</span>(<span class="ident">cache_http</span>.<span class="ident">http</span>(), <span class="ident">channel_id</span>).<span class="kw">await</span>
+    }
+
+    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http&quot;</span>)]</span>
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">_execute</span>(<span class="self">self</span>, <span class="ident">http</span>: <span class="kw-2">&amp;</span><span class="ident">Http</span>, <span class="ident">channel_id</span>: <span class="ident">ChannelId</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">GuildChannel</span><span class="op">&gt;</span> {
+        <span class="ident">http</span>.<span class="ident">edit_channel</span>(<span class="ident">channel_id</span>.<span class="ident">into</span>(), <span class="kw-2">&amp;</span><span class="self">self</span>, <span class="prelude-val">None</span>).<span class="kw">await</span>
+    }
+
     <span class="doccomment">/// The bitrate of the channel in bits.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// This is for [voice] channels only.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [voice]: crate::model::channel::ChannelType::Voice</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">bitrate</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">bitrate</span>: <span class="ident">u32</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
+    <span class="doccomment">/// [voice]: ChannelType::Voice</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">bitrate</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">bitrate</span>: <span class="ident">u32</span>) -&gt; <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">bitrate</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">bitrate</span>);
         <span class="self">self</span>
     }
@@ -270,19 +366,18 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// This is for [voice] channels only.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [voice]: crate::model::channel::ChannelType::Voice</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">video_quality_mode</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">quality</span>: <span class="ident">VideoQualityMode</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
+    <span class="doccomment">/// [voice]: ChannelType::Voice</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">video_quality_mode</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">quality</span>: <span class="ident">VideoQualityMode</span>) -&gt; <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">video_quality_mode</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">quality</span>);
         <span class="self">self</span>
     }
 
-    <span class="doccomment">/// The voice region of the channel.</span>
-    <span class="doccomment">/// It is automatic when `None`.</span>
+    <span class="doccomment">/// The voice region of the channel. It is automatic when `None`.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// This is for [voice] channels only.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [voice]: crate::model::channel::ChannelType::Voice</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">voice_region</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
+    <span class="doccomment">/// [voice]: ChannelType::Voice</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">voice_region</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">rtc_region</span> <span class="op">=</span> <span class="ident">id</span>;
         <span class="self">self</span>
     }
@@ -290,13 +385,13 @@
     <span class="doccomment">/// The name of the channel.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// Must be between 2 and 100 characters long.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">name</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">name</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">name</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">name</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">name</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">name</span>.<span class="ident">into</span>());
         <span class="self">self</span>
     }
 
     <span class="doccomment">/// The position of the channel in the channel list.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">position</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">position</span>: <span class="ident">u32</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">position</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">position</span>: <span class="ident">u32</span>) -&gt; <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">position</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">position</span>);
         <span class="self">self</span>
     }
@@ -307,8 +402,8 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// This is for [text] channels only.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [text]: crate::model::channel::ChannelType::Text</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">topic</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">topic</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
+    <span class="doccomment">/// [text]: ChannelType::Text</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">topic</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">topic</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">topic</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">topic</span>.<span class="ident">into</span>());
         <span class="self">self</span>
     }
@@ -317,8 +412,8 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// This is for [text] channels only.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [text]: crate::model::channel::ChannelType::Text</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">nsfw</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">nsfw</span>: <span class="ident">bool</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
+    <span class="doccomment">/// [text]: ChannelType::Text</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">nsfw</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">nsfw</span>: <span class="ident">bool</span>) -&gt; <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">nsfw</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">nsfw</span>);
         <span class="self">self</span>
     }
@@ -327,8 +422,8 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// This is for [voice] channels only.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [voice]: crate::model::channel::ChannelType::Voice</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">user_limit</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">user_limit</span>: <span class="ident">u32</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
+    <span class="doccomment">/// [voice]: ChannelType::Voice</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">user_limit</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">user_limit</span>: <span class="ident">u32</span>) -&gt; <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">user_limit</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">user_limit</span>);
         <span class="self">self</span>
     }
@@ -337,39 +432,39 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// This is for [text] and [voice] channels only.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [text]: crate::model::channel::ChannelType::Text</span>
-    <span class="doccomment">/// [voice]: crate::model::channel::ChannelType::Voice</span>
+    <span class="doccomment">/// [text]: ChannelType::Text</span>
+    <span class="doccomment">/// [voice]: ChannelType::Voice</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">category</span><span class="op">&lt;</span><span class="ident">C</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ChannelId</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">category</span>: <span class="ident">C</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">category</span><span class="op">&lt;</span><span class="ident">C</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ChannelId</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">category</span>: <span class="ident">C</span>) -&gt; <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">parent_id</span> <span class="op">=</span> <span class="ident">category</span>.<span class="ident">into</span>();
         <span class="self">self</span>
     }
 
     <span class="doccomment">/// How many seconds must a user wait before sending another message.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// Bots, or users with the [`MANAGE_MESSAGES`] and/or [`MANAGE_CHANNELS`] permissions are exempt</span>
-    <span class="doccomment">/// from this restriction.</span>
+    <span class="doccomment">/// Bots, or users with the [`MANAGE_MESSAGES`] and/or [`MANAGE_CHANNELS`] permissions are</span>
+    <span class="doccomment">/// exempt from this restriction.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// **Note**: Must be between 0 and 21600 seconds (360 minutes or 6 hours).</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [`MANAGE_MESSAGES`]: crate::model::permissions::Permissions::MANAGE_MESSAGES</span>
-    <span class="doccomment">/// [`MANAGE_CHANNELS`]: crate::model::permissions::Permissions::MANAGE_CHANNELS</span>
+    <span class="doccomment">/// [`MANAGE_MESSAGES`]: Permissions::MANAGE_MESSAGES</span>
+    <span class="doccomment">/// [`MANAGE_CHANNELS`]: Permissions::MANAGE_CHANNELS</span>
     <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">alias</span> <span class="op">=</span> <span class="string">&quot;slowmode&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">rate_limit_per_user</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">seconds</span>: <span class="ident">u64</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">rate_limit_per_user</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">seconds</span>: <span class="ident">u64</span>) -&gt; <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">rate_limit_per_user</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">seconds</span>);
-
         <span class="self">self</span>
     }
 
-    <span class="doccomment">/// A set of overwrites defining what a user or a user carrying a certain role can</span>
-    <span class="doccomment">/// and cannot do.</span>
+    <span class="doccomment">/// A set of overwrites defining what a user or a user carrying a certain role can or can&#39;t do.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// # Example</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// Inheriting permissions from an existing channel:</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// ```rust,no_run</span>
-    <span class="doccomment">/// # use serenity::{http::Http, model::id::ChannelId};</span>
+    <span class="doccomment">/// # use serenity::builder::EditChannel;</span>
+    <span class="doccomment">/// # use serenity::http::Http;</span>
+    <span class="doccomment">/// # use serenity::model::id::ChannelId;</span>
     <span class="doccomment">/// # use std::sync::Arc;</span>
     <span class="doccomment">/// #</span>
     <span class="doccomment">/// # async fn run() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {</span>
@@ -386,11 +481,12 @@
     <span class="doccomment">///     kind: PermissionOverwriteType::Member(UserId::new(1234)),</span>
     <span class="doccomment">/// }];</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// channel.edit(http, |c| c.name(&quot;my_edited_cool_channel&quot;).permissions(permissions)).await?;</span>
+    <span class="doccomment">/// let builder = EditChannel::default().name(&quot;my_edited_cool_channel&quot;).permissions(permissions);</span>
+    <span class="doccomment">/// channel.edit(http, builder).await?;</span>
     <span class="doccomment">/// #    Ok(())</span>
     <span class="doccomment">/// # }</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">permissions</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">perms</span>: <span class="ident">I</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">permissions</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">perms</span>: <span class="ident">I</span>) -&gt; <span class="self">Self</span>
     <span class="kw">where</span>
         <span class="ident">I</span>: <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">PermissionOverwrite</span><span class="op">&gt;</span>,
     {

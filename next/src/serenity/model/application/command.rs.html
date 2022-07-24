@@ -424,38 +424,6 @@
 <span id="418">418</span>
 <span id="419">419</span>
 <span id="420">420</span>
-<span id="421">421</span>
-<span id="422">422</span>
-<span id="423">423</span>
-<span id="424">424</span>
-<span id="425">425</span>
-<span id="426">426</span>
-<span id="427">427</span>
-<span id="428">428</span>
-<span id="429">429</span>
-<span id="430">430</span>
-<span id="431">431</span>
-<span id="432">432</span>
-<span id="433">433</span>
-<span id="434">434</span>
-<span id="435">435</span>
-<span id="436">436</span>
-<span id="437">437</span>
-<span id="438">438</span>
-<span id="439">439</span>
-<span id="440">440</span>
-<span id="441">441</span>
-<span id="442">442</span>
-<span id="443">443</span>
-<span id="444">444</span>
-<span id="445">445</span>
-<span id="446">446</span>
-<span id="447">447</span>
-<span id="448">448</span>
-<span id="449">449</span>
-<span id="450">450</span>
-<span id="451">451</span>
-<span id="452">452</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::collections::HashMap</span>;
 
 <span class="kw">use</span> <span class="ident">serde</span>::{<span class="ident">Deserialize</span>, <span class="ident">Serialize</span>};
@@ -539,8 +507,7 @@
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http&quot;</span>)]</span>
 <span class="kw">impl</span> <span class="ident">Command</span> {
-    <span class="doccomment">/// Creates a global [`Command`],</span>
-    <span class="doccomment">/// overriding an existing one with the same name if it exists.</span>
+    <span class="doccomment">/// Create a global [`Command`], overriding an existing one with the same name if it exists.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// When a created [`Command`] is used, the [`InteractionCreate`] event will be emitted.</span>
     <span class="doccomment">///</span>
@@ -560,13 +527,13 @@
     <span class="doccomment">/// #</span>
     <span class="doccomment">/// # async fn run() {</span>
     <span class="doccomment">/// # let http = Arc::new(Http::new(&quot;token&quot;));</span>
+    <span class="doccomment">/// use serenity::builder::CreateApplicationCommand;</span>
     <span class="doccomment">/// use serenity::model::application::command::Command;</span>
     <span class="doccomment">/// use serenity::model::id::ApplicationId;</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// let _ = Command::create_global_application_command(&amp;http, |command| {</span>
-    <span class="doccomment">///     command.name(&quot;ping&quot;).description(&quot;A simple ping command&quot;)</span>
-    <span class="doccomment">/// })</span>
-    <span class="doccomment">/// .await;</span>
+    <span class="doccomment">/// let builder =</span>
+    <span class="doccomment">///     CreateApplicationCommand::default().name(&quot;ping&quot;).description(&quot;A simple ping command&quot;);</span>
+    <span class="doccomment">/// let _ = Command::create_global_application_command(&amp;http, builder).await;</span>
     <span class="doccomment">/// # }</span>
     <span class="doccomment">/// ```</span>
     <span class="doccomment">///</span>
@@ -578,80 +545,62 @@
     <span class="doccomment">/// #</span>
     <span class="doccomment">/// # async fn run() {</span>
     <span class="doccomment">/// # let http = Arc::new(Http::new(&quot;token&quot;));</span>
+    <span class="doccomment">/// use serenity::builder::{</span>
+    <span class="doccomment">///     CreateApplicationCommand,</span>
+    <span class="doccomment">///     CreateApplicationCommandOption as CreateOption,</span>
+    <span class="doccomment">/// };</span>
     <span class="doccomment">/// use serenity::model::application::command::{Command, CommandOptionType};</span>
     <span class="doccomment">/// use serenity::model::id::ApplicationId;</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// let _ = Command::create_global_application_command(&amp;http, |command| {</span>
-    <span class="doccomment">///     command.name(&quot;echo&quot;).description(&quot;Makes the bot send a message&quot;).create_option(|option| {</span>
-    <span class="doccomment">///         option</span>
+    <span class="doccomment">/// let builder = CreateApplicationCommand::default()</span>
+    <span class="doccomment">///     .name(&quot;echo&quot;)</span>
+    <span class="doccomment">///     .description(&quot;Makes the bot send a message&quot;)</span>
+    <span class="doccomment">///     .add_option(</span>
+    <span class="doccomment">///         CreateOption::default()</span>
     <span class="doccomment">///             .name(&quot;message&quot;)</span>
     <span class="doccomment">///             .description(&quot;The message to send&quot;)</span>
     <span class="doccomment">///             .kind(CommandOptionType::String)</span>
-    <span class="doccomment">///             .required(true)</span>
-    <span class="doccomment">///     })</span>
-    <span class="doccomment">/// })</span>
-    <span class="doccomment">/// .await;</span>
+    <span class="doccomment">///             .required(true),</span>
+    <span class="doccomment">///     );</span>
+    <span class="doccomment">/// let _ = Command::create_global_application_command(&amp;http, builder).await;</span>
     <span class="doccomment">/// # }</span>
     <span class="doccomment">/// ```</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// # Errors</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// May return an [`Error::Http`] if the [`Command`] is illformed,</span>
-    <span class="doccomment">/// such as if more than 10 [`choices`] are set. See the [API Docs] for further details.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Can also return an [`Error::Json`] if there is an error in deserializing</span>
-    <span class="doccomment">/// the response.</span>
+    <span class="doccomment">/// See [`CreateApplicationCommand::execute`] for a list of possible errors.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// [`InteractionCreate`]: crate::client::EventHandler::interaction_create</span>
-    <span class="doccomment">/// [API Docs]: https://discord.com/developers/docs/interactions/slash-commands</span>
-    <span class="doccomment">/// [`choices`]: CommandOption::choices</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">create_global_application_command</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">create_global_application_command</span>(
         <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>,
-        <span class="ident">f</span>: <span class="ident">F</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Command</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="kw-2">&amp;mut</span> <span class="ident">CreateApplicationCommand</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="ident">CreateApplicationCommand</span>,
-    {
-        <span class="kw">let</span> <span class="ident">map</span> <span class="op">=</span> <span class="ident">Command::build_application_command</span>(<span class="ident">f</span>);
-        <span class="ident">http</span>.<span class="ident">as_ref</span>().<span class="ident">create_global_application_command</span>(<span class="kw-2">&amp;</span><span class="ident">map</span>).<span class="kw">await</span>
+        <span class="ident">builder</span>: <span class="ident">CreateApplicationCommand</span>,
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Command</span><span class="op">&gt;</span> {
+        <span class="ident">builder</span>.<span class="ident">execute</span>(<span class="ident">http</span>, <span class="prelude-val">None</span>, <span class="prelude-val">None</span>).<span class="kw">await</span>
     }
 
-    <span class="doccomment">/// Overrides all global application commands.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`create_global_application_command`]: Self::create_global_application_command</span>
+    <span class="doccomment">/// Override all global application commands.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// # Errors</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// If there is an error, it will be either [`Error::Http`] or [`Error::Json`].</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">set_global_application_commands</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(
+    <span class="doccomment">/// See [`CreateApplicationCommands::execute`] for a list of possible errors.</span>
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">set_global_application_commands</span>(
         <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>,
-        <span class="ident">f</span>: <span class="ident">F</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Command</span><span class="op">&gt;</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="kw-2">&amp;mut</span> <span class="ident">CreateApplicationCommands</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="ident">CreateApplicationCommands</span>,
-    {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">array</span> <span class="op">=</span> <span class="ident">CreateApplicationCommands::default</span>();
-
-        <span class="ident">f</span>(<span class="kw-2">&amp;mut</span> <span class="ident">array</span>);
-
-        <span class="ident">http</span>.<span class="ident">as_ref</span>().<span class="ident">create_global_application_commands</span>(<span class="kw-2">&amp;</span><span class="ident">array</span>).<span class="kw">await</span>
+        <span class="ident">builder</span>: <span class="ident">CreateApplicationCommands</span>,
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Command</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+        <span class="ident">builder</span>.<span class="ident">execute</span>(<span class="ident">http</span>, <span class="prelude-val">None</span>).<span class="kw">await</span>
     }
 
-    <span class="doccomment">/// Edits a global command by its Id.</span>
+    <span class="doccomment">/// Edit a global command, given its Id.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// # Errors</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// If there is an error, it will be either [`Error::Http`] or [`Error::Json`].</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">edit_global_application_command</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(
+    <span class="doccomment">/// See [`CreateApplicationCommand::execute`] for a list of possible errors.</span>
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">edit_global_application_command</span>(
         <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>,
         <span class="ident">command_id</span>: <span class="ident">CommandId</span>,
-        <span class="ident">f</span>: <span class="ident">F</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Command</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="kw-2">&amp;mut</span> <span class="ident">CreateApplicationCommand</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="ident">CreateApplicationCommand</span>,
-    {
-        <span class="kw">let</span> <span class="ident">map</span> <span class="op">=</span> <span class="ident">Command::build_application_command</span>(<span class="ident">f</span>);
-        <span class="ident">http</span>.<span class="ident">as_ref</span>().<span class="ident">edit_global_application_command</span>(<span class="ident">command_id</span>.<span class="ident">into</span>(), <span class="kw-2">&amp;</span><span class="ident">map</span>).<span class="kw">await</span>
+        <span class="ident">builder</span>: <span class="ident">CreateApplicationCommand</span>,
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Command</span><span class="op">&gt;</span> {
+        <span class="ident">builder</span>.<span class="ident">execute</span>(<span class="ident">http</span>, <span class="prelude-val">None</span>, <span class="prelude-val">Some</span>(<span class="ident">command_id</span>)).<span class="kw">await</span>
     }
 
     <span class="doccomment">/// Gets all global commands.</span>
@@ -685,19 +634,6 @@
         <span class="ident">command_id</span>: <span class="ident">CommandId</span>,
     ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="ident">http</span>.<span class="ident">as_ref</span>().<span class="ident">delete_global_application_command</span>(<span class="ident">command_id</span>.<span class="ident">into</span>()).<span class="kw">await</span>
-    }
-}
-
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http&quot;</span>)]</span>
-<span class="kw">impl</span> <span class="ident">Command</span> {
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">build_application_command</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="ident">f</span>: <span class="ident">F</span>) -&gt; <span class="ident">CreateApplicationCommand</span>
-    <span class="kw">where</span>
-        <span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="kw-2">&amp;mut</span> <span class="ident">CreateApplicationCommand</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="ident">CreateApplicationCommand</span>,
-    {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">create_application_command</span> <span class="op">=</span> <span class="ident">CreateApplicationCommand::default</span>();
-        <span class="ident">f</span>(<span class="kw-2">&amp;mut</span> <span class="ident">create_application_command</span>);
-        <span class="ident">create_application_command</span>
     }
 }
 

@@ -520,6 +520,77 @@
 <span id="514">514</span>
 <span id="515">515</span>
 <span id="516">516</span>
+<span id="517">517</span>
+<span id="518">518</span>
+<span id="519">519</span>
+<span id="520">520</span>
+<span id="521">521</span>
+<span id="522">522</span>
+<span id="523">523</span>
+<span id="524">524</span>
+<span id="525">525</span>
+<span id="526">526</span>
+<span id="527">527</span>
+<span id="528">528</span>
+<span id="529">529</span>
+<span id="530">530</span>
+<span id="531">531</span>
+<span id="532">532</span>
+<span id="533">533</span>
+<span id="534">534</span>
+<span id="535">535</span>
+<span id="536">536</span>
+<span id="537">537</span>
+<span id="538">538</span>
+<span id="539">539</span>
+<span id="540">540</span>
+<span id="541">541</span>
+<span id="542">542</span>
+<span id="543">543</span>
+<span id="544">544</span>
+<span id="545">545</span>
+<span id="546">546</span>
+<span id="547">547</span>
+<span id="548">548</span>
+<span id="549">549</span>
+<span id="550">550</span>
+<span id="551">551</span>
+<span id="552">552</span>
+<span id="553">553</span>
+<span id="554">554</span>
+<span id="555">555</span>
+<span id="556">556</span>
+<span id="557">557</span>
+<span id="558">558</span>
+<span id="559">559</span>
+<span id="560">560</span>
+<span id="561">561</span>
+<span id="562">562</span>
+<span id="563">563</span>
+<span id="564">564</span>
+<span id="565">565</span>
+<span id="566">566</span>
+<span id="567">567</span>
+<span id="568">568</span>
+<span id="569">569</span>
+<span id="570">570</span>
+<span id="571">571</span>
+<span id="572">572</span>
+<span id="573">573</span>
+<span id="574">574</span>
+<span id="575">575</span>
+<span id="576">576</span>
+<span id="577">577</span>
+<span id="578">578</span>
+<span id="579">579</span>
+<span id="580">580</span>
+<span id="581">581</span>
+<span id="582">582</span>
+<span id="583">583</span>
+<span id="584">584</span>
+<span id="585">585</span>
+<span id="586">586</span>
+<span id="587">587</span>
 </pre><pre class="rust"><code><span class="doccomment">//! A set of utilities to help with common use cases that are not required to</span>
 <span class="doccomment">//! fully use the library.</span>
 
@@ -553,9 +624,10 @@
 <span class="kw">use</span> <span class="ident">std::num::NonZeroU64</span>;
 <span class="kw">use</span> <span class="ident">std::path::Path</span>;
 
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>))]</span>
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::cache::Cache</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::internal::prelude</span>::<span class="kw-2">*</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::id</span>::{<span class="ident">ChannelId</span>, <span class="ident">EmojiId</span>, <span class="ident">RoleId</span>, <span class="ident">UserId</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::misc::EmojiIdentifier</span>;
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::prelude</span>::<span class="kw-2">*</span>;
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">encode_image</span>(<span class="ident">raw</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="ident">String</span> {
@@ -964,6 +1036,76 @@
         <span class="kw">return</span> <span class="prelude-val">None</span>;
     }
     <span class="prelude-val">Some</span>((<span class="ident">webhook_id</span>.<span class="ident">parse</span>().<span class="ident">ok</span>()<span class="question-mark">?</span>, <span class="ident">token</span>))
+}
+
+<span class="doccomment">/// Tries to find a user&#39;s permissions using the cache.</span>
+<span class="doccomment">/// Unlike [`user_has_perms`], this function will return `true` even when</span>
+<span class="doccomment">/// the permissions are not in the cache.</span>
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>))]</span>
+<span class="attribute">#[<span class="ident">inline</span>]</span>
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">user_has_perms_cache</span>(
+    <span class="ident">cache</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Cache</span><span class="op">&gt;</span>,
+    <span class="ident">channel_id</span>: <span class="ident">ChannelId</span>,
+    <span class="ident">guild_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">GuildId</span><span class="op">&gt;</span>,
+    <span class="ident">permissions</span>: <span class="ident">Permissions</span>,
+) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">if</span> <span class="kw">match</span> <span class="ident">user_has_perms</span>(<span class="ident">cache</span>, <span class="ident">channel_id</span>, <span class="ident">guild_id</span>, <span class="ident">permissions</span>) {
+        <span class="prelude-val">Err</span>(<span class="ident">Error::Model</span>(<span class="ident">err</span>)) =&gt; <span class="ident">err</span>.<span class="ident">is_cache_err</span>(),
+        <span class="ident">result</span> =&gt; <span class="ident">result</span><span class="question-mark">?</span>,
+    } {
+        <span class="prelude-val">Ok</span>(())
+    } <span class="kw">else</span> {
+        <span class="prelude-val">Err</span>(<span class="ident">Error::Model</span>(<span class="ident">ModelError::InvalidPermissions</span>(<span class="ident">permissions</span>)))
+    }
+}
+
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>))]</span>
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">user_has_perms</span>(
+    <span class="ident">cache</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Cache</span><span class="op">&gt;</span>,
+    <span class="ident">channel_id</span>: <span class="ident">ChannelId</span>,
+    <span class="ident">guild_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">GuildId</span><span class="op">&gt;</span>,
+    <span class="kw-2">mut</span> <span class="ident">permissions</span>: <span class="ident">Permissions</span>,
+) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span> {
+    <span class="kw">let</span> <span class="ident">cache</span> <span class="op">=</span> <span class="ident">cache</span>.<span class="ident">as_ref</span>();
+
+    <span class="kw">let</span> <span class="ident">channel</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">cache</span>.<span class="ident">channel</span>(<span class="ident">channel_id</span>) {
+        <span class="prelude-val">Some</span>(<span class="ident">channel</span>) =&gt; <span class="ident">channel</span>,
+        <span class="prelude-val">None</span> =&gt; <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::Model</span>(<span class="ident">ModelError::ChannelNotFound</span>)),
+    };
+
+    <span class="comment">// Both users in DMs, all users in groups, and maybe all channels in categories</span>
+    <span class="comment">// will have the same permissions.</span>
+    <span class="comment">//</span>
+    <span class="comment">// The only exception to this is when the current user is blocked by</span>
+    <span class="comment">// the recipient in a DM channel, preventing the current user</span>
+    <span class="comment">// from sending messages.</span>
+    <span class="comment">//</span>
+    <span class="comment">// Since serenity can&#39;t _reasonably_ check and keep track of these,</span>
+    <span class="comment">// just assume that all permissions are granted and return `true`.</span>
+    <span class="kw">let</span> (<span class="ident">guild_id</span>, <span class="ident">guild_channel</span>) <span class="op">=</span> <span class="kw">match</span> <span class="ident">channel</span> {
+        <span class="ident">Channel::Guild</span>(<span class="ident">channel</span>) =&gt; (<span class="ident">channel</span>.<span class="ident">guild_id</span>, <span class="ident">channel</span>),
+        <span class="ident">Channel::Category</span>(<span class="kw">_</span>) =&gt; <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="bool-val">true</span>),
+        <span class="ident">Channel::Private</span>(<span class="kw">_</span>) =&gt; <span class="kw">match</span> <span class="ident">guild_id</span> {
+            <span class="prelude-val">Some</span>(<span class="kw">_</span>) =&gt; <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::Model</span>(<span class="ident">ModelError::InvalidChannelType</span>)),
+            <span class="prelude-val">None</span> =&gt; <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="bool-val">true</span>),
+        },
+    };
+
+    <span class="kw">let</span> <span class="ident">guild</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">cache</span>.<span class="ident">guild</span>(<span class="ident">guild_id</span>) {
+        <span class="prelude-val">Some</span>(<span class="ident">guild</span>) =&gt; <span class="ident">guild</span>,
+        <span class="prelude-val">None</span> =&gt; <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::Model</span>(<span class="ident">ModelError::GuildNotFound</span>)),
+    };
+
+    <span class="kw">let</span> <span class="ident">member</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">guild</span>.<span class="ident">members</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="ident">cache</span>.<span class="ident">current_user</span>().<span class="ident">id</span>) {
+        <span class="prelude-val">Some</span>(<span class="ident">member</span>) =&gt; <span class="ident">member</span>,
+        <span class="prelude-val">None</span> =&gt; <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::Model</span>(<span class="ident">ModelError::MemberNotFound</span>)),
+    };
+
+    <span class="kw">let</span> <span class="ident">perms</span> <span class="op">=</span> <span class="ident">guild</span>.<span class="ident">user_permissions_in</span>(<span class="kw-2">&amp;</span><span class="ident">guild_channel</span>, <span class="ident">member</span>)<span class="question-mark">?</span>;
+
+    <span class="ident">permissions</span>.<span class="ident">remove</span>(<span class="ident">perms</span>);
+
+    <span class="prelude-val">Ok</span>(<span class="ident">permissions</span>.<span class="ident">is_empty</span>())
 }
 
 <span class="doccomment">/// Calculates the Id of the shard responsible for a guild, given its Id and</span>

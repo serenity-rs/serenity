@@ -295,9 +295,6 @@
 <span id="289">289</span>
 <span id="290">290</span>
 <span id="291">291</span>
-<span id="292">292</span>
-<span id="293">293</span>
-<span id="294">294</span>
 </pre><pre class="rust"><code><span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;utils&quot;</span>))]</span>
 <span class="kw">use</span> <span class="ident">std::error::Error</span> <span class="kw">as</span> <span class="ident">StdError</span>;
 <span class="kw">use</span> <span class="ident">std::fmt</span>;
@@ -323,6 +320,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// ```</span>
     <span class="doccomment">/// # #[cfg(feature = &quot;client&quot;)] {</span>
+    <span class="doccomment">/// # use serenity::builder::CreateMessage;</span>
     <span class="doccomment">/// # use serenity::model::guild::Member;</span>
     <span class="doccomment">/// # use serenity::model::channel::GuildChannel;</span>
     <span class="doccomment">/// # use serenity::model::id::ChannelId;</span>
@@ -335,18 +333,14 @@
     <span class="doccomment">///     to_channel: GuildChannel,</span>
     <span class="doccomment">///     rules_channel: ChannelId,</span>
     <span class="doccomment">/// ) -&gt; Result&lt;(), Error&gt; {</span>
-    <span class="doccomment">///     to_channel</span>
-    <span class="doccomment">///         .id</span>
-    <span class="doccomment">///         .send_message(ctx, |m| {</span>
-    <span class="doccomment">///             m.content(format!(</span>
-    <span class="doccomment">///                 &quot;Hi {member}, welcome to the server! \</span>
-    <span class="doccomment">///                 Please refer to {rules} for our code of conduct, \</span>
-    <span class="doccomment">///                 and enjoy your stay.&quot;,</span>
-    <span class="doccomment">///                 member = member.mention(),</span>
-    <span class="doccomment">///                 rules = rules_channel.mention(),</span>
-    <span class="doccomment">///             ))</span>
-    <span class="doccomment">///         })</span>
-    <span class="doccomment">///         .await?;</span>
+    <span class="doccomment">///     let builder = CreateMessage::default().content(format!(</span>
+    <span class="doccomment">///         &quot;Hi {member}, welcome to the server! \</span>
+    <span class="doccomment">///         Please refer to {rules} for our code of conduct, \</span>
+    <span class="doccomment">///         and enjoy your stay.&quot;,</span>
+    <span class="doccomment">///         member = member.mention(),</span>
+    <span class="doccomment">///         rules = rules_channel.mention(),</span>
+    <span class="doccomment">///     ));</span>
+    <span class="doccomment">///     to_channel.id.send_message(ctx, builder).await?;</span>
     <span class="doccomment">///     Ok(())</span>
     <span class="doccomment">/// }</span>
     <span class="doccomment">/// # }</span>

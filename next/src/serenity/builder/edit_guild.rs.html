@@ -306,18 +306,40 @@
 <span id="300">300</span>
 <span id="301">301</span>
 <span id="302">302</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::prelude</span>::<span class="kw-2">*</span>;
+<span id="303">303</span>
+<span id="304">304</span>
+<span id="305">305</span>
+<span id="306">306</span>
+<span id="307">307</span>
+<span id="308">308</span>
+<span id="309">309</span>
+<span id="310">310</span>
+<span id="311">311</span>
+<span id="312">312</span>
+<span id="313">313</span>
+<span id="314">314</span>
+<span id="315">315</span>
+<span id="316">316</span>
+<span id="317">317</span>
+<span id="318">318</span>
+<span id="319">319</span>
+<span id="320">320</span>
+<span id="321">321</span>
+<span id="322">322</span>
+<span id="323">323</span>
+<span id="324">324</span>
+<span id="325">325</span>
+<span id="326">326</span>
+<span id="327">327</span>
+</pre><pre class="rust"><code><span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http&quot;</span>)]</span>
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::http</span>::{<span class="ident">CacheHttp</span>, <span class="ident">Http</span>};
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http&quot;</span>)]</span>
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::internal::prelude</span>::<span class="kw-2">*</span>;
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::prelude</span>::<span class="kw-2">*</span>;
 
-<span class="doccomment">/// A builder to optionally edit certain fields of a [`Guild`]. This is meant</span>
-<span class="doccomment">/// for usage with [`Guild::edit`].</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// **Note**: Editing a guild requires that the current user have the</span>
-<span class="doccomment">/// [Manage Guild] permission.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [`Guild::edit`]: crate::model::guild::Guild::edit</span>
-<span class="doccomment">/// [`Guild`]: crate::model::guild::Guild</span>
-<span class="doccomment">/// [Manage Guild]: crate::model::permissions::Permissions::MANAGE_GUILD</span>
+<span class="doccomment">/// A builder to optionally edit certain fields of a [`Guild`].</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Default</span>, <span class="ident">Serialize</span>)]</span>
+<span class="attribute">#[<span class="ident">must_use</span>]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">EditGuild</span> {
     <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;Option::is_none&quot;</span>)]</span>
     <span class="ident">afk_channel_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ChannelId</span><span class="op">&gt;</span><span class="op">&gt;</span>,
@@ -358,21 +380,54 @@
 }
 
 <span class="kw">impl</span> <span class="ident">EditGuild</span> {
-    <span class="doccomment">/// Set the &quot;AFK voice channel&quot; that users are to move to if they have been</span>
-    <span class="doccomment">/// AFK for an amount of time, configurable by [`Self::afk_timeout`].</span>
+    <span class="doccomment">/// Edits the given guild.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// The given channel must be either some valid voice channel, or [`None`] to</span>
-    <span class="doccomment">/// not set an AFK channel. The library does not check if a channel is</span>
-    <span class="doccomment">/// valid.</span>
+    <span class="doccomment">/// **Note**: Requires the [Manage Guild] permission.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Errors</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// If the `cache` is enabled, returns a [`ModelError::InvalidPermissions`] if the current user</span>
+    <span class="doccomment">/// lacks permission. Otherwise returns [`Error::Http`], as well as if invalid data is given.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// [Manage Guild]: Permissions::MANAGE_GUILD</span>
+    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http&quot;</span>)]</span>
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">execute</span>(
+        <span class="self">self</span>,
+        <span class="ident">cache_http</span>: <span class="kw">impl</span> <span class="ident">CacheHttp</span>,
+        <span class="ident">guild_id</span>: <span class="ident">GuildId</span>,
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">PartialGuild</span><span class="op">&gt;</span> {
+        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
+        {
+            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">cache</span>) <span class="op">=</span> <span class="ident">cache_http</span>.<span class="ident">cache</span>() {
+                <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">guild</span>) <span class="op">=</span> <span class="ident">cache</span>.<span class="ident">guild</span>(<span class="ident">guild_id</span>) {
+                    <span class="kw">let</span> <span class="ident">req</span> <span class="op">=</span> <span class="ident">Permissions::MANAGE_GUILD</span>;
+
+                    <span class="kw">if</span> <span class="op">!</span><span class="ident">guild</span>.<span class="ident">has_perms</span>(<span class="kw-2">&amp;</span><span class="ident">cache_http</span>, <span class="ident">req</span>).<span class="kw">await</span> {
+                        <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::Model</span>(<span class="ident">ModelError::InvalidPermissions</span>(<span class="ident">req</span>)));
+                    }
+                }
+            }
+        }
+
+        <span class="self">self</span>.<span class="ident">_execute</span>(<span class="ident">cache_http</span>.<span class="ident">http</span>(), <span class="ident">guild_id</span>).<span class="kw">await</span>
+    }
+
+    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http&quot;</span>)]</span>
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">_execute</span>(<span class="self">self</span>, <span class="ident">http</span>: <span class="kw-2">&amp;</span><span class="ident">Http</span>, <span class="ident">guild_id</span>: <span class="ident">GuildId</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">PartialGuild</span><span class="op">&gt;</span> {
+        <span class="ident">http</span>.<span class="ident">as_ref</span>().<span class="ident">edit_guild</span>(<span class="ident">guild_id</span>.<span class="ident">into</span>(), <span class="kw-2">&amp;</span><span class="self">self</span>, <span class="prelude-val">None</span>).<span class="kw">await</span>
+    }
+
+    <span class="doccomment">/// Set the &quot;AFK voice channel&quot; that users are to move to if they have been AFK for an amount</span>
+    <span class="doccomment">/// of time, configurable by [`Self::afk_timeout`]. Pass [`None`] to unset the current value.</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">afk_channel</span><span class="op">&lt;</span><span class="ident">C</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">ChannelId</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">channel</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">C</span><span class="op">&gt;</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">afk_channel_id</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">channel</span>.<span class="ident">map</span>(<span class="ident">Into::into</span>));
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">afk_channel</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">channel</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ChannelId</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
+        <span class="self">self</span>.<span class="ident">afk_channel_id</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">channel</span>);
         <span class="self">self</span>
     }
 
-    <span class="doccomment">/// Set the amount of time a user is to be moved to the AFK channel -</span>
-    <span class="doccomment">/// configured via [`Self::afk_channel`] - after being AFK.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">afk_timeout</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">timeout</span>: <span class="ident">u64</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
+    <span class="doccomment">/// Set the amount of time a user is to be moved to the AFK channel - configured via</span>
+    <span class="doccomment">/// [`Self::afk_channel`] - after being AFK.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">afk_timeout</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">timeout</span>: <span class="ident">u64</span>) -&gt; <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">afk_timeout</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">timeout</span>);
         <span class="self">self</span>
     }
@@ -381,58 +436,63 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// # Examples</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// Using the utility function - [`utils::read_image`] - to read an image</span>
-    <span class="doccomment">/// from the cwd and encode it in base64 to send to Discord.</span>
+    <span class="doccomment">/// Using the utility function - [`utils::read_image`] - to read an image and encode it in</span>
+    <span class="doccomment">/// base64, to then set as the guild icon.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// ```rust,no_run</span>
+    <span class="doccomment">/// # use serenity::builder::EditGuild;</span>
     <span class="doccomment">/// # use serenity::{http::Http, model::id::GuildId};</span>
     <span class="doccomment">/// #</span>
     <span class="doccomment">/// # async fn run() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {</span>
     <span class="doccomment">/// #     let http = Http::new(&quot;token&quot;);</span>
     <span class="doccomment">/// #     let mut guild = GuildId::new(1).to_partial_guild(&amp;http).await?;</span>
-    <span class="doccomment">/// use serenity::utils;</span>
+    <span class="doccomment">/// let base64_icon = serenity::utils::read_image(&quot;./guild_icon.png&quot;)?;</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// // assuming a `guild` has already been bound</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let base64_icon = utils::read_image(&quot;./guild_icon.png&quot;)?;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// guild.edit(&amp;http, |g| g.icon(Some(base64_icon))).await?;</span>
+    <span class="doccomment">/// let builder = EditGuild::default().icon(Some(base64_icon));</span>
+    <span class="doccomment">/// guild.edit(&amp;http, builder).await?;</span>
     <span class="doccomment">/// #     Ok(())</span>
     <span class="doccomment">/// # }</span>
     <span class="doccomment">/// ```</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// [`utils::read_image`]: crate::utils::read_image</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">icon</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">icon</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">icon</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">icon</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">icon</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">icon</span>);
+        <span class="self">self</span>
+    }
+
+    <span class="doccomment">/// Clear the current guild icon, resetting it to the default logo.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">delete_icon</span>(<span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="self">Self</span> {
+        <span class="self">self</span>.<span class="ident">icon</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="prelude-val">None</span>);
         <span class="self">self</span>
     }
 
     <span class="doccomment">/// Set the name of the guild.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// **Note**: Must be between (and including) 2-100 characters.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">name</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">name</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">name</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">name</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">name</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">name</span>.<span class="ident">into</span>());
         <span class="self">self</span>
     }
 
     <span class="doccomment">/// Set the description of the guild.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// **Note**: Requires that the guild have the `DISCOVERABLE` feature enabled.</span>
-    <span class="doccomment">/// You can check this through a guild&#39;s [`features`] list.</span>
+    <span class="doccomment">/// **Note**: Requires that the guild have the `DISCOVERABLE` feature enabled. You can check</span>
+    <span class="doccomment">/// this through a guild&#39;s [`features`] list.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [`features`]: crate::model::guild::Guild::features</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">description</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">name</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
+    <span class="doccomment">/// [`features`]: Guild::features</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">description</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">name</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">description</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">name</span>.<span class="ident">into</span>());
         <span class="self">self</span>
     }
 
     <span class="doccomment">/// Set the features of the guild.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// **Note**: Requires that the guild have the `DISCOVERABLE` feature enabled.</span>
-    <span class="doccomment">/// You can check this through a guild&#39;s [`features`] list.</span>
+    <span class="doccomment">/// **Note**: Requires that the guild have the `DISCOVERABLE` feature enabled. You can check</span>
+    <span class="doccomment">/// this through a guild&#39;s [`features`] list.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [`features`]: crate::model::guild::Guild::features</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">features</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">features</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
+    <span class="doccomment">/// [`features`]: Guild::features</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">features</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">features</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">features</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">features</span>);
         <span class="self">self</span>
     }
@@ -441,7 +501,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// **Note**: The current user must be the owner of the guild.</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">owner</span><span class="op">&lt;</span><span class="ident">U</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">UserId</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">user_id</span>: <span class="ident">U</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">owner</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">user_id</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">UserId</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">owner_id</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">user_id</span>.<span class="ident">into</span>());
         <span class="self">self</span>
     }
@@ -450,11 +510,11 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// The `splash` must be base64-encoded 1024x1024 png/jpeg/gif image-data.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// Requires that the guild have the `INVITE_SPLASH` feature enabled.</span>
-    <span class="doccomment">/// You can check this through a guild&#39;s [`features`] list.</span>
+    <span class="doccomment">/// Requires that the guild have the `INVITE_SPLASH` feature enabled. You can check this</span>
+    <span class="doccomment">/// through a guild&#39;s [`features`] list.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [`features`]: crate::model::guild::Guild::features</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">splash</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">splash</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
+    <span class="doccomment">/// [`features`]: Guild::features</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">splash</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">splash</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">splash</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">splash</span>);
         <span class="self">self</span>
     }
@@ -463,11 +523,11 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// The `splash` must be base64-encoded 1024x1024 png/jpeg/gif image-data.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// Requires that the guild have the `DISCOVERABLE` feature enabled.</span>
-    <span class="doccomment">/// You can check this through a guild&#39;s [`features`] list.</span>
+    <span class="doccomment">/// Requires that the guild have the `DISCOVERABLE` feature enabled. You can check this through</span>
+    <span class="doccomment">/// a guild&#39;s [`features`] list.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [`features`]: crate::model::guild::Guild::features</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">discovery_splash</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">splash</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
+    <span class="doccomment">/// [`features`]: Guild::features</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">discovery_splash</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">splash</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">discovery_splash</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">splash</span>);
         <span class="self">self</span>
     }
@@ -476,18 +536,17 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// The `banner` must be base64-encoded 16:9 png/jpeg image data.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// Requires that the guild have the `BANNER` feature enabled.</span>
-    <span class="doccomment">/// You can check this through a guild&#39;s [`features`] list.</span>
+    <span class="doccomment">/// Requires that the guild have the `BANNER` feature enabled. You can check this through a</span>
+    <span class="doccomment">/// guild&#39;s [`features`] list.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [`features`]: crate::model::guild::Guild::features</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">banner</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">banner</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
+    <span class="doccomment">/// [`features`]: Guild::features</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">banner</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">banner</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">banner</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">banner</span>);
         <span class="self">self</span>
     }
 
-    <span class="doccomment">/// Set the channel ID where welcome messages and boost events will be</span>
-    <span class="doccomment">/// posted.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">system_channel_id</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">channel_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ChannelId</span><span class="op">&gt;</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
+    <span class="doccomment">/// Set the channel ID where welcome messages and boost events will be posted.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">system_channel_id</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">channel_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ChannelId</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">system_channel_id</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">channel_id</span>);
         <span class="self">self</span>
     }
@@ -496,60 +555,57 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// **Note**:</span>
     <span class="doccomment">/// This feature is for Community guilds only.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">rules_channel_id</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">channel_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ChannelId</span><span class="op">&gt;</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">rules_channel_id</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">channel_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ChannelId</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">rules_channel_id</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">channel_id</span>);
         <span class="self">self</span>
     }
 
-    <span class="doccomment">/// Set the channel ID where admins and moderators receive update messages</span>
-    <span class="doccomment">/// from Discord.</span>
+    <span class="doccomment">/// Set the channel ID where admins and moderators receive update messages from Discord.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// **Note**:</span>
     <span class="doccomment">/// This feature is for Community guilds only.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">public_updates_channel_id</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">channel_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ChannelId</span><span class="op">&gt;</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">public_updates_channel_id</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">channel_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ChannelId</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">public_updates_channel_id</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">channel_id</span>);
         <span class="self">self</span>
     }
 
-    <span class="doccomment">/// Set the preferred locale used in Server Discovery and update messages</span>
-    <span class="doccomment">/// from Discord.</span>
+    <span class="doccomment">/// Set the preferred locale used in Server Discovery and update messages from Discord.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// If this is not set, the locale will default to &quot;en-US&quot;;</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// **Note**:</span>
     <span class="doccomment">/// This feature is for Community guilds only.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">preferred_locale</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">locale</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">preferred_locale</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">locale</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">preferred_locale</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">locale</span>);
         <span class="self">self</span>
     }
 
     <span class="doccomment">/// Set the content filter level.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">explicit_content_filter</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">level</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ExplicitContentFilter</span><span class="op">&gt;</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">explicit_content_filter</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">level</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ExplicitContentFilter</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">explicit_content_filter</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">level</span>);
         <span class="self">self</span>
     }
 
     <span class="doccomment">/// Set the default message notification level.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">default_message_notifications</span>(
-        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
+        <span class="kw-2">mut</span> <span class="self">self</span>,
         <span class="ident">level</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">DefaultMessageNotificationLevel</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
+    ) -&gt; <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">default_message_notifications</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">level</span>);
         <span class="self">self</span>
     }
 
-    <span class="doccomment">/// Set the verification level of the guild. This can restrict what a</span>
-    <span class="doccomment">/// user must have prior to being able to send messages in a guild.</span>
+    <span class="doccomment">/// Set the verification level of the guild. This can restrict what a user must have prior to</span>
+    <span class="doccomment">/// being able to send messages in a guild.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// Refer to the documentation for [`VerificationLevel`] for more</span>
-    <span class="doccomment">/// information on each variant.</span>
-    <span class="doccomment">///</span>
+    <span class="doccomment">/// Refer to the documentation for [`VerificationLevel`] for more information on each variant.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// # Examples</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// Setting the verification level to [`High`][`VerificationLevel::High`]:</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// ```rust,no_run</span>
+    <span class="doccomment">/// # use serenity::builder::EditGuild;</span>
     <span class="doccomment">/// # use serenity::{http::Http, model::id::GuildId};</span>
     <span class="doccomment">/// #</span>
     <span class="doccomment">/// # async fn run() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {</span>
@@ -557,10 +613,10 @@
     <span class="doccomment">/// #     let mut guild = GuildId::new(1).to_partial_guild(&amp;http).await?;</span>
     <span class="doccomment">/// use serenity::model::guild::VerificationLevel;</span>
     <span class="doccomment">///</span>
+    <span class="doccomment">/// let builder = EditGuild::default().verification_level(VerificationLevel::High);</span>
+    <span class="doccomment">///</span>
     <span class="doccomment">/// // assuming a `guild` has already been bound</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let edit = guild.edit(&amp;http, |g| g.verification_level(VerificationLevel::High)).await;</span>
-    <span class="doccomment">///</span>
+    <span class="doccomment">/// let edit = guild.edit(&amp;http, builder).await;</span>
     <span class="doccomment">/// if let Err(why) = edit {</span>
     <span class="doccomment">///     println!(&quot;Error setting verification level: {:?}&quot;, why);</span>
     <span class="doccomment">/// }</span>
@@ -568,10 +624,7 @@
     <span class="doccomment">/// # }</span>
     <span class="doccomment">/// ```</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">verification_level</span><span class="op">&lt;</span><span class="ident">V</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">verification_level</span>: <span class="ident">V</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span>
-    <span class="kw">where</span>
-        <span class="ident">V</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">VerificationLevel</span><span class="op">&gt;</span>,
-    {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">verification_level</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">verification_level</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">VerificationLevel</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">verification_level</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">verification_level</span>.<span class="ident">into</span>());
         <span class="self">self</span>
     }
@@ -579,6 +632,7 @@
     <span class="doccomment">/// Modifies the notifications that are sent by discord to the configured system channel.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// ```rust,no_run</span>
+    <span class="doccomment">/// # use serenity::builder::EditGuild;</span>
     <span class="doccomment">/// # use serenity::{http::Http, model::id::GuildId};</span>
     <span class="doccomment">/// #</span>
     <span class="doccomment">/// # async fn run() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {</span>
@@ -586,24 +640,20 @@
     <span class="doccomment">/// #     let mut guild = GuildId::new(1).to_partial_guild(&amp;http).await?;</span>
     <span class="doccomment">/// use serenity::model::guild::SystemChannelFlags;</span>
     <span class="doccomment">///</span>
+    <span class="doccomment">/// let builder = EditGuild::default().system_channel_flags(</span>
+    <span class="doccomment">///     SystemChannelFlags::SUPPRESS_JOIN_NOTIFICATIONS</span>
+    <span class="doccomment">///         | SystemChannelFlags::SUPPRESS_GUILD_REMINDER_NOTIFICATIONS,</span>
+    <span class="doccomment">/// );</span>
+    <span class="doccomment">///</span>
     <span class="doccomment">/// // assuming a `guild` has already been bound</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let edit = guild</span>
-    <span class="doccomment">///     .edit(&amp;http, |g| {</span>
-    <span class="doccomment">///         g.system_channel_flags(</span>
-    <span class="doccomment">///             SystemChannelFlags::SUPPRESS_JOIN_NOTIFICATIONS</span>
-    <span class="doccomment">///                 | SystemChannelFlags::SUPPRESS_GUILD_REMINDER_NOTIFICATIONS,</span>
-    <span class="doccomment">///         )</span>
-    <span class="doccomment">///     })</span>
-    <span class="doccomment">///     .await;</span>
-    <span class="doccomment">///</span>
+    <span class="doccomment">/// let edit = guild.edit(&amp;http, builder).await;</span>
     <span class="doccomment">/// if let Err(why) = edit {</span>
-    <span class="doccomment">///     println!(&quot;Error setting verification level: {:?}&quot;, why);</span>
+    <span class="doccomment">///     println!(&quot;Error setting system channel flags: {:?}&quot;, why);</span>
     <span class="doccomment">/// }</span>
     <span class="doccomment">/// #     Ok(())</span>
     <span class="doccomment">/// # }</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">system_channel_flags</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">system_channel_flags</span>: <span class="ident">SystemChannelFlags</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">system_channel_flags</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">system_channel_flags</span>: <span class="ident">SystemChannelFlags</span>) -&gt; <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">system_channel_flags</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">system_channel_flags</span>);
         <span class="self">self</span>
     }

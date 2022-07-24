@@ -225,62 +225,6 @@
 <span id="219">219</span>
 <span id="220">220</span>
 <span id="221">221</span>
-<span id="222">222</span>
-<span id="223">223</span>
-<span id="224">224</span>
-<span id="225">225</span>
-<span id="226">226</span>
-<span id="227">227</span>
-<span id="228">228</span>
-<span id="229">229</span>
-<span id="230">230</span>
-<span id="231">231</span>
-<span id="232">232</span>
-<span id="233">233</span>
-<span id="234">234</span>
-<span id="235">235</span>
-<span id="236">236</span>
-<span id="237">237</span>
-<span id="238">238</span>
-<span id="239">239</span>
-<span id="240">240</span>
-<span id="241">241</span>
-<span id="242">242</span>
-<span id="243">243</span>
-<span id="244">244</span>
-<span id="245">245</span>
-<span id="246">246</span>
-<span id="247">247</span>
-<span id="248">248</span>
-<span id="249">249</span>
-<span id="250">250</span>
-<span id="251">251</span>
-<span id="252">252</span>
-<span id="253">253</span>
-<span id="254">254</span>
-<span id="255">255</span>
-<span id="256">256</span>
-<span id="257">257</span>
-<span id="258">258</span>
-<span id="259">259</span>
-<span id="260">260</span>
-<span id="261">261</span>
-<span id="262">262</span>
-<span id="263">263</span>
-<span id="264">264</span>
-<span id="265">265</span>
-<span id="266">266</span>
-<span id="267">267</span>
-<span id="268">268</span>
-<span id="269">269</span>
-<span id="270">270</span>
-<span id="271">271</span>
-<span id="272">272</span>
-<span id="273">273</span>
-<span id="274">274</span>
-<span id="275">275</span>
-<span id="276">276</span>
-<span id="277">277</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">serde::de</span>::{<span class="ident">Deserialize</span>, <span class="ident">Deserializer</span>, <span class="ident">Error</span> <span class="kw">as</span> <span class="ident">DeError</span>};
 <span class="kw">use</span> <span class="ident">serde::Serialize</span>;
 
@@ -364,69 +308,32 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// # Errors</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// Returns an [`Error::Model`] if the message content is too long.</span>
-    <span class="doccomment">/// May also return an [`Error::Http`] if the API returns an error,</span>
-    <span class="doccomment">/// or an [`Error::Json`] if there is an error in deserializing the</span>
-    <span class="doccomment">/// API response.</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">create_interaction_response</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">F</span><span class="op">&gt;</span>(
+    <span class="doccomment">/// Returns an [`Error::Model`] if the message content is too long. May also return an</span>
+    <span class="doccomment">/// [`Error::Http`] if the API returns an error, or an [`Error::Json`] if there is an error in</span>
+    <span class="doccomment">/// deserializing the API response.</span>
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">create_interaction_response</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>,
-        <span class="ident">f</span>: <span class="ident">F</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="kw">for</span><span class="op">&lt;</span><span class="lifetime">&#39;b</span><span class="op">&gt;</span> <span class="ident">F</span>:
-            <span class="ident">FnOnce</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;b</span> <span class="kw-2">mut</span> <span class="ident">CreateInteractionResponse</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;b</span> <span class="kw-2">mut</span> <span class="ident">CreateInteractionResponse</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
-    {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">interaction_response</span> <span class="op">=</span> <span class="ident">CreateInteractionResponse::default</span>();
-        <span class="ident">f</span>(<span class="kw-2">&amp;mut</span> <span class="ident">interaction_response</span>);
-
-        <span class="kw">let</span> <span class="ident">http</span> <span class="op">=</span> <span class="ident">http</span>.<span class="ident">as_ref</span>();
-        <span class="kw">let</span> <span class="ident">files</span> <span class="op">=</span> <span class="ident">interaction_response</span>
-            .<span class="ident">data</span>
-            .<span class="ident">as_mut</span>()
-            .<span class="ident">map_or_else</span>(<span class="ident">Vec::new</span>, <span class="op">|</span><span class="ident">d</span><span class="op">|</span> <span class="ident">std::mem::take</span>(<span class="kw-2">&amp;mut</span> <span class="ident">d</span>.<span class="ident">files</span>));
-
-        <span class="kw">if</span> <span class="ident">files</span>.<span class="ident">is_empty</span>() {
-            <span class="ident">http</span>.<span class="ident">create_interaction_response</span>(<span class="self">self</span>.<span class="ident">id</span>.<span class="ident">get</span>(), <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">token</span>, <span class="kw-2">&amp;</span><span class="ident">interaction_response</span>)
-                .<span class="kw">await</span>
-        } <span class="kw">else</span> {
-            <span class="ident">http</span>.<span class="ident">create_interaction_response_with_files</span>(
-                <span class="self">self</span>.<span class="ident">id</span>.<span class="ident">get</span>(),
-                <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">token</span>,
-                <span class="kw-2">&amp;</span><span class="ident">interaction_response</span>,
-                <span class="ident">files</span>,
-            )
-            .<span class="kw">await</span>
-        }
+        <span class="ident">builder</span>: <span class="ident">CreateInteractionResponse</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+        <span class="ident">builder</span>.<span class="ident">execute</span>(<span class="ident">http</span>, <span class="self">self</span>.<span class="ident">id</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">token</span>).<span class="kw">await</span>
     }
 
-    <span class="doccomment">/// Edits the initial interaction response.</span>
+    <span class="doccomment">/// Edits the initial interaction response. Does not work for ephemeral messages.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// `application_id` will usually be the bot&#39;s [`UserId`], except in cases of bots being very old.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Refer to Discord&#39;s docs for Edit Webhook Message for field information.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// **Note**:   Message contents must be under 2000 unicode code points.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`UserId`]: crate::model::id::UserId</span>
+    <span class="doccomment">/// **Note**: Message contents must be under 2000 unicode code points.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// # Errors</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// Returns [`Error::Model`] if the edited content is too long.</span>
-    <span class="doccomment">/// May also return [`Error::Http`] if the API returns an error,</span>
-    <span class="doccomment">/// or an [`Error::Json`] if there is an error deserializing the response.</span>
+    <span class="doccomment">/// Returns an [`Error::Model`] if the message content is too long. May also return an</span>
+    <span class="doccomment">/// [`Error::Http`] if the API returns an error, or an [`Error::Json`] if there is an error in</span>
+    <span class="doccomment">/// deserializing the API response.</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">edit_original_interaction_response</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>,
-        <span class="ident">f</span>: <span class="ident">F</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Message</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="kw-2">&amp;mut</span> <span class="ident">EditInteractionResponse</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="ident">EditInteractionResponse</span>,
-    {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">interaction_response</span> <span class="op">=</span> <span class="ident">EditInteractionResponse::default</span>();
-        <span class="ident">f</span>(<span class="kw-2">&amp;mut</span> <span class="ident">interaction_response</span>);
-
-        <span class="ident">http</span>.<span class="ident">as_ref</span>().<span class="ident">edit_original_interaction_response</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">token</span>, <span class="kw-2">&amp;</span><span class="ident">interaction_response</span>).<span class="kw">await</span>
+        <span class="ident">builder</span>: <span class="ident">EditInteractionResponse</span>,
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Message</span><span class="op">&gt;</span> {
+        <span class="ident">builder</span>.<span class="ident">execute</span>(<span class="ident">http</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">token</span>).<span class="kw">await</span>
     }
 
     <span class="doccomment">/// Deletes the initial interaction response.</span>
@@ -445,23 +352,15 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// # Errors</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// Will return [`Error::Model`] if the content is too long.</span>
-    <span class="doccomment">/// May also return [`Error::Http`] if the API returns an error,</span>
-    <span class="doccomment">/// or a [`Error::Json`] if there is an error in deserializing the response.</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">create_followup_message</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">F</span><span class="op">&gt;</span>(
+    <span class="doccomment">/// Returns [`Error::Model`] if the content is too long. May also return [`Error::Http`] if the</span>
+    <span class="doccomment">/// API returns an error, or [`Error::Json`] if there is an error in deserializing the</span>
+    <span class="doccomment">/// response.</span>
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">create_followup_message</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>,
-        <span class="ident">f</span>: <span class="ident">F</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Message</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="kw">for</span><span class="op">&lt;</span><span class="lifetime">&#39;b</span><span class="op">&gt;</span> <span class="ident">F</span>: <span class="ident">FnOnce</span>(
-            <span class="kw-2">&amp;</span><span class="lifetime">&#39;b</span> <span class="kw-2">mut</span> <span class="ident">CreateInteractionResponseFollowup</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
-        ) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;b</span> <span class="kw-2">mut</span> <span class="ident">CreateInteractionResponseFollowup</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
-    {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">interaction_response</span> <span class="op">=</span> <span class="ident">CreateInteractionResponseFollowup::default</span>();
-        <span class="ident">f</span>(<span class="kw-2">&amp;mut</span> <span class="ident">interaction_response</span>);
-
-        <span class="ident">http</span>.<span class="ident">as_ref</span>().<span class="ident">create_followup_message</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">token</span>, <span class="kw-2">&amp;</span><span class="ident">interaction_response</span>).<span class="kw">await</span>
+        <span class="ident">builder</span>: <span class="ident">CreateInteractionResponseFollowup</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Message</span><span class="op">&gt;</span> {
+        <span class="ident">builder</span>.<span class="ident">execute</span>(<span class="ident">http</span>, <span class="prelude-val">None</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">token</span>).<span class="kw">await</span>
     }
 
     <span class="doccomment">/// Edits a followup response to the response sent.</span>
@@ -470,26 +369,16 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// # Errors</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// Will return [`Error::Model`] if the content is too long.</span>
-    <span class="doccomment">/// May also return [`Error::Http`] if the API returns an error,</span>
-    <span class="doccomment">/// or a [`Error::Json`] if there is an error in deserializing the response.</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">edit_followup_message</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">F</span>, <span class="ident">M</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">MessageId</span><span class="op">&gt;</span><span class="op">&gt;</span>(
+    <span class="doccomment">/// Returns [`Error::Model`] if the content is too long. May also return [`Error::Http`] if the</span>
+    <span class="doccomment">/// API returns an error, or [`Error::Json`] if there is an error in deserializing the</span>
+    <span class="doccomment">/// response.</span>
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">edit_followup_message</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>,
-        <span class="ident">message_id</span>: <span class="ident">M</span>,
-        <span class="ident">f</span>: <span class="ident">F</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Message</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="kw">for</span><span class="op">&lt;</span><span class="lifetime">&#39;b</span><span class="op">&gt;</span> <span class="ident">F</span>: <span class="ident">FnOnce</span>(
-            <span class="kw-2">&amp;</span><span class="lifetime">&#39;b</span> <span class="kw-2">mut</span> <span class="ident">CreateInteractionResponseFollowup</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
-        ) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;b</span> <span class="kw-2">mut</span> <span class="ident">CreateInteractionResponseFollowup</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
-    {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">interaction_response</span> <span class="op">=</span> <span class="ident">CreateInteractionResponseFollowup::default</span>();
-        <span class="ident">f</span>(<span class="kw-2">&amp;mut</span> <span class="ident">interaction_response</span>);
-
-        <span class="ident">http</span>.<span class="ident">as_ref</span>()
-            .<span class="ident">edit_followup_message</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">token</span>, <span class="ident">message_id</span>.<span class="ident">into</span>().<span class="ident">into</span>(), <span class="kw-2">&amp;</span><span class="ident">interaction_response</span>)
-            .<span class="kw">await</span>
+        <span class="ident">message_id</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">MessageId</span><span class="op">&gt;</span>,
+        <span class="ident">builder</span>: <span class="ident">CreateInteractionResponseFollowup</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Message</span><span class="op">&gt;</span> {
+        <span class="ident">builder</span>.<span class="ident">execute</span>(<span class="ident">http</span>, <span class="prelude-val">Some</span>(<span class="ident">message_id</span>.<span class="ident">into</span>()), <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">token</span>).<span class="kw">await</span>
     }
 
     <span class="doccomment">/// Deletes a followup message.</span>
@@ -505,18 +394,17 @@
     ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="ident">http</span>.<span class="ident">as_ref</span>().<span class="ident">delete_followup_message</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">token</span>, <span class="ident">message_id</span>.<span class="ident">into</span>().<span class="ident">into</span>()).<span class="kw">await</span>
     }
-    <span class="doccomment">/// Helper function to defer an interaction</span>
+
+    <span class="doccomment">/// Helper function to defer an interaction.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// # Errors</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// May also return an [`Error::Http`] if the API returns an error,</span>
-    <span class="doccomment">/// or an [`Error::Json`] if there is an error in deserializing the</span>
-    <span class="doccomment">/// API response.</span>
+    <span class="doccomment">/// Returns an [`Error::Http`] if the API returns an error, or an [`Error::Json`] if there is</span>
+    <span class="doccomment">/// an error in deserializing the API response.</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">defer</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">create_interaction_response</span>(<span class="ident">http</span>, <span class="op">|</span><span class="ident">f</span><span class="op">|</span> {
-            <span class="ident">f</span>.<span class="ident">kind</span>(<span class="ident">InteractionResponseType::DeferredUpdateMessage</span>)
-        })
-        .<span class="kw">await</span>
+        <span class="kw">let</span> <span class="ident">builder</span> <span class="op">=</span> <span class="ident">CreateInteractionResponse::default</span>()
+            .<span class="ident">kind</span>(<span class="ident">InteractionResponseType::DeferredUpdateMessage</span>);
+        <span class="self">self</span>.<span class="ident">create_interaction_response</span>(<span class="ident">http</span>, <span class="ident">builder</span>).<span class="kw">await</span>
     }
 }
 

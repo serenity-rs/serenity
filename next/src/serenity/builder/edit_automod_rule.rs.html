@@ -93,10 +93,55 @@
 <span id="87">87</span>
 <span id="88">88</span>
 <span id="89">89</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::guild::automod</span>::{<span class="ident">Action</span>, <span class="ident">EventType</span>, <span class="ident">Trigger</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::id</span>::{<span class="ident">ChannelId</span>, <span class="ident">RoleId</span>};
+<span id="90">90</span>
+<span id="91">91</span>
+<span id="92">92</span>
+<span id="93">93</span>
+<span id="94">94</span>
+<span id="95">95</span>
+<span id="96">96</span>
+<span id="97">97</span>
+<span id="98">98</span>
+<span id="99">99</span>
+<span id="100">100</span>
+<span id="101">101</span>
+<span id="102">102</span>
+<span id="103">103</span>
+<span id="104">104</span>
+<span id="105">105</span>
+<span id="106">106</span>
+<span id="107">107</span>
+<span id="108">108</span>
+<span id="109">109</span>
+<span id="110">110</span>
+<span id="111">111</span>
+<span id="112">112</span>
+<span id="113">113</span>
+<span id="114">114</span>
+<span id="115">115</span>
+<span id="116">116</span>
+<span id="117">117</span>
+<span id="118">118</span>
+<span id="119">119</span>
+<span id="120">120</span>
+<span id="121">121</span>
+<span id="122">122</span>
+</pre><pre class="rust"><code><span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http&quot;</span>)]</span>
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::http::Http</span>;
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http&quot;</span>)]</span>
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::internal::prelude</span>::<span class="kw-2">*</span>;
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http&quot;</span>)]</span>
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::guild::automod::Rule</span>;
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::guild::automod</span>::{<span class="ident">Action</span>, <span class="ident">EventType</span>, <span class="ident">Trigger</span>};
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::prelude</span>::<span class="kw-2">*</span>;
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Serialize</span>)]</span>
+<span class="attribute">#[<span class="ident">must_use</span>]</span>
+<span class="doccomment">/// A builder for creating or editing guild automoderation rules.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// # Examples</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// See [`GuildId::create_automod_rule`] for details.</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">EditAutoModRule</span> {
     <span class="ident">event_type</span>: <span class="ident">EventType</span>,
     <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;Option::is_none&quot;</span>)]</span>
@@ -114,14 +159,38 @@
 }
 
 <span class="kw">impl</span> <span class="ident">EditAutoModRule</span> {
+    <span class="doccomment">/// Creates or edits an automoderation [`Rule`] in a guild. Passing `Some(rule_id)` will edit</span>
+    <span class="doccomment">/// that corresponding rule, otherwise a new rule will be created.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// **Note**: Requires the [Manage Guild] permission.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Errors</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// Returns [`Error::Http`] if the current user lacks permission, or if invalid data is given.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// [Manage Guild]: Permissions::MANAGE_GUILD</span>
+    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http&quot;</span>)]</span>
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">execute</span>(
+        <span class="self">self</span>,
+        <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>,
+        <span class="ident">guild_id</span>: <span class="ident">GuildId</span>,
+        <span class="ident">rule_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">RuleId</span><span class="op">&gt;</span>,
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Rule</span><span class="op">&gt;</span> {
+        <span class="kw">let</span> <span class="ident">http</span> <span class="op">=</span> <span class="ident">http</span>.<span class="ident">as_ref</span>();
+        <span class="kw">match</span> <span class="ident">rule_id</span> {
+            <span class="prelude-val">Some</span>(<span class="ident">rule_id</span>) =&gt; <span class="ident">http</span>.<span class="ident">edit_automod_rule</span>(<span class="ident">guild_id</span>.<span class="ident">into</span>(), <span class="ident">rule_id</span>.<span class="ident">into</span>(), <span class="kw-2">&amp;</span><span class="self">self</span>).<span class="kw">await</span>,
+            <span class="prelude-val">None</span> =&gt; <span class="ident">http</span>.<span class="ident">create_automod_rule</span>(<span class="ident">guild_id</span>.<span class="ident">into</span>(), <span class="kw-2">&amp;</span><span class="self">self</span>).<span class="kw">await</span>,
+        }
+    }
+
     <span class="doccomment">/// The display name of the rule.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">name</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">name</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">name</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">name</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">name</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">name</span>.<span class="ident">into</span>());
         <span class="self">self</span>
     }
 
     <span class="doccomment">/// Set the event context the rule should be checked.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">event_type</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">event_type</span>: <span class="ident">EventType</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">event_type</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">event_type</span>: <span class="ident">EventType</span>) -&gt; <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">event_type</span> <span class="op">=</span> <span class="ident">event_type</span>;
         <span class="self">self</span>
     }
@@ -129,19 +198,19 @@
     <span class="doccomment">/// Set the type of content which can trigger the rule.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// **None**: The trigger type can&#39;t be edited after creation. Only its values.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">trigger</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">trigger</span>: <span class="ident">Trigger</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">trigger</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">trigger</span>: <span class="ident">Trigger</span>) -&gt; <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">trigger</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">trigger</span>);
         <span class="self">self</span>
     }
 
     <span class="doccomment">/// Set the actions which will execute when the rule is triggered.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">actions</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">actions</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Action</span><span class="op">&gt;</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">actions</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">actions</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Action</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">actions</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">actions</span>);
         <span class="self">self</span>
     }
 
     <span class="doccomment">/// Set whether the rule is enabled.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">enabled</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">enabled</span>: <span class="ident">bool</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">enabled</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">enabled</span>: <span class="ident">bool</span>) -&gt; <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">enabled</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">enabled</span>);
         <span class="self">self</span>
     }
@@ -149,10 +218,7 @@
     <span class="doccomment">/// Set roles that should not be affected by the rule.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// Maximum of 20.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">exempt_roles</span>(
-        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
-        <span class="ident">roles</span>: <span class="kw">impl</span> <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">RoleId</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">exempt_roles</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">roles</span>: <span class="kw">impl</span> <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">RoleId</span><span class="op">&gt;</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">exempt_roles</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">roles</span>.<span class="ident">into_iter</span>().<span class="ident">map</span>(<span class="ident">Into::into</span>).<span class="ident">collect</span>());
         <span class="self">self</span>
     }
@@ -161,9 +227,9 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// Maximum of 50.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">exempt_channels</span>(
-        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
+        <span class="kw-2">mut</span> <span class="self">self</span>,
         <span class="ident">channels</span>: <span class="kw">impl</span> <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">ChannelId</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
+    ) -&gt; <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">exempt_channels</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">channels</span>.<span class="ident">into_iter</span>().<span class="ident">map</span>(<span class="ident">Into::into</span>).<span class="ident">collect</span>());
         <span class="self">self</span>
     }

@@ -1708,55 +1708,6 @@
 <span id="1702">1702</span>
 <span id="1703">1703</span>
 <span id="1704">1704</span>
-<span id="1705">1705</span>
-<span id="1706">1706</span>
-<span id="1707">1707</span>
-<span id="1708">1708</span>
-<span id="1709">1709</span>
-<span id="1710">1710</span>
-<span id="1711">1711</span>
-<span id="1712">1712</span>
-<span id="1713">1713</span>
-<span id="1714">1714</span>
-<span id="1715">1715</span>
-<span id="1716">1716</span>
-<span id="1717">1717</span>
-<span id="1718">1718</span>
-<span id="1719">1719</span>
-<span id="1720">1720</span>
-<span id="1721">1721</span>
-<span id="1722">1722</span>
-<span id="1723">1723</span>
-<span id="1724">1724</span>
-<span id="1725">1725</span>
-<span id="1726">1726</span>
-<span id="1727">1727</span>
-<span id="1728">1728</span>
-<span id="1729">1729</span>
-<span id="1730">1730</span>
-<span id="1731">1731</span>
-<span id="1732">1732</span>
-<span id="1733">1733</span>
-<span id="1734">1734</span>
-<span id="1735">1735</span>
-<span id="1736">1736</span>
-<span id="1737">1737</span>
-<span id="1738">1738</span>
-<span id="1739">1739</span>
-<span id="1740">1740</span>
-<span id="1741">1741</span>
-<span id="1742">1742</span>
-<span id="1743">1743</span>
-<span id="1744">1744</span>
-<span id="1745">1745</span>
-<span id="1746">1746</span>
-<span id="1747">1747</span>
-<span id="1748">1748</span>
-<span id="1749">1749</span>
-<span id="1750">1750</span>
-<span id="1751">1751</span>
-<span id="1752">1752</span>
-<span id="1753">1753</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">serde::de::Error</span> <span class="kw">as</span> <span class="ident">DeError</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
 <span class="kw">use</span> <span class="ident">tracing</span>::{<span class="ident">error</span>, <span class="ident">warn</span>};
@@ -1950,53 +1901,39 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// # Examples</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// Create a custom keyword filter to block the message and timeout the author.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```ignore</span>
-    <span class="doccomment">/// use serenity::model::guild::automod::{Action, Trigger};</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let _rule = guild</span>
-    <span class="doccomment">///     .create_automod_rule(&amp;http, |r| {</span>
-    <span class="doccomment">///         r.name(&quot;foobar filter&quot;)</span>
-    <span class="doccomment">///             .trigger(Trigger::Keyword(vec![&quot;foo*&quot;.to_string(), &quot;*bar&quot;.to_string()]))</span>
-    <span class="doccomment">///             .actions(vec![Action::BlockMessage, Action::Timeout(60)])</span>
-    <span class="doccomment">///     })</span>
-    <span class="doccomment">///     .await;</span>
-    <span class="doccomment">/// ```</span>
+    <span class="doccomment">/// See [`GuildId::create_automod_rule`] for details.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// # Errors</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// Returns [`Error::Http`] if the current user lacks permission,</span>
-    <span class="doccomment">/// or if invalid values are set.</span>
+    <span class="doccomment">/// Returns [`Error::Http`] if the current user lacks permission, or if invalid data is given.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// [Manage Guild]: Permissions::MANAGE_GUILD</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">create_automod_rule</span>(
-        <span class="self">self</span>,
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>,
-        <span class="ident">f</span>: <span class="kw">impl</span> <span class="ident">FnOnce</span>(<span class="kw-2">&amp;mut</span> <span class="ident">EditAutoModRule</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="ident">EditAutoModRule</span>,
+        <span class="ident">builder</span>: <span class="ident">EditAutoModRule</span>,
     ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Rule</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">id</span>.<span class="ident">create_automod_rule</span>(<span class="ident">http</span>, <span class="ident">f</span>).<span class="kw">await</span>
+        <span class="self">self</span>.<span class="ident">id</span>.<span class="ident">create_automod_rule</span>(<span class="ident">http</span>, <span class="ident">builder</span>).<span class="kw">await</span>
     }
 
-    <span class="doccomment">/// Edit an auto moderation [`Rule`] by its ID.</span>
+    <span class="doccomment">/// Edit an auto moderation [`Rule`], given its Id.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// **Note**: Requires the [Manage Guild] permission.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// # Errors</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// Returns [`Error::Http`] if the current user lacks permission,</span>
-    <span class="doccomment">/// or if invalid values are set.</span>
+    <span class="doccomment">/// Returns [`Error::Http`] if the current user lacks permission, or if invalid data is given.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// [Manage Guild]: Permissions::MANAGE_GUILD</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">edit_automod_rule</span>(
-        <span class="self">self</span>,
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>,
         <span class="ident">rule_id</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">RuleId</span><span class="op">&gt;</span>,
-        <span class="ident">f</span>: <span class="kw">impl</span> <span class="ident">FnOnce</span>(<span class="kw-2">&amp;mut</span> <span class="ident">EditAutoModRule</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="ident">EditAutoModRule</span>,
+        <span class="ident">builder</span>: <span class="ident">EditAutoModRule</span>,
     ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Rule</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">id</span>.<span class="ident">edit_automod_rule</span>(<span class="ident">http</span>, <span class="ident">rule_id</span>, <span class="ident">f</span>).<span class="kw">await</span>
+        <span class="self">self</span>.<span class="ident">id</span>.<span class="ident">edit_automod_rule</span>(<span class="ident">http</span>, <span class="ident">rule_id</span>, <span class="ident">builder</span>).<span class="kw">await</span>
     }
 
     <span class="doccomment">/// Deletes an auto moderation [`Rule`] from the guild.</span>
@@ -2141,32 +2078,42 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// Refer to [`Http::create_channel`] for more information.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// Requires the [Manage Channels] permission.</span>
+    <span class="doccomment">/// **Note**: Requires the [Manage Channels] permission.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// # Examples</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// Create a voice channel in a guild with the name `test`:</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// ```rust,ignore</span>
-    <span class="doccomment">/// use serenity::model::ChannelType;</span>
+    <span class="doccomment">/// ```rust,no_run</span>
+    <span class="doccomment">/// # use serenity::http::Http;</span>
+    <span class="doccomment">/// # use serenity::model::guild::PartialGuild;</span>
+    <span class="doccomment">/// # use serenity::model::id::GuildId;</span>
+    <span class="doccomment">/// use serenity::builder::CreateChannel;</span>
+    <span class="doccomment">/// use serenity::model::channel::ChannelType;</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// guild.create_channel(|c| c.name(&quot;test&quot;).kind(ChannelType::Voice));</span>
+    <span class="doccomment">/// # async fn run() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {</span>
+    <span class="doccomment">/// # let http = Http::new(&quot;token&quot;);</span>
+    <span class="doccomment">/// # let guild = PartialGuild::get(&amp;http, GuildId::new(7)).await?;</span>
+    <span class="doccomment">/// let builder = CreateChannel::default().name(&quot;my-test-channel&quot;).kind(ChannelType::Text);</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// // assuming a `guild` has already been bound</span>
+    <span class="doccomment">/// let _channel = guild.create_channel(&amp;http, builder).await?;</span>
+    <span class="doccomment">/// # Ok(())</span>
+    <span class="doccomment">/// # }</span>
     <span class="doccomment">/// ```</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// # Errors</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// Returns [`Error::Http`] if the current user lacks permission,</span>
-    <span class="doccomment">/// or if invalid data was given, such as the channel name being</span>
-    <span class="doccomment">/// too long.</span>
+    <span class="doccomment">/// If the `cache` is enabled, returns a [`ModelError::InvalidPermissions`] if the current user</span>
+    <span class="doccomment">/// lacks permission. Otherwise returns [`Error::Http`], as well as if invalid data is given.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// [Manage Channels]: Permissions::MANAGE_CHANNELS</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">create_channel</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>,
-        <span class="ident">f</span>: <span class="kw">impl</span> <span class="ident">FnOnce</span>(<span class="kw-2">&amp;mut</span> <span class="ident">CreateChannel</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="ident">CreateChannel</span>,
+        <span class="ident">cache_http</span>: <span class="kw">impl</span> <span class="ident">CacheHttp</span>,
+        <span class="ident">builder</span>: <span class="ident">CreateChannel</span>,
     ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">GuildChannel</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">id</span>.<span class="ident">create_channel</span>(<span class="kw-2">&amp;</span><span class="ident">http</span>, <span class="ident">f</span>).<span class="kw">await</span>
+        <span class="self">self</span>.<span class="ident">id</span>.<span class="ident">create_channel</span>(<span class="ident">cache_http</span>, <span class="ident">builder</span>).<span class="kw">await</span>
     }
 
     <span class="doccomment">/// Creates an emoji in the guild with a name and base64-encoded image.</span>
@@ -2219,83 +2166,62 @@
         <span class="self">self</span>.<span class="ident">id</span>.<span class="ident">create_integration</span>(<span class="kw-2">&amp;</span><span class="ident">http</span>, <span class="ident">integration_id</span>, <span class="ident">kind</span>).<span class="kw">await</span>
     }
 
-    <span class="doccomment">/// Creates a guild specific [`Command`]</span>
+    <span class="doccomment">/// Create a guild specific application [`Command`].</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// **Note**: Unlike global `Command`s, guild commands will update instantly.</span>
+    <span class="doccomment">/// **Note**: Unlike global commands, guild commands will update instantly.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// # Errors</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// Returns the same possible errors as `create_global_application_command`.</span>
+    <span class="doccomment">/// See [`CreateApplicationCommand::execute`] for a list of possible errors.</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">create_application_command</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">create_application_command</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>,
-        <span class="ident">f</span>: <span class="ident">F</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Command</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="kw-2">&amp;mut</span> <span class="ident">CreateApplicationCommand</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="ident">CreateApplicationCommand</span>,
-    {
-        <span class="self">self</span>.<span class="ident">id</span>.<span class="ident">create_application_command</span>(<span class="ident">http</span>, <span class="ident">f</span>).<span class="kw">await</span>
+        <span class="ident">builder</span>: <span class="ident">CreateApplicationCommand</span>,
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Command</span><span class="op">&gt;</span> {
+        <span class="self">self</span>.<span class="ident">id</span>.<span class="ident">create_application_command</span>(<span class="ident">http</span>, <span class="ident">builder</span>).<span class="kw">await</span>
     }
 
-    <span class="doccomment">/// Overrides all guild application commands.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`create_application_command`]: Self::create_application_command</span>
+    <span class="doccomment">/// Override all guild application commands.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// # Errors</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// If there is an error, it will be either [`Error::Http`] or [`Error::Json`].</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">set_application_commands</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(
+    <span class="doccomment">/// See [`CreateApplicationCommands::execute`] for a list of possible errors.</span>
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">set_application_commands</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>,
-        <span class="ident">f</span>: <span class="ident">F</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Command</span><span class="op">&gt;</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="kw-2">&amp;mut</span> <span class="ident">CreateApplicationCommands</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="ident">CreateApplicationCommands</span>,
-    {
-        <span class="self">self</span>.<span class="ident">id</span>.<span class="ident">set_application_commands</span>(<span class="ident">http</span>, <span class="ident">f</span>).<span class="kw">await</span>
+        <span class="ident">builder</span>: <span class="ident">CreateApplicationCommands</span>,
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Command</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+        <span class="self">self</span>.<span class="ident">id</span>.<span class="ident">set_application_commands</span>(<span class="ident">http</span>, <span class="ident">builder</span>).<span class="kw">await</span>
     }
 
-    <span class="doccomment">/// Creates a guild specific [`CommandPermission`].</span>
+    <span class="doccomment">/// Create a guild specific [`CommandPermission`].</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// **Note**: It will update instantly.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// # Errors</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// If there is an error, it will be either [`Error::Http`] or [`Error::Json`].</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">create_application_command_permission</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(
+    <span class="doccomment">/// See [`CreateApplicationCommandPermissionsData::execute`] for a list of possible errors.</span>
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">create_application_command_permission</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>,
         <span class="ident">command_id</span>: <span class="ident">CommandId</span>,
-        <span class="ident">f</span>: <span class="ident">F</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">CommandPermission</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">F</span>: <span class="ident">FnOnce</span>(
-            <span class="kw-2">&amp;mut</span> <span class="ident">CreateApplicationCommandPermissionsData</span>,
-        ) -&gt; <span class="kw-2">&amp;mut</span> <span class="ident">CreateApplicationCommandPermissionsData</span>,
-    {
-        <span class="self">self</span>.<span class="ident">id</span>.<span class="ident">create_application_command_permission</span>(<span class="ident">http</span>, <span class="ident">command_id</span>, <span class="ident">f</span>).<span class="kw">await</span>
+        <span class="ident">builder</span>: <span class="ident">CreateApplicationCommandPermissionsData</span>,
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">CommandPermission</span><span class="op">&gt;</span> {
+        <span class="self">self</span>.<span class="ident">id</span>.<span class="ident">create_application_command_permission</span>(<span class="ident">http</span>, <span class="ident">command_id</span>, <span class="ident">builder</span>).<span class="kw">await</span>
     }
 
-    <span class="doccomment">/// Same as [`create_application_command_permission`] but allows to create</span>
-    <span class="doccomment">/// more than one permission per call.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`create_application_command_permission`]: Self::create_application_command_permission</span>
+    <span class="doccomment">/// Override permissions for all guild application commands.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// # Errors</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// If there is an error, it will be either [`Error::Http`] or [`Error::Json`].</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">set_application_commands_permissions</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(
+    <span class="doccomment">/// See [`CreateApplicationCommandsPermissions::execute`] for a list of possible errors.</span>
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">set_application_commands_permissions</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>,
-        <span class="ident">f</span>: <span class="ident">F</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">CommandPermission</span><span class="op">&gt;</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">F</span>: <span class="ident">FnOnce</span>(
-            <span class="kw-2">&amp;mut</span> <span class="ident">CreateApplicationCommandsPermissions</span>,
-        ) -&gt; <span class="kw-2">&amp;mut</span> <span class="ident">CreateApplicationCommandsPermissions</span>,
-    {
-        <span class="self">self</span>.<span class="ident">id</span>.<span class="ident">set_application_commands_permissions</span>(<span class="ident">http</span>, <span class="ident">f</span>).<span class="kw">await</span>
+        <span class="ident">builder</span>: <span class="ident">CreateApplicationCommandsPermissions</span>,
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">CommandPermission</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+        <span class="self">self</span>.<span class="ident">id</span>.<span class="ident">set_application_commands_permissions</span>(<span class="ident">http</span>, <span class="ident">builder</span>).<span class="kw">await</span>
     }
 
     <span class="doccomment">/// Get all guild application commands.</span>
@@ -2320,21 +2246,18 @@
         <span class="self">self</span>.<span class="ident">id</span>.<span class="ident">get_application_command</span>(<span class="ident">http</span>, <span class="ident">command_id</span>).<span class="kw">await</span>
     }
 
-    <span class="doccomment">/// Edit guild application command by its Id.</span>
+    <span class="doccomment">/// Edit a guild application command, given its Id.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// # Errors</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// If there is an error, it will be either [`Error::Http`] or [`Error::Json`].</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">edit_application_command</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(
+    <span class="doccomment">/// See [`CreateApplicationCommand::execute`] for a list of possible errors.</span>
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">edit_application_command</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>,
         <span class="ident">command_id</span>: <span class="ident">CommandId</span>,
-        <span class="ident">f</span>: <span class="ident">F</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Command</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="kw-2">&amp;mut</span> <span class="ident">CreateApplicationCommand</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="ident">CreateApplicationCommand</span>,
-    {
-        <span class="self">self</span>.<span class="ident">id</span>.<span class="ident">edit_application_command</span>(<span class="ident">http</span>, <span class="ident">command_id</span>, <span class="ident">f</span>).<span class="kw">await</span>
+        <span class="ident">builder</span>: <span class="ident">CreateApplicationCommand</span>,
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Command</span><span class="op">&gt;</span> {
+        <span class="self">self</span>.<span class="ident">id</span>.<span class="ident">edit_application_command</span>(<span class="ident">http</span>, <span class="ident">command_id</span>, <span class="ident">builder</span>).<span class="kw">await</span>
     }
 
     <span class="doccomment">/// Delete guild application command by its Id.</span>
@@ -2383,16 +2306,13 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// # Errors</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// Returns [`Error::Http`] if the current user lacks permission,</span>
-    <span class="doccomment">/// or if an invalid value was set.</span>
+    <span class="doccomment">/// If the `cache` is enabled, returns a [`ModelError::InvalidPermissions`] if the current user</span>
+    <span class="doccomment">/// lacks permission. Otherwise returns [`Error::Http`], as well as if invalid data is given.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// [Manage Roles]: Permissions::MANAGE_ROLES</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">create_role</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>, <span class="ident">f</span>: <span class="ident">F</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Role</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="kw-2">&amp;mut</span> <span class="ident">EditRole</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="ident">EditRole</span>,
-    {
-        <span class="self">self</span>.<span class="ident">id</span>.<span class="ident">create_role</span>(<span class="kw-2">&amp;</span><span class="ident">http</span>, <span class="ident">f</span>).<span class="kw">await</span>
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">create_role</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">cache_http</span>: <span class="kw">impl</span> <span class="ident">CacheHttp</span>, <span class="ident">builder</span>: <span class="ident">EditRole</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Role</span><span class="op">&gt;</span> {
+        <span class="self">self</span>.<span class="ident">id</span>.<span class="ident">create_role</span>(<span class="ident">cache_http</span>, <span class="ident">builder</span>).<span class="kw">await</span>
     }
 
     <span class="doccomment">/// Creates a new sticker in the guild with the data set, if any.</span>
@@ -2401,26 +2321,16 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// # Errors</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// If the `cache` is enabled, returns a [`ModelError::InvalidPermissions`]</span>
-    <span class="doccomment">/// if the current user does not have permission to manage roles.</span>
+    <span class="doccomment">/// If the `cache` is enabled, returns a [`ModelError::InvalidPermissions`] if the current user</span>
+    <span class="doccomment">/// lacks permission. Otherwise returns [`Error::Http`], as well as if invalid data is given.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [Manage Emojis and Stickers]: crate::model::permissions::Permissions::MANAGE_EMOJIS_AND_STICKERS</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">create_sticker</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">cache_http</span>: <span class="kw">impl</span> <span class="ident">CacheHttp</span>, <span class="ident">f</span>: <span class="ident">F</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Sticker</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="kw">for</span><span class="op">&lt;</span><span class="lifetime">&#39;b</span><span class="op">&gt;</span> <span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;b</span> <span class="kw-2">mut</span> <span class="ident">CreateSticker</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;b</span> <span class="kw-2">mut</span> <span class="ident">CreateSticker</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
-    {
-        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
-        {
-            <span class="kw">if</span> <span class="ident">cache_http</span>.<span class="ident">cache</span>().<span class="ident">is_some</span>() {
-                <span class="kw">let</span> <span class="ident">req</span> <span class="op">=</span> <span class="ident">Permissions::MANAGE_EMOJIS_AND_STICKERS</span>;
-
-                <span class="kw">if</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">has_perms</span>(<span class="kw-2">&amp;</span><span class="ident">cache_http</span>, <span class="ident">req</span>).<span class="kw">await</span> {
-                    <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::Model</span>(<span class="ident">ModelError::InvalidPermissions</span>(<span class="ident">req</span>)));
-                }
-            }
-        }
-
-        <span class="self">self</span>.<span class="ident">id</span>.<span class="ident">create_sticker</span>(<span class="ident">cache_http</span>.<span class="ident">http</span>(), <span class="ident">f</span>).<span class="kw">await</span>
+    <span class="doccomment">/// [Manage Emojis and Stickers]: Permissions::MANAGE_EMOJIS_AND_STICKERS</span>
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">create_sticker</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        <span class="ident">cache_http</span>: <span class="kw">impl</span> <span class="ident">CacheHttp</span>,
+        <span class="ident">builder</span>: <span class="ident">CreateSticker</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Sticker</span><span class="op">&gt;</span> {
+        <span class="self">self</span>.<span class="ident">id</span>.<span class="ident">create_sticker</span>(<span class="ident">cache_http</span>, <span class="ident">builder</span>).<span class="kw">await</span>
     }
 
     <span class="doccomment">/// Deletes the current guild if the current user is the owner of the</span>
@@ -2518,38 +2428,31 @@
 
     <span class="doccomment">/// Edits the current guild with new data where specified.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// **Note**: Requires the current user to have the [Manage Guild]</span>
-    <span class="doccomment">/// permission.</span>
+    <span class="doccomment">/// **Note**: Requires the [Manage Guild] permission.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// # Errors</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// Returns [`Error::Http`] if an invalid value is set, or if the current user</span>
-    <span class="doccomment">/// lacks permission to edit the guild.</span>
+    <span class="doccomment">/// If the `cache` is enabled, returns a [`ModelError::InvalidPermissions`] if the current user</span>
+    <span class="doccomment">/// lacks permission. Otherwise returns [`Error::Http`], as well as if invalid data is given.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// [Manage Guild]: Permissions::MANAGE_GUILD</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">edit</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>, <span class="ident">f</span>: <span class="ident">F</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="kw-2">&amp;mut</span> <span class="ident">EditGuild</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="ident">EditGuild</span>,
-    {
-        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">id</span>.<span class="ident">edit</span>(<span class="kw-2">&amp;</span><span class="ident">http</span>, <span class="ident">f</span>).<span class="kw">await</span> {
-            <span class="prelude-val">Ok</span>(<span class="ident">guild</span>) =&gt; {
-                <span class="self">self</span>.<span class="ident">afk_channel_id</span> <span class="op">=</span> <span class="ident">guild</span>.<span class="ident">afk_channel_id</span>;
-                <span class="self">self</span>.<span class="ident">afk_timeout</span> <span class="op">=</span> <span class="ident">guild</span>.<span class="ident">afk_timeout</span>;
-                <span class="self">self</span>.<span class="ident">default_message_notifications</span> <span class="op">=</span> <span class="ident">guild</span>.<span class="ident">default_message_notifications</span>;
-                <span class="self">self</span>.<span class="ident">emojis</span> <span class="op">=</span> <span class="ident">guild</span>.<span class="ident">emojis</span>;
-                <span class="self">self</span>.<span class="ident">features</span> <span class="op">=</span> <span class="ident">guild</span>.<span class="ident">features</span>;
-                <span class="self">self</span>.<span class="ident">icon</span> <span class="op">=</span> <span class="ident">guild</span>.<span class="ident">icon</span>;
-                <span class="self">self</span>.<span class="ident">mfa_level</span> <span class="op">=</span> <span class="ident">guild</span>.<span class="ident">mfa_level</span>;
-                <span class="self">self</span>.<span class="ident">name</span> <span class="op">=</span> <span class="ident">guild</span>.<span class="ident">name</span>;
-                <span class="self">self</span>.<span class="ident">owner_id</span> <span class="op">=</span> <span class="ident">guild</span>.<span class="ident">owner_id</span>;
-                <span class="self">self</span>.<span class="ident">roles</span> <span class="op">=</span> <span class="ident">guild</span>.<span class="ident">roles</span>;
-                <span class="self">self</span>.<span class="ident">splash</span> <span class="op">=</span> <span class="ident">guild</span>.<span class="ident">splash</span>;
-                <span class="self">self</span>.<span class="ident">verification_level</span> <span class="op">=</span> <span class="ident">guild</span>.<span class="ident">verification_level</span>;
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">edit</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">cache_http</span>: <span class="kw">impl</span> <span class="ident">CacheHttp</span>, <span class="ident">builder</span>: <span class="ident">EditGuild</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+        <span class="kw">let</span> <span class="ident">guild</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">id</span>.<span class="ident">edit</span>(<span class="ident">cache_http</span>, <span class="ident">builder</span>).<span class="kw">await</span><span class="question-mark">?</span>;
 
-                <span class="prelude-val">Ok</span>(())
-            },
-            <span class="prelude-val">Err</span>(<span class="ident">why</span>) =&gt; <span class="prelude-val">Err</span>(<span class="ident">why</span>),
-        }
+        <span class="self">self</span>.<span class="ident">afk_channel_id</span> <span class="op">=</span> <span class="ident">guild</span>.<span class="ident">afk_channel_id</span>;
+        <span class="self">self</span>.<span class="ident">afk_timeout</span> <span class="op">=</span> <span class="ident">guild</span>.<span class="ident">afk_timeout</span>;
+        <span class="self">self</span>.<span class="ident">default_message_notifications</span> <span class="op">=</span> <span class="ident">guild</span>.<span class="ident">default_message_notifications</span>;
+        <span class="self">self</span>.<span class="ident">emojis</span> <span class="op">=</span> <span class="ident">guild</span>.<span class="ident">emojis</span>;
+        <span class="self">self</span>.<span class="ident">features</span> <span class="op">=</span> <span class="ident">guild</span>.<span class="ident">features</span>;
+        <span class="self">self</span>.<span class="ident">icon</span> <span class="op">=</span> <span class="ident">guild</span>.<span class="ident">icon</span>;
+        <span class="self">self</span>.<span class="ident">mfa_level</span> <span class="op">=</span> <span class="ident">guild</span>.<span class="ident">mfa_level</span>;
+        <span class="self">self</span>.<span class="ident">name</span> <span class="op">=</span> <span class="ident">guild</span>.<span class="ident">name</span>;
+        <span class="self">self</span>.<span class="ident">owner_id</span> <span class="op">=</span> <span class="ident">guild</span>.<span class="ident">owner_id</span>;
+        <span class="self">self</span>.<span class="ident">roles</span> <span class="op">=</span> <span class="ident">guild</span>.<span class="ident">roles</span>;
+        <span class="self">self</span>.<span class="ident">splash</span> <span class="op">=</span> <span class="ident">guild</span>.<span class="ident">splash</span>;
+        <span class="self">self</span>.<span class="ident">verification_level</span> <span class="op">=</span> <span class="ident">guild</span>.<span class="ident">verification_level</span>;
+
+        <span class="prelude-val">Ok</span>(())
     }
 
     <span class="doccomment">/// Edits an [`Emoji`]&#39;s name in the guild.</span>
@@ -2575,36 +2478,27 @@
         <span class="self">self</span>.<span class="ident">id</span>.<span class="ident">edit_emoji</span>(<span class="kw-2">&amp;</span><span class="ident">http</span>, <span class="ident">emoji_id</span>, <span class="ident">name</span>).<span class="kw">await</span>
     }
 
-    <span class="doccomment">/// Edits the properties of member of the guild, such as muting or</span>
-    <span class="doccomment">/// nicknaming them.</span>
+    <span class="doccomment">/// Edits the properties a guild member, such as muting or nicknaming them. Returns the new</span>
+    <span class="doccomment">/// member.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// Refer to [`EditMember`]&#39;s documentation for a full list of methods and</span>
-    <span class="doccomment">/// permission restrictions.</span>
+    <span class="doccomment">/// Refer to the documentation of [`EditMember`] for a full list of methods and permission</span>
+    <span class="doccomment">/// restrictions.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// # Examples</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// Mute a member and set their roles to just one role with a predefined Id:</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```rust,ignore</span>
-    <span class="doccomment">/// use serenity::model::GuildId;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// GuildId::new(7).edit_member(user_id, |m| m.mute(true).roles(&amp;vec![role_id])).await;</span>
-    <span class="doccomment">/// ```</span>
+    <span class="doccomment">/// See [`GuildId::edit_member`] for details.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// # Errors</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// Returns [`Error::Http`] if the current user lacks the necessary permissions.</span>
+    <span class="doccomment">/// Returns [`Error::Http`] if the current user lacks permission, or if invalid data is given.</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">edit_member</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">edit_member</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>,
         <span class="ident">user_id</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">UserId</span><span class="op">&gt;</span>,
-        <span class="ident">f</span>: <span class="ident">F</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Member</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="kw-2">&amp;mut</span> <span class="ident">EditMember</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="ident">EditMember</span>,
-    {
-        <span class="self">self</span>.<span class="ident">id</span>.<span class="ident">edit_member</span>(<span class="kw-2">&amp;</span><span class="ident">http</span>, <span class="ident">user_id</span>, <span class="ident">f</span>).<span class="kw">await</span>
+        <span class="ident">builder</span>: <span class="ident">EditMember</span>,
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Member</span><span class="op">&gt;</span> {
+        <span class="self">self</span>.<span class="ident">id</span>.<span class="ident">edit_member</span>(<span class="ident">http</span>, <span class="ident">user_id</span>, <span class="ident">builder</span>).<span class="kw">await</span>
     }
 
     <span class="doccomment">/// Edits the current user&#39;s nickname for the guild.</span>
@@ -2630,32 +2524,26 @@
 
     <span class="doccomment">/// Edits a role, optionally setting its fields.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// Requires the [Manage Roles] permission.</span>
+    <span class="doccomment">/// **Note**: Requires the [Manage Roles] permission.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// # Examples</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// Make a role hoisted:</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```rust,ignore</span>
-    <span class="doccomment">/// partial_guild.edit_role(&amp;context, RoleId::new(7), |r| r.hoist(true));</span>
-    <span class="doccomment">/// ```</span>
+    <span class="doccomment">/// See the documentation of [`GuildId::edit_role`] for details.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// # Errors</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// Returns [`Error::Http`] if the current user lacks permission.</span>
+    <span class="doccomment">/// If the `cache` is enabled, returns a [`ModelError::InvalidPermissions`] if the current user</span>
+    <span class="doccomment">/// lacks permission. Otherwise returns [`Error::Http`], as well as if invalid data is given.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// [Manage Roles]: Permissions::MANAGE_ROLES</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">edit_role</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">edit_role</span>(
         <span class="self">self</span>,
-        <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>,
+        <span class="ident">cache_http</span>: <span class="kw">impl</span> <span class="ident">CacheHttp</span>,
         <span class="ident">role_id</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">RoleId</span><span class="op">&gt;</span>,
-        <span class="ident">f</span>: <span class="ident">F</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Role</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="kw-2">&amp;mut</span> <span class="ident">EditRole</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="ident">EditRole</span>,
-    {
-        <span class="self">self</span>.<span class="ident">id</span>.<span class="ident">edit_role</span>(<span class="ident">http</span>, <span class="ident">role_id</span>, <span class="ident">f</span>).<span class="kw">await</span>
+        <span class="ident">builder</span>: <span class="ident">EditRole</span>,
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Role</span><span class="op">&gt;</span> {
+        <span class="self">self</span>.<span class="ident">id</span>.<span class="ident">edit_role</span>(<span class="ident">cache_http</span>, <span class="ident">role_id</span>, <span class="ident">builder</span>).<span class="kw">await</span>
     }
 
     <span class="doccomment">/// Edits the order of [`Role`]s</span>
@@ -2685,63 +2573,77 @@
         <span class="self">self</span>.<span class="ident">id</span>.<span class="ident">edit_role_position</span>(<span class="kw-2">&amp;</span><span class="ident">http</span>, <span class="ident">role_id</span>, <span class="ident">position</span>).<span class="kw">await</span>
     }
 
-    <span class="doccomment">/// Edits a sticker, optionally setting its fields.</span>
+    <span class="doccomment">/// Edits a sticker.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// Requires the [Manage Emojis and Stickers] permission.</span>
+    <span class="doccomment">/// **Note**: Requires the [Manage Emojis and Stickers] permission.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// # Examples</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// Rename a sticker:</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// ```rust,ignore</span>
-    <span class="doccomment">/// guild.edit_sticker(&amp;context, StickerId(7), |r| r.name(&quot;Bun bun meow&quot;));</span>
+    <span class="doccomment">/// ```rust,no_run</span>
+    <span class="doccomment">/// # use serenity::http::Http;</span>
+    <span class="doccomment">/// # use serenity::model::guild::PartialGuild;</span>
+    <span class="doccomment">/// # use serenity::model::id::GuildId;</span>
+    <span class="doccomment">/// use serenity::builder::EditSticker;</span>
+    <span class="doccomment">/// use serenity::model::id::StickerId;</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # async fn run() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {</span>
+    <span class="doccomment">/// # let http = Http::new(&quot;token&quot;);</span>
+    <span class="doccomment">/// # let guild = PartialGuild::get(&amp;http, GuildId::new(7)).await?;</span>
+    <span class="doccomment">/// let builder = EditSticker::default().name(&quot;Bun bun meow&quot;);</span>
+    <span class="doccomment">/// guild.edit_sticker(&amp;http, StickerId::new(7), builder).await?;</span>
+    <span class="doccomment">/// # Ok(())</span>
+    <span class="doccomment">/// # }</span>
     <span class="doccomment">/// ```</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Errors</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// Returns [`Error::Http`] if the current user lacks permission, or if invalid data is given.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// [Manage Emojis and Stickers]: Permissions::MANAGE_EMOJIS_AND_STICKERS</span>
+    <span class="attribute">#[<span class="ident">inline</span>]</span>
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">edit_sticker</span>(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>,
+        <span class="ident">sticker_id</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">StickerId</span><span class="op">&gt;</span>,
+        <span class="ident">builder</span>: <span class="ident">EditSticker</span>,
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Sticker</span><span class="op">&gt;</span> {
+        <span class="self">self</span>.<span class="ident">id</span>.<span class="ident">edit_sticker</span>(<span class="ident">http</span>, <span class="ident">sticker_id</span>, <span class="ident">builder</span>).<span class="kw">await</span>
+    }
+
+    <span class="doccomment">/// Edits the guild&#39;s welcome screen.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// **Note**: Requires the [Manage Guild] permission.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// # Errors</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// Returns [`Error::Http`] if the current user lacks permission.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [Manage Emojis and Stickers]: crate::model::permissions::Permissions::MANAGE_EMOJIS_AND_STICKERS</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">edit_sticker</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(
+    <span class="doccomment">/// [Manage Guild]: Permissions::MANAGE_GUILD</span>
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">edit_welcome_screen</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>,
-        <span class="ident">sticker_id</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">StickerId</span><span class="op">&gt;</span>,
-        <span class="ident">f</span>: <span class="ident">F</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Sticker</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="kw-2">&amp;mut</span> <span class="ident">EditSticker</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="ident">EditSticker</span>,
-    {
-        <span class="self">self</span>.<span class="ident">id</span>.<span class="ident">edit_sticker</span>(<span class="kw-2">&amp;</span><span class="ident">http</span>, <span class="ident">sticker_id</span>, <span class="ident">f</span>).<span class="kw">await</span>
+        <span class="ident">builder</span>: <span class="ident">EditGuildWelcomeScreen</span>,
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">GuildWelcomeScreen</span><span class="op">&gt;</span> {
+        <span class="self">self</span>.<span class="ident">id</span>.<span class="ident">edit_welcome_screen</span>(<span class="ident">http</span>, <span class="ident">builder</span>).<span class="kw">await</span>
     }
 
-    <span class="doccomment">/// Edits the [`GuildWelcomeScreen`].</span>
+    <span class="doccomment">/// Edits the guild&#39;s widget.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// **Note**: Requires the [Manage Guild] permission.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// # Errors</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// Returns an [`Error::Http`] if some mandatory fields are not provided.</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">edit_welcome_screen</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(
+    <span class="doccomment">/// Returns [`Error::Http`] if the current user lacks permission.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// [Manage Guild]: Permissions::MANAGE_GUILD</span>
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">edit_widget</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>,
-        <span class="ident">f</span>: <span class="ident">F</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">GuildWelcomeScreen</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="kw-2">&amp;mut</span> <span class="ident">EditGuildWelcomeScreen</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="ident">EditGuildWelcomeScreen</span>,
-    {
-        <span class="self">self</span>.<span class="ident">id</span>.<span class="ident">edit_welcome_screen</span>(<span class="ident">http</span>, <span class="ident">f</span>).<span class="kw">await</span>
-    }
-
-    <span class="doccomment">/// Edits the [`GuildWidget`].</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Errors</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Returns an [`Error::Http`] if the bot does not have the `MANAGE_GUILD`</span>
-    <span class="doccomment">/// permission.</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">edit_widget</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>, <span class="ident">f</span>: <span class="ident">F</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">GuildWidget</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="kw-2">&amp;mut</span> <span class="ident">EditGuildWidget</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="ident">EditGuildWidget</span>,
-    {
-        <span class="self">self</span>.<span class="ident">id</span>.<span class="ident">edit_widget</span>(<span class="ident">http</span>, <span class="ident">f</span>).<span class="kw">await</span>
+        <span class="ident">builder</span>: <span class="ident">EditGuildWidget</span>,
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">GuildWidget</span><span class="op">&gt;</span> {
+        <span class="self">self</span>.<span class="ident">id</span>.<span class="ident">edit_widget</span>(<span class="ident">http</span>, <span class="ident">builder</span>).<span class="kw">await</span>
     }
 
     <span class="doccomment">/// Gets a partial amount of guild data by its Id.</span>

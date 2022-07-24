@@ -190,48 +190,59 @@
 <span id="184">184</span>
 <span id="185">185</span>
 <span id="186">186</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::application::command::CommandPermissionType</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::id::CommandId</span>;
+<span id="187">187</span>
+</pre><pre class="rust"><code><span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http&quot;</span>)]</span>
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::http::Http</span>;
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http&quot;</span>)]</span>
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::internal::prelude</span>::<span class="kw-2">*</span>;
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http&quot;</span>)]</span>
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::application::command::CommandPermission</span>;
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::application::command::CommandPermissionType</span>;
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::prelude</span>::<span class="kw-2">*</span>;
 
 <span class="doccomment">/// A builder for creating several [`CommandPermission`].</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [`CommandPermission`]: crate::model::application::command::CommandPermission</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Default</span>, <span class="ident">Serialize</span>)]</span>
+<span class="attribute">#[<span class="ident">must_use</span>]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">CreateApplicationCommandsPermissions</span>(<span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">CreateApplicationCommandPermissions</span><span class="op">&gt;</span>);
 
 <span class="kw">impl</span> <span class="ident">CreateApplicationCommandsPermissions</span> {
-    <span class="doccomment">/// Creates a new application command.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">create_application_command</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">f</span>: <span class="ident">F</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span>
-    <span class="kw">where</span>
-        <span class="ident">F</span>: <span class="ident">FnOnce</span>(
-            <span class="kw-2">&amp;mut</span> <span class="ident">CreateApplicationCommandPermissions</span>,
-        ) -&gt; <span class="kw-2">&amp;mut</span> <span class="ident">CreateApplicationCommandPermissions</span>,
-    {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">data</span> <span class="op">=</span> <span class="ident">CreateApplicationCommandPermissions::default</span>();
-        <span class="ident">f</span>(<span class="kw-2">&amp;mut</span> <span class="ident">data</span>);
-
-        <span class="self">self</span>.<span class="ident">add_application_command</span>(<span class="ident">data</span>);
-
-        <span class="self">self</span>
+    <span class="doccomment">/// Overwrite permissions for all application commands in the guild.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// **Note**: Per [Discord&#39;s docs], this endpoint has been disabled and will always return an</span>
+    <span class="doccomment">/// error. Use [`CreateApplicationCommandPermissionsData`] instead to update permissions one</span>
+    <span class="doccomment">/// command at a time.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Errors</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// Returns [`Error::Http`] if invalid data is given.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// May also return [`Error::Json`] if there is an error in deserializing the API response.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// [Discord&#39;s docs]: https://discord.com/developers/docs/interactions/application-commands#batch-edit-application-command-permissions</span>
+    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http&quot;</span>)]</span>
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">execute</span>(
+        <span class="self">self</span>,
+        <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>,
+        <span class="ident">guild_id</span>: <span class="ident">GuildId</span>,
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">CommandPermission</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+        <span class="ident">http</span>.<span class="ident">as_ref</span>().<span class="ident">edit_guild_application_commands_permissions</span>(<span class="ident">guild_id</span>.<span class="ident">into</span>(), <span class="kw-2">&amp;</span><span class="self">self</span>).<span class="kw">await</span>
     }
 
     <span class="doccomment">/// Adds a new application command.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">add_application_command</span>(
-        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
+        <span class="kw-2">mut</span> <span class="self">self</span>,
         <span class="ident">application_command</span>: <span class="ident">CreateApplicationCommandPermissions</span>,
-    ) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
+    ) -&gt; <span class="self">Self</span> {
         <span class="self">self</span>.<span class="number">0</span>.<span class="ident">push</span>(<span class="ident">application_command</span>);
-
         <span class="self">self</span>
     }
 
     <span class="doccomment">/// Sets all the application commands.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_application_commands</span>(
-        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
+        <span class="kw-2">mut</span> <span class="self">self</span>,
         <span class="ident">application_commands</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">CreateApplicationCommandPermissions</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
+    ) -&gt; <span class="self">Self</span> {
         <span class="self">self</span>.<span class="number">0</span> <span class="op">=</span> <span class="ident">application_commands</span>;
-
         <span class="self">self</span>
     }
 }
@@ -240,6 +251,7 @@
 <span class="doccomment">///</span>
 <span class="doccomment">/// [`CommandPermission`]: crate::model::application::command::CommandPermission</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Default</span>, <span class="ident">Serialize</span>)]</span>
+<span class="attribute">#[<span class="ident">must_use</span>]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">CreateApplicationCommandPermissions</span> {
     <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;Option::is_none&quot;</span>)]</span>
     <span class="ident">id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">CommandId</span><span class="op">&gt;</span>,
@@ -250,40 +262,22 @@
     <span class="doccomment">/// The [`CommandId`] these permissions belong to.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// [`CommandId`]: crate::model::id::CommandId</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">id</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">application_command_id</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">CommandId</span><span class="op">&gt;</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">id</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">application_command_id</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">CommandId</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">id</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">application_command_id</span>.<span class="ident">into</span>());
         <span class="self">self</span>
     }
 
-    <span class="doccomment">/// Creates permissions for the application command.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">create_permissions</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">f</span>: <span class="ident">F</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span>
-    <span class="kw">where</span>
-        <span class="ident">F</span>: <span class="ident">FnOnce</span>(
-            <span class="kw-2">&amp;mut</span> <span class="ident">CreateApplicationCommandPermissionData</span>,
-        ) -&gt; <span class="kw-2">&amp;mut</span> <span class="ident">CreateApplicationCommandPermissionData</span>,
-    {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">data</span> <span class="op">=</span> <span class="ident">CreateApplicationCommandPermissionData::default</span>();
-        <span class="ident">f</span>(<span class="kw-2">&amp;mut</span> <span class="ident">data</span>);
-
-        <span class="self">self</span>.<span class="ident">add_permissions</span>(<span class="ident">data</span>);
-
-        <span class="self">self</span>
-    }
-
     <span class="doccomment">/// Adds permission for the application command.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">add_permissions</span>(
-        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
-        <span class="ident">permission</span>: <span class="ident">CreateApplicationCommandPermissionData</span>,
-    ) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">add_permissions</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">permission</span>: <span class="ident">CreateApplicationCommandPermissionData</span>) -&gt; <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">permissions</span>.<span class="ident">push</span>(<span class="ident">permission</span>);
         <span class="self">self</span>
     }
 
     <span class="doccomment">/// Sets permissions for the application command.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_permissions</span>(
-        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
+        <span class="kw-2">mut</span> <span class="self">self</span>,
         <span class="ident">permissions</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">CreateApplicationCommandPermissionData</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
+    ) -&gt; <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">permissions</span> <span class="op">=</span> <span class="ident">permissions</span>;
         <span class="self">self</span>
     }
@@ -293,40 +287,47 @@
 <span class="doccomment">///</span>
 <span class="doccomment">/// [`CommandPermissionData`]: crate::model::application::command::CommandPermissionData</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Default</span>, <span class="ident">Serialize</span>)]</span>
+<span class="attribute">#[<span class="ident">must_use</span>]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">CreateApplicationCommandPermissionsData</span> {
     <span class="ident">permissions</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">CreateApplicationCommandPermissionData</span><span class="op">&gt;</span>,
 }
 
 <span class="kw">impl</span> <span class="ident">CreateApplicationCommandPermissionsData</span> {
-    <span class="doccomment">/// Creates a permission for the application command.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">create_permission</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">f</span>: <span class="ident">F</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span>
-    <span class="kw">where</span>
-        <span class="ident">F</span>: <span class="ident">FnOnce</span>(
-            <span class="kw-2">&amp;mut</span> <span class="ident">CreateApplicationCommandPermissionData</span>,
-        ) -&gt; <span class="kw-2">&amp;mut</span> <span class="ident">CreateApplicationCommandPermissionData</span>,
-    {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">data</span> <span class="op">=</span> <span class="ident">CreateApplicationCommandPermissionData::default</span>();
-        <span class="ident">f</span>(<span class="kw-2">&amp;mut</span> <span class="ident">data</span>);
-
-        <span class="self">self</span>.<span class="ident">add_permission</span>(<span class="ident">data</span>);
-
-        <span class="self">self</span>
+    <span class="doccomment">/// Create permissions for a guild application command. These will overwrite any existing</span>
+    <span class="doccomment">/// permissions for that command.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// **Note**: The permissions will update instantly.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Errors</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// Returns [`Error::Http`] if invalid data is given. See [Discord&#39;s docs] for more details.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// May also return [`Error::Json`] if there is an error in deserializing the API response.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// [Discord&#39;s docs]: https://discord.com/developers/docs/interactions/slash-commands</span>
+    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http&quot;</span>)]</span>
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">execute</span>(
+        <span class="self">self</span>,
+        <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>,
+        <span class="ident">guild_id</span>: <span class="ident">GuildId</span>,
+        <span class="ident">command_id</span>: <span class="ident">CommandId</span>,
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">CommandPermission</span><span class="op">&gt;</span> {
+        <span class="ident">http</span>.<span class="ident">as_ref</span>()
+            .<span class="ident">edit_guild_application_command_permissions</span>(<span class="ident">guild_id</span>.<span class="ident">into</span>(), <span class="ident">command_id</span>.<span class="ident">into</span>(), <span class="kw-2">&amp;</span><span class="self">self</span>)
+            .<span class="kw">await</span>
     }
 
     <span class="doccomment">/// Adds a permission for the application command.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">add_permission</span>(
-        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
-        <span class="ident">permission</span>: <span class="ident">CreateApplicationCommandPermissionData</span>,
-    ) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">add_permission</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">permission</span>: <span class="ident">CreateApplicationCommandPermissionData</span>) -&gt; <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">permissions</span>.<span class="ident">push</span>(<span class="ident">permission</span>);
         <span class="self">self</span>
     }
 
     <span class="doccomment">/// Sets permissions for the application command.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_permissions</span>(
-        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
+        <span class="kw-2">mut</span> <span class="self">self</span>,
         <span class="ident">permissions</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">CreateApplicationCommandPermissionData</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
+    ) -&gt; <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">permissions</span> <span class="op">=</span> <span class="ident">permissions</span>;
         <span class="self">self</span>
     }
@@ -338,6 +339,7 @@
 <span class="doccomment">///</span>
 <span class="doccomment">/// [`CommandPermissionData`]: crate::model::application::command::CommandPermissionData</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Default</span>, <span class="ident">Serialize</span>)]</span>
+<span class="attribute">#[<span class="ident">must_use</span>]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">CreateApplicationCommandPermissionData</span> {
     <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename</span> <span class="op">=</span> <span class="string">&quot;type&quot;</span>)]</span>
     <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;Option::is_none&quot;</span>)]</span>
@@ -352,7 +354,7 @@
     <span class="doccomment">/// Sets the `CommandPermissionType` for the [`CommandPermissionData`].</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// [`CommandPermissionData`]: crate::model::application::command::CommandPermissionData</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">kind</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">kind</span>: <span class="ident">CommandPermissionType</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">kind</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">kind</span>: <span class="ident">CommandPermissionType</span>) -&gt; <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">kind</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">kind</span>);
         <span class="self">self</span>
     }
@@ -360,18 +362,18 @@
     <span class="doccomment">/// Sets the CommandPermissionId for the [`CommandPermissionData`].</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// [`CommandPermissionData`]: crate::model::application::command::CommandPermissionData</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">id</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">id</span>: <span class="ident">u64</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">id</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">id</span>: <span class="ident">u64</span>) -&gt; <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">id</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">id</span>.<span class="ident">to_string</span>());
         <span class="self">self</span>
     }
 
     <span class="doccomment">/// Sets the permission for the [`CommandPermissionData`].</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// **Note**: Setting it to `false` will only grey the application command in the</span>
-    <span class="doccomment">/// list, it will not fully hide it to the user.</span>
+    <span class="doccomment">/// **Note**: Passing `false` will only grey-out the application command in the list, and will</span>
+    <span class="doccomment">/// not fully hide it from the user.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// [`CommandPermissionData`]: crate::model::application::command::CommandPermissionData</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">permission</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">permission</span>: <span class="ident">bool</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">permission</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">permission</span>: <span class="ident">bool</span>) -&gt; <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">permission</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">permission</span>);
         <span class="self">self</span>
     }
