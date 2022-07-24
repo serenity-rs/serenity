@@ -153,7 +153,7 @@ pub struct SelectMenu {
     #[serde(default)]
     pub options: Vec<SelectMenuOption>,
     /// The result location for modals
-    pub values: Vec<String>,
+    pub values: Option<Vec<String>>,
 }
 
 /// A select menu component options.
