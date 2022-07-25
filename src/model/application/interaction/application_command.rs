@@ -125,7 +125,7 @@ impl ApplicationCommandInteraction {
     /// Returns an [`Error::Model`] if the message content is too long. May also return an
     /// [`Error::Http`] if the API returns an error, or an [`Error::Json`] if there is an error in
     /// deserializing the API response.
-    pub async fn edit_original_interaction_response<F>(
+    pub async fn edit_original_interaction_response(
         &self,
         http: impl AsRef<Http>,
         builder: EditInteractionResponse,
