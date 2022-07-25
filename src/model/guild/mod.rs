@@ -660,7 +660,7 @@ impl Guild {
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// # let http = Http::new("token");
     /// # let guild = Guild::get(&http, GuildId::new(7)).await?;
-    /// let builder = CreateChannel::default().name("my-test-channel").kind(ChannelType::Text);
+    /// let builder = CreateChannel::new("my-test-channel").kind(ChannelType::Text);
     ///
     /// // assuming a `guild` has already been bound
     /// let _channel = guild.create_channel(&http, builder).await?;

@@ -317,7 +317,7 @@ impl GuildId {
     ///
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// # let http = Http::new("token");
-    /// let builder = CreateChannel::default().name("test").kind(ChannelType::Voice);
+    /// let builder = CreateChannel::new("test").kind(ChannelType::Voice);
     /// let _channel = GuildId::new(7).create_channel(&http, builder).await?;
     /// # Ok(())
     /// # }
