@@ -11,17 +11,31 @@ use crate::model::prelude::*;
 /// - [`PartialGuild::create_sticker`]
 /// - [`Guild::create_sticker`]
 /// - [`GuildId::create_sticker`]
-#[derive(Clone, Debug, Default)]
+#[derive(Clone, Debug)]
 #[must_use]
 pub struct CreateSticker<'a> {
-    name: Option<String>,
-    tags: Option<String>,
-    description: Option<String>,
-
-    file: Option<AttachmentType<'a>>,
+    name: String,
+    tags: String,
+    description: String,
+    file: AttachmentType<'a>,
 }
 
 impl<'a> CreateSticker<'a> {
+    /// Creates a new builder with the given data. All of this builder's fields are required.
+    pub fn new(
+        name: impl Into<String>,
+        tags: impl Into<String>,
+        description: impl Into<String>,
+        file: impl Into<AttachmentType<'a>>,
+    ) -> Self {
+        Self {
+            name: name.into(),
+            tags: tags.into(),
+            description: description.into(),
+            file: file.into(),
+        }
+    }
+
     /// Creates a new sticker in the guild with the data set, if any.
     ///
     /// **Note**: Requires the [Manage Emojis and Stickers] permission.
@@ -48,51 +62,44 @@ impl<'a> CreateSticker<'a> {
 
     #[cfg(feature = "http")]
     async fn _execute(self, http: &Http, guild_id: GuildId) -> Result<Sticker> {
-        let file = self.file.ok_or(Error::Model(ModelError::NoStickerFileSet))?;
-
         let mut map = Vec::with_capacity(3);
-        if let Some(name) = self.name {
-            map.push(("name".to_string(), name));
-        }
-        if let Some(tags) = self.tags {
-            map.push(("tags".to_string(), tags));
-        }
-        if let Some(description) = self.description {
-            map.push(("description".to_string(), description));
-        }
+        map.push(("name".to_string(), self.name));
+        map.push(("tags".to_string(), self.tags));
+        map.push(("description".to_string(), self.description));
 
-        http.create_sticker(guild_id.into(), map, file, None).await
+        http.create_sticker(guild_id.into(), map, self.file, None).await
     }
 
-    /// The name of the sticker to set.
+    /// Set the name of the sticker, replacing the current value as set in [`Self::new`].
     ///
     /// **Note**: Must be between 2 and 30 characters long.
     pub fn name(mut self, name: impl Into<String>) -> Self {
-        self.name = Some(name.into());
+        self.name = name.into();
         self
     }
 
-    /// The description of the sticker.
+    /// Set the description of the sticker, replacing the current value as set in [`Self::new`].
     ///
     /// **Note**: If not empty, must be between 2 and 100 characters long.
     pub fn description(mut self, description: impl Into<String>) -> Self {
-        self.description = Some(description.into());
+        self.description = description.into();
         self
     }
 
-    /// The Discord name of a unicode emoji representing the sticker's expression.
+    /// The Discord name of a unicode emoji representing the sticker's expression. Replaces teh
+    /// current value as set in [`Self::new`].
     ///
     /// **Note**: Must be between 2 and 200 characters long.
     pub fn tags(mut self, tags: impl Into<String>) -> Self {
-        self.tags = Some(tags.into());
+        self.tags = tags.into();
         self
     }
 
-    /// The sticker file.
+    /// Set the sticker file. Replaces the current value as set in [`Self::new`].
     ///
     /// **Note**: Must be a PNG, APNG, or Lottie JSON file, max 500 KB.
-    pub fn file<T: Into<AttachmentType<'a>>>(mut self, file: T) -> Self {
-        self.file = Some(file.into());
+    pub fn file(mut self, file: impl Into<AttachmentType<'a>>) -> Self {
+        self.file = file.into();
         self
     }
 }
