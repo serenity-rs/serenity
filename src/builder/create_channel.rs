@@ -49,17 +49,8 @@ impl CreateChannel {
         guild_id: GuildId,
     ) -> Result<GuildChannel> {
         #[cfg(feature = "cache")]
-        {
-            if let Some(cache) = cache_http.cache() {
-                if let Some(guild) = cache.guild(guild_id) {
-                    let req = Permissions::MANAGE_CHANNELS;
-
-                    if !guild.has_perms(&cache_http, req).await {
-                        return Err(Error::Model(ModelError::InvalidPermissions(req)));
-                    }
-                }
-            }
-        }
+        crate::utils::user_has_guild_perms(&cache_http, guild_id, Permissions::MANAGE_CHANNELS)
+            .await?;
 
         self._execute(cache_http.http(), guild_id).await
     }
