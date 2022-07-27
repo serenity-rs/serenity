@@ -113,6 +113,20 @@ cfg_if::cfg_if! {
                 f.write_str(&s)
             }
         }
+
+        impl std::ops::Deref for Timestamp {
+            type Target = DateTime<Utc>;
+
+            fn deref(&self) -> &Self::Target {
+                &self.0
+            }
+        }
+
+        impl<Tz: TimeZone> From<DateTime<Tz>> for Timestamp {
+            fn from(dt: DateTime<Tz>) -> Self {
+                Self(dt.with_timezone(&Utc))
+            }
+        }
     } else {
         use dep_time::format_description::well_known::Rfc3339;
         use dep_time::serde::rfc3339;
@@ -196,11 +210,7 @@ cfg_if::cfg_if! {
                 f.write_str(&s)
             }
         }
-    }
-}
 
-cfg_if::cfg_if! {
-    if #[cfg(feature = "time")] {
         impl std::ops::Deref for Timestamp {
             type Target = OffsetDateTime;
 
@@ -212,20 +222,6 @@ cfg_if::cfg_if! {
         impl From<OffsetDateTime> for Timestamp {
             fn from(dt: OffsetDateTime) -> Self {
                 Self(dt)
-            }
-        }
-    } else if #[cfg(feature = "chrono")] {
-        impl std::ops::Deref for Timestamp {
-            type Target = DateTime<Utc>;
-
-            fn deref(&self) -> &Self::Target {
-                &self.0
-            }
-        }
-
-        impl<Tz: TimeZone> From<DateTime<Tz>> for Timestamp {
-            fn from(dt: DateTime<Tz>) -> Self {
-                Self(dt.with_timezone(&Utc))
             }
         }
     }
