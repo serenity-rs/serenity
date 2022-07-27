@@ -36,6 +36,8 @@ use base64::Engine as _;
 
 #[cfg(all(feature = "cache", feature = "model"))]
 use crate::cache::Cache;
+#[cfg(all(feature = "cache", feature = "model"))]
+use crate::http::CacheHttp;
 use crate::internal::prelude::*;
 use crate::model::prelude::*;
 
@@ -456,6 +458,25 @@ pub fn parse_webhook(url: &Url) -> Option<(u64, &str)> {
         return None;
     }
     Some((webhook_id.parse().ok()?, token))
+}
+
+#[cfg(all(feature = "cache", feature = "model"))]
+pub(crate) async fn user_has_guild_perms(
+    cache_http: impl CacheHttp,
+    guild_id: GuildId,
+    permissions: Permissions,
+) -> Result<()> {
+    if let Some(cache) = cache_http.cache() {
+        // Unfortunately have to clone the guild because CacheRef is not `Send` and
+        // `Guild::has_perms` is an async fn, but we want the returned Future to be `Send`.
+        let lookup = cache.guild(guild_id).as_deref().cloned();
+        if let Some(guild) = lookup {
+            if !guild.has_perms(&cache_http, permissions).await {
+                return Err(Error::Model(ModelError::InvalidPermissions(permissions)));
+            }
+        }
+    }
+    Ok(())
 }
 
 /// Tries to find a user's permissions using the cache.
