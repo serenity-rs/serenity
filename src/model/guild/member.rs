@@ -403,7 +403,6 @@ impl Member {
             }
         }
 
-
         self.guild_id.kick_with_reason(cache_http.http(), self.user.id, reason).await
     }
 
