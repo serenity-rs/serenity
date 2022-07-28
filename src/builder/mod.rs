@@ -54,7 +54,6 @@ pub use self::create_allowed_mentions::{CreateAllowedMentions, ParseValue};
 pub use self::create_application_command::{
     CreateApplicationCommand,
     CreateApplicationCommandOption,
-    CreateApplicationCommands,
 };
 pub use self::create_application_command_permission::{
     CreateApplicationCommandPermissionData,

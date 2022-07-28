@@ -8,7 +8,6 @@ use crate::builder::{
     AddMember,
     CreateApplicationCommand,
     CreateApplicationCommandPermissionsData,
-    CreateApplicationCommands,
     CreateApplicationCommandsPermissions,
     CreateChannel,
     CreateScheduledEvent,
@@ -1435,13 +1434,13 @@ impl GuildId {
     ///
     /// # Errors
     ///
-    /// See [`CreateApplicationCommands::execute`] for a list of possible errors.
+    /// Returns the same errors as [`Self::create_application_command`].
     pub async fn set_application_commands(
         self,
         http: impl AsRef<Http>,
-        builder: CreateApplicationCommands,
+        commands: Vec<CreateApplicationCommand>,
     ) -> Result<Vec<Command>> {
-        builder.execute(http, Some(self)).await
+        http.as_ref().create_guild_application_commands(self.get(), &commands).await
     }
 
     /// Create a guild specific [`CommandPermission`].
