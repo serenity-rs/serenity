@@ -8,7 +8,6 @@ use crate::builder::{
     AddMember,
     CreateApplicationCommand,
     CreateApplicationCommandPermissionsData,
-    CreateApplicationCommandsPermissions,
     CreateChannel,
     CreateScheduledEvent,
     CreateSticker,
@@ -1457,19 +1456,6 @@ impl GuildId {
         builder: CreateApplicationCommandPermissionsData,
     ) -> Result<CommandPermission> {
         builder.execute(http, self, command_id).await
-    }
-
-    /// Override permissions for all guild application commands.
-    ///
-    /// # Errors
-    ///
-    /// See [`CreateApplicationCommandsPermissions::execute`] for a list of possible errors.
-    pub async fn set_application_commands_permissions(
-        self,
-        http: impl AsRef<Http>,
-        builder: CreateApplicationCommandsPermissions,
-    ) -> Result<Vec<CommandPermission>> {
-        builder.execute(http, self).await
     }
 
     /// Get all guild application commands.

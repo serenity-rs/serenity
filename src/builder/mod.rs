@@ -57,9 +57,7 @@ pub use self::create_application_command::{
 };
 pub use self::create_application_command_permission::{
     CreateApplicationCommandPermissionData,
-    CreateApplicationCommandPermissions,
     CreateApplicationCommandPermissionsData,
-    CreateApplicationCommandsPermissions,
 };
 pub use self::create_channel::CreateChannel;
 pub use self::create_components::{

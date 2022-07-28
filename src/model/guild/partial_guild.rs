@@ -6,7 +6,6 @@ use tracing::{error, warn};
 use crate::builder::{
     CreateApplicationCommand,
     CreateApplicationCommandPermissionsData,
-    CreateApplicationCommandsPermissions,
     CreateChannel,
     CreateSticker,
     EditAutoModRule,
@@ -498,19 +497,6 @@ impl PartialGuild {
         builder: CreateApplicationCommandPermissionsData,
     ) -> Result<CommandPermission> {
         self.id.create_application_command_permission(http, command_id, builder).await
-    }
-
-    /// Override permissions for all guild application commands.
-    ///
-    /// # Errors
-    ///
-    /// See [`CreateApplicationCommandsPermissions::execute`] for a list of possible errors.
-    pub async fn set_application_commands_permissions(
-        &self,
-        http: impl AsRef<Http>,
-        builder: CreateApplicationCommandsPermissions,
-    ) -> Result<Vec<CommandPermission>> {
-        self.id.set_application_commands_permissions(http, builder).await
     }
 
     /// Get all guild application commands.
