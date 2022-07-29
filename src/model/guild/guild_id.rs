@@ -1583,6 +1583,7 @@ impl GuildId {
     /// # Errors
     ///
     /// If there is an error, it will be either [`Error::Http`] or [`Error::Json`].
+    #[deprecated(note = "use `create_appliction_command_permission`.")]
     pub async fn set_application_commands_permissions<F>(
         &self,
         http: impl AsRef<Http>,
