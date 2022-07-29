@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file.
 This project mostly adheres to [Semantic Versioning][semver].
 
+## [0.11.5] - 2022-07-29
+
+Thanks to the following for their contributions:
+
+- [@bumblepie]
+
+### Notable changes
+
+- Make select menu values optional to fix deserialization of message component interactions ([@bumblepie])
+
 ## [0.11.4] - 2022-07-19
 
 Thanks to the following for their contributions:
@@ -4813,6 +4823,7 @@ Initial commit.
 
 <!-- COMPARISONS -->
 
+[0.11.5]: https://github.com/serenity-rs/serenity/compare/v0.11.4...v0.11.5
 [0.11.4]: https://github.com/serenity-rs/serenity/compare/v0.11.3...v0.11.4
 [0.11.3]: https://github.com/serenity-rs/serenity/compare/v0.11.2...v0.11.3
 [0.11.2]: https://github.com/serenity-rs/serenity/compare/v0.11.1...v0.11.2
