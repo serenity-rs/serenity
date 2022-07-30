@@ -181,10 +181,7 @@ pub struct CurrentUser {
     pub verified: Option<bool>,
     pub public_flags: Option<UserPublicFlags>,
     pub banner: Option<String>,
-    #[cfg(feature = "utils")]
     pub accent_colour: Option<Colour>,
-    #[cfg(not(feature = "utils"))]
-    pub accent_colour: Option<u32>,
 }
 
 #[cfg(feature = "model")]
@@ -643,12 +640,8 @@ pub struct User {
     ///
     /// **Note**: This will only be present if the user is fetched via Rest API,
     /// e.g. with [`Http::get_user`].
-    #[cfg(feature = "utils")]
     #[serde(rename = "accent_color")]
     pub accent_colour: Option<Colour>,
-    #[cfg(not(feature = "utils"))]
-    #[serde(rename = "accent_color")]
-    pub accent_colour: Option<u32>,
 }
 
 bitflags! {

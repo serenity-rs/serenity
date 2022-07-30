@@ -1,6 +1,4 @@
-use crate::model::Timestamp;
-#[cfg(feature = "utils")]
-use crate::utils::Colour;
+use crate::model::{Colour, Timestamp};
 
 /// Represents a rich embed which allows using richer markdown, multiple fields
 /// and more. This was heavily inspired by [slack's attachments].
@@ -20,13 +18,8 @@ pub struct Embed {
     /// Information about the author of the embed.
     pub author: Option<EmbedAuthor>,
     /// The colour code of the embed.
-    #[cfg(feature = "utils")]
     #[serde(rename = "color")]
     pub colour: Option<Colour>,
-    /// The colour code of the embed.
-    #[cfg(not(feature = "utils"))]
-    #[serde(default, rename = "color")]
-    pub colour: u32,
     /// The description of the embed.
     ///
     /// The maximum value for this field is 2048 unicode codepoints.
