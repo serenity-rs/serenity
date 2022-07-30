@@ -31,15 +31,9 @@ pub struct Role {
     pub id: RoleId,
     /// The Id of the Guild the Role is in.
     pub guild_id: GuildId,
-    /// The colour of the role. This is an ergonomic representation of the inner
-    /// value.
-    #[cfg(feature = "utils")]
+    /// The colour of the role.
     #[serde(rename = "color")]
     pub colour: Colour,
-    /// The colour of the role.
-    #[cfg(not(feature = "utils"))]
-    #[serde(rename = "color")]
-    pub colour: u32,
     /// Indicator of whether the role is pinned above lesser roles.
     ///
     /// In the client, this causes [`Member`]s in the role to be seen above
@@ -90,12 +84,8 @@ pub(crate) struct InterimRole {
     pub id: RoleId,
     #[serde(default)]
     pub guild_id: Option<GuildId>,
-    #[cfg(feature = "utils")]
     #[serde(rename = "color")]
     pub colour: Colour,
-    #[cfg(not(feature = "utils"))]
-    #[serde(rename = "color")]
-    pub colour: u32,
     pub hoist: bool,
     pub managed: bool,
     #[serde(default)]
