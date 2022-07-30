@@ -3,11 +3,7 @@ mod commands;
 use std::env;
 
 use serenity::async_trait;
-use serenity::builder::{
-    CreateApplicationCommands as CreateCommands,
-    CreateInteractionResponse,
-    CreateInteractionResponseData,
-};
+use serenity::builder::{CreateInteractionResponse, CreateInteractionResponseData};
 use serenity::model::application::command::Command;
 use serenity::model::application::interaction::{Interaction, InteractionResponseType};
 use serenity::model::gateway::Ready;
@@ -50,15 +46,13 @@ impl EventHandler for Handler {
         );
 
         let commands = guild_id
-            .set_application_commands(
-                &ctx.http,
-                CreateCommands::default()
-                    .add_application_command(commands::ping::register())
-                    .add_application_command(commands::id::register())
-                    .add_application_command(commands::welcome::register())
-                    .add_application_command(commands::numberinput::register())
-                    .add_application_command(commands::attachmentinput::register()),
-            )
+            .set_application_commands(&ctx.http, vec![
+                commands::ping::register(),
+                commands::id::register(),
+                commands::welcome::register(),
+                commands::numberinput::register(),
+                commands::attachmentinput::register(),
+            ])
             .await;
 
         println!("I now have the following guild slash commands: {:#?}", commands);
