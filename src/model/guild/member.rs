@@ -390,7 +390,8 @@ impl Member {
         #[cfg(feature = "cache")]
         {
             if let Some(cache) = cache_http.cache() {
-                if let Some(guild) = cache.guilds.get(&self.guild_id) {
+                let lookup = cache.guild(self.guild_id).as_deref().cloned();
+                if let Some(guild) = lookup {
                     let req = Permissions::KICK_MEMBERS;
 
                     if !guild.has_perms(&cache_http, req).await {
