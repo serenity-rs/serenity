@@ -202,7 +202,6 @@ mentionable!(value:
 #[cfg(test)]
 mod test {
     use crate::model::prelude::*;
-    use crate::utils::Colour;
 
     #[test]
     fn test_mention() {
