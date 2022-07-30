@@ -45,7 +45,7 @@ use crate::utils::encode_image;
 pub struct EditRole {
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "color")]
-    colour: Option<u32>,
+    colour: Option<Colour>,
     #[serde(skip_serializing_if = "Option::is_none")]
     hoist: Option<bool>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -107,33 +107,21 @@ impl EditRole {
 
     /// Creates a new builder with the values of the given [`Role`].
     pub fn new(role: &Role) -> Self {
-        let colour;
-
-        #[cfg(feature = "utils")]
-        {
-            colour = role.colour.0;
-        }
-
-        #[cfg(not(feature = "utils"))]
-        {
-            colour = role.colour;
-        }
-
         EditRole {
             hoist: Some(role.hoist),
             mentionable: Some(role.mentionable),
             name: Some(role.name.clone()),
             permissions: Some(role.permissions.bits()),
             position: Some(role.position),
-            colour: Some(colour),
+            colour: Some(role.colour),
             unicode_emoji: role.unicode_emoji.clone(),
             icon: role.icon.clone(),
         }
     }
 
     /// Set the colour of the role.
-    pub fn colour(mut self, colour: u32) -> Self {
-        self.colour = Some(colour);
+    pub fn colour(mut self, colour: impl Into<Colour>) -> Self {
+        self.colour = Some(colour.into());
         self
     }
 
