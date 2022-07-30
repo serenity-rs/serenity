@@ -4,7 +4,6 @@ use serenity::async_trait;
 use serenity::builder::{
     CreateApplicationCommand as CreateCommand,
     CreateApplicationCommandOption as CreateOption,
-    CreateApplicationCommands as CreateCommands,
     CreateInteractionResponse,
     CreateInteractionResponseData,
 };
@@ -75,107 +74,94 @@ impl EventHandler for Handler {
                 .expect("GUILD_ID must be an integer"),
         );
 
-        let commands = guild_id
-            .set_application_commands(
-                &ctx.http,
-                CreateCommands::default()
-                    .add_application_command(
-                        CreateCommand::default().name("ping").description("A ping command"),
-                    )
-                    .add_application_command(
-                        CreateCommand::default()
-                            .name("id")
-                            .description("Get a user id")
-                            .add_option(
-                                CreateOption::default()
-                                    .name("id")
-                                    .description("The user to lookup")
-                                    .kind(CommandOptionType::User)
-                                    .required(true),
-                            ),
-                    )
-                    .add_application_command(
-                        CreateCommand::default()
-                            .name("welcome")
-                            .name_localized("de", "begrüßen")
-                            .description("Welcome a user")
-                            .description_localized("de", "Einen Nutzer begrüßen")
-                            .add_option(
-                                CreateOption::default()
-                                    .name("user")
-                                    .name_localized("de", "nutzer")
-                                    .description("The user to welcome")
-                                    .description_localized("de", "Der zu begrüßende Nutzer")
-                                    .kind(CommandOptionType::User)
-                                    .required(true),
-                            )
-                            .add_option(
-                                CreateOption::default()
-                                    .name("message")
-                                    .name_localized("de", "nachricht")
-                                    .description("The message to send")
-                                    .description_localized("de", "Die versendete Nachricht")
-                                    .kind(CommandOptionType::String)
-                                    .required(true)
-                                    .add_string_choice_localized(
-                                        "Welcome to our cool server! Ask me if you need help",
-                                        "pizza",
-                                        [("de", "Willkommen auf unserem coolen Server! Frag mich, falls du Hilfe brauchst")],
-                                    )
-                                    .add_string_choice_localized(
-                                        "Hey, do you want a coffee?",
-                                        "coffee",
-                                        [("de", "Hey, willst du einen Kaffee?")]
-                                    )
-                                    .add_string_choice_localized(
-                                        "Welcome to the club, you're now a good person. Well, I hope.",
-                                        "club",
-                                        [("de", "Willkommen im Club, du bist jetzt ein guter Mensch. Naja, hoffentlich.")],
-                                    )
-                                    .add_string_choice_localized(
-                                        "I hope that you brought a controller to play together!",
-                                        "game",
-                                        [("de", "Ich hoffe du hast einen Controller zum Spielen mitgebracht!")],
-                                    ),
-                            ),
-                    )
-                    .add_application_command(
-                        CreateCommand::default()
-                            .name("numberinput")
-                            .description("Test command for number input")
-                            .add_option(
-                                CreateOption::default()
-                                    .name("int")
-                                    .description("An integer from 5 to 10")
-                                    .kind(CommandOptionType::Integer)
-                                    .min_int_value(5)
-                                    .max_int_value(10)
-                                    .required(true),
-                            )
-                            .add_option(
-                                CreateOption::default()
-                                    .name("number")
-                                    .description("A float from -3.3 to 234.5")
-                                    .kind(CommandOptionType::Number)
-                                    .min_number_value(-3.3)
-                                    .max_number_value(234.5)
-                                    .required(true),
-                            ),
-                    )
-                    .add_application_command(
-                        CreateCommand::default()
-                            .name("attachmentinput")
-                            .description("Test command for attachment input")
-                            .add_option(
-                                CreateOption::default()
-                                    .name("attachment")
-                                    .description("A file")
-                                    .kind(CommandOptionType::Attachment)
-                                    .required(true),
-                            ),
-                    ),
+        let c1 = CreateCommand::default().name("ping").description("A ping command");
+
+        let c2 = CreateCommand::default().name("id").description("Get a user id").add_option(
+            CreateOption::default()
+                .name("id")
+                .description("The user to lookup")
+                .kind(CommandOptionType::User)
+                .required(true),
+        );
+
+        let c3 = CreateCommand::default()
+            .name("welcome")
+            .name_localized("de", "begrüßen")
+            .description("Welcome a user")
+            .description_localized("de", "Einen Nutzer begrüßen")
+            .add_option(
+                CreateOption::default()
+                    .name("user")
+                    .name_localized("de", "nutzer")
+                    .description("The user to welcome")
+                    .description_localized("de", "Der zu begrüßende Nutzer")
+                    .kind(CommandOptionType::User)
+                    .required(true),
             )
-            .await;
+            .add_option(
+                CreateOption::default()
+                    .name("message")
+                    .name_localized("de", "nachricht")
+                    .description("The message to send")
+                    .description_localized("de", "Die versendete Nachricht")
+                    .kind(CommandOptionType::String)
+                    .required(true)
+                    .add_string_choice_localized(
+                        "Welcome to our cool server! Ask me if you need help",
+                        "pizza",
+                        [("de", "Willkommen auf unserem coolen Server! Frag mich, falls du Hilfe brauchst")],
+                    )
+                    .add_string_choice_localized(
+                        "Hey, do you want a coffee?",
+                        "coffee",
+                        [("de", "Hey, willst du einen Kaffee?")]
+                    )
+                    .add_string_choice_localized(
+                        "Welcome to the club, you're now a good person. Well, I hope.",
+                        "club",
+                        [("de", "Willkommen im Club, du bist jetzt ein guter Mensch. Naja, hoffentlich.")],
+                    )
+                    .add_string_choice_localized(
+                        "I hope that you brought a controller to play together!",
+                        "game",
+                        [("de", "Ich hoffe du hast einen Controller zum Spielen mitgebracht!")],
+                    ),
+            );
+
+        let c4 = CreateCommand::default()
+            .name("numberinput")
+            .description("Test command for number input")
+            .add_option(
+                CreateOption::default()
+                    .name("int")
+                    .description("An integer from 5 to 10")
+                    .kind(CommandOptionType::Integer)
+                    .min_int_value(5)
+                    .max_int_value(10)
+                    .required(true),
+            )
+            .add_option(
+                CreateOption::default()
+                    .name("number")
+                    .description("A float from -3.3 to 234.5")
+                    .kind(CommandOptionType::Number)
+                    .min_number_value(-3.3)
+                    .max_number_value(234.5)
+                    .required(true),
+            );
+
+        let c5 = CreateCommand::default()
+            .name("attachmentinput")
+            .description("Test command for attachment input")
+            .add_option(
+                CreateOption::default()
+                    .name("attachment")
+                    .description("A file")
+                    .kind(CommandOptionType::Attachment)
+                    .required(true),
+            );
+
+        let commands = guild_id.set_application_commands(&ctx.http, vec![c1, c2, c3, c4, c5]).await;
 
         println!("I now have the following guild slash commands: {:#?}", commands);
 
