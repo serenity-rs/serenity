@@ -17,7 +17,7 @@ use crate::model::prelude::*;
 /// use serenity::builder::{CreateEmbed, ExecuteWebhook};
 /// use serenity::http::Http;
 /// use serenity::model::webhook::Webhook;
-/// use serenity::utils::Colour;
+/// use serenity::model::colour::Colour;
 ///
 /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
 /// # let http = Http::new("token");

@@ -34,7 +34,7 @@
 /// #     "position": 7,
 /// # })).unwrap();
 /// #
-/// use serenity::utils::Colour;
+/// use serenity::model::colour::Colour;
 ///
 /// // assuming a `role` has already been bound
 ///
@@ -47,7 +47,7 @@
 /// Creating an instance with the [`Self::DARK_TEAL`] preset:
 ///
 /// ```rust
-/// use serenity::utils::Colour;
+/// use serenity::model::colour::Colour;
 ///
 /// let colour = Colour::DARK_TEAL;
 ///
@@ -57,7 +57,7 @@
 /// Colours can also be directly compared for equivalence:
 ///
 /// ```rust
-/// use serenity::utils::Colour;
+/// use serenity::model::colour::Colour;
 ///
 /// let blitz_blue = Colour::BLITZ_BLUE;
 /// let fooyoo = Colour::FOOYOO;
@@ -80,7 +80,7 @@ impl Colour {
     /// to a specific RGB value, retrieved via [`Self::tuple`]:
     ///
     /// ```rust
-    /// use serenity::utils::Colour;
+    /// use serenity::model::colour::Colour;
     ///
     /// let colour = Colour::new(6573123);
     ///
@@ -100,7 +100,7 @@ impl Colour {
     /// Creating a [`Colour`] via its RGB values will set its inner u32 correctly:
     ///
     /// ```rust
-    /// use serenity::utils::Colour;
+    /// use serenity::model::colour::Colour;
     ///
     /// assert!(Colour::from_rgb(255, 0, 0).0 == 0xFF0000);
     /// assert!(Colour::from_rgb(217, 23, 211).0 == 0xD917D3);
@@ -109,7 +109,7 @@ impl Colour {
     /// And you can then retrieve those same RGB values via its methods:
     ///
     /// ```rust
-    /// use serenity::utils::Colour;
+    /// use serenity::model::colour::Colour;
     ///
     /// let colour = Colour::from_rgb(217, 45, 215);
     ///
@@ -131,7 +131,7 @@ impl Colour {
     /// # Examples
     ///
     /// ```rust
-    /// use serenity::utils::Colour;
+    /// use serenity::model::colour::Colour;
     ///
     /// assert_eq!(Colour::new(6573123).r(), 100);
     /// ```
@@ -145,7 +145,7 @@ impl Colour {
     /// # Examples
     ///
     /// ```rust
-    /// use serenity::utils::Colour;
+    /// use serenity::model::colour::Colour;
     ///
     /// assert_eq!(Colour::new(6573123).g(), 76);
     /// ```
@@ -159,7 +159,7 @@ impl Colour {
     /// # Examples
     ///
     /// ```rust
-    /// use serenity::utils::Colour;
+    /// use serenity::model::colour::Colour;
     ///
     /// assert_eq!(Colour::new(6573123).b(), 67);
     /// ```
@@ -176,7 +176,7 @@ impl Colour {
     /// # Examples
     ///
     /// ```rust
-    /// use serenity::utils::Colour;
+    /// use serenity::model::colour::Colour;
     ///
     /// assert_eq!(Colour::new(6573123).tuple(), (100, 76, 67));
     /// ```
@@ -193,7 +193,7 @@ impl Colour {
     /// # Examples
     ///
     /// ```rust
-    /// use serenity::utils::Colour;
+    /// use serenity::model::colour::Colour;
     ///
     /// assert_eq!(Colour::new(6573123).hex(), "644C43");
     /// ```
@@ -213,7 +213,7 @@ impl From<i32> for Colour {
     /// # Examples
     ///
     /// ```rust
-    /// use serenity::utils::Colour;
+    /// use serenity::model::colour::Colour;
     ///
     /// assert_eq!(Colour::from(0xDEA584).tuple(), (222, 165, 132));
     /// ```
@@ -230,7 +230,7 @@ impl From<u32> for Colour {
     /// # Examples
     ///
     /// ```rust
-    /// use serenity::utils::Colour;
+    /// use serenity::model::colour::Colour;
     ///
     /// assert_eq!(Colour::from(6573123u32).r(), 100);
     /// ```
@@ -247,7 +247,7 @@ impl From<u64> for Colour {
     /// # Examples
     ///
     /// ```rust
-    /// use serenity::utils::Colour;
+    /// use serenity::model::colour::Colour;
     ///
     /// assert_eq!(Colour::from(6573123u64).r(), 100);
     /// ```
@@ -332,7 +332,7 @@ impl Default for Colour {
 /// Colour constants used by Discord for their branding, role colour palette, etc.
 pub mod colours {
     pub mod branding {
-        use crate::utils::Colour;
+        use super::super::Colour;
 
         /// Creates a new [`Colour`], setting its value to `rgb(88, 101, 242)`.
         pub const BLURPLE: Colour = Colour(0x5865F2);
@@ -350,7 +350,7 @@ pub mod colours {
         pub const BLACK: Colour = Colour(0x23272A);
     }
     pub mod css {
-        use crate::utils::Colour;
+        use super::super::Colour;
 
         /// Creates a new [`Colour`], setting its value to `hsl(139, 47.3%, 43.9%)`.
         pub const POSITIVE: Colour = Colour(0x3BA55D);
@@ -360,7 +360,7 @@ pub mod colours {
         pub const DANGER: Colour = Colour(0xED4245);
     }
     pub mod roles {
-        use crate::utils::Colour;
+        use super::super::Colour;
 
         /// Creates a new [`Colour`], setting its value to `rgb(153, 170, 181)`.
         pub const DEFAULT: Colour = Colour(0x99AAB5);
