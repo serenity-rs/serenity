@@ -3,7 +3,7 @@ use std::collections::HashMap;
 use serde::{Deserialize, Serialize};
 
 #[cfg(feature = "http")]
-use crate::builder::{CreateApplicationCommand, CreateApplicationCommands};
+use crate::builder::CreateApplicationCommand;
 #[cfg(feature = "http")]
 use crate::http::Http;
 #[cfg(feature = "http")]
@@ -156,12 +156,12 @@ impl Command {
     ///
     /// # Errors
     ///
-    /// See [`CreateApplicationCommands::execute`] for a list of possible errors.
+    /// Returns the same errors as [`Self::create_global_application_command`].
     pub async fn set_global_application_commands(
         http: impl AsRef<Http>,
-        builder: CreateApplicationCommands,
+        commands: Vec<CreateApplicationCommand>,
     ) -> Result<Vec<Command>> {
-        builder.execute(http, None).await
+        http.as_ref().create_global_application_commands(&commands).await
     }
 
     /// Edit a global command, given its Id.
