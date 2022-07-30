@@ -82,8 +82,8 @@ use crate::{
     framework::standard::CommonOptions,
     http::CacheHttp,
     model::channel::Message,
+    model::colour::Colour,
     model::id::{ChannelId, UserId},
-    utils::Colour,
     Error,
 };
 
