@@ -275,11 +275,11 @@ mod tests {
 
     use super::*;
     use crate::model::channel::*;
+    use crate::model::colour::Colour;
     use crate::model::guild::*;
     use crate::model::id::{ChannelId, RoleId, UserId};
     use crate::model::user::User;
     use crate::model::{Permissions, Timestamp};
-    use crate::utils::Colour;
 
     #[test]
     fn test_content_safe() {

@@ -17,8 +17,6 @@
 #[cfg(feature = "http")]
 use crate::internal::prelude::*;
 use crate::model::prelude::*;
-#[cfg(feature = "utils")]
-use crate::utils::Colour;
 
 #[derive(Clone, Debug, Serialize)]
 struct HoldsUrl {
@@ -66,7 +64,7 @@ pub struct CreateEmbed {
     url: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "color")]
-    colour: Option<u32>,
+    colour: Option<Colour>,
 
     #[serde(rename = "type")]
     kind: &'static str,
@@ -94,28 +92,7 @@ impl CreateEmbed {
     #[cfg(feature = "utils")]
     #[inline]
     pub fn colour<C: Into<Colour>>(mut self, colour: C) -> Self {
-        self._colour(colour.into());
-        self
-    }
-
-    #[cfg(feature = "utils")]
-    fn _colour(&mut self, colour: Colour) {
-        self.colour = Some(colour.0);
-    }
-
-    /// Set the colour of the left-hand side of the embed.
-    ///
-    /// This is an alias of [`colour`].
-    #[cfg(not(feature = "utils"))]
-    #[inline]
-    pub fn color(self, colour: u32) -> Self {
-        self.colour(colour)
-    }
-
-    /// Set the colour of the left-hand side of the embed.
-    #[cfg(not(feature = "utils"))]
-    pub fn colour(mut self, colour: u32) -> Self {
-        self.colour = Some(colour);
+        self.colour = Some(colour.into());
         self
     }
 
@@ -482,7 +459,7 @@ mod test {
     use super::CreateEmbed;
     use crate::json::{json, to_value};
     use crate::model::channel::{Embed, EmbedField, EmbedFooter, EmbedImage, EmbedVideo};
-    use crate::utils::Colour;
+    use crate::model::colour::Colour;
 
     #[test]
     fn test_from_embed() {
