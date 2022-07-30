@@ -386,16 +386,6 @@
 <span id="380">380</span>
 <span id="381">381</span>
 <span id="382">382</span>
-<span id="383">383</span>
-<span id="384">384</span>
-<span id="385">385</span>
-<span id="386">386</span>
-<span id="387">387</span>
-<span id="388">388</span>
-<span id="389">389</span>
-<span id="390">390</span>
-<span id="391">391</span>
-<span id="392">392</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::cmp::Ordering</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;utils&quot;</span>))]</span>
 <span class="kw">use</span> <span class="ident">std::error::Error</span> <span class="kw">as</span> <span class="ident">StdError</span>;
@@ -429,15 +419,9 @@
     <span class="kw">pub</span> <span class="ident">id</span>: <span class="ident">RoleId</span>,
     <span class="doccomment">/// The Id of the Guild the Role is in.</span>
     <span class="kw">pub</span> <span class="ident">guild_id</span>: <span class="ident">GuildId</span>,
-    <span class="doccomment">/// The colour of the role. This is an ergonomic representation of the inner</span>
-    <span class="doccomment">/// value.</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;utils&quot;</span>)]</span>
+    <span class="doccomment">/// The colour of the role.</span>
     <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename</span> <span class="op">=</span> <span class="string">&quot;color&quot;</span>)]</span>
     <span class="kw">pub</span> <span class="ident">colour</span>: <span class="ident">Colour</span>,
-    <span class="doccomment">/// The colour of the role.</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;utils&quot;</span>))]</span>
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename</span> <span class="op">=</span> <span class="string">&quot;color&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">colour</span>: <span class="ident">u32</span>,
     <span class="doccomment">/// Indicator of whether the role is pinned above lesser roles.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// In the client, this causes [`Member`]s in the role to be seen above</span>
@@ -488,12 +472,8 @@
     <span class="kw">pub</span> <span class="ident">id</span>: <span class="ident">RoleId</span>,
     <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">default</span>)]</span>
     <span class="kw">pub</span> <span class="ident">guild_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">GuildId</span><span class="op">&gt;</span>,
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;utils&quot;</span>)]</span>
     <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename</span> <span class="op">=</span> <span class="string">&quot;color&quot;</span>)]</span>
     <span class="kw">pub</span> <span class="ident">colour</span>: <span class="ident">Colour</span>,
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;utils&quot;</span>))]</span>
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename</span> <span class="op">=</span> <span class="string">&quot;color&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">colour</span>: <span class="ident">u32</span>,
     <span class="kw">pub</span> <span class="ident">hoist</span>: <span class="ident">bool</span>,
     <span class="kw">pub</span> <span class="ident">managed</span>: <span class="ident">bool</span>,
     <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">default</span>)]</span>

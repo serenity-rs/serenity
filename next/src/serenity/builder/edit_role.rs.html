@@ -199,18 +199,6 @@
 <span id="193">193</span>
 <span id="194">194</span>
 <span id="195">195</span>
-<span id="196">196</span>
-<span id="197">197</span>
-<span id="198">198</span>
-<span id="199">199</span>
-<span id="200">200</span>
-<span id="201">201</span>
-<span id="202">202</span>
-<span id="203">203</span>
-<span id="204">204</span>
-<span id="205">205</span>
-<span id="206">206</span>
-<span id="207">207</span>
 </pre><pre class="rust"><code><span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http&quot;</span>)]</span>
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::http</span>::{<span class="ident">CacheHttp</span>, <span class="ident">Http</span>};
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http&quot;</span>)]</span>
@@ -258,7 +246,7 @@
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">EditRole</span> {
     <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;Option::is_none&quot;</span>)]</span>
     <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename</span> <span class="op">=</span> <span class="string">&quot;color&quot;</span>)]</span>
-    <span class="ident">colour</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
+    <span class="ident">colour</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Colour</span><span class="op">&gt;</span>,
     <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;Option::is_none&quot;</span>)]</span>
     <span class="ident">hoist</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span>,
     <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;Option::is_none&quot;</span>)]</span>
@@ -320,33 +308,21 @@
 
     <span class="doccomment">/// Creates a new builder with the values of the given [`Role`].</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">role</span>: <span class="kw-2">&amp;</span><span class="ident">Role</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw">let</span> <span class="ident">colour</span>;
-
-        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;utils&quot;</span>)]</span>
-        {
-            <span class="ident">colour</span> <span class="op">=</span> <span class="ident">role</span>.<span class="ident">colour</span>.<span class="number">0</span>;
-        }
-
-        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;utils&quot;</span>))]</span>
-        {
-            <span class="ident">colour</span> <span class="op">=</span> <span class="ident">role</span>.<span class="ident">colour</span>;
-        }
-
         <span class="ident">EditRole</span> {
             <span class="ident">hoist</span>: <span class="prelude-val">Some</span>(<span class="ident">role</span>.<span class="ident">hoist</span>),
             <span class="ident">mentionable</span>: <span class="prelude-val">Some</span>(<span class="ident">role</span>.<span class="ident">mentionable</span>),
             <span class="ident">name</span>: <span class="prelude-val">Some</span>(<span class="ident">role</span>.<span class="ident">name</span>.<span class="ident">clone</span>()),
             <span class="ident">permissions</span>: <span class="prelude-val">Some</span>(<span class="ident">role</span>.<span class="ident">permissions</span>.<span class="ident">bits</span>()),
             <span class="ident">position</span>: <span class="prelude-val">Some</span>(<span class="ident">role</span>.<span class="ident">position</span>),
-            <span class="ident">colour</span>: <span class="prelude-val">Some</span>(<span class="ident">colour</span>),
+            <span class="ident">colour</span>: <span class="prelude-val">Some</span>(<span class="ident">role</span>.<span class="ident">colour</span>),
             <span class="ident">unicode_emoji</span>: <span class="ident">role</span>.<span class="ident">unicode_emoji</span>.<span class="ident">clone</span>(),
             <span class="ident">icon</span>: <span class="ident">role</span>.<span class="ident">icon</span>.<span class="ident">clone</span>(),
         }
     }
 
     <span class="doccomment">/// Set the colour of the role.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">colour</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">colour</span>: <span class="ident">u32</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">colour</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">colour</span>);
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">colour</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">colour</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Colour</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
+        <span class="self">self</span>.<span class="ident">colour</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">colour</span>.<span class="ident">into</span>());
         <span class="self">self</span>
     }
 
