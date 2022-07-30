@@ -17,6 +17,7 @@ pub use super::application::interaction::{
 pub use super::application::oauth::*;
 pub use super::application::*;
 pub use super::channel::{MessageFlags, *};
+pub use super::colour::*;
 pub use super::connection::*;
 pub use super::event::*;
 pub use super::gateway::*;
