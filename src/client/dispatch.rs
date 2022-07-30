@@ -5,7 +5,7 @@ use std::sync::Arc;
 use futures::channel::mpsc::UnboundedSender as Sender;
 use futures::future::{BoxFuture, FutureExt};
 use tokio::sync::RwLock;
-use tracing::{instrument, warn};
+use tracing::{debug, instrument};
 use typemap_rev::TypeMap;
 
 #[cfg(feature = "gateway")]
@@ -697,7 +697,7 @@ async fn handle_event(
                 event_handler.typing_start(context, event).await;
             });
         },
-        Event::Unknown => warn!("An unknown event was received"),
+        Event::Unknown => debug!("An unknown event was received"),
         Event::UserUpdate(mut event) => {
             let _before = update(&cache_and_http, &mut event);
 
