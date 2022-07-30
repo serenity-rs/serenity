@@ -15,8 +15,6 @@ use crate::internal::prelude::*;
 use crate::model::permissions::Permissions;
 use crate::model::prelude::*;
 use crate::model::Timestamp;
-#[cfg(all(feature = "cache", feature = "model", feature = "utils"))]
-use crate::utils::Colour;
 
 /// Information about a member of a guild.
 ///
