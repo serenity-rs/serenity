@@ -24,6 +24,7 @@ mod utils;
 
 pub mod application;
 pub mod channel;
+pub mod colour;
 pub mod connection;
 pub mod error;
 pub mod event;
@@ -44,6 +45,7 @@ pub mod webhook;
 use std::collections::HashMap;
 use std::result::Result as StdResult;
 
+use colour::Colour;
 use serde::de::Visitor;
 use serde::{Deserialize, Deserializer};
 #[cfg(feature = "voice-model")]
@@ -53,5 +55,4 @@ pub use timestamp::Timestamp;
 pub use self::error::Error as ModelError;
 pub use self::permissions::Permissions;
 use crate::internal::prelude::*;
-#[cfg(feature = "utils")]
-use crate::utils::Colour;
+pub type Color = Colour;

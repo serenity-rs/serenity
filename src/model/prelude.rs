@@ -12,6 +12,7 @@
 
 pub use super::application::*;
 pub use super::channel::*;
+pub use super::colour::*;
 pub use super::connection::*;
 pub use super::event::*;
 pub use super::gateway::*;
