@@ -8,6 +8,7 @@ use crate::model::application::command::CommandPermissionType;
 ///
 /// [`CommandPermission`]: crate::model::application::command::CommandPermission
 #[derive(Clone, Debug, Default)]
+#[deprecated(note = "use `CreateApplicationCommandPermissionsData`")]
 pub struct CreateApplicationCommandsPermissions(pub Vec<Value>);
 
 impl CreateApplicationCommandsPermissions {
@@ -57,6 +58,7 @@ impl CreateApplicationCommandsPermissions {
 ///
 /// [`CommandPermission`]: crate::model::application::command::CommandPermission
 #[derive(Clone, Debug, Default)]
+#[deprecated(note = "use `CreateApplicationCommandPermissionsData`")]
 pub struct CreateApplicationCommandPermissions(pub HashMap<&'static str, Value>);
 
 impl CreateApplicationCommandPermissions {
