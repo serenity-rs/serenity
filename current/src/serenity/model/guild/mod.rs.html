@@ -3333,6 +3333,7 @@
 <span id="3327">3327</span>
 <span id="3328">3328</span>
 <span id="3329">3329</span>
+<span id="3330">3330</span>
 </pre><pre class="rust"><code><span class="doccomment">//! Models relating to guilds and types that it owns.</span>
 
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">audit_log</span>;
@@ -4156,6 +4157,7 @@
     <span class="doccomment">/// # Errors</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// If there is an error, it will be either [`Error::Http`] or [`Error::Json`].</span>
+    <span class="attribute">#[<span class="ident">deprecated</span>(<span class="ident">note</span> <span class="op">=</span> <span class="string">&quot;use `create_appliction_command_permission`.&quot;</span>)]</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">set_application_commands_permissions</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>,
