@@ -4,7 +4,6 @@
 #[cfg(feature = "client")]
 mod argument_convert;
 pub(crate) mod backports;
-mod colour;
 #[cfg(feature = "cache")]
 mod content_safe;
 mod custom_message;
@@ -12,25 +11,22 @@ mod message_builder;
 
 pub mod token;
 
-#[cfg(feature = "client")]
-pub use argument_convert::*;
-#[cfg(feature = "cache")]
-pub use content_safe::*;
-use url::Url;
-
-pub use self::colour::{colours, Colour};
-pub use self::custom_message::CustomMessage;
-pub use self::message_builder::{Content, ContentModifier, EmbedMessageBuilding, MessageBuilder};
-#[doc(inline)]
-pub use self::token::{parse as parse_token, validate as validate_token};
-pub type Color = Colour;
-
 use std::ffi::OsStr;
 use std::fs::File;
 use std::io::Read;
 use std::num::NonZeroU64;
 use std::path::Path;
 
+#[cfg(feature = "client")]
+pub use argument_convert::*;
+#[cfg(feature = "cache")]
+pub use content_safe::*;
+use url::Url;
+
+pub use self::custom_message::CustomMessage;
+pub use self::message_builder::{Content, ContentModifier, EmbedMessageBuilding, MessageBuilder};
+#[doc(inline)]
+pub use self::token::{parse as parse_token, validate as validate_token};
 #[cfg(all(feature = "cache", feature = "model"))]
 use crate::cache::Cache;
 #[cfg(all(feature = "cache", feature = "model"))]
