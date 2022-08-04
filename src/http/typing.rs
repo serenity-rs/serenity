@@ -90,7 +90,7 @@ impl Typing {
     /// Typing may persist for a few seconds on some clients after this is called.
     ///
     /// [`Channel`]: crate::model::channel::Channel
-    #[must_use]
+    #[allow(clippy::must_use_candidate)]
     pub fn stop(self) -> Option<()> {
         self.0.send(()).ok()
     }
