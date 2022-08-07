@@ -36,6 +36,22 @@ pub const NULL: Value = Value::Null;
 #[cfg(feature = "simd-json")]
 pub const NULL: Value = Value::Static(simd_json::StaticNode::Null);
 
+#[cfg(not(feature = "simd-json"))]
+pub(crate) async fn decode_resp<T: serde::de::DeserializeOwned>(
+    resp: reqwest::Response,
+) -> Result<T> {
+    let bytes = resp.bytes().await?;
+    serde_json::from_slice(&bytes).map_err(From::from)
+}
+
+#[cfg(feature = "simd-json")]
+pub(crate) async fn decode_resp<T: serde::de::DeserializeOwned>(
+    resp: reqwest::Response,
+) -> Result<T> {
+    let mut bytes = resp.bytes().await?.to_vec();
+    simd_json::from_slice(&mut bytes).map_err(From::from)
+}
+
 /// Converts a HashMap into a final [`JsonMap`] representation.
 pub fn hashmap_to_json_map<H, T>(map: HashMap<T, Value, H>) -> JsonMap
 where
