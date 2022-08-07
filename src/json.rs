@@ -36,7 +36,7 @@ pub const NULL: Value = Value::Null;
 #[cfg(feature = "simd-json")]
 pub const NULL: Value = Value::Static(simd_json::StaticNode::Null);
 
-#[cfg(not(feature = "simd-json"))]
+#[cfg(all(http, not(feature = "simd-json")))]
 pub(crate) async fn decode_resp<T: serde::de::DeserializeOwned>(
     resp: reqwest::Response,
 ) -> Result<T> {
@@ -44,7 +44,7 @@ pub(crate) async fn decode_resp<T: serde::de::DeserializeOwned>(
     serde_json::from_slice(&bytes).map_err(From::from)
 }
 
-#[cfg(feature = "simd-json")]
+#[cfg(all(http, feature = "simd-json"))]
 pub(crate) async fn decode_resp<T: serde::de::DeserializeOwned>(
     resp: reqwest::Response,
 ) -> Result<T> {
