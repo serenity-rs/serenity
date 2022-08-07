@@ -6,6 +6,7 @@ use reqwest::{Error as ReqwestError, Response, StatusCode, Url};
 use url::ParseError as UrlError;
 
 use crate::http::utils::deserialize_errors;
+use crate::json::decode_resp;
 
 #[derive(Clone, Debug, PartialEq, Eq, Deserialize, Serialize)]
 #[non_exhaustive]
@@ -44,7 +45,7 @@ impl ErrorResponse {
         ErrorResponse {
             status_code: r.status(),
             url: r.url().clone(),
-            error: r.json().await.unwrap_or_else(|e| DiscordJsonError {
+            error: decode_resp(r).await.unwrap_or_else(|e| DiscordJsonError {
                 code: -1,
                 message: format!("[Serenity] Could not decode json when receiving error response from discord:, {}", e),
                 errors: vec![],
