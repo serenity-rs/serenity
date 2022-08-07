@@ -228,6 +228,7 @@
 <span id="222">222</span>
 <span id="223">223</span>
 <span id="224">224</span>
+<span id="225">225</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::error::Error</span> <span class="kw">as</span> <span class="ident">StdError</span>;
 <span class="kw">use</span> <span class="ident">std::fmt</span>;
 
@@ -236,6 +237,7 @@
 <span class="kw">use</span> <span class="ident">url::ParseError</span> <span class="kw">as</span> <span class="ident">UrlError</span>;
 
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::http::utils::deserialize_errors</span>;
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::json::decode_resp</span>;
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
 <span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
@@ -274,7 +276,7 @@
         <span class="ident">ErrorResponse</span> {
             <span class="ident">status_code</span>: <span class="ident">r</span>.<span class="ident">status</span>(),
             <span class="ident">url</span>: <span class="ident">r</span>.<span class="ident">url</span>().<span class="ident">clone</span>(),
-            <span class="ident">error</span>: <span class="ident">r</span>.<span class="ident">json</span>().<span class="kw">await</span>.<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">DiscordJsonError</span> {
+            <span class="ident">error</span>: <span class="ident">decode_resp</span>(<span class="ident">r</span>).<span class="kw">await</span>.<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">DiscordJsonError</span> {
                 <span class="ident">code</span>: <span class="op">-</span><span class="number">1</span>,
                 <span class="ident">message</span>:
                     <span class="string">&quot;[Serenity] Could not decode json when receiving error response from discord!&quot;</span>
