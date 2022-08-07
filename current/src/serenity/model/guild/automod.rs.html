@@ -549,127 +549,6 @@
 <span id="543">543</span>
 <span id="544">544</span>
 <span id="545">545</span>
-<span id="546">546</span>
-<span id="547">547</span>
-<span id="548">548</span>
-<span id="549">549</span>
-<span id="550">550</span>
-<span id="551">551</span>
-<span id="552">552</span>
-<span id="553">553</span>
-<span id="554">554</span>
-<span id="555">555</span>
-<span id="556">556</span>
-<span id="557">557</span>
-<span id="558">558</span>
-<span id="559">559</span>
-<span id="560">560</span>
-<span id="561">561</span>
-<span id="562">562</span>
-<span id="563">563</span>
-<span id="564">564</span>
-<span id="565">565</span>
-<span id="566">566</span>
-<span id="567">567</span>
-<span id="568">568</span>
-<span id="569">569</span>
-<span id="570">570</span>
-<span id="571">571</span>
-<span id="572">572</span>
-<span id="573">573</span>
-<span id="574">574</span>
-<span id="575">575</span>
-<span id="576">576</span>
-<span id="577">577</span>
-<span id="578">578</span>
-<span id="579">579</span>
-<span id="580">580</span>
-<span id="581">581</span>
-<span id="582">582</span>
-<span id="583">583</span>
-<span id="584">584</span>
-<span id="585">585</span>
-<span id="586">586</span>
-<span id="587">587</span>
-<span id="588">588</span>
-<span id="589">589</span>
-<span id="590">590</span>
-<span id="591">591</span>
-<span id="592">592</span>
-<span id="593">593</span>
-<span id="594">594</span>
-<span id="595">595</span>
-<span id="596">596</span>
-<span id="597">597</span>
-<span id="598">598</span>
-<span id="599">599</span>
-<span id="600">600</span>
-<span id="601">601</span>
-<span id="602">602</span>
-<span id="603">603</span>
-<span id="604">604</span>
-<span id="605">605</span>
-<span id="606">606</span>
-<span id="607">607</span>
-<span id="608">608</span>
-<span id="609">609</span>
-<span id="610">610</span>
-<span id="611">611</span>
-<span id="612">612</span>
-<span id="613">613</span>
-<span id="614">614</span>
-<span id="615">615</span>
-<span id="616">616</span>
-<span id="617">617</span>
-<span id="618">618</span>
-<span id="619">619</span>
-<span id="620">620</span>
-<span id="621">621</span>
-<span id="622">622</span>
-<span id="623">623</span>
-<span id="624">624</span>
-<span id="625">625</span>
-<span id="626">626</span>
-<span id="627">627</span>
-<span id="628">628</span>
-<span id="629">629</span>
-<span id="630">630</span>
-<span id="631">631</span>
-<span id="632">632</span>
-<span id="633">633</span>
-<span id="634">634</span>
-<span id="635">635</span>
-<span id="636">636</span>
-<span id="637">637</span>
-<span id="638">638</span>
-<span id="639">639</span>
-<span id="640">640</span>
-<span id="641">641</span>
-<span id="642">642</span>
-<span id="643">643</span>
-<span id="644">644</span>
-<span id="645">645</span>
-<span id="646">646</span>
-<span id="647">647</span>
-<span id="648">648</span>
-<span id="649">649</span>
-<span id="650">650</span>
-<span id="651">651</span>
-<span id="652">652</span>
-<span id="653">653</span>
-<span id="654">654</span>
-<span id="655">655</span>
-<span id="656">656</span>
-<span id="657">657</span>
-<span id="658">658</span>
-<span id="659">659</span>
-<span id="660">660</span>
-<span id="661">661</span>
-<span id="662">662</span>
-<span id="663">663</span>
-<span id="664">664</span>
-<span id="665">665</span>
-<span id="666">666</span>
 </pre><pre class="rust"><code><span class="doccomment">//! Auto moderation types</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! [Discord docs](https://discord.com/developers/docs/resources/auto-moderation)</span>
@@ -1144,196 +1023,75 @@
 <span class="kw">mod</span> <span class="ident">tests</span> {
     <span class="kw">use</span> <span class="ident">std::time::Duration</span>;
 
-    <span class="kw">use</span> <span class="ident">serde_test::Token</span>;
-
     <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">rule_trigger_serde</span>() {
+    <span class="kw">fn</span> <span class="ident">rule_trigger_serde</span>() -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">PartialEq</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
         <span class="kw">struct</span> <span class="ident">Rule</span> {
             <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">flatten</span>)]</span>
             <span class="ident">trigger</span>: <span class="ident">Trigger</span>,
         }
 
-        <span class="kw">let</span> <span class="ident">value</span> <span class="op">=</span> <span class="ident">Rule</span> {
-            <span class="ident">trigger</span>: <span class="ident">Trigger::Keyword</span>(<span class="macro">vec!</span>[<span class="ident">String::from</span>(<span class="string">&quot;foo&quot;</span>), <span class="ident">String::from</span>(<span class="string">&quot;bar&quot;</span>)]),
-        };
+        <span class="macro">assert_eq!</span>(
+            <span class="ident"><span class="kw">crate</span>::json::to_string</span>(<span class="kw-2">&amp;</span><span class="ident">Rule</span> {
+                <span class="ident">trigger</span>: <span class="ident">Trigger::Keyword</span>(<span class="macro">vec!</span>[<span class="ident">String::from</span>(<span class="string">&quot;foo&quot;</span>), <span class="ident">String::from</span>(<span class="string">&quot;bar&quot;</span>)]),
+            })<span class="question-mark">?</span>,
+            <span class="string">r#&quot;{&quot;trigger_type&quot;:1,&quot;trigger_metadata&quot;:{&quot;keyword_filter&quot;:[&quot;foo&quot;,&quot;bar&quot;]}}&quot;#</span>,
+        );
 
-        <span class="ident">serde_test::assert_tokens</span>(<span class="kw-2">&amp;</span><span class="ident">value</span>, <span class="kw-2">&amp;</span>[
-            <span class="ident">Token::Map</span> {
-                <span class="ident">len</span>: <span class="prelude-val">None</span>,
-            },
-            <span class="ident">Token::Str</span>(<span class="string">&quot;trigger_type&quot;</span>),
-            <span class="ident">Token::U8</span>(<span class="number">1</span>),
-            <span class="ident">Token::Str</span>(<span class="string">&quot;trigger_metadata&quot;</span>),
-            <span class="ident">Token::Struct</span> {
-                <span class="ident">name</span>: <span class="string">&quot;TriggerMetadata&quot;</span>,
-                <span class="ident">len</span>: <span class="number">1</span>,
-            },
-            <span class="ident">Token::Str</span>(<span class="string">&quot;keyword_filter&quot;</span>),
-            <span class="ident">Token::Some</span>,
-            <span class="ident">Token::Seq</span> {
-                <span class="ident">len</span>: <span class="prelude-val">Some</span>(<span class="number">2</span>),
-            },
-            <span class="ident">Token::Str</span>(<span class="string">&quot;foo&quot;</span>),
-            <span class="ident">Token::Str</span>(<span class="string">&quot;bar&quot;</span>),
-            <span class="ident">Token::SeqEnd</span>,
-            <span class="ident">Token::StructEnd</span>,
-            <span class="ident">Token::MapEnd</span>,
-        ]);
+        <span class="macro">assert_eq!</span>(
+            <span class="ident"><span class="kw">crate</span>::json::to_string</span>(<span class="kw-2">&amp;</span><span class="ident">Rule</span> {
+                <span class="ident">trigger</span>: <span class="ident">Trigger::HarmfulLink</span>,
+            })<span class="question-mark">?</span>,
+            <span class="string">r#&quot;{&quot;trigger_type&quot;:2,&quot;trigger_metadata&quot;:{}}&quot;#</span>,
+        );
 
-        <span class="kw">let</span> <span class="ident">value</span> <span class="op">=</span> <span class="ident">Rule</span> {
-            <span class="ident">trigger</span>: <span class="ident">Trigger::HarmfulLink</span>,
-        };
-        <span class="ident">serde_test::assert_tokens</span>(<span class="kw-2">&amp;</span><span class="ident">value</span>, <span class="kw-2">&amp;</span>[
-            <span class="ident">Token::Map</span> {
-                <span class="ident">len</span>: <span class="prelude-val">None</span>,
-            },
-            <span class="ident">Token::Str</span>(<span class="string">&quot;trigger_type&quot;</span>),
-            <span class="ident">Token::U8</span>(<span class="number">2</span>),
-            <span class="ident">Token::Str</span>(<span class="string">&quot;trigger_metadata&quot;</span>),
-            <span class="ident">Token::Struct</span> {
-                <span class="ident">name</span>: <span class="string">&quot;TriggerMetadata&quot;</span>,
-                <span class="ident">len</span>: <span class="number">0</span>,
-            },
-            <span class="ident">Token::StructEnd</span>,
-            <span class="ident">Token::MapEnd</span>,
-        ]);
+        <span class="macro">assert_eq!</span>(
+            <span class="ident"><span class="kw">crate</span>::json::to_string</span>(<span class="kw-2">&amp;</span><span class="ident">Rule</span> {
+                <span class="ident">trigger</span>: <span class="ident">Trigger::Spam</span>,
+            })<span class="question-mark">?</span>,
+            <span class="string">r#&quot;{&quot;trigger_type&quot;:3,&quot;trigger_metadata&quot;:{}}&quot;#</span>,
+        );
 
-        <span class="kw">let</span> <span class="ident">value</span> <span class="op">=</span> <span class="ident">Rule</span> {
-            <span class="ident">trigger</span>: <span class="ident">Trigger::Spam</span>,
-        };
-        <span class="ident">serde_test::assert_tokens</span>(<span class="kw-2">&amp;</span><span class="ident">value</span>, <span class="kw-2">&amp;</span>[
-            <span class="ident">Token::Map</span> {
-                <span class="ident">len</span>: <span class="prelude-val">None</span>,
-            },
-            <span class="ident">Token::Str</span>(<span class="string">&quot;trigger_type&quot;</span>),
-            <span class="ident">Token::U8</span>(<span class="number">3</span>),
-            <span class="ident">Token::Str</span>(<span class="string">&quot;trigger_metadata&quot;</span>),
-            <span class="ident">Token::Struct</span> {
-                <span class="ident">name</span>: <span class="string">&quot;TriggerMetadata&quot;</span>,
-                <span class="ident">len</span>: <span class="number">0</span>,
-            },
-            <span class="ident">Token::StructEnd</span>,
-            <span class="ident">Token::MapEnd</span>,
-        ]);
+        <span class="macro">assert_eq!</span>(
+            <span class="ident"><span class="kw">crate</span>::json::to_string</span>(<span class="kw-2">&amp;</span><span class="ident">Rule</span> {
+                <span class="ident">trigger</span>: <span class="ident">Trigger::KeywordPreset</span>(<span class="macro">vec!</span>[
+                    <span class="ident">KeywordPresetType::Profanity</span>,
+                    <span class="ident">KeywordPresetType::SexualContent</span>,
+                    <span class="ident">KeywordPresetType::Slurs</span>,
+                ]),
+            })<span class="question-mark">?</span>,
+            <span class="string">r#&quot;{&quot;trigger_type&quot;:4,&quot;trigger_metadata&quot;:{&quot;presets&quot;:[1,2,3]}}&quot;#</span>,
+        );
 
-        <span class="kw">let</span> <span class="ident">value</span> <span class="op">=</span> <span class="ident">Rule</span> {
-            <span class="ident">trigger</span>: <span class="ident">Trigger::KeywordPreset</span>(<span class="macro">vec!</span>[
-                <span class="ident">KeywordPresetType::Profanity</span>,
-                <span class="ident">KeywordPresetType::SexualContent</span>,
-                <span class="ident">KeywordPresetType::Slurs</span>,
-            ]),
-        };
-        <span class="ident">serde_test::assert_tokens</span>(<span class="kw-2">&amp;</span><span class="ident">value</span>, <span class="kw-2">&amp;</span>[
-            <span class="ident">Token::Map</span> {
-                <span class="ident">len</span>: <span class="prelude-val">None</span>,
-            },
-            <span class="ident">Token::Str</span>(<span class="string">&quot;trigger_type&quot;</span>),
-            <span class="ident">Token::U8</span>(<span class="number">4</span>),
-            <span class="ident">Token::Str</span>(<span class="string">&quot;trigger_metadata&quot;</span>),
-            <span class="ident">Token::Struct</span> {
-                <span class="ident">name</span>: <span class="string">&quot;TriggerMetadata&quot;</span>,
-                <span class="ident">len</span>: <span class="number">1</span>,
-            },
-            <span class="ident">Token::Str</span>(<span class="string">&quot;presets&quot;</span>),
-            <span class="ident">Token::Some</span>,
-            <span class="ident">Token::Seq</span> {
-                <span class="ident">len</span>: <span class="prelude-val">Some</span>(<span class="number">3</span>),
-            },
-            <span class="ident">Token::U8</span>(<span class="ident">KeywordPresetType::Profanity</span>.<span class="ident">into</span>()),
-            <span class="ident">Token::U8</span>(<span class="ident">KeywordPresetType::SexualContent</span>.<span class="ident">into</span>()),
-            <span class="ident">Token::U8</span>(<span class="ident">KeywordPresetType::Slurs</span>.<span class="ident">into</span>()),
-            <span class="ident">Token::SeqEnd</span>,
-            <span class="ident">Token::StructEnd</span>,
-            <span class="ident">Token::MapEnd</span>,
-        ]);
+        <span class="macro">assert_eq!</span>(
+            <span class="ident"><span class="kw">crate</span>::json::to_string</span>(<span class="kw-2">&amp;</span><span class="ident">Rule</span> {
+                <span class="ident">trigger</span>: <span class="ident">Trigger::Unknown</span>(<span class="number">123</span>),
+            })<span class="question-mark">?</span>,
+            <span class="string">r#&quot;{&quot;trigger_type&quot;:123,&quot;trigger_metadata&quot;:{}}&quot;#</span>,
+        );
 
-        <span class="kw">let</span> <span class="ident">value</span> <span class="op">=</span> <span class="ident">Rule</span> {
-            <span class="ident">trigger</span>: <span class="ident">Trigger::Unknown</span>(<span class="number">123</span>),
-        };
-        <span class="ident">serde_test::assert_tokens</span>(<span class="kw-2">&amp;</span><span class="ident">value</span>, <span class="kw-2">&amp;</span>[
-            <span class="ident">Token::Map</span> {
-                <span class="ident">len</span>: <span class="prelude-val">None</span>,
-            },
-            <span class="ident">Token::Str</span>(<span class="string">&quot;trigger_type&quot;</span>),
-            <span class="ident">Token::U8</span>(<span class="number">123</span>),
-            <span class="ident">Token::Str</span>(<span class="string">&quot;trigger_metadata&quot;</span>),
-            <span class="ident">Token::Struct</span> {
-                <span class="ident">name</span>: <span class="string">&quot;TriggerMetadata&quot;</span>,
-                <span class="ident">len</span>: <span class="number">0</span>,
-            },
-            <span class="ident">Token::StructEnd</span>,
-            <span class="ident">Token::MapEnd</span>,
-        ]);
+        <span class="prelude-val">Ok</span>(())
     }
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">action_serde</span>() {
-        <span class="kw">let</span> <span class="ident">value</span> <span class="op">=</span> <span class="ident">Action::BlockMessage</span>;
+    <span class="kw">fn</span> <span class="ident">action_serde</span>() -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+        <span class="macro">assert_eq!</span>(<span class="ident"><span class="kw">crate</span>::json::to_string</span>(<span class="kw-2">&amp;</span><span class="ident">Action::BlockMessage</span>)<span class="question-mark">?</span>, <span class="string">r#&quot;{&quot;type&quot;:1}&quot;#</span>);
 
-        <span class="ident">serde_test::assert_tokens</span>(<span class="kw-2">&amp;</span><span class="ident">value</span>, <span class="kw-2">&amp;</span>[
-            <span class="ident">Token::Struct</span> {
-                <span class="ident">name</span>: <span class="string">&quot;Action&quot;</span>,
-                <span class="ident">len</span>: <span class="number">1</span>,
-            },
-            <span class="ident">Token::Str</span>(<span class="string">&quot;type&quot;</span>),
-            <span class="ident">Token::U8</span>(<span class="number">1</span>),
-            <span class="ident">Token::StructEnd</span>,
-        ]);
+        <span class="macro">assert_eq!</span>(
+            <span class="ident"><span class="kw">crate</span>::json::to_string</span>(<span class="kw-2">&amp;</span><span class="ident">Action::Alert</span>(<span class="ident">ChannelId</span>(<span class="number">123</span>)))<span class="question-mark">?</span>,
+            <span class="string">r#&quot;{&quot;type&quot;:2,&quot;metadata&quot;:{&quot;channel_id&quot;:&quot;123&quot;}}&quot;#</span>
+        );
 
-        <span class="kw">let</span> <span class="ident">value</span> <span class="op">=</span> <span class="ident">Action::Alert</span>(<span class="ident">ChannelId</span>(<span class="number">123</span>));
-        <span class="ident">serde_test::assert_tokens</span>(<span class="kw-2">&amp;</span><span class="ident">value</span>, <span class="kw-2">&amp;</span>[
-            <span class="ident">Token::Struct</span> {
-                <span class="ident">name</span>: <span class="string">&quot;Action&quot;</span>,
-                <span class="ident">len</span>: <span class="number">2</span>,
-            },
-            <span class="ident">Token::Str</span>(<span class="string">&quot;type&quot;</span>),
-            <span class="ident">Token::U8</span>(<span class="number">2</span>),
-            <span class="ident">Token::Str</span>(<span class="string">&quot;metadata&quot;</span>),
-            <span class="ident">Token::Struct</span> {
-                <span class="ident">name</span>: <span class="string">&quot;ActionMetadata&quot;</span>,
-                <span class="ident">len</span>: <span class="number">1</span>,
-            },
-            <span class="ident">Token::Str</span>(<span class="string">&quot;channel_id&quot;</span>),
-            <span class="ident">Token::NewtypeStruct</span> {
-                <span class="ident">name</span>: <span class="string">&quot;ChannelId&quot;</span>,
-            },
-            <span class="ident">Token::Str</span>(<span class="string">&quot;123&quot;</span>),
-            <span class="ident">Token::StructEnd</span>,
-            <span class="ident">Token::StructEnd</span>,
-        ]);
+        <span class="macro">assert_eq!</span>(
+            <span class="ident"><span class="kw">crate</span>::json::to_string</span>(<span class="kw-2">&amp;</span><span class="ident">Action::Timeout</span>(<span class="ident">Duration::from_secs</span>(<span class="number">1024</span>)))<span class="question-mark">?</span>,
+            <span class="string">r#&quot;{&quot;type&quot;:3,&quot;metadata&quot;:{&quot;duration_seconds&quot;:1024}}&quot;#</span>
+        );
 
-        <span class="kw">let</span> <span class="ident">value</span> <span class="op">=</span> <span class="ident">Action::Timeout</span>(<span class="ident">Duration::from_secs</span>(<span class="number">1024</span>));
-        <span class="ident">serde_test::assert_tokens</span>(<span class="kw-2">&amp;</span><span class="ident">value</span>, <span class="kw-2">&amp;</span>[
-            <span class="ident">Token::Struct</span> {
-                <span class="ident">name</span>: <span class="string">&quot;Action&quot;</span>,
-                <span class="ident">len</span>: <span class="number">2</span>,
-            },
-            <span class="ident">Token::Str</span>(<span class="string">&quot;type&quot;</span>),
-            <span class="ident">Token::U8</span>(<span class="number">3</span>),
-            <span class="ident">Token::Str</span>(<span class="string">&quot;metadata&quot;</span>),
-            <span class="ident">Token::Struct</span> {
-                <span class="ident">name</span>: <span class="string">&quot;ActionMetadata&quot;</span>,
-                <span class="ident">len</span>: <span class="number">1</span>,
-            },
-            <span class="ident">Token::Str</span>(<span class="string">&quot;duration_seconds&quot;</span>),
-            <span class="ident">Token::U64</span>(<span class="number">1024</span>),
-            <span class="ident">Token::StructEnd</span>,
-            <span class="ident">Token::StructEnd</span>,
-        ]);
+        <span class="macro">assert_eq!</span>(<span class="ident"><span class="kw">crate</span>::json::to_string</span>(<span class="kw-2">&amp;</span><span class="ident">Action::Unknown</span>(<span class="number">123</span>))<span class="question-mark">?</span>, <span class="string">r#&quot;{&quot;type&quot;:123}&quot;#</span>);
 
-        <span class="kw">let</span> <span class="ident">value</span> <span class="op">=</span> <span class="ident">Action::Unknown</span>(<span class="number">123</span>);
-        <span class="ident">serde_test::assert_tokens</span>(<span class="kw-2">&amp;</span><span class="ident">value</span>, <span class="kw-2">&amp;</span>[
-            <span class="ident">Token::Struct</span> {
-                <span class="ident">name</span>: <span class="string">&quot;Action&quot;</span>,
-                <span class="ident">len</span>: <span class="number">1</span>,
-            },
-            <span class="ident">Token::Str</span>(<span class="string">&quot;type&quot;</span>),
-            <span class="ident">Token::U8</span>(<span class="number">123</span>),
-            <span class="ident">Token::StructEnd</span>,
-        ]);
+        <span class="prelude-val">Ok</span>(())
     }
 }
 </code></pre></div>
