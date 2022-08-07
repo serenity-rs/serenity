@@ -1644,7 +1644,7 @@ impl Http {
     ) -> Result<Member> {
         let body = to_vec(map)?;
 
-        let mut value = self
+        let mut value: Value = self
             .fire(Request {
                 body: Some(body),
                 multipart: None,
