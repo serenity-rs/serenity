@@ -287,7 +287,7 @@ impl Http {
         if response.status() == 204 {
             Ok(None)
         } else {
-            Ok(Some(response.json().await?))
+            Ok(Some(decode_resp(response).await?))
         }
     }
 
@@ -814,8 +814,8 @@ impl Http {
         body: &impl serde::Serialize,
         audit_log_reason: Option<&str>,
     ) -> Result<Role> {
-        let mut value = self
-            .request(Request {
+        let mut value: Value = self
+            .fire(Request {
                 body: Some(to_vec(body)?),
                 multipart: None,
                 headers: audit_log_reason.map(reason_into_header),
@@ -823,8 +823,6 @@ impl Http {
                     guild_id,
                 },
             })
-            .await?
-            .json::<Value>()
             .await?;
 
         if let Some(map) = value.as_object_mut() {
@@ -1644,8 +1642,8 @@ impl Http {
     ) -> Result<Member> {
         let body = to_vec(map)?;
 
-        let mut value = self
-            .request(Request {
+        let mut value: Value = self
+            .fire(Request {
                 body: Some(body),
                 multipart: None,
                 headers: audit_log_reason.map(reason_into_header),
@@ -1654,8 +1652,6 @@ impl Http {
                     user_id,
                 },
             })
-            .await?
-            .json::<Value>()
             .await?;
 
         if let Some(map) = value.as_object_mut() {
@@ -1826,16 +1822,13 @@ impl Http {
     pub async fn edit_profile(&self, map: &impl serde::Serialize) -> Result<CurrentUser> {
         let body = to_vec(map)?;
 
-        let request = self
-            .request(Request {
-                body: Some(body),
-                multipart: None,
-                headers: None,
-                route: RouteInfo::EditProfile,
-            })
-            .await?;
-
-        Ok(request.json::<CurrentUser>().await?)
+        self.fire(Request {
+            body: Some(body),
+            multipart: None,
+            headers: None,
+            route: RouteInfo::EditProfile,
+        })
+        .await
     }
 
     /// Changes a role in a guild.
@@ -1846,8 +1839,8 @@ impl Http {
         map: &impl serde::Serialize,
         audit_log_reason: Option<&str>,
     ) -> Result<Role> {
-        let mut value = self
-            .request(Request {
+        let mut value: Value = self
+            .fire(Request {
                 body: Some(to_vec(map)?),
                 multipart: None,
                 headers: audit_log_reason.map(reason_into_header),
@@ -1856,8 +1849,6 @@ impl Http {
                     role_id,
                 },
             })
-            .await?
-            .json::<Value>()
             .await?;
 
         if let Some(map) = value.as_object_mut() {
@@ -1880,8 +1871,8 @@ impl Http {
             "position": position,
         }]))?;
 
-        let mut value = self
-            .request(Request {
+        let mut value: Value = self
+            .fire(Request {
                 body: Some(body),
                 multipart: None,
                 headers: audit_log_reason.map(reason_into_header),
@@ -1889,8 +1880,6 @@ impl Http {
                     guild_id,
                 },
             })
-            .await?
-            .json::<Value>()
             .await?;
 
         if let Some(array) = value.as_array_mut() {
@@ -1942,8 +1931,9 @@ impl Http {
         audit_log_reason: Option<&str>,
     ) -> Result<Sticker> {
         let body = to_vec(&map)?;
-        let mut value = self
-            .request(Request {
+
+        let mut value: Value = self
+            .fire(Request {
                 body: Some(body),
                 multipart: None,
                 headers: audit_log_reason.map(reason_into_header),
@@ -1952,8 +1942,6 @@ impl Http {
                     sticker_id,
                 },
             })
-            .await?
-            .json::<Value>()
             .await?;
 
         if let Some(map) = value.as_object_mut() {
@@ -2252,7 +2240,7 @@ impl Http {
             return Ok(None);
         }
 
-        response.json::<Message>().await.map(Some).map_err(From::from)
+        decode_resp(response).await.map(Some)
     }
 
     /// Send file(s) over a webhook.
@@ -2360,8 +2348,8 @@ impl Http {
             scheduled_maintenances: Vec<Maintenance>,
         }
 
-        let response = self
-            .request(Request {
+        let status: StatusResponse = self
+            .fire(Request {
                 body: None,
                 multipart: None,
                 headers: None,
@@ -2369,7 +2357,6 @@ impl Http {
             })
             .await?;
 
-        let status: StatusResponse = response.json().await?;
         Ok(status.scheduled_maintenances)
     }
 
@@ -3027,7 +3014,7 @@ impl Http {
             code: String,
         }
 
-        self.request(Request {
+        self.fire::<GuildVanityUrl>(Request {
             body: None,
             multipart: None,
             headers: None,
@@ -3035,11 +3022,8 @@ impl Http {
                 guild_id,
             },
         })
-        .await?
-        .json::<GuildVanityUrl>()
         .await
         .map(|x| x.code)
-        .map_err(From::from)
     }
 
     /// Gets the members of a guild. Optionally pass a `limit` and the Id of the
@@ -3056,8 +3040,8 @@ impl Http {
             }
         }
 
-        let mut value = self
-            .request(Request {
+        let mut value: Value = self
+            .fire(Request {
                 body: None,
                 multipart: None,
                 headers: None,
@@ -3067,8 +3051,6 @@ impl Http {
                     limit,
                 },
             })
-            .await?
-            .json::<Value>()
             .await?;
 
         if let Some(values) = value.as_array_mut() {
@@ -3079,7 +3061,7 @@ impl Http {
             }
         }
 
-        from_value::<Vec<Member>>(value).map_err(From::from)
+        from_value(value).map_err(From::from)
     }
 
     /// Gets the amount of users that can be pruned.
@@ -3112,8 +3094,8 @@ impl Http {
 
     /// Retrieves a list of roles in a [`Guild`].
     pub async fn get_guild_roles(&self, guild_id: u64) -> Result<Vec<Role>> {
-        let mut value = self
-            .request(Request {
+        let mut value: Value = self
+            .fire(Request {
                 body: None,
                 multipart: None,
                 headers: None,
@@ -3121,8 +3103,6 @@ impl Http {
                     guild_id,
                 },
             })
-            .await?
-            .json::<Value>()
             .await?;
 
         if let Some(array) = value.as_array_mut() {
@@ -3231,8 +3211,8 @@ impl Http {
 
     /// Retrieves a list of stickers in a [`Guild`].
     pub async fn get_guild_stickers(&self, guild_id: u64) -> Result<Vec<Sticker>> {
-        let mut value = self
-            .request(Request {
+        let mut value: Value = self
+            .fire(Request {
                 body: None,
                 multipart: None,
                 headers: None,
@@ -3240,8 +3220,6 @@ impl Http {
                     guild_id,
                 },
             })
-            .await?
-            .json::<Value>()
             .await?;
 
         if let Some(array) = value.as_array_mut() {
@@ -3257,8 +3235,8 @@ impl Http {
 
     /// Retrieves a single sticker in a [`Guild`].
     pub async fn get_guild_sticker(&self, guild_id: u64, sticker_id: u64) -> Result<Sticker> {
-        let mut value = self
-            .request(Request {
+        let mut value: Value = self
+            .fire(Request {
                 body: None,
                 multipart: None,
                 headers: None,
@@ -3267,8 +3245,6 @@ impl Http {
                     sticker_id,
                 },
             })
-            .await?
-            .json::<Value>()
             .await?;
 
         if let Some(map) = value.as_object_mut() {
@@ -3401,8 +3377,8 @@ impl Http {
 
     /// Gets member of a guild.
     pub async fn get_member(&self, guild_id: u64, user_id: u64) -> Result<Member> {
-        let mut value = self
-            .request(Request {
+        let mut value: Value = self
+            .fire(Request {
                 body: None,
                 multipart: None,
                 headers: None,
@@ -3411,15 +3387,13 @@ impl Http {
                     user_id,
                 },
             })
-            .await?
-            .json::<Value>()
             .await?;
 
         if let Some(map) = value.as_object_mut() {
             map.insert("guild_id".to_string(), guild_id.into());
         }
 
-        from_value::<Member>(value).map_err(From::from)
+        from_value(value).map_err(From::from)
     }
 
     /// Gets a message by an Id, bots only.
@@ -3457,17 +3431,14 @@ impl Http {
             sticker_packs: Vec<StickerPack>,
         }
 
-        self.request(Request {
+        self.fire::<StickerPacks>(Request {
             body: None,
             multipart: None,
             headers: None,
             route: RouteInfo::GetStickerPacks,
         })
-        .await?
-        .json::<StickerPacks>()
         .await
         .map(|s| s.sticker_packs)
-        .map_err(From::from)
     }
 
     /// Gets all pins of a channel.
@@ -3532,8 +3503,8 @@ impl Http {
             incidents: Vec<Incident>,
         }
 
-        let response = self
-            .request(Request {
+        let status: StatusResponse = self
+            .fire(Request {
                 body: None,
                 multipart: None,
                 headers: None,
@@ -3541,7 +3512,6 @@ impl Http {
             })
             .await?;
 
-        let status: StatusResponse = response.json().await?;
         Ok(status.incidents)
     }
 
@@ -3555,8 +3525,8 @@ impl Http {
             scheduled_maintenances: Vec<Maintenance>,
         }
 
-        let response = self
-            .request(Request {
+        let status: StatusResponse = self
+            .fire(Request {
                 body: None,
                 multipart: None,
                 headers: None,
@@ -3564,7 +3534,6 @@ impl Http {
             })
             .await?;
 
-        let status: StatusResponse = response.json().await?;
         Ok(status.scheduled_maintenances)
     }
 
@@ -3872,8 +3841,8 @@ impl Http {
         query: &str,
         limit: Option<u64>,
     ) -> Result<Vec<Member>> {
-        let mut value = self
-            .request(Request {
+        let mut value: Value = self
+            .fire(Request {
                 body: None,
                 multipart: None,
                 headers: None,
@@ -3883,8 +3852,6 @@ impl Http {
                     limit,
                 },
             })
-            .await?
-            .json::<Value>()
             .await?;
 
         if let Some(members) = value.as_array_mut() {
@@ -4035,8 +4002,7 @@ impl Http {
     /// If there is an error, it will be either [`Error::Http`] or [`Error::Json`].
     pub async fn fire<T: DeserializeOwned>(&self, req: Request<'_>) -> Result<T> {
         let response = self.request(req).await?;
-
-        response.json::<T>().await.map_err(From::from)
+        decode_resp(response).await
     }
 
     /// Performs a request, ratelimiting it if necessary.
