@@ -656,7 +656,10 @@ impl Cache {
         self._guild_channels(guild_id.into())
     }
 
-    fn _guild_channels(&self, guild_id: GuildId) -> Option<DashMap<ChannelId, GuildChannel, FxBuildHasher>> {
+    fn _guild_channels(
+        &self,
+        guild_id: GuildId,
+    ) -> Option<DashMap<ChannelId, GuildChannel, FxBuildHasher>> {
         self.guilds.get(&guild_id).map(|g| {
             g.channels
                 .iter()
@@ -682,7 +685,10 @@ impl Cache {
         self._guild_categories(guild_id.into())
     }
 
-    fn _guild_categories(&self, guild_id: GuildId) -> Option<DashMap<ChannelId, ChannelCategory, FxBuildHasher>> {
+    fn _guild_categories(
+        &self,
+        guild_id: GuildId,
+    ) -> Option<DashMap<ChannelId, ChannelCategory, FxBuildHasher>> {
         self.guilds.get(&guild_id).map(|g| {
             g.channels
                 .iter()
