@@ -68,23 +68,22 @@ impl Animal {
     }
 
     fn menu_option(&self) -> CreateSelectMenuOption {
-        CreateSelectMenuOption::default()
+        CreateSelectMenuOption::new(
             // This is what will be shown to the user
-            .label(format!("{} {}", self.emoji(), self))
+            format!("{} {}", self.emoji(), self),
             // This is used to identify the selected value
-            .value(self.to_string().to_ascii_lowercase())
+            self.to_string().to_ascii_lowercase(),
+        )
     }
 
     fn select_menu() -> CreateSelectMenu {
-        CreateSelectMenu::default()
-            .custom_id("animal_select")
-            .placeholder("No animal selected")
-            .options(vec![
-                Self::Cat.menu_option(),
-                Self::Dog.menu_option(),
-                Self::Horse.menu_option(),
-                Self::Alpaca.menu_option(),
-            ])
+        CreateSelectMenu::new("animal_select", vec![
+            Self::Cat.menu_option(),
+            Self::Dog.menu_option(),
+            Self::Horse.menu_option(),
+            Self::Alpaca.menu_option(),
+        ])
+        .placeholder("No animal selected")
     }
 
     fn action_row() -> CreateActionRow {

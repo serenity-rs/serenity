@@ -87,6 +87,7 @@ impl CreateActionRow {
 #[derive(Clone, Debug, Serialize)]
 #[must_use]
 pub struct CreateButton {
+    style: ButtonStyle,
     #[serde(skip_serializing_if = "Option::is_none")]
     label: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -97,7 +98,6 @@ pub struct CreateButton {
     emoji: Option<ReactionType>,
     #[serde(skip_serializing_if = "Option::is_none")]
     disabled: Option<bool>,
-    style: ButtonStyle,
 
     #[serde(rename = "type")]
     kind: u8,
@@ -108,17 +108,22 @@ impl Default for CreateButton {
     fn default() -> Self {
         Self {
             style: ButtonStyle::Primary,
-            custom_id: None,
-            disabled: None,
             label: None,
-            emoji: None,
+            custom_id: None,
             url: None,
+            emoji: None,
+            disabled: None,
             kind: 2,
         }
     }
 }
 
 impl CreateButton {
+    // Creates a primary button. Equivalent to [`Self::default`].
+    pub fn new() -> Self {
+        Self::default()
+    }
+
     /// Sets the style of the button.
     pub fn style(mut self, kind: ButtonStyle) -> Self {
         self.style = kind;
@@ -162,47 +167,46 @@ impl CreateButton {
 #[derive(Clone, Debug, Serialize)]
 #[must_use]
 pub struct CreateSelectMenu {
+    custom_id: String,
     #[serde(skip_serializing_if = "Option::is_none")]
     placeholder: Option<String>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    custom_id: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
     min_values: Option<u64>,
     #[serde(skip_serializing_if = "Option::is_none")]
     max_values: Option<u64>,
     #[serde(skip_serializing_if = "Option::is_none")]
     disabled: Option<bool>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    options: Option<Vec<CreateSelectMenuOption>>,
+    options: Vec<CreateSelectMenuOption>,
 
     #[serde(rename = "type")]
     kind: u8,
 }
 
-impl Default for CreateSelectMenu {
-    fn default() -> Self {
+impl CreateSelectMenu {
+    // Creates a builder with given custom id (a developer-defined identifier), and a list of
+    // options, leaving all other fields empty.
+    pub fn new(custom_id: impl Into<String>, options: Vec<CreateSelectMenuOption>) -> Self {
         Self {
+            custom_id: custom_id.into(),
             placeholder: None,
             min_values: None,
             max_values: None,
-            custom_id: None,
             disabled: None,
-            options: None,
+            options,
             kind: 3,
         }
     }
-}
 
-impl CreateSelectMenu {
     /// The placeholder of the select menu.
     pub fn placeholder(mut self, label: impl Into<String>) -> Self {
         self.placeholder = Some(label.into());
         self
     }
 
-    /// Sets the custom id of the select menu, a developer-defined identifier.
+    /// Sets the custom id of the select menu, a developer-defined identifier. Replaces the current
+    /// value as set in [`Self::new`].
     pub fn custom_id(mut self, id: impl Into<String>) -> Self {
-        self.custom_id = Some(id.into());
+        self.custom_id = id.into();
         self
     }
 
@@ -225,7 +229,7 @@ impl CreateSelectMenu {
     }
 
     pub fn options(mut self, options: Vec<CreateSelectMenuOption>) -> Self {
-        self.options = Some(options);
+        self.options = options;
         self
     }
 }
@@ -233,13 +237,11 @@ impl CreateSelectMenu {
 /// A builder for creating a [`SelectMenuOption`].
 ///
 /// [`SelectMenuOption`]: crate::model::application::component::SelectMenuOption
-#[derive(Clone, Debug, Default, Serialize)]
+#[derive(Clone, Debug, Serialize)]
 #[must_use]
 pub struct CreateSelectMenuOption {
-    #[serde(skip_serializing_if = "Option::is_none")]
-    label: Option<String>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    value: Option<String>,
+    label: String,
+    value: String,
     #[serde(skip_serializing_if = "Option::is_none")]
     description: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -249,20 +251,27 @@ pub struct CreateSelectMenuOption {
 }
 
 impl CreateSelectMenuOption {
-    /// Creates an option.
+    /// Creates a select menu option with the given label and value, leaving all other fields
+    /// empty.
     pub fn new(label: impl Into<String>, value: impl Into<String>) -> Self {
-        Self::default().label(label).value(value)
+        Self {
+            label: label.into(),
+            value: value.into(),
+            description: None,
+            emoji: None,
+            default: None,
+        }
     }
 
-    /// Sets the label of this option.
+    /// Sets the label of this option, replacing the current value as set in [`Self::new`].
     pub fn label(mut self, label: impl Into<String>) -> Self {
-        self.label = Some(label.into());
+        self.label = label.into();
         self
     }
 
-    /// Sets the value of this option.
+    /// Sets the value of this option, replacing the current value as set in [`Self::new`].
     pub fn value(mut self, value: impl Into<String>) -> Self {
-        self.value = Some(value.into());
+        self.value = value.into();
         self
     }
 
@@ -291,12 +300,10 @@ impl CreateSelectMenuOption {
 #[derive(Clone, Debug, Serialize)]
 #[must_use]
 pub struct CreateInputText {
-    #[serde(skip_serializing_if = "Option::is_none")]
-    custom_id: Option<String>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    style: Option<InputTextStyle>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    label: Option<String>,
+    style: InputTextStyle,
+    label: String,
+    custom_id: String,
+
     #[serde(skip_serializing_if = "Option::is_none")]
     placeholder: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -312,38 +319,45 @@ pub struct CreateInputText {
     kind: u8,
 }
 
-impl Default for CreateInputText {
-    fn default() -> Self {
+impl CreateInputText {
+    /// Creates a text input with the given style, label, and custom id (a developer-defined
+    /// identifier), leaving all other fields empty.
+    pub fn new(
+        style: InputTextStyle,
+        label: impl Into<String>,
+        custom_id: impl Into<String>,
+    ) -> Self {
         Self {
-            value: None,
-            style: None,
-            label: None,
-            required: None,
-            custom_id: None,
+            style,
+            label: label.into(),
+            custom_id: custom_id.into(),
+
             placeholder: None,
             min_length: None,
             max_length: None,
-            kind: 4_u8,
+            value: None,
+            required: None,
+
+            kind: 4,
         }
     }
-}
 
-impl CreateInputText {
-    /// Sets the custom id of the input text, a developer-defined identifier.
-    pub fn custom_id(mut self, id: impl Into<String>) -> Self {
-        self.custom_id = Some(id.into());
-        self
-    }
-
-    /// Sets the style of this input text
+    /// Sets the style of this input text. Replaces the current value as set in [`Self::new`].
     pub fn style(mut self, kind: InputTextStyle) -> Self {
-        self.style = Some(kind);
+        self.style = kind;
         self
     }
 
-    /// Sets the label of this input text.
+    /// Sets the label of this input text. Replaces the current value as set in [`Self::new`].
     pub fn label(mut self, label: impl Into<String>) -> Self {
-        self.label = Some(label.into());
+        self.label = label.into();
+        self
+    }
+
+    /// Sets the custom id of the input text, a developer-defined identifier. Replaces the current
+    /// value as set in [`Self::new`].
+    pub fn custom_id(mut self, id: impl Into<String>) -> Self {
+        self.custom_id = id.into();
         self
     }
 
