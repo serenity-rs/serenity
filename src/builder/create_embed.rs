@@ -219,9 +219,8 @@ impl CreateEmbed {
     ///             let channel_search = channels.values().find(|c| c.name == "join-log");
     ///
     ///             if let Some(channel) = channel_search {
-    ///                 let author = CreateEmbedAuthor::default()
-    ///                     .icon_url(member.user.face())
-    ///                     .name(member.user.name);
+    ///                 let icon_url = member.user.face();
+    ///                 let author = CreateEmbedAuthor::new(member.user.name).icon_url(icon_url);
     ///                 let mut embed = CreateEmbed::default().title("Member Join").author(author);
     ///                 if let Some(joined_at) = member.joined_at {
     ///                     embed = embed.timestamp(joined_at);
@@ -279,9 +278,7 @@ impl CreateEmbed {
     pub(super) fn check_length(&self) -> Result<()> {
         let mut length = 0;
         if let Some(ref author) = self.author {
-            if let Some(ref name) = author.name {
-                length += name.chars().count();
-            }
+            length += author.name.chars().count();
         }
 
         if let Some(ref description) = self.description {
@@ -294,9 +291,7 @@ impl CreateEmbed {
         }
 
         if let Some(ref footer) = self.footer {
-            if let Some(ref text) = footer.text {
-                length += text.chars().count();
-            }
+            length += footer.text.chars().count();
         }
 
         if let Some(ref title) = self.title {
@@ -375,29 +370,35 @@ impl From<Embed> for CreateEmbed {
 
 /// A builder to create a fake [`Embed`] object's author, for use with the [`CreateEmbed::author`]
 /// method.
-///
-/// Requires that you specify a [`Self::name`].
-#[derive(Clone, Debug, Default, Serialize)]
+#[derive(Clone, Debug, Serialize)]
 #[must_use]
 pub struct CreateEmbedAuthor {
+    name: String,
     #[serde(skip_serializing_if = "Option::is_none")]
     icon_url: Option<String>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    name: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
     url: Option<String>,
 }
 
 impl CreateEmbedAuthor {
-    /// Set the URL of the author's icon.
-    pub fn icon_url(mut self, icon_url: impl Into<String>) -> Self {
-        self.icon_url = Some(icon_url.into());
+    /// Creates an author object with the given name, leaving all other fields empty.
+    pub fn new(name: impl Into<String>) -> Self {
+        Self {
+            name: name.into(),
+            icon_url: None,
+            url: None,
+        }
+    }
+
+    /// Set the author's name, replacing the current value as set in [`Self::new`].
+    pub fn name(mut self, name: impl Into<String>) -> Self {
+        self.name = name.into();
         self
     }
 
-    /// Set the author's name.
-    pub fn name(mut self, name: impl Into<String>) -> Self {
-        self.name = Some(name.into());
+    /// Set the URL of the author's icon.
+    pub fn icon_url(mut self, icon_url: impl Into<String>) -> Self {
+        self.icon_url = Some(icon_url.into());
         self
     }
 
@@ -411,8 +412,8 @@ impl CreateEmbedAuthor {
 impl From<EmbedAuthor> for CreateEmbedAuthor {
     fn from(author: EmbedAuthor) -> Self {
         Self {
+            name: author.name,
             icon_url: author.icon_url,
-            name: Some(author.name),
             url: author.url,
         }
     }
@@ -422,25 +423,32 @@ impl From<EmbedAuthor> for CreateEmbedAuthor {
 /// method.
 ///
 /// This does not have any required fields.
-#[derive(Clone, Debug, Default, Serialize)]
+#[derive(Clone, Debug, Serialize)]
 #[must_use]
 pub struct CreateEmbedFooter {
+    text: String,
     #[serde(skip_serializing_if = "Option::is_none")]
     icon_url: Option<String>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    text: Option<String>,
 }
 
 impl CreateEmbedFooter {
-    /// Set the icon URL's value. This only supports HTTP(S).
-    pub fn icon_url(mut self, icon_url: impl Into<String>) -> Self {
-        self.icon_url = Some(icon_url.into());
+    // Creates a new footer object with the given text, leaving all other fields empty.
+    pub fn new(text: impl Into<String>) -> Self {
+        Self {
+            text: text.into(),
+            icon_url: None,
+        }
+    }
+
+    /// Set the footer's text, replacing the current value as set in [`Self::new`].
+    pub fn text(mut self, text: impl Into<String>) -> Self {
+        self.text = text.into();
         self
     }
 
-    /// Set the footer's text.
-    pub fn text(mut self, text: impl Into<String>) -> Self {
-        self.text = Some(text.into());
+    /// Set the icon URL's value. This only supports HTTP(S).
+    pub fn icon_url(mut self, icon_url: impl Into<String>) -> Self {
+        self.icon_url = Some(icon_url.into());
         self
     }
 }
@@ -449,7 +457,7 @@ impl From<EmbedFooter> for CreateEmbedFooter {
     fn from(footer: EmbedFooter) -> Self {
         Self {
             icon_url: footer.icon_url,
-            text: Some(footer.text),
+            text: footer.text,
         }
     }
 }

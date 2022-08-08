@@ -17,7 +17,7 @@ impl EventHandler for Handler {
             // using a builder syntax.
             // This example will create a message that says "Hello, World!", with an embed that has
             // a title, description, an image, three fields, and a footer.
-            let footer = CreateEmbedFooter::default().text("This is a footer");
+            let footer = CreateEmbedFooter::new("This is a footer");
             let embed = CreateEmbed::default()
                 .title("This is a title")
                 .description("This is a description")
