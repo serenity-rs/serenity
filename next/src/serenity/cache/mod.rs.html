@@ -1157,6 +1157,29 @@
 <span id="1151">1151</span>
 <span id="1152">1152</span>
 <span id="1153">1153</span>
+<span id="1154">1154</span>
+<span id="1155">1155</span>
+<span id="1156">1156</span>
+<span id="1157">1157</span>
+<span id="1158">1158</span>
+<span id="1159">1159</span>
+<span id="1160">1160</span>
+<span id="1161">1161</span>
+<span id="1162">1162</span>
+<span id="1163">1163</span>
+<span id="1164">1164</span>
+<span id="1165">1165</span>
+<span id="1166">1166</span>
+<span id="1167">1167</span>
+<span id="1168">1168</span>
+<span id="1169">1169</span>
+<span id="1170">1170</span>
+<span id="1171">1171</span>
+<span id="1172">1172</span>
+<span id="1173">1173</span>
+<span id="1174">1174</span>
+<span id="1175">1175</span>
+<span id="1176">1176</span>
 </pre><pre class="rust"><code><span class="doccomment">//! A cache containing data received from [`Shard`]s.</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! Using the cache allows to avoid REST API requests via the [`http`] module</span>
@@ -1190,7 +1213,7 @@
 <span class="doccomment">//! [`http`]: crate::http</span>
 
 <span class="kw">use</span> <span class="ident">std::collections</span>::{<span class="ident">HashMap</span>, <span class="ident">VecDeque</span>};
-<span class="kw">use</span> <span class="ident">std::hash::Hash</span>;
+<span class="kw">use</span> <span class="ident">std::hash</span>::{<span class="ident">BuildHasher</span>, <span class="ident">Hash</span>};
 <span class="kw">use</span> <span class="ident">std::str::FromStr</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;temp_cache&quot;</span>)]</span>
 <span class="kw">use</span> <span class="ident">std::sync::Arc</span>;
@@ -1200,27 +1223,28 @@
 <span class="kw">use</span> <span class="ident">dashmap::mapref::entry::Entry</span>;
 <span class="kw">use</span> <span class="ident">dashmap::mapref::one::Ref</span>;
 <span class="kw">use</span> <span class="ident">dashmap</span>::{<span class="ident">DashMap</span>, <span class="ident">DashSet</span>};
+<span class="kw">use</span> <span class="ident">fxhash::FxBuildHasher</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;temp_cache&quot;</span>)]</span>
 <span class="kw">use</span> <span class="ident">moka::dash::Cache</span> <span class="kw">as</span> <span class="ident">DashCache</span>;
 <span class="kw">use</span> <span class="ident">parking_lot::RwLock</span>;
 <span class="kw">use</span> <span class="ident">tracing::instrument</span>;
 
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="self">self</span>::cache_update::CacheUpdate</span>;
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="self">self</span>::settings::Settings</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::prelude</span>::<span class="kw-2">*</span>;
+
 <span class="kw">mod</span> <span class="ident">cache_update</span>;
 <span class="kw">mod</span> <span class="ident">event</span>;
 <span class="kw">mod</span> <span class="ident">settings</span>;
 
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="self">self</span>::cache_update::CacheUpdate</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="self">self</span>::settings::Settings</span>;
-
-<span class="kw">type</span> <span class="ident">MessageCache</span> <span class="op">=</span> <span class="ident">DashMap</span><span class="op">&lt;</span><span class="ident">ChannelId</span>, <span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">MessageId</span>, <span class="ident">Message</span><span class="op">&gt;</span><span class="op">&gt;</span>;
+<span class="kw">type</span> <span class="ident">MessageCache</span> <span class="op">=</span> <span class="ident">DashMap</span><span class="op">&lt;</span><span class="ident">ChannelId</span>, <span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">MessageId</span>, <span class="ident">Message</span><span class="op">&gt;</span>, <span class="ident">FxBuildHasher</span><span class="op">&gt;</span>;
 
 <span class="kw">struct</span> <span class="ident">NotSend</span>;
 
 <span class="kw">enum</span> <span class="ident">CacheRefInner</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">K</span>, <span class="ident">V</span><span class="op">&gt;</span> {
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;temp_cache&quot;</span>)]</span>
     <span class="ident">Arc</span>(<span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">V</span><span class="op">&gt;</span>),
-    <span class="ident">DashRef</span>(<span class="ident">Ref</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">K</span>, <span class="ident">V</span><span class="op">&gt;</span>),
+    <span class="ident">DashRef</span>(<span class="ident">Ref</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">K</span>, <span class="ident">V</span>, <span class="ident">FxBuildHasher</span><span class="op">&gt;</span>),
     <span class="ident">ReadGuard</span>(<span class="ident">parking_lot::RwLockReadGuard</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">V</span><span class="op">&gt;</span>),
 }
 
@@ -1242,7 +1266,7 @@
         <span class="ident"><span class="self">Self</span>::new</span>(<span class="ident">CacheRefInner::Arc</span>(<span class="ident">inner</span>))
     }
 
-    <span class="kw">fn</span> <span class="ident">from_ref</span>(<span class="ident">inner</span>: <span class="ident">Ref</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">K</span>, <span class="ident">V</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from_ref</span>(<span class="ident">inner</span>: <span class="ident">Ref</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">K</span>, <span class="ident">V</span>, <span class="ident">FxBuildHasher</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
         <span class="ident"><span class="self">Self</span>::new</span>(<span class="ident">CacheRefInner::DashRef</span>(<span class="ident">inner</span>))
     }
 
@@ -1326,25 +1350,25 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// When a [`Event::GuildDelete`] is received and processed by the cache,</span>
     <span class="doccomment">/// the relevant channels are also removed from this map.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">channels</span>: <span class="ident">DashMap</span><span class="op">&lt;</span><span class="ident">ChannelId</span>, <span class="ident">GuildChannel</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">channels</span>: <span class="ident">DashMap</span><span class="op">&lt;</span><span class="ident">ChannelId</span>, <span class="ident">GuildChannel</span>, <span class="ident">FxBuildHasher</span><span class="op">&gt;</span>,
     <span class="doccomment">/// Cache of channels that have been fetched via to_channel.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// Each value has a maximum TTL of 1 hour.</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;temp_cache&quot;</span>)]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">temp_channels</span>: <span class="ident">DashCache</span><span class="op">&lt;</span><span class="ident">ChannelId</span>, <span class="ident">GuildChannel</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">temp_channels</span>: <span class="ident">DashCache</span><span class="op">&lt;</span><span class="ident">ChannelId</span>, <span class="ident">GuildChannel</span>, <span class="ident">FxBuildHasher</span><span class="op">&gt;</span>,
     <span class="doccomment">/// A map of channel categories.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">categories</span>: <span class="ident">DashMap</span><span class="op">&lt;</span><span class="ident">ChannelId</span>, <span class="ident">ChannelCategory</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">categories</span>: <span class="ident">DashMap</span><span class="op">&lt;</span><span class="ident">ChannelId</span>, <span class="ident">ChannelCategory</span>, <span class="ident">FxBuildHasher</span><span class="op">&gt;</span>,
     <span class="doccomment">/// A map of guilds with full data available. This includes data like</span>
     <span class="doccomment">/// [`Role`]s and [`Emoji`]s that are not available through the REST API.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">guilds</span>: <span class="ident">DashMap</span><span class="op">&lt;</span><span class="ident">GuildId</span>, <span class="ident">Guild</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">guilds</span>: <span class="ident">DashMap</span><span class="op">&lt;</span><span class="ident">GuildId</span>, <span class="ident">Guild</span>, <span class="ident">FxBuildHasher</span><span class="op">&gt;</span>,
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">messages</span>: <span class="ident">MessageCache</span>,
     <span class="doccomment">/// A map of users&#39; presences. This is updated in real-time. Note that</span>
     <span class="doccomment">/// status updates are often &quot;eaten&quot; by the gateway, and this should not</span>
     <span class="doccomment">/// be treated as being entirely 100% accurate.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">presences</span>: <span class="ident">DashMap</span><span class="op">&lt;</span><span class="ident">UserId</span>, <span class="ident">Presence</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">presences</span>: <span class="ident">DashMap</span><span class="op">&lt;</span><span class="ident">UserId</span>, <span class="ident">Presence</span>, <span class="ident">FxBuildHasher</span><span class="op">&gt;</span>,
     <span class="doccomment">/// A map of direct message channels that the current user has open with</span>
     <span class="doccomment">/// other users.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">private_channels</span>: <span class="ident">DashMap</span><span class="op">&lt;</span><span class="ident">ChannelId</span>, <span class="ident">PrivateChannel</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">private_channels</span>: <span class="ident">DashMap</span><span class="op">&lt;</span><span class="ident">ChannelId</span>, <span class="ident">PrivateChannel</span>, <span class="ident">FxBuildHasher</span><span class="op">&gt;</span>,
     <span class="doccomment">/// The total number of shards being used by the bot.</span>
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">shard_count</span>: <span class="ident">RwLock</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
     <span class="doccomment">/// A list of guilds which are &quot;unavailable&quot;.</span>
@@ -1352,7 +1376,7 @@
     <span class="doccomment">/// Additionally, guilds are always unavailable for bot users when a Ready</span>
     <span class="doccomment">/// is received. Guilds are &quot;sent in&quot; over time through the receiving of</span>
     <span class="doccomment">/// [`Event::GuildCreate`]s.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">unavailable_guilds</span>: <span class="ident">DashSet</span><span class="op">&lt;</span><span class="ident">GuildId</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">unavailable_guilds</span>: <span class="ident">DashSet</span><span class="op">&lt;</span><span class="ident">GuildId</span>, <span class="ident">FxBuildHasher</span><span class="op">&gt;</span>,
     <span class="doccomment">/// The current user &quot;logged in&quot; and for which events are being received</span>
     <span class="doccomment">/// for.</span>
     <span class="doccomment">///</span>
@@ -1375,18 +1399,18 @@
     <span class="doccomment">/// Note, however, that users are _not_ removed from the map on removal</span>
     <span class="doccomment">/// events such as [`GuildMemberRemove`][`GuildMemberRemoveEvent`], as other</span>
     <span class="doccomment">/// structs such as members or recipients may still exist.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">users</span>: <span class="ident">DashMap</span><span class="op">&lt;</span><span class="ident">UserId</span>, <span class="ident">User</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">users</span>: <span class="ident">DashMap</span><span class="op">&lt;</span><span class="ident">UserId</span>, <span class="ident">User</span>, <span class="ident">FxBuildHasher</span><span class="op">&gt;</span>,
     <span class="doccomment">/// Queue of message IDs for each channel.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// This is simply a vecdeque so we can keep track of the order of messages</span>
     <span class="doccomment">/// inserted into the cache. When a maximum number of messages are in a</span>
     <span class="doccomment">/// channel&#39;s cache, we can pop the front and remove that ID from the cache.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">message_queue</span>: <span class="ident">DashMap</span><span class="op">&lt;</span><span class="ident">ChannelId</span>, <span class="ident">VecDeque</span><span class="op">&lt;</span><span class="ident">MessageId</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">message_queue</span>: <span class="ident">DashMap</span><span class="op">&lt;</span><span class="ident">ChannelId</span>, <span class="ident">VecDeque</span><span class="op">&lt;</span><span class="ident">MessageId</span><span class="op">&gt;</span>, <span class="ident">FxBuildHasher</span><span class="op">&gt;</span>,
     <span class="doccomment">/// Cache of users who have been fetched from `to_user`.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// Each value has a max TTL of 1 hour.</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;temp_cache&quot;</span>)]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">temp_users</span>: <span class="ident">DashCache</span><span class="op">&lt;</span><span class="ident">UserId</span>, <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">User</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">temp_users</span>: <span class="ident">DashCache</span><span class="op">&lt;</span><span class="ident">UserId</span>, <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">User</span><span class="op">&gt;</span>, <span class="ident">FxBuildHasher</span><span class="op">&gt;</span>,
     <span class="doccomment">/// The settings for the cache.</span>
     <span class="ident">settings</span>: <span class="ident">RwLock</span><span class="op">&lt;</span><span class="ident">Settings</span><span class="op">&gt;</span>,
 }
@@ -1500,7 +1524,9 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// println!(&quot;There are {} private channels&quot;, amount);</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">private_channels</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">DashMap</span><span class="op">&lt;</span><span class="ident">ChannelId</span>, <span class="ident">PrivateChannel</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">private_channels</span>(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+    ) -&gt; <span class="ident">DashMap</span><span class="op">&lt;</span><span class="ident">ChannelId</span>, <span class="ident">PrivateChannel</span>, <span class="kw">impl</span> <span class="ident">BuildHasher</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="ident">Clone</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">private_channels</span>.<span class="ident">clone</span>()
     }
 
@@ -1799,7 +1825,7 @@
 
     <span class="doccomment">/// This method clones and returns all unavailable guilds.</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">unavailable_guilds</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">DashSet</span><span class="op">&lt;</span><span class="ident">GuildId</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">unavailable_guilds</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">DashSet</span><span class="op">&lt;</span><span class="ident">GuildId</span>, <span class="kw">impl</span> <span class="ident">BuildHasher</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="ident">Clone</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">unavailable_guilds</span>.<span class="ident">clone</span>()
     }
 
@@ -1808,11 +1834,14 @@
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">guild_channels</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">guild_id</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">GuildId</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">DashMap</span><span class="op">&lt;</span><span class="ident">ChannelId</span>, <span class="ident">GuildChannel</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">DashMap</span><span class="op">&lt;</span><span class="ident">ChannelId</span>, <span class="ident">GuildChannel</span>, <span class="ident">FxBuildHasher</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">_guild_channels</span>(<span class="ident">guild_id</span>.<span class="ident">into</span>())
     }
 
-    <span class="kw">fn</span> <span class="ident">_guild_channels</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">guild_id</span>: <span class="ident">GuildId</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">DashMap</span><span class="op">&lt;</span><span class="ident">ChannelId</span>, <span class="ident">GuildChannel</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">_guild_channels</span>(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        <span class="ident">guild_id</span>: <span class="ident">GuildId</span>,
+    ) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">DashMap</span><span class="op">&lt;</span><span class="ident">ChannelId</span>, <span class="ident">GuildChannel</span>, <span class="ident">FxBuildHasher</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">guilds</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="ident">guild_id</span>).<span class="ident">map</span>(<span class="op">|</span><span class="ident">g</span><span class="op">|</span> {
             <span class="ident">g</span>.<span class="ident">channels</span>
                 .<span class="ident">iter</span>()
@@ -1834,11 +1863,14 @@
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">guild_categories</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">guild_id</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">GuildId</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">DashMap</span><span class="op">&lt;</span><span class="ident">ChannelId</span>, <span class="ident">ChannelCategory</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">DashMap</span><span class="op">&lt;</span><span class="ident">ChannelId</span>, <span class="ident">ChannelCategory</span>, <span class="ident">FxBuildHasher</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">_guild_categories</span>(<span class="ident">guild_id</span>.<span class="ident">into</span>())
     }
 
-    <span class="kw">fn</span> <span class="ident">_guild_categories</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">guild_id</span>: <span class="ident">GuildId</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">DashMap</span><span class="op">&lt;</span><span class="ident">ChannelId</span>, <span class="ident">ChannelCategory</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">_guild_categories</span>(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        <span class="ident">guild_id</span>: <span class="ident">GuildId</span>,
+    ) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">DashMap</span><span class="op">&lt;</span><span class="ident">ChannelId</span>, <span class="ident">ChannelCategory</span>, <span class="ident">FxBuildHasher</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">guilds</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="ident">guild_id</span>).<span class="ident">map</span>(<span class="op">|</span><span class="ident">g</span><span class="op">|</span> {
             <span class="ident">g</span>.<span class="ident">channels</span>
                 .<span class="ident">iter</span>()
@@ -2027,7 +2059,7 @@
 
     <span class="doccomment">/// Clones all users and returns them.</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">users</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">DashMap</span><span class="op">&lt;</span><span class="ident">UserId</span>, <span class="ident">User</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">users</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">DashMap</span><span class="op">&lt;</span><span class="ident">UserId</span>, <span class="ident">User</span>, <span class="kw">impl</span> <span class="ident">BuildHasher</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="ident">Clone</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">users</span>.<span class="ident">clone</span>()
     }
 
@@ -2049,7 +2081,9 @@
 
     <span class="doccomment">/// Clones all categories and returns them.</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">categories</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">DashMap</span><span class="op">&lt;</span><span class="ident">ChannelId</span>, <span class="ident">ChannelCategory</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">categories</span>(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+    ) -&gt; <span class="ident">DashMap</span><span class="op">&lt;</span><span class="ident">ChannelId</span>, <span class="ident">ChannelCategory</span>, <span class="kw">impl</span> <span class="ident">BuildHasher</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="ident">Clone</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">categories</span>.<span class="ident">clone</span>()
     }
 
@@ -2099,23 +2133,35 @@
 }
 
 <span class="kw">impl</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">Cache</span> {
-    <span class="kw">fn</span> <span class="ident">default</span>() -&gt; <span class="ident">Cache</span> {
-        <span class="ident">Cache</span> {
-            <span class="ident">channels</span>: <span class="ident">DashMap::default</span>(),
+    <span class="kw">fn</span> <span class="ident">default</span>() -&gt; <span class="self">Self</span> {
+        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;temp_cache&quot;</span>)]</span>
+        <span class="kw">fn</span> <span class="ident">temp_cache</span><span class="op">&lt;</span><span class="ident">K</span>, <span class="ident">V</span><span class="op">&gt;</span>() -&gt; <span class="ident">DashCache</span><span class="op">&lt;</span><span class="ident">K</span>, <span class="ident">V</span>, <span class="ident">FxBuildHasher</span><span class="op">&gt;</span>
+        <span class="kw">where</span>
+            <span class="ident">K</span>: <span class="ident">Hash</span> <span class="op">+</span> <span class="ident">Eq</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
+            <span class="ident">V</span>: <span class="ident">Clone</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
+        {
+            <span class="ident">DashCache::builder</span>()
+                .<span class="ident">time_to_live</span>(<span class="ident">Duration::from_secs</span>(<span class="number">60</span> <span class="op">*</span> <span class="number">60</span>))
+                .<span class="ident">build_with_hasher</span>(<span class="ident">FxBuildHasher::default</span>())
+        }
+
+        <span class="self">Self</span> {
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;temp_cache&quot;</span>)]</span>
-            <span class="ident">temp_channels</span>: <span class="ident">DashCache::builder</span>().<span class="ident">time_to_live</span>(<span class="ident">Duration::from_secs</span>(<span class="number">60</span> <span class="op">*</span> <span class="number">60</span>)).<span class="ident">build</span>(),
+            <span class="ident">temp_channels</span>: <span class="ident">temp_cache</span>(),
+            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;temp_cache&quot;</span>)]</span>
+            <span class="ident">temp_users</span>: <span class="ident">temp_cache</span>(),
+
+            <span class="ident">channels</span>: <span class="ident">DashMap::default</span>(),
             <span class="ident">categories</span>: <span class="ident">DashMap::default</span>(),
             <span class="ident">guilds</span>: <span class="ident">DashMap::default</span>(),
             <span class="ident">messages</span>: <span class="ident">DashMap::default</span>(),
             <span class="ident">presences</span>: <span class="ident">DashMap::default</span>(),
-            <span class="ident">private_channels</span>: <span class="ident">DashMap::with_capacity</span>(<span class="number">128</span>),
+            <span class="ident">private_channels</span>: <span class="ident">DashMap::with_capacity_and_hasher</span>(<span class="number">128</span>, <span class="ident">FxBuildHasher::default</span>()),
             <span class="ident">settings</span>: <span class="ident">RwLock::new</span>(<span class="ident">Settings::default</span>()),
             <span class="ident">shard_count</span>: <span class="ident">RwLock::new</span>(<span class="number">1</span>),
             <span class="ident">unavailable_guilds</span>: <span class="ident">DashSet::default</span>(),
             <span class="ident">user</span>: <span class="ident">RwLock::new</span>(<span class="ident">CurrentUser::default</span>()),
             <span class="ident">users</span>: <span class="ident">DashMap::default</span>(),
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;temp_cache&quot;</span>)]</span>
-            <span class="ident">temp_users</span>: <span class="ident">DashCache::builder</span>().<span class="ident">time_to_live</span>(<span class="ident">Duration::from_secs</span>(<span class="number">60</span> <span class="op">*</span> <span class="number">60</span>)).<span class="ident">build</span>(),
             <span class="ident">message_queue</span>: <span class="ident">DashMap::default</span>(),
         }
     }
