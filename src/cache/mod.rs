@@ -31,7 +31,7 @@
 //! [`http`]: crate::http
 
 use std::collections::{HashMap, VecDeque};
-use std::hash::Hash;
+use std::hash::{BuildHasher, Hash};
 use std::str::FromStr;
 #[cfg(feature = "temp_cache")]
 use std::sync::Arc;
@@ -41,27 +41,28 @@ use std::time::Duration;
 use dashmap::mapref::entry::Entry;
 use dashmap::mapref::one::Ref;
 use dashmap::{DashMap, DashSet};
+use fxhash::FxBuildHasher;
 #[cfg(feature = "temp_cache")]
 use moka::dash::Cache as DashCache;
 use parking_lot::RwLock;
 use tracing::instrument;
 
+pub use self::cache_update::CacheUpdate;
+pub use self::settings::Settings;
 use crate::model::prelude::*;
+
 mod cache_update;
 mod event;
 mod settings;
 
-pub use self::cache_update::CacheUpdate;
-pub use self::settings::Settings;
-
-type MessageCache = DashMap<ChannelId, HashMap<MessageId, Message>>;
+type MessageCache = DashMap<ChannelId, HashMap<MessageId, Message>, FxBuildHasher>;
 
 struct NotSend;
 
 enum CacheRefInner<'a, K, V> {
     #[cfg(feature = "temp_cache")]
     Arc(Arc<V>),
-    DashRef(Ref<'a, K, V>),
+    DashRef(Ref<'a, K, V, FxBuildHasher>),
     ReadGuard(parking_lot::RwLockReadGuard<'a, V>),
 }
 
@@ -83,7 +84,7 @@ impl<'a, K, V> CacheRef<'a, K, V> {
         Self::new(CacheRefInner::Arc(inner))
     }
 
-    fn from_ref(inner: Ref<'a, K, V>) -> Self {
+    fn from_ref(inner: Ref<'a, K, V, FxBuildHasher>) -> Self {
         Self::new(CacheRefInner::DashRef(inner))
     }
 
@@ -167,25 +168,25 @@ pub struct Cache {
     ///
     /// When a [`Event::GuildDelete`] is received and processed by the cache,
     /// the relevant channels are also removed from this map.
-    pub(crate) channels: DashMap<ChannelId, GuildChannel>,
+    pub(crate) channels: DashMap<ChannelId, GuildChannel, FxBuildHasher>,
     /// Cache of channels that have been fetched via to_channel.
     ///
     /// Each value has a maximum TTL of 1 hour.
     #[cfg(feature = "temp_cache")]
-    pub(crate) temp_channels: DashCache<ChannelId, GuildChannel>,
+    pub(crate) temp_channels: DashCache<ChannelId, GuildChannel, FxBuildHasher>,
     /// A map of channel categories.
-    pub(crate) categories: DashMap<ChannelId, ChannelCategory>,
+    pub(crate) categories: DashMap<ChannelId, ChannelCategory, FxBuildHasher>,
     /// A map of guilds with full data available. This includes data like
     /// [`Role`]s and [`Emoji`]s that are not available through the REST API.
-    pub(crate) guilds: DashMap<GuildId, Guild>,
+    pub(crate) guilds: DashMap<GuildId, Guild, FxBuildHasher>,
     pub(crate) messages: MessageCache,
     /// A map of users' presences. This is updated in real-time. Note that
     /// status updates are often "eaten" by the gateway, and this should not
     /// be treated as being entirely 100% accurate.
-    pub(crate) presences: DashMap<UserId, Presence>,
+    pub(crate) presences: DashMap<UserId, Presence, FxBuildHasher>,
     /// A map of direct message channels that the current user has open with
     /// other users.
-    pub(crate) private_channels: DashMap<ChannelId, PrivateChannel>,
+    pub(crate) private_channels: DashMap<ChannelId, PrivateChannel, FxBuildHasher>,
     /// The total number of shards being used by the bot.
     pub(crate) shard_count: RwLock<u32>,
     /// A list of guilds which are "unavailable".
@@ -193,7 +194,7 @@ pub struct Cache {
     /// Additionally, guilds are always unavailable for bot users when a Ready
     /// is received. Guilds are "sent in" over time through the receiving of
     /// [`Event::GuildCreate`]s.
-    pub(crate) unavailable_guilds: DashSet<GuildId>,
+    pub(crate) unavailable_guilds: DashSet<GuildId, FxBuildHasher>,
     /// The current user "logged in" and for which events are being received
     /// for.
     ///
@@ -216,18 +217,18 @@ pub struct Cache {
     /// Note, however, that users are _not_ removed from the map on removal
     /// events such as [`GuildMemberRemove`][`GuildMemberRemoveEvent`], as other
     /// structs such as members or recipients may still exist.
-    pub(crate) users: DashMap<UserId, User>,
+    pub(crate) users: DashMap<UserId, User, FxBuildHasher>,
     /// Queue of message IDs for each channel.
     ///
     /// This is simply a vecdeque so we can keep track of the order of messages
     /// inserted into the cache. When a maximum number of messages are in a
     /// channel's cache, we can pop the front and remove that ID from the cache.
-    pub(crate) message_queue: DashMap<ChannelId, VecDeque<MessageId>>,
+    pub(crate) message_queue: DashMap<ChannelId, VecDeque<MessageId>, FxBuildHasher>,
     /// Cache of users who have been fetched from `to_user`.
     ///
     /// Each value has a max TTL of 1 hour.
     #[cfg(feature = "temp_cache")]
-    pub(crate) temp_users: DashCache<UserId, Arc<User>>,
+    pub(crate) temp_users: DashCache<UserId, Arc<User>, FxBuildHasher>,
     /// The settings for the cache.
     settings: RwLock<Settings>,
 }
@@ -341,7 +342,9 @@ impl Cache {
     ///
     /// println!("There are {} private channels", amount);
     /// ```
-    pub fn private_channels(&self) -> DashMap<ChannelId, PrivateChannel> {
+    pub fn private_channels(
+        &self,
+    ) -> DashMap<ChannelId, PrivateChannel, impl BuildHasher + Send + Sync + Clone> {
         self.private_channels.clone()
     }
 
@@ -640,7 +643,7 @@ impl Cache {
 
     /// This method clones and returns all unavailable guilds.
     #[inline]
-    pub fn unavailable_guilds(&self) -> DashSet<GuildId> {
+    pub fn unavailable_guilds(&self) -> DashSet<GuildId, impl BuildHasher + Send + Sync + Clone> {
         self.unavailable_guilds.clone()
     }
 
@@ -649,11 +652,14 @@ impl Cache {
     pub fn guild_channels(
         &self,
         guild_id: impl Into<GuildId>,
-    ) -> Option<DashMap<ChannelId, GuildChannel>> {
+    ) -> Option<DashMap<ChannelId, GuildChannel, FxBuildHasher>> {
         self._guild_channels(guild_id.into())
     }
 
-    fn _guild_channels(&self, guild_id: GuildId) -> Option<DashMap<ChannelId, GuildChannel>> {
+    fn _guild_channels(
+        &self,
+        guild_id: GuildId,
+    ) -> Option<DashMap<ChannelId, GuildChannel, FxBuildHasher>> {
         self.guilds.get(&guild_id).map(|g| {
             g.channels
                 .iter()
@@ -675,11 +681,14 @@ impl Cache {
     pub fn guild_categories(
         &self,
         guild_id: impl Into<GuildId>,
-    ) -> Option<DashMap<ChannelId, ChannelCategory>> {
+    ) -> Option<DashMap<ChannelId, ChannelCategory, FxBuildHasher>> {
         self._guild_categories(guild_id.into())
     }
 
-    fn _guild_categories(&self, guild_id: GuildId) -> Option<DashMap<ChannelId, ChannelCategory>> {
+    fn _guild_categories(
+        &self,
+        guild_id: GuildId,
+    ) -> Option<DashMap<ChannelId, ChannelCategory, FxBuildHasher>> {
         self.guilds.get(&guild_id).map(|g| {
             g.channels
                 .iter()
@@ -868,7 +877,7 @@ impl Cache {
 
     /// Clones all users and returns them.
     #[inline]
-    pub fn users(&self) -> DashMap<UserId, User> {
+    pub fn users(&self) -> DashMap<UserId, User, impl BuildHasher + Send + Sync + Clone> {
         self.users.clone()
     }
 
@@ -890,7 +899,9 @@ impl Cache {
 
     /// Clones all categories and returns them.
     #[inline]
-    pub fn categories(&self) -> DashMap<ChannelId, ChannelCategory> {
+    pub fn categories(
+        &self,
+    ) -> DashMap<ChannelId, ChannelCategory, impl BuildHasher + Send + Sync + Clone> {
         self.categories.clone()
     }
 
@@ -940,23 +951,35 @@ impl Cache {
 }
 
 impl Default for Cache {
-    fn default() -> Cache {
-        Cache {
-            channels: DashMap::default(),
+    fn default() -> Self {
+        #[cfg(feature = "temp_cache")]
+        fn temp_cache<K, V>() -> DashCache<K, V, FxBuildHasher>
+        where
+            K: Hash + Eq + Send + Sync + 'static,
+            V: Clone + Send + Sync + 'static,
+        {
+            DashCache::builder()
+                .time_to_live(Duration::from_secs(60 * 60))
+                .build_with_hasher(FxBuildHasher::default())
+        }
+
+        Self {
             #[cfg(feature = "temp_cache")]
-            temp_channels: DashCache::builder().time_to_live(Duration::from_secs(60 * 60)).build(),
+            temp_channels: temp_cache(),
+            #[cfg(feature = "temp_cache")]
+            temp_users: temp_cache(),
+
+            channels: DashMap::default(),
             categories: DashMap::default(),
             guilds: DashMap::default(),
             messages: DashMap::default(),
             presences: DashMap::default(),
-            private_channels: DashMap::with_capacity(128),
+            private_channels: DashMap::with_capacity_and_hasher(128, FxBuildHasher::default()),
             settings: RwLock::new(Settings::default()),
             shard_count: RwLock::new(1),
             unavailable_guilds: DashSet::default(),
             user: RwLock::new(CurrentUser::default()),
             users: DashMap::default(),
-            #[cfg(feature = "temp_cache")]
-            temp_users: DashCache::builder().time_to_live(Duration::from_secs(60 * 60)).build(),
             message_queue: DashMap::default(),
         }
     }
