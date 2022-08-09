@@ -12,7 +12,6 @@ use serenity::builder::{
     CreateMessage,
     CreateSelectMenu,
     CreateSelectMenuOption,
-    CreateSelectMenuOptions,
 };
 use serenity::client::{Context, EventHandler};
 use serenity::futures::StreamExt;
@@ -47,13 +46,13 @@ impl EventHandler for Handler {
                         .add_select_menu(CreateSelectMenu::default()
                             .custom_id("animal_select")
                             .placeholder("No animal selected")
-                            .options(CreateSelectMenuOptions::default().set_options(vec![
+                            .options(vec![
                                 CreateSelectMenuOption::default().label("🐈 meow").value("Cat"),
                                 CreateSelectMenuOption::default().label("🐕 woof").value("Dog"),
                                 CreateSelectMenuOption::default().label("🐎 neigh").value("Horse"),
                                 CreateSelectMenuOption::default().label("🦙 hoooooooonk").value("Alpaca"),
                                 CreateSelectMenuOption::default().label("🦀 crab rave").value("Ferris"),
-                            ]))
+                            ])
                         )
                     )
                 ),
