@@ -76,15 +76,15 @@ impl Animal {
     }
 
     fn select_menu() -> CreateSelectMenu {
-        let options = CreateSelectMenuOptions::default()
-            .add_option(Self::Cat.menu_option())
-            .add_option(Self::Dog.menu_option())
-            .add_option(Self::Horse.menu_option())
-            .add_option(Self::Alpaca.menu_option());
         CreateSelectMenu::default()
             .custom_id("animal_select")
             .placeholder("No animal selected")
-            .options(options)
+            .options(vec![
+                Self::Cat.menu_option(),
+                Self::Dog.menu_option(),
+                Self::Horse.menu_option(),
+                Self::Alpaca.menu_option(),
+            ])
     }
 
     fn action_row() -> CreateActionRow {
