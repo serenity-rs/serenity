@@ -173,7 +173,7 @@ pub struct CreateSelectMenu {
     #[serde(skip_serializing_if = "Option::is_none")]
     disabled: Option<bool>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    options: Option<CreateSelectMenuOptions>,
+    options: Option<Vec<CreateSelectMenuOption>>,
 
     #[serde(rename = "type")]
     kind: u8,
@@ -224,29 +224,8 @@ impl CreateSelectMenu {
         self
     }
 
-    pub fn options(mut self, options: CreateSelectMenuOptions) -> Self {
+    pub fn options(mut self, options: Vec<CreateSelectMenuOption>) -> Self {
         self.options = Some(options);
-        self
-    }
-}
-
-/// A builder for creating several [`SelectMenuOption`].
-///
-/// [`SelectMenuOption`]: crate::model::application::component::SelectMenuOption
-#[derive(Clone, Debug, Default, Serialize)]
-#[must_use]
-pub struct CreateSelectMenuOptions(pub Vec<CreateSelectMenuOption>);
-
-impl CreateSelectMenuOptions {
-    /// Adds an option.
-    pub fn add_option(mut self, option: CreateSelectMenuOption) -> Self {
-        self.0.push(option);
-        self
-    }
-
-    /// Sets all the options.
-    pub fn set_options(mut self, options: Vec<CreateSelectMenuOption>) -> Self {
-        self.0.extend(options);
         self
     }
 }
