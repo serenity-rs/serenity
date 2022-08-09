@@ -9,6 +9,11 @@ use crate::model::channel::ReactionType;
 pub struct CreateComponents(pub Vec<CreateActionRow>);
 
 impl CreateComponents {
+    /// Equivalent to [`Self::default`].
+    pub fn new() -> Self {
+        Self::default()
+    }
+
     /// Adds an action row.
     pub fn add_action_row(mut self, row: CreateActionRow) -> Self {
         self.0.push(row);
@@ -62,6 +67,11 @@ impl Default for CreateActionRow {
 }
 
 impl CreateActionRow {
+    /// Equivalent to [`Self::default`].
+    pub fn new() -> Self {
+        Self::default()
+    }
+
     /// Adds a button.
     pub fn add_button(mut self, button: CreateButton) -> Self {
         self.components.push(ComponentBuilder::Button(button));

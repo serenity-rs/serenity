@@ -18,7 +18,7 @@ impl EventHandler for Handler {
             // This example will create a message that says "Hello, World!", with an embed that has
             // a title, description, an image, three fields, and a footer.
             let footer = CreateEmbedFooter::new("This is a footer");
-            let embed = CreateEmbed::default()
+            let embed = CreateEmbed::new()
                 .title("This is a title")
                 .description("This is a description")
                 .image("attachment://ferris_eyes.png")
@@ -31,7 +31,7 @@ impl EventHandler for Handler {
                 // Add a timestamp for the current time
                 // This also accepts a rfc3339 Timestamp
                 .timestamp(Timestamp::now());
-            let builder = CreateMessage::default()
+            let builder = CreateMessage::new()
                 .content("Hello, World!")
                 .embed(embed)
                 .add_file("./ferris_eyes.png");

@@ -310,7 +310,7 @@ impl ChannelId {
     /// # async fn run() {
     /// #     let http = Http::new("token");
     /// #     let channel_id = ChannelId::new(1234);
-    /// let builder = EditChannel::default().name("test").bitrate(64000);
+    /// let builder = EditChannel::new().name("test").bitrate(64000);
     /// channel_id.edit(&http, builder).await;
     /// # }
     /// ```
@@ -630,7 +630,7 @@ impl ChannelId {
         cache_http: impl CacheHttp,
         content: impl Into<String>,
     ) -> Result<Message> {
-        let builder = CreateMessage::default().content(content);
+        let builder = CreateMessage::new().content(content);
         self.send_message(cache_http, builder).await
     }
 
@@ -658,7 +658,7 @@ impl ChannelId {
     ///
     /// let paths = vec!["/path/to/file.jpg", "path/to/file2.jpg"];
     ///
-    /// let builder = CreateMessage::default().content("some files");
+    /// let builder = CreateMessage::new().content("some files");
     /// let _ = channel_id.send_files(&http, paths, builder).await;
     /// # }
     /// ```
@@ -682,7 +682,7 @@ impl ChannelId {
     ///
     /// let files = vec![(&f1, "my_file.jpg"), (&f2, "my_file2.jpg")];
     ///
-    /// let builder = CreateMessage::default().content("some files");
+    /// let builder = CreateMessage::new().content("some files");
     /// let _ = channel_id.send_files(&http, files, builder).await;
     /// #    Ok(())
     /// # }
@@ -1120,7 +1120,7 @@ impl<H: AsRef<Http>> MessagesIter<H> {
 
         // If `self.before` is not set yet, we can use `.messages` to fetch
         // the last message after very first fetch from last.
-        let mut builder = GetMessages::default().limit(grab_size);
+        let mut builder = GetMessages::new().limit(grab_size);
         if let Some(before) = self.before {
             builder = builder.before(before);
         }

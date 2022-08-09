@@ -94,7 +94,7 @@ impl Sticker {
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// # let http = Http::new("token");
     /// # let mut sticker = GuildId::new(7).sticker(&http, StickerId::new(7)).await?;
-    /// let builder = EditSticker::default().name("Bun bun meow");
+    /// let builder = EditSticker::new().name("Bun bun meow");
     /// sticker.edit(&http, builder).await?;
     /// # Ok(())
     /// # }

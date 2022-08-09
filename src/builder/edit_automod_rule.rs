@@ -31,6 +31,11 @@ pub struct EditAutoModRule {
 }
 
 impl EditAutoModRule {
+    /// Equivalent to [`Self::default`].
+    pub fn new() -> Self {
+        Self::default()
+    }
+
     /// Creates or edits an automoderation [`Rule`] in a guild. Passing `Some(rule_id)` will edit
     /// that corresponding rule, otherwise a new rule will be created.
     ///
@@ -51,6 +56,8 @@ impl EditAutoModRule {
         let http = http.as_ref();
         match rule_id {
             Some(rule_id) => http.edit_automod_rule(guild_id.into(), rule_id.into(), &self).await,
+            // Automod Rule creation has required fields, whereas modifying a rule does not.
+            // TODO: Enforce these fields (maybe with a separate CreateAutoModRule builder).
             None => http.create_automod_rule(guild_id.into(), &self).await,
         }
     }

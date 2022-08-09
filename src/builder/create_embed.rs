@@ -71,6 +71,11 @@ pub struct CreateEmbed {
 }
 
 impl CreateEmbed {
+    /// Equivalent to [`Self::default`].
+    pub fn new() -> Self {
+        Self::default()
+    }
+
     /// Set the author of the embed.
     ///
     /// Refer to the documentation for [`CreateEmbedAuthor`] for more information.
@@ -180,8 +185,8 @@ impl CreateEmbed {
     ///         if msg.content == "~embed" {
     ///             let timestamp: Timestamp =
     ///                 "2004-06-08T16:04:23Z".parse().expect("Invalid timestamp!");
-    ///             let embed = CreateEmbed::default().title("hello").timestamp(timestamp);
-    ///             let builder = CreateMessage::default().embed(embed);
+    ///             let embed = CreateEmbed::new().title("hello").timestamp(timestamp);
+    ///             let builder = CreateMessage::new().embed(embed);
     ///             let _ = msg.channel_id.send_message(&context.http, builder).await;
     ///         }
     ///     }
@@ -221,11 +226,11 @@ impl CreateEmbed {
     ///             if let Some(channel) = channel_search {
     ///                 let icon_url = member.user.face();
     ///                 let author = CreateEmbedAuthor::new(member.user.name).icon_url(icon_url);
-    ///                 let mut embed = CreateEmbed::default().title("Member Join").author(author);
+    ///                 let mut embed = CreateEmbed::new().title("Member Join").author(author);
     ///                 if let Some(joined_at) = member.joined_at {
     ///                     embed = embed.timestamp(joined_at);
     ///                 }
-    ///                 let builder = CreateMessage::default().embed(embed);
+    ///                 let builder = CreateMessage::new().embed(embed);
     ///                 let _ = channel.send_message(&context, builder).await;
     ///             }
     ///         }
