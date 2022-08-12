@@ -107,7 +107,7 @@ impl Context {
     /// impl EventHandler for Handler {
     ///     async fn message(&self, ctx: Context, msg: Message) {
     ///         if msg.content == "!online" {
-    ///             ctx.online().await;
+    ///             ctx.online();
     ///         }
     ///     }
     /// }
@@ -145,7 +145,7 @@ impl Context {
     /// impl EventHandler for Handler {
     ///     async fn message(&self, ctx: Context, msg: Message) {
     ///         if msg.content == "!idle" {
-    ///             ctx.idle().await;
+    ///             ctx.idle();
     ///         }
     ///     }
     /// }
@@ -183,7 +183,7 @@ impl Context {
     /// impl EventHandler for Handler {
     ///     async fn message(&self, ctx: Context, msg: Message) {
     ///         if msg.content == "!dnd" {
-    ///             ctx.dnd().await;
+    ///             ctx.dnd();
     ///         }
     ///     }
     /// }
@@ -221,7 +221,7 @@ impl Context {
     /// #[serenity::async_trait]
     /// impl EventHandler for Handler {
     ///     async fn ready(&self, ctx: Context, _: Ready) {
-    ///         ctx.invisible().await;
+    ///         ctx.invisible();
     ///     }
     /// }
     ///
@@ -260,7 +260,7 @@ impl Context {
     /// #[serenity::async_trait]
     /// impl EventHandler for Handler {
     ///     async fn resume(&self, ctx: Context, _: ResumedEvent) {
-    ///         ctx.reset_presence().await;
+    ///         ctx.reset_presence();
     ///     }
     /// }
     ///
@@ -302,7 +302,7 @@ impl Context {
     ///         let mut args = msg.content.splitn(2, ' ');
     ///
     ///         if let (Some("~setgame"), Some(game)) = (args.next(), args.next()) {
-    ///             ctx.set_activity(Some(ActivityData::playing(game))).await;
+    ///             ctx.set_activity(Some(ActivityData::playing(game)));
     ///         }
     ///     }
     /// }
