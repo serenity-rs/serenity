@@ -124,7 +124,7 @@ impl Context {
     /// [`Online`]: OnlineStatus::Online
     #[cfg(feature = "gateway")]
     #[inline]
-    pub async fn online(&self) {
+    pub fn online(&self) {
         self.shard.set_status(OnlineStatus::Online);
     }
 
@@ -162,7 +162,7 @@ impl Context {
     /// [`Idle`]: OnlineStatus::Idle
     #[cfg(feature = "gateway")]
     #[inline]
-    pub async fn idle(&self) {
+    pub fn idle(&self) {
         self.shard.set_status(OnlineStatus::Idle);
     }
 
@@ -200,7 +200,7 @@ impl Context {
     /// [`DoNotDisturb`]: OnlineStatus::DoNotDisturb
     #[cfg(feature = "gateway")]
     #[inline]
-    pub async fn dnd(&self) {
+    pub fn dnd(&self) {
         self.shard.set_status(OnlineStatus::DoNotDisturb);
     }
 
@@ -238,7 +238,7 @@ impl Context {
     /// [`Invisible`]: OnlineStatus::Invisible
     #[cfg(feature = "gateway")]
     #[inline]
-    pub async fn invisible(&self) {
+    pub fn invisible(&self) {
         self.shard.set_status(OnlineStatus::Invisible);
     }
 
@@ -277,7 +277,7 @@ impl Context {
     /// [`Online`]: OnlineStatus::Online
     #[cfg(feature = "gateway")]
     #[inline]
-    pub async fn reset_presence(&self) {
+    pub fn reset_presence(&self) {
         self.shard.set_presence(None, OnlineStatus::Online);
     }
 
@@ -317,7 +317,7 @@ impl Context {
     /// ```
     #[cfg(feature = "gateway")]
     #[inline]
-    pub async fn set_activity(&self, activity: Option<ActivityData>) {
+    pub fn set_activity(&self, activity: Option<ActivityData>) {
         self.shard.set_activity(activity);
     }
 
@@ -386,7 +386,7 @@ impl Context {
     /// [`Idle`]: OnlineStatus::Idle
     #[cfg(feature = "gateway")]
     #[inline]
-    pub async fn set_presence(&self, activity: Option<ActivityData>, status: OnlineStatus) {
+    pub fn set_presence(&self, activity: Option<ActivityData>, status: OnlineStatus) {
         self.shard.set_presence(activity, status);
     }
 
@@ -394,7 +394,7 @@ impl Context {
     /// sent back to `filter`'s paired receiver.
     #[inline]
     #[cfg(feature = "collector")]
-    pub async fn set_message_filter(&self, filter: MessageFilter) {
+    pub fn set_message_filter(&self, filter: MessageFilter) {
         self.shard.set_message_filter(filter);
     }
 
@@ -402,7 +402,7 @@ impl Context {
     /// sent back to `filter`'s paired receiver.
     #[inline]
     #[cfg(feature = "collector")]
-    pub async fn set_reaction_filter(&self, filter: ReactionFilter) {
+    pub fn set_reaction_filter(&self, filter: ReactionFilter) {
         self.shard.set_reaction_filter(filter);
     }
 
@@ -410,7 +410,7 @@ impl Context {
     /// sent back to `filter`'s paired receiver.
     #[inline]
     #[cfg(feature = "collector")]
-    pub async fn set_component_interaction_filter(&self, filter: ComponentInteractionFilter) {
+    pub fn set_component_interaction_filter(&self, filter: ComponentInteractionFilter) {
         self.shard.set_component_interaction_filter(filter);
     }
 }
