@@ -23,7 +23,7 @@ use crate::model::prelude::*;
 /// # #[command]
 /// # async fn example(ctx: &Context) -> CommandResult {
 /// # let mut message = ChannelId::new(7).message(&ctx, MessageId::new(8)).await?;
-/// let builder = EditMessage::default().content("hello");
+/// let builder = EditMessage::new().content("hello");
 /// message.edit(ctx, builder).await?;
 /// # Ok(())
 /// # }
@@ -51,6 +51,11 @@ pub struct EditMessage<'a> {
 }
 
 impl<'a> EditMessage<'a> {
+    /// Equivalent to [`Self::default`].
+    pub fn new() -> Self {
+        Self::default()
+    }
+
     /// Edits a message in the channel.
     ///
     /// **Note**: Message contents must be under 2000 unicode code points, and embeds must be under
