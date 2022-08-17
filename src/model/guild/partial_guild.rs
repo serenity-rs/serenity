@@ -960,18 +960,17 @@ impl PartialGuild {
     /// [`position`]: Role::position
     #[cfg(feature = "cache")]
     #[inline]
-    pub async fn greater_member_hierarchy(
+    pub fn greater_member_hierarchy(
         &self,
         cache: impl AsRef<Cache>,
         lhs_id: impl Into<UserId>,
         rhs_id: impl Into<UserId>,
     ) -> Option<UserId> {
-        self._greater_member_hierarchy(&cache, lhs_id.into(), rhs_id.into()).await
+        self._greater_member_hierarchy(&cache, lhs_id.into(), rhs_id.into())
     }
 
     #[cfg(feature = "cache")]
-    #[allow(clippy::unused_async)]
-    async fn _greater_member_hierarchy(
+    fn _greater_member_hierarchy(
         &self,
         cache: impl AsRef<Cache>,
         lhs_id: UserId,
