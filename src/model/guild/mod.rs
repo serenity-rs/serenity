@@ -371,8 +371,8 @@ impl Guild {
     /// Returns the "default" channel of the guild for the passed user id.
     /// (This returns the first channel that can be read by the user, if there isn't one,
     /// returns [`None`])
-    #[allow(clippy::unused_async)]
-    pub async fn default_channel(&self, uid: UserId) -> Option<&GuildChannel> {
+    #[must_use]
+    pub fn default_channel(&self, uid: UserId) -> Option<&GuildChannel> {
         let member = self.members.get(&uid)?;
         for channel in self.channels.values() {
             if let Channel::Guild(channel) = channel {
