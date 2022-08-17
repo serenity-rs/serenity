@@ -230,7 +230,7 @@ impl Webhook {
     /// let url = "https://discord.com/api/webhooks/245037420704169985/ig5AO-wdVWpCBtUUMxmgsWryqgsW3DChbKYOINftJ4DCrUbnkedoYZD0VOH1QLr-S3sV";
     /// let mut webhook = Webhook::from_url(&http, url).await?;
     ///
-    /// let builder = EditWebhook::default().name("new name");
+    /// let builder = EditWebhook::new().name("new name");
     /// webhook.edit(&http, builder).await?;
     /// #     Ok(())
     /// # }
@@ -265,7 +265,7 @@ impl Webhook {
     /// let url = "https://discord.com/api/webhooks/245037420704169985/ig5AO-wdVWpCBtUUMxmgsWryqgsW3DChbKYOINftJ4DCrUbnkedoYZD0VOH1QLr-S3sV";
     /// let mut webhook = Webhook::from_url(&http, url).await?;
     ///
-    /// let builder = ExecuteWebhook::default().content("test");
+    /// let builder = ExecuteWebhook::new().content("test");
     /// webhook.execute(&http, false, builder).await?;
     /// #     Ok(())
     /// # }
@@ -285,7 +285,7 @@ impl Webhook {
     /// let url = "https://discord.com/api/webhooks/245037420704169985/ig5AO-wdVWpCBtUUMxmgsWryqgsW3DChbKYOINftJ4DCrUbnkedoYZD0VOH1QLr-S3sV";
     /// let mut webhook = Webhook::from_url(&http, url).await?;
     ///
-    /// let embed = CreateEmbed::default()
+    /// let embed = CreateEmbed::new()
     ///     .title("Rust's website")
     ///     .description(
     ///         "Rust is a systems programming language that runs blazingly fast, prevents \
@@ -293,7 +293,7 @@ impl Webhook {
     ///     )
     ///     .url("https://rust-lang.org");
     ///
-    /// let builder = ExecuteWebhook::default().content("test").username("serenity").embed(embed);
+    /// let builder = ExecuteWebhook::new().content("test").username("serenity").embed(embed);
     /// webhook.execute(&http, false, builder).await?;
     /// #     Ok(())
     /// # }

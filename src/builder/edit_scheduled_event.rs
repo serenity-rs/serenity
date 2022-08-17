@@ -30,6 +30,11 @@ pub struct EditScheduledEvent {
 }
 
 impl EditScheduledEvent {
+    /// Equivalent to [`Self::default`].
+    pub fn new() -> Self {
+        Self::default()
+    }
+
     /// Modifies a scheduled event in the guild with the data set, if any.
     ///
     /// **Note**: Requires the [Manage Events] permission.

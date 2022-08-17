@@ -6,5 +6,5 @@ pub fn run(_options: &[ResolvedOption]) -> String {
 }
 
 pub fn register() -> CreateApplicationCommand {
-    CreateApplicationCommand::default().name("ping").description("A ping command")
+    CreateApplicationCommand::new("ping", "A ping command")
 }

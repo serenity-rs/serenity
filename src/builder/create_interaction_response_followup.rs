@@ -29,6 +29,11 @@ pub struct CreateInteractionResponseFollowup<'a> {
 }
 
 impl<'a> CreateInteractionResponseFollowup<'a> {
+    /// Equivalent to [`Self::default`].
+    pub fn new() -> Self {
+        Self::default()
+    }
+
     /// Creates or edits a followup response to the response sent. If `message_id` is not `None`,
     /// then the corresponding message will be edited. Otherwise, a new message will be created.
     ///
