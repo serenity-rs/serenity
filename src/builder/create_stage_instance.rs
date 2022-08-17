@@ -5,16 +5,22 @@ use crate::internal::prelude::*;
 use crate::model::prelude::*;
 
 /// Builder for creating a [`StageInstance`].
-#[derive(Clone, Debug, Default, Serialize)]
+#[derive(Clone, Debug, Serialize)]
 #[must_use]
 pub struct CreateStageInstance {
-    #[serde(skip_serializing_if = "Option::is_none")]
-    channel_id: Option<ChannelId>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    topic: Option<String>,
+    channel_id: ChannelId,
+    topic: String,
 }
 
 impl CreateStageInstance {
+    /// Creates a builder with the provided Channel Id and topic.
+    pub fn new(channel_id: impl Into<ChannelId>, topic: impl Into<String>) -> Self {
+        Self {
+            channel_id: channel_id.into(),
+            topic: topic.into(),
+        }
+    }
+
     /// Creates the stage instance.
     ///
     /// # Errors
@@ -27,12 +33,10 @@ impl CreateStageInstance {
     pub async fn execute(self, cache_http: impl CacheHttp) -> Result<StageInstance> {
         #[cfg(feature = "cache")]
         {
-            if let Some(channel_id) = self.channel_id {
-                if let Some(cache) = cache_http.cache() {
-                    if let Some(channel) = cache.guild_channel(channel_id) {
-                        if channel.kind != ChannelType::Stage {
-                            return Err(Error::Model(ModelError::InvalidChannelType));
-                        }
+            if let Some(cache) = cache_http.cache() {
+                if let Some(channel) = cache.guild_channel(self.channel_id) {
+                    if channel.kind != ChannelType::Stage {
+                        return Err(Error::Model(ModelError::InvalidChannelType));
                     }
                 }
             }
@@ -46,15 +50,17 @@ impl CreateStageInstance {
         http.create_stage_instance(&self).await
     }
 
-    /// Sets the stage channel id of the stage channel instance.
+    /// Sets the stage channel id of the stage channel instance, replacing the current value as set
+    /// in [`Self::new`].
     pub fn channel_id(mut self, id: impl Into<ChannelId>) -> Self {
-        self.channel_id = Some(id.into());
+        self.channel_id = id.into();
         self
     }
 
-    /// Sets the topic of the stage channel instance.
+    /// Sets the topic of the stage channel instance, replacing the current value as set in
+    /// [`Self::new`].
     pub fn topic(mut self, topic: impl Into<String>) -> Self {
-        self.topic = Some(topic.into());
+        self.topic = topic.into();
         self
     }
 }

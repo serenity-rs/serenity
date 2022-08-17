@@ -19,6 +19,11 @@ pub struct EditInteractionResponse {
 }
 
 impl EditInteractionResponse {
+    /// Equivalent to [`Self::default`].
+    pub fn new() -> Self {
+        Self::default()
+    }
+
     /// Edits the initial interaction response. Does not work for ephemeral messages.
     ///
     /// The `application_id` used will usually be the bot's [`UserId`], except if the bot is very
