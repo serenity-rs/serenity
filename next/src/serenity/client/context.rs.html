@@ -582,7 +582,7 @@
     <span class="doccomment">/// impl EventHandler for Handler {</span>
     <span class="doccomment">///     async fn message(&amp;self, ctx: Context, msg: Message) {</span>
     <span class="doccomment">///         if msg.content == &quot;!online&quot; {</span>
-    <span class="doccomment">///             ctx.online().await;</span>
+    <span class="doccomment">///             ctx.online();</span>
     <span class="doccomment">///         }</span>
     <span class="doccomment">///     }</span>
     <span class="doccomment">/// }</span>
@@ -599,7 +599,7 @@
     <span class="doccomment">/// [`Online`]: OnlineStatus::Online</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;gateway&quot;</span>)]</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">online</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">online</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) {
         <span class="self">self</span>.<span class="ident">shard</span>.<span class="ident">set_status</span>(<span class="ident">OnlineStatus::Online</span>);
     }
 
@@ -620,7 +620,7 @@
     <span class="doccomment">/// impl EventHandler for Handler {</span>
     <span class="doccomment">///     async fn message(&amp;self, ctx: Context, msg: Message) {</span>
     <span class="doccomment">///         if msg.content == &quot;!idle&quot; {</span>
-    <span class="doccomment">///             ctx.idle().await;</span>
+    <span class="doccomment">///             ctx.idle();</span>
     <span class="doccomment">///         }</span>
     <span class="doccomment">///     }</span>
     <span class="doccomment">/// }</span>
@@ -637,7 +637,7 @@
     <span class="doccomment">/// [`Idle`]: OnlineStatus::Idle</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;gateway&quot;</span>)]</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">idle</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">idle</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) {
         <span class="self">self</span>.<span class="ident">shard</span>.<span class="ident">set_status</span>(<span class="ident">OnlineStatus::Idle</span>);
     }
 
@@ -658,7 +658,7 @@
     <span class="doccomment">/// impl EventHandler for Handler {</span>
     <span class="doccomment">///     async fn message(&amp;self, ctx: Context, msg: Message) {</span>
     <span class="doccomment">///         if msg.content == &quot;!dnd&quot; {</span>
-    <span class="doccomment">///             ctx.dnd().await;</span>
+    <span class="doccomment">///             ctx.dnd();</span>
     <span class="doccomment">///         }</span>
     <span class="doccomment">///     }</span>
     <span class="doccomment">/// }</span>
@@ -675,7 +675,7 @@
     <span class="doccomment">/// [`DoNotDisturb`]: OnlineStatus::DoNotDisturb</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;gateway&quot;</span>)]</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">dnd</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">dnd</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) {
         <span class="self">self</span>.<span class="ident">shard</span>.<span class="ident">set_status</span>(<span class="ident">OnlineStatus::DoNotDisturb</span>);
     }
 
@@ -696,7 +696,7 @@
     <span class="doccomment">/// #[serenity::async_trait]</span>
     <span class="doccomment">/// impl EventHandler for Handler {</span>
     <span class="doccomment">///     async fn ready(&amp;self, ctx: Context, _: Ready) {</span>
-    <span class="doccomment">///         ctx.invisible().await;</span>
+    <span class="doccomment">///         ctx.invisible();</span>
     <span class="doccomment">///     }</span>
     <span class="doccomment">/// }</span>
     <span class="doccomment">///</span>
@@ -713,7 +713,7 @@
     <span class="doccomment">/// [`Invisible`]: OnlineStatus::Invisible</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;gateway&quot;</span>)]</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">invisible</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">invisible</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) {
         <span class="self">self</span>.<span class="ident">shard</span>.<span class="ident">set_status</span>(<span class="ident">OnlineStatus::Invisible</span>);
     }
 
@@ -735,7 +735,7 @@
     <span class="doccomment">/// #[serenity::async_trait]</span>
     <span class="doccomment">/// impl EventHandler for Handler {</span>
     <span class="doccomment">///     async fn resume(&amp;self, ctx: Context, _: ResumedEvent) {</span>
-    <span class="doccomment">///         ctx.reset_presence().await;</span>
+    <span class="doccomment">///         ctx.reset_presence();</span>
     <span class="doccomment">///     }</span>
     <span class="doccomment">/// }</span>
     <span class="doccomment">///</span>
@@ -752,7 +752,7 @@
     <span class="doccomment">/// [`Online`]: OnlineStatus::Online</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;gateway&quot;</span>)]</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">reset_presence</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">reset_presence</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) {
         <span class="self">self</span>.<span class="ident">shard</span>.<span class="ident">set_presence</span>(<span class="prelude-val">None</span>, <span class="ident">OnlineStatus::Online</span>);
     }
 
@@ -777,7 +777,7 @@
     <span class="doccomment">///         let mut args = msg.content.splitn(2, &#39; &#39;);</span>
     <span class="doccomment">///</span>
     <span class="doccomment">///         if let (Some(&quot;~setgame&quot;), Some(game)) = (args.next(), args.next()) {</span>
-    <span class="doccomment">///             ctx.set_activity(Some(ActivityData::playing(game))).await;</span>
+    <span class="doccomment">///             ctx.set_activity(Some(ActivityData::playing(game)));</span>
     <span class="doccomment">///         }</span>
     <span class="doccomment">///     }</span>
     <span class="doccomment">/// }</span>
@@ -792,7 +792,7 @@
     <span class="doccomment">/// ```</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;gateway&quot;</span>)]</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">set_activity</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">activity</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ActivityData</span><span class="op">&gt;</span>) {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_activity</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">activity</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ActivityData</span><span class="op">&gt;</span>) {
         <span class="self">self</span>.<span class="ident">shard</span>.<span class="ident">set_activity</span>(<span class="ident">activity</span>);
     }
 
@@ -861,7 +861,7 @@
     <span class="doccomment">/// [`Idle`]: OnlineStatus::Idle</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;gateway&quot;</span>)]</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">set_presence</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">activity</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ActivityData</span><span class="op">&gt;</span>, <span class="ident">status</span>: <span class="ident">OnlineStatus</span>) {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_presence</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">activity</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ActivityData</span><span class="op">&gt;</span>, <span class="ident">status</span>: <span class="ident">OnlineStatus</span>) {
         <span class="self">self</span>.<span class="ident">shard</span>.<span class="ident">set_presence</span>(<span class="ident">activity</span>, <span class="ident">status</span>);
     }
 
@@ -869,7 +869,7 @@
     <span class="doccomment">/// sent back to `filter`&#39;s paired receiver.</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;collector&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">set_message_filter</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">filter</span>: <span class="ident">MessageFilter</span>) {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_message_filter</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">filter</span>: <span class="ident">MessageFilter</span>) {
         <span class="self">self</span>.<span class="ident">shard</span>.<span class="ident">set_message_filter</span>(<span class="ident">filter</span>);
     }
 
@@ -877,7 +877,7 @@
     <span class="doccomment">/// sent back to `filter`&#39;s paired receiver.</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;collector&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">set_reaction_filter</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">filter</span>: <span class="ident">ReactionFilter</span>) {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_reaction_filter</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">filter</span>: <span class="ident">ReactionFilter</span>) {
         <span class="self">self</span>.<span class="ident">shard</span>.<span class="ident">set_reaction_filter</span>(<span class="ident">filter</span>);
     }
 
@@ -885,7 +885,7 @@
     <span class="doccomment">/// sent back to `filter`&#39;s paired receiver.</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;collector&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">set_component_interaction_filter</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">filter</span>: <span class="ident">ComponentInteractionFilter</span>) {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_component_interaction_filter</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">filter</span>: <span class="ident">ComponentInteractionFilter</span>) {
         <span class="self">self</span>.<span class="ident">shard</span>.<span class="ident">set_component_interaction_filter</span>(<span class="ident">filter</span>);
     }
 }

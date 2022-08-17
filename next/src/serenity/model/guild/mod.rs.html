@@ -2853,6 +2853,7 @@
 <span id="2847">2847</span>
 <span id="2848">2848</span>
 <span id="2849">2849</span>
+<span id="2850">2850</span>
 </pre><pre class="rust"><code><span class="doccomment">//! Models relating to guilds and types that it owns.</span>
 
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">audit_log</span>;
@@ -3222,7 +3223,8 @@
     <span class="doccomment">/// Returns the &quot;default&quot; channel of the guild for the passed user id.</span>
     <span class="doccomment">/// (This returns the first channel that can be read by the user, if there isn&#39;t one,</span>
     <span class="doccomment">/// returns [`None`])</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">default_channel</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">uid</span>: <span class="ident">UserId</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">GuildChannel</span><span class="op">&gt;</span> {
+    <span class="attribute">#[<span class="ident">must_use</span>]</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">default_channel</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">uid</span>: <span class="ident">UserId</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">GuildChannel</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">member</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">members</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="ident">uid</span>)<span class="question-mark">?</span>;
         <span class="kw">for</span> <span class="ident">channel</span> <span class="kw">in</span> <span class="self">self</span>.<span class="ident">channels</span>.<span class="ident">values</span>() {
             <span class="kw">if</span> <span class="kw">let</span> <span class="ident">Channel::Guild</span>(<span class="ident">channel</span>) <span class="op">=</span> <span class="ident">channel</span> {
