@@ -24,19 +24,19 @@ use crate::model::prelude::*;
 /// let url = "https://discord.com/api/webhooks/245037420704169985/ig5AO-wdVWpCBtUUMxmgsWryqgsW3DChbKYOINftJ4DCrUbnkedoYZD0VOH1QLr-S3sV";
 /// let webhook = Webhook::from_url(&http, url).await?;
 ///
-/// let website = CreateEmbed::default()
+/// let website = CreateEmbed::new()
 ///     .title("The Rust Language Website")
 ///     .description("Rust is a systems programming language.")
 ///     .colour(Colour::from_rgb(222, 165, 132));
 ///
-/// let resources = CreateEmbed::default()
+/// let resources = CreateEmbed::new()
 ///     .title("Rust Resources")
 ///     .description("A few resources to help with learning Rust")
 ///     .colour(0xDEA584)
 ///     .field("The Rust Book", "A comprehensive resource for Rust.", false)
 ///     .field("Rust by Example", "A collection of Rust examples", false);
 ///
-/// let builder = ExecuteWebhook::default()
+/// let builder = ExecuteWebhook::new()
 ///     .content("Here's some information on Rust:")
 ///     .embeds(vec![website, resources]);
 /// webhook.execute(&http, false, builder).await?;
@@ -68,6 +68,11 @@ pub struct ExecuteWebhook<'a> {
 }
 
 impl<'a> ExecuteWebhook<'a> {
+    /// Equivalent to [`Self::default`].
+    pub fn new() -> Self {
+        Self::default()
+    }
+
     /// Executes the webhook with the given content.
     ///
     /// If `wait` is set to false, this function will return `Ok(None)` on success. Otherwise,
@@ -136,7 +141,7 @@ impl<'a> ExecuteWebhook<'a> {
     /// # let http = Http::new("token");
     /// # let webhook = Webhook::from_id_with_token(&http, 0, "").await?;
     /// #
-    /// let builder = ExecuteWebhook::default()
+    /// let builder = ExecuteWebhook::new()
     ///     .avatar_url("https://i.imgur.com/KTs6whd.jpg")
     ///     .content("Here's a webhook");
     /// webhook.execute(&http, false, builder).await?;
@@ -166,7 +171,7 @@ impl<'a> ExecuteWebhook<'a> {
     /// # let http = Http::new("token");
     /// # let webhook = Webhook::from_id_with_token(&http, 0, "").await?;
     /// #
-    /// let builder = ExecuteWebhook::default().content("foo");
+    /// let builder = ExecuteWebhook::new().content("foo");
     /// let execution = webhook.execute(&http, false, builder).await;
     ///
     /// if let Err(why) = execution {
@@ -199,7 +204,7 @@ impl<'a> ExecuteWebhook<'a> {
     /// let url = "https://discord.com/api/webhooks/245037420704169985/ig5AO-wdVWpCBtUUMxmgsWryqgsW3DChbKYOINftJ4DCrUbnkedoYZD0VOH1QLr-S3sV";
     /// let mut webhook = Webhook::from_url(&http, url).await?;
     ///
-    /// let builder = ExecuteWebhook::default().in_thread(12345678).content("test");
+    /// let builder = ExecuteWebhook::new().in_thread(12345678).content("test");
     /// webhook.execute(&http, false, builder).await?;
     /// #     Ok(())
     /// # }
@@ -283,7 +288,7 @@ impl<'a> ExecuteWebhook<'a> {
     /// # let http = Http::new("token");
     /// # let webhook = Webhook::from_id_with_token(&http, 0, "").await?;
     /// #
-    /// let builder = ExecuteWebhook::default().content("hello").tts(true);
+    /// let builder = ExecuteWebhook::new().content("hello").tts(true);
     /// let execution = webhook.execute(&http, false, builder).await;
     ///
     /// if let Err(why) = execution {
@@ -312,7 +317,7 @@ impl<'a> ExecuteWebhook<'a> {
     /// # let http = Http::new("token");
     /// # let webhook = Webhook::from_id_with_token(&http, 0, "").await?;
     /// #
-    /// let builder = ExecuteWebhook::default().content("hello").username("hakase");
+    /// let builder = ExecuteWebhook::new().content("hello").username("hakase");
     /// let execution = webhook.execute(&http, false, builder).await;
     ///
     /// if let Err(why) = execution {
@@ -342,7 +347,7 @@ impl<'a> ExecuteWebhook<'a> {
     /// # let http = Http::new("token");
     /// # let webhook = Webhook::from_id_with_token(&http, 0, "").await?;
     /// #
-    /// let builder = ExecuteWebhook::default()
+    /// let builder = ExecuteWebhook::new()
     ///     .content("https://docs.rs/serenity/latest/serenity/")
     ///     .flags(MessageFlags::SUPPRESS_EMBEDS);
     /// let execution = webhook.execute(&http, false, builder).await;

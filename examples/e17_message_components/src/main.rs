@@ -68,28 +68,27 @@ impl Animal {
     }
 
     fn menu_option(&self) -> CreateSelectMenuOption {
-        CreateSelectMenuOption::default()
+        CreateSelectMenuOption::new(
             // This is what will be shown to the user
-            .label(format!("{} {}", self.emoji(), self))
+            format!("{} {}", self.emoji(), self),
             // This is used to identify the selected value
-            .value(self.to_string().to_ascii_lowercase())
+            self.to_string().to_ascii_lowercase(),
+        )
     }
 
     fn select_menu() -> CreateSelectMenu {
-        CreateSelectMenu::default()
-            .custom_id("animal_select")
-            .placeholder("No animal selected")
-            .options(vec![
-                Self::Cat.menu_option(),
-                Self::Dog.menu_option(),
-                Self::Horse.menu_option(),
-                Self::Alpaca.menu_option(),
-            ])
+        CreateSelectMenu::new("animal_select", vec![
+            Self::Cat.menu_option(),
+            Self::Dog.menu_option(),
+            Self::Horse.menu_option(),
+            Self::Alpaca.menu_option(),
+        ])
+        .placeholder("No animal selected")
     }
 
     fn action_row() -> CreateActionRow {
         // A select menu must be the only thing in an action row!
-        CreateActionRow::default().add_select_menu(Self::select_menu())
+        CreateActionRow::new().add_select_menu(Self::select_menu())
     }
 }
 
@@ -123,7 +122,7 @@ impl Sound {
     }
 
     fn button(&self) -> CreateButton {
-        CreateButton::default()
+        CreateButton::new()
             .custom_id(self.to_string().to_ascii_lowercase())
             .emoji(self.emoji())
             .label(self.to_string())
@@ -132,7 +131,7 @@ impl Sound {
 
     fn action_row() -> CreateActionRow {
         // We can add up to 5 buttons per action row
-        CreateActionRow::default()
+        CreateActionRow::new()
             .add_button(Sound::Meow.button())
             .add_button(Sound::Woof.button())
             .add_button(Sound::Neigh.button())
@@ -164,8 +163,8 @@ impl EventHandler for Handler {
         }
 
         // Ask the user for its favorite animal
-        let components = CreateComponents::default().add_action_row(Animal::action_row());
-        let builder = CreateMessage::default()
+        let components = CreateComponents::new().add_action_row(Animal::action_row());
+        let builder = CreateMessage::new()
             .content("Please select your favorite animal")
             .components(components);
         let m = msg.channel_id.send_message(&ctx, builder).await.unwrap();
@@ -190,11 +189,11 @@ impl EventHandler for Handler {
         let animal = Animal::from_str(mci.data.values.get(0).unwrap()).unwrap();
 
         // Acknowledge the interaction and edit the message
-        let components = CreateComponents::default().add_action_row(Sound::action_row());
-        let data = CreateInteractionResponseData::default()
+        let components = CreateComponents::new().add_action_row(Sound::action_row());
+        let data = CreateInteractionResponseData::new()
             .content(format!("You chose: **{}**\nNow choose a sound!", animal))
             .components(components);
-        let builder = CreateInteractionResponse::default()
+        let builder = CreateInteractionResponse::new()
             .kind(InteractionResponseType::UpdateMessage)
             .interaction_response_data(data);
         mci.create_interaction_response(&ctx, builder).await.unwrap();
@@ -209,11 +208,11 @@ impl EventHandler for Handler {
         while let Some(mci) = cib.next().await {
             let sound = Sound::from_str(&mci.data.custom_id).unwrap();
             // Acknowledge the interaction and send a reply
-            let data = CreateInteractionResponseData::default()
+            let data = CreateInteractionResponseData::new()
                 .content(format!("The **{}** says __{}__", animal, sound))
                 // Make the message hidden for other users by setting `ephemeral(true)`.
                 .ephemeral(true);
-            let builder = CreateInteractionResponse::default()
+            let builder = CreateInteractionResponse::new()
                 // This time we don't edit the message, but reply to it.
                 .kind(InteractionResponseType::ChannelMessageWithSource)
                 .interaction_response_data(data);

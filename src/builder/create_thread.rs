@@ -4,22 +4,30 @@ use crate::http::Http;
 use crate::internal::prelude::*;
 use crate::model::prelude::*;
 
-#[derive(Clone, Debug, Default, Serialize)]
+#[derive(Clone, Debug, Serialize)]
 #[must_use]
 pub struct CreateThread {
-    #[serde(skip_serializing_if = "Option::is_none")]
-    name: Option<String>,
+    name: String,
     #[serde(skip_serializing_if = "Option::is_none")]
     auto_archive_duration: Option<u16>,
     #[serde(skip_serializing_if = "Option::is_none")]
     rate_limit_per_user: Option<u16>,
-
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "type")]
     kind: Option<ChannelType>,
 }
 
 impl CreateThread {
+    /// Creates a builder with the given thread name, leaving all other fields empty.
+    pub fn new(name: impl Into<String>) -> Self {
+        Self {
+            name: name.into(),
+            auto_archive_duration: None,
+            rate_limit_per_user: None,
+            kind: None,
+        }
+    }
+
     /// Creates a thread, either private or public. Public threads require a message to connect the
     /// thread to.
     ///
@@ -41,12 +49,11 @@ impl CreateThread {
         }
     }
 
-    /// The name of the thread.
+    /// The name of the thread. Replaces the current value as set in [`Self::new`].
     ///
     /// **Note**: Must be between 2 and 100 characters long.
     pub fn name(mut self, name: impl Into<String>) -> Self {
-        self.name = Some(name.into());
-
+        self.name = name.into();
         self
     }
 
@@ -55,7 +62,6 @@ impl CreateThread {
     /// **Note**: Can only be set to 60, 1440, 4320, 10080 currently.
     pub fn auto_archive_duration(mut self, duration: u16) -> Self {
         self.auto_archive_duration = Some(duration);
-
         self
     }
 
@@ -63,7 +69,6 @@ impl CreateThread {
     ///
     /// Bots, or users with the [`MANAGE_MESSAGES`] and/or [`MANAGE_CHANNELS`] permissions are
     /// exempt from this restriction.
-    /// from this restriction.
     ///
     /// **Note**: Must be between 0 and 21600 seconds (360 minutes or 6 hours).
     ///
@@ -72,19 +77,17 @@ impl CreateThread {
     #[doc(alias = "slowmode")]
     pub fn rate_limit_per_user(mut self, seconds: u16) -> Self {
         self.rate_limit_per_user = Some(seconds);
-
         self
     }
 
-    /// The thread type, which can be [`ChannelType::PublicThread`] or [`ChannelType::PrivateThread`].
+    /// The thread type, either [`ChannelType::PublicThread`] or [`ChannelType::PrivateThread`].
     ///
     /// **Note**: This defaults to [`ChannelType::PrivateThread`] in order to match the behavior
-    /// when thread documentation was first published. This is a bit of a weird default though,
-    /// and thus is highly likely to change in the future, so it is recommended to always
-    /// explicitly setting it to avoid any breaking change.
+    /// when thread documentation was first published. This is a bit of a weird default though, and
+    /// thus is highly likely to change in the future, so it is recommended to always explicitly
+    /// setting it to avoid any breaking change.
     pub fn kind(mut self, kind: ChannelType) -> Self {
         self.kind = Some(kind);
-
         self
     }
 }

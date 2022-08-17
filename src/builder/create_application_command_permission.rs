@@ -18,6 +18,11 @@ pub struct CreateApplicationCommandPermissionsData {
 }
 
 impl CreateApplicationCommandPermissionsData {
+    /// Equivalent to [`Self::default`].
+    pub fn new() -> Self {
+        Self::default()
+    }
+
     /// Create permissions for a guild application command. These will overwrite any existing
     /// permissions for that command.
     ///
@@ -76,6 +81,11 @@ pub struct CreateApplicationCommandPermissionData {
 }
 
 impl CreateApplicationCommandPermissionData {
+    /// Equivalent to [`Self::default`].
+    pub fn new() -> Self {
+        Self::default()
+    }
+
     /// Sets the `CommandPermissionType` for the [`CommandPermissionData`].
     ///
     /// [`CommandPermissionData`]: crate::model::application::command::CommandPermissionData

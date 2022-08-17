@@ -31,6 +31,11 @@ pub struct EditSticker {
 }
 
 impl EditSticker {
+    /// Equivalent to [`Self::default`].
+    pub fn new() -> Self {
+        Self::default()
+    }
+
     /// Edits the sticker.
     ///
     /// **Note**: Requires the [Manage Emojis and Stickers] permission.
