@@ -14,6 +14,11 @@ pub struct EditStageInstance {
 }
 
 impl EditStageInstance {
+    /// Equivalent to [`Self::default`].
+    pub fn new() -> Self {
+        Self::default()
+    }
+
     /// Edits the stage instance
     ///
     /// # Errors

@@ -35,7 +35,7 @@ use crate::utils::encode_image;
 /// # let guild_id = GuildId::new(2);
 /// #
 /// // assuming a `guild_id` has been bound
-/// let builder = EditRole::default().name("a test role").hoist(true).mentionable(true);
+/// let builder = EditRole::new().name("a test role").hoist(true).mentionable(true);
 /// let role = guild_id.create_role(&http, builder).await?;
 /// # Ok(())
 /// # }
@@ -63,6 +63,25 @@ pub struct EditRole {
 }
 
 impl EditRole {
+    /// Equivalent to [`Self::default`].
+    pub fn new() -> Self {
+        Self::default()
+    }
+
+    /// Creates a new builder with the values of the given [`Role`].
+    pub fn from_role(role: &Role) -> Self {
+        EditRole {
+            hoist: Some(role.hoist),
+            mentionable: Some(role.mentionable),
+            name: Some(role.name.clone()),
+            permissions: Some(role.permissions.bits()),
+            position: Some(role.position),
+            colour: Some(role.colour),
+            unicode_emoji: role.unicode_emoji.clone(),
+            icon: role.icon.clone(),
+        }
+    }
+
     /// Edits the role.
     ///
     /// **Note**: Requires the [Manage Roles] permission.
@@ -103,20 +122,6 @@ impl EditRole {
             guild_id.edit_role_position(http, role.id, position as u64).await?;
         }
         Ok(role)
-    }
-
-    /// Creates a new builder with the values of the given [`Role`].
-    pub fn new(role: &Role) -> Self {
-        EditRole {
-            hoist: Some(role.hoist),
-            mentionable: Some(role.mentionable),
-            name: Some(role.name.clone()),
-            permissions: Some(role.permissions.bits()),
-            position: Some(role.position),
-            colour: Some(role.colour),
-            unicode_emoji: role.unicode_emoji.clone(),
-            icon: role.icon.clone(),
-        }
     }
 
     /// Set the colour of the role.

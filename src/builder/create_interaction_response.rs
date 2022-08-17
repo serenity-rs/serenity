@@ -15,6 +15,11 @@ pub struct CreateInteractionResponse<'a> {
 }
 
 impl<'a> CreateInteractionResponse<'a> {
+    /// Equivalent to [`Self::default`].
+    pub fn new() -> Self {
+        Self::default()
+    }
+
     /// Creates a response to the interaction received.
     ///
     /// **Note**: Message contents must be under 2000 unicode code points, and embeds must be under
@@ -113,6 +118,11 @@ pub struct CreateInteractionResponseData<'a> {
 }
 
 impl<'a> CreateInteractionResponseData<'a> {
+    /// Equivalent to [`Self::default`].
+    pub fn new() -> Self {
+        Self::default()
+    }
+
     /// Set whether the message is text-to-speech.
     ///
     /// Think carefully before setting this to `true`.
@@ -233,7 +243,7 @@ impl<'a> CreateInteractionResponseData<'a> {
     }
 }
 
-#[derive(Clone, Debug, Default, Serialize)]
+#[derive(Clone, Debug, Serialize)]
 #[non_exhaustive]
 pub struct AutocompleteChoice {
     pub name: String,
@@ -254,6 +264,11 @@ struct CreateAutocompleteResponseData {
 }
 
 impl CreateAutocompleteResponse {
+    /// Equivalent to [`Self::default`].
+    pub fn new() -> Self {
+        Self::default()
+    }
+
     /// Creates a response to an autocomplete interaction.
     ///
     /// # Errors

@@ -9,18 +9,15 @@ use crate::utils::encode_image;
 #[derive(Clone, Debug, Serialize)]
 #[must_use]
 pub struct CreateScheduledEvent {
+    name: String,
     #[serde(skip_serializing_if = "Option::is_none")]
     channel_id: Option<ChannelId>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    name: Option<String>,
-    #[serde(skip_serializing_if = "Option::is_none")]
     description: Option<String>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    scheduled_start_time: Option<String>,
+    scheduled_start_time: String,
     #[serde(skip_serializing_if = "Option::is_none")]
     scheduled_end_time: Option<String>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    entity_type: Option<ScheduledEventType>,
+    entity_type: ScheduledEventType,
     #[serde(skip_serializing_if = "Option::is_none")]
     entity_metadata: Option<ScheduledEventMetadata>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -30,6 +27,31 @@ pub struct CreateScheduledEvent {
 }
 
 impl CreateScheduledEvent {
+    /// Creates a builder with the provided kind, name, and start time, leaving all other fields
+    /// empty.
+    pub fn new(
+        kind: ScheduledEventType,
+        name: impl Into<String>,
+        scheduled_start_time: impl Into<Timestamp>,
+    ) -> Self {
+        Self {
+            name: name.into(),
+            entity_type: kind,
+            scheduled_start_time: scheduled_start_time.into().to_string(),
+
+            image: None,
+            channel_id: None,
+            description: None,
+            entity_metadata: None,
+            scheduled_end_time: None,
+
+            // Set the privacy level to `GUILD_ONLY`. As this is the only possible value of this
+            // field, it's onlyu used at event creation, and we don't even parse it into the
+            // `ScheduledEvent` struct.
+            privacy_level: 2,
+        }
+    }
+
     /// Creates a new scheduled event in the guild with the data set, if any.
     ///
     /// **Note**: Requires the [Manage Events] permission.
@@ -66,9 +88,9 @@ impl CreateScheduledEvent {
         self
     }
 
-    /// Sets the name of the scheduled event. Required to be set for event creation.
+    /// Sets the name of the scheduled event, replacing the current value as set in [`Self::new`].
     pub fn name(mut self, name: impl Into<String>) -> Self {
-        self.name = Some(name.into());
+        self.name = name.into();
         self
     }
 
@@ -78,22 +100,24 @@ impl CreateScheduledEvent {
         self
     }
 
-    /// Sets the start time of the scheduled event. Required to be set for event creation.
-    pub fn start_time<T: Into<Timestamp>>(mut self, timestamp: T) -> Self {
-        self.scheduled_start_time = Some(timestamp.into().to_string());
+    /// Sets the start time of the scheduled event, replacing the current value as set in
+    /// [`Self::new`].
+    pub fn start_time(mut self, timestamp: impl Into<Timestamp>) -> Self {
+        self.scheduled_start_time = timestamp.into().to_string();
         self
     }
 
     /// Sets the end time of the scheduled event. Required if [`Self::kind`] is
     /// [`ScheduledEventType::External`].
-    pub fn end_time<T: Into<Timestamp>>(mut self, timestamp: T) -> Self {
+    pub fn end_time(mut self, timestamp: impl Into<Timestamp>) -> Self {
         self.scheduled_end_time = Some(timestamp.into().to_string());
         self
     }
 
-    /// Sets the entity type of the scheduled event. Required to be set for event creation.
+    /// Sets the entity type of the scheduled event, replacing the current value as set in
+    /// [`Self::new`].
     pub fn kind(mut self, kind: ScheduledEventType) -> Self {
-        self.entity_type = Some(kind);
+        self.entity_type = kind;
         self
     }
 
@@ -131,25 +155,5 @@ impl CreateScheduledEvent {
     pub fn image(mut self, image: String) -> Self {
         self.image = Some(image);
         self
-    }
-}
-
-impl Default for CreateScheduledEvent {
-    /// Creates a builder with default values, setting the `privacy_level` to `GUILD_ONLY`. As this
-    /// is the only possible value of this field, it's only used at event creation, and we don't
-    /// even parse it into the `ScheduledEvent` struct.
-    fn default() -> Self {
-        Self {
-            privacy_level: 2,
-
-            name: None,
-            image: None,
-            channel_id: None,
-            description: None,
-            entity_type: None,
-            entity_metadata: None,
-            scheduled_end_time: None,
-            scheduled_start_time: None,
-        }
     }
 }

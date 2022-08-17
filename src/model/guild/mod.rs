@@ -666,7 +666,7 @@ impl Guild {
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// # let http = Http::new("token");
     /// # let guild = Guild::get(&http, GuildId::new(7)).await?;
-    /// let builder = CreateChannel::default().name("my-test-channel").kind(ChannelType::Text);
+    /// let builder = CreateChannel::new("my-test-channel").kind(ChannelType::Text);
     ///
     /// // assuming a `guild` has already been bound
     /// let _channel = guild.create_channel(&http, builder).await?;
@@ -1055,7 +1055,7 @@ impl Guild {
     /// let base64_icon = serenity::utils::read_image("./icon.png")?;
     ///
     /// // assuming a `guild` has already been bound
-    /// let builder = EditGuild::default().icon(Some(base64_icon));
+    /// let builder = EditGuild::new().icon(Some(base64_icon));
     /// guild.edit(&http, builder).await?;
     /// #     Ok(())
     /// # }
@@ -1253,7 +1253,7 @@ impl Guild {
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// # let http = Http::new("token");
     /// # let guild = Guild::get(&http, GuildId::new(7)).await?;
-    /// let builder = EditSticker::default().name("Bun bun meow");
+    /// let builder = EditSticker::new().name("Bun bun meow");
     /// guild.edit_sticker(&http, StickerId::new(7), builder).await?;
     /// # Ok(())
     /// # }
