@@ -240,7 +240,7 @@ doing and if it <em>really</em> needs to be doing this.</p>
 <div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use</span> <span class="ident">serenity::builder::CreateChannel</span>;
 <span class="kw">use</span> <span class="ident">serenity::model::channel::ChannelType</span>;
 
-<span class="kw">let</span> <span class="ident">builder</span> <span class="op">=</span> <span class="ident">CreateChannel::default</span>().<span class="ident">name</span>(<span class="string">&quot;my-test-channel&quot;</span>).<span class="ident">kind</span>(<span class="ident">ChannelType::Text</span>);
+<span class="kw">let</span> <span class="ident">builder</span> <span class="op">=</span> <span class="ident">CreateChannel::new</span>(<span class="string">&quot;my-test-channel&quot;</span>).<span class="ident">kind</span>(<span class="ident">ChannelType::Text</span>);
 
 <span class="comment">// assuming a `guild` has already been bound</span>
 <span class="kw">let</span> <span class="ident">_channel</span> <span class="op">=</span> <span class="ident">guild</span>.<span class="ident">create_channel</span>(<span class="kw-2">&amp;</span><span class="ident">http</span>, <span class="ident">builder</span>).<span class="kw">await</span><span class="question-mark">?</span>;</code></pre></div>
@@ -351,7 +351,7 @@ to delete the sticker.</p>
 <div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">let</span> <span class="ident">base64_icon</span> <span class="op">=</span> <span class="ident">serenity::utils::read_image</span>(<span class="string">&quot;./icon.png&quot;</span>)<span class="question-mark">?</span>;
 
 <span class="comment">// assuming a `guild` has already been bound</span>
-<span class="kw">let</span> <span class="ident">builder</span> <span class="op">=</span> <span class="ident">EditGuild::default</span>().<span class="ident">icon</span>(<span class="prelude-val">Some</span>(<span class="ident">base64_icon</span>));
+<span class="kw">let</span> <span class="ident">builder</span> <span class="op">=</span> <span class="ident">EditGuild::new</span>().<span class="ident">icon</span>(<span class="prelude-val">Some</span>(<span class="ident">base64_icon</span>));
 <span class="ident">guild</span>.<span class="ident">edit</span>(<span class="kw-2">&amp;</span><span class="ident">http</span>, <span class="ident">builder</span>).<span class="kw">await</span><span class="question-mark">?</span>;</code></pre></div>
 <h5 id="errors-33"><a href="#errors-33">Errors</a></h5>
 <p>If the <code>cache</code> is enabled, returns a <a href="../error/enum.Error.html#variant.InvalidPermissions" title="ModelError::InvalidPermissions"><code>ModelError::InvalidPermissions</code></a> if the current user
@@ -407,7 +407,7 @@ lacks permission. Otherwise returns <a href="../../prelude/enum.SerenityError.ht
 <div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use</span> <span class="ident">serenity::builder::EditSticker</span>;
 <span class="kw">use</span> <span class="ident">serenity::model::id::StickerId</span>;
 
-<span class="kw">let</span> <span class="ident">builder</span> <span class="op">=</span> <span class="ident">EditSticker::default</span>().<span class="ident">name</span>(<span class="string">&quot;Bun bun meow&quot;</span>);
+<span class="kw">let</span> <span class="ident">builder</span> <span class="op">=</span> <span class="ident">EditSticker::new</span>().<span class="ident">name</span>(<span class="string">&quot;Bun bun meow&quot;</span>);
 <span class="ident">guild</span>.<span class="ident">edit_sticker</span>(<span class="kw-2">&amp;</span><span class="ident">http</span>, <span class="ident">StickerId::new</span>(<span class="number">7</span>), <span class="ident">builder</span>).<span class="kw">await</span><span class="question-mark">?</span>;</code></pre></div>
 <h5 id="errors-40"><a href="#errors-40">Errors</a></h5>
 <p>Returns <a href="../../prelude/enum.SerenityError.html#variant.Http" title="Error::Http"><code>Error::Http</code></a> if the current user lacks permission, or if invalid data is given.</p>

@@ -2077,7 +2077,7 @@
     <span class="doccomment">/// # async fn run() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {</span>
     <span class="doccomment">/// # let http = Http::new(&quot;token&quot;);</span>
     <span class="doccomment">/// # let guild = PartialGuild::get(&amp;http, GuildId::new(7)).await?;</span>
-    <span class="doccomment">/// let builder = CreateChannel::default().name(&quot;my-test-channel&quot;).kind(ChannelType::Text);</span>
+    <span class="doccomment">/// let builder = CreateChannel::new(&quot;my-test-channel&quot;).kind(ChannelType::Text);</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// // assuming a `guild` has already been bound</span>
     <span class="doccomment">/// let _channel = guild.create_channel(&amp;http, builder).await?;</span>
@@ -2561,7 +2561,7 @@
     <span class="doccomment">/// # async fn run() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {</span>
     <span class="doccomment">/// # let http = Http::new(&quot;token&quot;);</span>
     <span class="doccomment">/// # let guild = PartialGuild::get(&amp;http, GuildId::new(7)).await?;</span>
-    <span class="doccomment">/// let builder = EditSticker::default().name(&quot;Bun bun meow&quot;);</span>
+    <span class="doccomment">/// let builder = EditSticker::new().name(&quot;Bun bun meow&quot;);</span>
     <span class="doccomment">/// guild.edit_sticker(&amp;http, StickerId::new(7), builder).await?;</span>
     <span class="doccomment">/// # Ok(())</span>
     <span class="doccomment">/// # }</span>

@@ -1363,7 +1363,7 @@
     <span class="doccomment">/// # let http = Http::new(&quot;token&quot;);</span>
     <span class="doccomment">/// # let mut message = ChannelId::new(7).message(&amp;http, MessageId::new(8)).await?;</span>
     <span class="doccomment">/// // assuming a `message` has already been bound</span>
-    <span class="doccomment">/// let builder = EditMessage::default().content(&quot;new content&quot;);</span>
+    <span class="doccomment">/// let builder = EditMessage::new().content(&quot;new content&quot;);</span>
     <span class="doccomment">/// message.edit(&amp;http, builder).await?;</span>
     <span class="doccomment">/// # Ok(())</span>
     <span class="doccomment">/// # }</span>
@@ -1709,9 +1709,9 @@
             }
         }
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">builder</span> <span class="op">=</span> <span class="ident">CreateMessage::default</span>().<span class="ident">content</span>(<span class="ident">content</span>);
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">builder</span> <span class="op">=</span> <span class="ident">CreateMessage::new</span>().<span class="ident">content</span>(<span class="ident">content</span>);
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">ping_user</span>) <span class="op">=</span> <span class="ident">inlined</span> {
-            <span class="kw">let</span> <span class="ident">allowed_mentions</span> <span class="op">=</span> <span class="ident">CreateAllowedMentions::default</span>()
+            <span class="kw">let</span> <span class="ident">allowed_mentions</span> <span class="op">=</span> <span class="ident">CreateAllowedMentions::new</span>()
                 .<span class="ident">replied_user</span>(<span class="ident">ping_user</span>)
                 <span class="comment">// By providing allowed_mentions, Discord disabled _all_ pings by default so we</span>
                 <span class="comment">// need to re-enable them</span>

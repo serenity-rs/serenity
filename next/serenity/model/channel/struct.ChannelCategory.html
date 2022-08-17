@@ -46,7 +46,7 @@ or if an invalid value was set.</p>
 <h5 id="examples"><a href="#examples">Examples</a></h5>
 <p>Change a category’s name:</p>
 
-<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">let</span> <span class="ident">builder</span> <span class="op">=</span> <span class="ident">EditChannel::default</span>().<span class="ident">name</span>(<span class="string">&quot;test&quot;</span>);
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">let</span> <span class="ident">builder</span> <span class="op">=</span> <span class="ident">EditChannel::new</span>().<span class="ident">name</span>(<span class="string">&quot;test&quot;</span>);
 <span class="ident">category</span>.<span class="ident">edit</span>(<span class="kw-2">&amp;</span><span class="ident">http</span>, <span class="ident">builder</span>).<span class="kw">await</span>;</code></pre></div>
 <h5 id="errors-3"><a href="#errors-3">Errors</a></h5>
 <p>If the <code>cache</code> is enabled, returns a <a href="../error/enum.Error.html#variant.InvalidPermissions" title="ModelError::InvalidPermissions"><code>ModelError::InvalidPermissions</code></a> if the current user

@@ -94,28 +94,39 @@
 <span id="88">88</span>
 <span id="89">89</span>
 <span id="90">90</span>
+<span id="91">91</span>
+<span id="92">92</span>
+<span id="93">93</span>
 </pre><pre class="rust"><code><span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http&quot;</span>)]</span>
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::http::Http</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http&quot;</span>)]</span>
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::internal::prelude</span>::<span class="kw-2">*</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::prelude</span>::<span class="kw-2">*</span>;
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Default</span>, <span class="ident">Serialize</span>)]</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Serialize</span>)]</span>
 <span class="attribute">#[<span class="ident">must_use</span>]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">CreateThread</span> {
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;Option::is_none&quot;</span>)]</span>
-    <span class="ident">name</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
+    <span class="ident">name</span>: <span class="ident">String</span>,
     <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;Option::is_none&quot;</span>)]</span>
     <span class="ident">auto_archive_duration</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u16</span><span class="op">&gt;</span>,
     <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;Option::is_none&quot;</span>)]</span>
     <span class="ident">rate_limit_per_user</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u16</span><span class="op">&gt;</span>,
-
     <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;Option::is_none&quot;</span>)]</span>
     <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename</span> <span class="op">=</span> <span class="string">&quot;type&quot;</span>)]</span>
     <span class="ident">kind</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ChannelType</span><span class="op">&gt;</span>,
 }
 
 <span class="kw">impl</span> <span class="ident">CreateThread</span> {
+    <span class="doccomment">/// Creates a builder with the given thread name, leaving all other fields empty.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">name</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
+        <span class="self">Self</span> {
+            <span class="ident">name</span>: <span class="ident">name</span>.<span class="ident">into</span>(),
+            <span class="ident">auto_archive_duration</span>: <span class="prelude-val">None</span>,
+            <span class="ident">rate_limit_per_user</span>: <span class="prelude-val">None</span>,
+            <span class="ident">kind</span>: <span class="prelude-val">None</span>,
+        }
+    }
+
     <span class="doccomment">/// Creates a thread, either private or public. Public threads require a message to connect the</span>
     <span class="doccomment">/// thread to.</span>
     <span class="doccomment">///</span>
@@ -137,12 +148,11 @@
         }
     }
 
-    <span class="doccomment">/// The name of the thread.</span>
+    <span class="doccomment">/// The name of the thread. Replaces the current value as set in [`Self::new`].</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// **Note**: Must be between 2 and 100 characters long.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">name</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">name</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">name</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">name</span>.<span class="ident">into</span>());
-
+        <span class="self">self</span>.<span class="ident">name</span> <span class="op">=</span> <span class="ident">name</span>.<span class="ident">into</span>();
         <span class="self">self</span>
     }
 
@@ -151,7 +161,6 @@
     <span class="doccomment">/// **Note**: Can only be set to 60, 1440, 4320, 10080 currently.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">auto_archive_duration</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">duration</span>: <span class="ident">u16</span>) -&gt; <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">auto_archive_duration</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">duration</span>);
-
         <span class="self">self</span>
     }
 
@@ -159,7 +168,6 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// Bots, or users with the [`MANAGE_MESSAGES`] and/or [`MANAGE_CHANNELS`] permissions are</span>
     <span class="doccomment">/// exempt from this restriction.</span>
-    <span class="doccomment">/// from this restriction.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// **Note**: Must be between 0 and 21600 seconds (360 minutes or 6 hours).</span>
     <span class="doccomment">///</span>
@@ -168,19 +176,17 @@
     <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">alias</span> <span class="op">=</span> <span class="string">&quot;slowmode&quot;</span>)]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">rate_limit_per_user</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">seconds</span>: <span class="ident">u16</span>) -&gt; <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">rate_limit_per_user</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">seconds</span>);
-
         <span class="self">self</span>
     }
 
-    <span class="doccomment">/// The thread type, which can be [`ChannelType::PublicThread`] or [`ChannelType::PrivateThread`].</span>
+    <span class="doccomment">/// The thread type, either [`ChannelType::PublicThread`] or [`ChannelType::PrivateThread`].</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// **Note**: This defaults to [`ChannelType::PrivateThread`] in order to match the behavior</span>
-    <span class="doccomment">/// when thread documentation was first published. This is a bit of a weird default though,</span>
-    <span class="doccomment">/// and thus is highly likely to change in the future, so it is recommended to always</span>
-    <span class="doccomment">/// explicitly setting it to avoid any breaking change.</span>
+    <span class="doccomment">/// when thread documentation was first published. This is a bit of a weird default though, and</span>
+    <span class="doccomment">/// thus is highly likely to change in the future, so it is recommended to always explicitly</span>
+    <span class="doccomment">/// setting it to avoid any breaking change.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">kind</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">kind</span>: <span class="ident">ChannelType</span>) -&gt; <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">kind</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">kind</span>);
-
         <span class="self">self</span>
     }
 }

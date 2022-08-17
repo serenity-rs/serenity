@@ -2468,7 +2468,7 @@
     <span class="comment">// creating embed outside message builder since flatten_group_to_string</span>
     <span class="comment">// may return an error.</span>
 
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">embed</span> <span class="op">=</span> <span class="ident">CreateEmbed::default</span>().<span class="ident">colour</span>(<span class="ident">colour</span>).<span class="ident">description</span>(<span class="ident">help_description</span>);
+    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">embed</span> <span class="op">=</span> <span class="ident">CreateEmbed::new</span>().<span class="ident">colour</span>(<span class="ident">colour</span>).<span class="ident">description</span>(<span class="ident">help_description</span>);
     <span class="kw">for</span> <span class="ident">group</span> <span class="kw">in</span> <span class="ident">groups</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">embed_text</span> <span class="op">=</span> <span class="ident">String::default</span>();
 
@@ -2477,7 +2477,7 @@
         <span class="ident">embed</span> <span class="op">=</span> <span class="ident">embed</span>.<span class="ident">field</span>(<span class="ident">group</span>.<span class="ident">name</span>, <span class="kw-2">&amp;</span><span class="ident">embed_text</span>, <span class="bool-val">true</span>);
     }
 
-    <span class="kw">let</span> <span class="ident">builder</span> <span class="op">=</span> <span class="ident">CreateMessage::default</span>().<span class="ident">embed</span>(<span class="ident">embed</span>);
+    <span class="kw">let</span> <span class="ident">builder</span> <span class="op">=</span> <span class="ident">CreateMessage::new</span>().<span class="ident">embed</span>(<span class="ident">embed</span>);
     <span class="ident">channel_id</span>.<span class="ident">send_message</span>(<span class="ident">cache_http</span>, <span class="ident">builder</span>).<span class="kw">await</span>
 }
 
@@ -2490,7 +2490,7 @@
     <span class="ident">command</span>: <span class="kw-2">&amp;</span><span class="ident">Command</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
     <span class="ident">colour</span>: <span class="ident">Colour</span>,
 ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Message</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">embed</span> <span class="op">=</span> <span class="ident">CreateEmbed::default</span>().<span class="ident">title</span>(<span class="ident">command</span>.<span class="ident">name</span>).<span class="ident">colour</span>(<span class="ident">colour</span>);
+    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">embed</span> <span class="op">=</span> <span class="ident">CreateEmbed::new</span>().<span class="ident">title</span>(<span class="ident">command</span>.<span class="ident">name</span>).<span class="ident">colour</span>(<span class="ident">colour</span>);
 
     <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">desc</span>) <span class="op">=</span> <span class="ident">command</span>.<span class="ident">description</span> {
         <span class="ident">embed</span> <span class="op">=</span> <span class="ident">embed</span>.<span class="ident">description</span>(<span class="ident">desc</span>);
@@ -2548,7 +2548,7 @@
         );
     }
 
-    <span class="kw">let</span> <span class="ident">builder</span> <span class="op">=</span> <span class="ident">CreateMessage::default</span>().<span class="ident">embed</span>(<span class="ident">embed</span>);
+    <span class="kw">let</span> <span class="ident">builder</span> <span class="op">=</span> <span class="ident">CreateMessage::new</span>().<span class="ident">embed</span>(<span class="ident">embed</span>);
     <span class="ident">channel_id</span>.<span class="ident">send_message</span>(<span class="ident">cache_http</span>, <span class="ident">builder</span>).<span class="kw">await</span>
 }
 
@@ -2563,8 +2563,8 @@
 ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Message</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="ident">text</span> <span class="op">=</span> <span class="ident">help_description</span>.<span class="ident">replace</span>(<span class="string">&quot;{}&quot;</span>, <span class="kw-2">&amp;</span><span class="ident">suggestions</span>.<span class="ident">join</span>(<span class="string">&quot;`, `&quot;</span>));
 
-    <span class="kw">let</span> <span class="ident">embed</span> <span class="op">=</span> <span class="ident">CreateEmbed::default</span>().<span class="ident">colour</span>(<span class="ident">colour</span>).<span class="ident">description</span>(<span class="ident">text</span>);
-    <span class="kw">let</span> <span class="ident">builder</span> <span class="op">=</span> <span class="ident">CreateMessage::default</span>().<span class="ident">embed</span>(<span class="ident">embed</span>);
+    <span class="kw">let</span> <span class="ident">embed</span> <span class="op">=</span> <span class="ident">CreateEmbed::new</span>().<span class="ident">colour</span>(<span class="ident">colour</span>).<span class="ident">description</span>(<span class="ident">text</span>);
+    <span class="kw">let</span> <span class="ident">builder</span> <span class="op">=</span> <span class="ident">CreateMessage::new</span>().<span class="ident">embed</span>(<span class="ident">embed</span>);
     <span class="ident">channel_id</span>.<span class="ident">send_message</span>(<span class="ident">cache_http</span>, <span class="ident">builder</span>).<span class="kw">await</span>
 }
 
@@ -2576,8 +2576,8 @@
     <span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
     <span class="ident">colour</span>: <span class="ident">Colour</span>,
 ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Message</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="ident">embed</span> <span class="op">=</span> <span class="ident">CreateEmbed::default</span>().<span class="ident">colour</span>(<span class="ident">colour</span>).<span class="ident">description</span>(<span class="ident">input</span>);
-    <span class="kw">let</span> <span class="ident">builder</span> <span class="op">=</span> <span class="ident">CreateMessage::default</span>().<span class="ident">embed</span>(<span class="ident">embed</span>);
+    <span class="kw">let</span> <span class="ident">embed</span> <span class="op">=</span> <span class="ident">CreateEmbed::new</span>().<span class="ident">colour</span>(<span class="ident">colour</span>).<span class="ident">description</span>(<span class="ident">input</span>);
+    <span class="kw">let</span> <span class="ident">builder</span> <span class="op">=</span> <span class="ident">CreateMessage::new</span>().<span class="ident">embed</span>(<span class="ident">embed</span>);
     <span class="ident">channel_id</span>.<span class="ident">send_message</span>(<span class="ident">cache_http</span>, <span class="ident">builder</span>).<span class="kw">await</span>
 }
 

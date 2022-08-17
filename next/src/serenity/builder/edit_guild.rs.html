@@ -322,6 +322,11 @@
 <span id="316">316</span>
 <span id="317">317</span>
 <span id="318">318</span>
+<span id="319">319</span>
+<span id="320">320</span>
+<span id="321">321</span>
+<span id="322">322</span>
+<span id="323">323</span>
 </pre><pre class="rust"><code><span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http&quot;</span>)]</span>
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::http</span>::{<span class="ident">CacheHttp</span>, <span class="ident">Http</span>};
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http&quot;</span>)]</span>
@@ -371,6 +376,11 @@
 }
 
 <span class="kw">impl</span> <span class="ident">EditGuild</span> {
+    <span class="doccomment">/// Equivalent to [`Self::default`].</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="self">Self</span> {
+        <span class="ident"><span class="self">Self</span>::default</span>()
+    }
+
     <span class="doccomment">/// Edits the given guild.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// **Note**: Requires the [Manage Guild] permission.</span>
@@ -431,7 +441,7 @@
     <span class="doccomment">/// let base64_icon = serenity::utils::read_image(&quot;./guild_icon.png&quot;)?;</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// // assuming a `guild` has already been bound</span>
-    <span class="doccomment">/// let builder = EditGuild::default().icon(Some(base64_icon));</span>
+    <span class="doccomment">/// let builder = EditGuild::new().icon(Some(base64_icon));</span>
     <span class="doccomment">/// guild.edit(&amp;http, builder).await?;</span>
     <span class="doccomment">/// #     Ok(())</span>
     <span class="doccomment">/// # }</span>
@@ -595,7 +605,7 @@
     <span class="doccomment">/// #     let mut guild = GuildId::new(1).to_partial_guild(&amp;http).await?;</span>
     <span class="doccomment">/// use serenity::model::guild::VerificationLevel;</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// let builder = EditGuild::default().verification_level(VerificationLevel::High);</span>
+    <span class="doccomment">/// let builder = EditGuild::new().verification_level(VerificationLevel::High);</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// // assuming a `guild` has already been bound</span>
     <span class="doccomment">/// let edit = guild.edit(&amp;http, builder).await;</span>
@@ -622,7 +632,7 @@
     <span class="doccomment">/// #     let mut guild = GuildId::new(1).to_partial_guild(&amp;http).await?;</span>
     <span class="doccomment">/// use serenity::model::guild::SystemChannelFlags;</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// let builder = EditGuild::default().system_channel_flags(</span>
+    <span class="doccomment">/// let builder = EditGuild::new().system_channel_flags(</span>
     <span class="doccomment">///     SystemChannelFlags::SUPPRESS_JOIN_NOTIFICATIONS</span>
     <span class="doccomment">///         | SystemChannelFlags::SUPPRESS_GUILD_REMINDER_NOTIFICATIONS,</span>
     <span class="doccomment">/// );</span>

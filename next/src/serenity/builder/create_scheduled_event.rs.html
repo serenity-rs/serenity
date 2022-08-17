@@ -159,6 +159,10 @@
 <span id="153">153</span>
 <span id="154">154</span>
 <span id="155">155</span>
+<span id="156">156</span>
+<span id="157">157</span>
+<span id="158">158</span>
+<span id="159">159</span>
 </pre><pre class="rust"><code><span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http&quot;</span>)]</span>
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::http</span>::{<span class="ident">CacheHttp</span>, <span class="ident">Http</span>};
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http&quot;</span>)]</span>
@@ -170,18 +174,15 @@
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Serialize</span>)]</span>
 <span class="attribute">#[<span class="ident">must_use</span>]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">CreateScheduledEvent</span> {
+    <span class="ident">name</span>: <span class="ident">String</span>,
     <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;Option::is_none&quot;</span>)]</span>
     <span class="ident">channel_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ChannelId</span><span class="op">&gt;</span>,
     <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;Option::is_none&quot;</span>)]</span>
-    <span class="ident">name</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;Option::is_none&quot;</span>)]</span>
     <span class="ident">description</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;Option::is_none&quot;</span>)]</span>
-    <span class="ident">scheduled_start_time</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
+    <span class="ident">scheduled_start_time</span>: <span class="ident">String</span>,
     <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;Option::is_none&quot;</span>)]</span>
     <span class="ident">scheduled_end_time</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;Option::is_none&quot;</span>)]</span>
-    <span class="ident">entity_type</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ScheduledEventType</span><span class="op">&gt;</span>,
+    <span class="ident">entity_type</span>: <span class="ident">ScheduledEventType</span>,
     <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;Option::is_none&quot;</span>)]</span>
     <span class="ident">entity_metadata</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ScheduledEventMetadata</span><span class="op">&gt;</span>,
     <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;Option::is_none&quot;</span>)]</span>
@@ -191,6 +192,31 @@
 }
 
 <span class="kw">impl</span> <span class="ident">CreateScheduledEvent</span> {
+    <span class="doccomment">/// Creates a builder with the provided kind, name, and start time, leaving all other fields</span>
+    <span class="doccomment">/// empty.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(
+        <span class="ident">kind</span>: <span class="ident">ScheduledEventType</span>,
+        <span class="ident">name</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
+        <span class="ident">scheduled_start_time</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Timestamp</span><span class="op">&gt;</span>,
+    ) -&gt; <span class="self">Self</span> {
+        <span class="self">Self</span> {
+            <span class="ident">name</span>: <span class="ident">name</span>.<span class="ident">into</span>(),
+            <span class="ident">entity_type</span>: <span class="ident">kind</span>,
+            <span class="ident">scheduled_start_time</span>: <span class="ident">scheduled_start_time</span>.<span class="ident">into</span>().<span class="ident">to_string</span>(),
+
+            <span class="ident">image</span>: <span class="prelude-val">None</span>,
+            <span class="ident">channel_id</span>: <span class="prelude-val">None</span>,
+            <span class="ident">description</span>: <span class="prelude-val">None</span>,
+            <span class="ident">entity_metadata</span>: <span class="prelude-val">None</span>,
+            <span class="ident">scheduled_end_time</span>: <span class="prelude-val">None</span>,
+
+            <span class="comment">// Set the privacy level to `GUILD_ONLY`. As this is the only possible value of this</span>
+            <span class="comment">// field, it&#39;s onlyu used at event creation, and we don&#39;t even parse it into the</span>
+            <span class="comment">// `ScheduledEvent` struct.</span>
+            <span class="ident">privacy_level</span>: <span class="number">2</span>,
+        }
+    }
+
     <span class="doccomment">/// Creates a new scheduled event in the guild with the data set, if any.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// **Note**: Requires the [Manage Events] permission.</span>
@@ -227,9 +253,9 @@
         <span class="self">self</span>
     }
 
-    <span class="doccomment">/// Sets the name of the scheduled event. Required to be set for event creation.</span>
+    <span class="doccomment">/// Sets the name of the scheduled event, replacing the current value as set in [`Self::new`].</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">name</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">name</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">name</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">name</span>.<span class="ident">into</span>());
+        <span class="self">self</span>.<span class="ident">name</span> <span class="op">=</span> <span class="ident">name</span>.<span class="ident">into</span>();
         <span class="self">self</span>
     }
 
@@ -239,22 +265,24 @@
         <span class="self">self</span>
     }
 
-    <span class="doccomment">/// Sets the start time of the scheduled event. Required to be set for event creation.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">start_time</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Timestamp</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">timestamp</span>: <span class="ident">T</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">scheduled_start_time</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">timestamp</span>.<span class="ident">into</span>().<span class="ident">to_string</span>());
+    <span class="doccomment">/// Sets the start time of the scheduled event, replacing the current value as set in</span>
+    <span class="doccomment">/// [`Self::new`].</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">start_time</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">timestamp</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Timestamp</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
+        <span class="self">self</span>.<span class="ident">scheduled_start_time</span> <span class="op">=</span> <span class="ident">timestamp</span>.<span class="ident">into</span>().<span class="ident">to_string</span>();
         <span class="self">self</span>
     }
 
     <span class="doccomment">/// Sets the end time of the scheduled event. Required if [`Self::kind`] is</span>
     <span class="doccomment">/// [`ScheduledEventType::External`].</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">end_time</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Timestamp</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">timestamp</span>: <span class="ident">T</span>) -&gt; <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">end_time</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">timestamp</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Timestamp</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">scheduled_end_time</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">timestamp</span>.<span class="ident">into</span>().<span class="ident">to_string</span>());
         <span class="self">self</span>
     }
 
-    <span class="doccomment">/// Sets the entity type of the scheduled event. Required to be set for event creation.</span>
+    <span class="doccomment">/// Sets the entity type of the scheduled event, replacing the current value as set in</span>
+    <span class="doccomment">/// [`Self::new`].</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">kind</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">kind</span>: <span class="ident">ScheduledEventType</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">entity_type</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">kind</span>);
+        <span class="self">self</span>.<span class="ident">entity_type</span> <span class="op">=</span> <span class="ident">kind</span>;
         <span class="self">self</span>
     }
 
@@ -292,26 +320,6 @@
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">image</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">image</span>: <span class="ident">String</span>) -&gt; <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">image</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">image</span>);
         <span class="self">self</span>
-    }
-}
-
-<span class="kw">impl</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">CreateScheduledEvent</span> {
-    <span class="doccomment">/// Creates a builder with default values, setting the `privacy_level` to `GUILD_ONLY`. As this</span>
-    <span class="doccomment">/// is the only possible value of this field, it&#39;s only used at event creation, and we don&#39;t</span>
-    <span class="doccomment">/// even parse it into the `ScheduledEvent` struct.</span>
-    <span class="kw">fn</span> <span class="ident">default</span>() -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> {
-            <span class="ident">privacy_level</span>: <span class="number">2</span>,
-
-            <span class="ident">name</span>: <span class="prelude-val">None</span>,
-            <span class="ident">image</span>: <span class="prelude-val">None</span>,
-            <span class="ident">channel_id</span>: <span class="prelude-val">None</span>,
-            <span class="ident">description</span>: <span class="prelude-val">None</span>,
-            <span class="ident">entity_type</span>: <span class="prelude-val">None</span>,
-            <span class="ident">entity_metadata</span>: <span class="prelude-val">None</span>,
-            <span class="ident">scheduled_end_time</span>: <span class="prelude-val">None</span>,
-            <span class="ident">scheduled_start_time</span>: <span class="prelude-val">None</span>,
-        }
     }
 }
 </code></pre></div>

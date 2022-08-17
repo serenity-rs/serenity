@@ -250,6 +250,11 @@
 <span id="244">244</span>
 <span id="245">245</span>
 <span id="246">246</span>
+<span id="247">247</span>
+<span id="248">248</span>
+<span id="249">249</span>
+<span id="250">250</span>
+<span id="251">251</span>
 </pre><pre class="rust"><code><span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http&quot;</span>)]</span>
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::http</span>::{<span class="ident">CacheHttp</span>, <span class="ident">Http</span>};
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http&quot;</span>)]</span>
@@ -270,7 +275,7 @@
 <span class="doccomment">/// # async fn run() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {</span>
 <span class="doccomment">/// #     let http = Http::new(&quot;token&quot;);</span>
 <span class="doccomment">/// #     let mut channel = ChannelId::new(1);</span>
-<span class="doccomment">/// let builder = EditChannel::default().name(&quot;new name&quot;).topic(&quot;a test topic&quot;);</span>
+<span class="doccomment">/// let builder = EditChannel::new().name(&quot;new name&quot;).topic(&quot;a test topic&quot;);</span>
 <span class="doccomment">/// if let Err(why) = channel.edit(&amp;http, builder).await {</span>
 <span class="doccomment">///     // properly handle the error</span>
 <span class="doccomment">/// }</span>
@@ -305,6 +310,11 @@
 }
 
 <span class="kw">impl</span> <span class="ident">EditChannel</span> {
+    <span class="doccomment">/// Equivalent to [`Self::default`].</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="self">Self</span> {
+        <span class="ident"><span class="self">Self</span>::default</span>()
+    }
+
     <span class="doccomment">/// Edits the channel&#39;s settings.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// **Note**: Requires the [Manage Channels] permission. Modifying permissions via</span>
@@ -481,7 +491,7 @@
     <span class="doccomment">///     kind: PermissionOverwriteType::Member(UserId::new(1234)),</span>
     <span class="doccomment">/// }];</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// let builder = EditChannel::default().name(&quot;my_edited_cool_channel&quot;).permissions(permissions);</span>
+    <span class="doccomment">/// let builder = EditChannel::new().name(&quot;my_edited_cool_channel&quot;).permissions(permissions);</span>
     <span class="doccomment">/// channel.edit(http, builder).await?;</span>
     <span class="doccomment">/// #    Ok(())</span>
     <span class="doccomment">/// # }</span>

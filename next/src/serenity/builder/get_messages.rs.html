@@ -128,6 +128,11 @@
 <span id="122">122</span>
 <span id="123">123</span>
 <span id="124">124</span>
+<span id="125">125</span>
+<span id="126">126</span>
+<span id="127">127</span>
+<span id="128">128</span>
+<span id="129">129</span>
 </pre><pre class="rust"><code><span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http&quot;</span>)]</span>
 <span class="kw">use</span> <span class="ident">std::fmt::Write</span>;
 
@@ -170,7 +175,7 @@
 <span class="doccomment">/// // you can then pass it into a function which retrieves messages:</span>
 <span class="doccomment">/// let channel_id = ChannelId::new(81384788765712384);</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// let builder = GetMessages::default().after(MessageId::new(158339864557912064)).limit(25);</span>
+<span class="doccomment">/// let builder = GetMessages::new().after(MessageId::new(158339864557912064)).limit(25);</span>
 <span class="doccomment">/// let _messages = channel_id.messages(&amp;http, builder).await?;</span>
 <span class="doccomment">/// #     Ok(())</span>
 <span class="doccomment">/// # }</span>
@@ -183,6 +188,11 @@
 }
 
 <span class="kw">impl</span> <span class="ident">GetMessages</span> {
+    <span class="doccomment">/// Equivalent to [`Self::default`].</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="self">Self</span> {
+        <span class="ident"><span class="self">Self</span>::default</span>()
+    }
+
     <span class="doccomment">/// Gets messages from the channel.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// **Note**: If the user does not have the [Read Message History] permission, returns an empty</span>

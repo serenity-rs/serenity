@@ -125,7 +125,7 @@ restrictions and requirements.</p>
 <p>Edit a message with new content:</p>
 
 <div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="comment">// assuming a `message` has already been bound</span>
-<span class="kw">let</span> <span class="ident">builder</span> <span class="op">=</span> <span class="ident">EditMessage::default</span>().<span class="ident">content</span>(<span class="string">&quot;new content&quot;</span>);
+<span class="kw">let</span> <span class="ident">builder</span> <span class="op">=</span> <span class="ident">EditMessage::new</span>().<span class="ident">content</span>(<span class="string">&quot;new content&quot;</span>);
 <span class="ident">message</span>.<span class="ident">edit</span>(<span class="kw-2">&amp;</span><span class="ident">http</span>, <span class="ident">builder</span>).<span class="kw">await</span><span class="question-mark">?</span>;</code></pre></div>
 <h5 id="errors-5"><a href="#errors-5">Errors</a></h5>
 <p>If the <code>cache</code> is enabled, returns a <a href="../error/enum.Error.html#variant.InvalidUser" title="ModelError::InvalidUser"><code>ModelError::InvalidUser</code></a> if the current user is not

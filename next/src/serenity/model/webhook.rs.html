@@ -662,7 +662,7 @@
     <span class="doccomment">/// let url = &quot;https://discord.com/api/webhooks/245037420704169985/ig5AO-wdVWpCBtUUMxmgsWryqgsW3DChbKYOINftJ4DCrUbnkedoYZD0VOH1QLr-S3sV&quot;;</span>
     <span class="doccomment">/// let mut webhook = Webhook::from_url(&amp;http, url).await?;</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// let builder = EditWebhook::default().name(&quot;new name&quot;);</span>
+    <span class="doccomment">/// let builder = EditWebhook::new().name(&quot;new name&quot;);</span>
     <span class="doccomment">/// webhook.edit(&amp;http, builder).await?;</span>
     <span class="doccomment">/// #     Ok(())</span>
     <span class="doccomment">/// # }</span>
@@ -697,7 +697,7 @@
     <span class="doccomment">/// let url = &quot;https://discord.com/api/webhooks/245037420704169985/ig5AO-wdVWpCBtUUMxmgsWryqgsW3DChbKYOINftJ4DCrUbnkedoYZD0VOH1QLr-S3sV&quot;;</span>
     <span class="doccomment">/// let mut webhook = Webhook::from_url(&amp;http, url).await?;</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// let builder = ExecuteWebhook::default().content(&quot;test&quot;);</span>
+    <span class="doccomment">/// let builder = ExecuteWebhook::new().content(&quot;test&quot;);</span>
     <span class="doccomment">/// webhook.execute(&amp;http, false, builder).await?;</span>
     <span class="doccomment">/// #     Ok(())</span>
     <span class="doccomment">/// # }</span>
@@ -717,7 +717,7 @@
     <span class="doccomment">/// let url = &quot;https://discord.com/api/webhooks/245037420704169985/ig5AO-wdVWpCBtUUMxmgsWryqgsW3DChbKYOINftJ4DCrUbnkedoYZD0VOH1QLr-S3sV&quot;;</span>
     <span class="doccomment">/// let mut webhook = Webhook::from_url(&amp;http, url).await?;</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// let embed = CreateEmbed::default()</span>
+    <span class="doccomment">/// let embed = CreateEmbed::new()</span>
     <span class="doccomment">///     .title(&quot;Rust&#39;s website&quot;)</span>
     <span class="doccomment">///     .description(</span>
     <span class="doccomment">///         &quot;Rust is a systems programming language that runs blazingly fast, prevents \</span>
@@ -725,7 +725,7 @@
     <span class="doccomment">///     )</span>
     <span class="doccomment">///     .url(&quot;https://rust-lang.org&quot;);</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// let builder = ExecuteWebhook::default().content(&quot;test&quot;).username(&quot;serenity&quot;).embed(embed);</span>
+    <span class="doccomment">/// let builder = ExecuteWebhook::new().content(&quot;test&quot;).username(&quot;serenity&quot;).embed(embed);</span>
     <span class="doccomment">/// webhook.execute(&amp;http, false, builder).await?;</span>
     <span class="doccomment">/// #     Ok(())</span>
     <span class="doccomment">/// # }</span>

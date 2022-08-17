@@ -402,8 +402,8 @@
     <span class="doccomment">/// Returns an [`Error::Http`] if the API returns an error, or an [`Error::Json`] if there is</span>
     <span class="doccomment">/// an error in deserializing the API response.</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">defer</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">builder</span> <span class="op">=</span> <span class="ident">CreateInteractionResponse::default</span>()
-            .<span class="ident">kind</span>(<span class="ident">InteractionResponseType::DeferredUpdateMessage</span>);
+        <span class="kw">let</span> <span class="ident">builder</span> <span class="op">=</span>
+            <span class="ident">CreateInteractionResponse::new</span>().<span class="ident">kind</span>(<span class="ident">InteractionResponseType::DeferredUpdateMessage</span>);
         <span class="self">self</span>.<span class="ident">create_interaction_response</span>(<span class="ident">http</span>, <span class="ident">builder</span>).<span class="kw">await</span>
     }
 }

@@ -109,6 +109,16 @@
 <span id="103">103</span>
 <span id="104">104</span>
 <span id="105">105</span>
+<span id="106">106</span>
+<span id="107">107</span>
+<span id="108">108</span>
+<span id="109">109</span>
+<span id="110">110</span>
+<span id="111">111</span>
+<span id="112">112</span>
+<span id="113">113</span>
+<span id="114">114</span>
+<span id="115">115</span>
 </pre><pre class="rust"><code><span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http&quot;</span>)]</span>
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::http::Http</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http&quot;</span>)]</span>
@@ -129,6 +139,11 @@
 }
 
 <span class="kw">impl</span> <span class="ident">CreateApplicationCommandPermissionsData</span> {
+    <span class="doccomment">/// Equivalent to [`Self::default`].</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="self">Self</span> {
+        <span class="ident"><span class="self">Self</span>::default</span>()
+    }
+
     <span class="doccomment">/// Create permissions for a guild application command. These will overwrite any existing</span>
     <span class="doccomment">/// permissions for that command.</span>
     <span class="doccomment">///</span>
@@ -187,6 +202,11 @@
 }
 
 <span class="kw">impl</span> <span class="ident">CreateApplicationCommandPermissionData</span> {
+    <span class="doccomment">/// Equivalent to [`Self::default`].</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="self">Self</span> {
+        <span class="ident"><span class="self">Self</span>::default</span>()
+    }
+
     <span class="doccomment">/// Sets the `CommandPermissionType` for the [`CommandPermissionData`].</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// [`CommandPermissionData`]: crate::model::application::command::CommandPermissionData</span>

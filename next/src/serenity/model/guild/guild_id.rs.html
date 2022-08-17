@@ -1844,7 +1844,7 @@
     <span class="doccomment">/// # async fn run() {</span>
     <span class="doccomment">/// # use serenity::http::Http;</span>
     <span class="doccomment">/// # let http = Http::new(&quot;token&quot;);</span>
-    <span class="doccomment">/// let builder = EditAutoModRule::default()</span>
+    <span class="doccomment">/// let builder = EditAutoModRule::new()</span>
     <span class="doccomment">///     .name(&quot;foobar filter&quot;)</span>
     <span class="doccomment">///     .trigger(Trigger::Keyword(vec![&quot;foo*&quot;.to_string(), &quot;*bar&quot;.to_string()]))</span>
     <span class="doccomment">///     .actions(vec![Action::BlockMessage, Action::Timeout(Duration::from_secs(60))]);</span>
@@ -2071,7 +2071,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// # async fn run() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {</span>
     <span class="doccomment">/// # let http = Http::new(&quot;token&quot;);</span>
-    <span class="doccomment">/// let builder = CreateChannel::default().name(&quot;test&quot;).kind(ChannelType::Voice);</span>
+    <span class="doccomment">/// let builder = CreateChannel::new(&quot;test&quot;).kind(ChannelType::Voice);</span>
     <span class="doccomment">/// let _channel = GuildId::new(7).create_channel(&amp;http, builder).await?;</span>
     <span class="doccomment">/// # Ok(())</span>
     <span class="doccomment">/// # }</span>
@@ -2382,7 +2382,7 @@
     <span class="doccomment">/// # let http = Http::new(&quot;token&quot;);</span>
     <span class="doccomment">/// # let role_id = RoleId::new(7);</span>
     <span class="doccomment">/// # let user_id = UserId::new(7);</span>
-    <span class="doccomment">/// let builder = EditMember::default().mute(true).roles(vec![role_id]);</span>
+    <span class="doccomment">/// let builder = EditMember::new().mute(true).roles(vec![role_id]);</span>
     <span class="doccomment">/// let _ = GuildId::new(7).edit_member(&amp;http, user_id, builder).await?;</span>
     <span class="doccomment">/// # Ok(())</span>
     <span class="doccomment">/// # }</span>
@@ -2441,7 +2441,7 @@
     <span class="doccomment">/// # let role_id = RoleId::new(8);</span>
     <span class="doccomment">/// #</span>
     <span class="doccomment">/// // assuming a `role_id` and `guild_id` has been bound</span>
-    <span class="doccomment">/// let builder = EditRole::default().name(&quot;a test role&quot;).hoist(true);</span>
+    <span class="doccomment">/// let builder = EditRole::new().name(&quot;a test role&quot;).hoist(true);</span>
     <span class="doccomment">/// let role = guild_id.edit_role(&amp;http, role_id, builder).await?;</span>
     <span class="doccomment">/// # Ok(())</span>
     <span class="doccomment">/// # }</span>
@@ -2497,7 +2497,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// # async fn run() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {</span>
     <span class="doccomment">/// # let http = Http::new(&quot;token&quot;);</span>
-    <span class="doccomment">/// let builder = EditSticker::default().name(&quot;Bun bun meow&quot;);</span>
+    <span class="doccomment">/// let builder = EditSticker::new().name(&quot;Bun bun meow&quot;);</span>
     <span class="doccomment">/// let _ = GuildId::new(7).edit_sticker(&amp;http, StickerId::new(7), builder).await?;</span>
     <span class="doccomment">/// # Ok(())</span>
     <span class="doccomment">/// # }</span>
@@ -2837,7 +2837,7 @@
         <span class="ident">user_id</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">UserId</span><span class="op">&gt;</span>,
         <span class="ident">channel_id</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">ChannelId</span><span class="op">&gt;</span>,
     ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Member</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">builder</span> <span class="op">=</span> <span class="ident">EditMember::default</span>().<span class="ident">voice_channel</span>(<span class="ident">channel_id</span>.<span class="ident">into</span>());
+        <span class="kw">let</span> <span class="ident">builder</span> <span class="op">=</span> <span class="ident">EditMember::new</span>().<span class="ident">voice_channel</span>(<span class="ident">channel_id</span>.<span class="ident">into</span>());
         <span class="self">self</span>.<span class="ident">edit_member</span>(<span class="ident">http</span>, <span class="ident">user_id</span>, <span class="ident">builder</span>).<span class="kw">await</span>
     }
 
@@ -2864,7 +2864,7 @@
         <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>,
         <span class="ident">user_id</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">UserId</span><span class="op">&gt;</span>,
     ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Member</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">edit_member</span>(<span class="ident">http</span>, <span class="ident">user_id</span>, <span class="ident">EditMember::default</span>().<span class="ident">disconnect_member</span>()).<span class="kw">await</span>
+        <span class="self">self</span>.<span class="ident">edit_member</span>(<span class="ident">http</span>, <span class="ident">user_id</span>, <span class="ident">EditMember::new</span>().<span class="ident">disconnect_member</span>()).<span class="kw">await</span>
     }
 
     <span class="doccomment">/// Gets the number of [`Member`]s that would be pruned with the given</span>

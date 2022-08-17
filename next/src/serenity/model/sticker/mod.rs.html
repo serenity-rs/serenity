@@ -268,7 +268,7 @@
     <span class="doccomment">/// # async fn run() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {</span>
     <span class="doccomment">/// # let http = Http::new(&quot;token&quot;);</span>
     <span class="doccomment">/// # let mut sticker = GuildId::new(7).sticker(&amp;http, StickerId::new(7)).await?;</span>
-    <span class="doccomment">/// let builder = EditSticker::default().name(&quot;Bun bun meow&quot;);</span>
+    <span class="doccomment">/// let builder = EditSticker::new().name(&quot;Bun bun meow&quot;);</span>
     <span class="doccomment">/// sticker.edit(&amp;http, builder).await?;</span>
     <span class="doccomment">/// # Ok(())</span>
     <span class="doccomment">/// # }</span>

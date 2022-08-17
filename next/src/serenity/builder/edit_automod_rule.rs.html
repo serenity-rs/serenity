@@ -126,6 +126,13 @@
 <span id="120">120</span>
 <span id="121">121</span>
 <span id="122">122</span>
+<span id="123">123</span>
+<span id="124">124</span>
+<span id="125">125</span>
+<span id="126">126</span>
+<span id="127">127</span>
+<span id="128">128</span>
+<span id="129">129</span>
 </pre><pre class="rust"><code><span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http&quot;</span>)]</span>
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::http::Http</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http&quot;</span>)]</span>
@@ -159,6 +166,11 @@
 }
 
 <span class="kw">impl</span> <span class="ident">EditAutoModRule</span> {
+    <span class="doccomment">/// Equivalent to [`Self::default`].</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="self">Self</span> {
+        <span class="ident"><span class="self">Self</span>::default</span>()
+    }
+
     <span class="doccomment">/// Creates or edits an automoderation [`Rule`] in a guild. Passing `Some(rule_id)` will edit</span>
     <span class="doccomment">/// that corresponding rule, otherwise a new rule will be created.</span>
     <span class="doccomment">///</span>
@@ -179,6 +191,8 @@
         <span class="kw">let</span> <span class="ident">http</span> <span class="op">=</span> <span class="ident">http</span>.<span class="ident">as_ref</span>();
         <span class="kw">match</span> <span class="ident">rule_id</span> {
             <span class="prelude-val">Some</span>(<span class="ident">rule_id</span>) =&gt; <span class="ident">http</span>.<span class="ident">edit_automod_rule</span>(<span class="ident">guild_id</span>.<span class="ident">into</span>(), <span class="ident">rule_id</span>.<span class="ident">into</span>(), <span class="kw-2">&amp;</span><span class="self">self</span>).<span class="kw">await</span>,
+            <span class="comment">// Automod Rule creation has required fields, whereas modifying a rule does not.</span>
+            <span class="comment">// TODO: Enforce these fields (maybe with a separate CreateAutoModRule builder).</span>
             <span class="prelude-val">None</span> =&gt; <span class="ident">http</span>.<span class="ident">create_automod_rule</span>(<span class="ident">guild_id</span>.<span class="ident">into</span>(), <span class="kw-2">&amp;</span><span class="self">self</span>).<span class="kw">await</span>,
         }
     }

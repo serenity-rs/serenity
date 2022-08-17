@@ -334,6 +334,10 @@
 <span id="328">328</span>
 <span id="329">329</span>
 <span id="330">330</span>
+<span id="331">331</span>
+<span id="332">332</span>
+<span id="333">333</span>
+<span id="334">334</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">CreateAllowedMentions</span>, <span class="ident">CreateComponents</span>, <span class="ident">CreateEmbed</span>};
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http&quot;</span>)]</span>
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::constants</span>;
@@ -372,8 +376,8 @@
 <span class="doccomment">///</span>
 <span class="doccomment">/// let channel_id = ChannelId::new(7);</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// let embed = CreateEmbed::default().title(&quot;This is an embed&quot;).description(&quot;With a description&quot;);</span>
-<span class="doccomment">/// let builder = CreateMessage::default().content(&quot;test&quot;).tts(true).embed(embed);</span>
+<span class="doccomment">/// let embed = CreateEmbed::new().title(&quot;This is an embed&quot;).description(&quot;With a description&quot;);</span>
+<span class="doccomment">/// let builder = CreateMessage::new().content(&quot;test&quot;).tts(true).embed(embed);</span>
 <span class="doccomment">/// let _ = channel_id.send_message(&amp;http, builder).await;</span>
 <span class="doccomment">/// # }</span>
 <span class="doccomment">/// ```</span>
@@ -406,6 +410,10 @@
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">CreateMessage</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="self">Self</span> {
+        <span class="ident"><span class="self">Self</span>::default</span>()
+    }
+
     <span class="doccomment">/// Send a message to the channel.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// **Note**: Requires the [Send Messages] permission. Additionally, attaching files requires the</span>

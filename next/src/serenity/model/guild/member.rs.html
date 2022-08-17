@@ -780,7 +780,7 @@
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">target_roles</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">roles</span>.<span class="ident">clone</span>();
         <span class="ident">target_roles</span>.<span class="ident">extend_from_slice</span>(<span class="ident">role_ids</span>);
 
-        <span class="kw">let</span> <span class="ident">builder</span> <span class="op">=</span> <span class="ident">EditMember::default</span>().<span class="ident">roles</span>(<span class="ident">target_roles</span>);
+        <span class="kw">let</span> <span class="ident">builder</span> <span class="op">=</span> <span class="ident">EditMember::new</span>().<span class="ident">roles</span>(<span class="ident">target_roles</span>);
         <span class="self">self</span>.<span class="ident">edit</span>(<span class="ident">http</span>, <span class="ident">builder</span>).<span class="kw">await</span>
     }
 
@@ -873,7 +873,7 @@
         <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>,
         <span class="ident">time</span>: <span class="ident">Timestamp</span>,
     ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">builder</span> <span class="op">=</span> <span class="ident">EditMember::default</span>().<span class="ident">disable_communication_until_datetime</span>(<span class="ident">time</span>);
+        <span class="kw">let</span> <span class="ident">builder</span> <span class="op">=</span> <span class="ident">EditMember::new</span>().<span class="ident">disable_communication_until_datetime</span>(<span class="ident">time</span>);
         <span class="kw">match</span> <span class="self">self</span>.<span class="ident">guild_id</span>.<span class="ident">edit_member</span>(<span class="ident">http</span>, <span class="self">self</span>.<span class="ident">user</span>.<span class="ident">id</span>, <span class="ident">builder</span>).<span class="kw">await</span> {
             <span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt; {
                 <span class="self">self</span>.<span class="ident">communication_disabled_until</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">time</span>);
@@ -926,7 +926,7 @@
     <span class="doccomment">/// [Moderate Members]: Permissions::MODERATE_MEMBERS</span>
     <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">alias</span> <span class="op">=</span> <span class="string">&quot;timeout&quot;</span>)]</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">enable_communication</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">builder</span> <span class="op">=</span> <span class="ident">EditMember::default</span>().<span class="ident">enable_communication</span>();
+        <span class="kw">let</span> <span class="ident">builder</span> <span class="op">=</span> <span class="ident">EditMember::new</span>().<span class="ident">enable_communication</span>();
         <span class="kw-2">*</span><span class="self">self</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">guild_id</span>.<span class="ident">edit_member</span>(<span class="ident">http</span>, <span class="self">self</span>.<span class="ident">user</span>.<span class="ident">id</span>, <span class="ident">builder</span>).<span class="kw">await</span><span class="question-mark">?</span>;
         <span class="prelude-val">Ok</span>(())
     }
@@ -1148,7 +1148,7 @@
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">target_roles</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">roles</span>.<span class="ident">clone</span>();
         <span class="ident">target_roles</span>.<span class="ident">retain</span>(<span class="op">|</span><span class="ident">r</span><span class="op">|</span> <span class="op">!</span><span class="ident">role_ids</span>.<span class="ident">contains</span>(<span class="ident">r</span>));
 
-        <span class="kw">let</span> <span class="ident">builder</span> <span class="op">=</span> <span class="ident">EditMember::default</span>().<span class="ident">roles</span>(<span class="ident">target_roles</span>);
+        <span class="kw">let</span> <span class="ident">builder</span> <span class="op">=</span> <span class="ident">EditMember::new</span>().<span class="ident">roles</span>(<span class="ident">target_roles</span>);
         <span class="self">self</span>.<span class="ident">edit</span>(<span class="ident">http</span>, <span class="ident">builder</span>).<span class="kw">await</span>
     }
 

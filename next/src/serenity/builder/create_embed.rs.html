@@ -549,6 +549,19 @@
 <span id="543">543</span>
 <span id="544">544</span>
 <span id="545">545</span>
+<span id="546">546</span>
+<span id="547">547</span>
+<span id="548">548</span>
+<span id="549">549</span>
+<span id="550">550</span>
+<span id="551">551</span>
+<span id="552">552</span>
+<span id="553">553</span>
+<span id="554">554</span>
+<span id="555">555</span>
+<span id="556">556</span>
+<span id="557">557</span>
+<span id="558">558</span>
 </pre><pre class="rust"><code><span class="doccomment">//! Developer note:</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! This is a set of embed builders for rich embeds.</span>
@@ -622,6 +635,11 @@
 }
 
 <span class="kw">impl</span> <span class="ident">CreateEmbed</span> {
+    <span class="doccomment">/// Equivalent to [`Self::default`].</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="self">Self</span> {
+        <span class="ident"><span class="self">Self</span>::default</span>()
+    }
+
     <span class="doccomment">/// Set the author of the embed.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// Refer to the documentation for [`CreateEmbedAuthor`] for more information.</span>
@@ -731,8 +749,8 @@
     <span class="doccomment">///         if msg.content == &quot;~embed&quot; {</span>
     <span class="doccomment">///             let timestamp: Timestamp =</span>
     <span class="doccomment">///                 &quot;2004-06-08T16:04:23Z&quot;.parse().expect(&quot;Invalid timestamp!&quot;);</span>
-    <span class="doccomment">///             let embed = CreateEmbed::default().title(&quot;hello&quot;).timestamp(timestamp);</span>
-    <span class="doccomment">///             let builder = CreateMessage::default().embed(embed);</span>
+    <span class="doccomment">///             let embed = CreateEmbed::new().title(&quot;hello&quot;).timestamp(timestamp);</span>
+    <span class="doccomment">///             let builder = CreateMessage::new().embed(embed);</span>
     <span class="doccomment">///             let _ = msg.channel_id.send_message(&amp;context.http, builder).await;</span>
     <span class="doccomment">///         }</span>
     <span class="doccomment">///     }</span>
@@ -770,14 +788,13 @@
     <span class="doccomment">///             let channel_search = channels.values().find(|c| c.name == &quot;join-log&quot;);</span>
     <span class="doccomment">///</span>
     <span class="doccomment">///             if let Some(channel) = channel_search {</span>
-    <span class="doccomment">///                 let author = CreateEmbedAuthor::default()</span>
-    <span class="doccomment">///                     .icon_url(member.user.face())</span>
-    <span class="doccomment">///                     .name(member.user.name);</span>
-    <span class="doccomment">///                 let mut embed = CreateEmbed::default().title(&quot;Member Join&quot;).author(author);</span>
+    <span class="doccomment">///                 let icon_url = member.user.face();</span>
+    <span class="doccomment">///                 let author = CreateEmbedAuthor::new(member.user.name).icon_url(icon_url);</span>
+    <span class="doccomment">///                 let mut embed = CreateEmbed::new().title(&quot;Member Join&quot;).author(author);</span>
     <span class="doccomment">///                 if let Some(joined_at) = member.joined_at {</span>
     <span class="doccomment">///                     embed = embed.timestamp(joined_at);</span>
     <span class="doccomment">///                 }</span>
-    <span class="doccomment">///                 let builder = CreateMessage::default().embed(embed);</span>
+    <span class="doccomment">///                 let builder = CreateMessage::new().embed(embed);</span>
     <span class="doccomment">///                 let _ = channel.send_message(&amp;context, builder).await;</span>
     <span class="doccomment">///             }</span>
     <span class="doccomment">///         }</span>
@@ -830,9 +847,7 @@
     <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">check_length</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">length</span> <span class="op">=</span> <span class="number">0</span>;
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">author</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">author</span> {
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">name</span>) <span class="op">=</span> <span class="ident">author</span>.<span class="ident">name</span> {
-                <span class="ident">length</span> <span class="op">+</span><span class="op">=</span> <span class="ident">name</span>.<span class="ident">chars</span>().<span class="ident">count</span>();
-            }
+            <span class="ident">length</span> <span class="op">+</span><span class="op">=</span> <span class="ident">author</span>.<span class="ident">name</span>.<span class="ident">chars</span>().<span class="ident">count</span>();
         }
 
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">description</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">description</span> {
@@ -845,9 +860,7 @@
         }
 
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">footer</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">footer</span> {
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">text</span>) <span class="op">=</span> <span class="ident">footer</span>.<span class="ident">text</span> {
-                <span class="ident">length</span> <span class="op">+</span><span class="op">=</span> <span class="ident">text</span>.<span class="ident">chars</span>().<span class="ident">count</span>();
-            }
+            <span class="ident">length</span> <span class="op">+</span><span class="op">=</span> <span class="ident">footer</span>.<span class="ident">text</span>.<span class="ident">chars</span>().<span class="ident">count</span>();
         }
 
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">title</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">title</span> {
@@ -926,29 +939,35 @@
 
 <span class="doccomment">/// A builder to create a fake [`Embed`] object&#39;s author, for use with the [`CreateEmbed::author`]</span>
 <span class="doccomment">/// method.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Requires that you specify a [`Self::name`].</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Default</span>, <span class="ident">Serialize</span>)]</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Serialize</span>)]</span>
 <span class="attribute">#[<span class="ident">must_use</span>]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">CreateEmbedAuthor</span> {
+    <span class="ident">name</span>: <span class="ident">String</span>,
     <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;Option::is_none&quot;</span>)]</span>
     <span class="ident">icon_url</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;Option::is_none&quot;</span>)]</span>
-    <span class="ident">name</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
     <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;Option::is_none&quot;</span>)]</span>
     <span class="ident">url</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
 }
 
 <span class="kw">impl</span> <span class="ident">CreateEmbedAuthor</span> {
-    <span class="doccomment">/// Set the URL of the author&#39;s icon.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">icon_url</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">icon_url</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">icon_url</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">icon_url</span>.<span class="ident">into</span>());
+    <span class="doccomment">/// Creates an author object with the given name, leaving all other fields empty.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">name</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
+        <span class="self">Self</span> {
+            <span class="ident">name</span>: <span class="ident">name</span>.<span class="ident">into</span>(),
+            <span class="ident">icon_url</span>: <span class="prelude-val">None</span>,
+            <span class="ident">url</span>: <span class="prelude-val">None</span>,
+        }
+    }
+
+    <span class="doccomment">/// Set the author&#39;s name, replacing the current value as set in [`Self::new`].</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">name</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">name</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
+        <span class="self">self</span>.<span class="ident">name</span> <span class="op">=</span> <span class="ident">name</span>.<span class="ident">into</span>();
         <span class="self">self</span>
     }
 
-    <span class="doccomment">/// Set the author&#39;s name.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">name</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">name</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">name</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">name</span>.<span class="ident">into</span>());
+    <span class="doccomment">/// Set the URL of the author&#39;s icon.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">icon_url</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">icon_url</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
+        <span class="self">self</span>.<span class="ident">icon_url</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">icon_url</span>.<span class="ident">into</span>());
         <span class="self">self</span>
     }
 
@@ -962,8 +981,8 @@
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">EmbedAuthor</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">CreateEmbedAuthor</span> {
     <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">author</span>: <span class="ident">EmbedAuthor</span>) -&gt; <span class="self">Self</span> {
         <span class="self">Self</span> {
+            <span class="ident">name</span>: <span class="ident">author</span>.<span class="ident">name</span>,
             <span class="ident">icon_url</span>: <span class="ident">author</span>.<span class="ident">icon_url</span>,
-            <span class="ident">name</span>: <span class="prelude-val">Some</span>(<span class="ident">author</span>.<span class="ident">name</span>),
             <span class="ident">url</span>: <span class="ident">author</span>.<span class="ident">url</span>,
         }
     }
@@ -973,25 +992,32 @@
 <span class="doccomment">/// method.</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// This does not have any required fields.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Default</span>, <span class="ident">Serialize</span>)]</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Serialize</span>)]</span>
 <span class="attribute">#[<span class="ident">must_use</span>]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">CreateEmbedFooter</span> {
+    <span class="ident">text</span>: <span class="ident">String</span>,
     <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;Option::is_none&quot;</span>)]</span>
     <span class="ident">icon_url</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;Option::is_none&quot;</span>)]</span>
-    <span class="ident">text</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
 }
 
 <span class="kw">impl</span> <span class="ident">CreateEmbedFooter</span> {
-    <span class="doccomment">/// Set the icon URL&#39;s value. This only supports HTTP(S).</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">icon_url</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">icon_url</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">icon_url</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">icon_url</span>.<span class="ident">into</span>());
+    <span class="comment">// Creates a new footer object with the given text, leaving all other fields empty.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">text</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
+        <span class="self">Self</span> {
+            <span class="ident">text</span>: <span class="ident">text</span>.<span class="ident">into</span>(),
+            <span class="ident">icon_url</span>: <span class="prelude-val">None</span>,
+        }
+    }
+
+    <span class="doccomment">/// Set the footer&#39;s text, replacing the current value as set in [`Self::new`].</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">text</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">text</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
+        <span class="self">self</span>.<span class="ident">text</span> <span class="op">=</span> <span class="ident">text</span>.<span class="ident">into</span>();
         <span class="self">self</span>
     }
 
-    <span class="doccomment">/// Set the footer&#39;s text.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">text</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">text</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">text</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">text</span>.<span class="ident">into</span>());
+    <span class="doccomment">/// Set the icon URL&#39;s value. This only supports HTTP(S).</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">icon_url</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">icon_url</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
+        <span class="self">self</span>.<span class="ident">icon_url</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">icon_url</span>.<span class="ident">into</span>());
         <span class="self">self</span>
     }
 }
@@ -1000,7 +1026,7 @@
     <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">footer</span>: <span class="ident">EmbedFooter</span>) -&gt; <span class="self">Self</span> {
         <span class="self">Self</span> {
             <span class="ident">icon_url</span>: <span class="ident">footer</span>.<span class="ident">icon_url</span>,
-            <span class="ident">text</span>: <span class="prelude-val">Some</span>(<span class="ident">footer</span>.<span class="ident">text</span>),
+            <span class="ident">text</span>: <span class="ident">footer</span>.<span class="ident">text</span>,
         }
     }
 }

@@ -1602,7 +1602,7 @@
     <span class="doccomment">/// # async fn run() {</span>
     <span class="doccomment">/// #     let http = Http::new(&quot;token&quot;);</span>
     <span class="doccomment">/// #     let channel = ChannelId::new(1234);</span>
-    <span class="doccomment">/// let builder = EditChannel::default().name(&quot;test&quot;).bitrate(86400);</span>
+    <span class="doccomment">/// let builder = EditChannel::new().name(&quot;test&quot;).bitrate(86400);</span>
     <span class="doccomment">/// channel.edit(&amp;http, builder).await;</span>
     <span class="doccomment">/// # }</span>
     <span class="doccomment">/// ```</span>
@@ -1686,7 +1686,7 @@
     <span class="doccomment">/// // assuming the cache has been unlocked</span>
     <span class="doccomment">/// let channel = cache.guild_channel(channel_id).ok_or(ModelError::ItemMissing)?;</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// let builder = EditVoiceState::default().suppress(false);</span>
+    <span class="doccomment">/// let builder = EditVoiceState::new().suppress(false);</span>
     <span class="doccomment">/// channel.edit_voice_state(&amp;http, user_id, builder).await?;</span>
     <span class="doccomment">/// #   Ok(())</span>
     <span class="doccomment">/// # }</span>
@@ -1736,7 +1736,7 @@
     <span class="doccomment">/// let channel = cache.guild_channel(channel_id).ok_or(ModelError::ItemMissing)?;</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// // Send a request to speak</span>
-    <span class="doccomment">/// let builder = EditVoiceState::default().request_to_speak(true);</span>
+    <span class="doccomment">/// let builder = EditVoiceState::new().request_to_speak(true);</span>
     <span class="doccomment">/// channel.edit_own_voice_state(&amp;http, builder.clone()).await?;</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// // Clear own request to speak</span>
@@ -1931,7 +1931,7 @@
     <span class="doccomment">///                 },</span>
     <span class="doccomment">///             };</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">///             let builder = CreateMessage::default().content(&quot;here&#39;s a cat&quot;);</span>
+    <span class="doccomment">///             let builder = CreateMessage::new().content(&quot;here&#39;s a cat&quot;);</span>
     <span class="doccomment">///             let _ = msg</span>
     <span class="doccomment">///                 .channel_id</span>
     <span class="doccomment">///                 .send_files(&amp;context.http, vec![(&amp;file, &quot;cat.png&quot;)], builder)</span>

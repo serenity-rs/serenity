@@ -156,7 +156,7 @@ the guild or if the guild is otherwise unavailable.</p>
 <div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use</span> <span class="ident">serenity::builder::CreateChannel</span>;
 <span class="kw">use</span> <span class="ident">serenity::model::channel::ChannelType</span>;
 
-<span class="kw">let</span> <span class="ident">builder</span> <span class="op">=</span> <span class="ident">CreateChannel::default</span>().<span class="ident">name</span>(<span class="string">&quot;my-test-channel&quot;</span>).<span class="ident">kind</span>(<span class="ident">ChannelType::Text</span>);
+<span class="kw">let</span> <span class="ident">builder</span> <span class="op">=</span> <span class="ident">CreateChannel::new</span>(<span class="string">&quot;my-test-channel&quot;</span>).<span class="ident">kind</span>(<span class="ident">ChannelType::Text</span>);
 
 <span class="comment">// assuming a `guild` has already been bound</span>
 <span class="kw">let</span> <span class="ident">_channel</span> <span class="op">=</span> <span class="ident">guild</span>.<span class="ident">create_channel</span>(<span class="kw-2">&amp;</span><span class="ident">http</span>, <span class="ident">builder</span>).<span class="kw">await</span><span class="question-mark">?</span>;</code></pre></div>
@@ -296,7 +296,7 @@ Requires the <a href="../permissions/struct.Permissions.html#associatedconstant.
 <div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use</span> <span class="ident">serenity::builder::EditSticker</span>;
 <span class="kw">use</span> <span class="ident">serenity::model::id::StickerId</span>;
 
-<span class="kw">let</span> <span class="ident">builder</span> <span class="op">=</span> <span class="ident">EditSticker::default</span>().<span class="ident">name</span>(<span class="string">&quot;Bun bun meow&quot;</span>);
+<span class="kw">let</span> <span class="ident">builder</span> <span class="op">=</span> <span class="ident">EditSticker::new</span>().<span class="ident">name</span>(<span class="string">&quot;Bun bun meow&quot;</span>);
 <span class="ident">guild</span>.<span class="ident">edit_sticker</span>(<span class="kw-2">&amp;</span><span class="ident">http</span>, <span class="ident">StickerId::new</span>(<span class="number">7</span>), <span class="ident">builder</span>).<span class="kw">await</span><span class="question-mark">?</span>;</code></pre></div>
 <h5 id="errors-35"><a href="#errors-35">Errors</a></h5>
 <p>Returns <a href="../../prelude/enum.SerenityError.html#variant.Http" title="Error::Http"><code>Error::Http</code></a> if the current user lacks permission, or if invalid data is given.</p>

@@ -199,6 +199,11 @@
 <span id="193">193</span>
 <span id="194">194</span>
 <span id="195">195</span>
+<span id="196">196</span>
+<span id="197">197</span>
+<span id="198">198</span>
+<span id="199">199</span>
+<span id="200">200</span>
 </pre><pre class="rust"><code><span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http&quot;</span>)]</span>
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::http</span>::{<span class="ident">CacheHttp</span>, <span class="ident">Http</span>};
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http&quot;</span>)]</span>
@@ -236,7 +241,7 @@
 <span class="doccomment">/// # let guild_id = GuildId::new(2);</span>
 <span class="doccomment">/// #</span>
 <span class="doccomment">/// // assuming a `guild_id` has been bound</span>
-<span class="doccomment">/// let builder = EditRole::default().name(&quot;a test role&quot;).hoist(true).mentionable(true);</span>
+<span class="doccomment">/// let builder = EditRole::new().name(&quot;a test role&quot;).hoist(true).mentionable(true);</span>
 <span class="doccomment">/// let role = guild_id.create_role(&amp;http, builder).await?;</span>
 <span class="doccomment">/// # Ok(())</span>
 <span class="doccomment">/// # }</span>
@@ -264,6 +269,25 @@
 }
 
 <span class="kw">impl</span> <span class="ident">EditRole</span> {
+    <span class="doccomment">/// Equivalent to [`Self::default`].</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="self">Self</span> {
+        <span class="ident"><span class="self">Self</span>::default</span>()
+    }
+
+    <span class="doccomment">/// Creates a new builder with the values of the given [`Role`].</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_role</span>(<span class="ident">role</span>: <span class="kw-2">&amp;</span><span class="ident">Role</span>) -&gt; <span class="self">Self</span> {
+        <span class="ident">EditRole</span> {
+            <span class="ident">hoist</span>: <span class="prelude-val">Some</span>(<span class="ident">role</span>.<span class="ident">hoist</span>),
+            <span class="ident">mentionable</span>: <span class="prelude-val">Some</span>(<span class="ident">role</span>.<span class="ident">mentionable</span>),
+            <span class="ident">name</span>: <span class="prelude-val">Some</span>(<span class="ident">role</span>.<span class="ident">name</span>.<span class="ident">clone</span>()),
+            <span class="ident">permissions</span>: <span class="prelude-val">Some</span>(<span class="ident">role</span>.<span class="ident">permissions</span>.<span class="ident">bits</span>()),
+            <span class="ident">position</span>: <span class="prelude-val">Some</span>(<span class="ident">role</span>.<span class="ident">position</span>),
+            <span class="ident">colour</span>: <span class="prelude-val">Some</span>(<span class="ident">role</span>.<span class="ident">colour</span>),
+            <span class="ident">unicode_emoji</span>: <span class="ident">role</span>.<span class="ident">unicode_emoji</span>.<span class="ident">clone</span>(),
+            <span class="ident">icon</span>: <span class="ident">role</span>.<span class="ident">icon</span>.<span class="ident">clone</span>(),
+        }
+    }
+
     <span class="doccomment">/// Edits the role.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// **Note**: Requires the [Manage Roles] permission.</span>
@@ -304,20 +328,6 @@
             <span class="ident">guild_id</span>.<span class="ident">edit_role_position</span>(<span class="ident">http</span>, <span class="ident">role</span>.<span class="ident">id</span>, <span class="ident">position</span> <span class="kw">as</span> <span class="ident">u64</span>).<span class="kw">await</span><span class="question-mark">?</span>;
         }
         <span class="prelude-val">Ok</span>(<span class="ident">role</span>)
-    }
-
-    <span class="doccomment">/// Creates a new builder with the values of the given [`Role`].</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">role</span>: <span class="kw-2">&amp;</span><span class="ident">Role</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">EditRole</span> {
-            <span class="ident">hoist</span>: <span class="prelude-val">Some</span>(<span class="ident">role</span>.<span class="ident">hoist</span>),
-            <span class="ident">mentionable</span>: <span class="prelude-val">Some</span>(<span class="ident">role</span>.<span class="ident">mentionable</span>),
-            <span class="ident">name</span>: <span class="prelude-val">Some</span>(<span class="ident">role</span>.<span class="ident">name</span>.<span class="ident">clone</span>()),
-            <span class="ident">permissions</span>: <span class="prelude-val">Some</span>(<span class="ident">role</span>.<span class="ident">permissions</span>.<span class="ident">bits</span>()),
-            <span class="ident">position</span>: <span class="prelude-val">Some</span>(<span class="ident">role</span>.<span class="ident">position</span>),
-            <span class="ident">colour</span>: <span class="prelude-val">Some</span>(<span class="ident">role</span>.<span class="ident">colour</span>),
-            <span class="ident">unicode_emoji</span>: <span class="ident">role</span>.<span class="ident">unicode_emoji</span>.<span class="ident">clone</span>(),
-            <span class="ident">icon</span>: <span class="ident">role</span>.<span class="ident">icon</span>.<span class="ident">clone</span>(),
-        }
     }
 
     <span class="doccomment">/// Set the colour of the role.</span>

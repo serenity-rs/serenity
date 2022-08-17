@@ -102,6 +102,9 @@
 <span id="96">96</span>
 <span id="97">97</span>
 <span id="98">98</span>
+<span id="99">99</span>
+<span id="100">100</span>
+<span id="101">101</span>
 </pre><pre class="rust"><code><span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http&quot;</span>)]</span>
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::http::Http</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http&quot;</span>)]</span>
@@ -121,6 +124,11 @@
 }
 
 <span class="kw">impl</span> <span class="ident">EditProfile</span> {
+    <span class="doccomment">/// Equivalent to [`Self::default`].</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="self">Self</span> {
+        <span class="ident"><span class="self">Self</span>::default</span>()
+    }
+
     <span class="doccomment">/// Edit the current user&#39;s profile with the fields set.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// # Errors</span>
@@ -151,10 +159,8 @@
     <span class="doccomment">/// // assuming a `context` has been bound</span>
     <span class="doccomment">/// let mut user = context.cache.current_user().clone();</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// let builder = EditProfile::default()</span>
-    <span class="doccomment">///     .avatar(&amp;context, &quot;./my_image.jpg&quot;)</span>
-    <span class="doccomment">///     .await</span>
-    <span class="doccomment">///     .expect(&quot;Failed to read image.&quot;);</span>
+    <span class="doccomment">/// let builder =</span>
+    <span class="doccomment">///     EditProfile::new().avatar(&amp;context, &quot;./my_image.jpg&quot;).await.expect(&quot;Failed to read image.&quot;);</span>
     <span class="doccomment">/// let _ = user.edit(&amp;context, builder).await;</span>
     <span class="doccomment">/// #     }</span>
     <span class="doccomment">/// # }</span>

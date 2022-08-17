@@ -1500,7 +1500,7 @@
     <span class="doccomment">/// # async fn run() {</span>
     <span class="doccomment">/// #     let http = Http::new(&quot;token&quot;);</span>
     <span class="doccomment">/// #     let channel_id = ChannelId::new(1234);</span>
-    <span class="doccomment">/// let builder = EditChannel::default().name(&quot;test&quot;).bitrate(64000);</span>
+    <span class="doccomment">/// let builder = EditChannel::new().name(&quot;test&quot;).bitrate(64000);</span>
     <span class="doccomment">/// channel_id.edit(&amp;http, builder).await;</span>
     <span class="doccomment">/// # }</span>
     <span class="doccomment">/// ```</span>
@@ -1820,7 +1820,7 @@
         <span class="ident">cache_http</span>: <span class="kw">impl</span> <span class="ident">CacheHttp</span>,
         <span class="ident">content</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
     ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Message</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">builder</span> <span class="op">=</span> <span class="ident">CreateMessage::default</span>().<span class="ident">content</span>(<span class="ident">content</span>);
+        <span class="kw">let</span> <span class="ident">builder</span> <span class="op">=</span> <span class="ident">CreateMessage::new</span>().<span class="ident">content</span>(<span class="ident">content</span>);
         <span class="self">self</span>.<span class="ident">send_message</span>(<span class="ident">cache_http</span>, <span class="ident">builder</span>).<span class="kw">await</span>
     }
 
@@ -1848,7 +1848,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// let paths = vec![&quot;/path/to/file.jpg&quot;, &quot;path/to/file2.jpg&quot;];</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// let builder = CreateMessage::default().content(&quot;some files&quot;);</span>
+    <span class="doccomment">/// let builder = CreateMessage::new().content(&quot;some files&quot;);</span>
     <span class="doccomment">/// let _ = channel_id.send_files(&amp;http, paths, builder).await;</span>
     <span class="doccomment">/// # }</span>
     <span class="doccomment">/// ```</span>
@@ -1872,7 +1872,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// let files = vec![(&amp;f1, &quot;my_file.jpg&quot;), (&amp;f2, &quot;my_file2.jpg&quot;)];</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// let builder = CreateMessage::default().content(&quot;some files&quot;);</span>
+    <span class="doccomment">/// let builder = CreateMessage::new().content(&quot;some files&quot;);</span>
     <span class="doccomment">/// let _ = channel_id.send_files(&amp;http, files, builder).await;</span>
     <span class="doccomment">/// #    Ok(())</span>
     <span class="doccomment">/// # }</span>
@@ -2310,7 +2310,7 @@
 
         <span class="comment">// If `self.before` is not set yet, we can use `.messages` to fetch</span>
         <span class="comment">// the last message after very first fetch from last.</span>
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">builder</span> <span class="op">=</span> <span class="ident">GetMessages::default</span>().<span class="ident">limit</span>(<span class="ident">grab_size</span>);
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">builder</span> <span class="op">=</span> <span class="ident">GetMessages::new</span>().<span class="ident">limit</span>(<span class="ident">grab_size</span>);
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">before</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">before</span> {
             <span class="ident">builder</span> <span class="op">=</span> <span class="ident">builder</span>.<span class="ident">before</span>(<span class="ident">before</span>);
         }

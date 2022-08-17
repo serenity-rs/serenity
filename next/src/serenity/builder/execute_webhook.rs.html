@@ -364,6 +364,11 @@
 <span id="358">358</span>
 <span id="359">359</span>
 <span id="360">360</span>
+<span id="361">361</span>
+<span id="362">362</span>
+<span id="363">363</span>
+<span id="364">364</span>
+<span id="365">365</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">CreateAllowedMentions</span>, <span class="ident">CreateComponents</span>, <span class="ident">CreateEmbed</span>};
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http&quot;</span>)]</span>
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::http::Http</span>;
@@ -390,19 +395,19 @@
 <span class="doccomment">/// let url = &quot;https://discord.com/api/webhooks/245037420704169985/ig5AO-wdVWpCBtUUMxmgsWryqgsW3DChbKYOINftJ4DCrUbnkedoYZD0VOH1QLr-S3sV&quot;;</span>
 <span class="doccomment">/// let webhook = Webhook::from_url(&amp;http, url).await?;</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// let website = CreateEmbed::default()</span>
+<span class="doccomment">/// let website = CreateEmbed::new()</span>
 <span class="doccomment">///     .title(&quot;The Rust Language Website&quot;)</span>
 <span class="doccomment">///     .description(&quot;Rust is a systems programming language.&quot;)</span>
 <span class="doccomment">///     .colour(Colour::from_rgb(222, 165, 132));</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// let resources = CreateEmbed::default()</span>
+<span class="doccomment">/// let resources = CreateEmbed::new()</span>
 <span class="doccomment">///     .title(&quot;Rust Resources&quot;)</span>
 <span class="doccomment">///     .description(&quot;A few resources to help with learning Rust&quot;)</span>
 <span class="doccomment">///     .colour(0xDEA584)</span>
 <span class="doccomment">///     .field(&quot;The Rust Book&quot;, &quot;A comprehensive resource for Rust.&quot;, false)</span>
 <span class="doccomment">///     .field(&quot;Rust by Example&quot;, &quot;A collection of Rust examples&quot;, false);</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// let builder = ExecuteWebhook::default()</span>
+<span class="doccomment">/// let builder = ExecuteWebhook::new()</span>
 <span class="doccomment">///     .content(&quot;Here&#39;s some information on Rust:&quot;)</span>
 <span class="doccomment">///     .embeds(vec![website, resources]);</span>
 <span class="doccomment">/// webhook.execute(&amp;http, false, builder).await?;</span>
@@ -434,6 +439,11 @@
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">ExecuteWebhook</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
+    <span class="doccomment">/// Equivalent to [`Self::default`].</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="self">Self</span> {
+        <span class="ident"><span class="self">Self</span>::default</span>()
+    }
+
     <span class="doccomment">/// Executes the webhook with the given content.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// If `wait` is set to false, this function will return `Ok(None)` on success. Otherwise,</span>
@@ -502,7 +512,7 @@
     <span class="doccomment">/// # let http = Http::new(&quot;token&quot;);</span>
     <span class="doccomment">/// # let webhook = Webhook::from_id_with_token(&amp;http, 0, &quot;&quot;).await?;</span>
     <span class="doccomment">/// #</span>
-    <span class="doccomment">/// let builder = ExecuteWebhook::default()</span>
+    <span class="doccomment">/// let builder = ExecuteWebhook::new()</span>
     <span class="doccomment">///     .avatar_url(&quot;https://i.imgur.com/KTs6whd.jpg&quot;)</span>
     <span class="doccomment">///     .content(&quot;Here&#39;s a webhook&quot;);</span>
     <span class="doccomment">/// webhook.execute(&amp;http, false, builder).await?;</span>
@@ -532,7 +542,7 @@
     <span class="doccomment">/// # let http = Http::new(&quot;token&quot;);</span>
     <span class="doccomment">/// # let webhook = Webhook::from_id_with_token(&amp;http, 0, &quot;&quot;).await?;</span>
     <span class="doccomment">/// #</span>
-    <span class="doccomment">/// let builder = ExecuteWebhook::default().content(&quot;foo&quot;);</span>
+    <span class="doccomment">/// let builder = ExecuteWebhook::new().content(&quot;foo&quot;);</span>
     <span class="doccomment">/// let execution = webhook.execute(&amp;http, false, builder).await;</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// if let Err(why) = execution {</span>
@@ -565,7 +575,7 @@
     <span class="doccomment">/// let url = &quot;https://discord.com/api/webhooks/245037420704169985/ig5AO-wdVWpCBtUUMxmgsWryqgsW3DChbKYOINftJ4DCrUbnkedoYZD0VOH1QLr-S3sV&quot;;</span>
     <span class="doccomment">/// let mut webhook = Webhook::from_url(&amp;http, url).await?;</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// let builder = ExecuteWebhook::default().in_thread(12345678).content(&quot;test&quot;);</span>
+    <span class="doccomment">/// let builder = ExecuteWebhook::new().in_thread(12345678).content(&quot;test&quot;);</span>
     <span class="doccomment">/// webhook.execute(&amp;http, false, builder).await?;</span>
     <span class="doccomment">/// #     Ok(())</span>
     <span class="doccomment">/// # }</span>
@@ -649,7 +659,7 @@
     <span class="doccomment">/// # let http = Http::new(&quot;token&quot;);</span>
     <span class="doccomment">/// # let webhook = Webhook::from_id_with_token(&amp;http, 0, &quot;&quot;).await?;</span>
     <span class="doccomment">/// #</span>
-    <span class="doccomment">/// let builder = ExecuteWebhook::default().content(&quot;hello&quot;).tts(true);</span>
+    <span class="doccomment">/// let builder = ExecuteWebhook::new().content(&quot;hello&quot;).tts(true);</span>
     <span class="doccomment">/// let execution = webhook.execute(&amp;http, false, builder).await;</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// if let Err(why) = execution {</span>
@@ -678,7 +688,7 @@
     <span class="doccomment">/// # let http = Http::new(&quot;token&quot;);</span>
     <span class="doccomment">/// # let webhook = Webhook::from_id_with_token(&amp;http, 0, &quot;&quot;).await?;</span>
     <span class="doccomment">/// #</span>
-    <span class="doccomment">/// let builder = ExecuteWebhook::default().content(&quot;hello&quot;).username(&quot;hakase&quot;);</span>
+    <span class="doccomment">/// let builder = ExecuteWebhook::new().content(&quot;hello&quot;).username(&quot;hakase&quot;);</span>
     <span class="doccomment">/// let execution = webhook.execute(&amp;http, false, builder).await;</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// if let Err(why) = execution {</span>
@@ -708,7 +718,7 @@
     <span class="doccomment">/// # let http = Http::new(&quot;token&quot;);</span>
     <span class="doccomment">/// # let webhook = Webhook::from_id_with_token(&amp;http, 0, &quot;&quot;).await?;</span>
     <span class="doccomment">/// #</span>
-    <span class="doccomment">/// let builder = ExecuteWebhook::default()</span>
+    <span class="doccomment">/// let builder = ExecuteWebhook::new()</span>
     <span class="doccomment">///     .content(&quot;https://docs.rs/serenity/latest/serenity/&quot;)</span>
     <span class="doccomment">///     .flags(MessageFlags::SUPPRESS_EMBEDS);</span>
     <span class="doccomment">/// let execution = webhook.execute(&amp;http, false, builder).await;</span>

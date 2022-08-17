@@ -132,6 +132,9 @@
 <span id="126">126</span>
 <span id="127">127</span>
 <span id="128">128</span>
+<span id="129">129</span>
+<span id="130">130</span>
+<span id="131">131</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">serde</span>::{<span class="ident">Deserialize</span>, <span class="ident">Serialize</span>};
 
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::id</span>::{<span class="ident">RoleId</span>, <span class="ident">UserId</span>};
@@ -156,37 +159,35 @@
 <span class="doccomment">/// #</span>
 <span class="doccomment">/// # async fn run() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {</span>
 <span class="doccomment">/// # let http = Http::new(&quot;token&quot;);</span>
-<span class="doccomment">/// # let b = CreateMessage::default();</span>
+<span class="doccomment">/// # let b = CreateMessage::new();</span>
 <span class="doccomment">/// # let msg = ChannelId::new(7).message(&amp;http, MessageId::new(8)).await?;</span>
 <span class="doccomment">/// use serenity::builder::{CreateAllowedMentions as Am, ParseValue};</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// // Mention only the user 110372470472613888</span>
 <span class="doccomment">/// # let m = b.clone();</span>
-<span class="doccomment">/// m.allowed_mentions(Am::default().users(vec![110372470472613888]));</span>
+<span class="doccomment">/// m.allowed_mentions(Am::new().users(vec![110372470472613888]));</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// // Mention all users and the role 182894738100322304</span>
 <span class="doccomment">/// # let m = b.clone();</span>
-<span class="doccomment">/// m.allowed_mentions(Am::default().parse(ParseValue::Users).roles(vec![182894738100322304]));</span>
+<span class="doccomment">/// m.allowed_mentions(Am::new().parse(ParseValue::Users).roles(vec![182894738100322304]));</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// // Mention all roles and nothing else</span>
 <span class="doccomment">/// # let m = b.clone();</span>
-<span class="doccomment">/// m.allowed_mentions(Am::default().parse(ParseValue::Roles));</span>
+<span class="doccomment">/// m.allowed_mentions(Am::new().parse(ParseValue::Roles));</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// // Mention all roles and users, but not everyone</span>
 <span class="doccomment">/// # let m = b.clone();</span>
-<span class="doccomment">/// m.allowed_mentions(Am::default().parse(ParseValue::Users).parse(ParseValue::Roles));</span>
+<span class="doccomment">/// m.allowed_mentions(Am::new().parse(ParseValue::Users).parse(ParseValue::Roles));</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// // Mention everyone and the users 182891574139682816, 110372470472613888</span>
 <span class="doccomment">/// # let m = b.clone();</span>
 <span class="doccomment">/// m.allowed_mentions(</span>
-<span class="doccomment">///     Am::default()</span>
-<span class="doccomment">///         .parse(ParseValue::Everyone)</span>
-<span class="doccomment">///         .users(vec![182891574139682816, 110372470472613888]),</span>
+<span class="doccomment">///     Am::new().parse(ParseValue::Everyone).users(vec![182891574139682816, 110372470472613888]),</span>
 <span class="doccomment">/// );</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// // Mention everyone and the message author.</span>
 <span class="doccomment">/// # let m = b.clone();</span>
-<span class="doccomment">/// m.allowed_mentions(Am::default().parse(ParseValue::Everyone).users(vec![msg.author.id]));</span>
+<span class="doccomment">/// m.allowed_mentions(Am::new().parse(ParseValue::Everyone).users(vec![msg.author.id]));</span>
 <span class="doccomment">/// # Ok(())</span>
 <span class="doccomment">/// # }</span>
 <span class="doccomment">/// ```</span>
@@ -204,6 +205,11 @@
 }
 
 <span class="kw">impl</span> <span class="ident">CreateAllowedMentions</span> {
+    <span class="doccomment">/// Equivalent to [`Self::default`].</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="self">Self</span> {
+        <span class="ident"><span class="self">Self</span>::default</span>()
+    }
+
     <span class="doccomment">/// Add a value that&#39;s allowed to be mentioned.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// If passing in [`ParseValue::Users`] or [`ParseValue::Roles`], note that later calling</span>
