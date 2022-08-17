@@ -14,14 +14,13 @@ pub fn run(options: &[ResolvedOption]) -> String {
 }
 
 pub fn register() -> CreateApplicationCommand {
-    CreateApplicationCommand::default()
-        .name("attachmentinput")
-        .description("Test command for attachment input")
+    CreateApplicationCommand::new("attachmentinput", "Test command for attachment input")
         .add_option(
-            CreateApplicationCommandOption::default()
-                .name("attachment")
-                .description("A file")
-                .kind(CommandOptionType::Attachment)
-                .required(true),
+            CreateApplicationCommandOption::new(
+                CommandOptionType::Attachment,
+                "attachment",
+                "A file",
+            )
+            .required(true),
         )
 }

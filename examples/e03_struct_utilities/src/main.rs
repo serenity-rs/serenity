@@ -20,7 +20,7 @@ impl EventHandler for Handler {
             // In this case, you can direct message a User directly by simply
             // calling a method on its instance, with the content of the
             // message.
-            let builder = CreateMessage::default().content("Hello!");
+            let builder = CreateMessage::new().content("Hello!");
             let dm = msg.author.dm(&context, builder).await;
 
             if let Err(why) = dm {

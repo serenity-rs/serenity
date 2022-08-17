@@ -27,17 +27,14 @@ enum Number {
 /// [`Self::kind`], [`Self::name`], and [`Self::description`] are required fields.
 ///
 /// [`CommandOption`]: crate::model::application::command::CommandOption
-#[derive(Clone, Debug, Default, Serialize)]
+#[derive(Clone, Debug, Serialize)]
 #[must_use]
 pub struct CreateApplicationCommandOption {
-    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "type")]
-    kind: Option<CommandOptionType>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    name: Option<String>,
+    kind: CommandOptionType,
+    name: String,
     name_localizations: HashMap<String, String>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    description: Option<String>,
+    description: String,
     description_localizations: HashMap<String, String>,
     #[serde(skip_serializing_if = "Option::is_none")]
     default: Option<bool>,
@@ -60,24 +57,53 @@ pub struct CreateApplicationCommandOption {
 }
 
 impl CreateApplicationCommandOption {
-    /// Sets the `CommandOptionType`.
+    /// Creates a new builder with the given option type, name, and description, leaving all other
+    /// fields empty.
+    pub fn new(
+        kind: CommandOptionType,
+        name: impl Into<String>,
+        description: impl Into<String>,
+    ) -> Self {
+        Self {
+            kind,
+            name: name.into(),
+            name_localizations: HashMap::new(),
+            description: description.into(),
+            description_localizations: HashMap::new(),
+            default: None,
+            required: None,
+            autocomplete: None,
+            min_value: None,
+            max_value: None,
+            min_length: None,
+            max_length: None,
+
+            channel_types: Vec::new(),
+            choices: Vec::new(),
+            options: Vec::new(),
+        }
+    }
+
+    /// Sets the `CommandOptionType`, replacing the current value as set in [`Self::new`].
     pub fn kind(mut self, kind: CommandOptionType) -> Self {
-        self.kind = Some(kind);
+        self.kind = kind;
         self
     }
 
-    /// Sets the name of the option.
+    /// Sets the name of the option, replacing the current value as set in [`Self::new`].
     ///
     /// **Note**: Must be between 1 and 32 lowercase characters, matching `r"^[\w-]{1,32}$"`.
     pub fn name(mut self, name: impl Into<String>) -> Self {
-        self.name = Some(name.into());
+        self.name = name.into();
         self
     }
 
     /// Specifies a localized name of the option.
     ///
     /// ```rust
-    /// # serenity::builder::CreateApplicationCommandOption::default()
+    /// # use serenity::builder::CreateApplicationCommandOption;
+    /// # use serenity::model::application::command::CommandOptionType;
+    /// # CreateApplicationCommandOption::new(CommandOptionType::Integer, "", "")
     /// .name("age")
     /// .name_localized("zh-CN", "岁数")
     /// # ;
@@ -87,18 +113,19 @@ impl CreateApplicationCommandOption {
         self
     }
 
-    /// Sets the description for the option.
+    /// Sets the description for the option, replacing the current value as set in [`Self::new]`.
     ///
     /// **Note**: Must be between 1 and 100 characters.
     pub fn description(mut self, description: impl Into<String>) -> Self {
-        self.description = Some(description.into());
+        self.description = description.into();
         self
     }
-
     /// Specifies a localized description of the option.
     ///
     /// ```rust
-    /// # serenity::builder::CreateApplicationCommandOption::default()
+    /// # use serenity::builder::CreateApplicationCommandOption;
+    /// # use serenity::model::application::command::CommandOptionType;
+    /// # CreateApplicationCommandOption::new(CommandOptionType::String, "", "")
     /// .description("Wish a friend a happy birthday")
     /// .description_localized("zh-CN", "祝你朋友生日快乐")
     /// # ;
@@ -289,18 +316,16 @@ impl CreateApplicationCommandOption {
 /// [`Self::name`] and [`Self::description`] are required fields.
 ///
 /// [`Command`]: crate::model::application::command::Command
-#[derive(Clone, Debug, Default, Serialize)]
+#[derive(Clone, Debug, Serialize)]
 #[must_use]
 pub struct CreateApplicationCommand {
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "type")]
     kind: Option<CommandType>,
 
-    #[serde(skip_serializing_if = "Option::is_none")]
-    name: Option<String>,
+    name: String,
     name_localizations: HashMap<String, String>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    description: Option<String>,
+    description: String,
     description_localizations: HashMap<String, String>,
     #[serde(skip_serializing_if = "Option::is_none")]
     default_member_permissions: Option<String>,
@@ -311,6 +336,22 @@ pub struct CreateApplicationCommand {
 }
 
 impl CreateApplicationCommand {
+    /// Creates a new builder with the given name and description, leaving all other fields empty.
+    pub fn new(name: impl Into<String>, description: impl Into<String>) -> Self {
+        Self {
+            kind: None,
+
+            name: name.into(),
+            name_localizations: HashMap::new(),
+            description: description.into(),
+            description_localizations: HashMap::new(),
+            default_member_permissions: None,
+            dm_permission: None,
+
+            options: Vec::new(),
+        }
+    }
+
     /// Create a [`Command`], overriding an existing one with the same name if it exists.
     ///
     /// Providing a `command_id` will edit the corresponding command.
@@ -347,20 +388,21 @@ impl CreateApplicationCommand {
         }
     }
 
-    /// Specifies the name of the application command.
+    /// Specifies the name of the application command, replacing the current value as set in
+    /// [`Self::new]`.
     ///
     /// **Note**: Must be between 1 and 32 lowercase characters, matching `r"^[\w-]{1,32}$"`. Two
     /// global commands of the same app cannot have the same name. Two guild-specific commands of
     /// the same app cannot have the same name.
     pub fn name(mut self, name: impl Into<String>) -> Self {
-        self.name = Some(name.into());
+        self.name = name.into();
         self
     }
 
     /// Specifies a localized name of the application command.
     ///
     /// ```rust
-    /// # serenity::builder::CreateApplicationCommand::default()
+    /// # serenity::builder::CreateApplicationCommand::new("", "")
     /// .name("birthday")
     /// .name_localized("zh-CN", "生日")
     /// .name_localized("el", "γενέθλια")
@@ -386,22 +428,22 @@ impl CreateApplicationCommand {
     /// Specifies if the command is available in DMs.
     pub fn dm_permission(mut self, enabled: bool) -> Self {
         self.dm_permission = Some(enabled);
-
         self
     }
 
-    /// Specifies the description of the application command.
+    /// Specifies the description of the application command, replacing the current value as set in
+    /// [`Self::new`].
     ///
     /// **Note**: Must be between 1 and 100 characters long.
     pub fn description(mut self, description: impl Into<String>) -> Self {
-        self.description = Some(description.into());
+        self.description = description.into();
         self
     }
 
     /// Specifies a localized description of the application command.
     ///
     /// ```rust
-    /// # serenity::builder::CreateApplicationCommand::default()
+    /// # serenity::builder::CreateApplicationCommand::new("", "")
     /// .description("Wish a friend a happy birthday")
     /// .description_localized("zh-CN", "祝你朋友生日快乐")
     /// # ;
@@ -409,7 +451,6 @@ impl CreateApplicationCommand {
     pub fn description_localized(
         mut self,
         locale: impl Into<String>,
-
         description: impl Into<String>,
     ) -> Self {
         self.description_localizations.insert(locale.into(), description.into());

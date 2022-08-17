@@ -18,7 +18,7 @@ use crate::model::prelude::*;
 /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
 /// #     let http = Http::new("token");
 /// #     let mut channel = ChannelId::new(1);
-/// let builder = EditChannel::default().name("new name").topic("a test topic");
+/// let builder = EditChannel::new().name("new name").topic("a test topic");
 /// if let Err(why) = channel.edit(&http, builder).await {
 ///     // properly handle the error
 /// }
@@ -53,6 +53,11 @@ pub struct EditChannel {
 }
 
 impl EditChannel {
+    /// Equivalent to [`Self::default`].
+    pub fn new() -> Self {
+        Self::default()
+    }
+
     /// Edits the channel's settings.
     ///
     /// **Note**: Requires the [Manage Channels] permission. Modifying permissions via
@@ -229,7 +234,7 @@ impl EditChannel {
     ///     kind: PermissionOverwriteType::Member(UserId::new(1234)),
     /// }];
     ///
-    /// let builder = EditChannel::default().name("my_edited_cool_channel").permissions(permissions);
+    /// let builder = EditChannel::new().name("my_edited_cool_channel").permissions(permissions);
     /// channel.edit(http, builder).await?;
     /// #    Ok(())
     /// # }

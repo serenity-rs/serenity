@@ -40,7 +40,7 @@ use crate::model::prelude::*;
 /// // you can then pass it into a function which retrieves messages:
 /// let channel_id = ChannelId::new(81384788765712384);
 ///
-/// let builder = GetMessages::default().after(MessageId::new(158339864557912064)).limit(25);
+/// let builder = GetMessages::new().after(MessageId::new(158339864557912064)).limit(25);
 /// let _messages = channel_id.messages(&http, builder).await?;
 /// #     Ok(())
 /// # }
@@ -53,6 +53,11 @@ pub struct GetMessages {
 }
 
 impl GetMessages {
+    /// Equivalent to [`Self::default`].
+    pub fn new() -> Self {
+        Self::default()
+    }
+
     /// Gets messages from the channel.
     ///
     /// **Note**: If the user does not have the [Read Message History] permission, returns an empty

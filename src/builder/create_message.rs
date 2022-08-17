@@ -36,8 +36,8 @@ use crate::model::prelude::*;
 ///
 /// let channel_id = ChannelId::new(7);
 ///
-/// let embed = CreateEmbed::default().title("This is an embed").description("With a description");
-/// let builder = CreateMessage::default().content("test").tts(true).embed(embed);
+/// let embed = CreateEmbed::new().title("This is an embed").description("With a description");
+/// let builder = CreateMessage::new().content("test").tts(true).embed(embed);
 /// let _ = channel_id.send_message(&http, builder).await;
 /// # }
 /// ```
@@ -70,6 +70,10 @@ pub struct CreateMessage<'a> {
 }
 
 impl<'a> CreateMessage<'a> {
+    pub fn new() -> Self {
+        Self::default()
+    }
+
     /// Send a message to the channel.
     ///
     /// **Note**: Requires the [Send Messages] permission. Additionally, attaching files requires the
