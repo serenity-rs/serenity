@@ -105,7 +105,7 @@ impl ChannelCategory {
     /// # async fn run() {
     /// #     let http = Http::new("token");
     /// #     let category = ChannelId::new(1234);
-    /// let builder = EditChannel::default().name("test");
+    /// let builder = EditChannel::new().name("test");
     /// category.edit(&http, builder).await;
     /// # }
     /// ```

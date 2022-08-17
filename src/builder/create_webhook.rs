@@ -5,16 +5,23 @@ use crate::internal::prelude::*;
 #[cfg(feature = "http")]
 use crate::model::prelude::*;
 
-#[derive(Debug, Default, Clone, Serialize)]
+#[derive(Clone, Debug, Serialize)]
 #[must_use]
 pub struct CreateWebhook {
-    #[serde(skip_serializing_if = "Option::is_none")]
-    name: Option<String>,
+    name: String,
     #[serde(skip_serializing_if = "Option::is_none")]
     avatar: Option<String>,
 }
 
 impl CreateWebhook {
+    /// Creates a new builder with the given webhook name, leaving all other fields empty.
+    pub fn new(name: impl Into<String>) -> Self {
+        Self {
+            name: name.into(),
+            avatar: None,
+        }
+    }
+
     /// Creates the webhook.
     ///
     /// # Errors
@@ -52,22 +59,20 @@ impl CreateWebhook {
 
     #[cfg(feature = "http")]
     async fn _execute(self, http: &Http, channel_id: ChannelId) -> Result<Webhook> {
-        if let Some(name) = &self.name {
-            if name.len() < 2 {
-                return Err(Error::Model(ModelError::NameTooShort));
-            } else if name.len() > 100 {
-                return Err(Error::Model(ModelError::NameTooLong));
-            }
+        if self.name.len() < 2 {
+            return Err(Error::Model(ModelError::NameTooShort));
+        } else if self.name.len() > 100 {
+            return Err(Error::Model(ModelError::NameTooLong));
         }
 
         http.create_webhook(channel_id.into(), &self, None).await
     }
 
-    /// Set the webhook's name.
+    /// Set the webhook's name, replacing the current value as set in [`Self::new`].
     ///
     /// This must be between 1-80 characters.
     pub fn name(mut self, name: impl Into<String>) -> Self {
-        self.name = Some(name.into());
+        self.name = name.into();
         self
     }
 

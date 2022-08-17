@@ -17,6 +17,11 @@ pub struct EditGuildWidget {
 }
 
 impl EditGuildWidget {
+    /// Equivalent to [`Self::default`].
+    pub fn new() -> Self {
+        Self::default()
+    }
+
     /// Edits the guild's widget.
     ///
     /// **Note**: Requires the [Manage Guild] permission.

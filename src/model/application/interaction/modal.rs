@@ -175,8 +175,8 @@ impl ModalSubmitInteraction {
     /// Returns an [`Error::Http`] if the API returns an error, or an [`Error::Json`] if there is
     /// an error in deserializing the API response.
     pub async fn defer(&self, http: impl AsRef<Http>) -> Result<()> {
-        let builder = CreateInteractionResponse::default()
-            .kind(InteractionResponseType::DeferredUpdateMessage);
+        let builder =
+            CreateInteractionResponse::new().kind(InteractionResponseType::DeferredUpdateMessage);
         self.create_interaction_response(http, builder).await
     }
 }

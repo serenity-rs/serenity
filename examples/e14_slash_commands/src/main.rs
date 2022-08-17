@@ -54,8 +54,8 @@ impl EventHandler for Handler {
                 _ => "not implemented :(".to_string(),
             };
 
-            let data = CreateInteractionResponseData::default().content(content);
-            let builder = CreateInteractionResponse::default()
+            let data = CreateInteractionResponseData::new().content(content);
+            let builder = CreateInteractionResponse::new()
                 .kind(InteractionResponseType::ChannelMessageWithSource)
                 .interaction_response_data(data);
             if let Err(why) = command.create_interaction_response(&ctx.http, builder).await {
@@ -74,37 +74,25 @@ impl EventHandler for Handler {
                 .expect("GUILD_ID must be an integer"),
         );
 
-        let c1 = CreateCommand::default().name("ping").description("A ping command");
+        let c1 = CreateCommand::new("ping", "A ping command");
 
-        let c2 = CreateCommand::default().name("id").description("Get a user id").add_option(
-            CreateOption::default()
-                .name("id")
-                .description("The user to lookup")
-                .kind(CommandOptionType::User)
-                .required(true),
+        let c2 = CreateCommand::new("id", "Get a user id").add_option(
+            CreateOption::new(CommandOptionType::User, "id", "The user to lookup").required(true),
         );
 
-        let c3 = CreateCommand::default()
-            .name("welcome")
+        let c3 = CreateCommand::new("welcome", "Welcome a user")
             .name_localized("de", "begrüßen")
-            .description("Welcome a user")
             .description_localized("de", "Einen Nutzer begrüßen")
             .add_option(
-                CreateOption::default()
-                    .name("user")
+                CreateOption::new(CommandOptionType::User, "user", "The user to welcome")
                     .name_localized("de", "nutzer")
-                    .description("The user to welcome")
                     .description_localized("de", "Der zu begrüßende Nutzer")
-                    .kind(CommandOptionType::User)
                     .required(true),
             )
             .add_option(
-                CreateOption::default()
-                    .name("message")
+                CreateOption::new(CommandOptionType::String, "message", "The message to send")
                     .name_localized("de", "nachricht")
-                    .description("The message to send")
                     .description_localized("de", "Die versendete Nachricht")
-                    .kind(CommandOptionType::String)
                     .required(true)
                     .add_string_choice_localized(
                         "Welcome to our cool server! Ask me if you need help",
@@ -128,36 +116,23 @@ impl EventHandler for Handler {
                     ),
             );
 
-        let c4 = CreateCommand::default()
-            .name("numberinput")
-            .description("Test command for number input")
+        let c4 = CreateCommand::new("numberinput", "Test command for number input")
             .add_option(
-                CreateOption::default()
-                    .name("int")
-                    .description("An integer from 5 to 10")
-                    .kind(CommandOptionType::Integer)
+                CreateOption::new(CommandOptionType::Integer, "int", "An integer fro 5 to 10")
                     .min_int_value(5)
                     .max_int_value(10)
                     .required(true),
             )
             .add_option(
-                CreateOption::default()
-                    .name("number")
-                    .description("A float from -3.3 to 234.5")
-                    .kind(CommandOptionType::Number)
-                    .min_number_value(-3.3)
+                CreateOption::new(CommandOptionType::Number, "number", "A float from -3 to 234.5")
+                    .min_number_value(-3.0)
                     .max_number_value(234.5)
                     .required(true),
             );
 
-        let c5 = CreateCommand::default()
-            .name("attachmentinput")
-            .description("Test command for attachment input")
+        let c5 = CreateCommand::new("attachmentinput", "Test command for attachment input")
             .add_option(
-                CreateOption::default()
-                    .name("attachment")
-                    .description("A file")
-                    .kind(CommandOptionType::Attachment)
+                CreateOption::new(CommandOptionType::Attachment, "attachment", "A file")
                     .required(true),
             );
 
@@ -167,7 +142,7 @@ impl EventHandler for Handler {
 
         let guild_command = Command::create_global_application_command(
             &ctx.http,
-            CreateCommand::default().name("wonderful_command").description("An amazing command"),
+            CreateCommand::new("wonderful_command", "An amazing command"),
         )
         .await;
 

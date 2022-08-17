@@ -36,7 +36,7 @@ pub trait Mentionable {
     ///     to_channel: GuildChannel,
     ///     rules_channel: ChannelId,
     /// ) -> Result<(), Error> {
-    ///     let builder = CreateMessage::default().content(format!(
+    ///     let builder = CreateMessage::new().content(format!(
     ///         "Hi {member}, welcome to the server! \
     ///         Please refer to {rules} for our code of conduct, \
     ///         and enjoy your stay.",

@@ -78,7 +78,7 @@ async fn log_system_load(ctx: &Context) {
 
     // We can use ChannelId directly to send a message to a specific channel; in this case, the
     // message would be sent to the #testing channel on the discord server.
-    let embed = CreateEmbed::default()
+    let embed = CreateEmbed::new()
         .title("System Resource Load")
         .field("CPU Load Average", &format!("{:.2}%", cpu_load.one * 10.0), false)
         .field(
@@ -90,7 +90,7 @@ async fn log_system_load(ctx: &Context) {
             ),
             false,
         );
-    let builder = CreateMessage::default().embed(embed);
+    let builder = CreateMessage::new().embed(embed);
     let message = ChannelId::new(381926291785383946).send_message(&ctx, builder).await;
     if let Err(why) = message {
         eprintln!("Error sending message: {:?}", why);
