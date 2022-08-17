@@ -565,7 +565,7 @@ async fn am_i_admin(ctx: &Context, msg: &Message, _args: Args) -> CommandResult 
 #[command]
 async fn slow_mode(ctx: &Context, msg: &Message, mut args: Args) -> CommandResult {
     let say_content = if let Ok(slow_mode_rate_seconds) = args.single::<u64>() {
-        let builder = EditChannel::default().rate_limit_per_user(slow_mode_rate_seconds);
+        let builder = EditChannel::new().rate_limit_per_user(slow_mode_rate_seconds);
         if let Err(why) = msg.channel_id.edit(&ctx.http, builder).await {
             println!("Error setting channel's slow mode rate: {:?}", why);
 

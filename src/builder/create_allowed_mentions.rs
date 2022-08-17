@@ -22,37 +22,35 @@ pub enum ParseValue {
 /// #
 /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
 /// # let http = Http::new("token");
-/// # let b = CreateMessage::default();
+/// # let b = CreateMessage::new();
 /// # let msg = ChannelId::new(7).message(&http, MessageId::new(8)).await?;
 /// use serenity::builder::{CreateAllowedMentions as Am, ParseValue};
 ///
 /// // Mention only the user 110372470472613888
 /// # let m = b.clone();
-/// m.allowed_mentions(Am::default().users(vec![110372470472613888]));
+/// m.allowed_mentions(Am::new().users(vec![110372470472613888]));
 ///
 /// // Mention all users and the role 182894738100322304
 /// # let m = b.clone();
-/// m.allowed_mentions(Am::default().parse(ParseValue::Users).roles(vec![182894738100322304]));
+/// m.allowed_mentions(Am::new().parse(ParseValue::Users).roles(vec![182894738100322304]));
 ///
 /// // Mention all roles and nothing else
 /// # let m = b.clone();
-/// m.allowed_mentions(Am::default().parse(ParseValue::Roles));
+/// m.allowed_mentions(Am::new().parse(ParseValue::Roles));
 ///
 /// // Mention all roles and users, but not everyone
 /// # let m = b.clone();
-/// m.allowed_mentions(Am::default().parse(ParseValue::Users).parse(ParseValue::Roles));
+/// m.allowed_mentions(Am::new().parse(ParseValue::Users).parse(ParseValue::Roles));
 ///
 /// // Mention everyone and the users 182891574139682816, 110372470472613888
 /// # let m = b.clone();
 /// m.allowed_mentions(
-///     Am::default()
-///         .parse(ParseValue::Everyone)
-///         .users(vec![182891574139682816, 110372470472613888]),
+///     Am::new().parse(ParseValue::Everyone).users(vec![182891574139682816, 110372470472613888]),
 /// );
 ///
 /// // Mention everyone and the message author.
 /// # let m = b.clone();
-/// m.allowed_mentions(Am::default().parse(ParseValue::Everyone).users(vec![msg.author.id]));
+/// m.allowed_mentions(Am::new().parse(ParseValue::Everyone).users(vec![msg.author.id]));
 /// # Ok(())
 /// # }
 /// ```
@@ -70,6 +68,11 @@ pub struct CreateAllowedMentions {
 }
 
 impl CreateAllowedMentions {
+    /// Equivalent to [`Self::default`].
+    pub fn new() -> Self {
+        Self::default()
+    }
+
     /// Add a value that's allowed to be mentioned.
     ///
     /// If passing in [`ParseValue::Users`] or [`ParseValue::Roles`], note that later calling

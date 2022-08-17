@@ -23,6 +23,11 @@ pub struct EditWebhookMessage {
 }
 
 impl EditWebhookMessage {
+    /// Equivalent to [`Self::default`].
+    pub fn new() -> Self {
+        Self::default()
+    }
+
     /// Edits the webhook's message.
     ///
     /// **Note**: Message contents must be under 2000 unicode code points, and embeds must be under
