@@ -517,7 +517,7 @@ impl ChannelId {
 
     /// Returns the name of whatever channel this id holds.
     #[cfg(feature = "cache")]
-    pub async fn name(self, cache: impl AsRef<Cache>) -> Option<String> {
+    pub fn name(self, cache: impl AsRef<Cache>) -> Option<String> {
         let channel = self.to_channel_cached(cache)?;
 
         Some(match channel {
