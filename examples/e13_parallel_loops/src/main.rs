@@ -52,9 +52,7 @@ impl EventHandler for Handler {
             // the application.
             tokio::spawn(async move {
                 loop {
-                    // We clone Context again here, because Arc is owned, so it moves to the
-                    // new function.
-                    log_system_load(Arc::clone(&ctx1)).await;
+                    log_system_load(&ctx1).await;
                     tokio::time::sleep(Duration::from_secs(120)).await;
                 }
             });
@@ -63,7 +61,7 @@ impl EventHandler for Handler {
             let ctx2 = Arc::clone(&ctx);
             tokio::spawn(async move {
                 loop {
-                    set_activity_to_current_time(Arc::clone(&ctx2)).await;
+                    set_activity_to_current_time(&ctx2);
                     tokio::time::sleep(Duration::from_secs(60)).await;
                 }
             });
@@ -74,7 +72,7 @@ impl EventHandler for Handler {
     }
 }
 
-async fn log_system_load(ctx: Arc<Context>) {
+async fn log_system_load(ctx: &Context) {
     let cpu_load = sys_info::loadavg().unwrap();
     let mem_use = sys_info::mem_info().unwrap();
 
@@ -99,11 +97,11 @@ async fn log_system_load(ctx: Arc<Context>) {
     };
 }
 
-async fn set_activity_to_current_time(ctx: Arc<Context>) {
+fn set_activity_to_current_time(ctx: &Context) {
     let current_time = Utc::now();
     let formatted_time = current_time.to_rfc2822();
 
-    ctx.set_activity(Some(ActivityData::playing(formatted_time))).await;
+    ctx.set_activity(Some(ActivityData::playing(formatted_time)));
 }
 
 #[tokio::main]
