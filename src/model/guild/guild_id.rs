@@ -90,7 +90,7 @@ impl GuildId {
     /// # async fn run() {
     /// # use serenity::http::Http;
     /// # let http = Http::new("token");
-    /// let builder = EditAutoModRule::default()
+    /// let builder = EditAutoModRule::new()
     ///     .name("foobar filter")
     ///     .trigger(Trigger::Keyword(vec!["foo*".to_string(), "*bar".to_string()]))
     ///     .actions(vec![Action::BlockMessage, Action::Timeout(Duration::from_secs(60))]);
@@ -317,7 +317,7 @@ impl GuildId {
     ///
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// # let http = Http::new("token");
-    /// let builder = CreateChannel::default().name("test").kind(ChannelType::Voice);
+    /// let builder = CreateChannel::new("test").kind(ChannelType::Voice);
     /// let _channel = GuildId::new(7).create_channel(&http, builder).await?;
     /// # Ok(())
     /// # }
@@ -628,7 +628,7 @@ impl GuildId {
     /// # let http = Http::new("token");
     /// # let role_id = RoleId::new(7);
     /// # let user_id = UserId::new(7);
-    /// let builder = EditMember::default().mute(true).roles(vec![role_id]);
+    /// let builder = EditMember::new().mute(true).roles(vec![role_id]);
     /// let _ = GuildId::new(7).edit_member(&http, user_id, builder).await?;
     /// # Ok(())
     /// # }
@@ -687,7 +687,7 @@ impl GuildId {
     /// # let role_id = RoleId::new(8);
     /// #
     /// // assuming a `role_id` and `guild_id` has been bound
-    /// let builder = EditRole::default().name("a test role").hoist(true);
+    /// let builder = EditRole::new().name("a test role").hoist(true);
     /// let role = guild_id.edit_role(&http, role_id, builder).await?;
     /// # Ok(())
     /// # }
@@ -743,7 +743,7 @@ impl GuildId {
     ///
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// # let http = Http::new("token");
-    /// let builder = EditSticker::default().name("Bun bun meow");
+    /// let builder = EditSticker::new().name("Bun bun meow");
     /// let _ = GuildId::new(7).edit_sticker(&http, StickerId::new(7), builder).await?;
     /// # Ok(())
     /// # }
@@ -1083,7 +1083,7 @@ impl GuildId {
         user_id: impl Into<UserId>,
         channel_id: impl Into<ChannelId>,
     ) -> Result<Member> {
-        let builder = EditMember::default().voice_channel(channel_id.into());
+        let builder = EditMember::new().voice_channel(channel_id.into());
         self.edit_member(http, user_id, builder).await
     }
 
@@ -1110,7 +1110,7 @@ impl GuildId {
         http: impl AsRef<Http>,
         user_id: impl Into<UserId>,
     ) -> Result<Member> {
-        self.edit_member(http, user_id, EditMember::default().disconnect_member()).await
+        self.edit_member(http, user_id, EditMember::new().disconnect_member()).await
     }
 
     /// Gets the number of [`Member`]s that would be pruned with the given

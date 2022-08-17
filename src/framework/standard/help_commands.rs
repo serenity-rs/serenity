@@ -1022,7 +1022,7 @@ async fn send_grouped_commands_embed(
     // creating embed outside message builder since flatten_group_to_string
     // may return an error.
 
-    let mut embed = CreateEmbed::default().colour(colour).description(help_description);
+    let mut embed = CreateEmbed::new().colour(colour).description(help_description);
     for group in groups {
         let mut embed_text = String::default();
 
@@ -1031,7 +1031,7 @@ async fn send_grouped_commands_embed(
         embed = embed.field(group.name, &embed_text, true);
     }
 
-    let builder = CreateMessage::default().embed(embed);
+    let builder = CreateMessage::new().embed(embed);
     channel_id.send_message(cache_http, builder).await
 }
 
@@ -1044,7 +1044,7 @@ async fn send_single_command_embed(
     command: &Command<'_>,
     colour: Colour,
 ) -> Result<Message, Error> {
-    let mut embed = CreateEmbed::default().title(command.name).colour(colour);
+    let mut embed = CreateEmbed::new().title(command.name).colour(colour);
 
     if let Some(desc) = command.description {
         embed = embed.description(desc);
@@ -1102,7 +1102,7 @@ async fn send_single_command_embed(
         );
     }
 
-    let builder = CreateMessage::default().embed(embed);
+    let builder = CreateMessage::new().embed(embed);
     channel_id.send_message(cache_http, builder).await
 }
 
@@ -1117,8 +1117,8 @@ async fn send_suggestion_embed(
 ) -> Result<Message, Error> {
     let text = help_description.replace("{}", &suggestions.join("`, `"));
 
-    let embed = CreateEmbed::default().colour(colour).description(text);
-    let builder = CreateMessage::default().embed(embed);
+    let embed = CreateEmbed::new().colour(colour).description(text);
+    let builder = CreateMessage::new().embed(embed);
     channel_id.send_message(cache_http, builder).await
 }
 
@@ -1130,8 +1130,8 @@ async fn send_error_embed(
     input: &str,
     colour: Colour,
 ) -> Result<Message, Error> {
-    let embed = CreateEmbed::default().colour(colour).description(input);
-    let builder = CreateMessage::default().embed(embed);
+    let embed = CreateEmbed::new().colour(colour).description(input);
+    let builder = CreateMessage::new().embed(embed);
     channel_id.send_message(cache_http, builder).await
 }
 

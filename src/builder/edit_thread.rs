@@ -21,6 +21,11 @@ pub struct EditThread {
 }
 
 impl EditThread {
+    /// Equivalent to [`Self::default`].
+    pub fn new() -> Self {
+        Self::default()
+    }
+
     /// Edits the thread.
     ///
     /// # Errors

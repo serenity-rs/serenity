@@ -16,6 +16,11 @@ pub struct EditWebhook {
 }
 
 impl EditWebhook {
+    /// Equivalent to [`Self::default`].
+    pub fn new() -> Self {
+        Self::default()
+    }
+
     /// Edits the webhook corresponding to the provided Id and token, and returns the resulting ne
     /// [`Webhook`].
     ///

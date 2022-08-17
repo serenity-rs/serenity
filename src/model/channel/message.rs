@@ -315,7 +315,7 @@ impl Message {
     /// # let http = Http::new("token");
     /// # let mut message = ChannelId::new(7).message(&http, MessageId::new(8)).await?;
     /// // assuming a `message` has already been bound
-    /// let builder = EditMessage::default().content("new content");
+    /// let builder = EditMessage::new().content("new content");
     /// message.edit(&http, builder).await?;
     /// # Ok(())
     /// # }
@@ -665,9 +665,9 @@ impl Message {
             }
         }
 
-        let mut builder = CreateMessage::default().content(content);
+        let mut builder = CreateMessage::new().content(content);
         if let Some(ping_user) = inlined {
-            let allowed_mentions = CreateAllowedMentions::default()
+            let allowed_mentions = CreateAllowedMentions::new()
                 .replied_user(ping_user)
                 // By providing allowed_mentions, Discord disabled _all_ pings by default so we
                 // need to re-enable them

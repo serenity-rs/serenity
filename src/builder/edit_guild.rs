@@ -47,6 +47,11 @@ pub struct EditGuild {
 }
 
 impl EditGuild {
+    /// Equivalent to [`Self::default`].
+    pub fn new() -> Self {
+        Self::default()
+    }
+
     /// Edits the given guild.
     ///
     /// **Note**: Requires the [Manage Guild] permission.
@@ -107,7 +112,7 @@ impl EditGuild {
     /// let base64_icon = serenity::utils::read_image("./guild_icon.png")?;
     ///
     /// // assuming a `guild` has already been bound
-    /// let builder = EditGuild::default().icon(Some(base64_icon));
+    /// let builder = EditGuild::new().icon(Some(base64_icon));
     /// guild.edit(&http, builder).await?;
     /// #     Ok(())
     /// # }
@@ -271,7 +276,7 @@ impl EditGuild {
     /// #     let mut guild = GuildId::new(1).to_partial_guild(&http).await?;
     /// use serenity::model::guild::VerificationLevel;
     ///
-    /// let builder = EditGuild::default().verification_level(VerificationLevel::High);
+    /// let builder = EditGuild::new().verification_level(VerificationLevel::High);
     ///
     /// // assuming a `guild` has already been bound
     /// let edit = guild.edit(&http, builder).await;
@@ -298,7 +303,7 @@ impl EditGuild {
     /// #     let mut guild = GuildId::new(1).to_partial_guild(&http).await?;
     /// use serenity::model::guild::SystemChannelFlags;
     ///
-    /// let builder = EditGuild::default().system_channel_flags(
+    /// let builder = EditGuild::new().system_channel_flags(
     ///     SystemChannelFlags::SUPPRESS_JOIN_NOTIFICATIONS
     ///         | SystemChannelFlags::SUPPRESS_GUILD_REMINDER_NOTIFICATIONS,
     /// );
