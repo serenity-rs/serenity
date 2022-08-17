@@ -25,8 +25,8 @@ impl EventHandler for Handler {
                 _ => "not implemented :(".to_string(),
             };
 
-            let data = CreateInteractionResponseData::default().content(content);
-            let builder = CreateInteractionResponse::default()
+            let data = CreateInteractionResponseData::new().content(content);
+            let builder = CreateInteractionResponse::new()
                 .kind(InteractionResponseType::ChannelMessageWithSource)
                 .interaction_response_data(data);
             if let Err(why) = command.create_interaction_response(&ctx.http, builder).await {
