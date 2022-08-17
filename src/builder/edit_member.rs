@@ -24,6 +24,11 @@ pub struct EditMember {
 }
 
 impl EditMember {
+    /// Equivalent to [`Self::default`].
+    pub fn new() -> Self {
+        Self::default()
+    }
+
     /// Edits the properties of the guild member.
     ///
     /// For details on permissions requirements, refer to each specific method.

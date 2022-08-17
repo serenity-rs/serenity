@@ -11,8 +11,7 @@ use crate::model::prelude::*;
 #[must_use]
 pub struct CreateChannel {
     kind: ChannelType,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    name: Option<String>,
+    name: String,
     #[serde(skip_serializing_if = "Option::is_none")]
     parent_id: Option<ChannelId>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -31,6 +30,23 @@ pub struct CreateChannel {
 }
 
 impl CreateChannel {
+    /// Creates a builder with the given name, setting [`Self::kind`] to [`ChannelType::Text`] and
+    /// leaving all other fields empty.
+    pub fn new(name: impl Into<String>) -> Self {
+        Self {
+            name: name.into(),
+            nsfw: None,
+            topic: None,
+            bitrate: None,
+            position: None,
+            parent_id: None,
+            user_limit: None,
+            rate_limit_per_user: None,
+            kind: ChannelType::Text,
+            permission_overwrites: Vec::new(),
+        }
+    }
+
     /// Creates a new [`Channel`] in the guild.
     ///
     /// **Note**: Requires the [Manage Channels] permission.
@@ -60,11 +76,11 @@ impl CreateChannel {
         http.create_channel(guild_id.into(), &self, None).await
     }
 
-    /// Specify how to call this new channel.
+    /// Specify how to call this new channel, replacing the current value as set in [`Self::new`].
     ///
     /// **Note**: Must be between 2 and 100 characters long.
     pub fn name(mut self, name: impl Into<String>) -> Self {
-        self.name = Some(name.into());
+        self.name = name.into();
         self
     }
 
@@ -75,7 +91,7 @@ impl CreateChannel {
     }
 
     /// Specify the category, the "parent" of this channel.
-    pub fn category<I: Into<ChannelId>>(mut self, id: I) -> Self {
+    pub fn category(mut self, id: impl Into<ChannelId>) -> Self {
         self.parent_id = Some(id.into());
         self
     }
@@ -153,34 +169,13 @@ impl CreateChannel {
     ///     kind: PermissionOverwriteType::Member(UserId::new(1234)),
     /// }];
     ///
-    /// let builder = CreateChannel::default().name("my_new_cool_channel").permissions(permissions);
+    /// let builder = CreateChannel::new("my_new_cool_channel").permissions(permissions);
     /// guild.create_channel(&http, builder).await?;
     /// #    Ok(())
     /// # }
     /// ```
-    pub fn permissions<I>(mut self, perms: I) -> Self
-    where
-        I: IntoIterator<Item = PermissionOverwrite>,
-    {
+    pub fn permissions(mut self, perms: impl IntoIterator<Item = PermissionOverwrite>) -> Self {
         self.permission_overwrites = perms.into_iter().map(Into::into).collect();
         self
-    }
-}
-
-impl Default for CreateChannel {
-    /// Creates a builder with default values, setting [`Self::kind`] to [`ChannelType::Text`].
-    fn default() -> Self {
-        Self {
-            name: None,
-            nsfw: None,
-            topic: None,
-            bitrate: None,
-            position: None,
-            parent_id: None,
-            user_limit: None,
-            rate_limit_per_user: None,
-            kind: ChannelType::Text,
-            permission_overwrites: Vec::new(),
-        }
     }
 }
