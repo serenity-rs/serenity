@@ -35,7 +35,7 @@ use crate::model::prelude::*;
 ///                 },
 ///             };
 ///
-///             let builder = CreateInvite::default().max_age(3600).max_uses(10);
+///             let builder = CreateInvite::new().max_age(3600).max_uses(10);
 ///             let creation = channel.create_invite(&context, builder).await;
 ///
 ///             let invite = match creation {
@@ -85,6 +85,11 @@ pub struct CreateInvite {
 }
 
 impl CreateInvite {
+    /// Equivalent to [`Self::default`].
+    pub fn new() -> Self {
+        Self::default()
+    }
+
     /// Creates an invite for the given channel.
     ///
     /// **Note**: Requires the [Create Instant Invite] permission.
@@ -146,7 +151,7 @@ impl CreateInvite {
     /// # async fn example(context: &Context) -> CommandResult {
     /// #     let channel = context.cache.guild_channel(81384788765712384).unwrap().clone();
     /// #
-    /// let builder = CreateInvite::default().max_age(3600);
+    /// let builder = CreateInvite::new().max_age(3600);
     /// let invite = channel.create_invite(context, builder).await?;
     /// #     Ok(())
     /// # }
@@ -179,7 +184,7 @@ impl CreateInvite {
     /// # async fn example(context: &Context) -> CommandResult {
     /// #     let channel = context.cache.guild_channel(81384788765712384).unwrap().clone();
     /// #
-    /// let builder = CreateInvite::default().max_uses(5);
+    /// let builder = CreateInvite::new().max_uses(5);
     /// let invite = channel.create_invite(context, builder).await?;
     /// #     Ok(())
     /// # }
@@ -210,7 +215,7 @@ impl CreateInvite {
     /// # async fn example(context: &Context) -> CommandResult {
     /// #     let channel = context.cache.guild_channel(81384788765712384).unwrap().clone();
     /// #
-    /// let builder = CreateInvite::default().temporary(true);
+    /// let builder = CreateInvite::new().temporary(true);
     /// let invite = channel.create_invite(context, builder).await?;
     /// #     Ok(())
     /// # }
@@ -243,7 +248,7 @@ impl CreateInvite {
     /// # async fn example(context: &Context) -> CommandResult {
     /// #     let channel = context.cache.guild_channel(81384788765712384).unwrap().clone();
     /// #
-    /// let builder = CreateInvite::default().unique(true);
+    /// let builder = CreateInvite::new().unique(true);
     /// let invite = channel.create_invite(context, builder).await?;
     /// #     Ok(())
     /// # }

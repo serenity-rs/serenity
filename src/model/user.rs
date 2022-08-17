@@ -242,7 +242,7 @@ impl CurrentUser {
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// #     let http = Http::new("token");
     /// #     let mut user = CurrentUser::default();
-    /// let builder = EditProfile::default().avatar(&http, "./avatar.png").await?;
+    /// let builder = EditProfile::new().avatar(&http, "./avatar.png").await?;
     /// user.edit(&http, builder).await;
     /// #     Ok(())
     /// # }
@@ -456,7 +456,7 @@ impl CurrentUser {
         permissions: Permissions,
         scopes: &[Scope],
     ) -> Result<String> {
-        let builder = CreateBotAuthParameters::default()
+        let builder = CreateBotAuthParameters::new()
             .permissions(permissions)
             .scopes(scopes)
             .auto_client_id(http)
@@ -819,7 +819,7 @@ impl User {
     ///
     ///             let help = format!("Helpful info here. Invite me with this link: <{}>", url);
     ///
-    ///             let builder = CreateMessage::default().content(help);
+    ///             let builder = CreateMessage::new().content(help);
     ///             let dm = msg.author.direct_message(&ctx, builder).await;
     ///
     ///             match dm {

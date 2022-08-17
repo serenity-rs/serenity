@@ -17,6 +17,11 @@ pub struct EditVoiceState {
 }
 
 impl EditVoiceState {
+    /// Equivalent to [`Self::default`].
+    pub fn new() -> Self {
+        Self::default()
+    }
+
     /// Edits the given user's voice state in a stage channel. Pass [`None`] for `user_id` to edit
     /// the current user's voice state.
     ///
