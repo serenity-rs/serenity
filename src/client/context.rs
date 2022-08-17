@@ -107,7 +107,7 @@ impl Context {
     /// impl EventHandler for Handler {
     ///     async fn message(&self, ctx: Context, msg: Message) {
     ///         if msg.content == "!online" {
-    ///             ctx.online().await;
+    ///             ctx.online();
     ///         }
     ///     }
     /// }
@@ -123,9 +123,8 @@ impl Context {
     ///
     /// [`Online`]: OnlineStatus::Online
     #[cfg(feature = "gateway")]
-    #[allow(clippy::unused_async)]
     #[inline]
-    pub async fn online(&self) {
+    pub fn online(&self) {
         self.shard.set_status(OnlineStatus::Online);
     }
 
@@ -146,7 +145,7 @@ impl Context {
     /// impl EventHandler for Handler {
     ///     async fn message(&self, ctx: Context, msg: Message) {
     ///         if msg.content == "!idle" {
-    ///             ctx.idle().await;
+    ///             ctx.idle();
     ///         }
     ///     }
     /// }
@@ -162,9 +161,8 @@ impl Context {
     ///
     /// [`Idle`]: OnlineStatus::Idle
     #[cfg(feature = "gateway")]
-    #[allow(clippy::unused_async)]
     #[inline]
-    pub async fn idle(&self) {
+    pub fn idle(&self) {
         self.shard.set_status(OnlineStatus::Idle);
     }
 
@@ -185,7 +183,7 @@ impl Context {
     /// impl EventHandler for Handler {
     ///     async fn message(&self, ctx: Context, msg: Message) {
     ///         if msg.content == "!dnd" {
-    ///             ctx.dnd().await;
+    ///             ctx.dnd();
     ///         }
     ///     }
     /// }
@@ -201,9 +199,8 @@ impl Context {
     ///
     /// [`DoNotDisturb`]: OnlineStatus::DoNotDisturb
     #[cfg(feature = "gateway")]
-    #[allow(clippy::unused_async)]
     #[inline]
-    pub async fn dnd(&self) {
+    pub fn dnd(&self) {
         self.shard.set_status(OnlineStatus::DoNotDisturb);
     }
 
@@ -224,7 +221,7 @@ impl Context {
     /// #[serenity::async_trait]
     /// impl EventHandler for Handler {
     ///     async fn ready(&self, ctx: Context, _: Ready) {
-    ///         ctx.invisible().await;
+    ///         ctx.invisible();
     ///     }
     /// }
     ///
@@ -240,9 +237,8 @@ impl Context {
     /// [`Event::Ready`]: crate::model::event::Event::Ready
     /// [`Invisible`]: OnlineStatus::Invisible
     #[cfg(feature = "gateway")]
-    #[allow(clippy::unused_async)]
     #[inline]
-    pub async fn invisible(&self) {
+    pub fn invisible(&self) {
         self.shard.set_status(OnlineStatus::Invisible);
     }
 
@@ -264,7 +260,7 @@ impl Context {
     /// #[serenity::async_trait]
     /// impl EventHandler for Handler {
     ///     async fn resume(&self, ctx: Context, _: ResumedEvent) {
-    ///         ctx.reset_presence().await;
+    ///         ctx.reset_presence();
     ///     }
     /// }
     ///
@@ -280,9 +276,8 @@ impl Context {
     /// [`Event::Resumed`]: crate::model::event::Event::Resumed
     /// [`Online`]: OnlineStatus::Online
     #[cfg(feature = "gateway")]
-    #[allow(clippy::unused_async)]
     #[inline]
-    pub async fn reset_presence(&self) {
+    pub fn reset_presence(&self) {
         self.shard.set_presence(None, OnlineStatus::Online);
     }
 
@@ -307,7 +302,7 @@ impl Context {
     ///         let mut args = msg.content.splitn(2, ' ');
     ///
     ///         if let (Some("~setgame"), Some(game)) = (args.next(), args.next()) {
-    ///             ctx.set_activity(Some(ActivityData::playing(game))).await;
+    ///             ctx.set_activity(Some(ActivityData::playing(game)));
     ///         }
     ///     }
     /// }
@@ -321,9 +316,8 @@ impl Context {
     /// # }
     /// ```
     #[cfg(feature = "gateway")]
-    #[allow(clippy::unused_async)]
     #[inline]
-    pub async fn set_activity(&self, activity: Option<ActivityData>) {
+    pub fn set_activity(&self, activity: Option<ActivityData>) {
         self.shard.set_activity(activity);
     }
 
@@ -391,36 +385,32 @@ impl Context {
     /// [`DoNotDisturb`]: OnlineStatus::DoNotDisturb
     /// [`Idle`]: OnlineStatus::Idle
     #[cfg(feature = "gateway")]
-    #[allow(clippy::unused_async)]
     #[inline]
-    pub async fn set_presence(&self, activity: Option<ActivityData>, status: OnlineStatus) {
+    pub fn set_presence(&self, activity: Option<ActivityData>, status: OnlineStatus) {
         self.shard.set_presence(activity, status);
     }
 
     /// Sets a new `filter` for the shard to check if a message event shall be
     /// sent back to `filter`'s paired receiver.
     #[cfg(feature = "collector")]
-    #[allow(clippy::unused_async)]
     #[inline]
-    pub async fn set_message_filter(&self, filter: MessageFilter) {
+    pub fn set_message_filter(&self, filter: MessageFilter) {
         self.shard.set_message_filter(filter);
     }
 
     /// Sets a new `filter` for the shard to check if a reaction event shall be
     /// sent back to `filter`'s paired receiver.
     #[cfg(feature = "collector")]
-    #[allow(clippy::unused_async)]
     #[inline]
-    pub async fn set_reaction_filter(&self, filter: ReactionFilter) {
+    pub fn set_reaction_filter(&self, filter: ReactionFilter) {
         self.shard.set_reaction_filter(filter);
     }
 
     /// Sets a new `filter` for the shard to check if an interaction event shall be
     /// sent back to `filter`'s paired receiver.
     #[cfg(feature = "collector")]
-    #[allow(clippy::unused_async)]
     #[inline]
-    pub async fn set_component_interaction_filter(&self, filter: ComponentInteractionFilter) {
+    pub fn set_component_interaction_filter(&self, filter: ComponentInteractionFilter) {
         self.shard.set_component_interaction_filter(filter);
     }
 }
