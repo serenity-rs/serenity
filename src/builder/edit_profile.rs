@@ -17,6 +17,11 @@ pub struct EditProfile {
 }
 
 impl EditProfile {
+    /// Equivalent to [`Self::default`].
+    pub fn new() -> Self {
+        Self::default()
+    }
+
     /// Edit the current user's profile with the fields set.
     ///
     /// # Errors
@@ -47,10 +52,8 @@ impl EditProfile {
     /// // assuming a `context` has been bound
     /// let mut user = context.cache.current_user().clone();
     ///
-    /// let builder = EditProfile::default()
-    ///     .avatar(&context, "./my_image.jpg")
-    ///     .await
-    ///     .expect("Failed to read image.");
+    /// let builder =
+    ///     EditProfile::new().avatar(&context, "./my_image.jpg").await.expect("Failed to read image.");
     /// let _ = user.edit(&context, builder).await;
     /// #     }
     /// # }

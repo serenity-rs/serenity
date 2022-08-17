@@ -40,21 +40,21 @@ impl EventHandler for Handler {
             .channel_id
             .send_message(
                 &ctx,
-                CreateMessage::default().content("Please select your favorite animal").components(
-                    CreateComponents::default().set_action_row(CreateActionRow::default()
+                CreateMessage::new().content("Please select your favorite animal").components(
+                    CreateComponents::new().set_action_row(
                         // An action row can only contain one select menu!
-                        .add_select_menu(CreateSelectMenu::default()
-                            .custom_id("animal_select")
-                            .placeholder("No animal selected")
-                            .options(vec![
-                                CreateSelectMenuOption::default().label("🐈 meow").value("Cat"),
-                                CreateSelectMenuOption::default().label("🐕 woof").value("Dog"),
-                                CreateSelectMenuOption::default().label("🐎 neigh").value("Horse"),
-                                CreateSelectMenuOption::default().label("🦙 hoooooooonk").value("Alpaca"),
-                                CreateSelectMenuOption::default().label("🦀 crab rave").value("Ferris"),
+                        CreateActionRow::new().add_select_menu(
+                            CreateSelectMenu::new("animal_select", vec![
+                                CreateSelectMenuOption::new("🐈 meow", "Cat"),
+                                CreateSelectMenuOption::new("🐕 woof", "Dog"),
+                                CreateSelectMenuOption::new("🐎 neigh", "Horse"),
+                                CreateSelectMenuOption::new("🦙 hoooooooonk", "Alpaca"),
+                                CreateSelectMenuOption::new("🦀 crab rave", "Ferris"),
                             ])
-                        )
-                    )
+                            .custom_id("animal_select")
+                            .placeholder("No animal selected"),
+                        ),
+                    ),
                 ),
             )
             .await

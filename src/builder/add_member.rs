@@ -7,11 +7,10 @@ use crate::model::prelude::*;
 /// A builder to add parameters when using [`GuildId::add_member`].
 ///
 /// [`GuildId::add_member`]: crate::model::id::GuildId::add_member
-#[derive(Clone, Debug, Default, Serialize)]
+#[derive(Clone, Debug, Serialize)]
 #[must_use]
 pub struct AddMember {
-    #[serde(skip_serializing_if = "Option::is_none")]
-    access_token: Option<String>,
+    access_token: String,
     #[serde(skip_serializing_if = "Option::is_none")]
     nick: Option<String>,
     #[serde(skip_serializing_if = "Vec::is_empty")]
@@ -23,6 +22,17 @@ pub struct AddMember {
 }
 
 impl AddMember {
+    /// Constructs a new builder with the given access token, leaving all other fields empty.
+    pub fn new(access_token: String) -> Self {
+        Self {
+            access_token,
+            nick: None,
+            roles: Vec::new(),
+            mute: None,
+            deaf: None,
+        }
+    }
+
     /// Adds a [`User`] to this guild with a valid OAuth2 access token.
     ///
     /// Returns the created [`Member`] object, or nothing if the user is already a member of the
@@ -42,11 +52,11 @@ impl AddMember {
         http.as_ref().add_guild_member(guild_id.into(), user_id.into(), &self).await
     }
 
-    /// Sets the OAuth2 access token for this request.
+    /// Sets the OAuth2 access token for this request, replacing the current one.
     ///
     /// Requires the access token to have the `guilds.join` scope granted.
     pub fn access_token(mut self, access_token: impl Into<String>) -> Self {
-        self.access_token = Some(access_token.into());
+        self.access_token = access_token.into();
         self
     }
 

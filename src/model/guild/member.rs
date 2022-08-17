@@ -133,7 +133,7 @@ impl Member {
         let mut target_roles = self.roles.clone();
         target_roles.extend_from_slice(role_ids);
 
-        let builder = EditMember::default().roles(target_roles);
+        let builder = EditMember::new().roles(target_roles);
         self.edit(http, builder).await
     }
 
@@ -226,7 +226,7 @@ impl Member {
         http: impl AsRef<Http>,
         time: Timestamp,
     ) -> Result<()> {
-        let builder = EditMember::default().disable_communication_until_datetime(time);
+        let builder = EditMember::new().disable_communication_until_datetime(time);
         match self.guild_id.edit_member(http, self.user.id, builder).await {
             Ok(_) => {
                 self.communication_disabled_until = Some(time);
@@ -279,7 +279,7 @@ impl Member {
     /// [Moderate Members]: Permissions::MODERATE_MEMBERS
     #[doc(alias = "timeout")]
     pub async fn enable_communication(&mut self, http: impl AsRef<Http>) -> Result<()> {
-        let builder = EditMember::default().enable_communication();
+        let builder = EditMember::new().enable_communication();
         *self = self.guild_id.edit_member(http, self.user.id, builder).await?;
         Ok(())
     }
@@ -501,7 +501,7 @@ impl Member {
         let mut target_roles = self.roles.clone();
         target_roles.retain(|r| !role_ids.contains(r));
 
-        let builder = EditMember::default().roles(target_roles);
+        let builder = EditMember::new().roles(target_roles);
         self.edit(http, builder).await
     }
 

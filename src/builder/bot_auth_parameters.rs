@@ -19,6 +19,11 @@ pub struct CreateBotAuthParameters {
 }
 
 impl CreateBotAuthParameters {
+    /// Equivalent to [`Self::default`].
+    pub fn new() -> Self {
+        Self::default()
+    }
+
     /// Builds the url with the provided data.
     #[must_use]
     pub fn build(self) -> String {
