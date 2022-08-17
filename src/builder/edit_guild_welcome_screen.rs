@@ -19,6 +19,11 @@ pub struct EditGuildWelcomeScreen {
 }
 
 impl EditGuildWelcomeScreen {
+    /// Equivalent to [`Self::default`].
+    pub fn new() -> Self {
+        Self::default()
+    }
+
     /// Edits the guild's welcome screen.
     ///
     /// **Note**: Requires the [Manage Guild] permission.

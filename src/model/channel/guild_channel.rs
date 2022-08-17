@@ -399,7 +399,7 @@ impl GuildChannel {
     /// # async fn run() {
     /// #     let http = Http::new("token");
     /// #     let channel = ChannelId::new(1234);
-    /// let builder = EditChannel::default().name("test").bitrate(86400);
+    /// let builder = EditChannel::new().name("test").bitrate(86400);
     /// channel.edit(&http, builder).await;
     /// # }
     /// ```
@@ -483,7 +483,7 @@ impl GuildChannel {
     /// // assuming the cache has been unlocked
     /// let channel = cache.guild_channel(channel_id).ok_or(ModelError::ItemMissing)?;
     ///
-    /// let builder = EditVoiceState::default().suppress(false);
+    /// let builder = EditVoiceState::new().suppress(false);
     /// channel.edit_voice_state(&http, user_id, builder).await?;
     /// #   Ok(())
     /// # }
@@ -533,7 +533,7 @@ impl GuildChannel {
     /// let channel = cache.guild_channel(channel_id).ok_or(ModelError::ItemMissing)?;
     ///
     /// // Send a request to speak
-    /// let builder = EditVoiceState::default().request_to_speak(true);
+    /// let builder = EditVoiceState::new().request_to_speak(true);
     /// channel.edit_own_voice_state(&http, builder.clone()).await?;
     ///
     /// // Clear own request to speak
@@ -728,7 +728,7 @@ impl GuildChannel {
     ///                 },
     ///             };
     ///
-    ///             let builder = CreateMessage::default().content("here's a cat");
+    ///             let builder = CreateMessage::new().content("here's a cat");
     ///             let _ = msg
     ///                 .channel_id
     ///                 .send_files(&context.http, vec![(&file, "cat.png")], builder)
