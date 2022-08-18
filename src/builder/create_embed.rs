@@ -437,7 +437,7 @@ pub struct CreateEmbedFooter {
 }
 
 impl CreateEmbedFooter {
-    // Creates a new footer object with the given text, leaving all other fields empty.
+    /// Creates a new footer object with the given text, leaving all other fields empty.
     pub fn new(text: impl Into<String>) -> Self {
         Self {
             text: text.into(),
