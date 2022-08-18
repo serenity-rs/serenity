@@ -469,7 +469,55 @@ impl BucketBuilder {
         self
     }
 
-    /// This function will be called once a user's invocation has been delayed.
+    /**
+    This function is called when a user's command invocation is delayed when:
+    1. await_ratelimits is set to a non zero value (the default is 0).
+    2. user's message rests comfortably within await_ratelimits (ex. if you set it to 1 then it will only respond once when the delay is first exceeded).
+    Example:
+    ```rust
+    use serenity::framework::standard::macros::{command, group};
+    use serenity::framework::standard::{CommandResult, StandardFramework};
+    use serenity::model::channel::Message;
+    use serenity::prelude::*;
+    #[command]
+    #[bucket="example_bucket"]
+    async fn example_command(ctx: &Context, msg: &Message) -> CommandResult {
+        msg.reply(ctx,"Example message, You can only repeat this once every 10 seconds").await?;
+
+        Ok(())
+    }
+    async fn example_overuse_response(ctx: &Context, msg: &Message) -> CommandResult {
+        msg.reply(ctx,"I told you that you can't call this command less than every 10 seconds").await?;
+    }
+    #[group]
+    #[commands(example_command)]
+    struct General;
+
+    let token = std::env::var("DISCORD_TOKEN")?;
+
+    let framework = StandardFramework::new()
+        .configure(|c| c.prefix("~"))
+        //we initialise the bucket with the closure
+        .bucket("example_bucket", |b|b.delay_action(|msg,ctx| {
+            //we return a future for the function we want to run
+            Box::pin(example_overuse_response(ctx,msg))
+        })
+            //we set the delay to 10 seconds
+            .delay(10)
+            //we override the default behavior so that the function actually gets ran
+            .await_ratelimits(1)
+        //we await the return of the bucket
+        ).await
+        .group(&GENERAL_GROUP);
+    
+    let mut client = Client::builder(&token, GatewayIntents::default())
+    .framework(framework)
+    .await?;
+
+    //presumably you'd then start the client
+    ```
+    You can use this to for example send a custom response when someone exceeds the amount of commands they're allowed to make.
+    */
     #[inline]
     pub fn delay_action(&mut self, action: DelayHook) -> &mut Self {
         self.delay_action = Some(action);
