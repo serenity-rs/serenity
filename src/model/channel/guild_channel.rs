@@ -1057,7 +1057,7 @@ impl GuildChannel {
         }
     }
 
-    /// Returns a builder which can be awaited to obtain a mesage or stream of messages sent in this guild channel.
+    /// Returns a builder which can be awaited to obtain a message or stream of messages sent in this guild channel.
     #[cfg(feature = "collector")]
     pub fn reply_collector<'a>(
         &self,
