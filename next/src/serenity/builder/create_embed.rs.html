@@ -1001,7 +1001,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">CreateEmbedFooter</span> {
-    <span class="comment">// Creates a new footer object with the given text, leaving all other fields empty.</span>
+    <span class="doccomment">/// Creates a new footer object with the given text, leaving all other fields empty.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">text</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
         <span class="self">Self</span> {
             <span class="ident">text</span>: <span class="ident">text</span>.<span class="ident">into</span>(),

@@ -402,7 +402,7 @@
     <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;Option::is_none&quot;</span>)]</span>
     <span class="ident">flags</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">MessageFlags</span><span class="op">&gt;</span>,
 
-    <span class="comment">// The following fields are handled seperately.</span>
+    <span class="comment">// The following fields are handled separately.</span>
     <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip</span>)]</span>
     <span class="ident">files</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">AttachmentType</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>,
     <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip</span>)]</span>
@@ -561,7 +561,7 @@
 
     <span class="doccomment">/// Appends a file to the message.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// **Note**: Requres the [Attach Files] permission.</span>
+    <span class="doccomment">/// **Note**: Requires the [Attach Files] permission.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// [Attach Files]: Permissions::ATTACH_FILES</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">add_file</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">AttachmentType</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">file</span>: <span class="ident">T</span>) -&gt; <span class="self">Self</span> {
@@ -571,7 +571,7 @@
 
     <span class="doccomment">/// Appends a list of files to the message.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// **Note**: Requres the [Attach Files] permission.</span>
+    <span class="doccomment">/// **Note**: Requires the [Attach Files] permission.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// [Attach Files]: Permissions::ATTACH_FILES</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">add_files</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">AttachmentType</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>, <span class="ident">It</span>: <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span>(
@@ -587,7 +587,7 @@
     <span class="doccomment">/// Calling this multiple times will overwrite the file list. To append files, call</span>
     <span class="doccomment">/// [`Self::add_file`] or [`Self::add_files`] instead.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// **Note**: Requres the [Attach Files] permission.</span>
+    <span class="doccomment">/// **Note**: Requires the [Attach Files] permission.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// [Attach Files]: Permissions::ATTACH_FILES</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">files</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">AttachmentType</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>, <span class="ident">It</span>: <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span>(

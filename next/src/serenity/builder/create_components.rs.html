@@ -538,7 +538,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">CreateButton</span> {
-    <span class="comment">// Creates a primary button. Equivalent to [`Self::default`].</span>
+    <span class="doccomment">/// Creates a primary button. Equivalent to [`Self::default`].</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="self">Self</span> {
         <span class="ident"><span class="self">Self</span>::default</span>()
     }
@@ -602,8 +602,8 @@
 }
 
 <span class="kw">impl</span> <span class="ident">CreateSelectMenu</span> {
-    <span class="comment">// Creates a builder with given custom id (a developer-defined identifier), and a list of</span>
-    <span class="comment">// options, leaving all other fields empty.</span>
+    <span class="doccomment">/// Creates a builder with given custom id (a developer-defined identifier), and a list of</span>
+    <span class="doccomment">/// options, leaving all other fields empty.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">custom_id</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>, <span class="ident">options</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">CreateSelectMenuOption</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
         <span class="self">Self</span> {
             <span class="ident">custom_id</span>: <span class="ident">custom_id</span>.<span class="ident">into</span>(),
