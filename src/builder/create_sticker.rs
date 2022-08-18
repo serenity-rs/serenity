@@ -86,7 +86,7 @@ impl<'a> CreateSticker<'a> {
         self
     }
 
-    /// The Discord name of a unicode emoji representing the sticker's expression. Replaces teh
+    /// The Discord name of a unicode emoji representing the sticker's expression. Replaces the
     /// current value as set in [`Self::new`].
     ///
     /// **Note**: Must be between 2 and 200 characters long.
