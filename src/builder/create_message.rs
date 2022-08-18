@@ -62,7 +62,7 @@ pub struct CreateMessage<'a> {
     #[serde(skip_serializing_if = "Option::is_none")]
     flags: Option<MessageFlags>,
 
-    // The following fields are handled seperately.
+    // The following fields are handled separately.
     #[serde(skip)]
     files: Vec<AttachmentType<'a>>,
     #[serde(skip)]
@@ -221,7 +221,7 @@ impl<'a> CreateMessage<'a> {
 
     /// Appends a file to the message.
     ///
-    /// **Note**: Requres the [Attach Files] permission.
+    /// **Note**: Requires the [Attach Files] permission.
     ///
     /// [Attach Files]: Permissions::ATTACH_FILES
     pub fn add_file<T: Into<AttachmentType<'a>>>(mut self, file: T) -> Self {
@@ -231,7 +231,7 @@ impl<'a> CreateMessage<'a> {
 
     /// Appends a list of files to the message.
     ///
-    /// **Note**: Requres the [Attach Files] permission.
+    /// **Note**: Requires the [Attach Files] permission.
     ///
     /// [Attach Files]: Permissions::ATTACH_FILES
     pub fn add_files<T: Into<AttachmentType<'a>>, It: IntoIterator<Item = T>>(
@@ -247,7 +247,7 @@ impl<'a> CreateMessage<'a> {
     /// Calling this multiple times will overwrite the file list. To append files, call
     /// [`Self::add_file`] or [`Self::add_files`] instead.
     ///
-    /// **Note**: Requres the [Attach Files] permission.
+    /// **Note**: Requires the [Attach Files] permission.
     ///
     /// [Attach Files]: Permissions::ATTACH_FILES
     pub fn files<T: Into<AttachmentType<'a>>, It: IntoIterator<Item = T>>(

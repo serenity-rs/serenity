@@ -129,7 +129,7 @@ impl Default for CreateButton {
 }
 
 impl CreateButton {
-    // Creates a primary button. Equivalent to [`Self::default`].
+    /// Creates a primary button. Equivalent to [`Self::default`].
     pub fn new() -> Self {
         Self::default()
     }
@@ -193,8 +193,8 @@ pub struct CreateSelectMenu {
 }
 
 impl CreateSelectMenu {
-    // Creates a builder with given custom id (a developer-defined identifier), and a list of
-    // options, leaving all other fields empty.
+    /// Creates a builder with given custom id (a developer-defined identifier), and a list of
+    /// options, leaving all other fields empty.
     pub fn new(custom_id: impl Into<String>, options: Vec<CreateSelectMenuOption>) -> Self {
         Self {
             custom_id: custom_id.into(),
