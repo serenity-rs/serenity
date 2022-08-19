@@ -469,7 +469,60 @@ impl BucketBuilder {
         self
     }
 
-    /// This function will be called once a user's invocation has been delayed.
+    /// This function is called when a user's command invocation is delayed when:
+    /// 1. `await_ratelimits` is set to a non zero value (the default is 0).
+    /// 2. user's message rests comfortably within `await_ratelimits` (ex. if you set it to 1 then it will only respond once when the delay is first exceeded).
+    ///
+    /// You can use this to, for example, send a custom response when someone exceeds the amount of commands they're allowed to make.
+    ///
+    /// # Examples
+    ///
+    /// ```rust
+    /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
+    /// use serenity::framework::standard::macros::{command, group};
+    /// use serenity::framework::standard::{CommandResult, StandardFramework};
+    /// use serenity::model::channel::Message;
+    /// use serenity::prelude::*;
+    ///
+    /// #[command]
+    /// #[bucket = "example_bucket"]
+    /// async fn example_command(ctx: &Context, msg: &Message) -> CommandResult {
+    ///     msg.reply(ctx, "Example message, You can only repeat this once every 10 seconds").await?;
+    ///
+    ///     Ok(())
+    /// }
+    ///
+    /// async fn example_overuse_response(ctx: &Context, msg: &Message) {
+    ///     msg.reply(ctx, "I told you that you can't call this command less than every 10 seconds!").await.unwrap();
+    /// }
+    ///
+    /// #[group]
+    /// #[commands(example_command)]
+    /// struct General;
+    ///
+    /// let token = std::env::var("DISCORD_TOKEN")?;
+    ///
+    /// let framework = StandardFramework::new()
+    ///     .configure(|c| c.prefix("~"))
+    ///     .bucket("example_bucket", |b| {
+    ///         // We initialise the bucket with the function we want to run
+    ///         b.delay_action(|ctx, msg| {
+    ///             Box::pin(example_overuse_response(ctx, msg))
+    ///         })
+    ///         .delay(10) // We set the delay to 10 seconds
+    ///         .await_ratelimits(1) // We override the default behavior so that the function actually gets run
+    ///     })
+    ///     .await
+    ///     .group(&GENERAL_GROUP);
+    ///
+    /// let mut client = Client::builder(&token, GatewayIntents::default())
+    /// .framework(framework)
+    /// .await?;
+    ///
+    /// client.start().await?;
+    /// #     Ok(())
+    /// # }
+    /// ```
     #[inline]
     pub fn delay_action(&mut self, action: DelayHook) -> &mut Self {
         self.delay_action = Some(action);
