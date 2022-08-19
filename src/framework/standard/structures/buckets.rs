@@ -493,7 +493,7 @@ impl BucketBuilder {
     /// }
     ///
     /// async fn example_overuse_response(ctx: &Context, msg: &Message) {
-    ///     msg.reply(ctx, "I told you that you can't call this command less than every 10 seconds!").await?;
+    ///     msg.reply(ctx, "I told you that you can't call this command less than every 10 seconds!").await.unwrap();
     /// }
     ///
     /// #[group]
