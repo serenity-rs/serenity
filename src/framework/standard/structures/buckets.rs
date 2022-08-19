@@ -506,7 +506,7 @@ impl BucketBuilder {
     ///     .configure(|c| c.prefix("~"))
     ///     .bucket("example_bucket", |b| {
     ///         // We initialise the bucket with the function we want to run
-    ///         b.delay_action(|msg, ctx| {
+    ///         b.delay_action(|ctx, msg| {
     ///             Box::pin(example_overuse_response(ctx, msg))
     ///         })
     ///         .delay(10) // We set the delay to 10 seconds
