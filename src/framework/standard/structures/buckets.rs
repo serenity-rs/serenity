@@ -472,7 +472,9 @@ impl BucketBuilder {
     /// This function is called when a user's command invocation is delayed when:
     /// 1. await_ratelimits is set to a non zero value (the default is 0).
     /// 2. user's message rests comfortably within await_ratelimits (ex. if you set it to 1 then it will only respond once when the delay is first exceeded).
-    /// Example:
+    ///
+    /// # Examples
+    ///
     /// ```rust
     /// use serenity::framework::standard::macros::{command, group};
     /// use serenity::framework::standard::{CommandResult, StandardFramework};
