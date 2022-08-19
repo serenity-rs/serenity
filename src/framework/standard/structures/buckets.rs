@@ -476,20 +476,24 @@ impl BucketBuilder {
     /// # Examples
     ///
     /// ```rust
+    /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// use serenity::framework::standard::macros::{command, group};
     /// use serenity::framework::standard::{CommandResult, StandardFramework};
     /// use serenity::model::channel::Message;
     /// use serenity::prelude::*;
+    ///
     /// #[command]
-    /// #[bucket="example_bucket"]
+    /// #[bucket = "example_bucket"]
     /// async fn example_command(ctx: &Context, msg: &Message) -> CommandResult {
-    ///     msg.reply(ctx,"Example message, You can only repeat this once every 10 seconds").await?;
+    ///     msg.reply(ctx, "Example message, You can only repeat this once every 10 seconds").await?;
     ///
     ///     Ok(())
     /// }
+    ///
     /// async fn example_overuse_response(ctx: &Context, msg: &Message) {
-    ///     msg.reply(ctx,"I told you that you can't call this command less than every 10 seconds").await?;
+    ///     msg.reply(ctx, "I told you that you can't call this command less than every 10 seconds!").await?;
     /// }
+    ///
     /// #[group]
     /// #[commands(example_command)]
     /// struct General;
@@ -498,24 +502,23 @@ impl BucketBuilder {
     ///
     /// let framework = StandardFramework::new()
     ///     .configure(|c| c.prefix("~"))
-    ///     //we initialise the bucket with the closure
-    ///     .bucket("example_bucket", |b|b.delay_action(|msg,ctx| {
-    ///     //we return a future for the function we want to run
-    ///         Box::pin(example_overuse_response(ctx,msg))
+    ///     .bucket("example_bucket", |b| {
+    ///         // We initialise the bucket with the function we want to run
+    ///         b.delay_action(|msg, ctx| {
+    ///             Box::pin(example_overuse_response(ctx,msg))
+    ///         })
     ///     })
-    ///         //we set the delay to 10 seconds
-    ///         .delay(10)
-    ///         //we override the default behavior so that the function actually gets ran
-    ///         .await_ratelimits(1)
-    ///     //we await the return of the bucket
-    ///     ).await
+    ///     .delay(10) // We set the delay to 10 seconds
+    ///     .await_ratelimits(1)).await // We override the default behavior so that the function actually gets run
     ///     .group(&GENERAL_GROUP);
     ///
     /// let mut client = Client::builder(&token, GatewayIntents::default())
     /// .framework(framework)
     /// .await?;
     ///
-    /// //presumably you'd then start the client
+    /// client.start().await?;
+    /// #     Ok(())
+    /// # }
     /// ```
     /// You can use this to for example send a custom response when someone exceeds the amount of commands they're allowed to make.
     #[inline]
