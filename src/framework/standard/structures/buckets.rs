@@ -520,7 +520,6 @@ impl BucketBuilder {
     /// #     Ok(())
     /// # }
     /// ```
-    /// You can use this to for example send a custom response when someone exceeds the amount of commands they're allowed to make.
     #[inline]
     pub fn delay_action(&mut self, action: DelayHook) -> &mut Self {
         self.delay_action = Some(action);
