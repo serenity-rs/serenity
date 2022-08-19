@@ -507,11 +507,12 @@ impl BucketBuilder {
     ///     .bucket("example_bucket", |b| {
     ///         // We initialise the bucket with the function we want to run
     ///         b.delay_action(|msg, ctx| {
-    ///             Box::pin(example_overuse_response(ctx,msg))
+    ///             Box::pin(example_overuse_response(ctx, msg))
     ///         })
+    ///         .delay(10) // We set the delay to 10 seconds
+    ///         .await_ratelimits(1) // We override the default behavior so that the function actually gets run
     ///     })
-    ///     .delay(10) // We set the delay to 10 seconds
-    ///     .await_ratelimits(1)).await // We override the default behavior so that the function actually gets run
+    ///     .await
     ///     .group(&GENERAL_GROUP);
     ///
     /// let mut client = Client::builder(&token, GatewayIntents::default())
