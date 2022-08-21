@@ -529,7 +529,7 @@ mod tests {
         assert_eq!(crate::json::to_string(&Action::BlockMessage)?, r#"{"type":1}"#);
 
         assert_eq!(
-            crate::json::to_string(&Action::Alert(ChannelId(123)))?,
+            crate::json::to_string(&Action::Alert(ChannelId::new(123)))?,
             r#"{"type":2,"metadata":{"channel_id":"123"}}"#
         );
 
