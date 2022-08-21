@@ -503,7 +503,6 @@ impl BucketBuilder {
     /// let token = std::env::var("DISCORD_TOKEN")?;
     ///
     /// let framework = StandardFramework::new()
-    ///     .configure(|c| c.prefix("~"))
     ///     .bucket("example_bucket", |b| {
     ///         // We initialise the bucket with the function we want to run
     ///         b.delay_action(|ctx, msg| {
@@ -514,6 +513,8 @@ impl BucketBuilder {
     ///     })
     ///     .await
     ///     .group(&GENERAL_GROUP);
+    ///
+    /// framework.configure(|c| c.prefix("~"));
     ///
     /// let mut client = Client::builder(&token, GatewayIntents::default())
     /// .framework(framework)
