@@ -2137,7 +2137,7 @@ impl Http {
     /// let value = json!({"name": "new name"});
     /// let map = value.as_object().unwrap();
     ///
-    /// let edited = http.edit_webhook_with_token(id, token, map).await?;
+    /// let edited = http.edit_webhook_with_token(id, token, map, None).await?;
     /// #     Ok(())
     /// # }
     /// ```
