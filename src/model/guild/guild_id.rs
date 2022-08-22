@@ -333,7 +333,7 @@ impl GuildId {
     pub async fn create_channel(
         self,
         cache_http: impl CacheHttp,
-        builder: CreateChannel,
+        builder: CreateChannel<'_>,
     ) -> Result<GuildChannel> {
         builder.execute(cache_http, self).await
     }
@@ -411,7 +411,11 @@ impl GuildId {
     ///
     /// [Manage Roles]: Permissions::MANAGE_ROLES
     #[inline]
-    pub async fn create_role(self, cache_http: impl CacheHttp, builder: EditRole) -> Result<Role> {
+    pub async fn create_role<'a>(
+        self,
+        cache_http: impl CacheHttp,
+        builder: EditRole<'a>,
+    ) -> Result<Role> {
         builder.execute(cache_http, self, None).await
     }
 
@@ -425,10 +429,10 @@ impl GuildId {
     /// lacks permission. Otherwise returns [`Error::Http`], as well as if invalid data is given.
     ///
     /// [Manage Events]: Permissions::MANAGE_EVENTS
-    pub async fn create_scheduled_event(
+    pub async fn create_scheduled_event<'a>(
         self,
         cache_http: impl CacheHttp,
-        builder: CreateScheduledEvent,
+        builder: CreateScheduledEvent<'a>,
     ) -> Result<ScheduledEvent> {
         builder.execute(cache_http, self).await
     }
@@ -575,10 +579,10 @@ impl GuildId {
     ///
     /// [Manage Guild]: Permissions::MANAGE_GUILD
     #[inline]
-    pub async fn edit(
+    pub async fn edit<'a>(
         self,
         cache_http: impl CacheHttp,
-        builder: EditGuild,
+        builder: EditGuild<'a>,
     ) -> Result<PartialGuild> {
         builder.execute(cache_http, self).await
     }
@@ -638,11 +642,11 @@ impl GuildId {
     ///
     /// Returns [`Error::Http`] if the current user lacks permission, or if invalid data is given.
     #[inline]
-    pub async fn edit_member(
+    pub async fn edit_member<'a>(
         self,
         http: impl AsRef<Http>,
         user_id: impl Into<UserId>,
-        builder: EditMember,
+        builder: EditMember<'a>,
     ) -> Result<Member> {
         builder.execute(http, self, user_id.into()).await
     }
@@ -700,11 +704,11 @@ impl GuildId {
     ///
     /// [Manage Roles]: Permissions::MANAGE_ROLES
     #[inline]
-    pub async fn edit_role(
+    pub async fn edit_role<'a>(
         self,
         cache_http: impl CacheHttp,
         role_id: impl Into<RoleId>,
-        builder: EditRole,
+        builder: EditRole<'a>,
     ) -> Result<Role> {
         builder.execute(cache_http, self, Some(role_id.into())).await
     }
@@ -719,11 +723,11 @@ impl GuildId {
     /// lacks permission. Otherwise returns [`Error::Http`], as well as if invalid data is given.
     ///
     /// [Manage Events]: Permissions::MANAGE_EVENTS
-    pub async fn edit_scheduled_event(
+    pub async fn edit_scheduled_event<'a>(
         self,
         cache_http: impl CacheHttp,
         event_id: impl Into<ScheduledEventId>,
-        builder: EditScheduledEvent,
+        builder: EditScheduledEvent<'a>,
     ) -> Result<ScheduledEvent> {
         builder.execute(cache_http, self, event_id.into()).await
     }
@@ -755,11 +759,11 @@ impl GuildId {
     ///
     /// [Manage Emojis and Stickers]: Permissions::MANAGE_EMOJIS_AND_STICKERS
     #[inline]
-    pub async fn edit_sticker(
+    pub async fn edit_sticker<'a>(
         self,
         http: impl AsRef<Http>,
         sticker_id: impl Into<StickerId>,
-        builder: EditSticker,
+        builder: EditSticker<'a>,
     ) -> Result<Sticker> {
         builder.execute(http, self, sticker_id.into()).await
     }

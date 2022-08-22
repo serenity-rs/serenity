@@ -18,6 +18,7 @@ pub struct CreateSticker<'a> {
     tags: String,
     description: String,
     file: AttachmentType<'a>,
+    audit_log_reason: Option<&'a str>,
 }
 
 impl<'a> CreateSticker<'a> {
@@ -33,6 +34,7 @@ impl<'a> CreateSticker<'a> {
             tags: tags.into(),
             description: description.into(),
             file: file.into(),
+            audit_log_reason: None,
         }
     }
 
@@ -67,7 +69,7 @@ impl<'a> CreateSticker<'a> {
         map.push(("tags".to_string(), self.tags));
         map.push(("description".to_string(), self.description));
 
-        http.create_sticker(guild_id.into(), map, self.file, None).await
+        http.create_sticker(guild_id.into(), map, self.file, self.audit_log_reason).await
     }
 
     /// Set the name of the sticker, replacing the current value as set in [`Self::new`].
@@ -100,6 +102,12 @@ impl<'a> CreateSticker<'a> {
     /// **Note**: Must be a PNG, APNG, or Lottie JSON file, max 500 KB.
     pub fn file(mut self, file: impl Into<AttachmentType<'a>>) -> Self {
         self.file = file.into();
+        self
+    }
+
+    /// Sets the request's audit log reason.
+    pub fn audit_log_reason(mut self, reason: &'a str) -> Self {
+        self.audit_log_reason = Some(reason);
         self
     }
 }

@@ -7,7 +7,7 @@ use crate::model::prelude::*;
 /// A builder to optionally edit certain fields of a [`Guild`].
 #[derive(Clone, Debug, Default, Serialize)]
 #[must_use]
-pub struct EditGuild {
+pub struct EditGuild<'a> {
     #[serde(skip_serializing_if = "Option::is_none")]
     afk_channel_id: Option<Option<ChannelId>>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -44,9 +44,12 @@ pub struct EditGuild {
     verification_level: Option<VerificationLevel>,
     #[serde(skip_serializing_if = "Option::is_none")]
     system_channel_flags: Option<SystemChannelFlags>,
+
+    #[serde(skip)]
+    audit_log_reason: Option<&'a str>,
 }
 
-impl EditGuild {
+impl<'a> EditGuild<'a> {
     /// Equivalent to [`Self::default`].
     pub fn new() -> Self {
         Self::default()
@@ -77,7 +80,7 @@ impl EditGuild {
 
     #[cfg(feature = "http")]
     async fn _execute(self, http: &Http, guild_id: GuildId) -> Result<PartialGuild> {
-        http.as_ref().edit_guild(guild_id.into(), &self, None).await
+        http.as_ref().edit_guild(guild_id.into(), &self, self.audit_log_reason).await
     }
 
     /// Set the "AFK voice channel" that users are to move to if they have been AFK for an amount
@@ -318,6 +321,12 @@ impl EditGuild {
     /// ```
     pub fn system_channel_flags(mut self, system_channel_flags: SystemChannelFlags) -> Self {
         self.system_channel_flags = Some(system_channel_flags);
+        self
+    }
+
+    /// Sets the request's audit log reason.
+    pub fn audit_log_reason(mut self, reason: &'a str) -> Self {
+        self.audit_log_reason = Some(reason);
         self
     }
 }

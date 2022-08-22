@@ -79,7 +79,7 @@ impl ChannelId {
     pub async fn create_invite(
         self,
         cache_http: impl CacheHttp,
-        builder: CreateInvite,
+        builder: CreateInvite<'_>,
     ) -> Result<RichInvite> {
         builder
             .execute(
@@ -323,10 +323,10 @@ impl ChannelId {
     /// [Manage Channels]: Permissions::MANAGE_CHANNELS
     /// [Manage Roles]: Permissions::MANAGE_ROLES
     #[inline]
-    pub async fn edit(
+    pub async fn edit<'a>(
         self,
         cache_http: impl CacheHttp,
-        builder: EditChannel,
+        builder: EditChannel<'_>,
     ) -> Result<GuildChannel> {
         builder
             .execute(
@@ -819,10 +819,10 @@ impl ChannelId {
     /// # Errors
     ///
     /// See [`CreateWebhook::execute`] for a detailed list of possible errors.
-    pub async fn create_webhook(
+    pub async fn create_webhook<'a>(
         self,
         cache_http: impl CacheHttp,
-        builder: CreateWebhook,
+        builder: CreateWebhook<'a>,
     ) -> Result<Webhook> {
         builder.execute(cache_http, self).await
     }

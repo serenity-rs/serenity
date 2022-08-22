@@ -181,7 +181,7 @@ impl GuildChannel {
     pub async fn create_invite(
         &self,
         cache_http: impl CacheHttp,
-        builder: CreateInvite,
+        builder: CreateInvite<'_>,
     ) -> Result<RichInvite> {
         builder
             .execute(
@@ -411,7 +411,11 @@ impl GuildChannel {
     ///
     /// [Manage Channels]: Permissions::MANAGE_CHANNELS
     /// [Manage Roles]: Permissions::MANAGE_ROLES
-    pub async fn edit(&mut self, cache_http: impl CacheHttp, builder: EditChannel) -> Result<()> {
+    pub async fn edit(
+        &mut self,
+        cache_http: impl CacheHttp,
+        builder: EditChannel<'_>,
+    ) -> Result<()> {
         *self = builder
             .execute(
                 cache_http,
@@ -1083,7 +1087,7 @@ impl GuildChannel {
     pub async fn create_webhook(
         &self,
         cache_http: impl CacheHttp,
-        builder: CreateWebhook,
+        builder: CreateWebhook<'_>,
     ) -> Result<Webhook> {
         self.id.create_webhook(cache_http, builder).await
     }

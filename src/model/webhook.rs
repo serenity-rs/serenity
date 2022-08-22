@@ -239,7 +239,7 @@ impl Webhook {
     /// May also return an [`Error::Http`] if the content is malformed, or if the token is invalid.
     ///
     /// Or may return an [`Error::Json`] if there is an error in deserialising Discord's response.
-    pub async fn edit(&mut self, http: impl AsRef<Http>, builder: EditWebhook) -> Result<()> {
+    pub async fn edit(&mut self, http: impl AsRef<Http>, builder: EditWebhook<'_>) -> Result<()> {
         *self = builder.execute(http, self.id, self.token.as_deref()).await?;
         Ok(())
     }

@@ -148,7 +148,7 @@ impl Role {
     ///
     /// [Manage Roles]: Permissions::MANAGE_ROLES
     #[inline]
-    pub async fn edit(&mut self, http: impl AsRef<Http>, builder: EditRole) -> Result<()> {
+    pub async fn edit(&mut self, http: impl AsRef<Http>, builder: EditRole<'_>) -> Result<()> {
         *self = self.guild_id.edit_role(http.as_ref(), self.id, builder).await?;
         Ok(())
     }
