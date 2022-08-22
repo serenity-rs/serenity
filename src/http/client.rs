@@ -2072,15 +2072,12 @@ impl Http {
     ///
     /// The Value is a map with optional values of:
     ///
-    /// - **avatar**: base64-encoded 128x128 image for the webhook's default avatar
-    ///   (_optional_);
-    /// - **name**: the name of the webhook, limited to between 2 and 100 characters
-    ///   long.
+    /// - **avatar**: base64-encoded 128x128 image for the webhook's default avatar (_optional_);
+    /// - **name**: the name of the webhook, limited to between 2 and 100 characters long.
     ///
     /// Note that, unlike with [`Self::create_webhook`], _all_ values are optional.
     ///
-    /// This method requires authentication, whereas [`Self::edit_webhook_with_token`]
-    /// does not.
+    /// This method requires authentication, whereas [`Self::edit_webhook_with_token`] does not.
     ///
     /// # Examples
     ///
@@ -2105,7 +2102,7 @@ impl Http {
     pub async fn edit_webhook(
         &self,
         webhook_id: u64,
-        map: &Value,
+        map: &impl serde::Serialize,
         audit_log_reason: Option<&str>,
     ) -> Result<Webhook> {
         self.fire(Request {
@@ -2149,13 +2146,14 @@ impl Http {
         webhook_id: u64,
         token: &str,
         map: &impl serde::Serialize,
+        audit_log_reason: Option<&str>,
     ) -> Result<Webhook> {
         let body = to_vec(map)?;
 
         self.fire(Request {
             body: Some(body),
             multipart: None,
-            headers: None,
+            headers: audit_log_reason.map(reason_into_header),
             route: RouteInfo::EditWebhookWithToken {
                 token,
                 webhook_id,
