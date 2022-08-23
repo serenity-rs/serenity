@@ -111,7 +111,7 @@ impl ChannelId {
         target: PermissionOverwrite,
     ) -> Result<()> {
         let data: PermissionOverwriteData = target.into();
-        http.as_ref().create_permission(self.get(), data.id.get(), &data).await
+        http.as_ref().create_permission(self.get(), data.id.get(), &data, None).await
     }
 
     /// React to a [`Message`] with a custom [`Emoji`] or unicode character.
@@ -150,7 +150,7 @@ impl ChannelId {
     /// [Manage Channels]: Permissions::MANAGE_CHANNELS
     #[inline]
     pub async fn delete(self, http: impl AsRef<Http>) -> Result<Channel> {
-        http.as_ref().delete_channel(self.get()).await
+        http.as_ref().delete_channel(self.get(), None).await
     }
 
     /// Deletes a [`Message`] given its Id.
@@ -172,7 +172,7 @@ impl ChannelId {
         http: impl AsRef<Http>,
         message_id: impl Into<MessageId>,
     ) -> Result<()> {
-        http.as_ref().delete_message(self.get(), message_id.into().get()).await
+        http.as_ref().delete_message(self.get(), message_id.into().get(), None).await
     }
 
     /// Deletes all messages by Ids from the given vector in the given channel.
@@ -212,7 +212,7 @@ impl ChannelId {
         } else {
             let map = json!({ "messages": ids });
 
-            http.as_ref().delete_messages(self.get(), &map).await
+            http.as_ref().delete_messages(self.get(), &map, None).await
         }
     }
 
@@ -230,12 +230,11 @@ impl ChannelId {
         http: impl AsRef<Http>,
         permission_type: PermissionOverwriteType,
     ) -> Result<()> {
-        http.as_ref()
-            .delete_permission(self.get(), match permission_type {
-                PermissionOverwriteType::Member(id) => id.get(),
-                PermissionOverwriteType::Role(id) => id.get(),
-            })
-            .await
+        let id = match permission_type {
+            PermissionOverwriteType::Member(id) => id.get(),
+            PermissionOverwriteType::Role(id) => id.get(),
+        };
+        http.as_ref().delete_permission(self.get(), id, None).await
     }
 
     /// Deletes the given [`Reaction`] from the channel.
@@ -906,7 +905,7 @@ impl ChannelId {
     /// Returns [`Error::Http`] if the channel is not a stage channel,
     /// or if there is no stage instance currently.
     pub async fn delete_stage_instance(&self, http: impl AsRef<Http>) -> Result<()> {
-        http.as_ref().delete_stage_instance(self.get()).await
+        http.as_ref().delete_stage_instance(self.get(), None).await
     }
 
     /// Creates a public thread that is connected to a message.

@@ -69,7 +69,7 @@ impl GuildId {
         http: impl AsRef<Http>,
         rule_id: impl Into<RuleId>,
     ) -> Result<Rule> {
-        http.as_ref().get_automod_rule(self.get(), rule_id.into().0.get()).await
+        http.as_ref().get_automod_rule(self.get(), rule_id.into().get()).await
     }
 
     /// Creates an auto moderation [`Rule`] in the guild.
@@ -147,7 +147,7 @@ impl GuildId {
         http: impl AsRef<Http>,
         rule_id: impl Into<RuleId>,
     ) -> Result<()> {
-        http.as_ref().delete_automod_rule(self.get(), rule_id.into().0.get()).await
+        http.as_ref().delete_automod_rule(self.get(), rule_id.into().get(), None).await
     }
 
     /// Adds a [`User`] to this guild with a valid OAuth2 access token.
@@ -487,7 +487,7 @@ impl GuildId {
         http: impl AsRef<Http>,
         emoji_id: impl Into<EmojiId>,
     ) -> Result<()> {
-        http.as_ref().delete_emoji(self.get(), emoji_id.into().get()).await
+        http.as_ref().delete_emoji(self.get(), emoji_id.into().get(), None).await
     }
 
     /// Deletes an integration by Id from the guild.
@@ -506,7 +506,7 @@ impl GuildId {
         http: impl AsRef<Http>,
         integration_id: impl Into<IntegrationId>,
     ) -> Result<()> {
-        http.as_ref().delete_guild_integration(self.get(), integration_id.into().get()).await
+        http.as_ref().delete_guild_integration(self.get(), integration_id.into().get(), None).await
     }
 
     /// Deletes a [`Role`] by Id from the guild.
@@ -528,7 +528,7 @@ impl GuildId {
         http: impl AsRef<Http>,
         role_id: impl Into<RoleId>,
     ) -> Result<()> {
-        http.as_ref().delete_role(self.get(), role_id.into().get()).await
+        http.as_ref().delete_role(self.get(), role_id.into().get(), None).await
     }
 
     /// Deletes a specified scheduled event in the guild.
@@ -668,7 +668,7 @@ impl GuildId {
         http: impl AsRef<Http>,
         new_nickname: Option<&str>,
     ) -> Result<()> {
-        http.as_ref().edit_nickname(self.get(), new_nickname).await
+        http.as_ref().edit_nickname(self.get(), new_nickname, None).await
     }
 
     /// Edits a [`Role`], optionally setting its new fields.
