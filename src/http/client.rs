@@ -396,11 +396,12 @@ impl Http {
     pub async fn create_stage_instance(
         &self,
         map: &impl serde::Serialize,
+        audit_log_reason: Option<&str>,
     ) -> Result<StageInstance> {
         self.fire(Request {
             body: Some(to_vec(map)?),
             multipart: None,
-            headers: None,
+            headers: audit_log_reason.map(reason_into_header),
             route: RouteInfo::CreateStageInstance,
         })
         .await
@@ -413,13 +414,14 @@ impl Http {
         channel_id: u64,
         message_id: u64,
         map: &impl serde::Serialize,
+        audit_log_reason: Option<&str>,
     ) -> Result<GuildChannel> {
         let body = to_vec(map)?;
 
         self.fire(Request {
             body: Some(body),
             multipart: None,
-            headers: None,
+            headers: audit_log_reason.map(reason_into_header),
             route: RouteInfo::CreatePublicThread {
                 channel_id,
                 message_id,
@@ -433,13 +435,14 @@ impl Http {
         &self,
         channel_id: u64,
         map: &impl serde::Serialize,
+        audit_log_reason: Option<&str>,
     ) -> Result<GuildChannel> {
         let body = to_vec(map)?;
 
         self.fire(Request {
             body: Some(body),
             multipart: None,
-            headers: None,
+            headers: audit_log_reason.map(reason_into_header),
             route: RouteInfo::CreatePrivateThread {
                 channel_id,
             },
@@ -1351,11 +1354,12 @@ impl Http {
         &self,
         channel_id: u64,
         map: &impl serde::Serialize,
+        audit_log_reason: Option<&str>,
     ) -> Result<StageInstance> {
         self.fire(Request {
             body: Some(to_vec(map)?),
             multipart: None,
-            headers: None,
+            headers: audit_log_reason.map(reason_into_header),
             route: RouteInfo::EditStageInstance {
                 channel_id,
             },
@@ -1601,13 +1605,14 @@ impl Http {
         &self,
         guild_id: u64,
         map: &impl serde::Serialize,
+        audit_log_reason: Option<&str>,
     ) -> Result<GuildWidget> {
         let body = to_vec(map)?;
 
         self.fire(Request {
             body: Some(body),
             multipart: None,
-            headers: None,
+            headers: audit_log_reason.map(reason_into_header),
             route: RouteInfo::EditGuildWidget {
                 guild_id,
             },
@@ -1620,13 +1625,14 @@ impl Http {
         &self,
         guild_id: u64,
         map: &impl serde::Serialize,
+        audit_log_reason: Option<&str>,
     ) -> Result<GuildWelcomeScreen> {
         let body = to_vec(map)?;
 
         self.fire(Request {
             body: Some(body),
             multipart: None,
-            headers: None,
+            headers: audit_log_reason.map(reason_into_header),
             route: RouteInfo::EditGuildWelcomeScreen {
                 guild_id,
             },
@@ -1958,11 +1964,12 @@ impl Http {
         &self,
         channel_id: u64,
         map: &impl serde::Serialize,
+        audit_log_reason: Option<&str>,
     ) -> Result<GuildChannel> {
         self.fire(Request {
             body: Some(to_vec(map)?),
             multipart: None,
-            headers: None,
+            headers: audit_log_reason.map(reason_into_header),
             route: RouteInfo::EditThread {
                 channel_id,
             },
@@ -2435,13 +2442,14 @@ impl Http {
         &self,
         guild_id: u64,
         map: &impl serde::Serialize,
+        audit_log_reason: Option<&str>,
     ) -> Result<Rule> {
         let body = to_vec(map)?;
 
         self.fire(Request {
             body: Some(body),
             multipart: None,
-            headers: None,
+            headers: audit_log_reason.map(reason_into_header),
             route: RouteInfo::CreateAutoModRule {
                 guild_id,
             },
@@ -2457,13 +2465,14 @@ impl Http {
         guild_id: u64,
         rule_id: u64,
         map: &impl serde::Serialize,
+        audit_log_reason: Option<&str>,
     ) -> Result<Rule> {
         let body = to_vec(map)?;
 
         self.fire(Request {
             body: Some(body),
             multipart: None,
-            headers: None,
+            headers: audit_log_reason.map(reason_into_header),
             route: RouteInfo::EditAutoModRule {
                 guild_id,
                 rule_id,

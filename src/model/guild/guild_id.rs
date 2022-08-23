@@ -104,10 +104,10 @@ impl GuildId {
     ///
     /// [Manage Guild]: Permissions::MANAGE_GUILD
     #[inline]
-    pub async fn create_automod_rule(
+    pub async fn create_automod_rule<'a>(
         self,
         http: impl AsRef<Http>,
-        builder: EditAutoModRule,
+        builder: EditAutoModRule<'a>,
     ) -> Result<Rule> {
         builder.execute(http, self, None).await
     }
@@ -122,11 +122,11 @@ impl GuildId {
     ///
     /// [Manage Guild]: Permissions::MANAGE_GUILD
     #[inline]
-    pub async fn edit_automod_rule(
+    pub async fn edit_automod_rule<'a>(
         self,
         http: impl AsRef<Http>,
         rule_id: impl Into<RuleId>,
-        builder: EditAutoModRule,
+        builder: EditAutoModRule<'a>,
     ) -> Result<Rule> {
         builder.execute(http, self, Some(rule_id.into())).await
     }
@@ -803,10 +803,10 @@ impl GuildId {
     /// Returns [`Error::Http`] if the current user lacks permission.
     ///
     /// [Manage Guild]: Permissions::MANAGE_GUILD
-    pub async fn edit_welcome_screen(
+    pub async fn edit_welcome_screen<'a>(
         self,
         http: impl AsRef<Http>,
-        builder: EditGuildWelcomeScreen,
+        builder: EditGuildWelcomeScreen<'a>,
     ) -> Result<GuildWelcomeScreen> {
         builder.execute(http, self).await
     }
@@ -820,10 +820,10 @@ impl GuildId {
     /// Returns [`Error::Http`] if the current user lacks permission.
     ///
     /// [Manage Guild]: Permissions::MANAGE_GUILD
-    pub async fn edit_widget(
+    pub async fn edit_widget<'a>(
         self,
         http: impl AsRef<Http>,
-        builder: EditGuildWidget,
+        builder: EditGuildWidget<'a>,
     ) -> Result<GuildWidget> {
         builder.execute(http, self).await
     }

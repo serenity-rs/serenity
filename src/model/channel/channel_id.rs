@@ -862,10 +862,10 @@ impl ChannelId {
     /// Returns [`ModelError::InvalidChannelType`] if the channel is not a stage channel.
     ///
     /// Returns [`Error::Http`] if there is already a stage instance currently.
-    pub async fn create_stage_instance(
+    pub async fn create_stage_instance<'a>(
         self,
         cache_http: impl CacheHttp,
-        builder: CreateStageInstance,
+        builder: CreateStageInstance<'a>,
     ) -> Result<StageInstance> {
         builder.channel_id(self).execute(cache_http).await
     }
@@ -878,10 +878,10 @@ impl ChannelId {
     ///
     /// Returns [`Error::Http`] if the channel is not a stage channel, or there is no stage
     /// instance currently.
-    pub async fn edit_stage_instance(
+    pub async fn edit_stage_instance<'a>(
         self,
         cache_http: impl CacheHttp,
-        builder: EditStageInstance,
+        builder: EditStageInstance<'a>,
     ) -> Result<StageInstance> {
         builder.execute(cache_http, self).await
     }
@@ -891,10 +891,10 @@ impl ChannelId {
     /// # Errors
     ///
     /// Returns [`Error::Http`] if the current user lacks permission.
-    pub async fn edit_thread(
+    pub async fn edit_thread<'a>(
         self,
         http: impl AsRef<Http>,
-        builder: EditThread,
+        builder: EditThread<'a>,
     ) -> Result<GuildChannel> {
         builder.execute(http, self).await
     }
@@ -914,11 +914,11 @@ impl ChannelId {
     /// # Errors
     ///
     /// Returns [`Error::Http`] if the current user lacks permission, or if invalid data is given.
-    pub async fn create_public_thread(
+    pub async fn create_public_thread<'a>(
         self,
         http: impl AsRef<Http>,
         message_id: impl Into<MessageId>,
-        builder: CreateThread,
+        builder: CreateThread<'a>,
     ) -> Result<GuildChannel> {
         builder.execute(http, self, Some(message_id.into())).await
     }
@@ -928,10 +928,10 @@ impl ChannelId {
     /// # Errors
     ///
     /// Returns [`Error::Http`] if the current user lacks permission, or if invalid data is given.
-    pub async fn create_private_thread(
+    pub async fn create_private_thread<'a>(
         self,
         http: impl AsRef<Http>,
-        builder: CreateThread,
+        builder: CreateThread<'a>,
     ) -> Result<GuildChannel> {
         builder.kind(ChannelType::PrivateThread).execute(http, self, None).await
     }

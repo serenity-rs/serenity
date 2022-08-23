@@ -14,7 +14,7 @@ use crate::model::prelude::*;
 /// # Examples
 ///
 /// See [`GuildId::create_automod_rule`] for details.
-pub struct EditAutoModRule {
+pub struct EditAutoModRule<'a> {
     event_type: EventType,
     #[serde(skip_serializing_if = "Option::is_none")]
     name: Option<String>,
@@ -28,9 +28,12 @@ pub struct EditAutoModRule {
     exempt_roles: Option<Vec<RoleId>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     exempt_channels: Option<Vec<ChannelId>>,
+
+    #[serde(skip)]
+    audit_log_reason: Option<&'a str>,
 }
 
-impl EditAutoModRule {
+impl<'a> EditAutoModRule<'a> {
     /// Equivalent to [`Self::default`].
     pub fn new() -> Self {
         Self::default()
@@ -55,10 +58,18 @@ impl EditAutoModRule {
     ) -> Result<Rule> {
         let http = http.as_ref();
         match rule_id {
-            Some(rule_id) => http.edit_automod_rule(guild_id.into(), rule_id.into(), &self).await,
+            Some(rule_id) => {
+                http.edit_automod_rule(
+                    guild_id.into(),
+                    rule_id.into(),
+                    &self,
+                    self.audit_log_reason,
+                )
+                .await
+            },
             // Automod Rule creation has required fields, whereas modifying a rule does not.
             // TODO: Enforce these fields (maybe with a separate CreateAutoModRule builder).
-            None => http.create_automod_rule(guild_id.into(), &self).await,
+            None => http.create_automod_rule(guild_id.into(), &self, self.audit_log_reason).await,
         }
     }
 
@@ -112,9 +123,15 @@ impl EditAutoModRule {
         self.exempt_channels = Some(channels.into_iter().map(Into::into).collect());
         self
     }
+
+    /// Sets the request's audit log reason.
+    pub fn audit_log_reason(mut self, reason: &'a str) -> Self {
+        self.audit_log_reason = Some(reason);
+        self
+    }
 }
 
-impl Default for EditAutoModRule {
+impl<'a> Default for EditAutoModRule<'a> {
     fn default() -> Self {
         Self {
             name: None,
@@ -124,6 +141,7 @@ impl Default for EditAutoModRule {
             exempt_roles: None,
             exempt_channels: None,
             event_type: EventType::MessageSend,
+            audit_log_reason: None,
         }
     }
 }

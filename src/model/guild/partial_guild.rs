@@ -200,7 +200,7 @@ impl PartialGuild {
     pub async fn create_automod_rule(
         &self,
         http: impl AsRef<Http>,
-        builder: EditAutoModRule,
+        builder: EditAutoModRule<'_>,
     ) -> Result<Rule> {
         self.id.create_automod_rule(http, builder).await
     }
@@ -219,7 +219,7 @@ impl PartialGuild {
         &self,
         http: impl AsRef<Http>,
         rule_id: impl Into<RuleId>,
-        builder: EditAutoModRule,
+        builder: EditAutoModRule<'_>,
     ) -> Result<Rule> {
         self.id.edit_automod_rule(http, rule_id, builder).await
     }
@@ -903,7 +903,7 @@ impl PartialGuild {
     pub async fn edit_welcome_screen(
         &self,
         http: impl AsRef<Http>,
-        builder: EditGuildWelcomeScreen,
+        builder: EditGuildWelcomeScreen<'_>,
     ) -> Result<GuildWelcomeScreen> {
         self.id.edit_welcome_screen(http, builder).await
     }
@@ -920,7 +920,7 @@ impl PartialGuild {
     pub async fn edit_widget(
         &self,
         http: impl AsRef<Http>,
-        builder: EditGuildWidget,
+        builder: EditGuildWidget<'_>,
     ) -> Result<GuildWidget> {
         self.id.edit_widget(http, builder).await
     }

@@ -456,7 +456,11 @@ impl GuildChannel {
     /// # Errors
     ///
     /// Returns [`Error::Http`] if the current user lacks permission.
-    pub async fn edit_thread(&mut self, http: impl AsRef<Http>, builder: EditThread) -> Result<()> {
+    pub async fn edit_thread(
+        &mut self,
+        http: impl AsRef<Http>,
+        builder: EditThread<'_>,
+    ) -> Result<()> {
         *self = self.id.edit_thread(http, builder).await?;
         Ok(())
     }
@@ -1116,7 +1120,7 @@ impl GuildChannel {
     pub async fn create_stage_instance(
         &self,
         cache_http: impl CacheHttp,
-        builder: CreateStageInstance,
+        builder: CreateStageInstance<'_>,
     ) -> Result<StageInstance> {
         self.id.create_stage_instance(cache_http, builder).await
     }
@@ -1132,7 +1136,7 @@ impl GuildChannel {
     pub async fn edit_stage_instance(
         &self,
         cache_http: impl CacheHttp,
-        builder: EditStageInstance,
+        builder: EditStageInstance<'_>,
     ) -> Result<StageInstance> {
         self.id.edit_stage_instance(cache_http, builder).await
     }
@@ -1160,7 +1164,7 @@ impl GuildChannel {
         &self,
         http: impl AsRef<Http>,
         message_id: impl Into<MessageId>,
-        builder: CreateThread,
+        builder: CreateThread<'_>,
     ) -> Result<GuildChannel> {
         self.id.create_public_thread(http, message_id, builder).await
     }
@@ -1173,7 +1177,7 @@ impl GuildChannel {
     pub async fn create_private_thread(
         &self,
         http: impl AsRef<Http>,
-        builder: CreateThread,
+        builder: CreateThread<'_>,
     ) -> Result<GuildChannel> {
         self.id.create_private_thread(http, builder).await
     }
