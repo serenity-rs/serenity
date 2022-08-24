@@ -21,7 +21,7 @@ impl EditWebhook {
         Self::default()
     }
 
-    /// Edits the webhook corresponding to the provided Id and token, and returns the resulting ne
+    /// Edits the webhook corresponding to the provided Id and token, and returns the resulting new
     /// [`Webhook`].
     ///
     /// # Errors
@@ -34,9 +34,13 @@ impl EditWebhook {
         self,
         http: impl AsRef<Http>,
         webhook_id: WebhookId,
-        token: &str,
+        token: Option<&str>,
     ) -> Result<Webhook> {
-        http.as_ref().edit_webhook_with_token(webhook_id.into(), token, &self).await
+        let id = webhook_id.into();
+        match token {
+            Some(token) => http.as_ref().edit_webhook_with_token(id, token, &self, None).await,
+            None => http.as_ref().edit_webhook(id, &self, None).await,
+        }
     }
 
     /// Set the webhook's name.
