@@ -169,7 +169,7 @@ impl Webhook {
 
     /// Retrieves a webhook given its url.
     ///
-    /// This method does _not_ require authentication
+    /// This method does _not_ require authentication.
     ///
     /// # Examples
     ///
@@ -198,25 +198,25 @@ impl Webhook {
 
     /// Deletes the webhook.
     ///
-    /// As this calls the [`Http::delete_webhook_with_token`] function,
-    /// authentication is not required.
+    /// If [`Self::token`] is set, then authentication is _not_ required. Otherwise, if it is
+    /// [`None`], then authentication _is_ required.
     ///
     /// # Errors
     ///
-    /// Returns an [`Error::Model`] if the [`Self::token`] is [`None`].
-    ///
-    /// May also return an [`Error::Http`] if the webhook does not exist,
-    /// the token is invalid, or if the webhook could not otherwise
-    /// be deleted.
+    /// Returns [`Error::Http`] if the webhook does not exist, the token is invalid, or if the
+    /// webhook could not otherwise be deleted.
     #[inline]
     pub async fn delete(&self, http: impl AsRef<Http>) -> Result<()> {
-        let token = self.token.as_ref().ok_or(ModelError::NoTokenSet)?;
-        http.as_ref().delete_webhook_with_token(self.id.get(), token).await
+        match self.token.as_deref() {
+            Some(token) => http.as_ref().delete_webhook_with_token(self.id.get(), token).await,
+            None => http.as_ref().delete_webhook(self.id.get()).await,
+        }
     }
 
     /// Edits the webhook.
     ///
-    /// Does not require authentication, as a token is required.
+    /// If [`Self::token`] is set, then authentication is _not_ required. Otherwise, if it is
+    /// [`None`], then authentication _is_ required.
     ///
     /// # Examples
     ///
@@ -244,8 +244,7 @@ impl Webhook {
     ///
     /// Or may return an [`Error::Json`] if there is an error in deserialising Discord's response.
     pub async fn edit(&mut self, http: impl AsRef<Http>, builder: EditWebhook) -> Result<()> {
-        let token = self.token.as_ref().ok_or(ModelError::NoTokenSet)?;
-        *self = builder.execute(http, self.id, token).await?;
+        *self = builder.execute(http, self.id, self.token.as_deref()).await?;
         Ok(())
     }
 
