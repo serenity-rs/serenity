@@ -636,19 +636,6 @@
 <span id="630">630</span>
 <span id="631">631</span>
 <span id="632">632</span>
-<span id="633">633</span>
-<span id="634">634</span>
-<span id="635">635</span>
-<span id="636">636</span>
-<span id="637">637</span>
-<span id="638">638</span>
-<span id="639">639</span>
-<span id="640">640</span>
-<span id="641">641</span>
-<span id="642">642</span>
-<span id="643">643</span>
-<span id="644">644</span>
-<span id="645">645</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::str::FromStr</span>;
 
 <span class="kw">use</span> <span class="ident">proc_macro2</span>::{<span class="ident">Span</span>, <span class="ident">TokenStream</span> <span class="kw">as</span> <span class="ident">TokenStream2</span>};
@@ -861,11 +848,7 @@
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">FunctionHook</span> {
-    <span class="doccomment">/// `#[...]`-style attributes.</span>
     <span class="kw">pub</span> <span class="ident">attributes</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Attribute</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// Populated by cooked attributes. These are attributes outside of the realm of this crate&#39;s procedural macros</span>
-    <span class="doccomment">/// and will appear in generated output.</span>
-    <span class="kw">pub</span> <span class="ident">cooked</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Attribute</span><span class="op">&gt;</span>,
     <span class="kw">pub</span> <span class="ident">visibility</span>: <span class="ident">Visibility</span>,
     <span class="kw">pub</span> <span class="ident">name</span>: <span class="ident">Ident</span>,
     <span class="kw">pub</span> <span class="ident">args</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Argument</span><span class="op">&gt;</span>,
@@ -875,11 +858,7 @@
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ClosureHook</span> {
-    <span class="doccomment">/// `#[...]`-style attributes.</span>
     <span class="kw">pub</span> <span class="ident">attributes</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Attribute</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// Populated by cooked attributes. These are attributes outside of the realm of this crate&#39;s procedural macros</span>
-    <span class="doccomment">/// and will appear in generated output.</span>
-    <span class="kw">pub</span> <span class="ident">cooked</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Attribute</span><span class="op">&gt;</span>,
     <span class="kw">pub</span> <span class="ident">args</span>: <span class="ident">Punctuated</span><span class="op">&lt;</span><span class="ident">Pat</span>, <span class="macro">Token!</span>[,]<span class="op">&gt;</span>,
     <span class="kw">pub</span> <span class="ident">ret</span>: <span class="ident">ReturnType</span>,
     <span class="kw">pub</span> <span class="ident">body</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">Expr</span><span class="op">&gt;</span>,
@@ -893,13 +872,12 @@
 
 <span class="kw">impl</span> <span class="ident">Parse</span> <span class="kw">for</span> <span class="ident">Hook</span> {
     <span class="kw">fn</span> <span class="ident">parse</span>(<span class="ident">input</span>: <span class="ident">ParseStream</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">attributes</span> <span class="op">=</span> <span class="ident">input</span>.<span class="ident">call</span>(<span class="ident">Attribute::parse_outer</span>)<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">cooked</span> <span class="op">=</span> <span class="ident">remove_cooked</span>(<span class="kw-2">&amp;mut</span> <span class="ident">attributes</span>);
+        <span class="kw">let</span> <span class="ident">attributes</span> <span class="op">=</span> <span class="ident">input</span>.<span class="ident">call</span>(<span class="ident">Attribute::parse_outer</span>)<span class="question-mark">?</span>;
 
         <span class="kw">if</span> <span class="ident">is_function</span>(<span class="ident">input</span>) {
-            <span class="ident">parse_function_hook</span>(<span class="ident">input</span>, <span class="ident">attributes</span>, <span class="ident">cooked</span>).<span class="ident">map</span>(<span class="op">|</span><span class="ident">h</span><span class="op">|</span> <span class="ident"><span class="self">Self</span>::Function</span>(<span class="ident">Box::new</span>(<span class="ident">h</span>)))
+            <span class="ident">parse_function_hook</span>(<span class="ident">input</span>, <span class="ident">attributes</span>).<span class="ident">map</span>(<span class="op">|</span><span class="ident">h</span><span class="op">|</span> <span class="ident"><span class="self">Self</span>::Function</span>(<span class="ident">Box::new</span>(<span class="ident">h</span>)))
         } <span class="kw">else</span> {
-            <span class="ident">parse_closure_hook</span>(<span class="ident">input</span>, <span class="ident">attributes</span>, <span class="ident">cooked</span>).<span class="ident">map</span>(<span class="ident"><span class="self">Self</span>::Closure</span>)
+            <span class="ident">parse_closure_hook</span>(<span class="ident">input</span>, <span class="ident">attributes</span>).<span class="ident">map</span>(<span class="ident"><span class="self">Self</span>::Closure</span>)
         }
     }
 }
@@ -911,7 +889,6 @@
 <span class="kw">fn</span> <span class="ident">parse_function_hook</span>(
     <span class="ident">input</span>: <span class="ident">ParseStream</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
     <span class="ident">attributes</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Attribute</span><span class="op">&gt;</span>,
-    <span class="ident">cooked</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Attribute</span><span class="op">&gt;</span>,
 ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">FunctionHook</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="ident">visibility</span> <span class="op">=</span> <span class="ident">input</span>.<span class="ident">parse</span>::<span class="op">&lt;</span><span class="ident">Visibility</span><span class="op">&gt;</span>()<span class="question-mark">?</span>;
 
@@ -939,7 +916,6 @@
 
     <span class="prelude-val">Ok</span>(<span class="ident">FunctionHook</span> {
         <span class="ident">attributes</span>,
-        <span class="ident">cooked</span>,
         <span class="ident">visibility</span>,
         <span class="ident">name</span>,
         <span class="ident">args</span>,
@@ -951,14 +927,12 @@
 <span class="kw">fn</span> <span class="ident">parse_closure_hook</span>(
     <span class="ident">input</span>: <span class="ident">ParseStream</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
     <span class="ident">attributes</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Attribute</span><span class="op">&gt;</span>,
-    <span class="ident">cooked</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Attribute</span><span class="op">&gt;</span>,
 ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">ClosureHook</span><span class="op">&gt;</span> {
     <span class="ident">input</span>.<span class="ident">parse</span>::<span class="op">&lt;</span><span class="macro">Token!</span>[<span class="kw">async</span>]<span class="op">&gt;</span>()<span class="question-mark">?</span>;
     <span class="kw">let</span> <span class="ident">closure</span> <span class="op">=</span> <span class="ident">input</span>.<span class="ident">parse</span>::<span class="op">&lt;</span><span class="ident">ExprClosure</span><span class="op">&gt;</span>()<span class="question-mark">?</span>;
 
     <span class="prelude-val">Ok</span>(<span class="ident">ClosureHook</span> {
         <span class="ident">attributes</span>,
-        <span class="ident">cooked</span>,
         <span class="ident">args</span>: <span class="ident">closure</span>.<span class="ident">inputs</span>,
         <span class="ident">ret</span>: <span class="ident">closure</span>.<span class="ident">output</span>,
         <span class="ident">body</span>: <span class="ident">closure</span>.<span class="ident">body</span>,
