@@ -433,7 +433,6 @@
 <span id="427">427</span>
 <span id="428">428</span>
 <span id="429">429</span>
-<span id="430">430</span>
 </pre><pre class="rust"><code><span class="doccomment">//! Webhook model and implementations.</span>
 
 <span class="kw">use</span> <span class="ident">std::fmt</span>;
@@ -601,7 +600,7 @@
 
     <span class="doccomment">/// Retrieves a webhook given its url.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// This method does _not_ require authentication</span>
+    <span class="doccomment">/// This method does _not_ require authentication.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// # Examples</span>
     <span class="doccomment">///</span>
@@ -630,25 +629,25 @@
 
     <span class="doccomment">/// Deletes the webhook.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// As this calls the [`Http::delete_webhook_with_token`] function,</span>
-    <span class="doccomment">/// authentication is not required.</span>
+    <span class="doccomment">/// If [`Self::token`] is set, then authentication is _not_ required. Otherwise, if it is</span>
+    <span class="doccomment">/// [`None`], then authentication _is_ required.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// # Errors</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// Returns an [`Error::Model`] if the [`Self::token`] is [`None`].</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// May also return an [`Error::Http`] if the webhook does not exist,</span>
-    <span class="doccomment">/// the token is invalid, or if the webhook could not otherwise</span>
-    <span class="doccomment">/// be deleted.</span>
+    <span class="doccomment">/// Returns [`Error::Http`] if the webhook does not exist, the token is invalid, or if the</span>
+    <span class="doccomment">/// webhook could not otherwise be deleted.</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">delete</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">token</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">token</span>.<span class="ident">as_ref</span>().<span class="ident">ok_or</span>(<span class="ident">ModelError::NoTokenSet</span>)<span class="question-mark">?</span>;
-        <span class="ident">http</span>.<span class="ident">as_ref</span>().<span class="ident">delete_webhook_with_token</span>(<span class="self">self</span>.<span class="ident">id</span>.<span class="ident">get</span>(), <span class="ident">token</span>).<span class="kw">await</span>
+        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">token</span>.<span class="ident">as_deref</span>() {
+            <span class="prelude-val">Some</span>(<span class="ident">token</span>) =&gt; <span class="ident">http</span>.<span class="ident">as_ref</span>().<span class="ident">delete_webhook_with_token</span>(<span class="self">self</span>.<span class="ident">id</span>.<span class="ident">get</span>(), <span class="ident">token</span>).<span class="kw">await</span>,
+            <span class="prelude-val">None</span> =&gt; <span class="ident">http</span>.<span class="ident">as_ref</span>().<span class="ident">delete_webhook</span>(<span class="self">self</span>.<span class="ident">id</span>.<span class="ident">get</span>()).<span class="kw">await</span>,
+        }
     }
 
     <span class="doccomment">/// Edits the webhook.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// Does not require authentication, as a token is required.</span>
+    <span class="doccomment">/// If [`Self::token`] is set, then authentication is _not_ required. Otherwise, if it is</span>
+    <span class="doccomment">/// [`None`], then authentication _is_ required.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// # Examples</span>
     <span class="doccomment">///</span>
@@ -676,8 +675,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// Or may return an [`Error::Json`] if there is an error in deserialising Discord&#39;s response.</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">edit</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>, <span class="ident">builder</span>: <span class="ident">EditWebhook</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">token</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">token</span>.<span class="ident">as_ref</span>().<span class="ident">ok_or</span>(<span class="ident">ModelError::NoTokenSet</span>)<span class="question-mark">?</span>;
-        <span class="kw-2">*</span><span class="self">self</span> <span class="op">=</span> <span class="ident">builder</span>.<span class="ident">execute</span>(<span class="ident">http</span>, <span class="self">self</span>.<span class="ident">id</span>, <span class="ident">token</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+        <span class="kw-2">*</span><span class="self">self</span> <span class="op">=</span> <span class="ident">builder</span>.<span class="ident">execute</span>(<span class="ident">http</span>, <span class="self">self</span>.<span class="ident">id</span>, <span class="self">self</span>.<span class="ident">token</span>.<span class="ident">as_deref</span>()).<span class="kw">await</span><span class="question-mark">?</span>;
         <span class="prelude-val">Ok</span>(())
     }
 

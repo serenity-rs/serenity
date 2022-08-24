@@ -4062,8 +4062,6 @@
 <span id="4056">4056</span>
 <span id="4057">4057</span>
 <span id="4058">4058</span>
-<span id="4059">4059</span>
-<span id="4060">4060</span>
 </pre><pre class="rust"><code><span class="attribute">#![<span class="ident">allow</span>(<span class="ident">clippy::missing_errors_doc</span>)]</span>
 
 <span class="kw">use</span> <span class="ident">std::borrow::Cow</span>;
@@ -6138,15 +6136,12 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// The Value is a map with optional values of:</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// - **avatar**: base64-encoded 128x128 image for the webhook&#39;s default avatar</span>
-    <span class="doccomment">///   (_optional_);</span>
-    <span class="doccomment">/// - **name**: the name of the webhook, limited to between 2 and 100 characters</span>
-    <span class="doccomment">///   long.</span>
+    <span class="doccomment">/// - **avatar**: base64-encoded 128x128 image for the webhook&#39;s default avatar (_optional_);</span>
+    <span class="doccomment">/// - **name**: the name of the webhook, limited to between 2 and 100 characters long.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// Note that, unlike with [`Self::create_webhook`], _all_ values are optional.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// This method requires authentication, whereas [`Self::edit_webhook_with_token`]</span>
-    <span class="doccomment">/// does not.</span>
+    <span class="doccomment">/// This method requires authentication, whereas [`Self::edit_webhook_with_token`] does not.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// # Examples</span>
     <span class="doccomment">///</span>
@@ -6171,7 +6166,7 @@
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">edit_webhook</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">webhook_id</span>: <span class="ident">u64</span>,
-        <span class="ident">map</span>: <span class="kw-2">&amp;</span><span class="ident">Value</span>,
+        <span class="ident">map</span>: <span class="kw-2">&amp;</span><span class="kw">impl</span> <span class="ident">serde::Serialize</span>,
         <span class="ident">audit_log_reason</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span>,
     ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Webhook</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">fire</span>(<span class="ident">Request</span> {
@@ -6206,7 +6201,7 @@
     <span class="doccomment">/// let value = json!({&quot;name&quot;: &quot;new name&quot;});</span>
     <span class="doccomment">/// let map = value.as_object().unwrap();</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// let edited = http.edit_webhook_with_token(id, token, map).await?;</span>
+    <span class="doccomment">/// let edited = http.edit_webhook_with_token(id, token, map, None).await?;</span>
     <span class="doccomment">/// #     Ok(())</span>
     <span class="doccomment">/// # }</span>
     <span class="doccomment">/// ```</span>
@@ -6215,13 +6210,14 @@
         <span class="ident">webhook_id</span>: <span class="ident">u64</span>,
         <span class="ident">token</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
         <span class="ident">map</span>: <span class="kw-2">&amp;</span><span class="kw">impl</span> <span class="ident">serde::Serialize</span>,
+        <span class="ident">audit_log_reason</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span>,
     ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Webhook</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">body</span> <span class="op">=</span> <span class="ident">to_vec</span>(<span class="ident">map</span>)<span class="question-mark">?</span>;
 
         <span class="self">self</span>.<span class="ident">fire</span>(<span class="ident">Request</span> {
             <span class="ident">body</span>: <span class="prelude-val">Some</span>(<span class="ident">body</span>),
             <span class="ident">multipart</span>: <span class="prelude-val">None</span>,
-            <span class="ident">headers</span>: <span class="prelude-val">None</span>,
+            <span class="ident">headers</span>: <span class="ident">audit_log_reason</span>.<span class="ident">map</span>(<span class="ident">reason_into_header</span>),
             <span class="ident">route</span>: <span class="ident">RouteInfo::EditWebhookWithToken</span> {
                 <span class="ident">token</span>,
                 <span class="ident">webhook_id</span>,
