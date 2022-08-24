@@ -210,11 +210,7 @@ impl ToTokens for CommandFun {
 
 #[derive(Debug)]
 pub struct FunctionHook {
-    /// `#[...]`-style attributes.
     pub attributes: Vec<Attribute>,
-    /// Populated by cooked attributes. These are attributes outside of the realm of this crate's procedural macros
-    /// and will appear in generated output.
-    pub cooked: Vec<Attribute>,
     pub visibility: Visibility,
     pub name: Ident,
     pub args: Vec<Argument>,
@@ -224,11 +220,7 @@ pub struct FunctionHook {
 
 #[derive(Debug)]
 pub struct ClosureHook {
-    /// `#[...]`-style attributes.
     pub attributes: Vec<Attribute>,
-    /// Populated by cooked attributes. These are attributes outside of the realm of this crate's procedural macros
-    /// and will appear in generated output.
-    pub cooked: Vec<Attribute>,
     pub args: Punctuated<Pat, Token![,]>,
     pub ret: ReturnType,
     pub body: Box<Expr>,
@@ -242,13 +234,12 @@ pub enum Hook {
 
 impl Parse for Hook {
     fn parse(input: ParseStream<'_>) -> Result<Self> {
-        let mut attributes = input.call(Attribute::parse_outer)?;
-        let cooked = remove_cooked(&mut attributes);
+        let attributes = input.call(Attribute::parse_outer)?;
 
         if is_function(input) {
-            parse_function_hook(input, attributes, cooked).map(|h| Self::Function(Box::new(h)))
+            parse_function_hook(input, attributes).map(|h| Self::Function(Box::new(h)))
         } else {
-            parse_closure_hook(input, attributes, cooked).map(Self::Closure)
+            parse_closure_hook(input, attributes).map(Self::Closure)
         }
     }
 }
@@ -260,7 +251,6 @@ fn is_function(input: ParseStream<'_>) -> bool {
 fn parse_function_hook(
     input: ParseStream<'_>,
     attributes: Vec<Attribute>,
-    cooked: Vec<Attribute>,
 ) -> Result<FunctionHook> {
     let visibility = input.parse::<Visibility>()?;
 
@@ -288,7 +278,6 @@ fn parse_function_hook(
 
     Ok(FunctionHook {
         attributes,
-        cooked,
         visibility,
         name,
         args,
@@ -300,14 +289,12 @@ fn parse_function_hook(
 fn parse_closure_hook(
     input: ParseStream<'_>,
     attributes: Vec<Attribute>,
-    cooked: Vec<Attribute>,
 ) -> Result<ClosureHook> {
     input.parse::<Token![async]>()?;
     let closure = input.parse::<ExprClosure>()?;
 
     Ok(ClosureHook {
         attributes,
-        cooked,
         args: closure.inputs,
         ret: closure.output,
         body: closure.body,

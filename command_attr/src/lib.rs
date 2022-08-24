@@ -909,7 +909,7 @@ pub fn hook(_attr: TokenStream, input: TokenStream) -> TokenStream {
 
     match hook {
         Hook::Function(mut fun) => {
-            let cooked = fun.cooked;
+            let attributes = fun.attributes;
             let visibility = fun.visibility;
             let fun_name = fun.name;
             let body = fun.body;
@@ -919,7 +919,7 @@ pub fn hook(_attr: TokenStream, input: TokenStream) -> TokenStream {
             let args = fun.args;
 
             (quote! {
-                #(#cooked)*
+                #(#attributes)*
                 #[allow(missing_docs)]
                 #visibility fn #fun_name<'fut>(#(#args),*) -> ::serenity::futures::future::BoxFuture<'fut, #ret> {
                     use ::serenity::futures::future::FutureExt;
@@ -934,13 +934,13 @@ pub fn hook(_attr: TokenStream, input: TokenStream) -> TokenStream {
                 .into()
         },
         Hook::Closure(closure) => {
-            let cooked = closure.cooked;
+            let attributes = closure.attributes;
             let args = closure.args;
             let ret = closure.ret;
             let body = closure.body;
 
             (quote! {
-                #(#cooked)*
+                #(#attributes)*
                 |#args| #ret {
                     use ::serenity::futures::future::FutureExt;
 
