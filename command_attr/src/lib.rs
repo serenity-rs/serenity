@@ -216,14 +216,12 @@ pub fn command(attr: TokenStream, input: TokenStream) -> TokenStream {
 
         #(#cooked)*
         #[allow(missing_docs)]
-        #visibility fn #name<'fut> (#(#args),*) -> ::serenity::futures::future::BoxFuture<'fut, #ret> {
-            use ::serenity::futures::future::FutureExt;
-
-            async move {
+        #visibility fn #name<'fut> (#(#args),*) -> std::pin::Pin<Box<dyn std::future::Future<Output = #ret> + Send + 'fut>> {
+            Box::pin(async move {
                 let _output: #ret = { #(#body)* };
                 #[allow(unreachable_code)]
                 _output
-            }.boxed()
+            })
         }
     })
     .into()
@@ -512,14 +510,12 @@ pub fn help(attr: TokenStream, input: TokenStream) -> TokenStream {
 
         #(#cooked)*
         #[allow(missing_docs)]
-        pub fn #nn<'fut>(#(#args),*) -> ::serenity::futures::future::BoxFuture<'fut, #ret> {
-            use ::serenity::futures::future::FutureExt;
-
-            async move {
+        pub fn #nn<'fut>(#(#args),*) -> std::pin::Pin<Box<dyn std::future::Future<Output = #ret> + Send + 'fut>> {
+            Box::pin(async move {
                 let _output: #ret = { #(#body)* };
                 #[allow(unreachable_code)]
                 _output
-            }.boxed()
+            })
         }
     })
     .into()
@@ -792,14 +788,12 @@ pub fn check(_attr: TokenStream, input: TokenStream) -> TokenStream {
 
         #(#cooked)*
         #[allow(missing_docs)]
-        #visibility fn #n<'fut>(#(#args),*) -> ::serenity::futures::future::BoxFuture<'fut, #ret> {
-            use ::serenity::futures::future::FutureExt;
-
-            async move {
+        #visibility fn #n<'fut>(#(#args),*) -> std::pin::Pin<Box<dyn std::future::Future<Output = #ret> + Send + 'fut>> {
+            Box::pin(async move {
                 let _output: #ret = { #(#body)* };
                 #[allow(unreachable_code)]
                 _output
-            }.boxed()
+            })
         }
     })
     .into()
@@ -921,14 +915,12 @@ pub fn hook(_attr: TokenStream, input: TokenStream) -> TokenStream {
             (quote! {
                 #(#attributes)*
                 #[allow(missing_docs)]
-                #visibility fn #fun_name<'fut>(#(#args),*) -> ::serenity::futures::future::BoxFuture<'fut, #ret> {
-                    use ::serenity::futures::future::FutureExt;
-
-                    async move {
+                #visibility fn #fun_name<'fut>(#(#args),*) -> std::pin::Pin<Box<dyn std::future::Future<Output = #ret> + Send + 'fut>> {
+                    Box::pin(async move {
                         let _output: #ret = { #(#body)* };
                         #[allow(unreachable_code)]
                         _output
-                    }.boxed()
+                    })
                 }
             })
                 .into()
@@ -942,9 +934,7 @@ pub fn hook(_attr: TokenStream, input: TokenStream) -> TokenStream {
             (quote! {
                 #(#attributes)*
                 |#args| #ret {
-                    use ::serenity::futures::future::FutureExt;
-
-                    async move { #body }.boxed()
+                    Box::pin(async move { #body })
                 }
             })
             .into()
