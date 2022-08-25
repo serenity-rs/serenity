@@ -269,7 +269,7 @@ impl Guild {
     ///
     /// [Manage Guild]: Permissions::MANAGE_GUILD
     #[inline]
-    pub async fn automod_rules(self, http: impl AsRef<Http>) -> Result<Vec<Rule>> {
+    pub async fn automod_rules(&self, http: impl AsRef<Http>) -> Result<Vec<Rule>> {
         self.id.automod_rules(http).await
     }
 
@@ -284,7 +284,7 @@ impl Guild {
     /// [Manage Guild]: Permissions::MANAGE_GUILD
     #[inline]
     pub async fn automod_rule(
-        self,
+        &self,
         http: impl AsRef<Http>,
         rule_id: impl Into<RuleId>,
     ) -> Result<Rule> {
@@ -344,7 +344,7 @@ impl Guild {
     /// [Manage Guild]: Permissions::MANAGE_GUILD
     #[inline]
     pub async fn delete_automod_rule(
-        self,
+        &self,
         http: impl AsRef<Http>,
         rule_id: impl Into<RuleId>,
     ) -> Result<()> {
@@ -2233,7 +2233,7 @@ impl Guild {
     ///
     /// [Manage Events]: Permissions::MANAGE_EVENTS
     pub async fn scheduled_event(
-        self,
+        &self,
         http: impl AsRef<Http>,
         event_id: impl Into<ScheduledEventId>,
         with_user_count: bool,
@@ -2252,7 +2252,7 @@ impl Guild {
     ///
     /// [Manage Events]: Permissions::MANAGE_EVENTS
     pub async fn scheduled_events(
-        self,
+        &self,
         http: impl AsRef<Http>,
         with_user_count: bool,
     ) -> Result<Vec<ScheduledEvent>> {
@@ -2272,7 +2272,7 @@ impl Guild {
     ///
     /// [Manage Events]: Permissions::MANAGE_EVENTS
     pub async fn scheduled_event_users(
-        self,
+        &self,
         http: impl AsRef<Http>,
         event_id: impl Into<ScheduledEventId>,
         limit: Option<u64>,
@@ -2292,7 +2292,7 @@ impl Guild {
     ///
     /// [Manage Events]: Permissions::MANAGE_EVENTS
     pub async fn scheduled_event_users_optioned(
-        self,
+        &self,
         http: impl AsRef<Http>,
         event_id: impl Into<ScheduledEventId>,
         limit: Option<u64>,
