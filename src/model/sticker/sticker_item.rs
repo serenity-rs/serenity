@@ -29,7 +29,7 @@ impl StickerItem {
     /// not exist, or is otherwise unavailable.
     #[inline]
     pub async fn to_sticker(&self, http: impl AsRef<Http>) -> Result<Sticker> {
-        self.id.to_sticker(&http).await
+        self.id.to_sticker(http).await
     }
 
     /// Retrieves the URL to the sticker image.
