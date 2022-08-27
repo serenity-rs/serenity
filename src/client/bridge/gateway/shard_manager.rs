@@ -66,7 +66,7 @@ use crate::CacheAndHttp;
 /// impl EventHandler for Handler {}
 /// impl RawEventHandler for Handler {}
 ///
-/// # let cache_and_http: Arc<CacheAndHttp> = unimplemented!();
+/// # let cache_and_http: CacheAndHttp = unimplemented!();
 /// # let http = &cache_and_http.http;
 /// let ws_url = Arc::new(Mutex::new(http.get_gateway().await?.url));
 /// let data = Arc::new(RwLock::new(TypeMap::new()));
@@ -360,7 +360,7 @@ pub struct ShardManagerOptions {
     #[cfg(feature = "voice")]
     pub voice_manager: Option<Arc<dyn VoiceGatewayManager + Send + Sync + 'static>>,
     pub ws_url: Arc<Mutex<String>>,
-    pub cache_and_http: Arc<CacheAndHttp>,
+    pub cache_and_http: CacheAndHttp,
     pub intents: GatewayIntents,
     pub presence: Option<PresenceData>,
 }
