@@ -78,7 +78,7 @@ pub struct ShardQueuer {
     pub voice_manager: Option<Arc<dyn VoiceGatewayManager + Send + Sync + 'static>>,
     /// A copy of the URL to use to connect to the gateway.
     pub ws_url: Arc<Mutex<String>>,
-    pub cache_and_http: Arc<CacheAndHttp>,
+    pub cache_and_http: CacheAndHttp,
     pub intents: GatewayIntents,
     pub presence: Option<PresenceData>,
 }
@@ -195,7 +195,7 @@ impl ShardQueuer {
             #[cfg(feature = "voice")]
             voice_manager: self.voice_manager.clone(),
             shard,
-            cache_and_http: Arc::clone(&self.cache_and_http),
+            cache_and_http: self.cache_and_http.clone(),
         });
 
         let runner_info = ShardRunnerInfo {
