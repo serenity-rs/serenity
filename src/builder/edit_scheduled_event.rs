@@ -8,7 +8,7 @@ use crate::utils::encode_image;
 
 #[derive(Clone, Debug, Default, Serialize)]
 #[must_use]
-pub struct EditScheduledEvent {
+pub struct EditScheduledEvent<'a> {
     #[serde(skip_serializing_if = "Option::is_none")]
     channel_id: Option<Option<ChannelId>>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -27,9 +27,12 @@ pub struct EditScheduledEvent {
     status: Option<ScheduledEventStatus>,
     #[serde(skip_serializing_if = "Option::is_none")]
     image: Option<String>,
+
+    #[serde(skip)]
+    audit_log_reason: Option<&'a str>,
 }
 
-impl EditScheduledEvent {
+impl<'a> EditScheduledEvent<'a> {
     /// Equivalent to [`Self::default`].
     pub fn new() -> Self {
         Self::default()
@@ -66,7 +69,9 @@ impl EditScheduledEvent {
         guild_id: GuildId,
         event_id: ScheduledEventId,
     ) -> Result<ScheduledEvent> {
-        http.as_ref().edit_scheduled_event(guild_id.into(), event_id.into(), &self, None).await
+        http.as_ref()
+            .edit_scheduled_event(guild_id.into(), event_id.into(), &self, self.audit_log_reason)
+            .await
     }
 
     /// Sets the channel id of the scheduled event. If the [`kind`] of the event is changed from
@@ -179,11 +184,11 @@ impl EditScheduledEvent {
     /// May error if the input is a URL and the HTTP request fails, or if it is a path to a file
     /// that does not exist.
     #[cfg(feature = "http")]
-    pub async fn image<'a>(
+    pub async fn image(
         mut self,
         http: impl AsRef<Http>,
         image: impl Into<AttachmentType<'a>>,
-    ) -> Result<Self> {
+    ) -> Result<EditScheduledEvent<'a>> {
         let image_data = image.into().data(&http.as_ref().client).await?;
         self.image = Some(encode_image(&image_data));
         Ok(self)
@@ -194,6 +199,12 @@ impl EditScheduledEvent {
     #[cfg(not(feature = "http"))]
     pub fn image(mut self, image: String) -> Self {
         self.image = Some(image);
+        self
+    }
+
+    /// Sets the request's audit log reason.
+    pub fn audit_log_reason(mut self, reason: &'a str) -> Self {
+        self.audit_log_reason = Some(reason);
         self
     }
 }
