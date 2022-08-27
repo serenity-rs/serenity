@@ -21,16 +21,19 @@ use crate::model::prelude::*;
 /// [`Sticker::edit`]: crate::model::sticker::Sticker::edit
 #[derive(Clone, Debug, Default, Serialize)]
 #[must_use]
-pub struct EditSticker {
+pub struct EditSticker<'a> {
     #[serde(skip_serializing_if = "Option::is_none")]
     name: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
     description: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
     tags: Option<String>,
+
+    #[serde(skip)]
+    audit_log_reason: Option<&'a str>,
 }
 
-impl EditSticker {
+impl<'a> EditSticker<'a> {
     /// Equivalent to [`Self::default`].
     pub fn new() -> Self {
         Self::default()
@@ -52,7 +55,9 @@ impl EditSticker {
         guild_id: GuildId,
         sticker_id: StickerId,
     ) -> Result<Sticker> {
-        http.as_ref().edit_sticker(guild_id.into(), sticker_id.into(), &self, None).await
+        http.as_ref()
+            .edit_sticker(guild_id.into(), sticker_id.into(), &self, self.audit_log_reason)
+            .await
     }
 
     /// The name of the sticker to set.
@@ -76,6 +81,12 @@ impl EditSticker {
     /// **Note**: Must be between 2 and 200 characters long.
     pub fn tags(mut self, tags: impl Into<String>) -> Self {
         self.tags = Some(tags.into());
+        self
+    }
+
+    /// Sets the request's audit log reason.
+    pub fn audit_log_reason(mut self, reason: &'a str) -> Self {
+        self.audit_log_reason = Some(reason);
         self
     }
 }

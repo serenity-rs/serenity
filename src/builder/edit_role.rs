@@ -42,7 +42,7 @@ use crate::utils::encode_image;
 /// ```
 #[derive(Clone, Debug, Default, Serialize)]
 #[must_use]
-pub struct EditRole {
+pub struct EditRole<'a> {
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "color")]
     colour: Option<Colour>,
@@ -60,9 +60,12 @@ pub struct EditRole {
     unicode_emoji: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
     icon: Option<String>,
+
+    #[serde(skip)]
+    audit_log_reason: Option<&'a str>,
 }
 
-impl EditRole {
+impl<'a> EditRole<'a> {
     /// Equivalent to [`Self::default`].
     pub fn new() -> Self {
         Self::default()
@@ -79,6 +82,7 @@ impl EditRole {
             colour: Some(role.colour),
             unicode_emoji: role.unicode_emoji.clone(),
             icon: role.icon.clone(),
+            audit_log_reason: None,
         }
     }
 
@@ -114,8 +118,11 @@ impl EditRole {
         role_id: Option<RoleId>,
     ) -> Result<Role> {
         let role = match role_id {
-            Some(role_id) => http.edit_role(guild_id.into(), role_id.into(), &self, None).await?,
-            None => http.create_role(guild_id.into(), &self, None).await?,
+            Some(role_id) => {
+                http.edit_role(guild_id.into(), role_id.into(), &self, self.audit_log_reason)
+                    .await?
+            },
+            None => http.create_role(guild_id.into(), &self, self.audit_log_reason).await?,
         };
 
         if let Some(position) = self.position {
@@ -176,11 +183,11 @@ impl EditRole {
     /// May error if the icon is a URL and the HTTP request fails, or if the icon is a file
     /// on a path that doesn't exist.
     #[cfg(feature = "http")]
-    pub async fn icon<'a>(
+    pub async fn icon(
         mut self,
         http: impl AsRef<Http>,
         icon: impl Into<AttachmentType<'a>>,
-    ) -> Result<Self> {
+    ) -> Result<EditRole<'a>> {
         let icon_data = icon.into().data(&http.as_ref().client).await?;
 
         self.icon = Some(encode_image(&icon_data));
@@ -195,6 +202,12 @@ impl EditRole {
     pub fn icon(mut self, icon: String) -> Self {
         self.icon = Some(icon);
         self.unicode_emoji = None;
+        self
+    }
+
+    /// Sets the request's audit log reason.
+    pub fn audit_log_reason(mut self, reason: &'a str) -> Self {
+        self.audit_log_reason = Some(reason);
         self
     }
 }
