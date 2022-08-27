@@ -156,7 +156,7 @@ impl GuildChannel {
     /// [Send Messages]: Permissions::SEND_MESSAGES
     #[inline]
     pub async fn broadcast_typing(&self, http: impl AsRef<Http>) -> Result<()> {
-        self.id.broadcast_typing(&http).await
+        self.id.broadcast_typing(http).await
     }
 
     /// Creates an invite for the given channel.
@@ -285,7 +285,7 @@ impl GuildChannel {
         http: impl AsRef<Http>,
         target: PermissionOverwrite,
     ) -> Result<()> {
-        self.id.create_permission(&http, target).await
+        self.id.create_permission(http, target).await
     }
 
     /// Deletes this channel, returning the channel on a successful deletion.
@@ -313,7 +313,7 @@ impl GuildChannel {
             }
         }
 
-        self.id.delete(&cache_http.http()).await
+        self.id.delete(cache_http.http()).await
     }
 
     /// Deletes all messages by Ids from the given vector in the channel.
@@ -341,7 +341,7 @@ impl GuildChannel {
         T: AsRef<MessageId>,
         It: IntoIterator<Item = T>,
     {
-        self.id.delete_messages(&http, message_ids).await
+        self.id.delete_messages(http, message_ids).await
     }
 
     /// Deletes all permission overrides in the channel from a member
@@ -360,7 +360,7 @@ impl GuildChannel {
         http: impl AsRef<Http>,
         permission_type: PermissionOverwriteType,
     ) -> Result<()> {
-        self.id.delete_permission(&http, permission_type).await
+        self.id.delete_permission(http, permission_type).await
     }
 
     /// Deletes the given [`Reaction`] from the channel.
@@ -380,7 +380,7 @@ impl GuildChannel {
         user_id: Option<UserId>,
         reaction_type: impl Into<ReactionType>,
     ) -> Result<()> {
-        self.id.delete_reaction(&http, message_id, user_id, reaction_type).await
+        self.id.delete_reaction(http, message_id, user_id, reaction_type).await
     }
 
     /// Edits the channel's settings.
@@ -599,7 +599,7 @@ impl GuildChannel {
     /// [Manage Channels]: Permissions::MANAGE_CHANNELS
     #[inline]
     pub async fn invites(&self, http: impl AsRef<Http>) -> Result<Vec<RichInvite>> {
-        self.id.invites(&http).await
+        self.id.invites(http).await
     }
 
     /// Determines if the channel is NSFW.
@@ -628,7 +628,7 @@ impl GuildChannel {
         cache_http: impl CacheHttp,
         message_id: impl Into<MessageId>,
     ) -> Result<Message> {
-        self.id.message(&cache_http, message_id).await
+        self.id.message(cache_http, message_id).await
     }
 
     /// Gets messages from the channel.
@@ -809,7 +809,7 @@ impl GuildChannel {
         http: impl AsRef<Http>,
         message_id: impl Into<MessageId>,
     ) -> Result<()> {
-        self.id.pin(&http, message_id).await
+        self.id.pin(http, message_id).await
     }
 
     /// Gets all channel's pins.
@@ -824,7 +824,7 @@ impl GuildChannel {
     /// [Read Message History]: Permissions::READ_MESSAGE_HISTORY
     #[inline]
     pub async fn pins(&self, http: impl AsRef<Http>) -> Result<Vec<Message>> {
-        self.id.pins(&http).await
+        self.id.pins(http).await
     }
 
     /// Gets the list of [`User`]s who have reacted to a [`Message`] with a
@@ -852,7 +852,7 @@ impl GuildChannel {
         limit: Option<u8>,
         after: impl Into<Option<UserId>>,
     ) -> Result<Vec<User>> {
-        self.id.reaction_users(&http, message_id, reaction_type, limit, after).await
+        self.id.reaction_users(http, message_id, reaction_type, limit, after).await
     }
 
     /// Sends a message with just the given message content in the channel.
@@ -991,7 +991,7 @@ impl GuildChannel {
         http: impl AsRef<Http>,
         message_id: impl Into<MessageId>,
     ) -> Result<()> {
-        self.id.unpin(&http, message_id).await
+        self.id.unpin(http, message_id).await
     }
 
     /// Retrieves the channel's webhooks.
@@ -1005,7 +1005,7 @@ impl GuildChannel {
     /// [Manage Webhooks]: Permissions::MANAGE_WEBHOOKS
     #[inline]
     pub async fn webhooks(&self, http: impl AsRef<Http>) -> Result<Vec<Webhook>> {
-        self.id.webhooks(&http).await
+        self.id.webhooks(http).await
     }
 
     /// Retrieves [`Member`]s from the current channel.
