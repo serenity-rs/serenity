@@ -67,7 +67,7 @@ use crate::model::prelude::*;
 /// ```
 #[derive(Clone, Debug, Default, Serialize)]
 #[must_use]
-pub struct CreateInvite {
+pub struct CreateInvite<'a> {
     #[serde(skip_serializing_if = "Option::is_none")]
     max_age: Option<u64>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -82,9 +82,12 @@ pub struct CreateInvite {
     target_user_id: Option<UserId>,
     #[serde(skip_serializing_if = "Option::is_none")]
     target_application_id: Option<ApplicationId>,
+
+    #[serde(skip)]
+    audit_log_reason: Option<&'a str>,
 }
 
-impl CreateInvite {
+impl<'a> CreateInvite<'a> {
     /// Equivalent to [`Self::default`].
     pub fn new() -> Self {
         Self::default()
@@ -125,7 +128,7 @@ impl CreateInvite {
 
     #[cfg(feature = "http")]
     async fn _execute(self, http: &Http, channel_id: ChannelId) -> Result<RichInvite> {
-        http.create_invite(channel_id.into(), &self, None).await
+        http.create_invite(channel_id.into(), &self, self.audit_log_reason).await
     }
 
     /// The duration that the invite will be valid for.
@@ -288,6 +291,12 @@ impl CreateInvite {
     /// chess: `832012774040141894`
     pub fn target_application_id(mut self, target_application_id: ApplicationId) -> Self {
         self.target_application_id = Some(target_application_id);
+        self
+    }
+
+    /// Sets the request's audit log reason.
+    pub fn audit_log_reason(mut self, reason: &'a str) -> Self {
+        self.audit_log_reason = Some(reason);
         self
     }
 }
