@@ -176,7 +176,7 @@ impl PartialGuild {
     /// [Manage Guild]: Permissions::MANAGE_GUILD
     #[inline]
     pub async fn automod_rule(
-        self,
+        &self,
         http: impl AsRef<Http>,
         rule_id: impl Into<RuleId>,
     ) -> Result<Rule> {
@@ -236,7 +236,7 @@ impl PartialGuild {
     /// [Manage Guild]: Permissions::MANAGE_GUILD
     #[inline]
     pub async fn delete_automod_rule(
-        self,
+        &self,
         http: impl AsRef<Http>,
         rule_id: impl Into<RuleId>,
     ) -> Result<()> {
@@ -318,7 +318,7 @@ impl PartialGuild {
     /// [View Audit Log]: Permissions::VIEW_AUDIT_LOG
     #[inline]
     pub async fn audit_logs(
-        self,
+        &self,
         http: impl AsRef<Http>,
         action_type: Option<u8>,
         user_id: Option<UserId>,
@@ -813,7 +813,7 @@ impl PartialGuild {
     /// [Manage Roles]: Permissions::MANAGE_ROLES
     #[inline]
     pub async fn edit_role(
-        self,
+        &self,
         cache_http: impl CacheHttp,
         role_id: impl Into<RoleId>,
         builder: EditRole,
