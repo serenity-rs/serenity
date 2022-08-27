@@ -273,7 +273,7 @@ impl PartialGuild {
         user: impl Into<UserId>,
         dmd: u8,
     ) -> Result<()> {
-        self.ban_with_reason(&http, user, dmd, "").await
+        self.ban_with_reason(http, user, dmd, "").await
     }
 
     /// Ban a [`User`] from the guild with a reason. Refer to [`Self::ban`] to further documentation.
@@ -290,7 +290,7 @@ impl PartialGuild {
         dmd: u8,
         reason: impl AsRef<str>,
     ) -> Result<()> {
-        self.id.ban_with_reason(&http, user, dmd, reason).await
+        self.id.ban_with_reason(http, user, dmd, reason).await
     }
 
     /// Gets a list of the guild's bans.
@@ -304,7 +304,7 @@ impl PartialGuild {
     /// [Ban Members]: Permissions::BAN_MEMBERS
     #[inline]
     pub async fn bans(&self, http: impl AsRef<Http>) -> Result<Vec<Ban>> {
-        self.id.bans(&http).await
+        self.id.bans(http).await
     }
 
     /// Gets a list of the guild's audit log entries
@@ -340,7 +340,7 @@ impl PartialGuild {
         &self,
         http: impl AsRef<Http>,
     ) -> Result<HashMap<ChannelId, GuildChannel>> {
-        self.id.channels(&http).await
+        self.id.channels(http).await
     }
 
     #[cfg(feature = "cache")]
@@ -433,7 +433,7 @@ impl PartialGuild {
         name: &str,
         image: &str,
     ) -> Result<Emoji> {
-        self.id.create_emoji(&http, name, image).await
+        self.id.create_emoji(http, name, image).await
     }
 
     /// Creates an integration for the guild.
@@ -452,7 +452,7 @@ impl PartialGuild {
         integration_id: impl Into<IntegrationId>,
         kind: &str,
     ) -> Result<()> {
-        self.id.create_integration(&http, integration_id, kind).await
+        self.id.create_integration(http, integration_id, kind).await
     }
 
     /// Create a guild specific application [`Command`].
@@ -632,7 +632,7 @@ impl PartialGuild {
     /// the guild.
     #[inline]
     pub async fn delete(&self, http: impl AsRef<Http>) -> Result<()> {
-        self.id.delete(&http).await
+        self.id.delete(http).await
     }
 
     /// Deletes an [`Emoji`] from the guild.
@@ -651,7 +651,7 @@ impl PartialGuild {
         http: impl AsRef<Http>,
         emoji_id: impl Into<EmojiId>,
     ) -> Result<()> {
-        self.id.delete_emoji(&http, emoji_id).await
+        self.id.delete_emoji(http, emoji_id).await
     }
 
     /// Deletes an integration by Id from the guild.
@@ -670,7 +670,7 @@ impl PartialGuild {
         http: impl AsRef<Http>,
         integration_id: impl Into<IntegrationId>,
     ) -> Result<()> {
-        self.id.delete_integration(&http, integration_id).await
+        self.id.delete_integration(http, integration_id).await
     }
 
     /// Deletes a [`Role`] by Id from the guild.
@@ -692,7 +692,7 @@ impl PartialGuild {
         http: impl AsRef<Http>,
         role_id: impl Into<RoleId>,
     ) -> Result<()> {
-        self.id.delete_role(&http, role_id).await
+        self.id.delete_role(http, role_id).await
     }
 
     /// Deletes a [`Sticker`] by Id from the guild.
@@ -711,7 +711,7 @@ impl PartialGuild {
         http: impl AsRef<Http>,
         sticker_id: impl Into<StickerId>,
     ) -> Result<()> {
-        self.id.delete_sticker(&http, sticker_id).await
+        self.id.delete_sticker(http, sticker_id).await
     }
 
     /// Edits the current guild with new data where specified.
@@ -763,7 +763,7 @@ impl PartialGuild {
         emoji_id: impl Into<EmojiId>,
         name: &str,
     ) -> Result<Emoji> {
-        self.id.edit_emoji(&http, emoji_id, name).await
+        self.id.edit_emoji(http, emoji_id, name).await
     }
 
     /// Edits the properties a guild member, such as muting or nicknaming them. Returns the new
@@ -807,7 +807,7 @@ impl PartialGuild {
         http: impl AsRef<Http>,
         new_nickname: Option<&str>,
     ) -> Result<()> {
-        self.id.edit_nickname(&http, new_nickname).await
+        self.id.edit_nickname(http, new_nickname).await
     }
 
     /// Edits a role, optionally setting its fields.
@@ -858,7 +858,7 @@ impl PartialGuild {
         role_id: impl Into<RoleId>,
         position: u64,
     ) -> Result<Vec<Role>> {
-        self.id.edit_role_position(&http, role_id, position).await
+        self.id.edit_role_position(http, role_id, position).await
     }
 
     /// Edits a sticker.
@@ -1106,7 +1106,7 @@ impl PartialGuild {
     where
         It: IntoIterator<Item = (ChannelId, u64)>,
     {
-        self.id.reorder_channels(&http, channels).await
+        self.id.reorder_channels(http, channels).await
     }
 
     /// Returns a list of [`Member`]s in a [`Guild`] whose username or nickname
@@ -1170,7 +1170,7 @@ impl PartialGuild {
         if let Some(cache) = cache_http.cache() {
             let user_id = cache.current_user().id;
 
-            if let Ok(perms) = self.member_permissions(&cache_http, user_id).await {
+            if let Ok(perms) = self.member_permissions(cache_http, user_id).await {
                 permissions.remove(perms);
 
                 permissions.is_empty()
@@ -1194,7 +1194,7 @@ impl PartialGuild {
     /// [Kick Members]: Permissions::KICK_MEMBERS
     #[inline]
     pub async fn kick(&self, http: impl AsRef<Http>, user_id: impl Into<UserId>) -> Result<()> {
-        self.id.kick(&http, user_id).await
+        self.id.kick(http, user_id).await
     }
 
     /// # Errors
@@ -1208,7 +1208,7 @@ impl PartialGuild {
         user_id: impl Into<UserId>,
         reason: &str,
     ) -> Result<()> {
-        self.id.kick_with_reason(&http, user_id, reason).await
+        self.id.kick_with_reason(http, user_id, reason).await
     }
 
     /// Returns a formatted URL of the guild's icon, if the guild has an icon.
@@ -1255,7 +1255,7 @@ impl PartialGuild {
     /// [Manage Guild]: Permissions::MANAGE_GUILD
     #[inline]
     pub async fn integrations(&self, http: impl AsRef<Http>) -> Result<Vec<Integration>> {
-        self.id.integrations(&http).await
+        self.id.integrations(http).await
     }
 
     /// Gets all of the guild's invites.
@@ -1269,7 +1269,7 @@ impl PartialGuild {
     /// [Manage Guild]: Permissions::MANAGE_GUILD
     #[inline]
     pub async fn invites(&self, http: impl AsRef<Http>) -> Result<Vec<RichInvite>> {
-        self.id.invites(&http).await
+        self.id.invites(http).await
     }
 
     /// Leaves the guild.
@@ -1280,7 +1280,7 @@ impl PartialGuild {
     /// leave the Guild, or currently is not in the guild.
     #[inline]
     pub async fn leave(&self, http: impl AsRef<Http>) -> Result<()> {
-        self.id.leave(&http).await
+        self.id.leave(http).await
     }
 
     /// Gets a user's [`Member`] for the guild by Id.
@@ -1319,7 +1319,7 @@ impl PartialGuild {
         limit: Option<u64>,
         after: impl Into<Option<UserId>>,
     ) -> Result<Vec<Member>> {
-        self.id.members(&http, limit, after).await
+        self.id.members(http, limit, after).await
     }
 
     /// Moves a member to a specific voice channel.
@@ -1339,7 +1339,7 @@ impl PartialGuild {
         user_id: impl Into<UserId>,
         channel_id: impl Into<ChannelId>,
     ) -> Result<Member> {
-        self.id.move_member(&http, user_id, channel_id).await
+        self.id.move_member(http, user_id, channel_id).await
     }
 
     /// Calculate a [`Member`]'s permissions in a given channel in the guild.
@@ -1382,7 +1382,7 @@ impl PartialGuild {
     /// [`Guild::prune_count`]: crate::model::guild::Guild::prune_count
     #[inline]
     pub async fn prune_count(&self, http: impl AsRef<Http>, days: u8) -> Result<GuildPrune> {
-        self.id.prune_count(&http, days).await
+        self.id.prune_count(http, days).await
     }
 
     /// Returns the Id of the shard associated with the guild.
@@ -1452,7 +1452,7 @@ impl PartialGuild {
         http: impl AsRef<Http>,
         integration_id: impl Into<IntegrationId>,
     ) -> Result<()> {
-        self.id.start_integration_sync(&http, integration_id).await
+        self.id.start_integration_sync(http, integration_id).await
     }
 
     /// Unbans a [`User`] from the guild.
@@ -1467,7 +1467,7 @@ impl PartialGuild {
     /// [`Guild::unban`]: crate::model::guild::Guild::unban
     #[inline]
     pub async fn unban(&self, http: impl AsRef<Http>, user_id: impl Into<UserId>) -> Result<()> {
-        self.id.unban(&http, user_id).await
+        self.id.unban(http, user_id).await
     }
 
     /// Retrieve's the guild's vanity URL.
@@ -1482,7 +1482,7 @@ impl PartialGuild {
     /// [`Guild::vanity_url`]: crate::model::guild::Guild::vanity_url
     #[inline]
     pub async fn vanity_url(&self, http: impl AsRef<Http>) -> Result<String> {
-        self.id.vanity_url(&http).await
+        self.id.vanity_url(http).await
     }
 
     /// Retrieves the guild's webhooks.
@@ -1497,7 +1497,7 @@ impl PartialGuild {
     /// [`Guild::webhooks`]: crate::model::guild::Guild::webhooks
     #[inline]
     pub async fn webhooks(&self, http: impl AsRef<Http>) -> Result<Vec<Webhook>> {
-        self.id.webhooks(&http).await
+        self.id.webhooks(http).await
     }
 
     /// Obtain a reference to a role by its name.
