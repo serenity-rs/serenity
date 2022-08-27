@@ -183,7 +183,7 @@ impl Reaction {
     /// [Read Message History]: Permissions::READ_MESSAGE_HISTORY
     #[inline]
     pub async fn message(&self, cache_http: impl CacheHttp) -> Result<Message> {
-        self.channel_id.message(&cache_http, self.message_id).await
+        self.channel_id.message(cache_http, self.message_id).await
     }
 
     /// Retrieves the user that made the reaction.
@@ -246,7 +246,7 @@ impl Reaction {
         R: Into<ReactionType>,
         U: Into<UserId>,
     {
-        self._users(&http, &reaction_type.into(), limit, after.map(Into::into)).await
+        self._users(http, &reaction_type.into(), limit, after.map(Into::into)).await
     }
 
     async fn _users(
