@@ -605,7 +605,7 @@ impl GuildChannel {
     /// [Manage Messages]: Permissions::MANAGE_MESSAGES
     #[inline]
     pub async fn follow(
-        self,
+        &self,
         http: impl AsRef<Http>,
         target_channel_id: impl Into<ChannelId>,
     ) -> Result<FollowedChannel> {
@@ -1007,7 +1007,7 @@ impl GuildChannel {
     /// # }
     /// ```
     #[allow(clippy::missing_errors_doc)]
-    pub fn start_typing(self, http: &Arc<Http>) -> Result<Typing> {
+    pub fn start_typing(&self, http: &Arc<Http>) -> Result<Typing> {
         http.start_typing(self.id.get())
     }
 
