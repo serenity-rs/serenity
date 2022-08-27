@@ -8,7 +8,7 @@ use crate::model::prelude::*;
 /// [`Member::edit`].
 #[derive(Clone, Debug, Default, Serialize)]
 #[must_use]
-pub struct EditMember {
+pub struct EditMember<'a> {
     #[serde(skip_serializing_if = "Option::is_none")]
     deaf: Option<bool>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -21,9 +21,12 @@ pub struct EditMember {
     channel_id: Option<Option<ChannelId>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     communication_disabled_until: Option<Option<String>>,
+
+    #[serde(skip)]
+    audit_log_reason: Option<&'a str>,
 }
 
-impl EditMember {
+impl<'a> EditMember<'a> {
     /// Equivalent to [`Self::default`].
     pub fn new() -> Self {
         Self::default()
@@ -43,7 +46,9 @@ impl EditMember {
         guild_id: GuildId,
         user_id: UserId,
     ) -> Result<Member> {
-        http.as_ref().edit_member(guild_id.into(), user_id.into(), &self, None).await
+        http.as_ref()
+            .edit_member(guild_id.into(), user_id.into(), &self, self.audit_log_reason)
+            .await
     }
 
     /// Whether to deafen the member.
@@ -141,6 +146,12 @@ impl EditMember {
     #[doc(alias = "timeout")]
     pub fn enable_communication(mut self) -> Self {
         self.communication_disabled_until = Some(None);
+        self
+    }
+
+    /// Sets the request's audit log reason.
+    pub fn audit_log_reason(mut self, reason: &'a str) -> Self {
+        self.audit_log_reason = Some(reason);
         self
     }
 }

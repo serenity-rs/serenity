@@ -9,14 +9,17 @@ use crate::model::prelude::*;
 /// [`GuildWidget`]: crate::model::guild::GuildWidget
 #[derive(Clone, Debug, Default, Serialize)]
 #[must_use]
-pub struct EditGuildWidget {
+pub struct EditGuildWidget<'a> {
     #[serde(skip_serializing_if = "Option::is_none")]
     enabled: Option<bool>,
     #[serde(skip_serializing_if = "Option::is_none")]
     channel_id: Option<ChannelId>,
+
+    #[serde(skip)]
+    audit_log_reason: Option<&'a str>,
 }
 
-impl EditGuildWidget {
+impl<'a> EditGuildWidget<'a> {
     /// Equivalent to [`Self::default`].
     pub fn new() -> Self {
         Self::default()
@@ -33,7 +36,7 @@ impl EditGuildWidget {
     /// [Manage Guild]: Permissions::MANAGE_GUILD
     #[cfg(feature = "http")]
     pub async fn execute(self, http: impl AsRef<Http>, guild_id: GuildId) -> Result<GuildWidget> {
-        http.as_ref().edit_guild_widget(guild_id.into(), &self).await
+        http.as_ref().edit_guild_widget(guild_id.into(), &self, self.audit_log_reason).await
     }
 
     /// Whether the widget is enabled or not.
@@ -45,6 +48,12 @@ impl EditGuildWidget {
     /// The server description shown in the welcome screen.
     pub fn channel_id(mut self, id: impl Into<ChannelId>) -> Self {
         self.channel_id = Some(id.into());
+        self
+    }
+
+    /// Sets the request's audit log reason.
+    pub fn audit_log_reason(mut self, reason: &'a str) -> Self {
+        self.audit_log_reason = Some(reason);
         self
     }
 }
