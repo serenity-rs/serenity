@@ -46,7 +46,7 @@ impl PrivateChannel {
     #[allow(clippy::missing_errors_doc)]
     #[inline]
     pub async fn broadcast_typing(&self, http: impl AsRef<Http>) -> Result<()> {
-        self.id.broadcast_typing(&http).await
+        self.id.broadcast_typing(http).await
     }
 
     /// React to a [`Message`] with a custom [`Emoji`] or unicode character.
@@ -65,7 +65,7 @@ impl PrivateChannel {
         message_id: impl Into<MessageId>,
         reaction_type: impl Into<ReactionType>,
     ) -> Result<()> {
-        self.id.create_reaction(&http, message_id, reaction_type).await
+        self.id.create_reaction(http, message_id, reaction_type).await
     }
 
     /// Deletes the channel. This does not delete the contents of the channel,
@@ -74,7 +74,7 @@ impl PrivateChannel {
     #[allow(clippy::missing_errors_doc)]
     #[inline]
     pub async fn delete(&self, http: impl AsRef<Http>) -> Result<Channel> {
-        self.id.delete(&http).await
+        self.id.delete(http).await
     }
 
     /// Deletes all messages by Ids from the given vector in the channel.
@@ -102,7 +102,7 @@ impl PrivateChannel {
         T: AsRef<MessageId>,
         It: IntoIterator<Item = T>,
     {
-        self.id.delete_messages(&http, message_ids).await
+        self.id.delete_messages(http, message_ids).await
     }
 
     /// Deletes all permission overrides in the channel from a member
@@ -118,7 +118,7 @@ impl PrivateChannel {
         http: impl AsRef<Http>,
         permission_type: PermissionOverwriteType,
     ) -> Result<()> {
-        self.id.delete_permission(&http, permission_type).await
+        self.id.delete_permission(http, permission_type).await
     }
 
     /// Deletes the given [`Reaction`] from the channel.
@@ -138,7 +138,7 @@ impl PrivateChannel {
         user_id: Option<UserId>,
         reaction_type: impl Into<ReactionType>,
     ) -> Result<()> {
-        self.id.delete_reaction(&http, message_id, user_id, reaction_type).await
+        self.id.delete_reaction(http, message_id, user_id, reaction_type).await
     }
 
     /// Edits a [`Message`] in the channel given its Id.
@@ -188,7 +188,7 @@ impl PrivateChannel {
         cache_http: impl CacheHttp,
         message_id: impl Into<MessageId>,
     ) -> Result<Message> {
-        self.id.message(&cache_http, message_id).await
+        self.id.message(cache_http, message_id).await
     }
 
     /// Gets messages from the channel.
@@ -239,7 +239,7 @@ impl PrivateChannel {
         limit: Option<u8>,
         after: impl Into<Option<UserId>>,
     ) -> Result<Vec<User>> {
-        self.id.reaction_users(&http, message_id, reaction_type, limit, after).await
+        self.id.reaction_users(http, message_id, reaction_type, limit, after).await
     }
 
     /// Pins a [`Message`] to the channel.
@@ -254,7 +254,7 @@ impl PrivateChannel {
         http: impl AsRef<Http>,
         message_id: impl Into<MessageId>,
     ) -> Result<()> {
-        self.id.pin(&http, message_id).await
+        self.id.pin(http, message_id).await
     }
 
     /// Retrieves the list of messages that have been pinned in the private
@@ -262,7 +262,7 @@ impl PrivateChannel {
     #[allow(clippy::missing_errors_doc)]
     #[inline]
     pub async fn pins(&self, http: impl AsRef<Http>) -> Result<Vec<Message>> {
-        self.id.pins(&http).await
+        self.id.pins(http).await
     }
 
     /// Sends a message with just the given message content in the channel.
@@ -388,7 +388,7 @@ impl PrivateChannel {
         http: impl AsRef<Http>,
         message_id: impl Into<MessageId>,
     ) -> Result<()> {
-        self.id.unpin(&http, message_id).await
+        self.id.unpin(http, message_id).await
     }
 }
 
