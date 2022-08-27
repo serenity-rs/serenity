@@ -98,7 +98,7 @@ impl Emoji {
     #[inline]
     pub async fn delete(&self, cache_http: impl CacheHttp) -> Result<()> {
         let guild_id = self.try_find_guild_id(&cache_http)?;
-        cache_http.http().delete_emoji(guild_id.get(), self.id.get()).await
+        cache_http.http().delete_emoji(guild_id.get(), self.id.get(), None).await
     }
 
     /// Edits the emoji by updating it with a new name.
