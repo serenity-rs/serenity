@@ -201,7 +201,7 @@ impl PartialGuild {
     pub async fn create_automod_rule(
         &self,
         http: impl AsRef<Http>,
-        builder: EditAutoModRule,
+        builder: EditAutoModRule<'_>,
     ) -> Result<Rule> {
         self.id.create_automod_rule(http, builder).await
     }
@@ -220,7 +220,7 @@ impl PartialGuild {
         &self,
         http: impl AsRef<Http>,
         rule_id: impl Into<RuleId>,
-        builder: EditAutoModRule,
+        builder: EditAutoModRule<'_>,
     ) -> Result<Rule> {
         self.id.edit_automod_rule(http, rule_id, builder).await
     }
@@ -400,7 +400,7 @@ impl PartialGuild {
     pub async fn create_channel(
         &self,
         cache_http: impl CacheHttp,
-        builder: CreateChannel,
+        builder: CreateChannel<'_>,
     ) -> Result<GuildChannel> {
         self.id.create_channel(cache_http, builder).await
     }
@@ -599,7 +599,11 @@ impl PartialGuild {
     ///
     /// [Manage Roles]: Permissions::MANAGE_ROLES
     #[inline]
-    pub async fn create_role(&self, cache_http: impl CacheHttp, builder: EditRole) -> Result<Role> {
+    pub async fn create_role(
+        &self,
+        cache_http: impl CacheHttp,
+        builder: EditRole<'_>,
+    ) -> Result<Role> {
         self.id.create_role(cache_http, builder).await
     }
 
@@ -724,7 +728,7 @@ impl PartialGuild {
     /// lacks permission. Otherwise returns [`Error::Http`], as well as if invalid data is given.
     ///
     /// [Manage Guild]: Permissions::MANAGE_GUILD
-    pub async fn edit(&mut self, cache_http: impl CacheHttp, builder: EditGuild) -> Result<()> {
+    pub async fn edit(&mut self, cache_http: impl CacheHttp, builder: EditGuild<'_>) -> Result<()> {
         let guild = self.id.edit(cache_http, builder).await?;
 
         self.afk_channel_id = guild.afk_channel_id;
@@ -784,7 +788,7 @@ impl PartialGuild {
         &self,
         http: impl AsRef<Http>,
         user_id: impl Into<UserId>,
-        builder: EditMember,
+        builder: EditMember<'_>,
     ) -> Result<Member> {
         self.id.edit_member(http, user_id, builder).await
     }
@@ -829,7 +833,7 @@ impl PartialGuild {
         &self,
         cache_http: impl CacheHttp,
         role_id: impl Into<RoleId>,
-        builder: EditRole,
+        builder: EditRole<'_>,
     ) -> Result<Role> {
         self.id.edit_role(cache_http, role_id, builder).await
     }
@@ -895,7 +899,7 @@ impl PartialGuild {
         &self,
         http: impl AsRef<Http>,
         sticker_id: impl Into<StickerId>,
-        builder: EditSticker,
+        builder: EditSticker<'_>,
     ) -> Result<Sticker> {
         self.id.edit_sticker(http, sticker_id, builder).await
     }
@@ -912,7 +916,7 @@ impl PartialGuild {
     pub async fn edit_welcome_screen(
         &self,
         http: impl AsRef<Http>,
-        builder: EditGuildWelcomeScreen,
+        builder: EditGuildWelcomeScreen<'_>,
     ) -> Result<GuildWelcomeScreen> {
         self.id.edit_welcome_screen(http, builder).await
     }
@@ -929,7 +933,7 @@ impl PartialGuild {
     pub async fn edit_widget(
         &self,
         http: impl AsRef<Http>,
-        builder: EditGuildWidget,
+        builder: EditGuildWidget<'_>,
     ) -> Result<GuildWidget> {
         self.id.edit_widget(http, builder).await
     }

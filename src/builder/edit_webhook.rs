@@ -6,16 +6,19 @@ use crate::model::prelude::*;
 
 #[derive(Debug, Default, Clone, Serialize)]
 #[must_use]
-pub struct EditWebhook {
+pub struct EditWebhook<'a> {
     #[serde(skip_serializing_if = "Option::is_none")]
     name: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
     channel_id: Option<ChannelId>,
     #[serde(skip_serializing_if = "Option::is_none")]
     avatar: Option<Option<String>>,
+
+    #[serde(skip)]
+    audit_log_reason: Option<&'a str>,
 }
 
-impl EditWebhook {
+impl<'a> EditWebhook<'a> {
     /// Equivalent to [`Self::default`].
     pub fn new() -> Self {
         Self::default()
@@ -38,8 +41,10 @@ impl EditWebhook {
     ) -> Result<Webhook> {
         let id = webhook_id.into();
         match token {
-            Some(token) => http.as_ref().edit_webhook_with_token(id, token, &self, None).await,
-            None => http.as_ref().edit_webhook(id, &self, None).await,
+            Some(token) => {
+                http.as_ref().edit_webhook_with_token(id, token, &self, self.audit_log_reason).await
+            },
+            None => http.as_ref().edit_webhook(id, &self, self.audit_log_reason).await,
         }
     }
 
@@ -64,11 +69,11 @@ impl EditWebhook {
     /// May error if the input is a URL and the HTTP request fails, or if it is a path to a file
     /// that does not exist.
     #[cfg(feature = "http")]
-    pub async fn avatar<'a>(
+    pub async fn avatar(
         mut self,
         http: impl AsRef<Http>,
         avatar: impl Into<AttachmentType<'a>>,
-    ) -> Result<Self> {
+    ) -> Result<EditWebhook<'a>> {
         let avatar_data = avatar.into().data(&http.as_ref().client).await?;
         self.avatar = Some(Some(crate::utils::encode_image(&avatar_data)));
         Ok(self)
@@ -85,6 +90,12 @@ impl EditWebhook {
     /// Delete the webhook's avatar, resetting it to the default logo.
     pub fn delete_avatar(mut self) -> Self {
         self.avatar = Some(None);
+        self
+    }
+
+    /// Sets the request's audit log reason.
+    pub fn audit_log_reason(mut self, reason: &'a str) -> Self {
+        self.audit_log_reason = Some(reason);
         self
     }
 }

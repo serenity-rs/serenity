@@ -263,7 +263,7 @@ impl Member {
     /// # Errors
     ///
     /// Returns [`Error::Http`] if the current user lacks necessary permissions.
-    pub async fn edit(&mut self, http: impl AsRef<Http>, builder: EditMember) -> Result<()> {
+    pub async fn edit(&mut self, http: impl AsRef<Http>, builder: EditMember<'_>) -> Result<()> {
         *self = self.guild_id.edit_member(http, self.user.id, builder).await?;
         Ok(())
     }
