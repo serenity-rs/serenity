@@ -396,11 +396,12 @@ impl Http {
     pub async fn create_stage_instance(
         &self,
         map: &impl serde::Serialize,
+        audit_log_reason: Option<&str>,
     ) -> Result<StageInstance> {
         self.fire(Request {
             body: Some(to_vec(map)?),
             multipart: None,
-            headers: None,
+            headers: audit_log_reason.map(reason_into_header),
             route: RouteInfo::CreateStageInstance,
         })
         .await
@@ -413,13 +414,14 @@ impl Http {
         channel_id: u64,
         message_id: u64,
         map: &impl serde::Serialize,
+        audit_log_reason: Option<&str>,
     ) -> Result<GuildChannel> {
         let body = to_vec(map)?;
 
         self.fire(Request {
             body: Some(body),
             multipart: None,
-            headers: None,
+            headers: audit_log_reason.map(reason_into_header),
             route: RouteInfo::CreatePublicThread {
                 channel_id,
                 message_id,
@@ -433,13 +435,14 @@ impl Http {
         &self,
         channel_id: u64,
         map: &impl serde::Serialize,
+        audit_log_reason: Option<&str>,
     ) -> Result<GuildChannel> {
         let body = to_vec(map)?;
 
         self.fire(Request {
             body: Some(body),
             multipart: None,
-            headers: None,
+            headers: audit_log_reason.map(reason_into_header),
             route: RouteInfo::CreatePrivateThread {
                 channel_id,
             },
@@ -759,13 +762,14 @@ impl Http {
         channel_id: u64,
         target_id: u64,
         map: &impl serde::Serialize,
+        audit_log_reason: Option<&str>,
     ) -> Result<()> {
         let body = to_vec(map)?;
 
         self.wind(204, Request {
             body: Some(body),
             multipart: None,
-            headers: None,
+            headers: audit_log_reason.map(reason_into_header),
             route: RouteInfo::CreatePermission {
                 channel_id,
                 target_id,
@@ -936,11 +940,15 @@ impl Http {
     }
 
     /// Deletes a private channel or a channel in a guild.
-    pub async fn delete_channel(&self, channel_id: u64) -> Result<Channel> {
+    pub async fn delete_channel(
+        &self,
+        channel_id: u64,
+        audit_log_reason: Option<&str>,
+    ) -> Result<Channel> {
         self.fire(Request {
             body: None,
             multipart: None,
-            headers: None,
+            headers: audit_log_reason.map(reason_into_header),
             route: RouteInfo::DeleteChannel {
                 channel_id,
             },
@@ -949,11 +957,15 @@ impl Http {
     }
 
     /// Deletes a stage instance.
-    pub async fn delete_stage_instance(&self, channel_id: u64) -> Result<()> {
+    pub async fn delete_stage_instance(
+        &self,
+        channel_id: u64,
+        audit_log_reason: Option<&str>,
+    ) -> Result<()> {
         self.wind(204, Request {
             body: None,
             multipart: None,
-            headers: None,
+            headers: audit_log_reason.map(reason_into_header),
             route: RouteInfo::DeleteStageInstance {
                 channel_id,
             },
@@ -962,11 +974,16 @@ impl Http {
     }
 
     /// Deletes an emoji from a server.
-    pub async fn delete_emoji(&self, guild_id: u64, emoji_id: u64) -> Result<()> {
+    pub async fn delete_emoji(
+        &self,
+        guild_id: u64,
+        emoji_id: u64,
+        audit_log_reason: Option<&str>,
+    ) -> Result<()> {
         self.wind(204, Request {
             body: None,
             multipart: None,
-            headers: None,
+            headers: audit_log_reason.map(reason_into_header),
             route: RouteInfo::DeleteEmoji {
                 guild_id,
                 emoji_id,
@@ -1041,11 +1058,16 @@ impl Http {
     }
 
     /// Removes an integration from a guild.
-    pub async fn delete_guild_integration(&self, guild_id: u64, integration_id: u64) -> Result<()> {
+    pub async fn delete_guild_integration(
+        &self,
+        guild_id: u64,
+        integration_id: u64,
+        audit_log_reason: Option<&str>,
+    ) -> Result<()> {
         self.wind(204, Request {
             body: None,
             multipart: None,
-            headers: None,
+            headers: audit_log_reason.map(reason_into_header),
             route: RouteInfo::DeleteGuildIntegration {
                 guild_id,
                 integration_id,
@@ -1055,11 +1077,15 @@ impl Http {
     }
 
     /// Deletes an invite by code.
-    pub async fn delete_invite(&self, code: &str) -> Result<Invite> {
+    pub async fn delete_invite(
+        &self,
+        code: &str,
+        audit_log_reason: Option<&str>,
+    ) -> Result<Invite> {
         self.fire(Request {
             body: None,
             multipart: None,
-            headers: None,
+            headers: audit_log_reason.map(reason_into_header),
             route: RouteInfo::DeleteInvite {
                 code,
             },
@@ -1067,13 +1093,17 @@ impl Http {
         .await
     }
 
-    /// Deletes a message if created by us or we have
-    /// specific permissions.
-    pub async fn delete_message(&self, channel_id: u64, message_id: u64) -> Result<()> {
+    /// Deletes a message if created by us or we have specific permissions.
+    pub async fn delete_message(
+        &self,
+        channel_id: u64,
+        message_id: u64,
+        audit_log_reason: Option<&str>,
+    ) -> Result<()> {
         self.wind(204, Request {
             body: None,
             multipart: None,
-            headers: None,
+            headers: audit_log_reason.map(reason_into_header),
             route: RouteInfo::DeleteMessage {
                 channel_id,
                 message_id,
@@ -1083,11 +1113,16 @@ impl Http {
     }
 
     /// Deletes a bunch of messages, only works for bots.
-    pub async fn delete_messages(&self, channel_id: u64, map: &Value) -> Result<()> {
+    pub async fn delete_messages(
+        &self,
+        channel_id: u64,
+        map: &Value,
+        audit_log_reason: Option<&str>,
+    ) -> Result<()> {
         self.wind(204, Request {
             body: Some(to_vec(map)?),
             multipart: None,
-            headers: None,
+            headers: audit_log_reason.map(reason_into_header),
             route: RouteInfo::DeleteMessages {
                 channel_id,
             },
@@ -1164,11 +1199,16 @@ impl Http {
     }
 
     /// Deletes a permission override from a role or a member in a channel.
-    pub async fn delete_permission(&self, channel_id: u64, target_id: u64) -> Result<()> {
+    pub async fn delete_permission(
+        &self,
+        channel_id: u64,
+        target_id: u64,
+        audit_log_reason: Option<&str>,
+    ) -> Result<()> {
         self.wind(204, Request {
             body: None,
             multipart: None,
-            headers: None,
+            headers: audit_log_reason.map(reason_into_header),
             route: RouteInfo::DeletePermission {
                 channel_id,
                 target_id,
@@ -1203,11 +1243,16 @@ impl Http {
     }
 
     /// Deletes a role from a server. Can't remove the default everyone role.
-    pub async fn delete_role(&self, guild_id: u64, role_id: u64) -> Result<()> {
+    pub async fn delete_role(
+        &self,
+        guild_id: u64,
+        role_id: u64,
+        audit_log_reason: Option<&str>,
+    ) -> Result<()> {
         self.wind(204, Request {
             body: None,
             multipart: None,
-            headers: None,
+            headers: audit_log_reason.map(reason_into_header),
             route: RouteInfo::DeleteRole {
                 guild_id,
                 role_id,
@@ -1260,8 +1305,7 @@ impl Http {
 
     /// Deletes a [`Webhook`] given its Id.
     ///
-    /// This method requires authentication, whereas [`Self::delete_webhook_with_token`]
-    /// does not.
+    /// This method requires authentication, whereas [`Self::delete_webhook_with_token`] does not.
     ///
     /// # Examples
     ///
@@ -1271,19 +1315,23 @@ impl Http {
     /// use serenity::http::Http;
     ///
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
-    /// // Due to the `delete_webhook` function requiring you to authenticate, you
-    /// // must have set the token first.
+    /// // Due to the `delete_webhook` function requiring you to authenticate, you must have set
+    /// // the token first.
     /// let http = Http::new("token");
     ///
-    /// http.delete_webhook(245037420704169985).await?;
+    /// http.delete_webhook(245037420704169985, None).await?;
     /// Ok(())
     /// # }
     /// ```
-    pub async fn delete_webhook(&self, webhook_id: u64) -> Result<()> {
+    pub async fn delete_webhook(
+        &self,
+        webhook_id: u64,
+        audit_log_reason: Option<&str>,
+    ) -> Result<()> {
         self.wind(204, Request {
             body: None,
             multipart: None,
-            headers: None,
+            headers: audit_log_reason.map(reason_into_header),
             route: RouteInfo::DeleteWebhook {
                 webhook_id,
             },
@@ -1307,15 +1355,20 @@ impl Http {
     /// let id = 245037420704169985;
     /// let token = "ig5AO-wdVWpCBtUUMxmgsWryqgsW3DChbKYOINftJ4DCrUbnkedoYZD0VOH1QLr-S3sV";
     ///
-    /// http.delete_webhook_with_token(id, token).await?;
+    /// http.delete_webhook_with_token(id, token, None).await?;
     /// #     Ok(())
     /// # }
     /// ```
-    pub async fn delete_webhook_with_token(&self, webhook_id: u64, token: &str) -> Result<()> {
+    pub async fn delete_webhook_with_token(
+        &self,
+        webhook_id: u64,
+        token: &str,
+        audit_log_reason: Option<&str>,
+    ) -> Result<()> {
         self.wind(204, Request {
             body: None,
             multipart: None,
-            headers: None,
+            headers: audit_log_reason.map(reason_into_header),
             route: RouteInfo::DeleteWebhookWithToken {
                 token,
                 webhook_id,
@@ -1349,11 +1402,12 @@ impl Http {
         &self,
         channel_id: u64,
         map: &impl serde::Serialize,
+        audit_log_reason: Option<&str>,
     ) -> Result<StageInstance> {
         self.fire(Request {
             body: Some(to_vec(map)?),
             multipart: None,
-            headers: None,
+            headers: audit_log_reason.map(reason_into_header),
             route: RouteInfo::EditStageInstance {
                 channel_id,
             },
@@ -1599,13 +1653,14 @@ impl Http {
         &self,
         guild_id: u64,
         map: &impl serde::Serialize,
+        audit_log_reason: Option<&str>,
     ) -> Result<GuildWidget> {
         let body = to_vec(map)?;
 
         self.fire(Request {
             body: Some(body),
             multipart: None,
-            headers: None,
+            headers: audit_log_reason.map(reason_into_header),
             route: RouteInfo::EditGuildWidget {
                 guild_id,
             },
@@ -1618,13 +1673,14 @@ impl Http {
         &self,
         guild_id: u64,
         map: &impl serde::Serialize,
+        audit_log_reason: Option<&str>,
     ) -> Result<GuildWelcomeScreen> {
         let body = to_vec(map)?;
 
         self.fire(Request {
             body: Some(body),
             multipart: None,
-            headers: None,
+            headers: audit_log_reason.map(reason_into_header),
             route: RouteInfo::EditGuildWelcomeScreen {
                 guild_id,
             },
@@ -1727,13 +1783,18 @@ impl Http {
     }
 
     /// Edits the current member for the provided [`Guild`] via its Id.
-    pub async fn edit_member_me(&self, guild_id: u64, map: &JsonMap) -> Result<Member> {
+    pub async fn edit_member_me(
+        &self,
+        guild_id: u64,
+        map: &JsonMap,
+        audit_log_reason: Option<&str>,
+    ) -> Result<Member> {
         let body = to_vec(map)?;
 
         self.fire(Request {
             body: Some(body),
             multipart: None,
-            headers: None,
+            headers: audit_log_reason.map(reason_into_header),
             route: RouteInfo::EditMemberMe {
                 guild_id,
             },
@@ -1744,14 +1805,19 @@ impl Http {
     /// Edits the current user's nickname for the provided [`Guild`] via its Id.
     ///
     /// Pass [`None`] to reset the nickname.
-    pub async fn edit_nickname(&self, guild_id: u64, new_nickname: Option<&str>) -> Result<()> {
+    pub async fn edit_nickname(
+        &self,
+        guild_id: u64,
+        new_nickname: Option<&str>,
+        audit_log_reason: Option<&str>,
+    ) -> Result<()> {
         let map = json!({ "nick": new_nickname });
         let body = to_vec(&map)?;
 
         self.wind(200, Request {
             body: Some(body),
             multipart: None,
-            headers: None,
+            headers: audit_log_reason.map(reason_into_header),
             route: RouteInfo::EditMemberMe {
                 guild_id,
             },
@@ -1866,10 +1932,11 @@ impl Http {
         position: u64,
         audit_log_reason: Option<&str>,
     ) -> Result<Vec<Role>> {
-        let body = to_vec(&json!([{
+        let map = json!([{
             "id": role_id,
             "position": position,
-        }]))?;
+        }]);
+        let body = to_vec(&map)?;
 
         let mut value: Value = self
             .fire(Request {
@@ -1956,11 +2023,12 @@ impl Http {
         &self,
         channel_id: u64,
         map: &impl serde::Serialize,
+        audit_log_reason: Option<&str>,
     ) -> Result<GuildChannel> {
         self.fire(Request {
             body: Some(to_vec(map)?),
             multipart: None,
-            headers: None,
+            headers: audit_log_reason.map(reason_into_header),
             route: RouteInfo::EditThread {
                 channel_id,
             },
@@ -2433,13 +2501,14 @@ impl Http {
         &self,
         guild_id: u64,
         map: &impl serde::Serialize,
+        audit_log_reason: Option<&str>,
     ) -> Result<Rule> {
         let body = to_vec(map)?;
 
         self.fire(Request {
             body: Some(body),
             multipart: None,
-            headers: None,
+            headers: audit_log_reason.map(reason_into_header),
             route: RouteInfo::CreateAutoModRule {
                 guild_id,
             },
@@ -2455,13 +2524,14 @@ impl Http {
         guild_id: u64,
         rule_id: u64,
         map: &impl serde::Serialize,
+        audit_log_reason: Option<&str>,
     ) -> Result<Rule> {
         let body = to_vec(map)?;
 
         self.fire(Request {
             body: Some(body),
             multipart: None,
-            headers: None,
+            headers: audit_log_reason.map(reason_into_header),
             route: RouteInfo::EditAutoModRule {
                 guild_id,
                 rule_id,
@@ -2473,11 +2543,16 @@ impl Http {
     /// Deletes an auto moderation rule in a guild.
     ///
     /// This method requires `MANAGE_GUILD` permissions.
-    pub async fn delete_automod_rule(&self, guild_id: u64, rule_id: u64) -> Result<()> {
+    pub async fn delete_automod_rule(
+        &self,
+        guild_id: u64,
+        rule_id: u64,
+        audit_log_reason: Option<&str>,
+    ) -> Result<()> {
         self.wind(204, Request {
             body: None,
             multipart: None,
-            headers: None,
+            headers: audit_log_reason.map(reason_into_header),
             route: RouteInfo::DeleteAutoModRule {
                 guild_id,
                 rule_id,

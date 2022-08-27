@@ -9,7 +9,7 @@ use crate::model::prelude::*;
 /// Except [`Self::name`], all fields are optional.
 #[derive(Clone, Debug, Serialize)]
 #[must_use]
-pub struct CreateChannel {
+pub struct CreateChannel<'a> {
     kind: ChannelType,
     name: String,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -27,9 +27,12 @@ pub struct CreateChannel {
     #[serde(skip_serializing_if = "Option::is_none")]
     position: Option<u32>,
     permission_overwrites: Vec<PermissionOverwriteData>,
+
+    #[serde(skip)]
+    audit_log_reason: Option<&'a str>,
 }
 
-impl CreateChannel {
+impl<'a> CreateChannel<'a> {
     /// Creates a builder with the given name, setting [`Self::kind`] to [`ChannelType::Text`] and
     /// leaving all other fields empty.
     pub fn new(name: impl Into<String>) -> Self {
@@ -44,6 +47,7 @@ impl CreateChannel {
             rate_limit_per_user: None,
             kind: ChannelType::Text,
             permission_overwrites: Vec::new(),
+            audit_log_reason: None,
         }
     }
 
@@ -73,7 +77,7 @@ impl CreateChannel {
 
     #[cfg(feature = "http")]
     async fn _execute(self, http: &Http, guild_id: GuildId) -> Result<GuildChannel> {
-        http.create_channel(guild_id.into(), &self, None).await
+        http.create_channel(guild_id.into(), &self, self.audit_log_reason).await
     }
 
     /// Specify how to call this new channel, replacing the current value as set in [`Self::new`].
@@ -176,6 +180,12 @@ impl CreateChannel {
     /// ```
     pub fn permissions(mut self, perms: impl IntoIterator<Item = PermissionOverwrite>) -> Self {
         self.permission_overwrites = perms.into_iter().map(Into::into).collect();
+        self
+    }
+
+    /// Sets the request's audit log reason.
+    pub fn audit_log_reason(mut self, reason: &'a str) -> Self {
+        self.audit_log_reason = Some(reason);
         self
     }
 }
