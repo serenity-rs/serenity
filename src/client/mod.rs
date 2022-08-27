@@ -392,11 +392,11 @@ impl Future for ClientBuilder {
             #[cfg(feature = "voice")]
             let voice_manager = self.voice_manager.take();
 
-            let cache_and_http = Arc::new(CacheAndHttp {
+            let cache_and_http = CacheAndHttp {
                 #[cfg(feature = "cache")]
                 cache: Arc::new(Cache::new_with_settings(self.cache_settings.take().unwrap())),
                 http: Arc::clone(&http),
-            });
+            };
 
             self.fut = Some(Box::pin(async move {
                 let ws_url = Arc::new(Mutex::new(http.get_gateway().await?.url));
@@ -414,7 +414,7 @@ impl Future for ClientBuilder {
                         #[cfg(feature = "voice")]
                         voice_manager: voice_manager.as_ref().map(Arc::clone),
                         ws_url: Arc::clone(&ws_url),
-                        cache_and_http: Arc::clone(&cache_and_http),
+                        cache_and_http: cache_and_http.clone(),
                         intents,
                         presence,
                     });
@@ -672,7 +672,7 @@ pub struct Client {
     /// value available.
     pub ws_url: Arc<Mutex<String>>,
     /// A container for an optional cache and HTTP client.
-    pub cache_and_http: Arc<CacheAndHttp>,
+    pub cache_and_http: CacheAndHttp,
 }
 
 impl Client {
