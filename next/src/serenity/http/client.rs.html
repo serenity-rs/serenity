@@ -4062,6 +4062,81 @@
 <span id="4056">4056</span>
 <span id="4057">4057</span>
 <span id="4058">4058</span>
+<span id="4059">4059</span>
+<span id="4060">4060</span>
+<span id="4061">4061</span>
+<span id="4062">4062</span>
+<span id="4063">4063</span>
+<span id="4064">4064</span>
+<span id="4065">4065</span>
+<span id="4066">4066</span>
+<span id="4067">4067</span>
+<span id="4068">4068</span>
+<span id="4069">4069</span>
+<span id="4070">4070</span>
+<span id="4071">4071</span>
+<span id="4072">4072</span>
+<span id="4073">4073</span>
+<span id="4074">4074</span>
+<span id="4075">4075</span>
+<span id="4076">4076</span>
+<span id="4077">4077</span>
+<span id="4078">4078</span>
+<span id="4079">4079</span>
+<span id="4080">4080</span>
+<span id="4081">4081</span>
+<span id="4082">4082</span>
+<span id="4083">4083</span>
+<span id="4084">4084</span>
+<span id="4085">4085</span>
+<span id="4086">4086</span>
+<span id="4087">4087</span>
+<span id="4088">4088</span>
+<span id="4089">4089</span>
+<span id="4090">4090</span>
+<span id="4091">4091</span>
+<span id="4092">4092</span>
+<span id="4093">4093</span>
+<span id="4094">4094</span>
+<span id="4095">4095</span>
+<span id="4096">4096</span>
+<span id="4097">4097</span>
+<span id="4098">4098</span>
+<span id="4099">4099</span>
+<span id="4100">4100</span>
+<span id="4101">4101</span>
+<span id="4102">4102</span>
+<span id="4103">4103</span>
+<span id="4104">4104</span>
+<span id="4105">4105</span>
+<span id="4106">4106</span>
+<span id="4107">4107</span>
+<span id="4108">4108</span>
+<span id="4109">4109</span>
+<span id="4110">4110</span>
+<span id="4111">4111</span>
+<span id="4112">4112</span>
+<span id="4113">4113</span>
+<span id="4114">4114</span>
+<span id="4115">4115</span>
+<span id="4116">4116</span>
+<span id="4117">4117</span>
+<span id="4118">4118</span>
+<span id="4119">4119</span>
+<span id="4120">4120</span>
+<span id="4121">4121</span>
+<span id="4122">4122</span>
+<span id="4123">4123</span>
+<span id="4124">4124</span>
+<span id="4125">4125</span>
+<span id="4126">4126</span>
+<span id="4127">4127</span>
+<span id="4128">4128</span>
+<span id="4129">4129</span>
+<span id="4130">4130</span>
+<span id="4131">4131</span>
+<span id="4132">4132</span>
+<span id="4133">4133</span>
 </pre><pre class="rust"><code><span class="attribute">#![<span class="ident">allow</span>(<span class="ident">clippy::missing_errors_doc</span>)]</span>
 
 <span class="kw">use</span> <span class="ident">std::borrow::Cow</span>;
@@ -4460,11 +4535,12 @@
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">create_stage_instance</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">map</span>: <span class="kw-2">&amp;</span><span class="kw">impl</span> <span class="ident">serde::Serialize</span>,
+        <span class="ident">audit_log_reason</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span>,
     ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">StageInstance</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">fire</span>(<span class="ident">Request</span> {
             <span class="ident">body</span>: <span class="prelude-val">Some</span>(<span class="ident">to_vec</span>(<span class="ident">map</span>)<span class="question-mark">?</span>),
             <span class="ident">multipart</span>: <span class="prelude-val">None</span>,
-            <span class="ident">headers</span>: <span class="prelude-val">None</span>,
+            <span class="ident">headers</span>: <span class="ident">audit_log_reason</span>.<span class="ident">map</span>(<span class="ident">reason_into_header</span>),
             <span class="ident">route</span>: <span class="ident">RouteInfo::CreateStageInstance</span>,
         })
         .<span class="kw">await</span>
@@ -4477,13 +4553,14 @@
         <span class="ident">channel_id</span>: <span class="ident">u64</span>,
         <span class="ident">message_id</span>: <span class="ident">u64</span>,
         <span class="ident">map</span>: <span class="kw-2">&amp;</span><span class="kw">impl</span> <span class="ident">serde::Serialize</span>,
+        <span class="ident">audit_log_reason</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span>,
     ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">GuildChannel</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">body</span> <span class="op">=</span> <span class="ident">to_vec</span>(<span class="ident">map</span>)<span class="question-mark">?</span>;
 
         <span class="self">self</span>.<span class="ident">fire</span>(<span class="ident">Request</span> {
             <span class="ident">body</span>: <span class="prelude-val">Some</span>(<span class="ident">body</span>),
             <span class="ident">multipart</span>: <span class="prelude-val">None</span>,
-            <span class="ident">headers</span>: <span class="prelude-val">None</span>,
+            <span class="ident">headers</span>: <span class="ident">audit_log_reason</span>.<span class="ident">map</span>(<span class="ident">reason_into_header</span>),
             <span class="ident">route</span>: <span class="ident">RouteInfo::CreatePublicThread</span> {
                 <span class="ident">channel_id</span>,
                 <span class="ident">message_id</span>,
@@ -4497,13 +4574,14 @@
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">channel_id</span>: <span class="ident">u64</span>,
         <span class="ident">map</span>: <span class="kw-2">&amp;</span><span class="kw">impl</span> <span class="ident">serde::Serialize</span>,
+        <span class="ident">audit_log_reason</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span>,
     ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">GuildChannel</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">body</span> <span class="op">=</span> <span class="ident">to_vec</span>(<span class="ident">map</span>)<span class="question-mark">?</span>;
 
         <span class="self">self</span>.<span class="ident">fire</span>(<span class="ident">Request</span> {
             <span class="ident">body</span>: <span class="prelude-val">Some</span>(<span class="ident">body</span>),
             <span class="ident">multipart</span>: <span class="prelude-val">None</span>,
-            <span class="ident">headers</span>: <span class="prelude-val">None</span>,
+            <span class="ident">headers</span>: <span class="ident">audit_log_reason</span>.<span class="ident">map</span>(<span class="ident">reason_into_header</span>),
             <span class="ident">route</span>: <span class="ident">RouteInfo::CreatePrivateThread</span> {
                 <span class="ident">channel_id</span>,
             },
@@ -4823,13 +4901,14 @@
         <span class="ident">channel_id</span>: <span class="ident">u64</span>,
         <span class="ident">target_id</span>: <span class="ident">u64</span>,
         <span class="ident">map</span>: <span class="kw-2">&amp;</span><span class="kw">impl</span> <span class="ident">serde::Serialize</span>,
+        <span class="ident">audit_log_reason</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span>,
     ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">body</span> <span class="op">=</span> <span class="ident">to_vec</span>(<span class="ident">map</span>)<span class="question-mark">?</span>;
 
         <span class="self">self</span>.<span class="ident">wind</span>(<span class="number">204</span>, <span class="ident">Request</span> {
             <span class="ident">body</span>: <span class="prelude-val">Some</span>(<span class="ident">body</span>),
             <span class="ident">multipart</span>: <span class="prelude-val">None</span>,
-            <span class="ident">headers</span>: <span class="prelude-val">None</span>,
+            <span class="ident">headers</span>: <span class="ident">audit_log_reason</span>.<span class="ident">map</span>(<span class="ident">reason_into_header</span>),
             <span class="ident">route</span>: <span class="ident">RouteInfo::CreatePermission</span> {
                 <span class="ident">channel_id</span>,
                 <span class="ident">target_id</span>,
@@ -5001,11 +5080,15 @@
     }
 
     <span class="doccomment">/// Deletes a private channel or a channel in a guild.</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">delete_channel</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">channel_id</span>: <span class="ident">u64</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Channel</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">delete_channel</span>(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        <span class="ident">channel_id</span>: <span class="ident">u64</span>,
+        <span class="ident">audit_log_reason</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span>,
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Channel</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">fire</span>(<span class="ident">Request</span> {
             <span class="ident">body</span>: <span class="prelude-val">None</span>,
             <span class="ident">multipart</span>: <span class="prelude-val">None</span>,
-            <span class="ident">headers</span>: <span class="prelude-val">None</span>,
+            <span class="ident">headers</span>: <span class="ident">audit_log_reason</span>.<span class="ident">map</span>(<span class="ident">reason_into_header</span>),
             <span class="ident">route</span>: <span class="ident">RouteInfo::DeleteChannel</span> {
                 <span class="ident">channel_id</span>,
             },
@@ -5014,11 +5097,15 @@
     }
 
     <span class="doccomment">/// Deletes a stage instance.</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">delete_stage_instance</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">channel_id</span>: <span class="ident">u64</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">delete_stage_instance</span>(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        <span class="ident">channel_id</span>: <span class="ident">u64</span>,
+        <span class="ident">audit_log_reason</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span>,
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">wind</span>(<span class="number">204</span>, <span class="ident">Request</span> {
             <span class="ident">body</span>: <span class="prelude-val">None</span>,
             <span class="ident">multipart</span>: <span class="prelude-val">None</span>,
-            <span class="ident">headers</span>: <span class="prelude-val">None</span>,
+            <span class="ident">headers</span>: <span class="ident">audit_log_reason</span>.<span class="ident">map</span>(<span class="ident">reason_into_header</span>),
             <span class="ident">route</span>: <span class="ident">RouteInfo::DeleteStageInstance</span> {
                 <span class="ident">channel_id</span>,
             },
@@ -5027,11 +5114,16 @@
     }
 
     <span class="doccomment">/// Deletes an emoji from a server.</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">delete_emoji</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">guild_id</span>: <span class="ident">u64</span>, <span class="ident">emoji_id</span>: <span class="ident">u64</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">delete_emoji</span>(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        <span class="ident">guild_id</span>: <span class="ident">u64</span>,
+        <span class="ident">emoji_id</span>: <span class="ident">u64</span>,
+        <span class="ident">audit_log_reason</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span>,
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">wind</span>(<span class="number">204</span>, <span class="ident">Request</span> {
             <span class="ident">body</span>: <span class="prelude-val">None</span>,
             <span class="ident">multipart</span>: <span class="prelude-val">None</span>,
-            <span class="ident">headers</span>: <span class="prelude-val">None</span>,
+            <span class="ident">headers</span>: <span class="ident">audit_log_reason</span>.<span class="ident">map</span>(<span class="ident">reason_into_header</span>),
             <span class="ident">route</span>: <span class="ident">RouteInfo::DeleteEmoji</span> {
                 <span class="ident">guild_id</span>,
                 <span class="ident">emoji_id</span>,
@@ -5106,11 +5198,16 @@
     }
 
     <span class="doccomment">/// Removes an integration from a guild.</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">delete_guild_integration</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">guild_id</span>: <span class="ident">u64</span>, <span class="ident">integration_id</span>: <span class="ident">u64</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">delete_guild_integration</span>(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        <span class="ident">guild_id</span>: <span class="ident">u64</span>,
+        <span class="ident">integration_id</span>: <span class="ident">u64</span>,
+        <span class="ident">audit_log_reason</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span>,
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">wind</span>(<span class="number">204</span>, <span class="ident">Request</span> {
             <span class="ident">body</span>: <span class="prelude-val">None</span>,
             <span class="ident">multipart</span>: <span class="prelude-val">None</span>,
-            <span class="ident">headers</span>: <span class="prelude-val">None</span>,
+            <span class="ident">headers</span>: <span class="ident">audit_log_reason</span>.<span class="ident">map</span>(<span class="ident">reason_into_header</span>),
             <span class="ident">route</span>: <span class="ident">RouteInfo::DeleteGuildIntegration</span> {
                 <span class="ident">guild_id</span>,
                 <span class="ident">integration_id</span>,
@@ -5120,11 +5217,15 @@
     }
 
     <span class="doccomment">/// Deletes an invite by code.</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">delete_invite</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">code</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Invite</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">delete_invite</span>(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        <span class="ident">code</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
+        <span class="ident">audit_log_reason</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span>,
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Invite</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">fire</span>(<span class="ident">Request</span> {
             <span class="ident">body</span>: <span class="prelude-val">None</span>,
             <span class="ident">multipart</span>: <span class="prelude-val">None</span>,
-            <span class="ident">headers</span>: <span class="prelude-val">None</span>,
+            <span class="ident">headers</span>: <span class="ident">audit_log_reason</span>.<span class="ident">map</span>(<span class="ident">reason_into_header</span>),
             <span class="ident">route</span>: <span class="ident">RouteInfo::DeleteInvite</span> {
                 <span class="ident">code</span>,
             },
@@ -5132,13 +5233,17 @@
         .<span class="kw">await</span>
     }
 
-    <span class="doccomment">/// Deletes a message if created by us or we have</span>
-    <span class="doccomment">/// specific permissions.</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">delete_message</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">channel_id</span>: <span class="ident">u64</span>, <span class="ident">message_id</span>: <span class="ident">u64</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="doccomment">/// Deletes a message if created by us or we have specific permissions.</span>
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">delete_message</span>(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        <span class="ident">channel_id</span>: <span class="ident">u64</span>,
+        <span class="ident">message_id</span>: <span class="ident">u64</span>,
+        <span class="ident">audit_log_reason</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span>,
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">wind</span>(<span class="number">204</span>, <span class="ident">Request</span> {
             <span class="ident">body</span>: <span class="prelude-val">None</span>,
             <span class="ident">multipart</span>: <span class="prelude-val">None</span>,
-            <span class="ident">headers</span>: <span class="prelude-val">None</span>,
+            <span class="ident">headers</span>: <span class="ident">audit_log_reason</span>.<span class="ident">map</span>(<span class="ident">reason_into_header</span>),
             <span class="ident">route</span>: <span class="ident">RouteInfo::DeleteMessage</span> {
                 <span class="ident">channel_id</span>,
                 <span class="ident">message_id</span>,
@@ -5148,11 +5253,16 @@
     }
 
     <span class="doccomment">/// Deletes a bunch of messages, only works for bots.</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">delete_messages</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">channel_id</span>: <span class="ident">u64</span>, <span class="ident">map</span>: <span class="kw-2">&amp;</span><span class="ident">Value</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">delete_messages</span>(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        <span class="ident">channel_id</span>: <span class="ident">u64</span>,
+        <span class="ident">map</span>: <span class="kw-2">&amp;</span><span class="ident">Value</span>,
+        <span class="ident">audit_log_reason</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span>,
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">wind</span>(<span class="number">204</span>, <span class="ident">Request</span> {
             <span class="ident">body</span>: <span class="prelude-val">Some</span>(<span class="ident">to_vec</span>(<span class="ident">map</span>)<span class="question-mark">?</span>),
             <span class="ident">multipart</span>: <span class="prelude-val">None</span>,
-            <span class="ident">headers</span>: <span class="prelude-val">None</span>,
+            <span class="ident">headers</span>: <span class="ident">audit_log_reason</span>.<span class="ident">map</span>(<span class="ident">reason_into_header</span>),
             <span class="ident">route</span>: <span class="ident">RouteInfo::DeleteMessages</span> {
                 <span class="ident">channel_id</span>,
             },
@@ -5229,11 +5339,16 @@
     }
 
     <span class="doccomment">/// Deletes a permission override from a role or a member in a channel.</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">delete_permission</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">channel_id</span>: <span class="ident">u64</span>, <span class="ident">target_id</span>: <span class="ident">u64</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">delete_permission</span>(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        <span class="ident">channel_id</span>: <span class="ident">u64</span>,
+        <span class="ident">target_id</span>: <span class="ident">u64</span>,
+        <span class="ident">audit_log_reason</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span>,
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">wind</span>(<span class="number">204</span>, <span class="ident">Request</span> {
             <span class="ident">body</span>: <span class="prelude-val">None</span>,
             <span class="ident">multipart</span>: <span class="prelude-val">None</span>,
-            <span class="ident">headers</span>: <span class="prelude-val">None</span>,
+            <span class="ident">headers</span>: <span class="ident">audit_log_reason</span>.<span class="ident">map</span>(<span class="ident">reason_into_header</span>),
             <span class="ident">route</span>: <span class="ident">RouteInfo::DeletePermission</span> {
                 <span class="ident">channel_id</span>,
                 <span class="ident">target_id</span>,
@@ -5269,11 +5384,16 @@
     }
 
     <span class="doccomment">/// Deletes a role from a server. Can&#39;t remove the default everyone role.</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">delete_role</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">guild_id</span>: <span class="ident">u64</span>, <span class="ident">role_id</span>: <span class="ident">u64</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">delete_role</span>(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        <span class="ident">guild_id</span>: <span class="ident">u64</span>,
+        <span class="ident">role_id</span>: <span class="ident">u64</span>,
+        <span class="ident">audit_log_reason</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span>,
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">wind</span>(<span class="number">204</span>, <span class="ident">Request</span> {
             <span class="ident">body</span>: <span class="prelude-val">None</span>,
             <span class="ident">multipart</span>: <span class="prelude-val">None</span>,
-            <span class="ident">headers</span>: <span class="prelude-val">None</span>,
+            <span class="ident">headers</span>: <span class="ident">audit_log_reason</span>.<span class="ident">map</span>(<span class="ident">reason_into_header</span>),
             <span class="ident">route</span>: <span class="ident">RouteInfo::DeleteRole</span> {
                 <span class="ident">guild_id</span>,
                 <span class="ident">role_id</span>,
@@ -5326,8 +5446,7 @@
 
     <span class="doccomment">/// Deletes a [`Webhook`] given its Id.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// This method requires authentication, whereas [`Self::delete_webhook_with_token`]</span>
-    <span class="doccomment">/// does not.</span>
+    <span class="doccomment">/// This method requires authentication, whereas [`Self::delete_webhook_with_token`] does not.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// # Examples</span>
     <span class="doccomment">///</span>
@@ -5337,19 +5456,23 @@
     <span class="doccomment">/// use serenity::http::Http;</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// # async fn run() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {</span>
-    <span class="doccomment">/// // Due to the `delete_webhook` function requiring you to authenticate, you</span>
-    <span class="doccomment">/// // must have set the token first.</span>
+    <span class="doccomment">/// // Due to the `delete_webhook` function requiring you to authenticate, you must have set</span>
+    <span class="doccomment">/// // the token first.</span>
     <span class="doccomment">/// let http = Http::new(&quot;token&quot;);</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// http.delete_webhook(245037420704169985).await?;</span>
+    <span class="doccomment">/// http.delete_webhook(245037420704169985, None).await?;</span>
     <span class="doccomment">/// Ok(())</span>
     <span class="doccomment">/// # }</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">delete_webhook</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">webhook_id</span>: <span class="ident">u64</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">delete_webhook</span>(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        <span class="ident">webhook_id</span>: <span class="ident">u64</span>,
+        <span class="ident">audit_log_reason</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span>,
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">wind</span>(<span class="number">204</span>, <span class="ident">Request</span> {
             <span class="ident">body</span>: <span class="prelude-val">None</span>,
             <span class="ident">multipart</span>: <span class="prelude-val">None</span>,
-            <span class="ident">headers</span>: <span class="prelude-val">None</span>,
+            <span class="ident">headers</span>: <span class="ident">audit_log_reason</span>.<span class="ident">map</span>(<span class="ident">reason_into_header</span>),
             <span class="ident">route</span>: <span class="ident">RouteInfo::DeleteWebhook</span> {
                 <span class="ident">webhook_id</span>,
             },
@@ -5373,15 +5496,20 @@
     <span class="doccomment">/// let id = 245037420704169985;</span>
     <span class="doccomment">/// let token = &quot;ig5AO-wdVWpCBtUUMxmgsWryqgsW3DChbKYOINftJ4DCrUbnkedoYZD0VOH1QLr-S3sV&quot;;</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// http.delete_webhook_with_token(id, token).await?;</span>
+    <span class="doccomment">/// http.delete_webhook_with_token(id, token, None).await?;</span>
     <span class="doccomment">/// #     Ok(())</span>
     <span class="doccomment">/// # }</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">delete_webhook_with_token</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">webhook_id</span>: <span class="ident">u64</span>, <span class="ident">token</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">delete_webhook_with_token</span>(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        <span class="ident">webhook_id</span>: <span class="ident">u64</span>,
+        <span class="ident">token</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
+        <span class="ident">audit_log_reason</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span>,
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">wind</span>(<span class="number">204</span>, <span class="ident">Request</span> {
             <span class="ident">body</span>: <span class="prelude-val">None</span>,
             <span class="ident">multipart</span>: <span class="prelude-val">None</span>,
-            <span class="ident">headers</span>: <span class="prelude-val">None</span>,
+            <span class="ident">headers</span>: <span class="ident">audit_log_reason</span>.<span class="ident">map</span>(<span class="ident">reason_into_header</span>),
             <span class="ident">route</span>: <span class="ident">RouteInfo::DeleteWebhookWithToken</span> {
                 <span class="ident">token</span>,
                 <span class="ident">webhook_id</span>,
@@ -5415,11 +5543,12 @@
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">channel_id</span>: <span class="ident">u64</span>,
         <span class="ident">map</span>: <span class="kw-2">&amp;</span><span class="kw">impl</span> <span class="ident">serde::Serialize</span>,
+        <span class="ident">audit_log_reason</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span>,
     ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">StageInstance</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">fire</span>(<span class="ident">Request</span> {
             <span class="ident">body</span>: <span class="prelude-val">Some</span>(<span class="ident">to_vec</span>(<span class="ident">map</span>)<span class="question-mark">?</span>),
             <span class="ident">multipart</span>: <span class="prelude-val">None</span>,
-            <span class="ident">headers</span>: <span class="prelude-val">None</span>,
+            <span class="ident">headers</span>: <span class="ident">audit_log_reason</span>.<span class="ident">map</span>(<span class="ident">reason_into_header</span>),
             <span class="ident">route</span>: <span class="ident">RouteInfo::EditStageInstance</span> {
                 <span class="ident">channel_id</span>,
             },
@@ -5665,13 +5794,14 @@
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">guild_id</span>: <span class="ident">u64</span>,
         <span class="ident">map</span>: <span class="kw-2">&amp;</span><span class="kw">impl</span> <span class="ident">serde::Serialize</span>,
+        <span class="ident">audit_log_reason</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span>,
     ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">GuildWidget</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">body</span> <span class="op">=</span> <span class="ident">to_vec</span>(<span class="ident">map</span>)<span class="question-mark">?</span>;
 
         <span class="self">self</span>.<span class="ident">fire</span>(<span class="ident">Request</span> {
             <span class="ident">body</span>: <span class="prelude-val">Some</span>(<span class="ident">body</span>),
             <span class="ident">multipart</span>: <span class="prelude-val">None</span>,
-            <span class="ident">headers</span>: <span class="prelude-val">None</span>,
+            <span class="ident">headers</span>: <span class="ident">audit_log_reason</span>.<span class="ident">map</span>(<span class="ident">reason_into_header</span>),
             <span class="ident">route</span>: <span class="ident">RouteInfo::EditGuildWidget</span> {
                 <span class="ident">guild_id</span>,
             },
@@ -5684,13 +5814,14 @@
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">guild_id</span>: <span class="ident">u64</span>,
         <span class="ident">map</span>: <span class="kw-2">&amp;</span><span class="kw">impl</span> <span class="ident">serde::Serialize</span>,
+        <span class="ident">audit_log_reason</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span>,
     ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">GuildWelcomeScreen</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">body</span> <span class="op">=</span> <span class="ident">to_vec</span>(<span class="ident">map</span>)<span class="question-mark">?</span>;
 
         <span class="self">self</span>.<span class="ident">fire</span>(<span class="ident">Request</span> {
             <span class="ident">body</span>: <span class="prelude-val">Some</span>(<span class="ident">body</span>),
             <span class="ident">multipart</span>: <span class="prelude-val">None</span>,
-            <span class="ident">headers</span>: <span class="prelude-val">None</span>,
+            <span class="ident">headers</span>: <span class="ident">audit_log_reason</span>.<span class="ident">map</span>(<span class="ident">reason_into_header</span>),
             <span class="ident">route</span>: <span class="ident">RouteInfo::EditGuildWelcomeScreen</span> {
                 <span class="ident">guild_id</span>,
             },
@@ -5793,13 +5924,18 @@
     }
 
     <span class="doccomment">/// Edits the current member for the provided [`Guild`] via its Id.</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">edit_member_me</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">guild_id</span>: <span class="ident">u64</span>, <span class="ident">map</span>: <span class="kw-2">&amp;</span><span class="ident">JsonMap</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Member</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">edit_member_me</span>(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        <span class="ident">guild_id</span>: <span class="ident">u64</span>,
+        <span class="ident">map</span>: <span class="kw-2">&amp;</span><span class="ident">JsonMap</span>,
+        <span class="ident">audit_log_reason</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span>,
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Member</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">body</span> <span class="op">=</span> <span class="ident">to_vec</span>(<span class="ident">map</span>)<span class="question-mark">?</span>;
 
         <span class="self">self</span>.<span class="ident">fire</span>(<span class="ident">Request</span> {
             <span class="ident">body</span>: <span class="prelude-val">Some</span>(<span class="ident">body</span>),
             <span class="ident">multipart</span>: <span class="prelude-val">None</span>,
-            <span class="ident">headers</span>: <span class="prelude-val">None</span>,
+            <span class="ident">headers</span>: <span class="ident">audit_log_reason</span>.<span class="ident">map</span>(<span class="ident">reason_into_header</span>),
             <span class="ident">route</span>: <span class="ident">RouteInfo::EditMemberMe</span> {
                 <span class="ident">guild_id</span>,
             },
@@ -5810,14 +5946,19 @@
     <span class="doccomment">/// Edits the current user&#39;s nickname for the provided [`Guild`] via its Id.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// Pass [`None`] to reset the nickname.</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">edit_nickname</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">guild_id</span>: <span class="ident">u64</span>, <span class="ident">new_nickname</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">edit_nickname</span>(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        <span class="ident">guild_id</span>: <span class="ident">u64</span>,
+        <span class="ident">new_nickname</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span>,
+        <span class="ident">audit_log_reason</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span>,
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">map</span> <span class="op">=</span> <span class="macro">json!</span>({ <span class="string">&quot;nick&quot;</span>: <span class="ident">new_nickname</span> });
         <span class="kw">let</span> <span class="ident">body</span> <span class="op">=</span> <span class="ident">to_vec</span>(<span class="kw-2">&amp;</span><span class="ident">map</span>)<span class="question-mark">?</span>;
 
         <span class="self">self</span>.<span class="ident">wind</span>(<span class="number">200</span>, <span class="ident">Request</span> {
             <span class="ident">body</span>: <span class="prelude-val">Some</span>(<span class="ident">body</span>),
             <span class="ident">multipart</span>: <span class="prelude-val">None</span>,
-            <span class="ident">headers</span>: <span class="prelude-val">None</span>,
+            <span class="ident">headers</span>: <span class="ident">audit_log_reason</span>.<span class="ident">map</span>(<span class="ident">reason_into_header</span>),
             <span class="ident">route</span>: <span class="ident">RouteInfo::EditMemberMe</span> {
                 <span class="ident">guild_id</span>,
             },
@@ -5932,10 +6073,11 @@
         <span class="ident">position</span>: <span class="ident">u64</span>,
         <span class="ident">audit_log_reason</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span>,
     ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Role</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">body</span> <span class="op">=</span> <span class="ident">to_vec</span>(<span class="kw-2">&amp;</span><span class="macro">json!</span>([{
+        <span class="kw">let</span> <span class="ident">map</span> <span class="op">=</span> <span class="macro">json!</span>([{
             <span class="string">&quot;id&quot;</span>: <span class="ident">role_id</span>,
             <span class="string">&quot;position&quot;</span>: <span class="ident">position</span>,
-        }]))<span class="question-mark">?</span>;
+        }]);
+        <span class="kw">let</span> <span class="ident">body</span> <span class="op">=</span> <span class="ident">to_vec</span>(<span class="kw-2">&amp;</span><span class="ident">map</span>)<span class="question-mark">?</span>;
 
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">value</span>: <span class="ident">Value</span> <span class="op">=</span> <span class="self">self</span>
             .<span class="ident">fire</span>(<span class="ident">Request</span> {
@@ -6022,11 +6164,12 @@
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">channel_id</span>: <span class="ident">u64</span>,
         <span class="ident">map</span>: <span class="kw-2">&amp;</span><span class="kw">impl</span> <span class="ident">serde::Serialize</span>,
+        <span class="ident">audit_log_reason</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span>,
     ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">GuildChannel</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">fire</span>(<span class="ident">Request</span> {
             <span class="ident">body</span>: <span class="prelude-val">Some</span>(<span class="ident">to_vec</span>(<span class="ident">map</span>)<span class="question-mark">?</span>),
             <span class="ident">multipart</span>: <span class="prelude-val">None</span>,
-            <span class="ident">headers</span>: <span class="prelude-val">None</span>,
+            <span class="ident">headers</span>: <span class="ident">audit_log_reason</span>.<span class="ident">map</span>(<span class="ident">reason_into_header</span>),
             <span class="ident">route</span>: <span class="ident">RouteInfo::EditThread</span> {
                 <span class="ident">channel_id</span>,
             },
@@ -6499,13 +6642,14 @@
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">guild_id</span>: <span class="ident">u64</span>,
         <span class="ident">map</span>: <span class="kw-2">&amp;</span><span class="kw">impl</span> <span class="ident">serde::Serialize</span>,
+        <span class="ident">audit_log_reason</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span>,
     ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Rule</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">body</span> <span class="op">=</span> <span class="ident">to_vec</span>(<span class="ident">map</span>)<span class="question-mark">?</span>;
 
         <span class="self">self</span>.<span class="ident">fire</span>(<span class="ident">Request</span> {
             <span class="ident">body</span>: <span class="prelude-val">Some</span>(<span class="ident">body</span>),
             <span class="ident">multipart</span>: <span class="prelude-val">None</span>,
-            <span class="ident">headers</span>: <span class="prelude-val">None</span>,
+            <span class="ident">headers</span>: <span class="ident">audit_log_reason</span>.<span class="ident">map</span>(<span class="ident">reason_into_header</span>),
             <span class="ident">route</span>: <span class="ident">RouteInfo::CreateAutoModRule</span> {
                 <span class="ident">guild_id</span>,
             },
@@ -6521,13 +6665,14 @@
         <span class="ident">guild_id</span>: <span class="ident">u64</span>,
         <span class="ident">rule_id</span>: <span class="ident">u64</span>,
         <span class="ident">map</span>: <span class="kw-2">&amp;</span><span class="kw">impl</span> <span class="ident">serde::Serialize</span>,
+        <span class="ident">audit_log_reason</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span>,
     ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Rule</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">body</span> <span class="op">=</span> <span class="ident">to_vec</span>(<span class="ident">map</span>)<span class="question-mark">?</span>;
 
         <span class="self">self</span>.<span class="ident">fire</span>(<span class="ident">Request</span> {
             <span class="ident">body</span>: <span class="prelude-val">Some</span>(<span class="ident">body</span>),
             <span class="ident">multipart</span>: <span class="prelude-val">None</span>,
-            <span class="ident">headers</span>: <span class="prelude-val">None</span>,
+            <span class="ident">headers</span>: <span class="ident">audit_log_reason</span>.<span class="ident">map</span>(<span class="ident">reason_into_header</span>),
             <span class="ident">route</span>: <span class="ident">RouteInfo::EditAutoModRule</span> {
                 <span class="ident">guild_id</span>,
                 <span class="ident">rule_id</span>,
@@ -6539,11 +6684,16 @@
     <span class="doccomment">/// Deletes an auto moderation rule in a guild.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// This method requires `MANAGE_GUILD` permissions.</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">delete_automod_rule</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">guild_id</span>: <span class="ident">u64</span>, <span class="ident">rule_id</span>: <span class="ident">u64</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">delete_automod_rule</span>(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        <span class="ident">guild_id</span>: <span class="ident">u64</span>,
+        <span class="ident">rule_id</span>: <span class="ident">u64</span>,
+        <span class="ident">audit_log_reason</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span>,
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">wind</span>(<span class="number">204</span>, <span class="ident">Request</span> {
             <span class="ident">body</span>: <span class="prelude-val">None</span>,
             <span class="ident">multipart</span>: <span class="prelude-val">None</span>,
-            <span class="ident">headers</span>: <span class="prelude-val">None</span>,
+            <span class="ident">headers</span>: <span class="ident">audit_log_reason</span>.<span class="ident">map</span>(<span class="ident">reason_into_header</span>),
             <span class="ident">route</span>: <span class="ident">RouteInfo::DeleteAutoModRule</span> {
                 <span class="ident">guild_id</span>,
                 <span class="ident">rule_id</span>,

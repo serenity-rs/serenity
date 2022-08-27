@@ -133,6 +133,24 @@
 <span id="127">127</span>
 <span id="128">128</span>
 <span id="129">129</span>
+<span id="130">130</span>
+<span id="131">131</span>
+<span id="132">132</span>
+<span id="133">133</span>
+<span id="134">134</span>
+<span id="135">135</span>
+<span id="136">136</span>
+<span id="137">137</span>
+<span id="138">138</span>
+<span id="139">139</span>
+<span id="140">140</span>
+<span id="141">141</span>
+<span id="142">142</span>
+<span id="143">143</span>
+<span id="144">144</span>
+<span id="145">145</span>
+<span id="146">146</span>
+<span id="147">147</span>
 </pre><pre class="rust"><code><span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http&quot;</span>)]</span>
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::http::Http</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http&quot;</span>)]</span>
@@ -149,7 +167,7 @@
 <span class="doccomment">/// # Examples</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// See [`GuildId::create_automod_rule`] for details.</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">EditAutoModRule</span> {
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">EditAutoModRule</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
     <span class="ident">event_type</span>: <span class="ident">EventType</span>,
     <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;Option::is_none&quot;</span>)]</span>
     <span class="ident">name</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
@@ -163,9 +181,12 @@
     <span class="ident">exempt_roles</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">RoleId</span><span class="op">&gt;</span><span class="op">&gt;</span>,
     <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;Option::is_none&quot;</span>)]</span>
     <span class="ident">exempt_channels</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ChannelId</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+
+    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip</span>)]</span>
+    <span class="ident">audit_log_reason</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span><span class="op">&gt;</span>,
 }
 
-<span class="kw">impl</span> <span class="ident">EditAutoModRule</span> {
+<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">EditAutoModRule</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
     <span class="doccomment">/// Equivalent to [`Self::default`].</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="self">Self</span> {
         <span class="ident"><span class="self">Self</span>::default</span>()
@@ -190,10 +211,18 @@
     ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Rule</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">http</span> <span class="op">=</span> <span class="ident">http</span>.<span class="ident">as_ref</span>();
         <span class="kw">match</span> <span class="ident">rule_id</span> {
-            <span class="prelude-val">Some</span>(<span class="ident">rule_id</span>) =&gt; <span class="ident">http</span>.<span class="ident">edit_automod_rule</span>(<span class="ident">guild_id</span>.<span class="ident">into</span>(), <span class="ident">rule_id</span>.<span class="ident">into</span>(), <span class="kw-2">&amp;</span><span class="self">self</span>).<span class="kw">await</span>,
+            <span class="prelude-val">Some</span>(<span class="ident">rule_id</span>) =&gt; {
+                <span class="ident">http</span>.<span class="ident">edit_automod_rule</span>(
+                    <span class="ident">guild_id</span>.<span class="ident">into</span>(),
+                    <span class="ident">rule_id</span>.<span class="ident">into</span>(),
+                    <span class="kw-2">&amp;</span><span class="self">self</span>,
+                    <span class="self">self</span>.<span class="ident">audit_log_reason</span>,
+                )
+                .<span class="kw">await</span>
+            },
             <span class="comment">// Automod Rule creation has required fields, whereas modifying a rule does not.</span>
             <span class="comment">// TODO: Enforce these fields (maybe with a separate CreateAutoModRule builder).</span>
-            <span class="prelude-val">None</span> =&gt; <span class="ident">http</span>.<span class="ident">create_automod_rule</span>(<span class="ident">guild_id</span>.<span class="ident">into</span>(), <span class="kw-2">&amp;</span><span class="self">self</span>).<span class="kw">await</span>,
+            <span class="prelude-val">None</span> =&gt; <span class="ident">http</span>.<span class="ident">create_automod_rule</span>(<span class="ident">guild_id</span>.<span class="ident">into</span>(), <span class="kw-2">&amp;</span><span class="self">self</span>, <span class="self">self</span>.<span class="ident">audit_log_reason</span>).<span class="kw">await</span>,
         }
     }
 
@@ -247,9 +276,15 @@
         <span class="self">self</span>.<span class="ident">exempt_channels</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">channels</span>.<span class="ident">into_iter</span>().<span class="ident">map</span>(<span class="ident">Into::into</span>).<span class="ident">collect</span>());
         <span class="self">self</span>
     }
+
+    <span class="doccomment">/// Sets the request&#39;s audit log reason.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">audit_log_reason</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">reason</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>) -&gt; <span class="self">Self</span> {
+        <span class="self">self</span>.<span class="ident">audit_log_reason</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">reason</span>);
+        <span class="self">self</span>
+    }
 }
 
-<span class="kw">impl</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">EditAutoModRule</span> {
+<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">EditAutoModRule</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
     <span class="kw">fn</span> <span class="ident">default</span>() -&gt; <span class="self">Self</span> {
         <span class="self">Self</span> {
             <span class="ident">name</span>: <span class="prelude-val">None</span>,
@@ -259,6 +294,7 @@
             <span class="ident">exempt_roles</span>: <span class="prelude-val">None</span>,
             <span class="ident">exempt_channels</span>: <span class="prelude-val">None</span>,
             <span class="ident">event_type</span>: <span class="ident">EventType::MessageSend</span>,
+            <span class="ident">audit_log_reason</span>: <span class="prelude-val">None</span>,
         }
     }
 }
