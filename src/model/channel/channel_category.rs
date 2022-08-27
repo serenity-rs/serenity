@@ -54,7 +54,7 @@ impl ChannelCategory {
         http: impl AsRef<Http>,
         target: PermissionOverwrite,
     ) -> Result<()> {
-        self.id.create_permission(&http, target).await
+        self.id.create_permission(http, target).await
     }
 
     /// Deletes all permission overrides in the category from the channels.
@@ -72,7 +72,7 @@ impl ChannelCategory {
         http: impl AsRef<Http>,
         permission_type: PermissionOverwriteType,
     ) -> Result<()> {
-        self.id.delete_permission(&http, permission_type).await
+        self.id.delete_permission(http, permission_type).await
     }
 
     /// Deletes this category.
@@ -86,7 +86,7 @@ impl ChannelCategory {
     /// [Manage Channels]: Permissions::MANAGE_CHANNELS
     #[inline]
     pub async fn delete(&self, cache_http: impl CacheHttp) -> Result<()> {
-        self.id.delete(&cache_http.http()).await.map(|_| ())
+        self.id.delete(cache_http.http()).await.map(|_| ())
     }
 
     /// Edits the category's settings.

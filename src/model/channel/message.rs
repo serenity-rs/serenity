@@ -223,7 +223,7 @@ impl Message {
             }
         }
 
-        self.channel_id.delete_message(&cache_http.http(), self.id).await
+        self.channel_id.delete_message(cache_http.http(), self.id).await
     }
 
     /// Deletes all of the [`Reaction`]s associated with the message.
@@ -437,7 +437,7 @@ impl Message {
         limit: Option<u8>,
         after: impl Into<Option<UserId>>,
     ) -> Result<Vec<User>> {
-        self.channel_id.reaction_users(&http, self.id, reaction_type, limit, after).await
+        self.channel_id.reaction_users(http, self.id, reaction_type, limit, after).await
     }
 
     /// Returns the associated [`Guild`] for the message if one is in the cache.
