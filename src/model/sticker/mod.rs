@@ -74,7 +74,7 @@ impl Sticker {
     #[inline]
     pub async fn delete(&self, http: impl AsRef<Http>) -> Result<()> {
         if let Some(guild_id) = self.guild_id {
-            guild_id.delete_sticker(&http, self.id).await
+            guild_id.delete_sticker(http, self.id).await
         } else {
             Err(Error::Model(ModelError::DeleteNitroSticker))
         }
