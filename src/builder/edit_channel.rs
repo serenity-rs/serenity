@@ -27,7 +27,7 @@ use crate::model::prelude::*;
 /// ```
 #[derive(Clone, Debug, Default, Serialize)]
 #[must_use]
-pub struct EditChannel {
+pub struct EditChannel<'a> {
     #[serde(skip_serializing_if = "Option::is_none")]
     bitrate: Option<u32>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -50,9 +50,12 @@ pub struct EditChannel {
     rate_limit_per_user: Option<u64>,
     #[serde(skip_serializing_if = "Option::is_none")]
     permission_overwrites: Option<Vec<PermissionOverwriteData>>,
+
+    #[serde(skip)]
+    audit_log_reason: Option<&'a str>,
 }
 
-impl EditChannel {
+impl<'a> EditChannel<'a> {
     /// Equivalent to [`Self::default`].
     pub fn new() -> Self {
         Self::default()
@@ -102,7 +105,7 @@ impl EditChannel {
 
     #[cfg(feature = "http")]
     async fn _execute(self, http: &Http, channel_id: ChannelId) -> Result<GuildChannel> {
-        http.edit_channel(channel_id.into(), &self, None).await
+        http.edit_channel(channel_id.into(), &self, self.audit_log_reason).await
     }
 
     /// The bitrate of the channel in bits.
@@ -246,6 +249,12 @@ impl EditChannel {
         let overwrites = perms.into_iter().map(Into::into).collect::<Vec<_>>();
 
         self.permission_overwrites = Some(overwrites);
+        self
+    }
+
+    /// Sets the request's audit log reason.
+    pub fn audit_log_reason(mut self, reason: &'a str) -> Self {
+        self.audit_log_reason = Some(reason);
         self
     }
 }
