@@ -360,7 +360,7 @@ pub struct ShardManagerOptions {
     #[cfg(feature = "voice")]
     pub voice_manager: Option<Arc<dyn VoiceGatewayManager + Send + Sync + 'static>>,
     pub ws_url: Arc<Mutex<String>>,
-    pub cache_and_http: Arc<CacheAndHttp>,
+    pub cache_and_http: CacheAndHttp,
     pub intents: GatewayIntents,
     pub presence: Option<PresenceData>,
 }
