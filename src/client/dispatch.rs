@@ -14,11 +14,10 @@ use super::bridge::gateway::event::ClientEvent;
 use super::event_handler::{EventHandler, RawEventHandler};
 use super::Context;
 #[cfg(feature = "cache")]
-use crate::cache::{Cache, CacheUpdate};
+use crate::cache::CacheUpdate;
 #[cfg(feature = "framework")]
 use crate::framework::Framework;
 use crate::gateway::InterMessage;
-use crate::http::Http;
 use crate::internal::tokio::spawn_named;
 use crate::model::channel::{Channel, Message};
 use crate::model::event::Event;
@@ -30,7 +29,7 @@ use crate::CacheAndHttp;
 #[inline]
 #[cfg(feature = "cache")]
 fn update<E: CacheUpdate + fmt::Debug>(
-    cache_and_http: &Arc<CacheAndHttp>,
+    cache_and_http: &CacheAndHttp,
     event: &mut E,
 ) -> Option<E::Output> {
     cache_and_http.cache.update(event)
@@ -38,29 +37,24 @@ fn update<E: CacheUpdate + fmt::Debug>(
 
 #[inline]
 #[cfg(not(feature = "cache"))]
-fn update<E>(_cache_and_http: &Arc<CacheAndHttp>, _event: &mut E) -> Option<()> {
+fn update<E>(_cache_and_http: &CacheAndHttp, _event: &mut E) -> Option<()> {
     None
 }
 
-#[cfg(feature = "cache")]
 fn context(
     data: &Arc<RwLock<TypeMap>>,
     runner_tx: &Sender<InterMessage>,
     shard_id: u32,
-    http: &Arc<Http>,
-    cache: &Arc<Cache>,
+    cache_and_http: &CacheAndHttp,
 ) -> Context {
-    Context::new(Arc::clone(data), runner_tx.clone(), shard_id, Arc::clone(http), Arc::clone(cache))
-}
-
-#[cfg(not(feature = "cache"))]
-fn context(
-    data: &Arc<RwLock<TypeMap>>,
-    runner_tx: &Sender<InterMessage>,
-    shard_id: u32,
-    http: &Arc<Http>,
-) -> Context {
-    Context::new(Arc::clone(data), runner_tx.clone(), shard_id, Arc::clone(http))
+    Context::new(
+        Arc::clone(data),
+        runner_tx.clone(),
+        shard_id,
+        Arc::clone(&cache_and_http.http),
+        #[cfg(feature = "cache")]
+        Arc::clone(&cache_and_http.cache),
+    )
 }
 
 // Once we can use `Box` as part of a pattern, we will reconsider boxing.
@@ -73,7 +67,7 @@ pub(crate) enum DispatchEvent {
 
 impl DispatchEvent {
     #[instrument(skip(self, cache_and_http))]
-    fn update(&mut self, cache_and_http: &Arc<CacheAndHttp>) {
+    fn update(&mut self, cache_and_http: &CacheAndHttp) {
         match self {
             Self::Model(Event::ChannelCreate(event)) => {
                 update(cache_and_http, event);
@@ -161,25 +155,16 @@ pub(crate) fn dispatch<'rec>(
     raw_event_handler: &'rec Option<Arc<dyn RawEventHandler>>,
     runner_tx: &'rec Sender<InterMessage>,
     shard_id: u32,
-    cache_and_http: Arc<CacheAndHttp>,
+    cache_and_http: &'rec CacheAndHttp,
 ) -> BoxFuture<'rec, ()> {
     async move {
         match (event_handler, raw_event_handler) {
             (None, None) => {
-                event.update(&cache_and_http);
+                event.update(cache_and_http);
 
                 #[cfg(feature = "framework")]
                 if let DispatchEvent::Model(Event::MessageCreate(event)) = event {
-                    #[cfg(not(feature = "cache"))]
-                    let context = context(data, runner_tx, shard_id, &cache_and_http.http);
-                    #[cfg(feature = "cache")]
-                    let context = context(
-                        data,
-                        runner_tx,
-                        shard_id,
-                        &cache_and_http.http,
-                        &cache_and_http.cache,
-                    );
+                    let context = context(data, runner_tx, shard_id, cache_and_http);
 
                     if let Some(framework) = framework {
                         let framework = Arc::clone(framework);
@@ -192,18 +177,9 @@ pub(crate) fn dispatch<'rec>(
             },
             (Some(h), None) => match event {
                 DispatchEvent::Model(Event::MessageCreate(mut event)) => {
-                    update(&cache_and_http, &mut event);
+                    update(cache_and_http, &mut event);
 
-                    #[cfg(not(feature = "cache"))]
-                    let context = context(data, runner_tx, shard_id, &cache_and_http.http);
-                    #[cfg(feature = "cache")]
-                    let context = context(
-                        data,
-                        runner_tx,
-                        shard_id,
-                        &cache_and_http.http,
-                        &cache_and_http.cache,
-                    );
+                    let context = context(data, runner_tx, shard_id, cache_and_http);
 
                     #[cfg(not(feature = "framework"))]
                     {
@@ -229,21 +205,12 @@ pub(crate) fn dispatch<'rec>(
                 },
             },
             (None, Some(rh)) => {
-                event.update(&cache_and_http);
+                event.update(cache_and_http);
 
                 if let DispatchEvent::Model(event) = event {
                     let event_handler = Arc::clone(rh);
 
-                    #[cfg(not(feature = "cache"))]
-                    let context = context(data, runner_tx, shard_id, &cache_and_http.http);
-                    #[cfg(feature = "cache")]
-                    let context = context(
-                        data,
-                        runner_tx,
-                        shard_id,
-                        &cache_and_http.http,
-                        &cache_and_http.cache,
-                    );
+                    let context = context(data, runner_tx, shard_id, cache_and_http);
 
                     #[cfg(not(feature = "framework"))]
                     {
@@ -275,11 +242,7 @@ pub(crate) fn dispatch<'rec>(
             // We call this function again, passing `None` for each event handler
             // and passing no framework, as we dispatch once we are done right here.
             (Some(handler), Some(raw_handler)) => {
-                #[cfg(not(feature = "cache"))]
-                let context = context(data, runner_tx, shard_id, &cache_and_http.http);
-                #[cfg(feature = "cache")]
-                let context =
-                    context(data, runner_tx, shard_id, &cache_and_http.http, &cache_and_http.cache);
+                let context = context(data, runner_tx, shard_id, cache_and_http);
 
                 if let DispatchEvent::Model(event) = &event {
                     raw_handler.raw_event(context.clone(), event.clone()).await;
@@ -338,14 +301,12 @@ async fn handle_event(
     event_handler: &Arc<dyn EventHandler>,
     runner_tx: &Sender<InterMessage>,
     shard_id: u32,
-    cache_and_http: Arc<CacheAndHttp>,
+    cache_and_http: &CacheAndHttp,
 ) {
-    #[cfg(not(feature = "cache"))]
-    let context = context(data, runner_tx, shard_id, &cache_and_http.http);
-    #[cfg(feature = "cache")]
-    let context = context(data, runner_tx, shard_id, &cache_and_http.http, &cache_and_http.cache);
+    let context = context(data, runner_tx, shard_id, cache_and_http);
 
     let event_handler = Arc::clone(event_handler);
+    let cache_and_http = cache_and_http.clone();
 
     // Handle ClientEvent or return back Event
     let model_event = match event {
