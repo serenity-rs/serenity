@@ -466,7 +466,7 @@ pub(crate) async fn user_has_guild_perms(
         // `Guild::has_perms` is an async fn, but we want the returned Future to be `Send`.
         let lookup = cache.guild(guild_id).as_deref().cloned();
         if let Some(guild) = lookup {
-            if !guild.has_perms(&cache_http, permissions).await {
+            if !guild.has_perms(cache_http, permissions).await {
                 return Err(Error::Model(ModelError::InvalidPermissions(permissions)));
             }
         }
