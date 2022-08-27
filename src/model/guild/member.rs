@@ -149,7 +149,7 @@ impl Member {
     /// [Ban Members]: Permissions::BAN_MEMBERS
     #[inline]
     pub async fn ban(&self, http: impl AsRef<Http>, dmd: u8) -> Result<()> {
-        self.ban_with_reason(&http, dmd, "").await
+        self.ban_with_reason(http, dmd, "").await
     }
 
     /// Ban the member from the guild with a reason. Refer to [`Self::ban`] to further documentation.
