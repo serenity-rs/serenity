@@ -9,16 +9,19 @@ use crate::model::prelude::*;
 /// [`GuildWelcomeScreen`]: crate::model::guild::GuildWelcomeScreen
 #[derive(Clone, Debug, Default, Serialize)]
 #[must_use]
-pub struct EditGuildWelcomeScreen {
+pub struct EditGuildWelcomeScreen<'a> {
     #[serde(skip_serializing_if = "Option::is_none")]
     enabled: Option<bool>,
     #[serde(skip_serializing_if = "Option::is_none")]
     description: Option<String>,
     #[serde(skip_serializing_if = "Vec::is_empty")]
     welcome_channels: Vec<CreateGuildWelcomeChannel>,
+
+    #[serde(skip)]
+    audit_log_reason: Option<&'a str>,
 }
 
-impl EditGuildWelcomeScreen {
+impl<'a> EditGuildWelcomeScreen<'a> {
     /// Equivalent to [`Self::default`].
     pub fn new() -> Self {
         Self::default()
@@ -39,7 +42,7 @@ impl EditGuildWelcomeScreen {
         http: impl AsRef<Http>,
         guild_id: GuildId,
     ) -> Result<GuildWelcomeScreen> {
-        http.as_ref().edit_guild_welcome_screen(guild_id.into(), &self).await
+        http.as_ref().edit_guild_welcome_screen(guild_id.into(), &self, self.audit_log_reason).await
     }
 
     /// Whether the welcome screen is enabled or not.
@@ -61,6 +64,12 @@ impl EditGuildWelcomeScreen {
 
     pub fn set_welcome_channels(mut self, channels: Vec<CreateGuildWelcomeChannel>) -> Self {
         self.welcome_channels = channels;
+        self
+    }
+
+    /// Sets the request's audit log reason.
+    pub fn audit_log_reason(mut self, reason: &'a str) -> Self {
+        self.audit_log_reason = Some(reason);
         self
     }
 }
