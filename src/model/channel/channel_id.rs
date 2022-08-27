@@ -79,7 +79,7 @@ impl ChannelId {
     pub async fn create_invite(
         self,
         cache_http: impl CacheHttp,
-        builder: CreateInvite,
+        builder: CreateInvite<'_>,
     ) -> Result<RichInvite> {
         builder
             .execute(
@@ -111,7 +111,7 @@ impl ChannelId {
         target: PermissionOverwrite,
     ) -> Result<()> {
         let data: PermissionOverwriteData = target.into();
-        http.as_ref().create_permission(self.get(), data.id.get(), &data).await
+        http.as_ref().create_permission(self.get(), data.id.get(), &data, None).await
     }
 
     /// React to a [`Message`] with a custom [`Emoji`] or unicode character.
@@ -150,7 +150,7 @@ impl ChannelId {
     /// [Manage Channels]: Permissions::MANAGE_CHANNELS
     #[inline]
     pub async fn delete(self, http: impl AsRef<Http>) -> Result<Channel> {
-        http.as_ref().delete_channel(self.get()).await
+        http.as_ref().delete_channel(self.get(), None).await
     }
 
     /// Deletes a [`Message`] given its Id.
@@ -172,7 +172,7 @@ impl ChannelId {
         http: impl AsRef<Http>,
         message_id: impl Into<MessageId>,
     ) -> Result<()> {
-        http.as_ref().delete_message(self.get(), message_id.into().get()).await
+        http.as_ref().delete_message(self.get(), message_id.into().get(), None).await
     }
 
     /// Deletes all messages by Ids from the given vector in the given channel.
@@ -212,7 +212,7 @@ impl ChannelId {
         } else {
             let map = json!({ "messages": ids });
 
-            http.as_ref().delete_messages(self.get(), &map).await
+            http.as_ref().delete_messages(self.get(), &map, None).await
         }
     }
 
@@ -230,12 +230,11 @@ impl ChannelId {
         http: impl AsRef<Http>,
         permission_type: PermissionOverwriteType,
     ) -> Result<()> {
-        http.as_ref()
-            .delete_permission(self.get(), match permission_type {
-                PermissionOverwriteType::Member(id) => id.get(),
-                PermissionOverwriteType::Role(id) => id.get(),
-            })
-            .await
+        let id = match permission_type {
+            PermissionOverwriteType::Member(id) => id.get(),
+            PermissionOverwriteType::Role(id) => id.get(),
+        };
+        http.as_ref().delete_permission(self.get(), id, None).await
     }
 
     /// Deletes the given [`Reaction`] from the channel.
@@ -323,10 +322,10 @@ impl ChannelId {
     /// [Manage Channels]: Permissions::MANAGE_CHANNELS
     /// [Manage Roles]: Permissions::MANAGE_ROLES
     #[inline]
-    pub async fn edit(
+    pub async fn edit<'a>(
         self,
         cache_http: impl CacheHttp,
-        builder: EditChannel,
+        builder: EditChannel<'_>,
     ) -> Result<GuildChannel> {
         builder
             .execute(
@@ -823,10 +822,10 @@ impl ChannelId {
     /// # Errors
     ///
     /// See [`CreateWebhook::execute`] for a detailed list of possible errors.
-    pub async fn create_webhook(
+    pub async fn create_webhook<'a>(
         self,
         cache_http: impl CacheHttp,
-        builder: CreateWebhook,
+        builder: CreateWebhook<'a>,
     ) -> Result<Webhook> {
         builder.execute(cache_http, self).await
     }
@@ -866,10 +865,10 @@ impl ChannelId {
     /// Returns [`ModelError::InvalidChannelType`] if the channel is not a stage channel.
     ///
     /// Returns [`Error::Http`] if there is already a stage instance currently.
-    pub async fn create_stage_instance(
+    pub async fn create_stage_instance<'a>(
         self,
         cache_http: impl CacheHttp,
-        builder: CreateStageInstance,
+        builder: CreateStageInstance<'a>,
     ) -> Result<StageInstance> {
         builder.channel_id(self).execute(cache_http).await
     }
@@ -882,10 +881,10 @@ impl ChannelId {
     ///
     /// Returns [`Error::Http`] if the channel is not a stage channel, or there is no stage
     /// instance currently.
-    pub async fn edit_stage_instance(
+    pub async fn edit_stage_instance<'a>(
         self,
         cache_http: impl CacheHttp,
-        builder: EditStageInstance,
+        builder: EditStageInstance<'a>,
     ) -> Result<StageInstance> {
         builder.execute(cache_http, self).await
     }
@@ -895,10 +894,10 @@ impl ChannelId {
     /// # Errors
     ///
     /// Returns [`Error::Http`] if the current user lacks permission.
-    pub async fn edit_thread(
+    pub async fn edit_thread<'a>(
         self,
         http: impl AsRef<Http>,
-        builder: EditThread,
+        builder: EditThread<'a>,
     ) -> Result<GuildChannel> {
         builder.execute(http, self).await
     }
@@ -910,7 +909,7 @@ impl ChannelId {
     /// Returns [`Error::Http`] if the channel is not a stage channel,
     /// or if there is no stage instance currently.
     pub async fn delete_stage_instance(&self, http: impl AsRef<Http>) -> Result<()> {
-        http.as_ref().delete_stage_instance(self.get()).await
+        http.as_ref().delete_stage_instance(self.get(), None).await
     }
 
     /// Creates a public thread that is connected to a message.
@@ -918,11 +917,11 @@ impl ChannelId {
     /// # Errors
     ///
     /// Returns [`Error::Http`] if the current user lacks permission, or if invalid data is given.
-    pub async fn create_public_thread(
+    pub async fn create_public_thread<'a>(
         self,
         http: impl AsRef<Http>,
         message_id: impl Into<MessageId>,
-        builder: CreateThread,
+        builder: CreateThread<'a>,
     ) -> Result<GuildChannel> {
         builder.execute(http, self, Some(message_id.into())).await
     }
@@ -932,10 +931,10 @@ impl ChannelId {
     /// # Errors
     ///
     /// Returns [`Error::Http`] if the current user lacks permission, or if invalid data is given.
-    pub async fn create_private_thread(
+    pub async fn create_private_thread<'a>(
         self,
         http: impl AsRef<Http>,
-        builder: CreateThread,
+        builder: CreateThread<'a>,
     ) -> Result<GuildChannel> {
         builder.kind(ChannelType::PrivateThread).execute(http, self, None).await
     }

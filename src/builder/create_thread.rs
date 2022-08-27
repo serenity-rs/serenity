@@ -6,7 +6,7 @@ use crate::model::prelude::*;
 
 #[derive(Clone, Debug, Serialize)]
 #[must_use]
-pub struct CreateThread {
+pub struct CreateThread<'a> {
     name: String,
     #[serde(skip_serializing_if = "Option::is_none")]
     auto_archive_duration: Option<u16>,
@@ -15,9 +15,12 @@ pub struct CreateThread {
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "type")]
     kind: Option<ChannelType>,
+
+    #[serde(skip)]
+    audit_log_reason: Option<&'a str>,
 }
 
-impl CreateThread {
+impl<'a> CreateThread<'a> {
     /// Creates a builder with the given thread name, leaving all other fields empty.
     pub fn new(name: impl Into<String>) -> Self {
         Self {
@@ -25,6 +28,7 @@ impl CreateThread {
             auto_archive_duration: None,
             rate_limit_per_user: None,
             kind: None,
+            audit_log_reason: None,
         }
     }
 
@@ -41,11 +45,13 @@ impl CreateThread {
         channel_id: ChannelId,
         message_id: Option<MessageId>,
     ) -> Result<GuildChannel> {
+        let http = http.as_ref();
+        let id = channel_id.into();
         match message_id {
             Some(msg_id) => {
-                http.as_ref().create_public_thread(channel_id.into(), msg_id.into(), &self).await
+                http.create_public_thread(id, msg_id.into(), &self, self.audit_log_reason).await
             },
-            None => http.as_ref().create_private_thread(channel_id.into(), &self).await,
+            None => http.create_private_thread(id, &self, self.audit_log_reason).await,
         }
     }
 
@@ -88,6 +94,12 @@ impl CreateThread {
     /// setting it to avoid any breaking change.
     pub fn kind(mut self, kind: ChannelType) -> Self {
         self.kind = Some(kind);
+        self
+    }
+
+    /// Sets the request's audit log reason.
+    pub fn audit_log_reason(mut self, reason: &'a str) -> Self {
+        self.audit_log_reason = Some(reason);
         self
     }
 }
