@@ -125,7 +125,7 @@ impl<'a> CreateMessage<'a> {
         };
 
         for reaction in self.reactions {
-            channel_id.create_reaction(&http, message.id, reaction).await?;
+            channel_id.create_reaction(http, message.id, reaction).await?;
         }
 
         Ok(message)
