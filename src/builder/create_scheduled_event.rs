@@ -8,7 +8,7 @@ use crate::utils::encode_image;
 
 #[derive(Clone, Debug, Serialize)]
 #[must_use]
-pub struct CreateScheduledEvent {
+pub struct CreateScheduledEvent<'a> {
     name: String,
     #[serde(skip_serializing_if = "Option::is_none")]
     channel_id: Option<ChannelId>,
@@ -24,9 +24,12 @@ pub struct CreateScheduledEvent {
     image: Option<String>,
 
     privacy_level: u8,
+
+    #[serde(skip)]
+    audit_log_reason: Option<&'a str>,
 }
 
-impl CreateScheduledEvent {
+impl<'a> CreateScheduledEvent<'a> {
     /// Creates a builder with the provided kind, name, and start time, leaving all other fields
     /// empty.
     pub fn new(
@@ -49,6 +52,8 @@ impl CreateScheduledEvent {
             // field, it's onlyu used at event creation, and we don't even parse it into the
             // `ScheduledEvent` struct.
             privacy_level: 2,
+
+            audit_log_reason: None,
         }
     }
 
@@ -78,7 +83,7 @@ impl CreateScheduledEvent {
 
     #[cfg(feature = "http")]
     async fn _execute(self, http: &Http, guild_id: GuildId) -> Result<ScheduledEvent> {
-        http.create_scheduled_event(guild_id.into(), &self, None).await
+        http.create_scheduled_event(guild_id.into(), &self, self.audit_log_reason).await
     }
 
     /// Sets the channel id of the scheduled event. Required if [`Self::kind`] is
@@ -139,11 +144,11 @@ impl CreateScheduledEvent {
     /// May error if the input is a URL and the HTTP request fails, or if it is a path to a file
     /// that does not exist.
     #[cfg(feature = "http")]
-    pub async fn image<'a>(
+    pub async fn image(
         mut self,
         http: impl AsRef<Http>,
         image: impl Into<AttachmentType<'a>>,
-    ) -> Result<Self> {
+    ) -> Result<CreateScheduledEvent<'a>> {
         let image_data = image.into().data(&http.as_ref().client).await?;
         self.image = Some(encode_image(&image_data));
         Ok(self)
@@ -154,6 +159,12 @@ impl CreateScheduledEvent {
     #[cfg(not(feature = "http"))]
     pub fn image(mut self, image: String) -> Self {
         self.image = Some(image);
+        self
+    }
+
+    /// Sets the request's audit log reason.
+    pub fn audit_log_reason(mut self, reason: &'a str) -> Self {
+        self.audit_log_reason = Some(reason);
         self
     }
 }

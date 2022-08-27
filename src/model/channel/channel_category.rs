@@ -119,7 +119,11 @@ impl ChannelCategory {
     ///
     /// [Manage Channels]: Permissions::MANAGE_CHANNELS
     /// [Manage Roles]: Permissions::MANAGE_ROLES
-    pub async fn edit(&mut self, cache_http: impl CacheHttp, builder: EditChannel) -> Result<()> {
+    pub async fn edit(
+        &mut self,
+        cache_http: impl CacheHttp,
+        builder: EditChannel<'_>,
+    ) -> Result<()> {
         let GuildChannel {
             id,
             guild_id,

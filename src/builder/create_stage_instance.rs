@@ -7,17 +7,21 @@ use crate::model::prelude::*;
 /// Builder for creating a [`StageInstance`].
 #[derive(Clone, Debug, Serialize)]
 #[must_use]
-pub struct CreateStageInstance {
+pub struct CreateStageInstance<'a> {
     channel_id: ChannelId,
     topic: String,
+
+    #[serde(skip)]
+    audit_log_reason: Option<&'a str>,
 }
 
-impl CreateStageInstance {
+impl<'a> CreateStageInstance<'a> {
     /// Creates a builder with the provided Channel Id and topic.
     pub fn new(channel_id: impl Into<ChannelId>, topic: impl Into<String>) -> Self {
         Self {
             channel_id: channel_id.into(),
             topic: topic.into(),
+            audit_log_reason: None,
         }
     }
 
@@ -47,7 +51,7 @@ impl CreateStageInstance {
 
     #[cfg(feature = "http")]
     async fn _execute(self, http: &Http) -> Result<StageInstance> {
-        http.create_stage_instance(&self).await
+        http.create_stage_instance(&self, self.audit_log_reason).await
     }
 
     /// Sets the stage channel id of the stage channel instance, replacing the current value as set
@@ -61,6 +65,12 @@ impl CreateStageInstance {
     /// [`Self::new`].
     pub fn topic(mut self, topic: impl Into<String>) -> Self {
         self.topic = topic.into();
+        self
+    }
+
+    /// Sets the request's audit log reason.
+    pub fn audit_log_reason(mut self, reason: &'a str) -> Self {
+        self.audit_log_reason = Some(reason);
         self
     }
 }
