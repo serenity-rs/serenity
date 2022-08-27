@@ -7,7 +7,7 @@ use crate::model::prelude::*;
 
 #[derive(Clone, Debug, Default, Serialize)]
 #[must_use]
-pub struct EditThread {
+pub struct EditThread<'a> {
     #[serde(skip_serializing_if = "Option::is_none")]
     name: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -18,9 +18,12 @@ pub struct EditThread {
     locked: Option<bool>,
     #[serde(skip_serializing_if = "Option::is_none")]
     invitable: Option<bool>,
+
+    #[serde(skip)]
+    audit_log_reason: Option<&'a str>,
 }
 
-impl EditThread {
+impl<'a> EditThread<'a> {
     /// Equivalent to [`Self::default`].
     pub fn new() -> Self {
         Self::default()
@@ -37,7 +40,7 @@ impl EditThread {
         http: impl AsRef<Http>,
         channel_id: ChannelId,
     ) -> Result<GuildChannel> {
-        http.as_ref().edit_thread(channel_id.into(), &self).await
+        http.as_ref().edit_thread(channel_id.into(), &self, self.audit_log_reason).await
     }
 
     /// The name of the thread.
@@ -76,6 +79,12 @@ impl EditThread {
     /// **Note**: Only available on private threads.
     pub fn invitable(mut self, invitable: bool) -> Self {
         self.invitable = Some(invitable);
+        self
+    }
+
+    /// Sets the request's audit log reason.
+    pub fn audit_log_reason(mut self, reason: &'a str) -> Self {
+        self.audit_log_reason = Some(reason);
         self
     }
 }

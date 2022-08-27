@@ -72,10 +72,10 @@ impl Invite {
     ///
     /// [Create Instant Invite]: Permissions::CREATE_INSTANT_INVITE
     #[inline]
-    pub async fn create(
+    pub async fn create<'a>(
         cache_http: impl CacheHttp,
         channel_id: impl Into<ChannelId>,
-        builder: CreateInvite,
+        builder: CreateInvite<'a>,
     ) -> Result<RichInvite> {
         channel_id.into().create_invite(cache_http, builder).await
     }
@@ -108,7 +108,7 @@ impl Invite {
             }
         }
 
-        cache_http.http().as_ref().delete_invite(&self.code).await
+        cache_http.http().as_ref().delete_invite(&self.code, None).await
     }
 
     /// Gets information about an invite.
@@ -323,7 +323,6 @@ impl RichInvite {
         {
             if let Some(cache) = cache_http.cache() {
                 let guild_id = self.guild.as_ref().map(|g| g.id);
-
                 crate::utils::user_has_perms_cache(
                     cache,
                     self.channel.id,
@@ -333,7 +332,7 @@ impl RichInvite {
             }
         }
 
-        cache_http.http().as_ref().delete_invite(&self.code).await
+        cache_http.http().as_ref().delete_invite(&self.code, None).await
     }
 
     /// Returns a URL to use for the invite.

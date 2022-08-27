@@ -46,7 +46,7 @@ impl StickerId {
         &self,
         http: impl AsRef<Http>,
         guild_id: impl Into<GuildId>,
-        builder: EditSticker,
+        builder: EditSticker<'_>,
     ) -> Result<Sticker> {
         guild_id.into().edit_sticker(http, self, builder).await
     }

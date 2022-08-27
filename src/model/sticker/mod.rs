@@ -108,7 +108,7 @@ impl Sticker {
     ///
     /// [Manage Emojis and Stickers]: Permissions::MANAGE_EMOJIS_AND_STICKERS
     #[inline]
-    pub async fn edit(&mut self, http: impl AsRef<Http>, builder: EditSticker) -> Result<()> {
+    pub async fn edit(&mut self, http: impl AsRef<Http>, builder: EditSticker<'_>) -> Result<()> {
         if let Some(guild_id) = self.guild_id {
             *self = self.id.edit(http, guild_id, builder).await?;
             Ok(())
