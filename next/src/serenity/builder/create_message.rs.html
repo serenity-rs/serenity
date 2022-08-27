@@ -465,7 +465,7 @@
         };
 
         <span class="kw">for</span> <span class="ident">reaction</span> <span class="kw">in</span> <span class="self">self</span>.<span class="ident">reactions</span> {
-            <span class="ident">channel_id</span>.<span class="ident">create_reaction</span>(<span class="kw-2">&amp;</span><span class="ident">http</span>, <span class="ident">message</span>.<span class="ident">id</span>, <span class="ident">reaction</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+            <span class="ident">channel_id</span>.<span class="ident">create_reaction</span>(<span class="ident">http</span>, <span class="ident">message</span>.<span class="ident">id</span>, <span class="ident">reaction</span>).<span class="kw">await</span><span class="question-mark">?</span>;
         }
 
         <span class="prelude-val">Ok</span>(<span class="ident">message</span>)
