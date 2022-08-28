@@ -479,6 +479,7 @@
 <span id="473">473</span>
 <span id="474">474</span>
 <span id="475">475</span>
+<span id="476">476</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::collections::HashMap</span>;
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http&quot;</span>)]</span>
@@ -806,7 +807,8 @@
 
     <span class="ident">name</span>: <span class="ident">String</span>,
     <span class="ident">name_localizations</span>: <span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">String</span><span class="op">&gt;</span>,
-    <span class="ident">description</span>: <span class="ident">String</span>,
+    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;Option::is_none&quot;</span>)]</span>
+    <span class="ident">description</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
     <span class="ident">description_localizations</span>: <span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">String</span><span class="op">&gt;</span>,
     <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;Option::is_none&quot;</span>)]</span>
     <span class="ident">default_member_permissions</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
@@ -818,13 +820,13 @@
 
 <span class="kw">impl</span> <span class="ident">CreateApplicationCommand</span> {
     <span class="doccomment">/// Creates a new builder with the given name and description, leaving all other fields empty.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">name</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>, <span class="ident">description</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">name</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
         <span class="self">Self</span> {
             <span class="ident">kind</span>: <span class="prelude-val">None</span>,
 
             <span class="ident">name</span>: <span class="ident">name</span>.<span class="ident">into</span>(),
             <span class="ident">name_localizations</span>: <span class="ident">HashMap::new</span>(),
-            <span class="ident">description</span>: <span class="ident">description</span>.<span class="ident">into</span>(),
+            <span class="ident">description</span>: <span class="prelude-val">None</span>,
             <span class="ident">description_localizations</span>: <span class="ident">HashMap::new</span>(),
             <span class="ident">default_member_permissions</span>: <span class="prelude-val">None</span>,
             <span class="ident">dm_permission</span>: <span class="prelude-val">None</span>,
@@ -883,7 +885,7 @@
     <span class="doccomment">/// Specifies a localized name of the application command.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// # serenity::builder::CreateApplicationCommand::new(&quot;&quot;, &quot;&quot;)</span>
+    <span class="doccomment">/// # serenity::builder::CreateApplicationCommand::new(&quot;&quot;)</span>
     <span class="doccomment">/// .name(&quot;birthday&quot;)</span>
     <span class="doccomment">/// .name_localized(&quot;zh-CN&quot;, &quot;生日&quot;)</span>
     <span class="doccomment">/// .name_localized(&quot;el&quot;, &quot;γενέθλια&quot;)</span>
@@ -917,14 +919,14 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// **Note**: Must be between 1 and 100 characters long.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">description</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">description</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">description</span> <span class="op">=</span> <span class="ident">description</span>.<span class="ident">into</span>();
+        <span class="self">self</span>.<span class="ident">description</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">description</span>.<span class="ident">into</span>());
         <span class="self">self</span>
     }
 
     <span class="doccomment">/// Specifies a localized description of the application command.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// # serenity::builder::CreateApplicationCommand::new(&quot;&quot;, &quot;&quot;)</span>
+    <span class="doccomment">/// # serenity::builder::CreateApplicationCommand::new(&quot;&quot;)</span>
     <span class="doccomment">/// .description(&quot;Wish a friend a happy birthday&quot;)</span>
     <span class="doccomment">/// .description_localized(&quot;zh-CN&quot;, &quot;祝你朋友生日快乐&quot;)</span>
     <span class="doccomment">/// # ;</span>
