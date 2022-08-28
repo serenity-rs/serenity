@@ -74,13 +74,13 @@ impl EventHandler for Handler {
                 .expect("GUILD_ID must be an integer"),
         );
 
-        let c1 = CreateCommand::new("ping", "A ping command");
+        let c1 = CreateCommand::new("ping").description("A ping command");
 
-        let c2 = CreateCommand::new("id", "Get a user id").add_option(
+        let c2 = CreateCommand::new("id").description("Get a user id").add_option(
             CreateOption::new(CommandOptionType::User, "id", "The user to lookup").required(true),
         );
 
-        let c3 = CreateCommand::new("welcome", "Welcome a user")
+        let c3 = CreateCommand::new("welcome").description("Welcome a user")
             .name_localized("de", "begrüßen")
             .description_localized("de", "Einen Nutzer begrüßen")
             .add_option(
@@ -116,9 +116,10 @@ impl EventHandler for Handler {
                     ),
             );
 
-        let c4 = CreateCommand::new("numberinput", "Test command for number input")
+        let c4 = CreateCommand::new("numberinput")
+            .description("Test command for number input")
             .add_option(
-                CreateOption::new(CommandOptionType::Integer, "int", "An integer fro 5 to 10")
+                CreateOption::new(CommandOptionType::Integer, "int", "An integer from 5 to 10")
                     .min_int_value(5)
                     .max_int_value(10)
                     .required(true),
@@ -130,7 +131,8 @@ impl EventHandler for Handler {
                     .required(true),
             );
 
-        let c5 = CreateCommand::new("attachmentinput", "Test command for attachment input")
+        let c5 = CreateCommand::new("attachmentinput")
+            .description("Test command for attachment input")
             .add_option(
                 CreateOption::new(CommandOptionType::Attachment, "attachment", "A file")
                     .required(true),
@@ -142,7 +144,7 @@ impl EventHandler for Handler {
 
         let guild_command = Command::create_global_application_command(
             &ctx.http,
-            CreateCommand::new("wonderful_command", "An amazing command"),
+            CreateCommand::new("wonderful_command").description("An amazing command"),
         )
         .await;
 
