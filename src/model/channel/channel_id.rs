@@ -322,7 +322,7 @@ impl ChannelId {
     /// [Manage Channels]: Permissions::MANAGE_CHANNELS
     /// [Manage Roles]: Permissions::MANAGE_ROLES
     #[inline]
-    pub async fn edit<'a>(
+    pub async fn edit(
         self,
         cache_http: impl CacheHttp,
         builder: EditChannel<'_>,
@@ -352,7 +352,7 @@ impl ChannelId {
     /// See [`EditMessage::execute`] for a list of possible errors, and their corresponding
     /// reasons.
     #[inline]
-    pub async fn edit_message<'a>(
+    pub async fn edit_message(
         self,
         http: impl AsRef<Http>,
         message_id: impl Into<MessageId>,
@@ -727,7 +727,7 @@ impl ChannelId {
     ///
     /// See [`CreateMessage::execute`] for a list of possible errors, and their corresponding
     /// reasons.
-    pub async fn send_message<'a>(
+    pub async fn send_message(
         self,
         cache_http: impl CacheHttp,
         builder: CreateMessage<'_>,
@@ -822,10 +822,10 @@ impl ChannelId {
     /// # Errors
     ///
     /// See [`CreateWebhook::execute`] for a detailed list of possible errors.
-    pub async fn create_webhook<'a>(
+    pub async fn create_webhook(
         self,
         cache_http: impl CacheHttp,
-        builder: CreateWebhook<'a>,
+        builder: CreateWebhook<'_>,
     ) -> Result<Webhook> {
         builder.execute(cache_http, self).await
     }
@@ -865,10 +865,10 @@ impl ChannelId {
     /// Returns [`ModelError::InvalidChannelType`] if the channel is not a stage channel.
     ///
     /// Returns [`Error::Http`] if there is already a stage instance currently.
-    pub async fn create_stage_instance<'a>(
+    pub async fn create_stage_instance(
         self,
         cache_http: impl CacheHttp,
-        builder: CreateStageInstance<'a>,
+        builder: CreateStageInstance<'_>,
     ) -> Result<StageInstance> {
         builder.channel_id(self).execute(cache_http).await
     }
@@ -881,10 +881,10 @@ impl ChannelId {
     ///
     /// Returns [`Error::Http`] if the channel is not a stage channel, or there is no stage
     /// instance currently.
-    pub async fn edit_stage_instance<'a>(
+    pub async fn edit_stage_instance(
         self,
         cache_http: impl CacheHttp,
-        builder: EditStageInstance<'a>,
+        builder: EditStageInstance<'_>,
     ) -> Result<StageInstance> {
         builder.execute(cache_http, self).await
     }
@@ -894,10 +894,10 @@ impl ChannelId {
     /// # Errors
     ///
     /// Returns [`Error::Http`] if the current user lacks permission.
-    pub async fn edit_thread<'a>(
+    pub async fn edit_thread(
         self,
         http: impl AsRef<Http>,
-        builder: EditThread<'a>,
+        builder: EditThread<'_>,
     ) -> Result<GuildChannel> {
         builder.execute(http, self).await
     }
@@ -917,11 +917,11 @@ impl ChannelId {
     /// # Errors
     ///
     /// Returns [`Error::Http`] if the current user lacks permission, or if invalid data is given.
-    pub async fn create_public_thread<'a>(
+    pub async fn create_public_thread(
         self,
         http: impl AsRef<Http>,
         message_id: impl Into<MessageId>,
-        builder: CreateThread<'a>,
+        builder: CreateThread<'_>,
     ) -> Result<GuildChannel> {
         builder.execute(http, self, Some(message_id.into())).await
     }
@@ -931,10 +931,10 @@ impl ChannelId {
     /// # Errors
     ///
     /// Returns [`Error::Http`] if the current user lacks permission, or if invalid data is given.
-    pub async fn create_private_thread<'a>(
+    pub async fn create_private_thread(
         self,
         http: impl AsRef<Http>,
-        builder: CreateThread<'a>,
+        builder: CreateThread<'_>,
     ) -> Result<GuildChannel> {
         builder.kind(ChannelType::PrivateThread).execute(http, self, None).await
     }
