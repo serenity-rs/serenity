@@ -2,7 +2,8 @@ use serenity::builder::{CreateApplicationCommand, CreateApplicationCommandOption
 use serenity::model::prelude::command::CommandOptionType;
 
 pub fn register() -> CreateApplicationCommand {
-    CreateApplicationCommand::new("numberinput", "Test command for number input")
+    CreateApplicationCommand::new("numberinput")
+        .description("Test command for number input")
         .add_option(
             CreateApplicationCommandOption::new(
                 CommandOptionType::Integer,

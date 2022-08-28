@@ -105,7 +105,7 @@ impl Command {
     /// use serenity::model::application::command::Command;
     /// use serenity::model::id::ApplicationId;
     ///
-    /// let builder = CreateApplicationCommand::new("ping", "A simple ping command");
+    /// let builder = CreateApplicationCommand::new("ping").description("A simple ping command");
     /// let _ = Command::create_global_application_command(&http, builder).await;
     /// # }
     /// ```
@@ -125,10 +125,12 @@ impl Command {
     /// use serenity::model::application::command::{Command, CommandOptionType};
     /// use serenity::model::id::ApplicationId;
     ///
-    /// let builder = CreateApplicationCommand::new("echo", "Makes the bot send a message").add_option(
-    ///     CreateOption::new(CommandOptionType::String, "message", "The message to send")
-    ///         .required(true),
-    /// );
+    /// let builder = CreateApplicationCommand::new("echo")
+    ///     .description("Makes the bot send a message")
+    ///     .add_option(
+    ///         CreateOption::new(CommandOptionType::String, "message", "The message to send")
+    ///             .required(true),
+    ///     );
     /// let _ = Command::create_global_application_command(&http, builder).await;
     /// # }
     /// ```
