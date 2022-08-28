@@ -72,10 +72,10 @@ impl Invite {
     ///
     /// [Create Instant Invite]: Permissions::CREATE_INSTANT_INVITE
     #[inline]
-    pub async fn create<'a>(
+    pub async fn create(
         cache_http: impl CacheHttp,
         channel_id: impl Into<ChannelId>,
-        builder: CreateInvite<'a>,
+        builder: CreateInvite<'_>,
     ) -> Result<RichInvite> {
         channel_id.into().create_invite(cache_http, builder).await
     }
