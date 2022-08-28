@@ -14,7 +14,8 @@ pub fn run(options: &[ResolvedOption]) -> String {
 }
 
 pub fn register() -> CreateApplicationCommand {
-    CreateApplicationCommand::new("attachmentinput", "Test command for attachment input")
+    CreateApplicationCommand::new("attachmentinput")
+        .description("Test command for attachment input")
         .add_option(
             CreateApplicationCommandOption::new(
                 CommandOptionType::Attachment,
