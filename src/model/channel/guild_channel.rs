@@ -276,12 +276,12 @@ impl GuildChannel {
     /// ```rust,no_run
     /// # #[cfg(feature = "cache")]
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
-    /// # use serenity::{cache::Cache, http::Http, model::id::{ChannelId, UserId}};
+    /// # use serenity::{cache::Cache, http::Http, model::id::{ChannelId, UserId, RoleId}};
     /// # use std::sync::Arc;
     /// #
     /// #   let http = Arc::new(Http::new("token"));
     /// #   let cache = Cache::default();
-    /// #   let (channel_id, user_id) = (ChannelId::new(1), UserId::new(1));
+    /// #   let (channel_id, user_id, role_id) = (ChannelId::new(1), UserId::new(1), RoleId::new(1));
     /// #
     /// use serenity::model::channel::{Channel, PermissionOverwrite, PermissionOverwriteType};
     /// use serenity::model::{ModelError, Permissions};
@@ -291,7 +291,7 @@ impl GuildChannel {
     /// let overwrite = PermissionOverwrite {
     ///     allow,
     ///     deny,
-    ///     kind: PermissionOverwriteType::Member(user_id),
+    ///     kind: PermissionOverwriteType::Role(role_id),
     /// };
     ///
     /// let channel = cache.guild_channel(channel_id).ok_or(ModelError::ItemMissing)?;
