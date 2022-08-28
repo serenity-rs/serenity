@@ -248,10 +248,7 @@ fn is_function(input: ParseStream<'_>) -> bool {
     input.peek(Token![pub]) || (input.peek(Token![async]) && input.peek2(Token![fn]))
 }
 
-fn parse_function_hook(
-    input: ParseStream<'_>,
-    attributes: Vec<Attribute>,
-) -> Result<FunctionHook> {
+fn parse_function_hook(input: ParseStream<'_>, attributes: Vec<Attribute>) -> Result<FunctionHook> {
     let visibility = input.parse::<Visibility>()?;
 
     input.parse::<Token![async]>()?;
@@ -286,10 +283,7 @@ fn parse_function_hook(
     })
 }
 
-fn parse_closure_hook(
-    input: ParseStream<'_>,
-    attributes: Vec<Attribute>,
-) -> Result<ClosureHook> {
+fn parse_closure_hook(input: ParseStream<'_>, attributes: Vec<Attribute>) -> Result<ClosureHook> {
     input.parse::<Token![async]>()?;
     let closure = input.parse::<ExprClosure>()?;
 
