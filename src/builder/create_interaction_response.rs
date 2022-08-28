@@ -243,8 +243,7 @@ impl<'a> CreateInteractionResponseData<'a> {
     }
 }
 
-#[derive(Clone, Debug, Serialize)]
-#[non_exhaustive]
+#[derive(Clone, Default, Debug, Serialize)]
 pub struct AutocompleteChoice {
     pub name: String,
     pub value: Value,
