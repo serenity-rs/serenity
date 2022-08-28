@@ -258,7 +258,7 @@ impl GuildChannel {
     /// let overwrite = PermissionOverwrite {
     ///     allow,
     ///     deny,
-    ///     kind: PermissionOverwriteType::Member(user_id),
+    ///     kind: PermissionOverwriteType::Role(role_id),
     /// };
     ///
     /// let channel = cache.guild_channel(channel_id).ok_or(ModelError::ItemMissing)?;
