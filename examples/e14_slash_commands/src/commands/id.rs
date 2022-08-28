@@ -14,7 +14,7 @@ pub fn run(options: &[ResolvedOption]) -> String {
 }
 
 pub fn register() -> CreateApplicationCommand {
-    CreateApplicationCommand::new("id", "Get a user id").add_option(
+    CreateApplicationCommand::new("id").description("Get a user id").add_option(
         CreateApplicationCommandOption::new(CommandOptionType::User, "id", "The user to lookup")
             .required(true),
     )
