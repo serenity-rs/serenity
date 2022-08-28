@@ -325,7 +325,8 @@ pub struct CreateApplicationCommand {
 
     name: String,
     name_localizations: HashMap<String, String>,
-    description: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    description: Option<String>,
     description_localizations: HashMap<String, String>,
     #[serde(skip_serializing_if = "Option::is_none")]
     default_member_permissions: Option<String>,
@@ -337,13 +338,13 @@ pub struct CreateApplicationCommand {
 
 impl CreateApplicationCommand {
     /// Creates a new builder with the given name and description, leaving all other fields empty.
-    pub fn new(name: impl Into<String>, description: impl Into<String>) -> Self {
+    pub fn new(name: impl Into<String>) -> Self {
         Self {
             kind: None,
 
             name: name.into(),
             name_localizations: HashMap::new(),
-            description: description.into(),
+            description: None,
             description_localizations: HashMap::new(),
             default_member_permissions: None,
             dm_permission: None,
@@ -402,7 +403,7 @@ impl CreateApplicationCommand {
     /// Specifies a localized name of the application command.
     ///
     /// ```rust
-    /// # serenity::builder::CreateApplicationCommand::new("", "")
+    /// # serenity::builder::CreateApplicationCommand::new("")
     /// .name("birthday")
     /// .name_localized("zh-CN", "生日")
     /// .name_localized("el", "γενέθλια")
@@ -436,14 +437,14 @@ impl CreateApplicationCommand {
     ///
     /// **Note**: Must be between 1 and 100 characters long.
     pub fn description(mut self, description: impl Into<String>) -> Self {
-        self.description = description.into();
+        self.description = Some(description.into());
         self
     }
 
     /// Specifies a localized description of the application command.
     ///
     /// ```rust
-    /// # serenity::builder::CreateApplicationCommand::new("", "")
+    /// # serenity::builder::CreateApplicationCommand::new("")
     /// .description("Wish a friend a happy birthday")
     /// .description_localized("zh-CN", "祝你朋友生日快乐")
     /// # ;
