@@ -2,7 +2,8 @@ use serenity::builder::{CreateApplicationCommand, CreateApplicationCommandOption
 use serenity::model::prelude::command::CommandOptionType;
 
 pub fn register() -> CreateApplicationCommand {
-    CreateApplicationCommand::new("welcome", "Welcome a user")
+    CreateApplicationCommand::new("welcome")
+        .description("Welcome a user")
         .name_localized("de", "begrüßen")
         .description_localized("de", "Einen Nutzer begrüßen")
         .add_option(
