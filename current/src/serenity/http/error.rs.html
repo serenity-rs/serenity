@@ -226,8 +226,6 @@
 <span id="220">220</span>
 <span id="221">221</span>
 <span id="222">222</span>
-<span id="223">223</span>
-<span id="224">224</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::error::Error</span> <span class="kw">as</span> <span class="ident">StdError</span>;
 <span class="kw">use</span> <span class="ident">std::fmt</span>;
 
@@ -274,11 +272,9 @@
         <span class="ident">ErrorResponse</span> {
             <span class="ident">status_code</span>: <span class="ident">r</span>.<span class="ident">status</span>(),
             <span class="ident">url</span>: <span class="ident">r</span>.<span class="ident">url</span>().<span class="ident">clone</span>(),
-            <span class="ident">error</span>: <span class="ident">r</span>.<span class="ident">json</span>().<span class="kw">await</span>.<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">DiscordJsonError</span> {
+            <span class="ident">error</span>: <span class="ident">r</span>.<span class="ident">json</span>().<span class="kw">await</span>.<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="ident">DiscordJsonError</span> {
                 <span class="ident">code</span>: <span class="op">-</span><span class="number">1</span>,
-                <span class="ident">message</span>:
-                    <span class="string">&quot;[Serenity] Could not decode json when receiving error response from discord!&quot;</span>
-                        .<span class="ident">to_string</span>(),
+                <span class="ident">message</span>: <span class="macro">format!</span>(<span class="string">&quot;[Serenity] Could not decode json when receiving error response from discord:, {}&quot;</span>, <span class="ident">e</span>),
                 <span class="ident">errors</span>: <span class="macro">vec!</span>[],
             }),
         }
