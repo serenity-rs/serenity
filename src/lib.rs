@@ -133,6 +133,20 @@ pub struct CacheAndHttp {
     pub http: Arc<Http>,
 }
 
+#[cfg(all(feature = "client", feature = "cache"))]
+impl AsRef<Cache> for CacheAndHttp {
+    fn as_ref(&self) -> &Cache {
+        &self.cache
+    }
+}
+
+#[cfg(feature = "client")]
+impl AsRef<Http> for CacheAndHttp {
+    fn as_ref(&self) -> &Http {
+        &self.http
+    }
+}
+
 // For the procedural macros in `command_attr`.
 pub use async_trait::async_trait;
 pub use futures;
