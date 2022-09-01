@@ -44,11 +44,9 @@ impl ErrorResponse {
         ErrorResponse {
             status_code: r.status(),
             url: r.url().clone(),
-            error: r.json().await.unwrap_or_else(|_| DiscordJsonError {
+            error: r.json().await.unwrap_or_else(|e| DiscordJsonError {
                 code: -1,
-                message:
-                    "[Serenity] Could not decode json when receiving error response from discord!"
-                        .to_string(),
+                message: format!("[Serenity] Could not decode json when receiving error response from discord:, {}", e),
                 errors: vec![],
             }),
         }
