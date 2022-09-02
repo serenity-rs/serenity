@@ -101,6 +101,15 @@
 <span id="95">95</span>
 <span id="96">96</span>
 <span id="97">97</span>
+<span id="98">98</span>
+<span id="99">99</span>
+<span id="100">100</span>
+<span id="101">101</span>
+<span id="102">102</span>
+<span id="103">103</span>
+<span id="104">104</span>
+<span id="105">105</span>
+<span id="106">106</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::fmt</span>;
 
 <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::ArgumentConvert</span>;
@@ -193,6 +202,15 @@
         <span class="comment">// If not successful, convert as a Member which uses HTTP endpoints instead of cache</span>
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Ok</span>(<span class="ident">member</span>) <span class="op">=</span> <span class="ident">Member::convert</span>(<span class="ident">ctx</span>, <span class="ident">guild_id</span>, <span class="ident">channel_id</span>, <span class="ident">s</span>).<span class="kw">await</span> {
             <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">member</span>.<span class="ident">user</span>);
+        }
+
+        <span class="comment">// If string is a raw user ID or a mention</span>
+        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">user_id</span>) <span class="op">=</span> <span class="ident">s</span>.<span class="ident">parse</span>().<span class="ident">ok</span>().<span class="ident">or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident"><span class="kw">crate</span>::utils::parse_username</span>(<span class="ident">s</span>)) {
+            <span class="comment">// Now, we can still try UserId::to_user because it works for all users from all guilds the</span>
+            <span class="comment">// bot is joined</span>
+            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Ok</span>(<span class="ident">user</span>) <span class="op">=</span> <span class="ident">UserId</span>(<span class="ident">user_id</span>).<span class="ident">to_user</span>(<span class="ident">ctx</span>).<span class="kw">await</span> {
+                <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">user</span>);
+            }
         }
 
         <span class="prelude-val">Err</span>(<span class="ident">UserParseError::NotFoundOrMalformed</span>)
