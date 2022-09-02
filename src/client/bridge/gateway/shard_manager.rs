@@ -16,16 +16,18 @@ use super::{
     ShardQueuerMessage,
     ShardRunnerInfo,
 };
+#[cfg(feature = "cache")]
+use crate::cache::Cache;
 #[cfg(feature = "voice")]
 use crate::client::bridge::voice::VoiceGatewayManager;
 use crate::client::{EventHandler, RawEventHandler};
 #[cfg(feature = "framework")]
 use crate::framework::Framework;
 use crate::gateway::PresenceData;
+use crate::http::Http;
 use crate::internal::prelude::*;
 use crate::internal::tokio::spawn_named;
 use crate::model::gateway::GatewayIntents;
-use crate::CacheAndHttp;
 
 /// A manager for handling the status of shards by starting them, restarting
 /// them, and stopping them when required.
@@ -58,7 +60,6 @@ use crate::CacheAndHttp;
 /// use serenity::http::Http;
 /// use serenity::model::gateway::GatewayIntents;
 /// use serenity::prelude::*;
-/// use serenity::CacheAndHttp;
 /// use tokio::sync::{Mutex, RwLock};
 ///
 /// struct Handler;
@@ -66,8 +67,7 @@ use crate::CacheAndHttp;
 /// impl EventHandler for Handler {}
 /// impl RawEventHandler for Handler {}
 ///
-/// # let cache_and_http: CacheAndHttp = unimplemented!();
-/// # let http = &cache_and_http.http;
+/// # let http: Arc<Http> = unimplemented!();
 /// let ws_url = Arc::new(Mutex::new(http.get_gateway().await?.url));
 /// let data = Arc::new(RwLock::new(TypeMap::new()));
 /// let event_handler = Arc::new(Handler) as Arc<dyn EventHandler>;
@@ -88,7 +88,9 @@ use crate::CacheAndHttp;
 ///     # #[cfg(feature = "voice")]
 ///     # voice_manager: None,
 ///     ws_url,
-///     # cache_and_http,
+///     # http,
+///     # #[cfg(feature = "cache")]
+///     # cache: unimplemented!(),
 ///     intents: GatewayIntents::non_privileged(),
 ///     presence: None,
 /// });
@@ -141,7 +143,9 @@ impl ShardManager {
             #[cfg(feature = "voice")]
             voice_manager: opt.voice_manager,
             ws_url: opt.ws_url,
-            cache_and_http: opt.cache_and_http,
+            #[cfg(feature = "cache")]
+            cache: opt.cache,
+            http: opt.http,
             intents: opt.intents,
             presence: opt.presence,
         };
@@ -360,7 +364,9 @@ pub struct ShardManagerOptions {
     #[cfg(feature = "voice")]
     pub voice_manager: Option<Arc<dyn VoiceGatewayManager + Send + Sync + 'static>>,
     pub ws_url: Arc<Mutex<String>>,
-    pub cache_and_http: CacheAndHttp,
+    #[cfg(feature = "cache")]
+    pub cache: Arc<Cache>,
+    pub http: Arc<Http>,
     pub intents: GatewayIntents,
     pub presence: Option<PresenceData>,
 }

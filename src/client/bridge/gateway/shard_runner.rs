@@ -11,10 +11,12 @@ use typemap_rev::TypeMap;
 
 use super::event::{ClientEvent, ShardStageUpdateEvent};
 use super::{ShardClientMessage, ShardId, ShardManagerMessage, ShardRunnerMessage};
+#[cfg(feature = "cache")]
+use crate::cache::Cache;
 #[cfg(feature = "voice")]
 use crate::client::bridge::voice::VoiceGatewayManager;
 use crate::client::dispatch::{dispatch, DispatchEvent};
-use crate::client::{EventHandler, RawEventHandler};
+use crate::client::{Context, EventHandler, RawEventHandler};
 #[cfg(feature = "collector")]
 use crate::collector::{
     ComponentInteractionFilter,
@@ -28,11 +30,11 @@ use crate::collector::{
 #[cfg(feature = "framework")]
 use crate::framework::Framework;
 use crate::gateway::{GatewayError, InterMessage, ReconnectType, Shard, ShardAction};
+use crate::http::Http;
 use crate::internal::prelude::*;
 #[cfg(feature = "collector")]
 use crate::model::application::interaction::Interaction;
 use crate::model::event::{Event, GatewayEvent};
-use crate::CacheAndHttp;
 
 /// A runner for managing a [`Shard`] and its respective WebSocket client.
 pub struct ShardRunner {
@@ -49,7 +51,9 @@ pub struct ShardRunner {
     pub(crate) shard: Shard,
     #[cfg(feature = "voice")]
     voice_manager: Option<Arc<dyn VoiceGatewayManager + Send + Sync + 'static>>,
-    cache_and_http: CacheAndHttp,
+    #[cfg(feature = "cache")]
+    cache: Arc<Cache>,
+    http: Arc<Http>,
     #[cfg(feature = "collector")]
     event_filters: Vec<EventFilter>,
     #[cfg(feature = "collector")]
@@ -79,7 +83,9 @@ impl ShardRunner {
             shard: opt.shard,
             #[cfg(feature = "voice")]
             voice_manager: opt.voice_manager,
-            cache_and_http: opt.cache_and_http,
+            #[cfg(feature = "cache")]
+            cache: opt.cache,
+            http: opt.http,
             #[cfg(feature = "collector")]
             event_filters: Vec::new(),
             #[cfg(feature = "collector")]
@@ -328,16 +334,21 @@ impl ShardRunner {
     #[inline]
     #[instrument(skip(self, event))]
     async fn dispatch(&self, event: DispatchEvent) {
+        let context = Context::new(
+            Arc::clone(&self.data),
+            self.runner_tx.clone(),
+            self.shard.shard_info().id,
+            Arc::clone(&self.http),
+            #[cfg(feature = "cache")]
+            Arc::clone(&self.cache),
+        );
         dispatch(
             event,
+            context,
             #[cfg(feature = "framework")]
             &self.framework,
-            &self.data,
             &self.event_handler,
             &self.raw_event_handler,
-            &self.runner_tx,
-            self.shard.shard_info().id,
-            &self.cache_and_http,
         )
         .await;
     }
@@ -664,5 +675,7 @@ pub struct ShardRunnerOptions {
     pub shard: Shard,
     #[cfg(feature = "voice")]
     pub voice_manager: Option<Arc<dyn VoiceGatewayManager + Send + Sync>>,
-    pub cache_and_http: CacheAndHttp,
+    #[cfg(feature = "cache")]
+    pub cache: Arc<Cache>,
+    pub http: Arc<Http>,
 }

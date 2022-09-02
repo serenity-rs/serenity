@@ -39,6 +39,7 @@
 //! serenity = "0.11"
 //! ```
 //!
+//! [`Cache`]: crate::cache::Cache
 //! [`Context`]: crate::client::Context
 //! [`EventHandler::message`]: crate::client::EventHandler::message
 //! [`Event`]: crate::model::event::Event
@@ -112,39 +113,6 @@ pub mod utils;
 
 mod error;
 
-#[cfg(feature = "client")]
-use std::sync::Arc;
-
-#[cfg(all(feature = "client", feature = "cache"))]
-use crate::cache::Cache;
-#[cfg(all(feature = "client", feature = "gateway"))]
-pub use crate::client::Client;
-pub use crate::error::{Error, Result};
-#[cfg(feature = "client")]
-use crate::http::Http;
-
-#[cfg(feature = "client")]
-#[derive(Clone)]
-pub struct CacheAndHttp {
-    #[cfg(feature = "cache")]
-    pub cache: Arc<Cache>,
-    pub http: Arc<Http>,
-}
-
-#[cfg(all(feature = "client", feature = "cache"))]
-impl AsRef<Cache> for CacheAndHttp {
-    fn as_ref(&self) -> &Cache {
-        &self.cache
-    }
-}
-
-#[cfg(feature = "client")]
-impl AsRef<Http> for CacheAndHttp {
-    fn as_ref(&self) -> &Http {
-        &self.http
-    }
-}
-
 // For the procedural macros in `command_attr`.
 pub use async_trait::async_trait;
 pub use futures;
@@ -152,3 +120,7 @@ pub use futures::future::FutureExt;
 #[cfg(feature = "standard_framework")]
 #[doc(hidden)]
 pub use static_assertions;
+
+#[cfg(all(feature = "client", feature = "gateway"))]
+pub use crate::client::Client;
+pub use crate::error::{Error, Result};
