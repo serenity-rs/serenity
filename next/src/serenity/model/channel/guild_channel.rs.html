@@ -1454,12 +1454,12 @@
     <span class="doccomment">/// ```rust,no_run</span>
     <span class="doccomment">/// # #[cfg(feature = &quot;cache&quot;)]</span>
     <span class="doccomment">/// # async fn run() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {</span>
-    <span class="doccomment">/// # use serenity::{cache::Cache, http::Http, model::id::{ChannelId, UserId}};</span>
+    <span class="doccomment">/// # use serenity::{cache::Cache, http::Http, model::id::{ChannelId, UserId, RoleId}};</span>
     <span class="doccomment">/// # use std::sync::Arc;</span>
     <span class="doccomment">/// #</span>
     <span class="doccomment">/// #   let http = Arc::new(Http::new(&quot;token&quot;));</span>
     <span class="doccomment">/// #   let cache = Cache::default();</span>
-    <span class="doccomment">/// #   let (channel_id, user_id) = (ChannelId::new(1), UserId::new(1));</span>
+    <span class="doccomment">/// #   let (channel_id, user_id, role_id) = (ChannelId::new(1), UserId::new(1), RoleId::new(1));</span>
     <span class="doccomment">/// #</span>
     <span class="doccomment">/// use serenity::model::channel::{Channel, PermissionOverwrite, PermissionOverwriteType};</span>
     <span class="doccomment">/// use serenity::model::{ModelError, Permissions};</span>
@@ -1469,7 +1469,7 @@
     <span class="doccomment">/// let overwrite = PermissionOverwrite {</span>
     <span class="doccomment">///     allow,</span>
     <span class="doccomment">///     deny,</span>
-    <span class="doccomment">///     kind: PermissionOverwriteType::Member(user_id),</span>
+    <span class="doccomment">///     kind: PermissionOverwriteType::Role(role_id),</span>
     <span class="doccomment">/// };</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// let channel = cache.guild_channel(channel_id).ok_or(ModelError::ItemMissing)?;</span>
