@@ -438,7 +438,7 @@
 <span class="doccomment">/// impl EventHandler for Handler {}</span>
 <span class="doccomment">/// impl RawEventHandler for Handler {}</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// # let cache_and_http: Arc&lt;CacheAndHttp&gt; = unimplemented!();</span>
+<span class="doccomment">/// # let cache_and_http: CacheAndHttp = unimplemented!();</span>
 <span class="doccomment">/// # let http = &amp;cache_and_http.http;</span>
 <span class="doccomment">/// let ws_url = Arc::new(Mutex::new(http.get_gateway().await?.url));</span>
 <span class="doccomment">/// let data = Arc::new(RwLock::new(TypeMap::new()));</span>
@@ -732,7 +732,7 @@
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;voice&quot;</span>)]</span>
     <span class="kw">pub</span> <span class="ident">voice_manager</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">VoiceGatewayManager</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="lifetime">&#39;static</span><span class="op">&gt;</span><span class="op">&gt;</span>,
     <span class="kw">pub</span> <span class="ident">ws_url</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Mutex</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span> <span class="ident">cache_and_http</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">CacheAndHttp</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">cache_and_http</span>: <span class="ident">CacheAndHttp</span>,
     <span class="kw">pub</span> <span class="ident">intents</span>: <span class="ident">GatewayIntents</span>,
     <span class="kw">pub</span> <span class="ident">presence</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">PresenceData</span><span class="op">&gt;</span>,
 }

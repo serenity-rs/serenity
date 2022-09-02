@@ -1404,11 +1404,11 @@
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;voice&quot;</span>)]</span>
             <span class="kw">let</span> <span class="ident">voice_manager</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">voice_manager</span>.<span class="ident">take</span>();
 
-            <span class="kw">let</span> <span class="ident">cache_and_http</span> <span class="op">=</span> <span class="ident">Arc::new</span>(<span class="ident">CacheAndHttp</span> {
+            <span class="kw">let</span> <span class="ident">cache_and_http</span> <span class="op">=</span> <span class="ident">CacheAndHttp</span> {
                 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
                 <span class="ident">cache</span>: <span class="ident">Arc::new</span>(<span class="ident">Cache::new_with_settings</span>(<span class="self">self</span>.<span class="ident">cache_settings</span>.<span class="ident">take</span>().<span class="ident">unwrap</span>())),
                 <span class="ident">http</span>: <span class="ident">Arc::clone</span>(<span class="kw-2">&amp;</span><span class="ident">http</span>),
-            });
+            };
 
             <span class="self">self</span>.<span class="ident">fut</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">Box::pin</span>(<span class="kw">async</span> <span class="kw">move</span> {
                 <span class="kw">let</span> <span class="ident">ws_url</span> <span class="op">=</span> <span class="ident">Arc::new</span>(<span class="ident">Mutex::new</span>(<span class="ident">http</span>.<span class="ident">get_gateway</span>().<span class="kw">await</span><span class="question-mark">?</span>.<span class="ident">url</span>));
@@ -1426,7 +1426,7 @@
                         <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;voice&quot;</span>)]</span>
                         <span class="ident">voice_manager</span>: <span class="ident">voice_manager</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="ident">Arc::clone</span>),
                         <span class="ident">ws_url</span>: <span class="ident">Arc::clone</span>(<span class="kw-2">&amp;</span><span class="ident">ws_url</span>),
-                        <span class="ident">cache_and_http</span>: <span class="ident">Arc::clone</span>(<span class="kw-2">&amp;</span><span class="ident">cache_and_http</span>),
+                        <span class="ident">cache_and_http</span>: <span class="ident">cache_and_http</span>.<span class="ident">clone</span>(),
                         <span class="ident">intents</span>,
                         <span class="ident">presence</span>,
                     });
@@ -1684,7 +1684,7 @@
     <span class="doccomment">/// value available.</span>
     <span class="kw">pub</span> <span class="ident">ws_url</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Mutex</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span><span class="op">&gt;</span>,
     <span class="doccomment">/// A container for an optional cache and HTTP client.</span>
-    <span class="kw">pub</span> <span class="ident">cache_and_http</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">CacheAndHttp</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">cache_and_http</span>: <span class="ident">CacheAndHttp</span>,
 }
 
 <span class="kw">impl</span> <span class="ident">Client</span> {
