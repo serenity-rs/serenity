@@ -460,7 +460,14 @@ impl ChannelId {
             }
         }
 
-        cache_http.http().get_message(self.get(), message_id.get()).await
+        let message = cache_http.http().get_message(self.get(), message_id.get()).await?;
+
+        #[cfg(feature = "cache")]
+        if let Some(cache) = cache_http.cache() {
+            cache.add_message(&message);
+        }
+
+        Ok(message)
     }
 
     /// Gets messages from the channel.
