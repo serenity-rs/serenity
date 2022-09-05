@@ -468,14 +468,29 @@ impl ChannelId {
     #[inline]
     pub async fn message(
         self,
-        http: impl AsRef<Http>,
+        cache_http: impl CacheHttp,
         message_id: impl Into<MessageId>,
     ) -> Result<Message> {
-        http.as_ref().get_message(self.0, message_id.into().0).await.map(|mut msg| {
-            msg.transform_content();
+        let message_id = message_id.into();
+        let mut message = None;
 
-            msg
-        })
+        if let Some(cache) = cache_http.cache() {
+            message = cache.message(self, message_id);
+        }
+
+        if message.is_none() {
+            let msg = cache_http.http().get_message(self.0, message_id.0).await?;
+            if let Some(cache) = cache_http.cache() {
+                cache.add_message(&msg);
+            }
+
+            message = Some(msg);
+        }
+
+        let mut message = message.unwrap();
+        message.transform_content();
+
+        Ok(message)
     }
 
     /// Gets messages from the channel.

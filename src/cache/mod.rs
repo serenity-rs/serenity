@@ -1008,6 +1008,31 @@ impl Cache {
             },
         }
     }
+
+    /// Adds given Message to Cache.
+    pub(crate) fn add_message(&self, msg: &Message) -> Option<Message> {
+        let max = self.settings().max_messages;
+
+        if max == 0 {
+            return None;
+        }
+
+        let messages = self.messages.entry(msg.channel_id).or_insert_with(Default::default);
+        let mut queue = self.message_queue.entry(msg.channel_id).or_insert_with(Default::default);
+
+        let mut removed_msg = None;
+
+        if messages.len() == max {
+            if let Some(id) = queue.pop_front() {
+                removed_msg = messages.remove(&id);
+            }
+        }
+
+        queue.push_back(msg.id);
+        messages.insert(msg.id, msg.clone());
+
+        removed_msg.map(|i| i.1)
+    }
 }
 
 impl Default for Cache {

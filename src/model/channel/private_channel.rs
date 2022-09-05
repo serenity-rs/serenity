@@ -5,7 +5,7 @@ use std::sync::Arc;
 #[cfg(feature = "model")]
 use crate::builder::{CreateMessage, EditMessage, GetMessages};
 #[cfg(feature = "http")]
-use crate::http::{Http, Typing};
+use crate::http::{CacheHttp, Http, Typing};
 #[cfg(feature = "model")]
 use crate::model::channel::AttachmentType;
 use crate::model::prelude::*;
@@ -188,10 +188,10 @@ impl PrivateChannel {
     #[inline]
     pub async fn message(
         &self,
-        http: impl AsRef<Http>,
+        cache_http: impl CacheHttp,
         message_id: impl Into<MessageId>,
     ) -> Result<Message> {
-        self.id.message(&http, message_id).await
+        self.id.message(cache_http, message_id).await
     }
 
     /// Gets messages from the channel.

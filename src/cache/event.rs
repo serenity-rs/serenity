@@ -451,29 +451,7 @@ impl CacheUpdate for MessageCreateEvent {
     type Output = Message;
 
     fn update(&mut self, cache: &Cache) -> Option<Self::Output> {
-        let max = cache.settings().max_messages;
-
-        if max == 0 {
-            return None;
-        }
-
-        let messages =
-            cache.messages.entry(self.message.channel_id).or_insert_with(Default::default);
-        let mut queue =
-            cache.message_queue.entry(self.message.channel_id).or_insert_with(Default::default);
-
-        let mut removed_msg = None;
-
-        if messages.len() == max {
-            if let Some(id) = queue.pop_front() {
-                removed_msg = messages.remove(&id);
-            }
-        }
-
-        queue.push_back(self.message.id);
-        messages.insert(self.message.id, self.message.clone());
-
-        removed_msg.map(|i| i.1)
+        cache.add_message(&self.message)
     }
 }
 
