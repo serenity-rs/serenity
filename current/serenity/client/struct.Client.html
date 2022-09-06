@@ -173,7 +173,7 @@ client.</p>
 <span class="comment">// Create a thread which will sleep for 60 seconds and then have the</span>
 <span class="comment">// shard manager shutdown.</span>
 <span class="ident">tokio::spawn</span>(<span class="kw">async</span> <span class="kw">move</span> {
-    <span class="ident">tokio::time::sleep</span>(<span class="ident">Duration::from_secs</span>(<span class="number">60</span>));
+    <span class="ident">tokio::time::sleep</span>(<span class="ident">Duration::from_secs</span>(<span class="number">60</span>)).<span class="kw">await</span>;
 
     <span class="ident">shard_manager</span>.<span class="ident">lock</span>().<span class="kw">await</span>.<span class="ident">shutdown_all</span>().<span class="kw">await</span>;
 
