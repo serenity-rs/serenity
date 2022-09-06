@@ -621,7 +621,7 @@ pub struct Client {
     /// // Create a thread which will sleep for 60 seconds and then have the
     /// // shard manager shutdown.
     /// tokio::spawn(async move {
-    ///     tokio::time::sleep(Duration::from_secs(60));
+    ///     tokio::time::sleep(Duration::from_secs(60)).await;
     ///
     ///     shard_manager.lock().await.shutdown_all().await;
     ///
