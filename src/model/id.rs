@@ -99,6 +99,7 @@ pub struct EmojiId(#[serde(with = "snowflake")] pub u64);
 #[derive(
     Copy, Clone, Default, Debug, Eq, Hash, PartialEq, PartialOrd, Ord, Deserialize, Serialize,
 )]
+// TODO: replace occurences of `#[serde(with = "snowflake")] u64` in the codebase with GenericId
 pub struct GenericId(#[serde(with = "snowflake")] pub u64);
 
 /// An identifier for a Guild

@@ -42,6 +42,8 @@ use crate::model::utils::{emojis, roles, stickers};
 
 /// Partial information about a [`Guild`]. This does not include information
 /// like member data.
+///
+/// [Discord docs](https://discord.com/developers/docs/resources/guild#guild-object).
 #[derive(Clone, Debug, Serialize)]
 #[non_exhaustive]
 pub struct PartialGuild {

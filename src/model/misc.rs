@@ -56,6 +56,8 @@ impl_from_str! {
 }
 
 /// A version of an emoji used only when solely the animated state, Id, and name are known.
+///
+/// [Discord docs](https://discord.com/developers/docs/topics/gateway#activity-object-activity-emoji).
 #[derive(Clone, Debug, Eq, Hash, PartialEq, PartialOrd, Ord)]
 pub struct EmojiIdentifier {
     /// Whether the emoji is animated

@@ -15,6 +15,7 @@ use crate::model::application::command::CommandPermission;
 use crate::model::application::interaction::Interaction;
 use crate::model::guild::automod::{ActionExecution, Rule};
 
+/// [Discord docs](https://discord.com/developers/docs/topics/gateway#application-command-permissions-update).
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[serde(transparent)]
 #[non_exhaustive]
@@ -22,6 +23,7 @@ pub struct ApplicationCommandPermissionsUpdateEvent {
     pub permission: CommandPermission,
 }
 
+/// [Discord docs](https://discord.com/developers/docs/topics/gateway#auto-moderation-rule-create).
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[serde(transparent)]
 #[non_exhaustive]
@@ -29,6 +31,7 @@ pub struct AutoModerationRuleCreateEvent {
     pub rule: Rule,
 }
 
+/// [Discord docs](https://discord.com/developers/docs/topics/gateway#auto-moderation-rule-update).
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[serde(transparent)]
 #[non_exhaustive]
@@ -36,6 +39,7 @@ pub struct AutoModerationRuleUpdateEvent {
     pub rule: Rule,
 }
 
+/// [Discord docs](https://discord.com/developers/docs/topics/gateway#auto-moderation-rule-delete).
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[serde(transparent)]
 #[non_exhaustive]
@@ -43,6 +47,7 @@ pub struct AutoModerationRuleDeleteEvent {
     pub rule: Rule,
 }
 
+/// [Discord docs](https://discord.com/developers/docs/topics/gateway#auto-moderation-action-execution).
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[serde(transparent)]
 #[non_exhaustive]
@@ -56,6 +61,8 @@ pub struct AutoModerationActionExecutionEvent {
 ///
 /// - A [`Channel`] is created in a [`Guild`]
 /// - A [`PrivateChannel`] is created
+///
+/// [Discord docs](https://discord.com/developers/docs/topics/gateway#channel-create).
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[serde(transparent)]
 #[non_exhaustive]
@@ -64,6 +71,7 @@ pub struct ChannelCreateEvent {
     pub channel: Channel,
 }
 
+/// [Discord docs](https://discord.com/developers/docs/topics/gateway#channel-delete).
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[serde(transparent)]
 #[non_exhaustive]
@@ -71,6 +79,7 @@ pub struct ChannelDeleteEvent {
     pub channel: Channel,
 }
 
+/// [Discord docs](https://discord.com/developers/docs/topics/gateway#channel-pins-update).
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 pub struct ChannelPinsUpdateEvent {
@@ -79,6 +88,7 @@ pub struct ChannelPinsUpdateEvent {
     pub last_pin_timestamp: Option<Timestamp>,
 }
 
+/// [Discord docs](https://discord.com/developers/docs/topics/gateway#channel-update).
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[serde(transparent)]
 #[non_exhaustive]
@@ -86,6 +96,7 @@ pub struct ChannelUpdateEvent {
     pub channel: Channel,
 }
 
+/// [Discord docs](https://discord.com/developers/docs/topics/gateway#guild-ban-add).
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 pub struct GuildBanAddEvent {
@@ -93,6 +104,7 @@ pub struct GuildBanAddEvent {
     pub user: User,
 }
 
+/// [Discord docs](https://discord.com/developers/docs/topics/gateway#guild-ban-remove).
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 pub struct GuildBanRemoveEvent {
@@ -100,6 +112,7 @@ pub struct GuildBanRemoveEvent {
     pub user: User,
 }
 
+/// [Discord docs](https://discord.com/developers/docs/topics/gateway#guild-create).
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[serde(transparent)]
 #[non_exhaustive]
@@ -107,6 +120,7 @@ pub struct GuildCreateEvent {
     pub guild: Guild,
 }
 
+/// [Discord docs](https://discord.com/developers/docs/topics/gateway#guild-delete).
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[serde(transparent)]
 #[non_exhaustive]
@@ -114,6 +128,7 @@ pub struct GuildDeleteEvent {
     pub guild: UnavailableGuild,
 }
 
+/// [Discord docs](https://discord.com/developers/docs/topics/gateway#guild-emojis-update).
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 pub struct GuildEmojisUpdateEvent {
@@ -122,12 +137,14 @@ pub struct GuildEmojisUpdateEvent {
     pub guild_id: GuildId,
 }
 
+/// [Discord docs](https://discord.com/developers/docs/topics/gateway#guild-integrations-update).
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 pub struct GuildIntegrationsUpdateEvent {
     pub guild_id: GuildId,
 }
 
+/// [Discord docs](https://discord.com/developers/docs/topics/gateway#guild-member-add).
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[serde(transparent)]
 #[non_exhaustive]
@@ -135,6 +152,7 @@ pub struct GuildMemberAddEvent {
     pub member: Member,
 }
 
+/// [Discord docs](https://discord.com/developers/docs/topics/gateway#guild-member-remove).
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 pub struct GuildMemberRemoveEvent {
@@ -142,6 +160,7 @@ pub struct GuildMemberRemoveEvent {
     pub user: User,
 }
 
+/// [Discord docs](https://discord.com/developers/docs/topics/gateway#guild-member-update).
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 pub struct GuildMemberUpdateEvent {
@@ -161,6 +180,7 @@ pub struct GuildMemberUpdateEvent {
     pub communication_disabled_until: Option<Timestamp>,
 }
 
+/// [Discord docs](https://discord.com/developers/docs/topics/gateway#guild-members-chunk).
 #[derive(Clone, Debug, Serialize)]
 #[non_exhaustive]
 pub struct GuildMembersChunkEvent {
@@ -270,6 +290,7 @@ impl<'de> Deserialize<'de> for GuildMembersChunkEvent {
     }
 }
 
+/// [Discord docs](https://discord.com/developers/docs/topics/gateway#guild-role-create).
 #[derive(Clone, Debug, Serialize)]
 #[non_exhaustive]
 pub struct GuildRoleCreateEvent {
@@ -284,6 +305,7 @@ impl<'de> Deserialize<'de> for GuildRoleCreateEvent {
     }
 }
 
+/// [Discord docs](https://discord.com/developers/docs/topics/gateway#guild-role-delete).
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 pub struct GuildRoleDeleteEvent {
@@ -291,6 +313,7 @@ pub struct GuildRoleDeleteEvent {
     pub role_id: RoleId,
 }
 
+/// [Discord docs](https://discord.com/developers/docs/topics/gateway#guild-role-update).
 #[derive(Clone, Debug, Serialize)]
 #[non_exhaustive]
 pub struct GuildRoleUpdateEvent {
@@ -305,6 +328,7 @@ impl<'de> Deserialize<'de> for GuildRoleUpdateEvent {
     }
 }
 
+/// [Discord docs](https://discord.com/developers/docs/topics/gateway#guild-stickers-update).
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 pub struct GuildStickersUpdateEvent {
@@ -313,6 +337,7 @@ pub struct GuildStickersUpdateEvent {
     pub guild_id: GuildId,
 }
 
+/// [Discord docs](https://discord.com/developers/docs/topics/gateway#invite-create).
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 pub struct InviteCreateEvent {
@@ -325,6 +350,7 @@ pub struct InviteCreateEvent {
     pub temporary: bool,
 }
 
+/// [Discord docs](https://discord.com/developers/docs/topics/gateway#invite-delete).
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 pub struct InviteDeleteEvent {
@@ -340,6 +366,7 @@ pub struct GuildUnavailableEvent {
     pub guild_id: GuildId,
 }
 
+/// [Discord docs](https://discord.com/developers/docs/topics/gateway#guild-update).
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[serde(transparent)]
 #[non_exhaustive]
@@ -347,6 +374,7 @@ pub struct GuildUpdateEvent {
     pub guild: PartialGuild,
 }
 
+/// [Discord docs](https://discord.com/developers/docs/topics/gateway#message-create).
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[serde(transparent)]
 #[non_exhaustive]
@@ -354,6 +382,7 @@ pub struct MessageCreateEvent {
     pub message: Message,
 }
 
+/// [Discord docs](https://discord.com/developers/docs/topics/gateway#message-delete-bulk).
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 pub struct MessageDeleteBulkEvent {
@@ -362,6 +391,7 @@ pub struct MessageDeleteBulkEvent {
     pub ids: Vec<MessageId>,
 }
 
+/// [Discord docs](https://discord.com/developers/docs/topics/gateway#message-delete).
 #[derive(Clone, Copy, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 pub struct MessageDeleteEvent {
@@ -371,6 +401,7 @@ pub struct MessageDeleteEvent {
     pub message_id: MessageId,
 }
 
+/// [Discord docs](https://discord.com/developers/docs/topics/gateway#message-update).
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 pub struct MessageUpdateEvent {
@@ -393,6 +424,7 @@ pub struct MessageUpdateEvent {
     pub flags: Option<MessageFlags>,
 }
 
+/// [Discord docs](https://discord.com/developers/docs/topics/gateway#presence-update).
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[serde(transparent)]
 #[non_exhaustive]
@@ -407,6 +439,7 @@ pub struct PresencesReplaceEvent {
     pub presences: Vec<Presence>,
 }
 
+/// [Discord docs](https://discord.com/developers/docs/topics/gateway#message-reaction-add).
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[serde(transparent)]
 #[non_exhaustive]
@@ -414,6 +447,7 @@ pub struct ReactionAddEvent {
     pub reaction: Reaction,
 }
 
+/// [Discord docs](https://discord.com/developers/docs/topics/gateway#message-reaction-remove).
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[serde(transparent)]
 #[non_exhaustive]
@@ -421,6 +455,7 @@ pub struct ReactionRemoveEvent {
     pub reaction: Reaction,
 }
 
+/// [Discord docs](https://discord.com/developers/docs/topics/gateway#message-reaction-remove-all).
 #[derive(Clone, Copy, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 pub struct ReactionRemoveAllEvent {
@@ -430,6 +465,8 @@ pub struct ReactionRemoveAllEvent {
 }
 
 /// The "Ready" event, containing initial ready cache
+///
+/// [Discord docs](https://discord.com/developers/docs/topics/gateway#ready).
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[serde(transparent)]
 #[non_exhaustive]
@@ -437,6 +474,7 @@ pub struct ReadyEvent {
     pub ready: Ready,
 }
 
+/// [Discord docs](https://discord.com/developers/docs/topics/gateway#resumed).
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 pub struct ResumedEvent {
@@ -444,6 +482,7 @@ pub struct ResumedEvent {
     pub trace: Vec<Option<String>>,
 }
 
+/// [Discord docs](https://discord.com/developers/docs/topics/gateway#typing-start).
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 pub struct TypingStartEvent {
@@ -460,6 +499,7 @@ pub struct UnknownEvent {
     pub value: Value,
 }
 
+/// [Discord docs](https://discord.com/developers/docs/topics/gateway#user-update).
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[serde(transparent)]
 #[non_exhaustive]
@@ -467,6 +507,7 @@ pub struct UserUpdateEvent {
     pub current_user: CurrentUser,
 }
 
+/// [Discord docs](https://discord.com/developers/docs/topics/gateway#voice-server-update).
 #[derive(Clone, Deserialize, Serialize)]
 #[non_exhaustive]
 pub struct VoiceServerUpdateEvent {
@@ -486,6 +527,7 @@ impl fmt::Debug for VoiceServerUpdateEvent {
     }
 }
 
+/// [Discord docs](https://discord.com/developers/docs/topics/gateway#voice-state-update).
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[serde(transparent)]
 #[non_exhaustive]
@@ -493,6 +535,7 @@ pub struct VoiceStateUpdateEvent {
     pub voice_state: VoiceState,
 }
 
+/// [Discord docs](https://discord.com/developers/docs/topics/gateway#webhooks-update).
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 pub struct WebhookUpdateEvent {
@@ -500,6 +543,7 @@ pub struct WebhookUpdateEvent {
     pub guild_id: GuildId,
 }
 
+/// [Discord docs](https://discord.com/developers/docs/topics/gateway#interaction-create).
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[serde(transparent)]
 #[non_exhaustive]
@@ -507,6 +551,7 @@ pub struct InteractionCreateEvent {
     pub interaction: Interaction,
 }
 
+/// [Discord docs](https://discord.com/developers/docs/topics/gateway#integration-create).
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[serde(transparent)]
 #[non_exhaustive]
@@ -514,6 +559,7 @@ pub struct IntegrationCreateEvent {
     pub integration: Integration,
 }
 
+/// [Discord docs](https://discord.com/developers/docs/topics/gateway#integration-update).
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[serde(transparent)]
 #[non_exhaustive]
@@ -521,6 +567,7 @@ pub struct IntegrationUpdateEvent {
     pub integration: Integration,
 }
 
+/// [Discord docs](https://discord.com/developers/docs/topics/gateway#integration-delete).
 #[derive(Clone, Debug, Serialize, Deserialize)]
 #[non_exhaustive]
 pub struct IntegrationDeleteEvent {
@@ -529,6 +576,7 @@ pub struct IntegrationDeleteEvent {
     pub application_id: Option<ApplicationId>,
 }
 
+/// [Discord docs](https://discord.com/developers/docs/topics/gateway#stage-instance-create).
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[serde(transparent)]
 #[non_exhaustive]
@@ -536,6 +584,7 @@ pub struct StageInstanceCreateEvent {
     pub stage_instance: StageInstance,
 }
 
+/// [Discord docs](https://discord.com/developers/docs/topics/gateway#stage-instance-update).
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[serde(transparent)]
 #[non_exhaustive]
@@ -543,6 +592,7 @@ pub struct StageInstanceUpdateEvent {
     pub stage_instance: StageInstance,
 }
 
+/// [Discord docs](https://discord.com/developers/docs/topics/gateway#stage-instance-delete).
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[serde(transparent)]
 #[non_exhaustive]
@@ -550,6 +600,7 @@ pub struct StageInstanceDeleteEvent {
     pub stage_instance: StageInstance,
 }
 
+/// [Discord docs](https://discord.com/developers/docs/topics/gateway#thread-create).
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[serde(transparent)]
 #[non_exhaustive]
@@ -557,6 +608,7 @@ pub struct ThreadCreateEvent {
     pub thread: GuildChannel,
 }
 
+/// [Discord docs](https://discord.com/developers/docs/topics/gateway#thread-update).
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[serde(transparent)]
 #[non_exhaustive]
@@ -564,6 +616,7 @@ pub struct ThreadUpdateEvent {
     pub thread: GuildChannel,
 }
 
+/// [Discord docs](https://discord.com/developers/docs/topics/gateway#thread-delete).
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[serde(transparent)]
 #[non_exhaustive]
@@ -571,6 +624,7 @@ pub struct ThreadDeleteEvent {
     pub thread: PartialGuildChannel,
 }
 
+/// [Discord docs](https://discord.com/developers/docs/topics/gateway#thread-list-sync).
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 pub struct ThreadListSyncEvent {
@@ -587,6 +641,7 @@ pub struct ThreadListSyncEvent {
     pub members: Vec<ThreadMember>,
 }
 
+/// [Discord docs](https://discord.com/developers/docs/topics/gateway#thread-member-update).
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[serde(transparent)]
 #[non_exhaustive]
@@ -594,6 +649,7 @@ pub struct ThreadMemberUpdateEvent {
     pub member: ThreadMember,
 }
 
+/// [Discord docs](https://discord.com/developers/docs/topics/gateway#thread-members-update).
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 pub struct ThreadMembersUpdateEvent {
@@ -611,6 +667,7 @@ pub struct ThreadMembersUpdateEvent {
     pub removed_members_ids: Vec<UserId>,
 }
 
+/// [Discord docs](https://discord.com/developers/docs/topics/gateway#guild-scheduled-event-create).
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[serde(transparent)]
 #[non_exhaustive]
@@ -618,6 +675,7 @@ pub struct GuildScheduledEventCreateEvent {
     pub event: ScheduledEvent,
 }
 
+/// [Discord docs](https://discord.com/developers/docs/topics/gateway#guild-scheduled-event-update).
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[serde(transparent)]
 #[non_exhaustive]
@@ -625,6 +683,7 @@ pub struct GuildScheduledEventUpdateEvent {
     pub event: ScheduledEvent,
 }
 
+/// [Discord docs](https://discord.com/developers/docs/topics/gateway#guild-scheduled-event-delete).
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[serde(transparent)]
 #[non_exhaustive]
@@ -632,6 +691,7 @@ pub struct GuildScheduledEventDeleteEvent {
     pub event: ScheduledEvent,
 }
 
+/// [Discord docs](https://discord.com/developers/docs/topics/gateway#guild-scheduled-event-user-add).
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 pub struct GuildScheduledEventUserAddEvent {
@@ -641,6 +701,7 @@ pub struct GuildScheduledEventUserAddEvent {
     user_id: UserId,
 }
 
+/// [Discord docs](https://discord.com/developers/docs/topics/gateway#guild-scheduled-event-user-remove).
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 pub struct GuildScheduledEventUserRemoveEvent {
@@ -650,6 +711,7 @@ pub struct GuildScheduledEventUserRemoveEvent {
     user_id: UserId,
 }
 
+/// [Discord docs](https://discord.com/developers/docs/topics/gateway#payloads-gateway-payload-structure).
 #[allow(clippy::large_enum_variant)]
 #[derive(Debug, Clone, Serialize)]
 #[non_exhaustive]
@@ -740,6 +802,8 @@ impl<'de> Deserialize<'de> for GatewayEvent {
 }
 
 /// Event received over a websocket connection
+///
+/// [Discord docs](https://discord.com/developers/docs/topics/gateway#commands-and-events-gateway-events).
 #[allow(clippy::large_enum_variant)]
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
@@ -1637,6 +1701,8 @@ pub fn deserialize_event_with_type(kind: EventType, v: Value) -> Result<Event> {
 /// A Deserialization implementation is provided for deserializing raw event
 /// dispatch type strings to this enum, e.g. deserializing `"CHANNEL_CREATE"` to
 /// [`EventType::ChannelCreate`].
+///
+/// [Discord docs](https://discord.com/developers/docs/topics/gateway#commands-and-events-gateway-events).
 #[derive(Clone, Debug, Eq, PartialEq, PartialOrd, Ord)]
 #[non_exhaustive]
 pub enum EventType {

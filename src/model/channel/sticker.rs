@@ -3,6 +3,8 @@ use crate::model::id::{StickerId, StickerPackId};
 /// A sticker sent with a message.
 ///
 /// Bots currently can only receive messages with stickers, not send.
+///
+/// [Discord docs](https://discord.com/developers/docs/resources/sticker#sticker-object).
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 pub struct Sticker {
@@ -25,6 +27,8 @@ pub struct Sticker {
 }
 
 /// Differentiates between sticker formats.
+///
+/// [Discord docs](https://discord.com/developers/docs/resources/sticker#sticker-object-sticker-format-types).
 #[derive(Clone, Copy, Debug, Eq, Hash, PartialEq, PartialOrd, Ord)]
 #[non_exhaustive]
 pub enum StickerFormatType {

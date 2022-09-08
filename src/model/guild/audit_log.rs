@@ -15,6 +15,8 @@ use utils::{optional_string, users, webhooks};
 use crate::model::prelude::*;
 
 /// Determines the action that was done on a target.
+///
+/// [Discord docs](https://discord.com/developers/docs/resources/audit-log#audit-log-entry-object-audit-log-events).
 #[derive(Copy, Clone, Debug)]
 #[non_exhaustive]
 pub enum Action {
@@ -102,6 +104,7 @@ impl Serialize for Action {
 #[deprecated(note = "use `ChannelAction`")]
 pub type ActionChannel = ChannelAction;
 
+/// [Discord docs](https://discord.com/developers/docs/resources/audit-log#audit-log-entry-object-audit-log-events).
 #[derive(Copy, Clone, Debug)]
 #[non_exhaustive]
 #[repr(u8)]
@@ -114,6 +117,7 @@ pub enum ChannelAction {
 #[deprecated(note = "use `ChannelOverwriteAction`")]
 pub type ActionChannelOverwrite = ChannelOverwriteAction;
 
+/// [Discord docs](https://discord.com/developers/docs/resources/audit-log#audit-log-entry-object-audit-log-events).
 #[derive(Copy, Clone, Debug)]
 #[non_exhaustive]
 #[repr(u8)]
@@ -126,6 +130,7 @@ pub enum ChannelOverwriteAction {
 #[deprecated(note = "use `MemberAction`")]
 pub type ActionMember = MemberAction;
 
+/// [Discord docs](https://discord.com/developers/docs/resources/audit-log#audit-log-entry-object-audit-log-events).
 #[derive(Copy, Clone, Debug)]
 #[non_exhaustive]
 #[repr(u8)]
@@ -144,6 +149,7 @@ pub enum MemberAction {
 #[deprecated(note = "use `RoleAction`")]
 pub type ActionRole = RoleAction;
 
+/// [Discord docs](https://discord.com/developers/docs/resources/audit-log#audit-log-entry-object-audit-log-events).
 #[derive(Copy, Clone, Debug)]
 #[non_exhaustive]
 #[repr(u8)]
@@ -156,6 +162,7 @@ pub enum RoleAction {
 #[deprecated(note = "use `InviteAction`")]
 pub type ActionInvite = InviteAction;
 
+/// [Discord docs](https://discord.com/developers/docs/resources/audit-log#audit-log-entry-object-audit-log-events).
 #[derive(Copy, Clone, Debug)]
 #[non_exhaustive]
 #[repr(u8)]
@@ -168,6 +175,7 @@ pub enum InviteAction {
 #[deprecated(note = "use `WebhookAction`")]
 pub type ActionWebhook = WebhookAction;
 
+/// [Discord docs](https://discord.com/developers/docs/resources/audit-log#audit-log-entry-object-audit-log-events).
 #[derive(Copy, Clone, Debug)]
 #[non_exhaustive]
 #[repr(u8)]
@@ -180,6 +188,7 @@ pub enum WebhookAction {
 #[deprecated(note = "use `EmojiAction`")]
 pub type ActionEmoji = EmojiAction;
 
+/// [Discord docs](https://discord.com/developers/docs/resources/audit-log#audit-log-entry-object-audit-log-events).
 #[derive(Copy, Clone, Debug)]
 #[non_exhaustive]
 #[repr(u8)]
@@ -192,6 +201,7 @@ pub enum EmojiAction {
 #[deprecated(note = "use `MessageAction`")]
 pub type ActionMessage = MessageAction;
 
+/// [Discord docs](https://discord.com/developers/docs/resources/audit-log#audit-log-entry-object-audit-log-events).
 #[derive(Copy, Clone, Debug)]
 #[non_exhaustive]
 #[repr(u8)]
@@ -205,6 +215,7 @@ pub enum MessageAction {
 #[deprecated(note = "use `IntegrationAction`")]
 pub type ActionIntegration = IntegrationAction;
 
+/// [Discord docs](https://discord.com/developers/docs/resources/audit-log#audit-log-entry-object-audit-log-events).
 #[derive(Copy, Clone, Debug)]
 #[non_exhaustive]
 #[repr(u8)]
@@ -217,6 +228,7 @@ pub enum IntegrationAction {
 #[deprecated(note = "use `StageInstanceAction`")]
 pub type ActionStageInstance = StageInstanceAction;
 
+/// [Discord docs](https://discord.com/developers/docs/resources/audit-log#audit-log-entry-object-audit-log-events).
 #[derive(Copy, Clone, Debug)]
 #[non_exhaustive]
 #[repr(u8)]
@@ -229,6 +241,7 @@ pub enum StageInstanceAction {
 #[deprecated(note = "use `StickerAction`")]
 pub type ActionSticker = StickerAction;
 
+/// [Discord docs](https://discord.com/developers/docs/resources/audit-log#audit-log-entry-object-audit-log-events).
 #[derive(Copy, Clone, Debug)]
 #[non_exhaustive]
 #[repr(u8)]
@@ -238,6 +251,7 @@ pub enum StickerAction {
     Delete = 92,
 }
 
+/// [Discord docs](https://discord.com/developers/docs/resources/audit-log#audit-log-entry-object-audit-log-events).
 #[derive(Copy, Clone, Debug)]
 #[non_exhaustive]
 #[repr(u8)]
@@ -250,6 +264,7 @@ pub enum ScheduledEventAction {
 #[deprecated(note = "use `ThreadAction`")]
 pub type ActionThread = ThreadAction;
 
+/// [Discord docs](https://discord.com/developers/docs/resources/audit-log#audit-log-entry-object-audit-log-events).
 #[derive(Copy, Clone, Debug)]
 #[non_exhaustive]
 #[repr(u8)]
@@ -259,6 +274,7 @@ pub enum ThreadAction {
     Delete = 112,
 }
 
+/// [Discord docs](https://discord.com/developers/docs/resources/audit-log#audit-log-entry-object-audit-log-events).
 #[derive(Copy, Clone, Debug)]
 #[non_exhaustive]
 #[repr(u8)]
@@ -269,6 +285,7 @@ pub enum AutoModerationAction {
     BlockMessage = 143,
 }
 
+/// [Discord docs](https://discord.com/developers/docs/resources/audit-log#audit-log-object).
 #[derive(Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 pub struct AuditLogs {
@@ -280,6 +297,7 @@ pub struct AuditLogs {
     pub webhooks: HashMap<WebhookId, Webhook>,
 }
 
+/// [Discord docs](https://discord.com/developers/docs/resources/audit-log#audit-log-entry-object).
 #[derive(Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 pub struct AuditLogEntry {
@@ -301,6 +319,7 @@ pub struct AuditLogEntry {
     pub options: Option<Options>,
 }
 
+/// [Discord docs](https://discord.com/developers/docs/resources/audit-log#audit-log-entry-object-optional-audit-entry-info).
 #[derive(Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 pub struct Options {

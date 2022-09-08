@@ -284,6 +284,8 @@ impl fmt::Display for Channel {
 }
 
 /// A representation of a type of channel.
+///
+/// [Discord docs](https://discord.com/developers/docs/resources/channel#channel-object-channel-types).
 #[derive(Clone, Copy, Debug, Eq, Hash, PartialEq, PartialOrd, Ord)]
 #[non_exhaustive]
 #[repr(u8)]
@@ -356,6 +358,7 @@ impl ChannelType {
     }
 }
 
+/// [Discord docs](https://discord.com/developers/docs/resources/channel#overwrite-object).
 #[derive(Deserialize, Serialize)]
 struct PermissionOverwriteData {
     allow: Permissions,
@@ -367,6 +370,8 @@ struct PermissionOverwriteData {
 }
 
 /// A channel-specific permission overwrite for a member or role.
+///
+/// [Discord docs](https://discord.com/developers/docs/resources/channel#overwrite-object).
 #[derive(Clone, Debug, PartialEq)]
 pub struct PermissionOverwrite {
     pub allow: Permissions,
@@ -417,6 +422,8 @@ impl Serialize for PermissionOverwrite {
 /// The type of edit being made to a Channel's permissions.
 ///
 /// This is for use with methods such as [`GuildChannel::create_permission`].
+///
+/// [Discord docs](https://discord.com/developers/docs/resources/channel#overwrite-object-overwrite-structure) (field `type`).
 #[derive(Copy, Clone, Debug, Eq, PartialEq)]
 #[non_exhaustive]
 pub enum PermissionOverwriteType {
@@ -427,6 +434,8 @@ pub enum PermissionOverwriteType {
 }
 
 /// The video quality mode for a voice channel.
+///
+/// [Discord docs](https://discord.com/developers/docs/resources/channel#channel-object-video-quality-modes).
 #[derive(Clone, Copy, Debug, Eq, Hash, PartialEq, PartialOrd, Ord)]
 #[non_exhaustive]
 pub enum VideoQualityMode {
@@ -444,6 +453,7 @@ enum_number!(VideoQualityMode {
     Full
 });
 
+/// [Discord docs](https://discord.com/developers/docs/resources/stage-instance#stage-instance-object).
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 pub struct StageInstance {
@@ -458,6 +468,8 @@ pub struct StageInstance {
 }
 
 /// A thread data.
+///
+/// [Discord docs](https://discord.com/developers/docs/resources/channel#thread-metadata-object).
 #[derive(Debug, Clone, Copy, Serialize, Deserialize)]
 #[non_exhaustive]
 pub struct ThreadMetadata {
@@ -484,6 +496,8 @@ pub struct ThreadMetadata {
 }
 
 /// A response to getting several threads channels.
+///
+/// Discord docs: scattered, but e.g. [here](https://discord.com/developers/docs/resources/channel#list-public-archived-threads-response-body).
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[non_exhaustive]
 pub struct ThreadsData {

@@ -7,6 +7,8 @@ use crate::internal::prelude::*;
 use crate::model::prelude::*;
 
 /// The smallest amount of data required to render a sticker.
+///
+/// [Discord docs](https://discord.com/developers/docs/resources/sticker#sticker-item-object).
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 pub struct StickerItem {

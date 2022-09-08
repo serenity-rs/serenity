@@ -11,6 +11,8 @@ use super::utils::*;
 /// shards that Discord recommends to use for a bot user.
 ///
 /// This is only applicable to bot users.
+///
+/// [Discord docs](https://discord.com/developers/docs/topics/gateway#get-gateway-bot-json-response).
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 pub struct BotGateway {
@@ -25,6 +27,8 @@ pub struct BotGateway {
 }
 
 /// Representation of an activity that a [`User`] is performing.
+///
+/// [Discord docs](https://discord.com/developers/docs/topics/gateway#activity-object-activity-structure).
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 pub struct Activity {
@@ -265,6 +269,7 @@ impl Activity {
     }
 }
 
+/// [Discord docs](https://discord.com/developers/docs/topics/gateway#activity-object-activity-buttons).
 #[derive(Clone, Debug, Serialize, Deserialize)]
 #[non_exhaustive]
 pub struct ActivityButton {
@@ -278,6 +283,8 @@ pub struct ActivityButton {
 }
 
 /// The assets for an activity.
+///
+/// [Discord docs](https://discord.com/developers/docs/topics/gateway#activity-object-activity-assets).
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 pub struct ActivityAssets {
@@ -293,6 +300,8 @@ pub struct ActivityAssets {
 
 bitflags! {
     /// A set of flags defining what is in an activity's payload.
+    ///
+    /// [Discord docs](https://discord.com/developers/docs/topics/gateway#activity-object-activity-flags).
     #[derive(Default)]
     pub struct ActivityFlags: u64 {
         /// Whether the activity is an instance activity.
@@ -317,6 +326,8 @@ bitflags! {
 }
 
 /// Information about an activity's party.
+///
+/// [Discord docs](https://discord.com/developers/docs/topics/gateway#activity-object-activity-party).
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 pub struct ActivityParty {
@@ -327,6 +338,8 @@ pub struct ActivityParty {
 }
 
 /// Secrets for an activity.
+///
+/// [Discord docs](https://discord.com/developers/docs/topics/gateway#activity-object-activity-secrets).
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 pub struct ActivitySecrets {
@@ -340,6 +353,8 @@ pub struct ActivitySecrets {
 }
 
 /// Representation of an emoji used in a custom status
+///
+/// [Discord docs](https://discord.com/developers/docs/topics/gateway#activity-object-activity-emoji).
 #[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct ActivityEmoji {
     /// The name of the emoji.
@@ -350,6 +365,7 @@ pub struct ActivityEmoji {
     pub animated: Option<bool>,
 }
 
+/// [Discord docs](https://discord.com/developers/docs/topics/gateway#activity-object-activity-types).
 #[derive(Clone, Copy, Debug, PartialEq)]
 #[non_exhaustive]
 pub enum ActivityType {
@@ -387,6 +403,8 @@ impl Default for ActivityType {
 /// A representation of the data retrieved from the gateway endpoint.
 ///
 /// For the bot-specific gateway, refer to [`BotGateway`].
+///
+/// [Discord docs](https://discord.com/developers/docs/topics/gateway#get-gateway-example-response).
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 pub struct Gateway {
@@ -395,6 +413,8 @@ pub struct Gateway {
 }
 
 /// Information detailing the current active status of a [`User`].
+///
+/// [Discord docs](https://discord.com/developers/docs/topics/gateway#client-status-object).
 #[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct ClientStatus {
     pub desktop: Option<OnlineStatus>,
@@ -403,6 +423,8 @@ pub struct ClientStatus {
 }
 
 /// Information about the user of a [`Presence`] event.
+///
+/// [Discord docs](https://discord.com/developers/docs/topics/gateway#presence-update).
 #[derive(Clone, Default, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 #[serde(default)]
@@ -473,6 +495,8 @@ impl PresenceUser {
 }
 
 /// Information detailing the current online status of a [`User`].
+///
+/// [Discord docs](https://discord.com/developers/docs/topics/gateway#presence-update-presence-update-event-fields).
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 pub struct Presence {
@@ -491,6 +515,8 @@ pub struct Presence {
 }
 
 /// An initial set of information given after IDENTIFYing to the gateway.
+///
+/// [Discord docs](https://discord.com/developers/docs/topics/gateway#ready-ready-event-fields).
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 pub struct Ready {
@@ -511,6 +537,8 @@ pub struct Ready {
 
 /// Information describing how many gateway sessions you can initiate within a
 /// ratelimit period.
+///
+/// [Discord docs](https://discord.com/developers/docs/topics/gateway#session-start-limit-object-session-start-limit-structure).
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 pub struct SessionStartLimit {
@@ -521,8 +549,12 @@ pub struct SessionStartLimit {
     pub reset_after: u64,
     /// The total number of session starts within the ratelimit period allowed.
     pub total: u64,
+    /// The number of identify requests allowed per 5 seconds.
+    pub max_concurrency: u64,
 }
 /// Timestamps of when a user started and/or is ending their activity.
+///
+/// [Discord docs](https://discord.com/developers/docs/game-sdk/activities#data-models-activitytimestamps-struct).
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 pub struct ActivityTimestamps {
@@ -552,6 +584,8 @@ bitflags! {
     /// **Note**:
     /// Once the bot is in 100 guilds or more, [the bot must be verified] in
     /// order to use privileged intents.
+    ///
+    /// [Discord docs](https://discord.com/developers/docs/topics/gateway#list-of-intents).
     ///
     /// [gateway intent]: https://discord.com/developers/docs/topics/gateway#privileged-intents
     /// [Privileged Intents]: https://discord.com/developers/docs/topics/gateway#privileged-intents

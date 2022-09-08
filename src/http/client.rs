@@ -2913,6 +2913,8 @@ impl Http {
     }
 
     /// Gets a guild widget information.
+    // TODO: according to Discord, this returns different data; namely https://discord.com/developers/docs/resources/guild#guild-widget-object-guild-widget-structure.
+    // Should investigate if this endpoint actually works
     pub async fn get_guild_widget(&self, guild_id: u64) -> Result<GuildWidget> {
         self.fire(Request {
             body: None,

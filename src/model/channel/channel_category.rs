@@ -7,6 +7,8 @@ use crate::json;
 use crate::model::prelude::*;
 
 /// A category of [`GuildChannel`]s.
+///
+/// [Discord docs](https://discord.com/developers/docs/resources/channel#channel-object).
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 pub struct ChannelCategory {

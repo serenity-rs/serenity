@@ -14,6 +14,8 @@ use serde_value::{DeserializerError, Value};
 use crate::model::id::{ChannelId, GuildId, MessageId, RoleId, RuleId, UserId};
 
 /// Configured auto moderation rule.
+///
+/// [Discord docs](https://discord.com/developers/docs/resources/auto-moderation#auto-moderation-rule-object).
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
 pub struct Rule {
     /// ID of the rule.
@@ -44,6 +46,8 @@ pub struct Rule {
 }
 
 /// Indicates in what event context a rule should be checked.
+///
+/// [Discord docs](https://discord.com/developers/docs/resources/auto-moderation#auto-moderation-rule-object-event-types).
 #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
 #[serde(from = "u8", into = "u8")]
 #[non_exhaustive]
@@ -71,6 +75,10 @@ impl From<EventType> for u8 {
 }
 
 /// Characterizes the type of content which can trigger the rule.
+///
+/// Discord docs:
+/// [type](https://discord.com/developers/docs/resources/auto-moderation#auto-moderation-rule-object-trigger-types),
+/// [metadata](https://discord.com/developers/docs/resources/auto-moderation#auto-moderation-rule-object-trigger-metadata)
 #[derive(Clone, Debug, PartialEq)]
 #[non_exhaustive]
 pub enum Trigger {
@@ -92,6 +100,8 @@ struct InterimTrigger<'a> {
 }
 
 /// Helper struct for the (de)serialization of `Trigger`.
+///
+/// [Discord docs](https://discord.com/developers/docs/resources/auto-moderation#auto-moderation-rule-object-trigger-metadata).
 #[derive(Deserialize, Serialize)]
 #[serde(rename = "TriggerMetadata")]
 struct InterimTriggerMetadata<'a> {
@@ -157,6 +167,8 @@ impl Trigger {
 }
 
 /// Type of [`Trigger`].
+///
+/// [Discord docs](https://discord.com/developers/docs/resources/auto-moderation#auto-moderation-rule-object-trigger-types).
 #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
 #[serde(from = "u8", into = "u8")]
 #[non_exhaustive]
@@ -198,6 +210,8 @@ impl From<TriggerType> for u8 {
 /// See [`Change::TriggerMetadata`].
 ///
 /// [`Change::TriggerMetadata`]: crate::model::guild::audit_log::Change::TriggerMetadata
+///
+/// [Discord docs](https://discord.com/developers/docs/resources/auto-moderation#auto-moderation-rule-object-trigger-metadata).
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
 pub struct TriggerMetadata {
     keyword_filter: Option<Vec<String>>,
@@ -205,6 +219,8 @@ pub struct TriggerMetadata {
 }
 
 /// Internally pre-defined wordsets which will be searched for in content.
+///
+/// [Discord docs](https://discord.com/developers/docs/resources/auto-moderation#auto-moderation-rule-object-keyword-preset-types).
 #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
 #[serde(from = "u8", into = "u8")]
 #[non_exhaustive]
@@ -238,6 +254,8 @@ impl From<KeywordPresetType> for u8 {
 }
 
 /// An action which will execute whenever a rule is triggered.
+///
+/// [Discord docs](https://discord.com/developers/docs/resources/auto-moderation#auto-moderation-action-object).
 #[derive(Clone, Debug, PartialEq)]
 pub enum Action {
     /// Blocks the content of a message according to the rule.
@@ -260,7 +278,7 @@ pub enum Action {
 /// Gateway event payload sent when a rule is triggered and an action is executed (e.g. message is
 /// blocked).
 ///
-/// [Discord docs](https://discord.com/developers/docs/topics/gateway#auto-moderation-action-execution)
+/// [Discord docs](https://discord.com/developers/docs/topics/gateway#auto-moderation-action-execution).
 #[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct ActionExecution {
     /// ID of the guild in which the action was executed.
@@ -427,6 +445,8 @@ impl Action {
 }
 
 /// Type of [`Action`].
+///
+/// [Discord docs](https://discord.com/developers/docs/resources/auto-moderation#auto-moderation-action-object-action-types).
 #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
 #[serde(from = "u8", into = "u8")]
 #[non_exhaustive]
@@ -491,14 +511,14 @@ mod tests {
 
         assert_eq!(
             crate::json::to_string(&Rule {
-                trigger: Trigger::HarmfulLink,
+                trigger: Trigger::HarmfulLink
             })?,
             r#"{"trigger_type":2,"trigger_metadata":{}}"#,
         );
 
         assert_eq!(
             crate::json::to_string(&Rule {
-                trigger: Trigger::Spam,
+                trigger: Trigger::Spam
             })?,
             r#"{"trigger_type":3,"trigger_metadata":{}}"#,
         );
@@ -516,7 +536,7 @@ mod tests {
 
         assert_eq!(
             crate::json::to_string(&Rule {
-                trigger: Trigger::Unknown(123),
+                trigger: Trigger::Unknown(123)
             })?,
             r#"{"trigger_type":123,"trigger_metadata":{}}"#,
         );

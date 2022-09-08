@@ -24,6 +24,8 @@ use crate::utils::parse_role;
 /// are unique per guild and do not cross over to other guilds in any way, and
 /// can have channel-specific permission overrides in addition to guild-level
 /// permissions.
+///
+/// [Discord docs](https://discord.com/developers/docs/topics/permissions#role-object).
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 pub struct Role {
@@ -302,6 +304,8 @@ impl FromStrAndCache for Role {
 }
 
 /// The tags of a [`Role`].
+///
+/// [Discord docs](https://discord.com/developers/docs/topics/permissions#role-object-role-tags-structure).
 #[derive(Clone, Debug, Default, Deserialize, Serialize)]
 #[cfg_attr(test, derive(PartialEq))]
 #[non_exhaustive]

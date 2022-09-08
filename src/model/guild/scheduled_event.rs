@@ -1,6 +1,8 @@
 use crate::model::prelude::*;
 
 /// Information about a guild scheduled event.
+///
+/// [Discord docs](https://discord.com/developers/docs/resources/guild-scheduled-event#guild-scheduled-event-object).
 #[derive(Clone, Debug, Serialize, Deserialize)]
 #[non_exhaustive]
 pub struct ScheduledEvent {
@@ -46,6 +48,7 @@ pub struct ScheduledEvent {
     pub image: Option<String>,
 }
 
+/// [Discord docs](https://discord.com/developers/docs/resources/guild-scheduled-event#guild-scheduled-event-object-guild-scheduled-event-status).
 #[derive(Copy, Clone, Debug)]
 pub enum ScheduledEventStatus {
     Scheduled = 1,
@@ -59,9 +62,10 @@ enum_number!(ScheduledEventStatus {
     Scheduled,
     Active,
     Completed,
-    Canceled,
+    Canceled
 });
 
+/// [Discord docs](https://discord.com/developers/docs/resources/guild-scheduled-event#guild-scheduled-event-object-guild-scheduled-event-entity-types).
 #[derive(Copy, Clone, Debug)]
 pub enum ScheduledEventType {
     StageInstance = 1,
@@ -73,9 +77,10 @@ pub enum ScheduledEventType {
 enum_number!(ScheduledEventType {
     StageInstance,
     Voice,
-    External,
+    External
 });
 
+/// [Discord docs](https://discord.com/developers/docs/resources/guild-scheduled-event#guild-scheduled-event-object-guild-scheduled-event-entity-metadata).
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct ScheduledEventMetadata {
     // TODO: Change to `Option<String>` in next version.
@@ -83,6 +88,7 @@ pub struct ScheduledEventMetadata {
     pub location: String,
 }
 
+/// [Discord docs](https://discord.com/developers/docs/resources/guild-scheduled-event#guild-scheduled-event-user-object).
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct ScheduledEventUser {
     #[serde(rename = "guild_scheduled_event_id")]

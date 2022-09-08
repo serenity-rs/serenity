@@ -40,6 +40,8 @@ use crate::{
 
 /// A representation of a message over a guild's text channel, a group, or a
 /// private channel.
+///
+/// [Discord docs](https://discord.com/developers/docs/resources/channel#message-object).
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 pub struct Message {
@@ -1042,6 +1044,8 @@ impl<'a> From<&'a Message> for MessageId {
 /// Multiple of the same [reaction type] are sent into one [`MessageReaction`],
 /// with an associated [`Self::count`].
 ///
+/// [Discord docs](https://discord.com/developers/docs/resources/channel#reaction-object).
+///
 /// [reaction type]: ReactionType
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
@@ -1057,6 +1061,8 @@ pub struct MessageReaction {
 }
 
 /// Differentiates between regular and different types of system messages.
+///
+/// [Discord docs](https://discord.com/developers/docs/resources/channel#message-object-message-types).
 #[derive(Clone, Copy, Debug, Eq, Hash, PartialEq, PartialOrd, Ord)]
 #[non_exhaustive]
 pub enum MessageType {
@@ -1139,6 +1145,7 @@ enum_number!(MessageType {
     AutoModerationAction,
 });
 
+/// [Discord docs](https://discord.com/developers/docs/resources/channel#message-object-message-activity-types).
 #[derive(Clone, Copy, Debug, Eq, Hash, PartialEq, PartialOrd, Ord)]
 #[non_exhaustive]
 pub enum MessageActivityKind {
@@ -1161,6 +1168,8 @@ enum_number!(MessageActivityKind {
 });
 
 /// Rich Presence application information.
+///
+/// [Discord docs](https://discord.com/developers/docs/resources/application#application-object).
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 pub struct MessageApplication {
@@ -1177,6 +1186,8 @@ pub struct MessageApplication {
 }
 
 /// Rich Presence activity information.
+///
+/// [Discord docs](https://discord.com/developers/docs/resources/channel#message-object-message-activity-structure).
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 pub struct MessageActivity {
@@ -1188,6 +1199,8 @@ pub struct MessageActivity {
 }
 
 /// Reference data sent with crossposted messages.
+///
+/// [Discord docs](https://discord.com/developers/docs/resources/channel#message-reference-object-message-reference-structure).
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 pub struct MessageReference {
@@ -1219,7 +1232,7 @@ impl From<(ChannelId, MessageId)> for MessageReference {
     }
 }
 
-/// Channel Mention Object
+/// [Discord docs](https://discord.com/developers/docs/resources/channel#channel-mention-object).
 #[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct ChannelMention {
     /// ID of the channel.
@@ -1235,6 +1248,8 @@ pub struct ChannelMention {
 
 bitflags! {
     /// Describes extra features of the message.
+    ///
+    /// [Discord docs](https://discord.com/developers/docs/resources/channel#message-object-message-flags).
     #[derive(Default)]
     pub struct MessageFlags: u64 {
         /// This message has been published to subscribed channels (via Channel Following).

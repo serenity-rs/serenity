@@ -21,6 +21,8 @@ use crate::model::Timestamp;
 use crate::utils::Colour;
 
 /// Information about a member of a guild.
+///
+/// [Discord docs](https://discord.com/developers/docs/resources/guild#guild-member-object).
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 pub struct Member {
@@ -652,6 +654,8 @@ impl fmt::Display for Member {
 /// A partial amount of data for a member.
 ///
 /// This is used in [`Message`]s from [`Guild`]s.
+///
+/// [Discord docs](https://discord.com/developers/docs/resources/guild#guild-member-object), subset specification unknown
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 pub struct PartialMember {
@@ -695,6 +699,7 @@ fn avatar_url(guild_id: GuildId, user_id: UserId, hash: Option<&String>) -> Opti
     })
 }
 
+/// [Discord docs](https://discord.com/developers/docs/resources/channel#thread-member-object).
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 pub struct ThreadMember {
@@ -710,6 +715,8 @@ pub struct ThreadMember {
 
 bitflags! {
     /// Describes extra features of the message.
+    ///
+    /// Discord docs: flags field on [Thread Member](https://discord.com/developers/docs/resources/channel#thread-member-object).
     #[derive(Default)]
     pub struct ThreadMemberFlags: u64 {
         // Not documented.

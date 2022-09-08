@@ -1,4 +1,6 @@
 /// The guild's premium tier, depends on the amount of users boosting the guild currently
+///
+/// [Discord docs](https://discord.com/developers/docs/resources/guild#guild-object-premium-tier).
 #[derive(Debug, Clone, Copy, Eq, PartialEq, Ord, PartialOrd, Hash)]
 #[non_exhaustive]
 pub enum PremiumTier {

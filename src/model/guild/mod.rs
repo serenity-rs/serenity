@@ -82,6 +82,8 @@ use crate::model::utils::{emojis, presences, roles, stickers};
 use crate::model::Timestamp;
 
 /// A representation of a banning of a user.
+///
+/// [Discord docs](https://discord.com/developers/docs/resources/guild#ban-object).
 #[derive(Clone, Debug, Deserialize, Eq, PartialEq, Hash, Serialize)]
 pub struct Ban {
     /// The reason given for this ban.
@@ -91,6 +93,9 @@ pub struct Ban {
 }
 
 /// Information about a Discord guild, such as channels, emojis, etc.
+///
+/// [Discord docs](https://discord.com/developers/docs/resources/guild#guild-object) plus
+/// [extension](https://discord.com/developers/docs/topics/gateway#guild-create).
 #[derive(Clone, Debug, Serialize)]
 #[non_exhaustive]
 pub struct Guild {
@@ -3016,6 +3021,8 @@ pub enum GuildContainer {
 }
 
 /// A [`Guild`] widget.
+///
+/// [Discord docs](https://discord.com/developers/docs/resources/guild#guild-widget-settings-object).
 #[derive(Clone, Debug, Serialize, Deserialize)]
 #[non_exhaustive]
 pub struct GuildWidget {
@@ -3027,6 +3034,8 @@ pub struct GuildWidget {
 
 /// Representation of the number of members that would be pruned by a guild
 /// prune operation.
+///
+/// [Discord docs](https://discord.com/developers/docs/resources/guild#get-guild-prune-count).
 #[derive(Clone, Copy, Debug, Deserialize, Serialize)]
 pub struct GuildPrune {
     /// The number of members that would be pruned by the operation.
@@ -3034,6 +3043,9 @@ pub struct GuildPrune {
 }
 
 /// Basic information about a guild.
+///
+/// [Discord docs](https://discord.com/developers/docs/resources/guild#guild-object), subset undocumented (closest thing is
+/// [this](https://discord.com/developers/docs/topics/rpc#getguilds-get-guilds-response-structure)).
 #[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct GuildInfo {
     /// The unique Id of the guild.
@@ -3095,6 +3107,8 @@ impl InviteGuild {
 }
 
 /// Data for an unavailable guild.
+///
+/// [Discord docs](https://discord.com/developers/docs/resources/guild#unavailable-guild-object).
 #[derive(Clone, Copy, Debug, Deserialize, Serialize)]
 pub struct UnavailableGuild {
     /// The Id of the [`Guild`] that may be unavailable.
@@ -3105,6 +3119,8 @@ pub struct UnavailableGuild {
 }
 
 /// Default message notification level for a guild.
+///
+/// [Discord docs](https://discord.com/developers/docs/resources/guild#guild-object-default-message-notification-level).
 #[derive(Clone, Copy, Debug, Eq, Hash, PartialEq, PartialOrd, Ord)]
 #[non_exhaustive]
 pub enum DefaultMessageNotificationLevel {
@@ -3122,6 +3138,8 @@ enum_number!(DefaultMessageNotificationLevel {
 });
 
 /// Setting used to filter explicit messages from members.
+///
+/// [Discord docs](https://discord.com/developers/docs/resources/guild#guild-object-explicit-content-filter-level).
 #[derive(Clone, Copy, Debug, Eq, Hash, PartialEq, PartialOrd, Ord)]
 #[non_exhaustive]
 pub enum ExplicitContentFilter {
@@ -3142,6 +3160,8 @@ enum_number!(ExplicitContentFilter {
 });
 
 /// Multi-Factor Authentication level for guild moderators.
+///
+/// [Discord docs](https://discord.com/developers/docs/resources/guild#guild-object-mfa-level).
 #[derive(Clone, Copy, Debug, Eq, Hash, PartialEq, PartialOrd, Ord)]
 #[non_exhaustive]
 pub enum MfaLevel {
@@ -3160,6 +3180,8 @@ enum_number!(MfaLevel {
 
 /// The level to set as criteria prior to a user being able to send
 /// messages in a [`Guild`].
+///
+/// [Discord docs](https://discord.com/developers/docs/resources/guild#guild-object-verification-level).
 #[derive(Clone, Copy, Debug, Eq, Hash, PartialEq, PartialOrd, Ord)]
 #[non_exhaustive]
 pub enum VerificationLevel {
@@ -3186,6 +3208,8 @@ enum_number!(VerificationLevel {
 });
 
 /// The [`Guild`] nsfw level.
+///
+/// [Discord docs](https://discord.com/developers/docs/resources/guild#guild-object-guild-nsfw-level).
 #[derive(Clone, Copy, Debug, Eq, Hash, PartialEq, PartialOrd, Ord)]
 #[non_exhaustive]
 pub enum NsfwLevel {

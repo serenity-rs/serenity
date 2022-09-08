@@ -1,5 +1,7 @@
 bitflags! {
     /// Describes a system channel flags.
+    ///
+    /// [Discord docs](https://discord.com/developers/docs/resources/guild#guild-object-system-channel-flags).
     #[derive(Default)]
     pub struct SystemChannelFlags: u64 {
         /// Suppress member join notifications.

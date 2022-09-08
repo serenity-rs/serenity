@@ -5,8 +5,10 @@ pub mod component;
 pub mod interaction;
 pub mod oauth;
 
-use super::id::{snowflake, ApplicationId, UserId};
+use self::oauth::Scope;
+use super::id::{snowflake, ApplicationId, GuildId, SkuId, UserId};
 use super::user::User;
+use super::Permissions;
 
 /// Partial information about the given application.
 #[derive(Clone, Debug, Deserialize, Serialize)]
@@ -18,22 +20,48 @@ pub struct PartialCurrentApplicationInfo {
 }
 
 /// Information about the current application and its owner.
+///
+/// [Discord docs](https://discord.com/developers/docs/resources/application#application-object-application-structure).
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 pub struct CurrentApplicationInfo {
-    pub description: String,
-    pub icon: Option<String>,
     pub id: ApplicationId,
     pub name: String,
-    pub owner: User,
+    pub icon: Option<String>,
+    pub description: String,
     #[serde(default)]
     pub rpc_origins: Vec<String>,
     pub bot_public: bool,
     pub bot_require_code_grant: bool,
+    #[serde(default)]
+    pub terms_of_service_url: Option<String>,
+    #[serde(default)]
+    pub privacy_policy_url: Option<String>,
+    // TODO: this is an optional field according to Discord and should be Option<User>
+    pub owner: User,
+    pub verify_key: String,
     pub team: Option<Team>,
+    #[serde(default)]
+    pub guild_id: Option<GuildId>,
+    #[serde(default)]
+    pub primary_sku_id: Option<SkuId>,
+    #[serde(default)]
+    pub slug: Option<String>,
+    #[serde(default)]
+    pub cover_image: Option<String>,
+    #[serde(default)]
+    pub flags: Option<ApplicationFlags>,
+    #[serde(default)]
+    pub tags: Option<Vec<String>>,
+    #[serde(default)]
+    pub install_params: Option<InstallParams>,
+    #[serde(default)]
+    pub custom_install_url: Option<String>,
 }
 
 /// Information about the Team group of the application.
+///
+/// [Discord docs](https://discord.com/developers/docs/topics/teams#data-models-team-object).
 #[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct Team {
     /// The icon of the team.
@@ -50,6 +78,8 @@ pub struct Team {
 }
 
 /// Information about a Member on a Team.
+///
+/// [Discord docs](https://discord.com/developers/docs/topics/teams#data-models-team-member-object).
 #[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct TeamMember {
     /// The member's membership state.
@@ -65,6 +95,7 @@ pub struct TeamMember {
     pub user: User,
 }
 
+/// [Discord docs](https://discord.com/developers/docs/topics/teams#data-models-membership-state-enum).
 #[derive(Clone, Debug, Copy, PartialEq)]
 pub enum MembershipState {
     Invited = 1,
@@ -79,6 +110,8 @@ enum_number!(MembershipState {
 
 bitflags! {
     /// The flags of the application.
+    ///
+    /// [Discord docs](https://discord.com/developers/docs/resources/application#application-object-application-flags).
     #[derive(Default)]
     pub struct ApplicationFlags: u64 {
         const GATEWAY_PRESENCE = 1 << 12;
@@ -90,4 +123,12 @@ bitflags! {
         const GATEWAY_MESSAGE_CONTENT = 2 << 18;
         const GATEWAY_MESSAGE_CONTENT_LIMITED = 2 << 19;
     }
+}
+
+/// Settings for the application's default in-app authorization link
+///
+/// [Discord docs](https://discord.com/developers/docs/resources/application#install-params-object-install-params-structure).
+pub struct InstallParams {
+    pub scopes: Vec<Scope>,
+    pub permissions: Permissions,
 }

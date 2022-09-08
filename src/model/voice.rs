@@ -9,6 +9,8 @@ use crate::model::id::{ChannelId, GuildId, UserId};
 use crate::model::Timestamp;
 
 /// Information about an available voice region.
+///
+/// [Discord docs](https://discord.com/developers/docs/resources/voice#voice-region-object).
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 pub struct VoiceRegion {
@@ -25,6 +27,8 @@ pub struct VoiceRegion {
 }
 
 /// A user's state within a voice channel.
+///
+/// [Discord docs](https://discord.com/developers/docs/resources/voice#voice-state-object).
 #[derive(Clone, Serialize)]
 #[non_exhaustive]
 pub struct VoiceState {

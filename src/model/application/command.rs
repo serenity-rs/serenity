@@ -429,7 +429,7 @@ pub enum CommandPermissionType {
 enum_number!(CommandPermissionType {
     Role,
     User,
-    Channel,
+    Channel
 });
 
 impl CommandPermissionId {
