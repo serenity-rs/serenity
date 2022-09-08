@@ -25,11 +25,6 @@ use crate::utils::Colour;
 /// A builder to create a fake [`Embed`] object, for use with the
 /// [`ChannelId::send_message`] and [`ExecuteWebhook::embeds`] methods.
 ///
-/// # Examples
-///
-/// Refer to the documentation for [`ChannelId::send_message`] for a very in-depth
-/// example on how to use this.
-///
 /// [`ChannelId::send_message`]: crate::model::id::ChannelId::send_message
 /// [`Embed`]: crate::model::channel::Embed
 /// [`ExecuteWebhook::embeds`]: crate::builder::ExecuteWebhook::embeds
