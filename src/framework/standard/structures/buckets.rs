@@ -49,7 +49,7 @@ pub(crate) enum Bucket {
     /// The bucket will collect tickets per category.
     ///
     /// This requires the cache, as messages do not contain their channel's
-    /// category.
+    /// category and retrieving channel data via HTTP is costly.
     #[cfg(feature = "cache")]
     Category(TicketCounter),
 }
@@ -72,7 +72,7 @@ impl Bucket {
             // category.
             #[cfg(feature = "cache")]
             Self::Category(counter) => {
-                if let Some(category_id) = msg.category_id(ctx) {
+                if let Some(category_id) = msg.category_id(ctx).await {
                     counter.take(ctx, msg, category_id.get()).await
                 } else {
                     None
@@ -96,7 +96,7 @@ impl Bucket {
             // category.
             #[cfg(feature = "cache")]
             Self::Category(counter) => {
-                if let Some(category_id) = msg.category_id(ctx) {
+                if let Some(category_id) = msg.category_id(ctx).await {
                     counter.give(ctx, msg, category_id.get()).await;
                 }
             },
