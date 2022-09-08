@@ -1,10 +1,12 @@
+use std::collections::HashSet;
+
 use serde::{Deserialize, Serialize};
 
 use crate::model::id::{RoleId, UserId};
 
-#[derive(Clone, Copy, Debug, Deserialize, Serialize)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, Deserialize, Serialize)]
 #[serde(rename_all = "lowercase")]
-pub enum ParseValue {
+enum ParseValue {
     Everyone,
     Users,
     Roles,
@@ -60,7 +62,7 @@ pub enum ParseValue {
 #[derive(Clone, Debug, Default, Serialize)]
 #[must_use]
 pub struct CreateAllowedMentions {
-    parse: Vec<ParseValue>,
+    parse: HashSet<ParseValue>,
     users: Vec<UserId>,
     roles: Vec<RoleId>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -73,24 +75,33 @@ impl CreateAllowedMentions {
         Self::default()
     }
 
-    /// Add a value that's allowed to be mentioned.
-    ///
-    /// If passing in [`ParseValue::Users`] or [`ParseValue::Roles`], note that later calling
-    /// [`Self::users`] or [`Self::roles`] will then not work as intended, as the [`ParseValue`]
-    /// will take precedence.
-    #[inline]
-    pub fn parse(mut self, value: ParseValue) -> Self {
-        self.parse.push(value);
+    /// Toggles mentions for all users. Overrides [`users`] if it was previously set.
+    pub fn all_users(mut self, allow: bool) -> Self {
+        if allow {
+            self.parse.insert(ParseValue::Users);
+        } else {
+            self.parse.remove(&ParseValue::Users);
+        }
         self
     }
 
-    /// Clear all the values that would be mentioned.
-    ///
-    /// Will disable all mentions, except for any specific ones added with [`Self::users`] or
-    /// [`Self::roles`].
-    #[inline]
-    pub fn empty_parse(mut self) -> Self {
-        self.parse.clear();
+    /// Toggles mentions for all roles. Overrides [`roles`] if it was previously set.
+    pub fn all_roles(mut self, allow: bool) -> Self {
+        if allow {
+            self.parse.insert(ParseValue::Roles);
+        } else {
+            self.parse.remove(&ParseValue::Roles);
+        }
+        self
+    }
+
+    /// Toggles @everyone and @here mentions.
+    pub fn everyone(mut self, allow: bool) -> Self {
+        if allow {
+            self.parse.insert(ParseValue::Everyone);
+        } else {
+            self.parse.remove(&ParseValue::Everyone);
+        }
         self
     }
 
