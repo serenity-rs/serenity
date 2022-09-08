@@ -128,6 +128,7 @@ bitflags! {
 /// Settings for the application's default in-app authorization link
 ///
 /// [Discord docs](https://discord.com/developers/docs/resources/application#install-params-object-install-params-structure).
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct InstallParams {
     pub scopes: Vec<Scope>,
     pub permissions: Permissions,
