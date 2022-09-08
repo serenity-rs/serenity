@@ -225,7 +225,7 @@ enum_number! {
         Private = 1,
         /// An indicator that the channel is a voice [`GuildChannel`].
         Voice = 2,
-        /// An indicator that the channel is the channel of a [`ChannelCategory`].
+        /// An indicator that the channel is a channel category.
         Category = 4,
         /// An indicator that the channel is a `NewsChannel`.
         ///
