@@ -75,7 +75,7 @@ impl CreateAllowedMentions {
         Self::default()
     }
 
-    /// Toggles mentions for all users. Overrides [`users`] if it was previously set.
+    /// Toggles mentions for all users. Overrides [`Self::users`] if it was previously set.
     pub fn all_users(mut self, allow: bool) -> Self {
         if allow {
             self.parse.insert(ParseValue::Users);
@@ -85,7 +85,7 @@ impl CreateAllowedMentions {
         self
     }
 
-    /// Toggles mentions for all roles. Overrides [`roles`] if it was previously set.
+    /// Toggles mentions for all roles. Overrides [`Self::roles`] if it was previously set.
     pub fn all_roles(mut self, allow: bool) -> Self {
         if allow {
             self.parse.insert(ParseValue::Roles);
