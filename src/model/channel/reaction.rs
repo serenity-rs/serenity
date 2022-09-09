@@ -17,6 +17,8 @@ use crate::internal::prelude::*;
 use crate::model::prelude::*;
 
 /// An emoji reaction to a message.
+///
+/// [Discord docs](https://discord.com/developers/docs/topics/gateway#message-reaction-add-message-reaction-add-event-fields).
 #[derive(Clone, Debug, Serialize)]
 #[non_exhaustive]
 pub struct Reaction {

@@ -49,6 +49,8 @@ pub static JOIN_MESSAGES: &[&str] = &[
 ];
 
 /// Enum to map gateway opcodes.
+///
+/// [Discord docs](https://discord.com/developers/docs/topics/opcodes-and-status-codes#gateway-gateway-opcodes).
 #[derive(Clone, Copy, Debug, Eq, Hash, PartialEq, PartialOrd, Ord)]
 #[non_exhaustive]
 pub enum OpCode {

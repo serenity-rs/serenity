@@ -54,6 +54,8 @@ fn message_count_patch<'de, D: serde::Deserializer<'de>>(
 /// only for voice channels and some are only available for text channels.
 /// News channels are a subset of text channels and lack slow mode hence
 /// [`Self::rate_limit_per_user`] will be [`None`].
+///
+/// [Discord docs](https://discord.com/developers/docs/resources/channel#channel-object).
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 pub struct GuildChannel {
@@ -1326,6 +1328,9 @@ impl fmt::Display for GuildChannel {
 }
 
 /// A partial guild channel.
+///
+/// [Discord docs](https://discord.com/developers/docs/resources/channel#channel-object),
+/// [subset description](https://discord.com/developers/docs/topics/gateway#thread-delete)
 #[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct PartialGuildChannel {
     /// The channel Id.

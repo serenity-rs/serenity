@@ -22,6 +22,8 @@ use crate::model::ModelError;
 use crate::utils::encode_image;
 
 /// A representation of a type of webhook.
+///
+/// [Discord docs](https://discord.com/developers/docs/resources/webhook#webhook-object-webhook-types).
 #[derive(Clone, Copy, Debug, Eq, Hash, PartialEq, PartialOrd, Ord)]
 #[non_exhaustive]
 pub enum WebhookType {
@@ -40,7 +42,7 @@ pub enum WebhookType {
 enum_number!(WebhookType {
     Incoming,
     ChannelFollower,
-    Application,
+    Application
 });
 
 impl WebhookType {
@@ -59,6 +61,8 @@ impl WebhookType {
 /// A representation of a webhook, which is a low-effort way to post messages to
 /// channels. They do not necessarily require a bot user or authentication to
 /// use.
+///
+/// [Discord docs](https://discord.com/developers/docs/resources/webhook#webhook-object).
 #[derive(Clone, Deserialize, Serialize)]
 #[non_exhaustive]
 pub struct Webhook {

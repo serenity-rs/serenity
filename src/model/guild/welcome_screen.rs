@@ -3,6 +3,8 @@ use serde::{Deserialize, Deserializer, Serialize, Serializer};
 use crate::model::id::{ChannelId, EmojiId};
 
 /// Information relating to a guild's welcome screen.
+///
+/// [Discord docs](https://discord.com/developers/docs/resources/guild#welcome-screen-object).
 #[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct GuildWelcomeScreen {
     /// The server description shown in the welcome screen.
@@ -14,6 +16,8 @@ pub struct GuildWelcomeScreen {
 }
 
 /// A channel shown in the [`GuildWelcomeScreen`].
+///
+/// [Discord docs](https://discord.com/developers/docs/resources/guild#welcome-screen-object-welcome-screen-channel-structure).
 #[derive(Clone, Debug)]
 #[non_exhaustive]
 pub struct GuildWelcomeChannel {
@@ -80,6 +84,8 @@ impl Serialize for GuildWelcomeChannel {
 }
 
 /// A [`GuildWelcomeScreen`] emoji.
+///
+/// [Discord docs](https://discord.com/developers/docs/resources/guild#welcome-screen-object-welcome-screen-channel-structure).
 #[derive(Clone, Debug, Eq, PartialEq, Hash)]
 #[non_exhaustive]
 pub enum GuildWelcomeChannelEmoji {

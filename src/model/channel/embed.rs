@@ -16,6 +16,8 @@ use crate::utils::Colour;
 /// **Note**: Maximum amount of characters you can put is 256 in a field name,
 /// 1024 in a field value, and 2048 in a description.
 ///
+/// [Discord docs](https://discord.com/developers/docs/resources/channel#embed-object).
+///
 /// [slack's attachments]: https://api.slack.com/docs/message-attachments
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
@@ -103,6 +105,8 @@ impl Embed {
 }
 
 /// An author object in an embed.
+///
+/// [Discord docs](https://discord.com/developers/docs/resources/channel#embed-object-embed-author-structure).
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 pub struct EmbedAuthor {
@@ -119,6 +123,8 @@ pub struct EmbedAuthor {
 }
 
 /// A field object in an embed.
+///
+/// [Discord docs](https://discord.com/developers/docs/resources/channel#embed-object-embed-field-structure).
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 pub struct EmbedField {
@@ -158,6 +164,8 @@ impl EmbedField {
 }
 
 /// Footer information for an embed.
+///
+/// [Discord docs](https://discord.com/developers/docs/resources/channel#embed-object-embed-footer-structure).
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 pub struct EmbedFooter {
@@ -172,6 +180,8 @@ pub struct EmbedFooter {
 }
 
 /// An image object in an embed.
+///
+/// [Discord docs](https://discord.com/developers/docs/resources/channel#embed-object-embed-image-structure).
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 pub struct EmbedImage {
@@ -188,6 +198,8 @@ pub struct EmbedImage {
 }
 
 /// The provider of an embed.
+///
+/// [Discord docs](https://discord.com/developers/docs/resources/channel#embed-object-embed-provider-structure).
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 pub struct EmbedProvider {
@@ -198,6 +210,8 @@ pub struct EmbedProvider {
 }
 
 /// The dimensions and URL of an embed thumbnail.
+///
+/// [Discord docs](https://discord.com/developers/docs/resources/channel#embed-object-embed-thumbnail-structure).
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 pub struct EmbedThumbnail {
@@ -214,6 +228,8 @@ pub struct EmbedThumbnail {
 }
 
 /// Video information for an embed.
+///
+/// [Discord docs](https://discord.com/developers/docs/resources/channel#embed-object-embed-video-structure).
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 pub struct EmbedVideo {

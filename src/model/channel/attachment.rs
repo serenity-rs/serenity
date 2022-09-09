@@ -8,6 +8,8 @@ use crate::model::utils::is_false;
 
 /// A file uploaded with a message. Not to be confused with [`Embed`]s.
 ///
+/// [Discord docs](https://discord.com/developers/docs/resources/channel#attachment-object).
+///
 /// [`Embed`]: super::Embed
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]

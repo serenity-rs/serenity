@@ -4,6 +4,8 @@ use crate::model::sticker::Sticker;
 /// A sticker sent with a message.
 ///
 /// Bots currently can only receive messages with stickers, not send.
+///
+/// [Discord docs](https://discord.com/developers/docs/resources/sticker#sticker-pack-object).
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 pub struct StickerPack {

@@ -18,6 +18,8 @@ use crate::model::Timestamp;
 /// Information about an invite code.
 ///
 /// Information can not be accessed for guilds the current user is banned from.
+///
+/// [Discord docs](https://discord.com/developers/docs/resources/invite#invite-object).
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 pub struct Invite {
@@ -219,6 +221,8 @@ impl Invite {
 }
 
 /// A minimal amount of information about the channel an invite points to.
+///
+/// [Discord docs](https://discord.com/developers/docs/resources/invite#invite-object-example-invite-object).
 #[non_exhaustive]
 #[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct InviteChannel {
@@ -229,6 +233,8 @@ pub struct InviteChannel {
 }
 
 /// A minimal amount of information about the guild an invite points to.
+///
+/// [Discord docs](https://discord.com/developers/docs/resources/invite#invite-object-example-invite-object).
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 pub struct InviteGuild {
@@ -291,6 +297,8 @@ impl InviteGuild {
 /// the [`Invite`] struct.
 ///
 /// [Manage Guild]: Permissions::MANAGE_GUILD
+///
+/// [Discord docs](https://discord.com/developers/docs/resources/invite#invite-metadata-object) (extends [`Invite`] fields).
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 pub struct RichInvite {
@@ -407,6 +415,7 @@ impl RichInvite {
     }
 }
 
+/// [Discord docs](https://discord.com/developers/docs/resources/invite#invite-stage-instance-object).
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 pub struct InviteStageInstance {
@@ -420,6 +429,7 @@ pub struct InviteStageInstance {
     topic: String,
 }
 
+/// [Discord docs](https://discord.com/developers/docs/resources/invite#invite-object-invite-target-types).
 #[derive(Clone, Copy, Debug, Eq, Hash, PartialEq, PartialOrd, Ord)]
 #[non_exhaustive]
 pub enum InviteTargetType {
@@ -432,5 +442,5 @@ pub enum InviteTargetType {
 enum_number!(InviteTargetType {
     Normal,
     Stream,
-    EmmbeddedApplication,
+    EmmbeddedApplication
 });

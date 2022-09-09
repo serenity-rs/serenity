@@ -224,6 +224,8 @@ bitflags::bitflags! {
     /// [`PermissionOverwrite`]s, roles globally in a [`Guild`], and to
     /// [`GuildChannel`]s.
     ///
+    /// [Discord docs](https://discord.com/developers/docs/topics/permissions#permissions-bitwise-permission-flags).
+    ///
     /// [`Guild`]: super::guild::Guild
     /// [`GuildChannel`]: super::channel::GuildChannel
     /// [`PermissionOverwrite`]: super::channel::PermissionOverwrite
@@ -402,6 +404,7 @@ generate_get_permission_names! {
     view_guild_insights: "View Guild Insights"
 }
 
+/// TODO: use a macro to shorten this entire file lol
 #[cfg(feature = "model")]
 impl Permissions {
     /// Shorthand for checking that the set of permissions contains the

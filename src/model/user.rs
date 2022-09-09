@@ -169,6 +169,9 @@ pub(crate) mod discriminator {
 }
 
 /// Information about the current user.
+///
+/// [Discord docs](https://discord.com/developers/docs/resources/user#user-object).
+// TODO: replace this with User
 #[derive(Clone, Default, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 pub struct CurrentUser {
@@ -576,13 +579,7 @@ impl DefaultAvatar {
 
 /// The representation of a user's status.
 ///
-/// # Examples
-///
-/// - [`DoNotDisturb`];
-/// - [`Invisible`].
-///
-/// [`DoNotDisturb`]: OnlineStatus::DoNotDisturb
-/// [`Invisible`]: OnlineStatus::Invisible
+/// [Discord docs](https://discord.com/developers/docs/topics/gateway#update-presence-status-types).
 #[derive(Clone, Copy, Debug, Deserialize, Eq, Hash, PartialEq, PartialOrd, Ord, Serialize)]
 #[non_exhaustive]
 pub enum OnlineStatus {
@@ -618,6 +615,8 @@ impl Default for OnlineStatus {
 }
 
 /// Information about a user.
+///
+/// [Discord docs](https://discord.com/developers/docs/resources/user#user-object).
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 pub struct User {
@@ -659,6 +658,8 @@ pub struct User {
 
 bitflags! {
     /// User's public flags
+    ///
+    /// [Discord docs](https://discord.com/developers/docs/resources/user#user-object-user-flags).
     #[derive(Default)]
     pub struct UserPublicFlags: u32 {
         /// User's flag as discord employee
