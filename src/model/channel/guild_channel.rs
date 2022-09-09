@@ -159,7 +159,7 @@ impl GuildChannel {
     /// it is possible to send messages.
     #[must_use]
     pub fn is_text_based(&self) -> bool {
-        matches!(self.kind, ChannelType::Text | ChannelType::News)
+        matches!(self.kind, ChannelType::Text | ChannelType::News | ChannelType::Voice)
     }
 
     /// Broadcasts to the channel that the current user is typing.
