@@ -998,6 +998,11 @@
 <span id="992">992</span>
 <span id="993">993</span>
 <span id="994">994</span>
+<span id="995">995</span>
+<span id="996">996</span>
+<span id="997">997</span>
+<span id="998">998</span>
+<span id="999">999</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::borrow::Cow</span>;
 <span class="kw">use</span> <span class="ident">std::error::Error</span> <span class="kw">as</span> <span class="ident">StdError</span>;
 <span class="kw">use</span> <span class="ident">std::fmt</span>;
@@ -1142,7 +1147,12 @@
     <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">kind</span>) <span class="op">=</span> <span class="ident">QuoteKind::new</span>(<span class="ident">stream</span>.<span class="ident">current_char</span>()<span class="question-mark">?</span>) {
         <span class="ident">stream</span>.<span class="ident">next_char</span>();
 
-        <span class="ident">stream</span>.<span class="ident">take_until_char</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="ident">kind</span>.<span class="ident">is_ending_quote</span>(<span class="ident">c</span>));
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">prev_was_backslash</span> <span class="op">=</span> <span class="bool-val">false</span>;
+        <span class="ident">stream</span>.<span class="ident">take_until_char</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> {
+            <span class="kw">let</span> <span class="ident">result</span> <span class="op">=</span> <span class="ident">kind</span>.<span class="ident">is_ending_quote</span>(<span class="ident">c</span>) <span class="op">&amp;&amp;</span> <span class="op">!</span><span class="ident">prev_was_backslash</span>;
+            <span class="ident">prev_was_backslash</span> <span class="op">=</span> <span class="ident">c</span> <span class="op">==</span> <span class="string">&#39;\\&#39;</span>;
+            <span class="ident">result</span>
+        });
 
         <span class="kw">let</span> <span class="ident">is_quote</span> <span class="op">=</span> <span class="ident">stream</span>.<span class="ident">current_char</span>().<span class="ident">map_or</span>(<span class="bool-val">false</span>, <span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="ident">kind</span>.<span class="ident">is_ending_quote</span>(<span class="ident">c</span>));
         <span class="ident">stream</span>.<span class="ident">next_char</span>();
