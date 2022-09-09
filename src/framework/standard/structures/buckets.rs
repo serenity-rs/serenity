@@ -473,6 +473,8 @@ impl BucketBuilder {
     /// 1. `await_ratelimits` is set to a non zero value (the default is 0).
     /// 2. user's message rests comfortably within `await_ratelimits` (ex. if you set it to 1 then it will only respond once when the delay is first exceeded).
     ///
+    /// For convenience, this function will automatically raise `await_ratelimits` to at least 1.
+    ///
     /// You can use this to, for example, send a custom response when someone exceeds the amount of commands they're allowed to make.
     ///
     /// # Examples
@@ -526,6 +528,9 @@ impl BucketBuilder {
     #[inline]
     pub fn delay_action(&mut self, action: DelayHook) -> &mut Self {
         self.delay_action = Some(action);
+        if self.await_ratelimits == 0 {
+            self.await_ratelimits = 1;
+        }
 
         self
     }
