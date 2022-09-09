@@ -636,18 +636,18 @@ pub struct GuildScheduledEventDeleteEvent {
 #[non_exhaustive]
 pub struct GuildScheduledEventUserAddEvent {
     #[serde(rename = "guild_scheduled_event_id")]
-    scheduled_event_id: ScheduledEventId,
-    guild_id: GuildId,
-    user_id: UserId,
+    pub scheduled_event_id: ScheduledEventId,
+    pub guild_id: GuildId,
+    pub user_id: UserId,
 }
 
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 pub struct GuildScheduledEventUserRemoveEvent {
     #[serde(rename = "guild_scheduled_event_id")]
-    scheduled_event_id: ScheduledEventId,
-    guild_id: GuildId,
-    user_id: UserId,
+    pub scheduled_event_id: ScheduledEventId,
+    pub guild_id: GuildId,
+    pub user_id: UserId,
 }
 
 #[allow(clippy::large_enum_variant)]
