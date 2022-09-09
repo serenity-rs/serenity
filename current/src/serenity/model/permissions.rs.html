@@ -855,6 +855,9 @@
 <span id="849">849</span>
 <span id="850">850</span>
 <span id="851">851</span>
+<span id="852">852</span>
+<span id="853">853</span>
+<span id="854">854</span>
 </pre><pre class="rust"><code><span class="doccomment">//! A set of permissions for a role or user. These can be assigned directly</span>
 <span class="doccomment">//! to a role or as a channel&#39;s permission overrides.</span>
 <span class="doccomment">//!</span>
@@ -1081,6 +1084,8 @@
     <span class="doccomment">/// [`PermissionOverwrite`]s, roles globally in a [`Guild`], and to</span>
     <span class="doccomment">/// [`GuildChannel`]s.</span>
     <span class="doccomment">///</span>
+    <span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/topics/permissions#permissions-bitwise-permission-flags).</span>
+    <span class="doccomment">///</span>
     <span class="doccomment">/// [`Guild`]: super::guild::Guild</span>
     <span class="doccomment">/// [`GuildChannel`]: super::channel::GuildChannel</span>
     <span class="doccomment">/// [`PermissionOverwrite`]: super::channel::PermissionOverwrite</span>
@@ -1259,6 +1264,7 @@
     <span class="ident">view_guild_insights</span>: <span class="string">&quot;View Guild Insights&quot;</span>
 }
 
+<span class="doccomment">/// TODO: use a macro to shorten this entire file lol</span>
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
 <span class="kw">impl</span> <span class="ident">Permissions</span> {
     <span class="doccomment">/// Shorthand for checking that the set of permissions contains the</span>

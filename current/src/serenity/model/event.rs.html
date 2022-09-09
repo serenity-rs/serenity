@@ -2189,6 +2189,72 @@
 <span id="2183">2183</span>
 <span id="2184">2184</span>
 <span id="2185">2185</span>
+<span id="2186">2186</span>
+<span id="2187">2187</span>
+<span id="2188">2188</span>
+<span id="2189">2189</span>
+<span id="2190">2190</span>
+<span id="2191">2191</span>
+<span id="2192">2192</span>
+<span id="2193">2193</span>
+<span id="2194">2194</span>
+<span id="2195">2195</span>
+<span id="2196">2196</span>
+<span id="2197">2197</span>
+<span id="2198">2198</span>
+<span id="2199">2199</span>
+<span id="2200">2200</span>
+<span id="2201">2201</span>
+<span id="2202">2202</span>
+<span id="2203">2203</span>
+<span id="2204">2204</span>
+<span id="2205">2205</span>
+<span id="2206">2206</span>
+<span id="2207">2207</span>
+<span id="2208">2208</span>
+<span id="2209">2209</span>
+<span id="2210">2210</span>
+<span id="2211">2211</span>
+<span id="2212">2212</span>
+<span id="2213">2213</span>
+<span id="2214">2214</span>
+<span id="2215">2215</span>
+<span id="2216">2216</span>
+<span id="2217">2217</span>
+<span id="2218">2218</span>
+<span id="2219">2219</span>
+<span id="2220">2220</span>
+<span id="2221">2221</span>
+<span id="2222">2222</span>
+<span id="2223">2223</span>
+<span id="2224">2224</span>
+<span id="2225">2225</span>
+<span id="2226">2226</span>
+<span id="2227">2227</span>
+<span id="2228">2228</span>
+<span id="2229">2229</span>
+<span id="2230">2230</span>
+<span id="2231">2231</span>
+<span id="2232">2232</span>
+<span id="2233">2233</span>
+<span id="2234">2234</span>
+<span id="2235">2235</span>
+<span id="2236">2236</span>
+<span id="2237">2237</span>
+<span id="2238">2238</span>
+<span id="2239">2239</span>
+<span id="2240">2240</span>
+<span id="2241">2241</span>
+<span id="2242">2242</span>
+<span id="2243">2243</span>
+<span id="2244">2244</span>
+<span id="2245">2245</span>
+<span id="2246">2246</span>
+<span id="2247">2247</span>
+<span id="2248">2248</span>
+<span id="2249">2249</span>
+<span id="2250">2250</span>
+<span id="2251">2251</span>
 </pre><pre class="rust"><code><span class="doccomment">//! All the events this library handles.</span>
 
 <span class="kw">use</span> <span class="ident">std::collections::HashMap</span>;
@@ -2206,6 +2272,7 @@
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::application::interaction::Interaction</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::guild::automod</span>::{<span class="ident">ActionExecution</span>, <span class="ident">Rule</span>};
 
+<span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/topics/gateway#application-command-permissions-update).</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
 <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">transparent</span>)]</span>
 <span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
@@ -2213,6 +2280,7 @@
     <span class="kw">pub</span> <span class="ident">permission</span>: <span class="ident">CommandPermission</span>,
 }
 
+<span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/topics/gateway#auto-moderation-rule-create).</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
 <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">transparent</span>)]</span>
 <span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
@@ -2220,6 +2288,7 @@
     <span class="kw">pub</span> <span class="ident">rule</span>: <span class="ident">Rule</span>,
 }
 
+<span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/topics/gateway#auto-moderation-rule-update).</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
 <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">transparent</span>)]</span>
 <span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
@@ -2227,6 +2296,7 @@
     <span class="kw">pub</span> <span class="ident">rule</span>: <span class="ident">Rule</span>,
 }
 
+<span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/topics/gateway#auto-moderation-rule-delete).</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
 <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">transparent</span>)]</span>
 <span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
@@ -2234,6 +2304,7 @@
     <span class="kw">pub</span> <span class="ident">rule</span>: <span class="ident">Rule</span>,
 }
 
+<span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/topics/gateway#auto-moderation-action-execution).</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
 <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">transparent</span>)]</span>
 <span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
@@ -2247,6 +2318,8 @@
 <span class="doccomment">///</span>
 <span class="doccomment">/// - A [`Channel`] is created in a [`Guild`]</span>
 <span class="doccomment">/// - A [`PrivateChannel`] is created</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/topics/gateway#channel-create).</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
 <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">transparent</span>)]</span>
 <span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
@@ -2255,6 +2328,7 @@
     <span class="kw">pub</span> <span class="ident">channel</span>: <span class="ident">Channel</span>,
 }
 
+<span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/topics/gateway#channel-delete).</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
 <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">transparent</span>)]</span>
 <span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
@@ -2262,6 +2336,7 @@
     <span class="kw">pub</span> <span class="ident">channel</span>: <span class="ident">Channel</span>,
 }
 
+<span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/topics/gateway#channel-pins-update).</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
 <span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ChannelPinsUpdateEvent</span> {
@@ -2270,6 +2345,7 @@
     <span class="kw">pub</span> <span class="ident">last_pin_timestamp</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Timestamp</span><span class="op">&gt;</span>,
 }
 
+<span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/topics/gateway#channel-update).</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
 <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">transparent</span>)]</span>
 <span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
@@ -2277,6 +2353,7 @@
     <span class="kw">pub</span> <span class="ident">channel</span>: <span class="ident">Channel</span>,
 }
 
+<span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/topics/gateway#guild-ban-add).</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
 <span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">GuildBanAddEvent</span> {
@@ -2284,6 +2361,7 @@
     <span class="kw">pub</span> <span class="ident">user</span>: <span class="ident">User</span>,
 }
 
+<span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/topics/gateway#guild-ban-remove).</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
 <span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">GuildBanRemoveEvent</span> {
@@ -2291,6 +2369,7 @@
     <span class="kw">pub</span> <span class="ident">user</span>: <span class="ident">User</span>,
 }
 
+<span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/topics/gateway#guild-create).</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
 <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">transparent</span>)]</span>
 <span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
@@ -2298,6 +2377,7 @@
     <span class="kw">pub</span> <span class="ident">guild</span>: <span class="ident">Guild</span>,
 }
 
+<span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/topics/gateway#guild-delete).</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
 <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">transparent</span>)]</span>
 <span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
@@ -2305,6 +2385,7 @@
     <span class="kw">pub</span> <span class="ident">guild</span>: <span class="ident">UnavailableGuild</span>,
 }
 
+<span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/topics/gateway#guild-emojis-update).</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
 <span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">GuildEmojisUpdateEvent</span> {
@@ -2313,12 +2394,14 @@
     <span class="kw">pub</span> <span class="ident">guild_id</span>: <span class="ident">GuildId</span>,
 }
 
+<span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/topics/gateway#guild-integrations-update).</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
 <span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">GuildIntegrationsUpdateEvent</span> {
     <span class="kw">pub</span> <span class="ident">guild_id</span>: <span class="ident">GuildId</span>,
 }
 
+<span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/topics/gateway#guild-member-add).</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
 <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">transparent</span>)]</span>
 <span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
@@ -2326,6 +2409,7 @@
     <span class="kw">pub</span> <span class="ident">member</span>: <span class="ident">Member</span>,
 }
 
+<span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/topics/gateway#guild-member-remove).</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
 <span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">GuildMemberRemoveEvent</span> {
@@ -2333,6 +2417,7 @@
     <span class="kw">pub</span> <span class="ident">user</span>: <span class="ident">User</span>,
 }
 
+<span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/topics/gateway#guild-member-update).</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
 <span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">GuildMemberUpdateEvent</span> {
@@ -2352,6 +2437,7 @@
     <span class="kw">pub</span> <span class="ident">communication_disabled_until</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Timestamp</span><span class="op">&gt;</span>,
 }
 
+<span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/topics/gateway#guild-members-chunk).</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Serialize</span>)]</span>
 <span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">GuildMembersChunkEvent</span> {
@@ -2461,6 +2547,7 @@
     }
 }
 
+<span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/topics/gateway#guild-role-create).</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Serialize</span>)]</span>
 <span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">GuildRoleCreateEvent</span> {
@@ -2475,6 +2562,7 @@
     }
 }
 
+<span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/topics/gateway#guild-role-delete).</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
 <span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">GuildRoleDeleteEvent</span> {
@@ -2482,6 +2570,7 @@
     <span class="kw">pub</span> <span class="ident">role_id</span>: <span class="ident">RoleId</span>,
 }
 
+<span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/topics/gateway#guild-role-update).</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Serialize</span>)]</span>
 <span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">GuildRoleUpdateEvent</span> {
@@ -2496,6 +2585,7 @@
     }
 }
 
+<span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/topics/gateway#guild-stickers-update).</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
 <span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">GuildStickersUpdateEvent</span> {
@@ -2504,6 +2594,7 @@
     <span class="kw">pub</span> <span class="ident">guild_id</span>: <span class="ident">GuildId</span>,
 }
 
+<span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/topics/gateway#invite-create).</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
 <span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">InviteCreateEvent</span> {
@@ -2516,6 +2607,7 @@
     <span class="kw">pub</span> <span class="ident">temporary</span>: <span class="ident">bool</span>,
 }
 
+<span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/topics/gateway#invite-delete).</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
 <span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">InviteDeleteEvent</span> {
@@ -2531,6 +2623,7 @@
     <span class="kw">pub</span> <span class="ident">guild_id</span>: <span class="ident">GuildId</span>,
 }
 
+<span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/topics/gateway#guild-update).</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
 <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">transparent</span>)]</span>
 <span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
@@ -2538,6 +2631,7 @@
     <span class="kw">pub</span> <span class="ident">guild</span>: <span class="ident">PartialGuild</span>,
 }
 
+<span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/topics/gateway#message-create).</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
 <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">transparent</span>)]</span>
 <span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
@@ -2545,6 +2639,7 @@
     <span class="kw">pub</span> <span class="ident">message</span>: <span class="ident">Message</span>,
 }
 
+<span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/topics/gateway#message-delete-bulk).</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
 <span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">MessageDeleteBulkEvent</span> {
@@ -2553,6 +2648,7 @@
     <span class="kw">pub</span> <span class="ident">ids</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">MessageId</span><span class="op">&gt;</span>,
 }
 
+<span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/topics/gateway#message-delete).</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Debug</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
 <span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">MessageDeleteEvent</span> {
@@ -2562,6 +2658,7 @@
     <span class="kw">pub</span> <span class="ident">message_id</span>: <span class="ident">MessageId</span>,
 }
 
+<span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/topics/gateway#message-update).</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
 <span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">MessageUpdateEvent</span> {
@@ -2584,6 +2681,7 @@
     <span class="kw">pub</span> <span class="ident">flags</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">MessageFlags</span><span class="op">&gt;</span>,
 }
 
+<span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/topics/gateway#presence-update).</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
 <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">transparent</span>)]</span>
 <span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
@@ -2598,6 +2696,7 @@
     <span class="kw">pub</span> <span class="ident">presences</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Presence</span><span class="op">&gt;</span>,
 }
 
+<span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/topics/gateway#message-reaction-add).</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
 <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">transparent</span>)]</span>
 <span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
@@ -2605,6 +2704,7 @@
     <span class="kw">pub</span> <span class="ident">reaction</span>: <span class="ident">Reaction</span>,
 }
 
+<span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/topics/gateway#message-reaction-remove).</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
 <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">transparent</span>)]</span>
 <span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
@@ -2612,6 +2712,7 @@
     <span class="kw">pub</span> <span class="ident">reaction</span>: <span class="ident">Reaction</span>,
 }
 
+<span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/topics/gateway#message-reaction-remove-all).</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Debug</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
 <span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ReactionRemoveAllEvent</span> {
@@ -2621,6 +2722,8 @@
 }
 
 <span class="doccomment">/// The &quot;Ready&quot; event, containing initial ready cache</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/topics/gateway#ready).</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
 <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">transparent</span>)]</span>
 <span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
@@ -2628,6 +2731,7 @@
     <span class="kw">pub</span> <span class="ident">ready</span>: <span class="ident">Ready</span>,
 }
 
+<span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/topics/gateway#resumed).</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
 <span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ResumedEvent</span> {
@@ -2635,6 +2739,7 @@
     <span class="kw">pub</span> <span class="ident">trace</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span><span class="op">&gt;</span>,
 }
 
+<span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/topics/gateway#typing-start).</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
 <span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">TypingStartEvent</span> {
@@ -2651,6 +2756,7 @@
     <span class="kw">pub</span> <span class="ident">value</span>: <span class="ident">Value</span>,
 }
 
+<span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/topics/gateway#user-update).</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
 <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">transparent</span>)]</span>
 <span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
@@ -2658,6 +2764,7 @@
     <span class="kw">pub</span> <span class="ident">current_user</span>: <span class="ident">CurrentUser</span>,
 }
 
+<span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/topics/gateway#voice-server-update).</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
 <span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">VoiceServerUpdateEvent</span> {
@@ -2677,6 +2784,7 @@
     }
 }
 
+<span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/topics/gateway#voice-state-update).</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
 <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">transparent</span>)]</span>
 <span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
@@ -2684,6 +2792,7 @@
     <span class="kw">pub</span> <span class="ident">voice_state</span>: <span class="ident">VoiceState</span>,
 }
 
+<span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/topics/gateway#webhooks-update).</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
 <span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">WebhookUpdateEvent</span> {
@@ -2691,6 +2800,7 @@
     <span class="kw">pub</span> <span class="ident">guild_id</span>: <span class="ident">GuildId</span>,
 }
 
+<span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/topics/gateway#interaction-create).</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
 <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">transparent</span>)]</span>
 <span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
@@ -2698,6 +2808,7 @@
     <span class="kw">pub</span> <span class="ident">interaction</span>: <span class="ident">Interaction</span>,
 }
 
+<span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/topics/gateway#integration-create).</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
 <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">transparent</span>)]</span>
 <span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
@@ -2705,6 +2816,7 @@
     <span class="kw">pub</span> <span class="ident">integration</span>: <span class="ident">Integration</span>,
 }
 
+<span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/topics/gateway#integration-update).</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
 <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">transparent</span>)]</span>
 <span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
@@ -2712,6 +2824,7 @@
     <span class="kw">pub</span> <span class="ident">integration</span>: <span class="ident">Integration</span>,
 }
 
+<span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/topics/gateway#integration-delete).</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Serialize</span>, <span class="ident">Deserialize</span>)]</span>
 <span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">IntegrationDeleteEvent</span> {
@@ -2720,6 +2833,7 @@
     <span class="kw">pub</span> <span class="ident">application_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ApplicationId</span><span class="op">&gt;</span>,
 }
 
+<span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/topics/gateway#stage-instance-create).</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
 <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">transparent</span>)]</span>
 <span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
@@ -2727,6 +2841,7 @@
     <span class="kw">pub</span> <span class="ident">stage_instance</span>: <span class="ident">StageInstance</span>,
 }
 
+<span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/topics/gateway#stage-instance-update).</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
 <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">transparent</span>)]</span>
 <span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
@@ -2734,6 +2849,7 @@
     <span class="kw">pub</span> <span class="ident">stage_instance</span>: <span class="ident">StageInstance</span>,
 }
 
+<span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/topics/gateway#stage-instance-delete).</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
 <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">transparent</span>)]</span>
 <span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
@@ -2741,6 +2857,7 @@
     <span class="kw">pub</span> <span class="ident">stage_instance</span>: <span class="ident">StageInstance</span>,
 }
 
+<span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/topics/gateway#thread-create).</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
 <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">transparent</span>)]</span>
 <span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
@@ -2748,6 +2865,7 @@
     <span class="kw">pub</span> <span class="ident">thread</span>: <span class="ident">GuildChannel</span>,
 }
 
+<span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/topics/gateway#thread-update).</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
 <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">transparent</span>)]</span>
 <span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
@@ -2755,6 +2873,7 @@
     <span class="kw">pub</span> <span class="ident">thread</span>: <span class="ident">GuildChannel</span>,
 }
 
+<span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/topics/gateway#thread-delete).</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
 <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">transparent</span>)]</span>
 <span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
@@ -2762,6 +2881,7 @@
     <span class="kw">pub</span> <span class="ident">thread</span>: <span class="ident">PartialGuildChannel</span>,
 }
 
+<span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/topics/gateway#thread-list-sync).</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
 <span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ThreadListSyncEvent</span> {
@@ -2778,6 +2898,7 @@
     <span class="kw">pub</span> <span class="ident">members</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ThreadMember</span><span class="op">&gt;</span>,
 }
 
+<span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/topics/gateway#thread-member-update).</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
 <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">transparent</span>)]</span>
 <span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
@@ -2785,6 +2906,7 @@
     <span class="kw">pub</span> <span class="ident">member</span>: <span class="ident">ThreadMember</span>,
 }
 
+<span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/topics/gateway#thread-members-update).</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
 <span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ThreadMembersUpdateEvent</span> {
@@ -2802,6 +2924,7 @@
     <span class="kw">pub</span> <span class="ident">removed_members_ids</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">UserId</span><span class="op">&gt;</span>,
 }
 
+<span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/topics/gateway#guild-scheduled-event-create).</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
 <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">transparent</span>)]</span>
 <span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
@@ -2809,6 +2932,7 @@
     <span class="kw">pub</span> <span class="ident">event</span>: <span class="ident">ScheduledEvent</span>,
 }
 
+<span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/topics/gateway#guild-scheduled-event-update).</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
 <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">transparent</span>)]</span>
 <span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
@@ -2816,6 +2940,7 @@
     <span class="kw">pub</span> <span class="ident">event</span>: <span class="ident">ScheduledEvent</span>,
 }
 
+<span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/topics/gateway#guild-scheduled-event-delete).</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
 <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">transparent</span>)]</span>
 <span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
@@ -2823,6 +2948,7 @@
     <span class="kw">pub</span> <span class="ident">event</span>: <span class="ident">ScheduledEvent</span>,
 }
 
+<span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/topics/gateway#guild-scheduled-event-user-add).</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
 <span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">GuildScheduledEventUserAddEvent</span> {
@@ -2832,6 +2958,7 @@
     <span class="kw">pub</span> <span class="ident">user_id</span>: <span class="ident">UserId</span>,
 }
 
+<span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/topics/gateway#guild-scheduled-event-user-remove).</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
 <span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">GuildScheduledEventUserRemoveEvent</span> {
@@ -2841,6 +2968,7 @@
     <span class="kw">pub</span> <span class="ident">user_id</span>: <span class="ident">UserId</span>,
 }
 
+<span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/topics/gateway#payloads-gateway-payload-structure).</span>
 <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::large_enum_variant</span>)]</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Serialize</span>)]</span>
 <span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
@@ -2931,6 +3059,8 @@
 }
 
 <span class="doccomment">/// Event received over a websocket connection</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/topics/gateway#commands-and-events-gateway-events).</span>
 <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::large_enum_variant</span>)]</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
 <span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
@@ -3828,6 +3958,8 @@
 <span class="doccomment">/// A Deserialization implementation is provided for deserializing raw event</span>
 <span class="doccomment">/// dispatch type strings to this enum, e.g. deserializing `&quot;CHANNEL_CREATE&quot;` to</span>
 <span class="doccomment">/// [`EventType::ChannelCreate`].</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/topics/gateway#commands-and-events-gateway-events).</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>, <span class="ident">PartialOrd</span>, <span class="ident">Ord</span>)]</span>
 <span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">EventType</span> {

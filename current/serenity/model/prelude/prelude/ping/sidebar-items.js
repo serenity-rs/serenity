@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"type":[["PingInteraction","A ping interaction, which can only be received through an endpoint url."]]};

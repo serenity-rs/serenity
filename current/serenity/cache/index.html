@@ -14,7 +14,7 @@ when calling its methods.</p>
 <p>Most models of Discord objects, such as the <a href="../model/channel/struct.Message.html" title="Message"><code>Message</code></a>, <a href="../model/channel/struct.GuildChannel.html" title="GuildChannel"><code>GuildChannel</code></a>,
 or <a href="../model/guild/struct.Emoji.html" title="Emoji"><code>Emoji</code></a>, have methods for interacting with that single instance. This
 feature is only compiled if the <code>methods</code> feature is enabled. An example of
-this is <a href="../model/guild/struct.Guild.html#method.edit" title="Guild::edit"><code>Guild::edit</code></a>, which performs a check to ensure that the current
+this is <a href="../model/prelude/struct.Guild.html#method.edit" title="Guild::edit"><code>Guild::edit</code></a>, which performs a check to ensure that the current
 user is the owner of the guild, prior to actually performing the HTTP
 request. The cache is involved due to the function’s use of unlocking the
 cache and retrieving the Id of the current user, and comparing it to the Id

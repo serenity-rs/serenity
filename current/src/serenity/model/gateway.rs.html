@@ -893,6 +893,40 @@
 <span id="887">887</span>
 <span id="888">888</span>
 <span id="889">889</span>
+<span id="890">890</span>
+<span id="891">891</span>
+<span id="892">892</span>
+<span id="893">893</span>
+<span id="894">894</span>
+<span id="895">895</span>
+<span id="896">896</span>
+<span id="897">897</span>
+<span id="898">898</span>
+<span id="899">899</span>
+<span id="900">900</span>
+<span id="901">901</span>
+<span id="902">902</span>
+<span id="903">903</span>
+<span id="904">904</span>
+<span id="905">905</span>
+<span id="906">906</span>
+<span id="907">907</span>
+<span id="908">908</span>
+<span id="909">909</span>
+<span id="910">910</span>
+<span id="911">911</span>
+<span id="912">912</span>
+<span id="913">913</span>
+<span id="914">914</span>
+<span id="915">915</span>
+<span id="916">916</span>
+<span id="917">917</span>
+<span id="918">918</span>
+<span id="919">919</span>
+<span id="920">920</span>
+<span id="921">921</span>
+<span id="922">922</span>
+<span id="923">923</span>
 </pre><pre class="rust"><code><span class="doccomment">//! Models pertaining to the gateway.</span>
 
 <span class="kw">use</span> <span class="ident">url::Url</span>;
@@ -906,6 +940,8 @@
 <span class="doccomment">/// shards that Discord recommends to use for a bot user.</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// This is only applicable to bot users.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/topics/gateway#get-gateway-bot-json-response).</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
 <span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">BotGateway</span> {
@@ -920,6 +956,8 @@
 }
 
 <span class="doccomment">/// Representation of an activity that a [`User`] is performing.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/topics/gateway#activity-object-activity-structure).</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
 <span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Activity</span> {
@@ -1160,6 +1198,7 @@
     }
 }
 
+<span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/topics/gateway#activity-object-activity-buttons).</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Serialize</span>, <span class="ident">Deserialize</span>)]</span>
 <span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ActivityButton</span> {
@@ -1173,6 +1212,8 @@
 }
 
 <span class="doccomment">/// The assets for an activity.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/topics/gateway#activity-object-activity-assets).</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
 <span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ActivityAssets</span> {
@@ -1188,6 +1229,8 @@
 
 <span class="macro">bitflags!</span> {
     <span class="doccomment">/// A set of flags defining what is in an activity&#39;s payload.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/topics/gateway#activity-object-activity-flags).</span>
     <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Default</span>)]</span>
     <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ActivityFlags</span>: <span class="ident">u64</span> {
         <span class="doccomment">/// Whether the activity is an instance activity.</span>
@@ -1212,6 +1255,8 @@
 }
 
 <span class="doccomment">/// Information about an activity&#39;s party.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/topics/gateway#activity-object-activity-party).</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
 <span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ActivityParty</span> {
@@ -1222,6 +1267,8 @@
 }
 
 <span class="doccomment">/// Secrets for an activity.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/topics/gateway#activity-object-activity-secrets).</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
 <span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ActivitySecrets</span> {
@@ -1235,6 +1282,8 @@
 }
 
 <span class="doccomment">/// Representation of an emoji used in a custom status</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/topics/gateway#activity-object-activity-emoji).</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ActivityEmoji</span> {
     <span class="doccomment">/// The name of the emoji.</span>
@@ -1245,6 +1294,7 @@
     <span class="kw">pub</span> <span class="ident">animated</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span>,
 }
 
+<span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/topics/gateway#activity-object-activity-types).</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Debug</span>, <span class="ident">PartialEq</span>)]</span>
 <span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">ActivityType</span> {
@@ -1282,6 +1332,8 @@
 <span class="doccomment">/// A representation of the data retrieved from the gateway endpoint.</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// For the bot-specific gateway, refer to [`BotGateway`].</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/topics/gateway#get-gateway-example-response).</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
 <span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Gateway</span> {
@@ -1290,6 +1342,8 @@
 }
 
 <span class="doccomment">/// Information detailing the current active status of a [`User`].</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/topics/gateway#client-status-object).</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ClientStatus</span> {
     <span class="kw">pub</span> <span class="ident">desktop</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">OnlineStatus</span><span class="op">&gt;</span>,
@@ -1298,6 +1352,8 @@
 }
 
 <span class="doccomment">/// Information about the user of a [`Presence`] event.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/topics/gateway#presence-update).</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Default</span>, <span class="ident">Debug</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
 <span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
 <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">default</span>)]</span>
@@ -1368,6 +1424,8 @@
 }
 
 <span class="doccomment">/// Information detailing the current online status of a [`User`].</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/topics/gateway#presence-update-presence-update-event-fields).</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
 <span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Presence</span> {
@@ -1386,6 +1444,8 @@
 }
 
 <span class="doccomment">/// An initial set of information given after IDENTIFYing to the gateway.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/topics/gateway#ready-ready-event-fields).</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
 <span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Ready</span> {
@@ -1406,6 +1466,8 @@
 
 <span class="doccomment">/// Information describing how many gateway sessions you can initiate within a</span>
 <span class="doccomment">/// ratelimit period.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/topics/gateway#session-start-limit-object-session-start-limit-structure).</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
 <span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">SessionStartLimit</span> {
@@ -1416,8 +1478,12 @@
     <span class="kw">pub</span> <span class="ident">reset_after</span>: <span class="ident">u64</span>,
     <span class="doccomment">/// The total number of session starts within the ratelimit period allowed.</span>
     <span class="kw">pub</span> <span class="ident">total</span>: <span class="ident">u64</span>,
+    <span class="doccomment">/// The number of identify requests allowed per 5 seconds.</span>
+    <span class="kw">pub</span> <span class="ident">max_concurrency</span>: <span class="ident">u64</span>,
 }
 <span class="doccomment">/// Timestamps of when a user started and/or is ending their activity.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/game-sdk/activities#data-models-activitytimestamps-struct).</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
 <span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ActivityTimestamps</span> {
@@ -1447,6 +1513,8 @@
     <span class="doccomment">/// **Note**:</span>
     <span class="doccomment">/// Once the bot is in 100 guilds or more, [the bot must be verified] in</span>
     <span class="doccomment">/// order to use privileged intents.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/topics/gateway#list-of-intents).</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// [gateway intent]: https://discord.com/developers/docs/topics/gateway#privileged-intents</span>
     <span class="doccomment">/// [Privileged Intents]: https://discord.com/developers/docs/topics/gateway#privileged-intents</span>

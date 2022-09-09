@@ -394,6 +394,7 @@
 <span id="388">388</span>
 <span id="389">389</span>
 <span id="390">390</span>
+<span id="391">391</span>
 </pre><pre class="rust"><code><span class="doccomment">//! A collection of newtypes defining type-strong IDs.</span>
 
 <span class="kw">use</span> <span class="ident">std::fmt</span>;
@@ -495,6 +496,7 @@
 <span class="attribute">#[<span class="ident">derive</span>(
     <span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">Default</span>, <span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>, <span class="ident">PartialEq</span>, <span class="ident">PartialOrd</span>, <span class="ident">Ord</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>,
 )]</span>
+<span class="comment">// TODO: replace occurences of `#[serde(with = &quot;snowflake&quot;)] u64` in the codebase with GenericId</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">GenericId</span>(<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">with</span> <span class="op">=</span> <span class="string">&quot;snowflake&quot;</span>)]</span> <span class="kw">pub</span> <span class="ident">u64</span>);
 
 <span class="doccomment">/// An identifier for a Guild</span>

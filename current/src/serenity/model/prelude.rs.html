@@ -37,6 +37,7 @@
 <span id="31">31</span>
 <span id="32">32</span>
 <span id="33">33</span>
+<span id="34">34</span>
 </pre><pre class="rust"><code><span class="doccomment">//! The model prelude re-exports all types in the model sub-modules.</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! This allows for quick and easy access to all of the model types.</span>
@@ -48,28 +49,29 @@
 <span class="doccomment">//! ```rust,no_run</span>
 <span class="doccomment">//! use serenity::model::prelude::*;</span>
 <span class="doccomment">//! ```</span>
-
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::application</span>::<span class="kw-2">*</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::channel</span>::<span class="kw-2">*</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::connection</span>::<span class="kw-2">*</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::event</span>::<span class="kw-2">*</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::gateway</span>::<span class="kw-2">*</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::guild::audit_log</span>::<span class="kw-2">*</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::guild</span>::<span class="kw-2">*</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::id</span>::<span class="kw-2">*</span>;
 <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">deprecated</span>)]</span>
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::interactions</span>::<span class="kw-2">*</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::invite</span>::<span class="kw-2">*</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::mention</span>::<span class="kw-2">*</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::misc</span>::<span class="kw-2">*</span>;
-<span class="attribute">#[<span class="ident">allow</span>(<span class="ident">deprecated</span>)]</span>
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::oauth2</span>::<span class="kw-2">*</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::permissions</span>::<span class="kw-2">*</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::sticker</span>::<span class="kw-2">*</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::user</span>::<span class="kw-2">*</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::voice</span>::<span class="kw-2">*</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::webhook</span>::<span class="kw-2">*</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
+<span class="attribute">#[<span class="ident">doc</span>(<span class="ident">inline</span>)]</span>
+<span class="kw">pub</span> <span class="kw">use</span> <span class="kw">super</span>::{
+    <span class="ident">application</span>::<span class="kw-2">*</span>,
+    <span class="ident">channel</span>::<span class="kw-2">*</span>,
+    <span class="ident">connection</span>::<span class="kw-2">*</span>,
+    <span class="ident">event</span>::<span class="kw-2">*</span>,
+    <span class="ident">gateway</span>::<span class="kw-2">*</span>,
+    <span class="ident">guild::audit_log</span>::<span class="kw-2">*</span>,
+    <span class="ident">guild</span>::<span class="kw-2">*</span>,
+    <span class="ident">id</span>::<span class="kw-2">*</span>,
+    <span class="ident">interactions</span>::<span class="kw-2">*</span>,
+    <span class="ident">invite</span>::<span class="kw-2">*</span>,
+    <span class="ident">mention</span>::<span class="kw-2">*</span>,
+    <span class="ident">misc</span>::<span class="kw-2">*</span>,
+    <span class="ident">oauth2</span>::<span class="kw-2">*</span>,
+    <span class="ident">permissions</span>::<span class="kw-2">*</span>,
+    <span class="ident">sticker</span>::<span class="kw-2">*</span>,
+    <span class="ident">user</span>::<span class="kw-2">*</span>,
+    <span class="ident">voice</span>::<span class="kw-2">*</span>,
+    <span class="ident">webhook</span>::<span class="kw-2">*</span>,
+    <span class="kw-2">*</span>,
+};
 </code></pre></div>
 </section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.63.0-nightly (10f4ce324 2022-06-22)" ></div>
 </body></html>

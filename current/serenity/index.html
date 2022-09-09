@@ -8,9 +8,9 @@
     <h1 class="fqn"><span class="in-band">Crate <a class="mod" href="#">serenity</a><button id="copy-path" onclick="copy_path(this)" title="Copy item path to clipboard"><img src="../clipboard.svg" width="19" height="18" alt="Copy item path"></button></span></h1><span class="out-of-band"><a class="srclink" href="../src/serenity/lib.rs.html#1-156">source</a> · <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">[<span class="inner">&#x2212;</span>]</a></span></div><details class="rustdoc-toggle top-doc" open><summary class="hideme"><span>Expand description</span></summary><div class="docblock"><p>Serenity is a Rust library for the Discord API.</p>
 <p>View the <a href="https://github.com/serenity-rs/serenity/tree/current/examples">examples</a> on how to make and structure a bot.</p>
 <p>Serenity supports bot user authentication via the use of <a href="client/struct.Client.html#method.builder" title="Client::builder"><code>Client::builder</code></a>.</p>
-<p>Once logged in, you may add handlers to your client to dispatch <a href="model/event/enum.Event.html"><code>Event</code></a>s,
+<p>Once logged in, you may add handlers to your client to dispatch <a href="model/prelude/enum.Event.html"><code>Event</code></a>s,
 such as <a href="prelude/trait.EventHandler.html#method.message"><code>EventHandler::message</code></a>. This will cause your handler to be called
-when a <a href="model/event/enum.Event.html#variant.MessageCreate"><code>Event::MessageCreate</code></a> is received. Each handler is given a
+when a <a href="model/prelude/enum.Event.html#variant.MessageCreate"><code>Event::MessageCreate</code></a> is received. Each handler is given a
 <a href="prelude/struct.Context.html"><code>Context</code></a>, giving information about the event. See the
 <a href="client/index.html">client’s module-level documentation</a>.</p>
 <p>The <a href="gateway/struct.Shard.html"><code>Shard</code></a> is transparently handled by the library, removing

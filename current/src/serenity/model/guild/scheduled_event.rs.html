@@ -96,9 +96,17 @@
 <span id="90">90</span>
 <span id="91">91</span>
 <span id="92">92</span>
+<span id="93">93</span>
+<span id="94">94</span>
+<span id="95">95</span>
+<span id="96">96</span>
+<span id="97">97</span>
+<span id="98">98</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::prelude</span>::<span class="kw-2">*</span>;
 
 <span class="doccomment">/// Information about a guild scheduled event.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/resources/guild-scheduled-event#guild-scheduled-event-object).</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Serialize</span>, <span class="ident">Deserialize</span>)]</span>
 <span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ScheduledEvent</span> {
@@ -144,6 +152,7 @@
     <span class="kw">pub</span> <span class="ident">image</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
 }
 
+<span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/resources/guild-scheduled-event#guild-scheduled-event-object-guild-scheduled-event-status).</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">Debug</span>)]</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">ScheduledEventStatus</span> {
     <span class="ident">Scheduled</span> <span class="op">=</span> <span class="number">1</span>,
@@ -157,9 +166,10 @@
     <span class="ident">Scheduled</span>,
     <span class="ident">Active</span>,
     <span class="ident">Completed</span>,
-    <span class="ident">Canceled</span>,
+    <span class="ident">Canceled</span>
 });
 
+<span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/resources/guild-scheduled-event#guild-scheduled-event-object-guild-scheduled-event-entity-types).</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">Debug</span>)]</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">ScheduledEventType</span> {
     <span class="ident">StageInstance</span> <span class="op">=</span> <span class="number">1</span>,
@@ -171,9 +181,10 @@
 <span class="macro">enum_number!</span>(<span class="ident">ScheduledEventType</span> {
     <span class="ident">StageInstance</span>,
     <span class="ident">Voice</span>,
-    <span class="ident">External</span>,
+    <span class="ident">External</span>
 });
 
+<span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/resources/guild-scheduled-event#guild-scheduled-event-object-guild-scheduled-event-entity-metadata).</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Serialize</span>, <span class="ident">Deserialize</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ScheduledEventMetadata</span> {
     <span class="comment">// TODO: Change to `Option&lt;String&gt;` in next version.</span>
@@ -181,6 +192,7 @@
     <span class="kw">pub</span> <span class="ident">location</span>: <span class="ident">String</span>,
 }
 
+<span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/resources/guild-scheduled-event#guild-scheduled-event-user-object).</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Serialize</span>, <span class="ident">Deserialize</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ScheduledEventUser</span> {
     <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename</span> <span class="op">=</span> <span class="string">&quot;guild_scheduled_event_id&quot;</span>)]</span>
