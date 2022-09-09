@@ -1510,7 +1510,7 @@
     <span class="doccomment">/// it is possible to send messages.</span>
     <span class="attribute">#[<span class="ident">must_use</span>]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_text_based</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="macro">matches!</span>(<span class="self">self</span>.<span class="ident">kind</span>, <span class="ident">ChannelType::Text</span> <span class="op">|</span> <span class="ident">ChannelType::News</span>)
+        <span class="macro">matches!</span>(<span class="self">self</span>.<span class="ident">kind</span>, <span class="ident">ChannelType::Text</span> <span class="op">|</span> <span class="ident">ChannelType::News</span> <span class="op">|</span> <span class="ident">ChannelType::Voice</span>)
     }
 
     <span class="doccomment">/// Broadcasts to the channel that the current user is typing.</span>
