@@ -142,7 +142,12 @@ fn lex(stream: &mut Stream<'_>, delims: &[Cow<'_, str>]) -> Option<Token> {
     if let Some(kind) = QuoteKind::new(stream.current_char()?) {
         stream.next_char();
 
-        stream.take_until_char(|c| kind.is_ending_quote(c));
+        let mut prev_was_backslash = false;
+        stream.take_until_char(|c| {
+            let result = kind.is_ending_quote(c) && !prev_was_backslash;
+            prev_was_backslash = c == '\\';
+            result
+        });
 
         let is_quote = stream.current_char().map_or(false, |c| kind.is_ending_quote(c));
         stream.next_char();
