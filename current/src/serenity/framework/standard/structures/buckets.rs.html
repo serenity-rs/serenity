@@ -582,6 +582,11 @@
 <span id="576">576</span>
 <span id="577">577</span>
 <span id="578">578</span>
+<span id="579">579</span>
+<span id="580">580</span>
+<span id="581">581</span>
+<span id="582">582</span>
+<span id="583">583</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::collections::HashMap</span>;
 <span class="kw">use</span> <span class="ident">std::fmt</span>;
 <span class="kw">use</span> <span class="ident">std::time</span>::{<span class="ident">Duration</span>, <span class="ident">Instant</span>};
@@ -1057,6 +1062,8 @@
     <span class="doccomment">/// 1. `await_ratelimits` is set to a non zero value (the default is 0).</span>
     <span class="doccomment">/// 2. user&#39;s message rests comfortably within `await_ratelimits` (ex. if you set it to 1 then it will only respond once when the delay is first exceeded).</span>
     <span class="doccomment">///</span>
+    <span class="doccomment">/// For convenience, this function will automatically raise `await_ratelimits` to at least 1.</span>
+    <span class="doccomment">///</span>
     <span class="doccomment">/// You can use this to, for example, send a custom response when someone exceeds the amount of commands they&#39;re allowed to make.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// # Examples</span>
@@ -1110,6 +1117,9 @@
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">delay_action</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">action</span>: <span class="ident">DelayHook</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">delay_action</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">action</span>);
+        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">await_ratelimits</span> <span class="op">==</span> <span class="number">0</span> {
+            <span class="self">self</span>.<span class="ident">await_ratelimits</span> <span class="op">=</span> <span class="number">1</span>;
+        }
 
         <span class="self">self</span>
     }

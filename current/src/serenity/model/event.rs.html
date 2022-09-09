@@ -2827,18 +2827,18 @@
 <span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">GuildScheduledEventUserAddEvent</span> {
     <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename</span> <span class="op">=</span> <span class="string">&quot;guild_scheduled_event_id&quot;</span>)]</span>
-    <span class="ident">scheduled_event_id</span>: <span class="ident">ScheduledEventId</span>,
-    <span class="ident">guild_id</span>: <span class="ident">GuildId</span>,
-    <span class="ident">user_id</span>: <span class="ident">UserId</span>,
+    <span class="kw">pub</span> <span class="ident">scheduled_event_id</span>: <span class="ident">ScheduledEventId</span>,
+    <span class="kw">pub</span> <span class="ident">guild_id</span>: <span class="ident">GuildId</span>,
+    <span class="kw">pub</span> <span class="ident">user_id</span>: <span class="ident">UserId</span>,
 }
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
 <span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">GuildScheduledEventUserRemoveEvent</span> {
     <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename</span> <span class="op">=</span> <span class="string">&quot;guild_scheduled_event_id&quot;</span>)]</span>
-    <span class="ident">scheduled_event_id</span>: <span class="ident">ScheduledEventId</span>,
-    <span class="ident">guild_id</span>: <span class="ident">GuildId</span>,
-    <span class="ident">user_id</span>: <span class="ident">UserId</span>,
+    <span class="kw">pub</span> <span class="ident">scheduled_event_id</span>: <span class="ident">ScheduledEventId</span>,
+    <span class="kw">pub</span> <span class="ident">guild_id</span>: <span class="ident">GuildId</span>,
+    <span class="kw">pub</span> <span class="ident">user_id</span>: <span class="ident">UserId</span>,
 }
 
 <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::large_enum_variant</span>)]</span>
