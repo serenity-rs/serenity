@@ -363,7 +363,15 @@ impl Future for ClientBuilder {
             let event_handler = self.event_handler.take();
             let raw_event_handler = self.raw_event_handler.take();
             let intents = self.intents;
-            let http = Arc::new(self.http.take().unwrap());
+
+            let mut http = self.http.take().unwrap();
+            if let Some(event_handler) = event_handler.clone() {
+                http.ratelimiter.set_ratelimit_callback(Box::new(move |info| {
+                    let event_handler = event_handler.clone();
+                    tokio::spawn(async move { event_handler.ratelimit(info).await });
+                }));
+            }
+            let http = Arc::new(http);
 
             #[cfg(feature = "voice")]
             let voice_manager = self.voice_manager.take();

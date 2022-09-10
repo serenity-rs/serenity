@@ -4,6 +4,7 @@ use async_trait::async_trait;
 
 use super::context::Context;
 use crate::client::bridge::gateway::event::*;
+use crate::http::ratelimiting::RatelimitInfo;
 use crate::json::Value;
 use crate::model::application::command::CommandPermission;
 use crate::model::application::interaction::Interaction;
@@ -575,6 +576,9 @@ pub trait EventHandler: Send + Sync {
         _unsubscribed: GuildScheduledEventUserRemoveEvent,
     ) {
     }
+
+    /// Dispatched when an HTTP rate limit is hit
+    async fn ratelimit(&self, _data: RatelimitInfo) {}
 }
 
 /// This core trait for handling raw events
