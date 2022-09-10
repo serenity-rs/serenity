@@ -62,12 +62,12 @@ pub trait EventHandler: Send + Sync {
     /// Dispatched when a category is created.
     ///
     /// Provides said category's data.
-    async fn category_create(&self, _ctx: Context, _category: &ChannelCategory) {}
+    async fn category_create(&self, _ctx: Context, _category: &GuildChannel) {}
 
     /// Dispatched when a category is deleted.
     ///
     /// Provides said category's data.
-    async fn category_delete(&self, _ctx: Context, _category: &ChannelCategory) {}
+    async fn category_delete(&self, _ctx: Context, _category: &GuildChannel) {}
 
     /// Dispatched when a channel is deleted.
     ///

@@ -77,7 +77,7 @@ pub mod emojis {
 
 pub fn deserialize_guild_channels<'de, D: Deserializer<'de>>(
     deserializer: D,
-) -> StdResult<HashMap<ChannelId, Channel>, D::Error> {
+) -> StdResult<HashMap<ChannelId, GuildChannel>, D::Error> {
     struct TryDeserialize<T>(StdResult<T, String>);
     impl<'de, T: Deserialize<'de>> Deserialize<'de> for TryDeserialize<T> {
         fn deserialize<D: Deserializer<'de>>(deserializer: D) -> StdResult<Self, D::Error> {
@@ -85,13 +85,13 @@ pub fn deserialize_guild_channels<'de, D: Deserializer<'de>>(
         }
     }
 
-    let vec: Vec<TryDeserialize<Channel>> = Deserialize::deserialize(deserializer)?;
+    let vec: Vec<TryDeserialize<GuildChannel>> = Deserialize::deserialize(deserializer)?;
     let mut map = HashMap::new();
 
     for channel in vec {
         match channel.0 {
             Ok(channel) => {
-                map.insert(channel.id(), channel);
+                map.insert(channel.id, channel);
             },
             Err(e) => tracing::warn!("skipping guild channel due to deserialization error: {}", e),
         }
@@ -157,7 +157,6 @@ pub mod private_channels {
         deserializer.deserialize_seq(SequenceToMapVisitor::new(|channel: &Channel| match channel {
             Channel::Private(channel) => channel.id,
             Channel::Guild(_) => unreachable!("Guild private channel decode"),
-            Channel::Category(_) => unreachable!("Channel category private channel decode"),
         }))
     }
 
