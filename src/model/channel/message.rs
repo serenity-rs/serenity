@@ -797,9 +797,8 @@ impl Message {
     }
 
     /// Retrieves the message channel's category ID if the channel has one.
-    #[cfg(feature = "cache")]
-    pub fn category_id(&self, cache: impl AsRef<Cache>) -> Option<ChannelId> {
-        cache.as_ref().channel_category_id(self.channel_id)
+    pub async fn category_id(&self, cache_http: impl CacheHttp) -> Option<ChannelId> {
+        self.channel_id.to_channel(cache_http).await.ok()?.guild()?.parent_id
     }
 }
 
