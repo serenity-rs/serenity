@@ -1,163 +1,25 @@
-use std::error::Error as StdError;
-use std::str::FromStr;
+use std::env;
 use std::time::Duration;
-use std::{env, fmt};
 
 use dotenv::dotenv;
 use serenity::async_trait;
-use serenity::builder::{CreateActionRow, CreateButton, CreateSelectMenu, CreateSelectMenuOption};
+use serenity::builder::CreateButton;
 use serenity::client::{Context, EventHandler};
 use serenity::futures::StreamExt;
 use serenity::model::application::component::ButtonStyle;
-use serenity::model::application::interaction::InteractionResponseType;
-use serenity::model::channel::Message;
+use serenity::model::prelude::*;
 use serenity::prelude::*;
 
-#[derive(Debug)]
-enum Animal {
-    Cat,
-    Dog,
-    Horse,
-    Alpaca,
-}
-
-#[derive(Debug)]
-struct ParseComponentError(String);
-
-impl fmt::Display for ParseComponentError {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "Failed to parse {} as component", self.0)
-    }
-}
-
-impl StdError for ParseComponentError {}
-
-impl fmt::Display for Animal {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        match self {
-            Self::Cat => write!(f, "Cat"),
-            Self::Dog => write!(f, "Dog"),
-            Self::Horse => write!(f, "Horse"),
-            Self::Alpaca => write!(f, "Alpaca"),
-        }
-    }
-}
-
-impl FromStr for Animal {
-    type Err = ParseComponentError;
-
-    fn from_str(s: &str) -> Result<Self, Self::Err> {
-        match s {
-            "cat" => Ok(Animal::Cat),
-            "dog" => Ok(Animal::Dog),
-            "horse" => Ok(Animal::Horse),
-            "alpaca" => Ok(Animal::Alpaca),
-            _ => Err(ParseComponentError(s.to_string())),
-        }
-    }
-}
-
-impl Animal {
-    fn emoji(&self) -> char {
-        match self {
-            Self::Cat => '🐈',
-            Self::Dog => '🐕',
-            Self::Horse => '🐎',
-            Self::Alpaca => '🦙',
-        }
-    }
-
-    fn menu_option(&self) -> CreateSelectMenuOption {
-        let mut opt = CreateSelectMenuOption::default();
-        // This is what will be shown to the user
-        opt.label(format!("{} {}", self.emoji(), self));
-        // This is used to identify the selected value
-        opt.value(self.to_string().to_ascii_lowercase());
-        opt
-    }
-
-    fn select_menu() -> CreateSelectMenu {
-        let mut menu = CreateSelectMenu::default();
-        menu.custom_id("animal_select");
-        menu.placeholder("No animal selected");
-        menu.options(|f| {
-            f.add_option(Self::Cat.menu_option())
-                .add_option(Self::Dog.menu_option())
-                .add_option(Self::Horse.menu_option())
-                .add_option(Self::Alpaca.menu_option())
-        });
-        menu
-    }
-
-    fn action_row() -> CreateActionRow {
-        let mut ar = CreateActionRow::default();
-        // A select menu must be the only thing in an action row!
-        ar.add_select_menu(Self::select_menu());
-        ar
-    }
-}
-
-#[derive(Debug)]
-enum Sound {
-    Meow,
-    Woof,
-    Neigh,
-    Honk,
-}
-
-impl fmt::Display for Sound {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        match self {
-            Self::Meow => write!(f, "meow"),
-            Self::Woof => write!(f, "woof"),
-            Self::Neigh => write!(f, "neigh"),
-            Self::Honk => write!(f, "hoooooooonk"),
-        }
-    }
-}
-
-impl Sound {
-    fn emoji(&self) -> char {
-        match self {
-            Self::Meow => Animal::Cat.emoji(),
-            Self::Woof => Animal::Dog.emoji(),
-            Self::Neigh => Animal::Horse.emoji(),
-            Self::Honk => Animal::Alpaca.emoji(),
-        }
-    }
-
-    fn button(&self) -> CreateButton {
-        let mut b = CreateButton::default();
-        b.custom_id(self.to_string().to_ascii_lowercase());
-        b.emoji(self.emoji());
-        b.label(self);
-        b.style(ButtonStyle::Primary);
-        b
-    }
-
-    fn action_row() -> CreateActionRow {
-        let mut ar = CreateActionRow::default();
-        // We can add up to 5 buttons per action row
-        ar.add_button(Sound::Meow.button());
-        ar.add_button(Sound::Woof.button());
-        ar.add_button(Sound::Neigh.button());
-        ar.add_button(Sound::Honk.button());
-        ar
-    }
-}
-
-impl FromStr for Sound {
-    type Err = ParseComponentError;
-
-    fn from_str(s: &str) -> Result<Self, Self::Err> {
-        match s {
-            "meow" => Ok(Sound::Meow),
-            "woof" => Ok(Sound::Woof),
-            "neigh" => Ok(Sound::Neigh),
-            "hoooooooonk" => Ok(Sound::Honk),
-            _ => Err(ParseComponentError(s.to_string())),
-        }
-    }
+fn sound_button(name: &str, emoji: ReactionType) -> CreateButton {
+    let mut b = CreateButton::default();
+    b.custom_id(name);
+    // To add an emoji to buttons, use .emoji(). The method accepts anything ReactionType or
+    // anything that can be converted to it. For a list of that, search Trait Implementations in the
+    // docs for From<...>.
+    b.emoji(emoji);
+    b.label(name);
+    b.style(ButtonStyle::Primary);
+    b
 }
 
 struct Handler;
@@ -173,59 +35,96 @@ impl EventHandler for Handler {
         let m = msg
             .channel_id
             .send_message(&ctx, |m| {
-                m.content("Please select your favorite animal")
-                    .components(|c| c.add_action_row(Animal::action_row()))
+                m.content("Please select your favorite animal").components(|c| {
+                    c.create_action_row(|row| {
+                        // An action row can only contain one select menu!
+                        row.create_select_menu(|menu| {
+                            menu.custom_id("animal_select");
+                            menu.placeholder("No animal selected");
+                            menu.options(|f| {
+                                f.create_option(|o| o.label("🐈 meow").value("Cat"));
+                                f.create_option(|o| o.label("🐕 woof").value("Dog"));
+                                f.create_option(|o| o.label("🐎 neigh").value("Horse"));
+                                f.create_option(|o| o.label("🦙 hoooooooonk").value("Alpaca"));
+                                f.create_option(|o| o.label("🦀 crab rave").value("Ferris"))
+                            })
+                        })
+                    })
+                })
             })
             .await
             .unwrap();
 
         // Wait for the user to make a selection
-        let mci =
+        // This uses a collector to wait for an incoming event without needing to listen for it
+        // manually in the EventHandler.
+        let interaction =
             match m.await_component_interaction(&ctx).timeout(Duration::from_secs(60 * 3)).await {
-                Some(ci) => ci,
+                Some(x) => x,
                 None => {
                     m.reply(&ctx, "Timed out").await.unwrap();
                     return;
                 },
             };
 
-        // data.custom_id contains the id of the component (here "animal_select")
-        // and should be used to identify if a message has multiple components.
-        // data.values contains the selected values from the menu
-        let animal = Animal::from_str(mci.data.values.get(0).unwrap()).unwrap();
+        // data.values contains the selected value from each select menus. We only have one menu,
+        // so we retrieve the first
+        let animal = &interaction.data.values[0];
 
         // Acknowledge the interaction and edit the message
-        mci.create_interaction_response(&ctx, |r| {
-            r.kind(InteractionResponseType::UpdateMessage).interaction_response_data(|d| {
-                d.content(format!("You chose: **{}**\nNow choose a sound!", animal))
-                    .components(|c| c.add_action_row(Sound::action_row()))
-            })
-        })
-        .await
-        .unwrap();
-
-        // Wait for multiple interactions
-
-        let mut cib =
-            m.await_component_interactions(&ctx).timeout(Duration::from_secs(60 * 3)).build();
-
-        while let Some(mci) = cib.next().await {
-            let sound = Sound::from_str(&mci.data.custom_id).unwrap();
-            // Acknowledge the interaction and send a reply
-            mci.create_interaction_response(&ctx, |r| {
-                // This time we dont edit the message but reply to it
-                r.kind(InteractionResponseType::ChannelMessageWithSource).interaction_response_data(
-                    |d| {
-                        // Make the message hidden for other users by setting `ephemeral(true)`.
-                        d.ephemeral(true).content(format!("The **{}** says __{}__", animal, sound))
-                    },
-                )
+        interaction
+            .create_interaction_response(&ctx, |r| {
+                r.kind(InteractionResponseType::UpdateMessage).interaction_response_data(|d| {
+                    d.content(format!("You chose: **{}**\nNow choose a sound!", animal)).components(
+                        |c| {
+                            c.create_action_row(|r| {
+                                // add_XXX methods are an alternative to create_XXX methods
+                                r.add_button(sound_button("meow", "🐈".parse().unwrap()));
+                                r.add_button(sound_button("woof", "🐕".parse().unwrap()));
+                                r.add_button(sound_button("neigh", "🐎".parse().unwrap()));
+                                r.add_button(sound_button("hoooooooonk", "🦙".parse().unwrap()));
+                                r.add_button(sound_button(
+                                    "crab rave",
+                                    // Custom emojis in Discord are represented with
+                                    // `<:EMOJI_NAME:EMOJI_ID>`. You can see this by
+                                    // posting an emoji in your server and putting a backslash
+                                    // before the emoji.
+                                    //
+                                    // Because ReactionType implements FromStr, we can use .parse()
+                                    // to convert the textual emoji representation to ReactionType
+                                    "<:ferris:381919740114763787>".parse().unwrap(),
+                                ))
+                            })
+                        },
+                    )
+                })
             })
             .await
             .unwrap();
+
+        // Wait for multiple interactions
+        let mut interaction_stream =
+            m.await_component_interactions(&ctx).timeout(Duration::from_secs(60 * 3)).build();
+
+        while let Some(interaction) = interaction_stream.next().await {
+            let sound = &interaction.data.custom_id;
+            // Acknowledge the interaction and send a reply
+            interaction
+                .create_interaction_response(&ctx, |r| {
+                    // This time we dont edit the message but reply to it
+                    r.kind(InteractionResponseType::ChannelMessageWithSource)
+                        .interaction_response_data(|d| {
+                            // Make the message hidden for other users by setting `ephemeral(true)`.
+                            d.ephemeral(true)
+                                .content(format!("The **{}** says __{}__", animal, sound))
+                        })
+                })
+                .await
+                .unwrap();
         }
 
-        // Delete the orig message or there will be dangling components
+        // Delete the orig message or there will be dangling components (components that still
+        // exist, but no collector is running so any user who presses them sees an error)
         m.delete(&ctx).await.unwrap()
     }
 }
