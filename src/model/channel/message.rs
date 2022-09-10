@@ -11,6 +11,7 @@ use crate::builder::{CreateAllowedMentions, CreateMessage, EditMessage, ParseVal
 use crate::cache::{Cache, GuildRef};
 #[cfg(feature = "collector")]
 use crate::client::bridge::gateway::ShardMessenger;
+use crate::client::Context;
 #[cfg(feature = "collector")]
 use crate::collector::{
     ComponentInteractionCollectorBuilder,
@@ -184,9 +185,8 @@ impl Message {
 
     /// A util function for determining whether this message was sent by someone else, or the
     /// bot.
-    #[cfg(feature = "cache")]
-    pub fn is_own(&self, cache: impl AsRef<Cache>) -> bool {
-        self.author.id == cache.as_ref().current_user().id
+    pub fn is_own(&self, context: impl AsRef<Context>) -> bool {
+        self.author.id == context.as_ref().bot_user.id
     }
 
     /// Deletes the message.
