@@ -607,7 +607,6 @@
 <span id="601">601</span>
 <span id="602">602</span>
 <span id="603">603</span>
-<span id="604">604</span>
 </pre><pre class="rust"><code><span class="doccomment">//! A set of utilities to help with common use cases that are not required to</span>
 <span class="doccomment">//! fully use the library.</span>
 
@@ -1118,7 +1117,6 @@
     <span class="comment">// just assume that all permissions are granted and return `true`.</span>
     <span class="kw">let</span> (<span class="ident">guild_id</span>, <span class="ident">guild_channel</span>) <span class="op">=</span> <span class="kw">match</span> <span class="ident">channel</span> {
         <span class="ident">Channel::Guild</span>(<span class="ident">channel</span>) =&gt; (<span class="ident">channel</span>.<span class="ident">guild_id</span>, <span class="ident">channel</span>),
-        <span class="ident">Channel::Category</span>(<span class="kw">_</span>) =&gt; <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="bool-val">true</span>),
         <span class="ident">Channel::Private</span>(<span class="kw">_</span>) =&gt; <span class="kw">match</span> <span class="ident">guild_id</span> {
             <span class="prelude-val">Some</span>(<span class="kw">_</span>) =&gt; <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::Model</span>(<span class="ident">ModelError::InvalidChannelType</span>)),
             <span class="prelude-val">None</span> =&gt; <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="bool-val">true</span>),

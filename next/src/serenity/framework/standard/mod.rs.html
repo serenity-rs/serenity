@@ -1768,7 +1768,7 @@
     } <span class="kw">else</span> {
         <span class="ident">message</span>.<span class="ident">guild</span>(<span class="ident">cache</span>.<span class="ident">as_ref</span>()).<span class="ident">map_or</span>(<span class="bool-val">false</span>, <span class="op">|</span><span class="ident">guild</span><span class="op">|</span> {
             <span class="kw">let</span> <span class="ident">channel</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">guild</span>.<span class="ident">channels</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="ident">message</span>.<span class="ident">channel_id</span>) {
-                <span class="prelude-val">Some</span>(<span class="ident">Channel::Guild</span>(<span class="ident">channel</span>)) =&gt; <span class="ident">channel</span>,
+                <span class="prelude-val">Some</span>(<span class="ident">channel</span>) =&gt; <span class="ident">channel</span>,
                 <span class="kw">_</span> =&gt; <span class="kw">return</span> <span class="bool-val">false</span>,
             };
 

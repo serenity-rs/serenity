@@ -634,7 +634,7 @@
     <span class="doccomment">/// The bucket will collect tickets per category.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// This requires the cache, as messages do not contain their channel&#39;s</span>
-    <span class="doccomment">/// category.</span>
+    <span class="doccomment">/// category and retrieving channel data via HTTP is costly.</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
     <span class="ident">Category</span>(<span class="ident">TicketCounter</span>),
 }
@@ -657,7 +657,7 @@
             <span class="comment">// category.</span>
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
             <span class="ident"><span class="self">Self</span>::Category</span>(<span class="ident">counter</span>) =&gt; {
-                <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">category_id</span>) <span class="op">=</span> <span class="ident">msg</span>.<span class="ident">category_id</span>(<span class="ident">ctx</span>) {
+                <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">category_id</span>) <span class="op">=</span> <span class="ident">msg</span>.<span class="ident">category_id</span>(<span class="ident">ctx</span>).<span class="kw">await</span> {
                     <span class="ident">counter</span>.<span class="ident">take</span>(<span class="ident">ctx</span>, <span class="ident">msg</span>, <span class="ident">category_id</span>.<span class="ident">get</span>()).<span class="kw">await</span>
                 } <span class="kw">else</span> {
                     <span class="prelude-val">None</span>
@@ -681,7 +681,7 @@
             <span class="comment">// category.</span>
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
             <span class="ident"><span class="self">Self</span>::Category</span>(<span class="ident">counter</span>) =&gt; {
-                <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">category_id</span>) <span class="op">=</span> <span class="ident">msg</span>.<span class="ident">category_id</span>(<span class="ident">ctx</span>) {
+                <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">category_id</span>) <span class="op">=</span> <span class="ident">msg</span>.<span class="ident">category_id</span>(<span class="ident">ctx</span>).<span class="kw">await</span> {
                     <span class="ident">counter</span>.<span class="ident">give</span>(<span class="ident">ctx</span>, <span class="ident">msg</span>, <span class="ident">category_id</span>.<span class="ident">get</span>()).<span class="kw">await</span>;
                 }
             },

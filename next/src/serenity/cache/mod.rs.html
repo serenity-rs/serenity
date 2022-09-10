@@ -1115,71 +1115,6 @@
 <span id="1109">1109</span>
 <span id="1110">1110</span>
 <span id="1111">1111</span>
-<span id="1112">1112</span>
-<span id="1113">1113</span>
-<span id="1114">1114</span>
-<span id="1115">1115</span>
-<span id="1116">1116</span>
-<span id="1117">1117</span>
-<span id="1118">1118</span>
-<span id="1119">1119</span>
-<span id="1120">1120</span>
-<span id="1121">1121</span>
-<span id="1122">1122</span>
-<span id="1123">1123</span>
-<span id="1124">1124</span>
-<span id="1125">1125</span>
-<span id="1126">1126</span>
-<span id="1127">1127</span>
-<span id="1128">1128</span>
-<span id="1129">1129</span>
-<span id="1130">1130</span>
-<span id="1131">1131</span>
-<span id="1132">1132</span>
-<span id="1133">1133</span>
-<span id="1134">1134</span>
-<span id="1135">1135</span>
-<span id="1136">1136</span>
-<span id="1137">1137</span>
-<span id="1138">1138</span>
-<span id="1139">1139</span>
-<span id="1140">1140</span>
-<span id="1141">1141</span>
-<span id="1142">1142</span>
-<span id="1143">1143</span>
-<span id="1144">1144</span>
-<span id="1145">1145</span>
-<span id="1146">1146</span>
-<span id="1147">1147</span>
-<span id="1148">1148</span>
-<span id="1149">1149</span>
-<span id="1150">1150</span>
-<span id="1151">1151</span>
-<span id="1152">1152</span>
-<span id="1153">1153</span>
-<span id="1154">1154</span>
-<span id="1155">1155</span>
-<span id="1156">1156</span>
-<span id="1157">1157</span>
-<span id="1158">1158</span>
-<span id="1159">1159</span>
-<span id="1160">1160</span>
-<span id="1161">1161</span>
-<span id="1162">1162</span>
-<span id="1163">1163</span>
-<span id="1164">1164</span>
-<span id="1165">1165</span>
-<span id="1166">1166</span>
-<span id="1167">1167</span>
-<span id="1168">1168</span>
-<span id="1169">1169</span>
-<span id="1170">1170</span>
-<span id="1171">1171</span>
-<span id="1172">1172</span>
-<span id="1173">1173</span>
-<span id="1174">1174</span>
-<span id="1175">1175</span>
-<span id="1176">1176</span>
 </pre><pre class="rust"><code><span class="doccomment">//! A cache containing data received from [`Shard`]s.</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! Using the cache allows to avoid REST API requests via the [`http`] module</span>
@@ -1356,8 +1291,6 @@
     <span class="doccomment">/// Each value has a maximum TTL of 1 hour.</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;temp_cache&quot;</span>)]</span>
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">temp_channels</span>: <span class="ident">DashCache</span><span class="op">&lt;</span><span class="ident">ChannelId</span>, <span class="ident">GuildChannel</span>, <span class="ident">FxBuildHasher</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// A map of channel categories.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">categories</span>: <span class="ident">DashMap</span><span class="op">&lt;</span><span class="ident">ChannelId</span>, <span class="ident">ChannelCategory</span>, <span class="ident">FxBuildHasher</span><span class="op">&gt;</span>,
     <span class="doccomment">/// A map of guilds with full data available. This includes data like</span>
     <span class="doccomment">/// [`Role`]s and [`Emoji`]s that are not available through the REST API.</span>
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">guilds</span>: <span class="ident">DashMap</span><span class="op">&lt;</span><span class="ident">GuildId</span>, <span class="ident">Guild</span>, <span class="ident">FxBuildHasher</span><span class="op">&gt;</span>,
@@ -1842,44 +1775,12 @@
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">guild_id</span>: <span class="ident">GuildId</span>,
     ) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">DashMap</span><span class="op">&lt;</span><span class="ident">ChannelId</span>, <span class="ident">GuildChannel</span>, <span class="ident">FxBuildHasher</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">guilds</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="ident">guild_id</span>).<span class="ident">map</span>(<span class="op">|</span><span class="ident">g</span><span class="op">|</span> {
-            <span class="ident">g</span>.<span class="ident">channels</span>
-                .<span class="ident">iter</span>()
-                .<span class="ident">filter_map</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">c</span>.<span class="number">1</span> {
-                    <span class="ident">Channel::Guild</span>(<span class="ident">channel</span>) =&gt; <span class="prelude-val">Some</span>((<span class="ident">channel</span>.<span class="ident">id</span>, <span class="ident">channel</span>.<span class="ident">clone</span>())),
-                    <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
-                })
-                .<span class="ident">collect</span>()
-        })
+        <span class="self">self</span>.<span class="ident">guilds</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="ident">guild_id</span>).<span class="ident">map</span>(<span class="op">|</span><span class="ident">g</span><span class="op">|</span> <span class="ident">g</span>.<span class="ident">channels</span>.<span class="ident">clone</span>().<span class="ident">into_iter</span>().<span class="ident">collect</span>())
     }
 
     <span class="doccomment">/// Returns the number of guild channels in the cache.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">guild_channel_count</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">usize</span> {
         <span class="self">self</span>.<span class="ident">channels</span>.<span class="ident">len</span>()
-    }
-
-    <span class="doccomment">/// This method returns all categories from a guild of with the given `guild_id`.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">guild_categories</span>(
-        <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">guild_id</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">GuildId</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">DashMap</span><span class="op">&lt;</span><span class="ident">ChannelId</span>, <span class="ident">ChannelCategory</span>, <span class="ident">FxBuildHasher</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">_guild_categories</span>(<span class="ident">guild_id</span>.<span class="ident">into</span>())
-    }
-
-    <span class="kw">fn</span> <span class="ident">_guild_categories</span>(
-        <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">guild_id</span>: <span class="ident">GuildId</span>,
-    ) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">DashMap</span><span class="op">&lt;</span><span class="ident">ChannelId</span>, <span class="ident">ChannelCategory</span>, <span class="ident">FxBuildHasher</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">guilds</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="ident">guild_id</span>).<span class="ident">map</span>(<span class="op">|</span><span class="ident">g</span><span class="op">|</span> {
-            <span class="ident">g</span>.<span class="ident">channels</span>
-                .<span class="ident">iter</span>()
-                .<span class="ident">filter_map</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">c</span>.<span class="number">1</span> {
-                    <span class="ident">Channel::Category</span>(<span class="ident">category</span>) =&gt; <span class="prelude-val">Some</span>((<span class="ident">category</span>.<span class="ident">id</span>, <span class="ident">category</span>.<span class="ident">clone</span>())),
-                    <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
-                })
-                .<span class="ident">collect</span>()
-        })
     }
 
     <span class="doccomment">/// Returns the number of shards.</span>
@@ -2069,36 +1970,6 @@
         <span class="self">self</span>.<span class="ident">users</span>.<span class="ident">len</span>()
     }
 
-    <span class="doccomment">/// Clones a category matching the `channel_id` and returns it.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">category</span><span class="op">&lt;</span><span class="ident">C</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">ChannelId</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">channel_id</span>: <span class="ident">C</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ChannelCategory</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">_category</span>(<span class="ident">channel_id</span>.<span class="ident">into</span>())
-    }
-
-    <span class="kw">fn</span> <span class="ident">_category</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">channel_id</span>: <span class="ident">ChannelId</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ChannelCategory</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">categories</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="ident">channel_id</span>).<span class="ident">map</span>(<span class="op">|</span><span class="ident">i</span><span class="op">|</span> <span class="ident">i</span>.<span class="ident">clone</span>())
-    }
-
-    <span class="doccomment">/// Clones all categories and returns them.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">categories</span>(
-        <span class="kw-2">&amp;</span><span class="self">self</span>,
-    ) -&gt; <span class="ident">DashMap</span><span class="op">&lt;</span><span class="ident">ChannelId</span>, <span class="ident">ChannelCategory</span>, <span class="kw">impl</span> <span class="ident">BuildHasher</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="ident">Clone</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">categories</span>.<span class="ident">clone</span>()
-    }
-
-    <span class="doccomment">/// Returns the amount of cached categories.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">category_count</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">usize</span> {
-        <span class="self">self</span>.<span class="ident">categories</span>.<span class="ident">len</span>()
-    }
-
-    <span class="doccomment">/// Returns the optional category ID of a channel.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">channel_category_id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">channel_id</span>: <span class="ident">ChannelId</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ChannelId</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">categories</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="ident">channel_id</span>).<span class="ident">map</span>(<span class="op">|</span><span class="ident">category</span><span class="op">|</span> <span class="ident">category</span>.<span class="ident">id</span>)
-    }
-
     <span class="doccomment">/// This method provides a reference to the user used by the bot.</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">current_user</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">CurrentUserRef</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> {
@@ -2152,7 +2023,6 @@
             <span class="ident">temp_users</span>: <span class="ident">temp_cache</span>(),
 
             <span class="ident">channels</span>: <span class="ident">DashMap::default</span>(),
-            <span class="ident">categories</span>: <span class="ident">DashMap::default</span>(),
             <span class="ident">guilds</span>: <span class="ident">DashMap::default</span>(),
             <span class="ident">messages</span>: <span class="ident">DashMap::default</span>(),
             <span class="ident">presences</span>: <span class="ident">DashMap::default</span>(),
@@ -2250,7 +2120,7 @@
             <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">channel</span>.<span class="ident">contains_key</span>(<span class="kw-2">&amp;</span><span class="ident">MessageId::new</span>(<span class="number">3</span>)));
         }
 
-        <span class="kw">let</span> <span class="ident">channel</span> <span class="op">=</span> <span class="ident">Channel::Guild</span>(<span class="ident">GuildChannel</span> {
+        <span class="kw">let</span> <span class="ident">channel</span> <span class="op">=</span> <span class="ident">GuildChannel</span> {
             <span class="ident">id</span>: <span class="ident">event</span>.<span class="ident">message</span>.<span class="ident">channel_id</span>,
             <span class="ident">bitrate</span>: <span class="prelude-val">None</span>,
             <span class="ident">parent_id</span>: <span class="prelude-val">None</span>,
@@ -2272,12 +2142,12 @@
             <span class="ident">thread_metadata</span>: <span class="prelude-val">None</span>,
             <span class="ident">member</span>: <span class="prelude-val">None</span>,
             <span class="ident">default_auto_archive_duration</span>: <span class="prelude-val">None</span>,
-        });
+        };
 
         <span class="comment">// Add a channel delete event to the cache, the cached messages for that</span>
         <span class="comment">// channel should now be gone.</span>
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">delete</span> <span class="op">=</span> <span class="ident">ChannelDeleteEvent</span> {
-            <span class="ident">channel</span>: <span class="ident">channel</span>.<span class="ident">clone</span>(),
+            <span class="ident">channel</span>: <span class="ident">Channel::Guild</span>(<span class="ident">channel</span>.<span class="ident">clone</span>()),
         };
         <span class="macro">assert!</span>(<span class="ident">cache</span>.<span class="ident">update</span>(<span class="kw-2">&amp;mut</span> <span class="ident">delete</span>).<span class="ident">is_none</span>());
         <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">cache</span>.<span class="ident">messages</span>.<span class="ident">contains_key</span>(<span class="kw-2">&amp;</span><span class="ident">delete</span>.<span class="ident">channel</span>.<span class="ident">id</span>()));
