@@ -371,10 +371,10 @@ impl Guild {
     pub fn default_channel(&self, uid: UserId) -> Option<&GuildChannel> {
         let member = self.members.get(&uid)?;
         for channel in self.channels.values() {
-            if channel.kind != ChannelType::Category {
-                if self.user_permissions_in(channel, member).ok()?.view_channel() {
-                    return Some(channel);
-                }
+            if channel.kind != ChannelType::Category
+                && self.user_permissions_in(channel, member).ok()?.view_channel()
+            {
+                return Some(channel);
             }
         }
 

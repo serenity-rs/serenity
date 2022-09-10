@@ -196,10 +196,10 @@ impl Member {
         let member = guild.members.get(&self.user.id)?;
 
         for channel in guild.channels.values() {
-            if channel.kind != ChannelType::Category {
-                if guild.user_permissions_in(channel, member).ok()?.view_channel() {
-                    return Some(channel.clone());
-                }
+            if channel.kind != ChannelType::Category
+                && guild.user_permissions_in(channel, member).ok()?.view_channel()
+            {
+                return Some(channel.clone());
             }
         }
 

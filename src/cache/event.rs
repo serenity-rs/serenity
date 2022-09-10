@@ -186,7 +186,7 @@ impl CacheUpdate for GuildDeleteEvent {
 
         match cache.guilds.remove(&self.guild.id) {
             Some(guild) => {
-                for (channel_id, _) in &guild.1.channels {
+                for channel_id in guild.1.channels.keys() {
                     // Remove the channel from the cache.
                     cache.channels.remove(channel_id);
 
