@@ -2,7 +2,6 @@
 
 mod attachment;
 mod attachment_type;
-mod channel_category;
 mod channel_id;
 mod embed;
 mod guild_channel;
@@ -17,11 +16,9 @@ use std::fmt;
 use std::num::NonZeroU64;
 
 use serde::de::{Error as DeError, Unexpected};
-use serde::ser::{Serialize, Serializer};
 
 pub use self::attachment::*;
 pub use self::attachment_type::*;
-pub use self::channel_category::*;
 pub use self::channel_id::*;
 pub use self::embed::*;
 pub use self::guild_channel::*;
@@ -43,30 +40,22 @@ use crate::model::Timestamp;
 use crate::utils::parse_channel;
 
 /// A container for any channel.
-#[allow(clippy::large_enum_variant)]
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, Serialize)]
+#[serde(untagged)]
 #[non_exhaustive]
 pub enum Channel {
-    /// A [text], [voice], [stage] or [directory] channel within a [`Guild`].
-    ///
-    /// [text]: ChannelType::Text
-    /// [voice]: ChannelType::Voice
-    /// [stage]: ChannelType::Stage
-    /// [directory]: ChannelType::Directory
+    /// A channel within a [`Guild`].
     Guild(GuildChannel),
-    /// A private channel to another [`User`]. No other users may access the
+    /// A private channel to another [`User`] (Direct Message). No other users may access the
     /// channel.
     Private(PrivateChannel),
-    /// A category of [`GuildChannel`]s
-    Category(ChannelCategory),
 }
 
 impl Channel {
     /// Converts from [`Channel`] to `Option<GuildChannel>`.
     ///
     /// Converts `self` into an `Option<GuildChannel>`, consuming
-    /// `self`, and discarding a [`PrivateChannel`], or
-    /// [`ChannelCategory`], if any.
+    /// `self`, and discarding a [`PrivateChannel`] if any.
     ///
     /// # Examples
     ///
@@ -97,7 +86,7 @@ impl Channel {
     /// Converts from [`Channel`] to `Option<PrivateChannel>`.
     ///
     /// Converts `self` into an `Option<PrivateChannel>`, consuming
-    /// `self`, and discarding a [`GuildChannel`], or [`ChannelCategory`],
+    /// `self`, and discarding a [`GuildChannel`],
     /// if any.
     ///
     /// # Examples
@@ -126,38 +115,6 @@ impl Channel {
         }
     }
 
-    /// Converts from [`Channel`] to `Option<ChannelCategory>`.
-    ///
-    /// Converts `self` into an `Option<ChannelCategory>`,
-    /// consuming `self`, and discarding a [`GuildChannel`], or
-    /// [`PrivateChannel`], if any.
-    ///
-    /// # Examples
-    ///
-    /// Basic usage:
-    ///
-    /// ```rust,no_run
-    /// # use serenity::model::channel::Channel;
-    /// # fn run(channel: Channel) {
-    /// #
-    /// match channel.category() {
-    ///     Some(category) => {
-    ///         println!("It's a category named {}!", category.name);
-    ///     },
-    ///     None => {
-    ///         println!("It's not a category!");
-    ///     },
-    /// }
-    /// # }
-    /// ```
-    #[must_use]
-    pub fn category(self) -> Option<ChannelCategory> {
-        match self {
-            Self::Category(lock) => Some(lock),
-            _ => None,
-        }
-    }
-
     /// Deletes the inner channel.
     ///
     /// # Errors
@@ -176,9 +133,6 @@ impl Channel {
             Self::Private(private_channel) => {
                 private_channel.delete(cache_http.http()).await?;
             },
-            Self::Category(category) => {
-                category.delete(cache_http).await?;
-            },
         }
 
         Ok(())
@@ -191,7 +145,6 @@ impl Channel {
     pub fn is_nsfw(&self) -> bool {
         match self {
             Self::Guild(channel) => channel.is_nsfw(),
-            Self::Category(category) => category.is_nsfw(),
             Self::Private(_) => false,
         }
     }
@@ -204,21 +157,18 @@ impl Channel {
         match self {
             Self::Guild(ch) => ch.id,
             Self::Private(ch) => ch.id,
-            Self::Category(ch) => ch.id,
         }
     }
 
-    /// Retrieves the position of the inner [`GuildChannel`] or
-    /// [`ChannelCategory`].
+    /// Retrieves the position of the inner [`GuildChannel`].
     ///
-    /// If other channel types are used it will return None.
+    /// In DMs (private channel) it will return None.
     #[inline]
     #[must_use]
     pub const fn position(&self) -> Option<i64> {
         match self {
             Self::Guild(channel) => Some(channel.position),
-            Self::Category(category) => Some(category.position),
-            _ => None,
+            Self::Private(_) => None,
         }
     }
 }
@@ -239,25 +189,11 @@ impl<'de> Deserialize<'de> for Channel {
 
         let value = Value::from(map);
         match kind {
-            0 | 2 | 5 | 10 | 11 | 12 | 13 | 14 | 15 => from_value(value).map(Channel::Guild),
+            0 | 2 | 4 | 5 | 10 | 11 | 12 | 13 | 14 | 15 => from_value(value).map(Channel::Guild),
             1 => from_value(value).map(Channel::Private),
-            4 => from_value(value).map(Channel::Category),
             _ => return Err(DeError::custom("Unknown channel type")),
         }
         .map_err(DeError::custom)
-    }
-}
-
-impl Serialize for Channel {
-    fn serialize<S>(&self, serializer: S) -> StdResult<S::Ok, S::Error>
-    where
-        S: Serializer,
-    {
-        match self {
-            Self::Category(c) => ChannelCategory::serialize(c, serializer),
-            Self::Guild(c) => GuildChannel::serialize(c, serializer),
-            Self::Private(c) => PrivateChannel::serialize(c, serializer),
-        }
     }
 }
 
@@ -273,7 +209,6 @@ impl fmt::Display for Channel {
         match self {
             Self::Guild(ch) => fmt::Display::fmt(&ch.id.mention(), f),
             Self::Private(ch) => fmt::Display::fmt(&ch.recipient.name, f),
-            Self::Category(ch) => fmt::Display::fmt(&ch.name, f),
         }
     }
 }
@@ -292,7 +227,7 @@ enum_number! {
         Private = 1,
         /// An indicator that the channel is a voice [`GuildChannel`].
         Voice = 2,
-        /// An indicator that the channel is the channel of a [`ChannelCategory`].
+        /// An indicator that the channel is a channel category.
         Category = 4,
         /// An indicator that the channel is a `NewsChannel`.
         ///
