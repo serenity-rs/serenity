@@ -56,7 +56,8 @@ use super::routing::RouteInfo;
 use super::{HttpError, LightMethod, Request};
 use crate::internal::prelude::*;
 
-/// Passed to [`EventHandler::ratelimit`]. Contains information about the ratelimit
+/// Passed to the [`Ratelimiter::set_ratelimit_callback`] callback. If using Client, that callback
+/// is initialized to call the `EventHandler::ratelimit()` method.
 #[derive(Clone, Debug)]
 #[non_exhaustive]
 pub struct RatelimitInfo {
