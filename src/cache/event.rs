@@ -46,11 +46,11 @@ impl CacheUpdate for ChannelCreateEvent {
                 let old_channel = cache
                     .guilds
                     .get_mut(&guild_id)
-                    .and_then(|mut g| g.channels.insert(channel_id, self.channel.clone()));
+                    .and_then(|mut g| g.channels.insert(channel_id, channel.clone()));
 
                 cache.channels.insert(channel_id, channel.clone());
 
-                old_channel
+                old_channel.map(Channel::Guild)
             },
             Channel::Private(ref mut channel) => {
                 if let Some(channel) = cache.private_channels.get(&channel.id) {
@@ -73,18 +73,6 @@ impl CacheUpdate for ChannelCreateEvent {
 
                 cache.private_channels.insert(id, channel.clone()).map(Channel::Private)
             },
-            Channel::Category(ref category) => {
-                let (guild_id, channel_id) = (category.guild_id, category.id);
-
-                let old_channel = cache
-                    .guilds
-                    .get_mut(&guild_id)
-                    .and_then(|mut g| g.channels.insert(channel_id, self.channel.clone()));
-
-                cache.categories.insert(channel_id, category.clone());
-
-                old_channel
-            },
         }
     }
 }
@@ -98,13 +86,6 @@ impl CacheUpdate for ChannelDeleteEvent {
                 let (guild_id, channel_id) = (channel.guild_id, channel.id);
 
                 cache.channels.remove(&channel_id);
-
-                cache.guilds.get_mut(&guild_id).map(|mut g| g.channels.remove(&channel_id));
-            },
-            Channel::Category(category) => {
-                let (guild_id, channel_id) = (category.guild_id, category.id);
-
-                cache.categories.remove(&channel_id);
 
                 cache.guilds.get_mut(&guild_id).map(|mut g| g.channels.remove(&channel_id));
             },
@@ -135,22 +116,12 @@ impl CacheUpdate for ChannelUpdateEvent {
                 cache
                     .guilds
                     .get_mut(&guild_id)
-                    .map(|mut g| g.channels.insert(channel_id, self.channel.clone()));
+                    .map(|mut g| g.channels.insert(channel_id, channel.clone()));
             },
             Channel::Private(channel) => {
                 if let Some(mut c) = cache.private_channels.get_mut(&channel.id) {
                     c.clone_from(channel);
                 }
-            },
-            Channel::Category(category) => {
-                let (guild_id, channel_id) = (category.guild_id, category.id);
-
-                cache.categories.insert(channel_id, category.clone());
-
-                cache
-                    .guilds
-                    .get_mut(&guild_id)
-                    .map(|mut g| g.channels.insert(channel_id, self.channel.clone()));
             },
         }
 
@@ -192,16 +163,8 @@ impl CacheUpdate for GuildCreateEvent {
             }
         }
 
-        for pair in guild.channels.clone() {
-            if let Channel::Guild(channel) = pair.1 {
-                cache.channels.insert(pair.0, channel);
-            }
-        }
-
-        for pair in guild.channels.clone() {
-            if let Channel::Category(category) = pair.1 {
-                cache.categories.insert(pair.0, category);
-            }
+        for (id, channel) in guild.channels.clone() {
+            cache.channels.insert(id, channel);
         }
 
         cache.guilds.insert(self.guild.id, guild);
@@ -223,21 +186,12 @@ impl CacheUpdate for GuildDeleteEvent {
 
         match cache.guilds.remove(&self.guild.id) {
             Some(guild) => {
-                for (channel_id, channel) in &guild.1.channels {
-                    match channel {
-                        Channel::Guild(_) => {
-                            // Remove the channel from the cache.
-                            cache.channels.remove(channel_id);
+                for channel_id in guild.1.channels.keys() {
+                    // Remove the channel from the cache.
+                    cache.channels.remove(channel_id);
 
-                            // Remove the channel's cached messages.
-                            cache.messages.remove(channel_id);
-                        },
-                        Channel::Category(_) => {
-                            // Remove the category from the cache
-                            cache.categories.remove(channel_id);
-                        },
-                        _ => {},
-                    }
+                    // Remove the channel's cached messages.
+                    cache.messages.remove(channel_id);
                 }
 
                 Some(guild.1)
