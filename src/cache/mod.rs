@@ -174,8 +174,6 @@ pub struct Cache {
     /// Each value has a maximum TTL of 1 hour.
     #[cfg(feature = "temp_cache")]
     pub(crate) temp_channels: DashCache<ChannelId, GuildChannel, FxBuildHasher>,
-    /// A map of channel categories.
-    pub(crate) categories: DashMap<ChannelId, ChannelCategory, FxBuildHasher>,
     /// A map of guilds with full data available. This includes data like
     /// [`Role`]s and [`Emoji`]s that are not available through the REST API.
     pub(crate) guilds: DashMap<GuildId, Guild, FxBuildHasher>,
@@ -660,44 +658,12 @@ impl Cache {
         &self,
         guild_id: GuildId,
     ) -> Option<DashMap<ChannelId, GuildChannel, FxBuildHasher>> {
-        self.guilds.get(&guild_id).map(|g| {
-            g.channels
-                .iter()
-                .filter_map(|c| match c.1 {
-                    Channel::Guild(channel) => Some((channel.id, channel.clone())),
-                    _ => None,
-                })
-                .collect()
-        })
+        self.guilds.get(&guild_id).map(|g| g.channels.clone().into_iter().collect())
     }
 
     /// Returns the number of guild channels in the cache.
     pub fn guild_channel_count(&self) -> usize {
         self.channels.len()
-    }
-
-    /// This method returns all categories from a guild of with the given `guild_id`.
-    #[inline]
-    pub fn guild_categories(
-        &self,
-        guild_id: impl Into<GuildId>,
-    ) -> Option<DashMap<ChannelId, ChannelCategory, FxBuildHasher>> {
-        self._guild_categories(guild_id.into())
-    }
-
-    fn _guild_categories(
-        &self,
-        guild_id: GuildId,
-    ) -> Option<DashMap<ChannelId, ChannelCategory, FxBuildHasher>> {
-        self.guilds.get(&guild_id).map(|g| {
-            g.channels
-                .iter()
-                .filter_map(|c| match c.1 {
-                    Channel::Category(category) => Some((category.id, category.clone())),
-                    _ => None,
-                })
-                .collect()
-        })
     }
 
     /// Returns the number of shards.
@@ -887,36 +853,6 @@ impl Cache {
         self.users.len()
     }
 
-    /// Clones a category matching the `channel_id` and returns it.
-    #[inline]
-    pub fn category<C: Into<ChannelId>>(&self, channel_id: C) -> Option<ChannelCategory> {
-        self._category(channel_id.into())
-    }
-
-    fn _category(&self, channel_id: ChannelId) -> Option<ChannelCategory> {
-        self.categories.get(&channel_id).map(|i| i.clone())
-    }
-
-    /// Clones all categories and returns them.
-    #[inline]
-    pub fn categories(
-        &self,
-    ) -> DashMap<ChannelId, ChannelCategory, impl BuildHasher + Send + Sync + Clone> {
-        self.categories.clone()
-    }
-
-    /// Returns the amount of cached categories.
-    #[inline]
-    pub fn category_count(&self) -> usize {
-        self.categories.len()
-    }
-
-    /// Returns the optional category ID of a channel.
-    #[inline]
-    pub fn channel_category_id(&self, channel_id: ChannelId) -> Option<ChannelId> {
-        self.categories.get(&channel_id).map(|category| category.id)
-    }
-
     /// This method provides a reference to the user used by the bot.
     #[inline]
     pub fn current_user(&self) -> CurrentUserRef<'_> {
@@ -970,7 +906,6 @@ impl Default for Cache {
             temp_users: temp_cache(),
 
             channels: DashMap::default(),
-            categories: DashMap::default(),
             guilds: DashMap::default(),
             messages: DashMap::default(),
             presences: DashMap::default(),
@@ -1071,7 +1006,7 @@ mod test {
             assert!(!channel.contains_key(&MessageId::new(3)));
         }
 
-        let channel = Channel::Guild(GuildChannel {
+        let channel = GuildChannel {
             id: event.message.channel_id,
             bitrate: None,
             parent_id: None,
@@ -1101,12 +1036,12 @@ mod test {
             default_reaction_emoji: None,
             default_thread_rate_limit_per_user: None,
             default_sort_order: None,
-        });
+        };
 
         // Add a channel delete event to the cache, the cached messages for that
         // channel should now be gone.
         let mut delete = ChannelDeleteEvent {
-            channel: channel.clone(),
+            channel: Channel::Guild(channel.clone()),
         };
         assert!(cache.update(&mut delete).is_none());
         assert!(!cache.messages.contains_key(&delete.channel.id()));
