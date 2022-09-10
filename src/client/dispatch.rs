@@ -2,11 +2,8 @@
 use std::fmt;
 use std::sync::Arc;
 
-use futures::channel::mpsc::UnboundedSender as Sender;
 use futures::future::{BoxFuture, FutureExt};
-use tokio::sync::RwLock;
 use tracing::{debug, instrument};
-use typemap_rev::TypeMap;
 
 #[cfg(feature = "gateway")]
 use super::bridge::gateway::event::ClientEvent;
@@ -17,7 +14,6 @@ use super::Context;
 use crate::cache::CacheUpdate;
 #[cfg(feature = "framework")]
 use crate::framework::Framework;
-use crate::gateway::InterMessage;
 use crate::internal::tokio::spawn_named;
 use crate::model::channel::{Channel, ChannelType, Message};
 use crate::model::event::Event;
@@ -41,25 +37,10 @@ fn update<E>(_cache_and_http: &CacheAndHttp, _event: &mut E) -> Option<()> {
     None
 }
 
-fn context(
-    data: &Arc<RwLock<TypeMap>>,
-    runner_tx: &Sender<InterMessage>,
-    shard_id: u32,
-    cache_and_http: &CacheAndHttp,
-) -> Context {
-    Context::new(
-        Arc::clone(data),
-        runner_tx.clone(),
-        shard_id,
-        Arc::clone(&cache_and_http.http),
-        #[cfg(feature = "cache")]
-        Arc::clone(&cache_and_http.cache),
-    )
-}
-
 // Once we can use `Box` as part of a pattern, we will reconsider boxing.
 #[allow(clippy::large_enum_variant)]
 #[non_exhaustive]
+#[derive(Debug)]
 pub(crate) enum DispatchEvent {
     Client(ClientEvent),
     Model(Event),
@@ -150,11 +131,9 @@ pub(crate) fn dispatch<'rec>(
     // #[allow(unused_variables)]
     mut event: DispatchEvent,
     #[cfg(feature = "framework")] framework: &'rec Option<Arc<dyn Framework + Send + Sync>>,
-    data: &'rec Arc<RwLock<TypeMap>>,
     event_handler: &'rec Option<Arc<dyn EventHandler>>,
     raw_event_handler: &'rec Option<Arc<dyn RawEventHandler>>,
-    runner_tx: &'rec Sender<InterMessage>,
-    shard_id: u32,
+    context: Context,
     cache_and_http: &'rec CacheAndHttp,
 ) -> BoxFuture<'rec, ()> {
     async move {
@@ -164,8 +143,6 @@ pub(crate) fn dispatch<'rec>(
 
                 #[cfg(feature = "framework")]
                 if let DispatchEvent::Model(Event::MessageCreate(event)) = event {
-                    let context = context(data, runner_tx, shard_id, cache_and_http);
-
                     if let Some(framework) = framework {
                         let framework = Arc::clone(framework);
 
@@ -178,8 +155,6 @@ pub(crate) fn dispatch<'rec>(
             (Some(h), None) => match event {
                 DispatchEvent::Model(Event::MessageCreate(mut event)) => {
                     update(cache_and_http, &mut event);
-
-                    let context = context(data, runner_tx, shard_id, cache_and_http);
 
                     #[cfg(not(feature = "framework"))]
                     {
@@ -201,7 +176,7 @@ pub(crate) fn dispatch<'rec>(
                     }
                 },
                 other => {
-                    handle_event(other, data, h, runner_tx, shard_id, cache_and_http).await;
+                    handle_event(other, h, context, cache_and_http).await;
                 },
             },
             (None, Some(rh)) => {
@@ -209,8 +184,6 @@ pub(crate) fn dispatch<'rec>(
 
                 if let DispatchEvent::Model(event) = event {
                     let event_handler = Arc::clone(rh);
-
-                    let context = context(data, runner_tx, shard_id, cache_and_http);
 
                     #[cfg(not(feature = "framework"))]
                     {
@@ -242,8 +215,6 @@ pub(crate) fn dispatch<'rec>(
             // We call this function again, passing `None` for each event handler
             // and passing no framework, as we dispatch once we are done right here.
             (Some(handler), Some(raw_handler)) => {
-                let context = context(data, runner_tx, shard_id, cache_and_http);
-
                 if let DispatchEvent::Model(event) = &event {
                     raw_handler.raw_event(context.clone(), event.clone()).await;
                 }
@@ -270,8 +241,7 @@ pub(crate) fn dispatch<'rec>(
                         }
                     },
                     other => {
-                        handle_event(other, data, handler, runner_tx, shard_id, cache_and_http)
-                            .await;
+                        handle_event(other, handler, context, cache_and_http).await;
                     },
                 }
             },
@@ -294,17 +264,13 @@ async fn dispatch_message(
 // Once we can use `Box` as part of a pattern, we will reconsider boxing.
 #[allow(clippy::too_many_arguments)]
 #[cfg_attr(feature = "cache", allow(clippy::used_underscore_binding))]
-#[instrument(skip(event, data, event_handler, cache_and_http))]
+#[instrument(skip(event, event_handler, context, cache_and_http))]
 async fn handle_event(
     event: DispatchEvent,
-    data: &Arc<RwLock<TypeMap>>,
     event_handler: &Arc<dyn EventHandler>,
-    runner_tx: &Sender<InterMessage>,
-    shard_id: u32,
+    context: Context,
     cache_and_http: &CacheAndHttp,
 ) {
-    let context = context(data, runner_tx, shard_id, cache_and_http);
-
     let event_handler = Arc::clone(event_handler);
     let cache_and_http = cache_and_http.clone();
 

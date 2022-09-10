@@ -10,11 +10,11 @@ use tracing::{debug, error, info, instrument, trace, warn};
 use typemap_rev::TypeMap;
 
 use super::event::{ClientEvent, ShardStageUpdateEvent};
-use super::{ShardClientMessage, ShardId, ShardManagerMessage, ShardRunnerMessage};
+use super::{ShardClientMessage, ShardId, ShardManagerMessage, ShardMessenger, ShardRunnerMessage};
 #[cfg(feature = "voice")]
 use crate::client::bridge::voice::VoiceGatewayManager;
 use crate::client::dispatch::{dispatch, DispatchEvent};
-use crate::client::{EventHandler, RawEventHandler};
+use crate::client::{Context, EventHandler, RawEventHandler};
 #[cfg(feature = "collector")]
 use crate::collector::{
     ComponentInteractionFilter,
@@ -328,15 +328,32 @@ impl ShardRunner {
     #[inline]
     #[instrument(skip(self, event))]
     async fn dispatch(&self, event: DispatchEvent) {
+        let bot_user = match self.shard.bot_user.clone() {
+            Some(x) => x,
+            None => {
+                tracing::error!(
+                    "can't dispatch event due to empty bot_user field (event: {:?})",
+                    event
+                );
+                return;
+            },
+        };
+        let context = Context {
+            data: self.data.clone(),
+            shard: ShardMessenger::new(self.runner_tx.clone()),
+            shard_id: self.shard.shard_info().id,
+            bot_user,
+            http: self.cache_and_http.http.clone(),
+            #[cfg(feature = "cache")]
+            cache: self.cache_and_http.cache.clone(),
+        };
         dispatch(
             event,
             #[cfg(feature = "framework")]
             &self.framework,
-            &self.data,
             &self.event_handler,
             &self.raw_event_handler,
-            &self.runner_tx,
-            self.shard.shard_info().id,
+            context,
             &self.cache_and_http,
         )
         .await;

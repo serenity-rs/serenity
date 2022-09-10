@@ -23,7 +23,7 @@ use crate::internal::prelude::*;
 use crate::model::event::{Event, GatewayEvent};
 use crate::model::gateway::{GatewayIntents, ShardInfo};
 use crate::model::id::GuildId;
-use crate::model::user::OnlineStatus;
+use crate::model::user::{CurrentUser, OnlineStatus};
 
 /// A Shard is a higher-level handler for a websocket connection to Discord's
 /// gateway. The shard allows for sending and receiving messages over the
@@ -87,6 +87,7 @@ pub struct Shard {
     pub token: String,
     ws_url: Arc<Mutex<String>>,
     pub intents: GatewayIntents,
+    pub bot_user: Option<Arc<CurrentUser>>,
 }
 
 impl Shard {
@@ -163,6 +164,7 @@ impl Shard {
             shard_info,
             ws_url,
             intents,
+            bot_user: None,
         })
     }
 
@@ -303,6 +305,7 @@ impl Shard {
 
                 self.session_id = Some(ready.ready.session_id.clone());
                 self.stage = ConnectionStage::Connected;
+                self.bot_user = Some(Arc::new(ready.ready.user.clone()));
 
                 if let Some(http) = &self.http {
                     http.set_application_id(ready.ready.application.id.get());

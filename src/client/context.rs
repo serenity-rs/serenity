@@ -1,6 +1,5 @@
 use std::sync::Arc;
 
-use futures::channel::mpsc::UnboundedSender as Sender;
 use tokio::sync::RwLock;
 use typemap_rev::TypeMap;
 
@@ -11,8 +10,6 @@ use crate::client::bridge::gateway::ShardMessenger;
 #[cfg(feature = "collector")]
 use crate::collector::{ComponentInteractionFilter, MessageFilter, ReactionFilter};
 use crate::gateway::ActivityData;
-#[cfg(feature = "gateway")]
-use crate::gateway::InterMessage;
 use crate::http::Http;
 use crate::model::prelude::*;
 
@@ -41,49 +38,16 @@ pub struct Context {
     pub shard: ShardMessenger,
     /// The ID of the shard this context is related to.
     pub shard_id: u32,
+    pub bot_user: Arc<CurrentUser>,
     pub http: Arc<Http>,
     #[cfg(feature = "cache")]
     pub cache: Arc<Cache>,
 }
 
 impl Context {
-    /// Create a new Context to be passed to an event handler.
-    #[cfg(all(feature = "cache", feature = "gateway"))]
-    pub(crate) fn new(
-        data: Arc<RwLock<TypeMap>>,
-        runner_tx: Sender<InterMessage>,
-        shard_id: u32,
-        http: Arc<Http>,
-        cache: Arc<Cache>,
-    ) -> Context {
-        Context {
-            shard: ShardMessenger::new(runner_tx),
-            shard_id,
-            data,
-            http,
-            cache,
-        }
-    }
-
     #[cfg(all(not(feature = "cache"), not(feature = "gateway")))]
     pub fn easy(data: Arc<RwLock<TypeMap>>, shard_id: u32, http: Arc<Http>) -> Context {
         Context {
-            shard_id,
-            data,
-            http,
-        }
-    }
-
-    /// Create a new Context to be passed to an event handler.
-    #[cfg(all(not(feature = "cache"), feature = "gateway"))]
-    pub(crate) fn new(
-        data: Arc<RwLock<TypeMap>>,
-        runner_tx: Sender<InterMessage>,
-        shard_id: u32,
-        http: Arc<Http>,
-    ) -> Context {
-        Context {
-            shard: ShardMessenger::new(runner_tx),
             shard_id,
             data,
             http,
