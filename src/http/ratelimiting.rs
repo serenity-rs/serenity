@@ -235,7 +235,7 @@ impl Ratelimiter {
                         debug!("Ratelimited on route {:?} for {:?}s", route, retry_after);
                         (self.ratelimit_callback)(RatelimitInfo {
                             timeout: Duration::from_secs_f64(retry_after),
-                            limit: 1, // is this correct?
+                            limit: 50,
                             method,
                             path,
                             global: true,
