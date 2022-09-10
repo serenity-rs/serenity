@@ -60,9 +60,7 @@ fn permissions_in(
         return Permissions::all();
     }
 
-    if let Some(Channel::Guild(channel)) =
-        guild.and_then(|guild| guild.channels.get(&channel_id).cloned())
-    {
+    if let Some(channel) = guild.and_then(|guild| guild.channels.get(&channel_id).cloned()) {
         let mut data = Vec::with_capacity(member.roles.len());
 
         for overwrite in &channel.permission_overwrites {

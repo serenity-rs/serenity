@@ -36,7 +36,6 @@ impl fmt::Display for ChannelParseError {
 fn channel_belongs_to_guild(channel: &Channel, guild: GuildId) -> bool {
     match channel {
         Channel::Guild(channel) => channel.guild_id == guild,
-        Channel::Category(channel) => channel.guild_id == guild,
         Channel::Private(_channel) => false,
     }
 }
@@ -163,65 +162,6 @@ impl ArgumentConvert for GuildChannel {
             Err(ChannelParseError::Http(e)) => Err(GuildChannelParseError::Http(e)),
             Err(ChannelParseError::NotFoundOrMalformed) => {
                 Err(GuildChannelParseError::NotFoundOrMalformed)
-            },
-        }
-    }
-}
-
-/// Error that can be returned from [`ChannelCategory::convert`].
-#[non_exhaustive]
-#[derive(Debug)]
-pub enum ChannelCategoryParseError {
-    /// When channel retrieval via HTTP failed
-    Http(SerenityError),
-    /// The provided channel string failed to parse, or the parsed result cannot be found in the
-    /// cache.
-    NotFoundOrMalformed,
-    /// When the referenced channel is not a channel category
-    NotAChannelCategory,
-}
-
-impl std::error::Error for ChannelCategoryParseError {
-    fn source(&self) -> Option<&(dyn std::error::Error + 'static)> {
-        match self {
-            Self::Http(e) => Some(e),
-            Self::NotFoundOrMalformed | Self::NotAChannelCategory => None,
-        }
-    }
-}
-
-impl fmt::Display for ChannelCategoryParseError {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        match self {
-            Self::Http(_) => f.write_str("Failed to request channel via HTTP"),
-            Self::NotFoundOrMalformed => f.write_str("Channel not found or unknown format"),
-            Self::NotAChannelCategory => f.write_str("Channel is not a channel category"),
-        }
-    }
-}
-
-/// Look up a ChannelCategory by a string case-insensitively.
-///
-/// Lookup is done by the global cache, hence the cache feature needs to be enabled.
-///
-/// For more information, see the ArgumentConvert implementation for [`Channel`]
-#[async_trait::async_trait]
-impl ArgumentConvert for ChannelCategory {
-    type Err = ChannelCategoryParseError;
-
-    async fn convert(
-        ctx: &Context,
-        guild_id: Option<GuildId>,
-        channel_id: Option<ChannelId>,
-        s: &str,
-    ) -> Result<Self, Self::Err> {
-        match Channel::convert(ctx, guild_id, channel_id, s).await {
-            Ok(Channel::Category(channel)) => Ok(channel),
-            // TODO: accommodate issue #1352 somehow
-            Ok(_) => Err(ChannelCategoryParseError::NotAChannelCategory),
-            Err(ChannelParseError::Http(e)) => Err(ChannelCategoryParseError::Http(e)),
-            Err(ChannelParseError::NotFoundOrMalformed) => {
-                Err(ChannelCategoryParseError::NotFoundOrMalformed)
             },
         }
     }
