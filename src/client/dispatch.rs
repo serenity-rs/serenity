@@ -19,7 +19,7 @@ use crate::cache::CacheUpdate;
 use crate::framework::Framework;
 use crate::gateway::InterMessage;
 use crate::internal::tokio::spawn_named;
-use crate::model::channel::{Channel, Message};
+use crate::model::channel::{Channel, ChannelType, Message};
 use crate::model::event::Event;
 use crate::model::guild::Member;
 #[cfg(feature = "cache")]
@@ -361,17 +361,18 @@ async fn handle_event(
             update(&cache_and_http, &mut event);
             match event.channel {
                 Channel::Guild(channel) => {
-                    spawn_named("dispatch::event_handler::channel_create", async move {
-                        event_handler.channel_create(context, &channel).await;
-                    });
-                },
-                Channel::Category(channel) => {
-                    spawn_named("dispatch::event_handler::category_create", async move {
-                        event_handler.category_create(context, &channel).await;
-                    });
+                    if channel.kind == ChannelType::Category {
+                        spawn_named("dispatch::event_handler::category_create", async move {
+                            event_handler.category_create(context, &channel).await;
+                        });
+                    } else {
+                        spawn_named("dispatch::event_handler::channel_create", async move {
+                            event_handler.channel_create(context, &channel).await;
+                        });
+                    }
                 },
                 // Private channel create events are no longer sent to bots in the v8 gateway.
-                _ => {},
+                Channel::Private(_) => {},
             }
         },
         Event::ChannelDelete(mut event) => {
@@ -380,14 +381,15 @@ async fn handle_event(
             match event.channel {
                 Channel::Private(_) => {},
                 Channel::Guild(channel) => {
-                    spawn_named("dispatch::event_handler::channel_delete", async move {
-                        event_handler.channel_delete(context, &channel).await;
-                    });
-                },
-                Channel::Category(channel) => {
-                    spawn_named("dispatch::event_handler::category_delete", async move {
-                        event_handler.category_delete(context, &channel).await;
-                    });
+                    if channel.kind == ChannelType::Category {
+                        spawn_named("dispatch::event_handler::category_delete", async move {
+                            event_handler.category_delete(context, &channel).await;
+                        });
+                    } else {
+                        spawn_named("dispatch::event_handler::channel_delete", async move {
+                            event_handler.channel_delete(context, &channel).await;
+                        });
+                    }
                 },
             }
         },
