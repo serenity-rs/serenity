@@ -375,7 +375,13 @@ impl Future for ClientBuilder {
             });
 
             self.fut = Some(Box::pin(async move {
-                let ws_url = Arc::new(Mutex::new(http.get_gateway().await?.url));
+                let ws_url = Arc::new(Mutex::new(match http.get_gateway().await {
+                    Ok(response) => response.url,
+                    Err(err) => {
+                        tracing::warn!("HTTP request to get gateway URL failed: {}", err);
+                        "wss://gateway.discord.gg".to_string()
+                    },
+                }));
 
                 let (shard_manager, shard_manager_worker) = {
                     ShardManager::new(ShardManagerOptions {
