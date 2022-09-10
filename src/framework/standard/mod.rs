@@ -859,7 +859,7 @@ pub(crate) fn has_correct_permissions(
     } else {
         message.guild(cache.as_ref()).map_or(false, |guild| {
             let channel = match guild.channels.get(&message.channel_id) {
-                Some(Channel::Guild(channel)) => channel,
+                Some(channel) => channel,
                 _ => return false,
             };
 

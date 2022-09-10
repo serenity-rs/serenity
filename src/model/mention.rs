@@ -187,7 +187,6 @@ macro_rules! mentionable {
 mentionable!(value: Channel, value.id(););
 
 mentionable!(value:
-    ChannelCategory, value.id;
     GuildChannel, value.id;
     PrivateChannel, value.id;
     CurrentUser, value.id;

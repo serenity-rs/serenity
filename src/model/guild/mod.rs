@@ -102,7 +102,7 @@ pub struct Guild {
     /// of the bot to read from or connect to them).
     #[serde(serialize_with = "serialize_map_values")]
     #[serde(deserialize_with = "deserialize_guild_channels")]
-    pub channels: HashMap<ChannelId, Channel>,
+    pub channels: HashMap<ChannelId, GuildChannel>,
     /// Indicator of whether notifications for all messages are enabled by
     /// default in the guild.
     pub default_message_notifications: DefaultMessageNotificationLevel,
@@ -375,10 +375,10 @@ impl Guild {
     pub fn default_channel(&self, uid: UserId) -> Option<&GuildChannel> {
         let member = self.members.get(&uid)?;
         for channel in self.channels.values() {
-            if let Channel::Guild(channel) = channel {
-                if self.user_permissions_in(channel, member).ok()?.view_channel() {
-                    return Some(channel);
-                }
+            if channel.kind != ChannelType::Category
+                && self.user_permissions_in(channel, member).ok()?.view_channel()
+            {
+                return Some(channel);
             }
         }
 
@@ -393,20 +393,14 @@ impl Guild {
     /// members, or both.
     #[must_use]
     pub fn default_channel_guaranteed(&self) -> Option<&GuildChannel> {
-        for channel in self.channels.values() {
-            if let Channel::Guild(channel) = channel {
-                if self
+        self.channels.values().find(|&channel| {
+            channel.kind != ChannelType::Category
+                && self
                     .members
                     .values()
                     .filter_map(|member| self.user_permissions_in(channel, member).ok())
                     .all(Permissions::view_channel)
-                {
-                    return Some(channel);
-                }
-            }
-        }
-
-        None
+        })
     }
 
     #[cfg(feature = "cache")]
