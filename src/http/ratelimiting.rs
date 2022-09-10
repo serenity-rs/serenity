@@ -54,7 +54,6 @@ use tracing::{debug, instrument};
 pub use super::routing::Route;
 use super::routing::RouteInfo;
 use super::{HttpError, LightMethod, Request};
-use crate::client::EventHandler;
 use crate::internal::prelude::*;
 
 /// Passed to [`EventHandler::ratelimit`]. Contains information about the ratelimit
@@ -94,8 +93,7 @@ pub struct Ratelimiter {
     // when the 'reset' passes.
     routes: Arc<RwLock<HashMap<Route, Arc<Mutex<Ratelimit>>>>>,
     token: String,
-    // To trigger rate-limit-hit events
-    event_handler: Option<Arc<dyn EventHandler>>,
+    ratelimit_callback: Box<dyn Fn(RatelimitInfo) + Send + Sync>,
 }
 
 impl fmt::Debug for Ratelimiter {
@@ -124,13 +122,16 @@ impl Ratelimiter {
             global: Arc::default(),
             routes: Arc::default(),
             token,
-            event_handler: None,
+            ratelimit_callback: Box::new(|_| {}),
         }
     }
 
-    /// Sets an event handler, in order to trigger [`EventHandler::ratelimit`]
-    pub fn set_event_handler(&mut self, event_handler: Arc<dyn EventHandler>) {
-        self.event_handler = Some(event_handler);
+    /// Sets a callback to be called when a route is rate limited.
+    pub fn set_ratelimit_callback(
+        &mut self,
+        ratelimit_callback: Box<dyn Fn(RatelimitInfo) + Send + Sync>,
+    ) {
+        self.ratelimit_callback = ratelimit_callback;
     }
 
     /// The routes mutex is a HashMap of each [`Route`] and their respective
@@ -200,7 +201,7 @@ impl Ratelimiter {
             // - then, perform the request
             let bucket = Arc::clone(self.routes.write().await.entry(route).or_default());
 
-            bucket.lock().await.pre_hook(&req.route, &self.event_handler).await;
+            bucket.lock().await.pre_hook(&req.route, &self.ratelimit_callback).await;
 
             let request = req.build(&self.client, &self.token, None).await?.build()?;
 
@@ -231,16 +232,13 @@ impl Ratelimiter {
                         parse_header::<f64>(response.headers(), "retry-after")?
                     {
                         debug!("Ratelimited on route {:?} for {:?}s", route, retry_after);
-                        if let Some(event_handler) = self.event_handler.clone() {
-                            let info = RatelimitInfo {
-                                timeout: Duration::from_secs_f64(retry_after),
-                                limit: 1, // is this correct?
-                                method,
-                                path,
-                                global: true,
-                            };
-                            tokio::spawn(async move { event_handler.ratelimit(info).await });
-                        }
+                        (self.ratelimit_callback)(RatelimitInfo {
+                            timeout: Duration::from_secs_f64(retry_after),
+                            limit: 1, // is this correct?
+                            method,
+                            path,
+                            global: true,
+                        });
                         sleep(Duration::from_secs_f64(retry_after)).await;
 
                         true
@@ -249,7 +247,7 @@ impl Ratelimiter {
                     },
                 )
             } else {
-                bucket.lock().await.post_hook(&response, &req.route, &self.event_handler).await
+                bucket.lock().await.post_hook(&response, &req.route, &self.ratelimit_callback).await
             };
 
             if !redo.unwrap_or(true) {
@@ -282,11 +280,11 @@ pub struct Ratelimit {
 }
 
 impl Ratelimit {
-    #[instrument(skip(event_handler))]
+    #[instrument(skip(ratelimit_callback))]
     pub async fn pre_hook(
         &mut self,
         route: &RouteInfo<'_>,
-        event_handler: &Option<Arc<dyn EventHandler>>,
+        ratelimit_callback: &(dyn Fn(RatelimitInfo) + Send + Sync),
     ) {
         if self.limit() == 0 {
             return;
@@ -315,16 +313,13 @@ impl Ratelimit {
             let (method, route, path) = route.deconstruct();
 
             debug!("Pre-emptive ratelimit on route {:?} for {}ms", route, delay.as_millis(),);
-            if let Some(event_handler) = event_handler.clone() {
-                let info = RatelimitInfo {
-                    timeout: delay,
-                    limit: self.limit,
-                    method,
-                    path: path.to_string(),
-                    global: false,
-                };
-                tokio::spawn(async move { event_handler.ratelimit(info).await });
-            }
+            ratelimit_callback(RatelimitInfo {
+                timeout: delay,
+                limit: self.limit,
+                method,
+                path: path.to_string(),
+                global: false,
+            });
 
             sleep(delay).await;
 
@@ -334,12 +329,12 @@ impl Ratelimit {
         self.remaining -= 1;
     }
 
-    #[instrument(skip(event_handler))]
+    #[instrument(skip(ratelimit_callback))]
     pub async fn post_hook(
         &mut self,
         response: &Response,
         route: &RouteInfo<'_>,
-        event_handler: &Option<Arc<dyn EventHandler>>,
+        ratelimit_callback: &(dyn Fn(RatelimitInfo) + Send + Sync),
     ) -> Result<bool> {
         if let Some(limit) = parse_header(response.headers(), "x-ratelimit-limit")? {
             self.limit = limit;
@@ -371,16 +366,13 @@ impl Ratelimit {
             let (method, route, path) = route.deconstruct();
 
             debug!("Ratelimited on route {:?} for {:?}ms", route, retry_after);
-            if let Some(event_handler) = event_handler.clone() {
-                let info = RatelimitInfo {
-                    timeout: Duration::from_secs_f64(retry_after),
-                    limit: self.limit,
-                    method,
-                    path: path.to_string(),
-                    global: false,
-                };
-                tokio::spawn(async move { event_handler.ratelimit(info).await });
-            }
+            ratelimit_callback(RatelimitInfo {
+                timeout: Duration::from_secs_f64(retry_after),
+                limit: self.limit,
+                method,
+                path: path.to_string(),
+                global: false,
+            });
 
             sleep(Duration::from_secs_f64(retry_after)).await;
 

@@ -366,7 +366,10 @@ impl Future for ClientBuilder {
 
             let mut http = self.http.take().unwrap();
             if let Some(event_handler) = event_handler.clone() {
-                http.ratelimiter.set_event_handler(event_handler);
+                http.ratelimiter.set_ratelimit_callback(Box::new(move |info| {
+                    let event_handler = event_handler.clone();
+                    tokio::spawn(async move { event_handler.ratelimit(info).await });
+                }));
             }
             let http = Arc::new(http);
 
