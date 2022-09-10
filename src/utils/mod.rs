@@ -518,7 +518,6 @@ pub(crate) fn user_has_perms(
     // just assume that all permissions are granted and return `true`.
     let (guild_id, guild_channel) = match channel {
         Channel::Guild(channel) => (channel.guild_id, channel),
-        Channel::Category(_) => return Ok(true),
         Channel::Private(_) => match guild_id {
             Some(_) => return Err(Error::Model(ModelError::InvalidChannelType)),
             None => return Ok(true),
