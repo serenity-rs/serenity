@@ -393,7 +393,10 @@ impl ChannelId {
     /// required permissions the HTTP-request will be issued. Additionally, you might want to
     /// enable the `temp_cache` feature to cache channel data retrieved by this function for a
     /// short duration.
-    #[allow(clippy::missing_errors_doc)]
+    ///
+    /// # Errors
+    ///
+    /// Returns [`Error::Http`] if the channel retrieval request failed.
     #[inline]
     pub async fn to_channel(self, cache_http: impl CacheHttp) -> Result<Channel> {
         #[cfg(feature = "cache")]
@@ -517,6 +520,10 @@ impl ChannelId {
     /// Returns the name of whatever channel this id holds.
     ///
     /// DM channels don't have a name, so a name is generated according to [`PrivateChannel::name()`].
+    ///
+    /// # Errors
+    ///
+    /// Same as [`Self::to_channel()`].
     pub async fn name(self, cache_http: impl CacheHttp) -> Result<String> {
         let channel = self.to_channel(cache_http).await?;
 
