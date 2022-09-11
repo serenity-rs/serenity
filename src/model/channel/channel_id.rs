@@ -515,12 +515,13 @@ impl ChannelId {
     }
 
     /// Returns the name of whatever channel this id holds.
-    #[cfg(feature = "cache")]
-    pub fn name(self, cache: impl AsRef<Cache>) -> Option<String> {
-        let channel = self.to_channel_cached(cache)?;
+    ///
+    /// DM channels don't have a name, so a name is generated according to [`PrivateChannel::name()`].
+    pub async fn name(self, cache_http: impl CacheHttp) -> Result<String> {
+        let channel = self.to_channel(cache_http).await?;
 
-        Some(match channel {
-            Channel::Guild(channel) => channel.name().to_string(),
+        Ok(match channel {
+            Channel::Guild(channel) => channel.name,
             Channel::Private(channel) => channel.name(),
         })
     }
