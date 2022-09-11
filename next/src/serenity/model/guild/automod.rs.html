@@ -549,6 +549,26 @@
 <span id="543">543</span>
 <span id="544">544</span>
 <span id="545">545</span>
+<span id="546">546</span>
+<span id="547">547</span>
+<span id="548">548</span>
+<span id="549">549</span>
+<span id="550">550</span>
+<span id="551">551</span>
+<span id="552">552</span>
+<span id="553">553</span>
+<span id="554">554</span>
+<span id="555">555</span>
+<span id="556">556</span>
+<span id="557">557</span>
+<span id="558">558</span>
+<span id="559">559</span>
+<span id="560">560</span>
+<span id="561">561</span>
+<span id="562">562</span>
+<span id="563">563</span>
+<span id="564">564</span>
+<span id="565">565</span>
 </pre><pre class="rust"><code><span class="doccomment">//! Auto moderation types</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! [Discord docs](https://discord.com/developers/docs/resources/auto-moderation)</span>
@@ -565,6 +585,8 @@
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::id</span>::{<span class="ident">ChannelId</span>, <span class="ident">GuildId</span>, <span class="ident">MessageId</span>, <span class="ident">RoleId</span>, <span class="ident">RuleId</span>, <span class="ident">UserId</span>};
 
 <span class="doccomment">/// Configured auto moderation rule.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/resources/auto-moderation#auto-moderation-rule-object).</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Rule</span> {
     <span class="doccomment">/// ID of the rule.</span>
@@ -595,6 +617,8 @@
 }
 
 <span class="doccomment">/// Indicates in what event context a rule should be checked.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/resources/auto-moderation#auto-moderation-rule-object-event-types).</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>, <span class="ident">Ord</span>, <span class="ident">PartialEq</span>, <span class="ident">PartialOrd</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
 <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">from</span> <span class="op">=</span> <span class="string">&quot;u8&quot;</span>, <span class="ident">into</span> <span class="op">=</span> <span class="string">&quot;u8&quot;</span>)]</span>
 <span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
@@ -622,6 +646,10 @@
 }
 
 <span class="doccomment">/// Characterizes the type of content which can trigger the rule.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// Discord docs:</span>
+<span class="doccomment">/// [type](https://discord.com/developers/docs/resources/auto-moderation#auto-moderation-rule-object-trigger-types),</span>
+<span class="doccomment">/// [metadata](https://discord.com/developers/docs/resources/auto-moderation#auto-moderation-rule-object-trigger-metadata)</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>)]</span>
 <span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">Trigger</span> {
@@ -643,6 +671,8 @@
 }
 
 <span class="doccomment">/// Helper struct for the (de)serialization of `Trigger`.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/resources/auto-moderation#auto-moderation-rule-object-trigger-metadata).</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
 <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename</span> <span class="op">=</span> <span class="string">&quot;TriggerMetadata&quot;</span>)]</span>
 <span class="kw">struct</span> <span class="ident">InterimTriggerMetadata</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
@@ -708,6 +738,8 @@
 }
 
 <span class="doccomment">/// Type of [`Trigger`].</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/resources/auto-moderation#auto-moderation-rule-object-trigger-types).</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>, <span class="ident">Ord</span>, <span class="ident">PartialEq</span>, <span class="ident">PartialOrd</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
 <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">from</span> <span class="op">=</span> <span class="string">&quot;u8&quot;</span>, <span class="ident">into</span> <span class="op">=</span> <span class="string">&quot;u8&quot;</span>)]</span>
 <span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
@@ -749,6 +781,8 @@
 <span class="doccomment">/// See [`Change::TriggerMetadata`].</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// [`Change::TriggerMetadata`]: crate::model::guild::audit_log::Change::TriggerMetadata</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/resources/auto-moderation#auto-moderation-rule-object-trigger-metadata).</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">TriggerMetadata</span> {
     <span class="ident">keyword_filter</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span><span class="op">&gt;</span>,
@@ -756,6 +790,8 @@
 }
 
 <span class="doccomment">/// Internally pre-defined wordsets which will be searched for in content.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/resources/auto-moderation#auto-moderation-rule-object-keyword-preset-types).</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>, <span class="ident">Ord</span>, <span class="ident">PartialEq</span>, <span class="ident">PartialOrd</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
 <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">from</span> <span class="op">=</span> <span class="string">&quot;u8&quot;</span>, <span class="ident">into</span> <span class="op">=</span> <span class="string">&quot;u8&quot;</span>)]</span>
 <span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
@@ -789,6 +825,8 @@
 }
 
 <span class="doccomment">/// An action which will execute whenever a rule is triggered.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/resources/auto-moderation#auto-moderation-action-object).</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>)]</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">Action</span> {
     <span class="doccomment">/// Blocks the content of a message according to the rule.</span>
@@ -811,7 +849,7 @@
 <span class="doccomment">/// Gateway event payload sent when a rule is triggered and an action is executed (e.g. message is</span>
 <span class="doccomment">/// blocked).</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/topics/gateway#auto-moderation-action-execution)</span>
+<span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/topics/gateway#auto-moderation-action-execution).</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ActionExecution</span> {
     <span class="doccomment">/// ID of the guild in which the action was executed.</span>
@@ -978,6 +1016,8 @@
 }
 
 <span class="doccomment">/// Type of [`Action`].</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/resources/auto-moderation#auto-moderation-action-object-action-types).</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>, <span class="ident">Ord</span>, <span class="ident">PartialEq</span>, <span class="ident">PartialOrd</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
 <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">from</span> <span class="op">=</span> <span class="string">&quot;u8&quot;</span>, <span class="ident">into</span> <span class="op">=</span> <span class="string">&quot;u8&quot;</span>)]</span>
 <span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
@@ -1042,14 +1082,14 @@
 
         <span class="macro">assert_eq!</span>(
             <span class="ident"><span class="kw">crate</span>::json::to_string</span>(<span class="kw-2">&amp;</span><span class="ident">Rule</span> {
-                <span class="ident">trigger</span>: <span class="ident">Trigger::HarmfulLink</span>,
+                <span class="ident">trigger</span>: <span class="ident">Trigger::HarmfulLink</span>
             })<span class="question-mark">?</span>,
             <span class="string">r#&quot;{&quot;trigger_type&quot;:2,&quot;trigger_metadata&quot;:{}}&quot;#</span>,
         );
 
         <span class="macro">assert_eq!</span>(
             <span class="ident"><span class="kw">crate</span>::json::to_string</span>(<span class="kw-2">&amp;</span><span class="ident">Rule</span> {
-                <span class="ident">trigger</span>: <span class="ident">Trigger::Spam</span>,
+                <span class="ident">trigger</span>: <span class="ident">Trigger::Spam</span>
             })<span class="question-mark">?</span>,
             <span class="string">r#&quot;{&quot;trigger_type&quot;:3,&quot;trigger_metadata&quot;:{}}&quot;#</span>,
         );
@@ -1067,7 +1107,7 @@
 
         <span class="macro">assert_eq!</span>(
             <span class="ident"><span class="kw">crate</span>::json::to_string</span>(<span class="kw-2">&amp;</span><span class="ident">Rule</span> {
-                <span class="ident">trigger</span>: <span class="ident">Trigger::Unknown</span>(<span class="number">123</span>),
+                <span class="ident">trigger</span>: <span class="ident">Trigger::Unknown</span>(<span class="number">123</span>)
             })<span class="question-mark">?</span>,
             <span class="string">r#&quot;{&quot;trigger_type&quot;:123,&quot;trigger_metadata&quot;:{}}&quot;#</span>,
         );

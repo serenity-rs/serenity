@@ -1352,6 +1352,7 @@
 <span id="1346">1346</span>
 <span id="1347">1347</span>
 <span id="1348">1348</span>
+<span id="1349">1349</span>
 </pre><pre class="rust"><code><span class="doccomment">//! User information-related models.</span>
 
 <span class="kw">use</span> <span class="ident">std::fmt</span>;
@@ -1516,6 +1517,9 @@
 }
 
 <span class="doccomment">/// Information about the current user.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/resources/user#user-object).</span>
+<span class="comment">// TODO: replace this with User</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
 <span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">CurrentUser</span> {
@@ -1922,13 +1926,7 @@
 
 <span class="doccomment">/// The representation of a user&#39;s status.</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// # Examples</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// - [`DoNotDisturb`];</span>
-<span class="doccomment">/// - [`Invisible`].</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [`DoNotDisturb`]: OnlineStatus::DoNotDisturb</span>
-<span class="doccomment">/// [`Invisible`]: OnlineStatus::Invisible</span>
+<span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/topics/gateway#update-presence-status-types).</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>, <span class="ident">Ord</span>, <span class="ident">PartialEq</span>, <span class="ident">PartialOrd</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
 <span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">OnlineStatus</span> {
@@ -1964,6 +1962,8 @@
 }
 
 <span class="doccomment">/// Information about a user.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/resources/user#user-object).</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
 <span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">User</span> {
@@ -2001,6 +2001,8 @@
 
 <span class="macro">bitflags!</span> {
     <span class="doccomment">/// User&#39;s public flags</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/resources/user#user-object-user-flags).</span>
     <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Default</span>)]</span>
     <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">UserPublicFlags</span>: <span class="ident">u32</span> {
         <span class="doccomment">/// User&#39;s flag as discord employee</span>

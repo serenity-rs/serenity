@@ -1209,6 +1209,11 @@
 <span id="1203">1203</span>
 <span id="1204">1204</span>
 <span id="1205">1205</span>
+<span id="1206">1206</span>
+<span id="1207">1207</span>
+<span id="1208">1208</span>
+<span id="1209">1209</span>
+<span id="1210">1210</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::fmt</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
 <span class="kw">use</span> <span class="ident">std::sync::Arc</span>;
@@ -1246,6 +1251,8 @@
 <span class="doccomment">/// only for voice channels and some are only available for text channels.</span>
 <span class="doccomment">/// News channels are a subset of text channels and lack slow mode hence</span>
 <span class="doccomment">/// [`Self::rate_limit_per_user`] will be [`None`].</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/resources/channel#channel-object).</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
 <span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">GuildChannel</span> {
@@ -1348,7 +1355,7 @@
     <span class="doccomment">/// it is possible to send messages.</span>
     <span class="attribute">#[<span class="ident">must_use</span>]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_text_based</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="macro">matches!</span>(<span class="self">self</span>.<span class="ident">kind</span>, <span class="ident">ChannelType::Text</span> <span class="op">|</span> <span class="ident">ChannelType::News</span>)
+        <span class="macro">matches!</span>(<span class="self">self</span>.<span class="ident">kind</span>, <span class="ident">ChannelType::Text</span> <span class="op">|</span> <span class="ident">ChannelType::News</span> <span class="op">|</span> <span class="ident">ChannelType::Voice</span>)
     }
 
     <span class="doccomment">/// Broadcasts to the channel that the current user is typing.</span>
@@ -2402,6 +2409,9 @@
 }
 
 <span class="doccomment">/// A partial guild channel.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// [Discord docs](https://discord.com/developers/docs/resources/channel#channel-object),</span>
+<span class="doccomment">/// [subset description](https://discord.com/developers/docs/topics/gateway#thread-delete)</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">PartialGuildChannel</span> {
     <span class="doccomment">/// The channel Id.</span>

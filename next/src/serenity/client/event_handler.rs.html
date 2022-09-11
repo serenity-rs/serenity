@@ -578,12 +578,17 @@
 <span id="572">572</span>
 <span id="573">573</span>
 <span id="574">574</span>
+<span id="575">575</span>
+<span id="576">576</span>
+<span id="577">577</span>
+<span id="578">578</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::collections::HashMap</span>;
 
 <span class="kw">use</span> <span class="ident">async_trait::async_trait</span>;
 
 <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::context::Context</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::client::bridge::gateway::event</span>::<span class="kw-2">*</span>;
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::http::ratelimiting::RatelimitInfo</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::application::command::CommandPermission</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::application::interaction::Interaction</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::guild::automod</span>::{<span class="ident">ActionExecution</span>, <span class="ident">Rule</span>};
@@ -1144,6 +1149,9 @@
         <span class="ident">_unsubscribed</span>: <span class="ident">GuildScheduledEventUserRemoveEvent</span>,
     ) {
     }
+
+    <span class="doccomment">/// Dispatched when an HTTP rate limit is hit</span>
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">ratelimit</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_data</span>: <span class="ident">RatelimitInfo</span>) {}
 }
 
 <span class="doccomment">/// This core trait for handling raw events</span>
