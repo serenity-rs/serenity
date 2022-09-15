@@ -1186,6 +1186,14 @@
 <span id="1180">1180</span>
 <span id="1181">1181</span>
 <span id="1182">1182</span>
+<span id="1183">1183</span>
+<span id="1184">1184</span>
+<span id="1185">1185</span>
+<span id="1186">1186</span>
+<span id="1187">1187</span>
+<span id="1188">1188</span>
+<span id="1189">1189</span>
+<span id="1190">1190</span>
 </pre><pre class="rust"><code><span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
 <span class="kw">use</span> <span class="ident">std::sync::Arc</span>;
 
@@ -1581,7 +1589,10 @@
     <span class="doccomment">/// required permissions the HTTP-request will be issued. Additionally, you might want to</span>
     <span class="doccomment">/// enable the `temp_cache` feature to cache channel data retrieved by this function for a</span>
     <span class="doccomment">/// short duration.</span>
-    <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::missing_errors_doc</span>)]</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Errors</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// Returns [`Error::Http`] if the channel retrieval request failed.</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">to_channel</span>(<span class="self">self</span>, <span class="ident">cache_http</span>: <span class="kw">impl</span> <span class="ident">CacheHttp</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Channel</span><span class="op">&gt;</span> {
         <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
@@ -1703,12 +1714,17 @@
     }
 
     <span class="doccomment">/// Returns the name of whatever channel this id holds.</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">name</span>(<span class="self">self</span>, <span class="ident">cache</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Cache</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">channel</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">to_channel_cached</span>(<span class="ident">cache</span>)<span class="question-mark">?</span>;
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// DM channels don&#39;t have a name, so a name is generated according to [`PrivateChannel::name()`].</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Errors</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// Same as [`Self::to_channel()`].</span>
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">name</span>(<span class="self">self</span>, <span class="ident">cache_http</span>: <span class="kw">impl</span> <span class="ident">CacheHttp</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
+        <span class="kw">let</span> <span class="ident">channel</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">to_channel</span>(<span class="ident">cache_http</span>).<span class="kw">await</span><span class="question-mark">?</span>;
 
-        <span class="prelude-val">Some</span>(<span class="kw">match</span> <span class="ident">channel</span> {
-            <span class="ident">Channel::Guild</span>(<span class="ident">channel</span>) =&gt; <span class="ident">channel</span>.<span class="ident">name</span>().<span class="ident">to_string</span>(),
+        <span class="prelude-val">Ok</span>(<span class="kw">match</span> <span class="ident">channel</span> {
+            <span class="ident">Channel::Guild</span>(<span class="ident">channel</span>) =&gt; <span class="ident">channel</span>.<span class="ident">name</span>,
             <span class="ident">Channel::Private</span>(<span class="ident">channel</span>) =&gt; <span class="ident">channel</span>.<span class="ident">name</span>(),
         })
     }
