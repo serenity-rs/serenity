@@ -101,6 +101,8 @@ serenity = "0.11"
 
 Serenity supports a minimum of Rust 1.53.
 
+**NOTE**: This is only achievable by pinning specific dependencies which have bumped their MSRV in a breaking manner. Specifically, you must pin `dashmap = "=5.2.0"`, `indexmap = "=1.8.2"`, and `time = "=0.3.9"`. If the `simd_json` feature is enabled, you must additionally pin `halfbrown = "=0.1.12"` and `value-trait = "=0.2.10"`. Without dependency pinning, **the de facto MSRV is Rust 1.59**.
+
 # Features
 
 Features can be enabled or disabled by configuring the library through
