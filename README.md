@@ -196,6 +196,7 @@ If you use the `native_tls_backend` and you are not developing on macOS or Windo
 - [lavalink-rs][project:lavalink-rs]: An interface to [Lavalink][repo:lavalink] and [Andesite][repo:andesite], an audio sending node based on [Lavaplayer][repo:lavaplayer]
 - [Songbird][project:songbird]: An async Rust library for the Discord voice API.
 - [Poise][project:poise]: Experimental command framework, with advanced features like edit tracking, single function slash and prefix commands and flexible argument parsing.
+- [shuttle.rs][project:shuttle]: A web application platform that allows deploying Serenity bots for free.
 
 [`Cache`]: https://docs.rs/serenity/*/serenity/cache/struct.Cache.html
 [`Client::builder`]: https://docs.rs/serenity/*/serenity/client/struct.Client.html#method.builder
@@ -223,6 +224,7 @@ If you use the `native_tls_backend` and you are not developing on macOS or Windo
 [project:lavalink-rs]: https://gitlab.com/vicky5124/lavalink-rs/
 [project:songbird]: https://github.com/serenity-rs/songbird
 [project:poise]: https://github.com/kangalioo/poise
+[project:shuttle]: https://shuttle.rs
 [repo:lavalink]: https://github.com/freyacodes/Lavalink
 [repo:andesite]: https://github.com/natanbc/andesite
 [repo:lavaplayer]: https://github.com/sedmelluq/lavaplayer
