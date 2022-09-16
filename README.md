@@ -191,12 +191,16 @@ If you use the `native_tls_backend` and you are not developing on macOS or Windo
 
 - openssl
 
+# Hosting
+
+If you want a quick and easy way to host your bot, you can use [shuttle.rs][project:shuttle],
+a web application platform that allows deploying Serenity bots for free.
+
 # Projects extending Serenity
 
 - [lavalink-rs][project:lavalink-rs]: An interface to [Lavalink][repo:lavalink] and [Andesite][repo:andesite], an audio sending node based on [Lavaplayer][repo:lavaplayer]
 - [Songbird][project:songbird]: An async Rust library for the Discord voice API.
 - [Poise][project:poise]: Experimental command framework, with advanced features like edit tracking, single function slash and prefix commands and flexible argument parsing.
-- [shuttle.rs][project:shuttle]: A web application platform that allows deploying Serenity bots for free.
 
 [`Cache`]: https://docs.rs/serenity/*/serenity/cache/struct.Cache.html
 [`Client::builder`]: https://docs.rs/serenity/*/serenity/client/struct.Client.html#method.builder
