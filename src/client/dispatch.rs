@@ -307,6 +307,8 @@ async fn handle_event(
 
     let event_handler = Arc::clone(event_handler);
     let cache_and_http = cache_and_http.clone();
+    #[cfg(feature = "cache")]
+    let cache = cache_and_http.cache.clone();
 
     // Handle ClientEvent or return back Event
     let model_event = match event {
@@ -323,6 +325,7 @@ async fn handle_event(
     };
 
     // Handle Event, this is done to prevent indenting twice (once to destructure DispatchEvent, then to destructure Event)
+    #[cfg_attr(not(feature = "cache"), allow(unused_mut))]
     match model_event {
         Event::ApplicationCommandPermissionsUpdate(event) => {
             spawn_named(
@@ -397,16 +400,10 @@ async fn handle_event(
         },
         Event::ChannelUpdate(mut event) => {
             spawn_named("dispatch::event_handler::channel_update", async move {
-                feature_cache! {{
-                    let old_channel = cache_and_http.cache.channel(event.channel.id());
-                    update(&cache_and_http, &mut event);
+                let old_channel = if_cache!(cache.channel(event.channel.id()));
+                update(&cache_and_http, &mut event);
 
-                    event_handler.channel_update(context, old_channel, event.channel).await;
-                } else {
-                    update(&cache_and_http, &mut event);
-
-                    event_handler.channel_update(context, event.channel).await;
-                }}
+                event_handler.channel_update(context, old_channel, event.channel).await;
             });
         },
         Event::GuildBanAdd(event) => {
@@ -420,8 +417,7 @@ async fn handle_event(
             });
         },
         Event::GuildCreate(mut event) => {
-            #[cfg(feature = "cache")]
-            let _is_new = !cache_and_http.cache.unavailable_guilds.contains(&event.guild.id);
+            let _is_new = if_cache!(Some(cache.unavailable_guilds.contains(&event.guild.id)));
 
             update(&cache_and_http, &mut event);
 
@@ -445,22 +441,14 @@ async fn handle_event(
             }
 
             spawn_named("dispatch::event_handler::guild_create", async move {
-                feature_cache! {{
-                    event_handler.guild_create(context, event.guild, _is_new).await;
-                } else {
-                    event_handler.guild_create(context, event.guild).await;
-                }}
+                event_handler.guild_create(context, event.guild, _is_new).await;
             });
         },
         Event::GuildDelete(mut event) => {
-            let _full = update(&cache_and_http, &mut event);
+            let _full = if_cache!(update(&cache_and_http, &mut event));
 
             spawn_named("dispatch::event_handler::guild_delete", async move {
-                feature_cache! {{
-                    event_handler.guild_delete(context, event.guild, _full).await;
-                } else {
-                    event_handler.guild_delete(context, event.guild).await;
-                }}
+                event_handler.guild_delete(context, event.guild, _full).await;
             });
         },
         Event::GuildEmojisUpdate(mut event) => {
@@ -483,32 +471,20 @@ async fn handle_event(
             });
         },
         Event::GuildMemberRemove(mut event) => {
-            let _member = update(&cache_and_http, &mut event);
+            let _member = if_cache!(update(&cache_and_http, &mut event));
 
             spawn_named("dispatch::event_handler::guild_member_removal", async move {
-                feature_cache! {{
-                    event_handler.guild_member_removal(context, event.guild_id, event.user, _member).await;
-                } else {
-                    event_handler.guild_member_removal(context, event.guild_id, event.user).await;
-                }}
+                event_handler
+                    .guild_member_removal(context, event.guild_id, event.user, _member)
+                    .await;
             });
         },
         Event::GuildMemberUpdate(mut event) => {
-            let _before = update(&cache_and_http, &mut event);
-            let _after: Option<Member> = feature_cache! {{
-                cache_and_http.cache.member(event.guild_id, event.user.id)
-            } else {
-                None
-            }};
+            let _before = if_cache!(update(&cache_and_http, &mut event));
+            let _after: Option<Member> = if_cache!(cache.member(event.guild_id, event.user.id));
 
             spawn_named("dispatch::event_handler::guild_member_update", async move {
-                feature_cache! {{
-                    if let Some(after) = _after {
-                        event_handler.guild_member_update(context, _before, after).await;
-                    }
-                } else {
-                    event_handler.guild_member_update(context, event).await;
-                }}
+                event_handler.guild_member_update(context, _before, _after, event).await;
             });
         },
         Event::GuildMembersChunk(mut event) => {
@@ -526,25 +502,19 @@ async fn handle_event(
             });
         },
         Event::GuildRoleDelete(mut event) => {
-            let _role = update(&cache_and_http, &mut event);
+            let _role = if_cache!(update(&cache_and_http, &mut event));
 
             spawn_named("dispatch::event_handler::guild_role_delete", async move {
-                feature_cache! {{
-                    event_handler.guild_role_delete(context, event.guild_id, event.role_id, _role).await;
-                } else {
-                    event_handler.guild_role_delete(context, event.guild_id, event.role_id).await;
-                }}
+                event_handler
+                    .guild_role_delete(context, event.guild_id, event.role_id, _role)
+                    .await;
             });
         },
         Event::GuildRoleUpdate(mut event) => {
-            let _before = update(&cache_and_http, &mut event);
+            let _before = if_cache!(update(&cache_and_http, &mut event));
 
             spawn_named("dispatch::event_handler::guild_role_update", async move {
-                feature_cache! {{
-                    event_handler.guild_role_update(context, _before, event.role).await;
-                } else {
-                    event_handler.guild_role_update(context, event.role).await;
-                }}
+                event_handler.guild_role_update(context, _before, event.role).await;
             });
         },
         Event::GuildStickersUpdate(mut event) => {
@@ -556,17 +526,11 @@ async fn handle_event(
         },
         Event::GuildUpdate(mut event) => {
             spawn_named("dispatch::event_handler::guild_update", async move {
-                feature_cache! {{
-                    let before = cache_and_http.cache.guild(&event.guild.id).as_deref().cloned();
+                let before = if_cache!(cache.guild(&event.guild.id).map(|g| g.clone()));
 
-                    update(&cache_and_http, &mut event);
+                update(&cache_and_http, &mut event);
 
-                    event_handler.guild_update(context, before, event.guild).await;
-                } else {
-                    update(&cache_and_http, &mut event);
-
-                    event_handler.guild_update(context, event.guild).await;
-                }}
+                event_handler.guild_update(context, before, event.guild).await;
             });
         },
         Event::InviteCreate(event) => {
@@ -596,15 +560,11 @@ async fn handle_event(
             });
         },
         Event::MessageUpdate(mut event) => {
-            let _before = update(&cache_and_http, &mut event);
+            let _before = if_cache!(update(&cache_and_http, &mut event));
 
             spawn_named("dispatch::event_handler::message_update", async move {
-                feature_cache! {{
-                    let _after = cache_and_http.cache.message(event.channel_id, event.id);
-                    event_handler.message_update(context, _before, _after, event).await;
-                } else {
-                    event_handler.message_update(context, event).await;
-                }}
+                let _after = if_cache!(cache.message(event.channel_id, event.id));
+                event_handler.message_update(context, _before, _after, event).await;
             });
         },
         Event::PresencesReplace(mut event) => {
@@ -656,14 +616,10 @@ async fn handle_event(
         },
         Event::Unknown => debug!("An unknown event was received"),
         Event::UserUpdate(mut event) => {
-            let _before = update(&cache_and_http, &mut event);
+            let _before = if_cache!(update(&cache_and_http, &mut event));
 
             spawn_named("dispatch::event_handler::user_update", async move {
-                feature_cache! {{
-                    event_handler.user_update(context, _before.expect("missing old user"), event.current_user).await;
-                } else {
-                    event_handler.user_update(context, event.current_user).await;
-                }}
+                event_handler.user_update(context, _before, event.current_user).await;
             });
         },
         Event::VoiceServerUpdate(event) => {
@@ -672,14 +628,10 @@ async fn handle_event(
             });
         },
         Event::VoiceStateUpdate(mut event) => {
-            let _before = update(&cache_and_http, &mut event);
+            let _before = if_cache!(update(&cache_and_http, &mut event));
 
             spawn_named("dispatch::event_handler::voice_state_update", async move {
-                feature_cache! {{
-                    event_handler.voice_state_update(context, _before, event.voice_state).await;
-                } else {
-                    event_handler.voice_state_update(context, event.voice_state).await;
-                }}
+                event_handler.voice_state_update(context, _before, event.voice_state).await;
             });
         },
         Event::WebhookUpdate(event) => {
