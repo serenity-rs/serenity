@@ -3,7 +3,6 @@
 
 #[cfg(feature = "client")]
 mod argument_convert;
-pub(crate) mod backports;
 #[cfg(feature = "cache")]
 mod content_safe;
 mod custom_message;

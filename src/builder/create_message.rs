@@ -134,10 +134,9 @@ impl<'a> CreateMessage<'a> {
     #[cfg(feature = "http")]
     fn check_length(&self) -> Result<()> {
         if let Some(content) = &self.content {
-            let length = content.chars().count();
-            let max_length = constants::MESSAGE_CODE_LIMIT;
-            if length > max_length {
-                return Err(Error::Model(ModelError::MessageTooLong(length - max_length)));
+            let overflow = content.chars().count().saturating_sub(constants::MESSAGE_CODE_LIMIT);
+            if overflow > 0 {
+                return Err(Error::Model(ModelError::MessageTooLong(overflow)));
             }
         }
 

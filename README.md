@@ -98,7 +98,7 @@ Add the following to your `Cargo.toml` file:
 serenity = "0.11"
 ```
 
-Serenity supports a minimum of Rust 1.53.
+Serenity officially supports a minimum of Rust 1.63. You may be able to build it with earlier versions, but no guarantees are made. If you do so, expect potential breakage when upgrading to a new minor version release.
 
 # Features
 

@@ -395,12 +395,7 @@ pub fn help(attr: TokenStream, input: TokenStream) -> TokenStream {
         }
 
         strike_text.push('.');
-
-        if is_any_option_strike {
-            Some(strike_text)
-        } else {
-            None
-        }
+        is_any_option_strike.then_some(strike_text)
     }
 
     if options.strikethrough_commands_tip_in_dm == None {

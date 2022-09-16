@@ -509,24 +509,14 @@ fn nested_group_command_search<'rec, 'a: 'rec>(
                     .checks
                     .iter()
                     .chain(group.options.checks.iter())
-                    .filter_map(|check| {
-                        if check.display_in_help {
-                            Some(check.name.to_string())
-                        } else {
-                            None
-                        }
-                    })
+                    .filter_map(|check| check.display_in_help.then(|| check.name.to_string()))
                     .collect();
 
                 let sub_command_names: Vec<String> = options
                     .sub_commands
                     .iter()
-                    .filter_map(|cmd| {
-                        if (*cmd).options.help_available {
-                            Some((*cmd).options.names[0].to_string())
-                        } else {
-                            None
-                        }
+                    .filter_map(|&cmd| {
+                        cmd.options.help_available.then(|| cmd.options.names[0].to_string())
                     })
                     .collect();
 
@@ -841,7 +831,7 @@ pub async fn create_customised_help_data<'a>(
     ctx: &Context,
     msg: &Message,
     args: &'a Args,
-    groups: &'a [&'static CommandGroup],
+    groups: &[&'static CommandGroup],
     owners: &HashSet<UserId, impl std::hash::BuildHasher + Send + Sync>,
     help_options: &'a HelpOptions,
 ) -> CustomisedHelpData<'a> {
