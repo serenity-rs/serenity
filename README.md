@@ -194,7 +194,7 @@ If you use the `native_tls_backend` and you are not developing on macOS or Windo
 # Hosting
 
 If you want a quick and easy way to host your bot, you can use [shuttle.rs][project:shuttle],
-a web application platform that allows deploying Serenity bots for free.
+a Rust-native cloud development platform that allows deploying Serenity bots for free.
 
 # Projects extending Serenity
 
