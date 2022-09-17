@@ -789,7 +789,7 @@ impl GuildId {
         self,
         http: impl AsRef<Http>,
         role_id: impl Into<RoleId>,
-        position: u64,
+        position: u32,
     ) -> Result<Vec<Role>> {
         http.as_ref().edit_role_position(self.get(), role_id.into().get(), position, None).await
     }

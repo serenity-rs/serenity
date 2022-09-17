@@ -165,7 +165,7 @@ impl Channel {
     /// In DMs (private channel) it will return None.
     #[inline]
     #[must_use]
-    pub const fn position(&self) -> Option<i64> {
+    pub const fn position(&self) -> Option<u32> {
         match self {
             Self::Guild(channel) => Some(channel.position),
             Self::Private(_) => None,
