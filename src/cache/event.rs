@@ -480,48 +480,39 @@ impl CacheUpdate for MessageCreateEvent {
 impl CacheUpdate for MessageUpdateEvent {
     type Output = Message;
 
+    #[rustfmt::skip]
     fn update(&mut self, cache: &Cache) -> Option<Self::Output> {
-        if let Some(messages) = cache.messages.get_mut(&self.channel_id) {
-            if let Some(mut message) = messages.get_mut(&self.id) {
-                let item = message.clone();
+        // Destructure, so we get an `unused` warning when we forget to process one of the fields
+        // in this method
+        #[allow(deprecated)] // yes rust, exhaustive means exhaustive, even the deprecated ones
+        let Self {
+            id, channel_id, content, edited_timestamp, tts, mention_everyone, mentions,
+            mention_roles, mention_channels, attachments, embeds, reactions, pinned, flags,
+            components, sticker_items,
 
-                if let Some(attachments) = self.attachments.clone() {
-                    message.attachments = attachments;
-                }
+            author: _, timestamp: _,  nonce: _, kind: _, stickers: _,  guild_id: _,
+        } = &self;
 
-                if let Some(content) = self.content.clone() {
-                    message.content = content;
-                }
+        let messages = cache.messages.get_mut(channel_id)?;
+        let mut message = messages.get_mut(id)?;
+        let old_message = message.clone();
 
-                if let Some(edited_timestamp) = self.edited_timestamp {
-                    message.edited_timestamp = Some(edited_timestamp);
-                }
+        if let Some(x) = attachments { message.attachments = x.clone() }
+        if let Some(x) = content { message.content = x.clone() }
+        if let Some(x) = edited_timestamp { message.edited_timestamp = Some(*x) }
+        if let Some(x) = mentions { message.mentions = x.clone() }
+        if let Some(x) = mention_everyone { message.mention_everyone = *x }
+        if let Some(x) = mention_roles { message.mention_roles = x.clone() }
+        if let Some(x) = mention_channels { message.mention_channels = x.clone() }
+        if let Some(x) = pinned { message.pinned = *x }
+        if let Some(x) = flags { message.flags = Some(*x) }
+        if let Some(x) = tts { message.tts = *x }
+        if let Some(x) = embeds { message.embeds = x.clone() }
+        if let Some(x) = reactions { message.reactions = x.clone() }
+        if let Some(x) = components { message.components = x.clone() }
+        if let Some(x) = sticker_items { message.sticker_items = x.clone() }
 
-                if let Some(mentions) = self.mentions.clone() {
-                    message.mentions = mentions;
-                }
-
-                if let Some(mention_everyone) = self.mention_everyone {
-                    message.mention_everyone = mention_everyone;
-                }
-
-                if let Some(mention_roles) = self.mention_roles.clone() {
-                    message.mention_roles = mention_roles;
-                }
-
-                if let Some(pinned) = self.pinned {
-                    message.pinned = pinned;
-                }
-
-                if self.flags.is_some() {
-                    message.flags = self.flags;
-                }
-
-                return Some(item);
-            }
-        }
-
-        None
+        Some(old_message)
     }
 }
 

@@ -6,6 +6,7 @@ use std::fmt;
 
 use serde::de::{Error as DeError, IgnoredAny, MapAccess};
 
+use super::application::component::ActionRow;
 use super::prelude::*;
 use super::utils::{emojis, roles, stickers};
 use crate::constants::OpCode;
@@ -406,22 +407,29 @@ pub struct MessageDeleteEvent {
 #[non_exhaustive]
 pub struct MessageUpdateEvent {
     pub id: MessageId,
-    pub guild_id: Option<GuildId>,
     pub channel_id: ChannelId,
-    pub kind: Option<MessageType>,
+    pub author: Option<User>, // TODO: Is this a Message field that can even change?
     pub content: Option<String>,
-    pub nonce: Option<String>,
-    pub tts: Option<bool>,
-    pub pinned: Option<bool>,
-    pub timestamp: Option<Timestamp>,
+    pub timestamp: Option<Timestamp>, // TODO: Is this a Message field that can even change?
     pub edited_timestamp: Option<Timestamp>,
-    pub author: Option<User>,
+    pub tts: Option<bool>,
     pub mention_everyone: Option<bool>,
     pub mentions: Option<Vec<User>>,
     pub mention_roles: Option<Vec<RoleId>>,
+    pub mention_channels: Option<Vec<ChannelMention>>,
     pub attachments: Option<Vec<Attachment>>,
     pub embeds: Option<Vec<Embed>>,
+    pub reactions: Option<Vec<MessageReaction>>,
+    pub nonce: Option<String>, // TODO: Is this a Message field that can even change?
+    pub pinned: Option<bool>,
+    pub kind: Option<MessageType>, // TODO: Is this a Message field that can even change?
     pub flags: Option<MessageFlags>,
+    pub components: Option<Vec<ActionRow>>,
+    #[deprecated(note = "deprecated by Discord")]
+    pub stickers: Option<Vec<StickerItem>>,
+    pub sticker_items: Option<Vec<StickerItem>>,
+
+    pub guild_id: Option<GuildId>, // TODO: Is this a Message field that can even change?
 }
 
 /// [Discord docs](https://discord.com/developers/docs/topics/gateway#presence-update).
