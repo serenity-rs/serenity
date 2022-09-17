@@ -27,21 +27,19 @@ macro_rules! status {
     };
 }
 
-// Enable check for cache
 #[cfg(all(feature = "cache", feature = "client"))]
-macro_rules! feature_cache {
-    ($enabled:block else $disabled:block) => {{
-        $enabled
-    }};
+macro_rules! if_cache {
+    ($e:expr) => {
+        $e
+    };
 }
 
 #[cfg(all(not(feature = "cache"), feature = "client"))]
-macro_rules! feature_cache {
-    ($enabled:block else $disabled:block) => {{
-        $disabled
-    }};
+macro_rules! if_cache {
+    ($e:expr) => {
+        None
+    };
 }
-
 /// The `enum_number!` macro generates `From` implementations to convert between values and the
 /// enum which can then be utilized by `serde` with `#[serde(from = "u8", into = "u8")]`.
 ///
