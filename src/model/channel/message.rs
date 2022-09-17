@@ -50,7 +50,12 @@ pub struct Message {
     /// Array of embeds sent with the message.
     pub embeds: Vec<Embed>,
     /// The Id of the [`Guild`] that the message was sent in. This value will
-    /// only be present if this message was received over the gateway.
+    /// only be present if this message was received over the gateway, therefore **do not use this
+    /// to check if message is in DMs**, it is not a reliable method.
+    // TODO: maybe introduce an `enum MessageLocation { Dm, Guild(GuildId) }` and store
+    // `Option<MessageLocation` here. Instead of None being ambiguous (is it in DMs? Or do we just
+    // not know because HTTP retrieved Messages don't have guild ID?), we'd set
+    // Some(MessageLocation::Dm) in gateway and None in HTTP.
     pub guild_id: Option<GuildId>,
     /// Indicator of the type of message this is, i.e. whether it is a regular
     /// message or a system message.
@@ -206,9 +211,6 @@ impl Message {
         {
             if let Some(cache) = cache_http.cache() {
                 if self.author.id != cache.current_user().id {
-                    if self.is_private() {
-                        return Err(Error::Model(ModelError::NotAuthor));
-                    }
                     utils::user_has_perms_cache(
                         cache,
                         self.channel_id,
@@ -426,11 +428,12 @@ impl Message {
         cache.guild(self.guild_id?)
     }
 
-    /// True if message was sent using direct messages.
+    /// If true, the message was sent in a guild. If false, the message was sent either in guild or
+    /// in DMs
     #[inline]
     #[must_use]
-    pub fn is_private(&self) -> bool {
-        self.guild_id.is_none()
+    pub fn is_definitely_in_guild(&self) -> bool {
+        self.guild_id.is_some()
     }
 
     /// Retrieves a clone of the author's Member instance, if this message was
