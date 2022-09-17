@@ -404,6 +404,8 @@
 <span id="398">398</span>
 <span id="399">399</span>
 <span id="400">400</span>
+<span id="401">401</span>
+<span id="402">402</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">serde::de</span>::{<span class="ident">Deserialize</span>, <span class="ident">Deserializer</span>, <span class="ident">Error</span> <span class="kw">as</span> <span class="ident">DeError</span>};
 <span class="kw">use</span> <span class="ident">serde::Serialize</span>;
 
@@ -536,7 +538,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// Refer to Discord&#39;s docs for Edit Webhook Message for field information.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// **Note**:   Message contents must be under 2000 unicode code points.</span>
+    <span class="doccomment">/// **Note**: Message contents must be under 2000 unicode code points.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// [`UserId`]: crate::model::id::UserId</span>
     <span class="doccomment">///</span>
@@ -565,6 +567,8 @@
     }
 
     <span class="doccomment">/// Deletes the initial interaction response.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// Does not work on ephemeral messages.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// # Errors</span>
     <span class="doccomment">///</span>
