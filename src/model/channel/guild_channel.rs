@@ -900,6 +900,10 @@ impl GuildChannel {
     ///
     /// **Note**: Requires the [Read Message History] permission.
     ///
+    /// **Note**: If the passed reaction_type is a custom guild emoji, it must contain the name. So,
+    /// [`Emoji`] or [`EmojiIdentifier`] will always work, [`ReactionType`] only if
+    /// [`ReactionType::Custom::name`] is Some, and **[`EmojiId`] will never work**.
+    ///
     /// # Errors
     ///
     /// Returns [`Error::Http`] if the current user lacks permission.
