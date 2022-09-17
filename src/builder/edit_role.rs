@@ -55,7 +55,7 @@ pub struct EditRole<'a> {
     #[serde(skip_serializing_if = "Option::is_none")]
     permissions: Option<u64>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    position: Option<i64>,
+    position: Option<u32>,
     #[serde(skip_serializing_if = "Option::is_none")]
     unicode_emoji: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -126,7 +126,7 @@ impl<'a> EditRole<'a> {
         };
 
         if let Some(position) = self.position {
-            guild_id.edit_role_position(http, role.id, position as u64).await?;
+            guild_id.edit_role_position(http, role.id, position).await?;
         }
         Ok(role)
     }
@@ -164,7 +164,7 @@ impl<'a> EditRole<'a> {
 
     /// Set the role's position in the role list. This correlates to the role's position in the
     /// user list.
-    pub fn position(mut self, position: i64) -> Self {
+    pub fn position(mut self, position: u32) -> Self {
         self.position = Some(position);
         self
     }
