@@ -52,15 +52,17 @@ use crate::CacheAndHttp;
 /// This trait will be required by functions that need [`Http`] and can
 /// optionally use a [`Cache`] to potentially avoid REST-requests.
 ///
-/// The types [`Context`], [`Cache`], and [`Http`] implement this trait
-/// and thus passing these to functions expecting `impl CacheHttp` is possible.
+/// The types [`Context`] and [`Http`] implement this trait
+/// and thus passing these to functions expecting `impl CacheHttp` is possible. For the full list
+/// of implementations, see the Implementors and Implementations on Foreign Types section in the
+/// generated docs.
 ///
 /// In a situation where you have the `cache`-feature enabled but you do not
 /// pass a cache, the function will behave as if no `cache`-feature is active.
 ///
 /// If you are calling a function that expects `impl CacheHttp` as argument
 /// and you wish to utilise the `cache`-feature but you got no access to a
-/// [`Context`], you can pass a tuple of `(CacheRwLock, Http)`.
+/// [`Context`], you can pass a tuple of `(&Arc<Cache>, &Http)`.
 pub trait CacheHttp: Send + Sync {
     fn http(&self) -> &Http;
 
