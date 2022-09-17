@@ -496,92 +496,6 @@
 <span id="490">490</span>
 <span id="491">491</span>
 <span id="492">492</span>
-<span id="493">493</span>
-<span id="494">494</span>
-<span id="495">495</span>
-<span id="496">496</span>
-<span id="497">497</span>
-<span id="498">498</span>
-<span id="499">499</span>
-<span id="500">500</span>
-<span id="501">501</span>
-<span id="502">502</span>
-<span id="503">503</span>
-<span id="504">504</span>
-<span id="505">505</span>
-<span id="506">506</span>
-<span id="507">507</span>
-<span id="508">508</span>
-<span id="509">509</span>
-<span id="510">510</span>
-<span id="511">511</span>
-<span id="512">512</span>
-<span id="513">513</span>
-<span id="514">514</span>
-<span id="515">515</span>
-<span id="516">516</span>
-<span id="517">517</span>
-<span id="518">518</span>
-<span id="519">519</span>
-<span id="520">520</span>
-<span id="521">521</span>
-<span id="522">522</span>
-<span id="523">523</span>
-<span id="524">524</span>
-<span id="525">525</span>
-<span id="526">526</span>
-<span id="527">527</span>
-<span id="528">528</span>
-<span id="529">529</span>
-<span id="530">530</span>
-<span id="531">531</span>
-<span id="532">532</span>
-<span id="533">533</span>
-<span id="534">534</span>
-<span id="535">535</span>
-<span id="536">536</span>
-<span id="537">537</span>
-<span id="538">538</span>
-<span id="539">539</span>
-<span id="540">540</span>
-<span id="541">541</span>
-<span id="542">542</span>
-<span id="543">543</span>
-<span id="544">544</span>
-<span id="545">545</span>
-<span id="546">546</span>
-<span id="547">547</span>
-<span id="548">548</span>
-<span id="549">549</span>
-<span id="550">550</span>
-<span id="551">551</span>
-<span id="552">552</span>
-<span id="553">553</span>
-<span id="554">554</span>
-<span id="555">555</span>
-<span id="556">556</span>
-<span id="557">557</span>
-<span id="558">558</span>
-<span id="559">559</span>
-<span id="560">560</span>
-<span id="561">561</span>
-<span id="562">562</span>
-<span id="563">563</span>
-<span id="564">564</span>
-<span id="565">565</span>
-<span id="566">566</span>
-<span id="567">567</span>
-<span id="568">568</span>
-<span id="569">569</span>
-<span id="570">570</span>
-<span id="571">571</span>
-<span id="572">572</span>
-<span id="573">573</span>
-<span id="574">574</span>
-<span id="575">575</span>
-<span id="576">576</span>
-<span id="577">577</span>
-<span id="578">578</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::collections::HashMap</span>;
 
 <span class="kw">use</span> <span class="ident">async_trait::async_trait</span>;
@@ -665,15 +579,8 @@
 
     <span class="doccomment">/// Dispatched when a channel is updated.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// Provides the old channel data, and the new data.</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
+    <span class="doccomment">/// The old channel data is only provided when the cache feature is enabled.</span>
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">channel_update</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_ctx</span>: <span class="ident">Context</span>, <span class="ident">_old</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Channel</span><span class="op">&gt;</span>, <span class="ident">_new</span>: <span class="ident">Channel</span>) {}
-
-    <span class="doccomment">/// Dispatched when a channel is updated.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Provides the new data.</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>))]</span>
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">channel_update</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_ctx</span>: <span class="ident">Context</span>, <span class="ident">_new_data</span>: <span class="ident">Channel</span>) {}
 
     <span class="doccomment">/// Dispatched when a user is banned from a guild.</span>
     <span class="doccomment">///</span>
@@ -688,28 +595,19 @@
     <span class="doccomment">/// Dispatched when a guild is created;</span>
     <span class="doccomment">/// or an existing guild&#39;s data is sent to us.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// Provides the guild&#39;s data and whether the guild is new.</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">guild_create</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_ctx</span>: <span class="ident">Context</span>, <span class="ident">_guild</span>: <span class="ident">Guild</span>, <span class="ident">_is_new</span>: <span class="ident">bool</span>) {}
-
-    <span class="doccomment">/// Dispatched when a guild is created;</span>
-    <span class="doccomment">/// or an existing guild&#39;s data is sent to us.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Provides the guild&#39;s data.</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>))]</span>
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">guild_create</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_ctx</span>: <span class="ident">Context</span>, <span class="ident">_guild</span>: <span class="ident">Guild</span>) {}
+    <span class="doccomment">/// Provides the guild&#39;s data and whether the guild is new (only when cache feature is enabled).</span>
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">guild_create</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_ctx</span>: <span class="ident">Context</span>, <span class="ident">_guild</span>: <span class="ident">Guild</span>, <span class="ident">_is_new</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span>) {}
 
     <span class="doccomment">/// Dispatched when a guild is deleted.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// Provides the partial data of the guild sent by discord,</span>
-    <span class="doccomment">/// and the full data from the cache, if available.</span>
+    <span class="doccomment">/// and the full data from the cache, if cache feature is enabled and the data is available.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// The [`unavailable`] flag in the partial data determines the status of the guild.</span>
     <span class="doccomment">/// If the flag is false, the bot was removed from the guild, either by being</span>
     <span class="doccomment">/// kicked or banned. If the flag is true, the guild went offline.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// [`unavailable`]: UnavailableGuild::unavailable</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">guild_delete</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">_ctx</span>: <span class="ident">Context</span>,
@@ -717,18 +615,6 @@
         <span class="ident">_full</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Guild</span><span class="op">&gt;</span>,
     ) {
     }
-
-    <span class="doccomment">/// Dispatched when a guild is deleted.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Provides the partial data of the guild sent by discord.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The [`unavailable`] flag in the partial data determines the status of the guild.</span>
-    <span class="doccomment">/// If the flag is false, the bot was removed from the guild, either by being</span>
-    <span class="doccomment">/// kicked or banned. If the flag is true, the guild went offline.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`unavailable`]: UnavailableGuild::unavailable</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>))]</span>
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">guild_delete</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_ctx</span>: <span class="ident">Context</span>, <span class="ident">_incomplete</span>: <span class="ident">UnavailableGuild</span>) {}
 
     <span class="comment">// the emojis were updated.</span>
 
@@ -758,11 +644,11 @@
 
     <span class="doccomment">/// Dispatched when a user&#39;s membership ends by leaving, getting kicked, or being banned.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// Provides the guild&#39;s id, the user&#39;s data, and the user&#39;s member data if available.</span>
+    <span class="doccomment">/// Provides the guild&#39;s id, the user&#39;s data, and the user&#39;s member data if cache feature is</span>
+    <span class="doccomment">/// enabled and the data is available.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// Note: This event will not trigger unless the &quot;guild members&quot; privileged intent</span>
     <span class="doccomment">/// is enabled on the bot application page.</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">guild_member_removal</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">_ctx</span>: <span class="ident">Context</span>,
@@ -772,38 +658,21 @@
     ) {
     }
 
-    <span class="doccomment">/// Dispatched when a user&#39;s membership ends by leaving, getting kicked, or being banned.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Provides the guild&#39;s id, the user&#39;s data.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Note: This event will not trigger unless the &quot;guild members&quot; privileged intent</span>
-    <span class="doccomment">/// is enabled on the bot application page.</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>))]</span>
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">guild_member_removal</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_ctx</span>: <span class="ident">Context</span>, <span class="ident">_guild_id</span>: <span class="ident">GuildId</span>, <span class="ident">_kicked</span>: <span class="ident">User</span>) {}
-
     <span class="doccomment">/// Dispatched when a member is updated (e.g their nickname is updated).</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// Provides the member&#39;s old data (if available) and the new data.</span>
+    <span class="doccomment">/// Provides the member&#39;s old and new data (if cache feature is enabled and data is available) and the</span>
+    <span class="doccomment">/// new raw data about updated fields.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// Note: This event will not trigger unless the &quot;guild members&quot; privileged intent</span>
     <span class="doccomment">/// is enabled on the bot application page.</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">guild_member_update</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">_ctx</span>: <span class="ident">Context</span>,
         <span class="ident">_old_if_available</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Member</span><span class="op">&gt;</span>,
-        <span class="ident">_new</span>: <span class="ident">Member</span>,
+        <span class="ident">_new</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Member</span><span class="op">&gt;</span>,
+        <span class="ident">_event</span>: <span class="ident">GuildMemberUpdateEvent</span>,
     ) {
     }
-
-    <span class="doccomment">/// Dispatched when a member is updated (e.g their nickname is updated).</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Provides the new data.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Note: This event will not trigger unless the &quot;guild members&quot; privileged intent</span>
-    <span class="doccomment">/// is enabled on the bot application page.</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>))]</span>
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">guild_member_update</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_ctx</span>: <span class="ident">Context</span>, <span class="ident">_new</span>: <span class="ident">GuildMemberUpdateEvent</span>) {}
 
     <span class="doccomment">/// Dispatched when the data for offline members was requested.</span>
     <span class="doccomment">///</span>
@@ -817,8 +686,8 @@
 
     <span class="doccomment">/// Dispatched when a role is deleted.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// Provides the guild&#39;s id, the role&#39;s id and its data if available.</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
+    <span class="doccomment">/// Provides the guild&#39;s id, the role&#39;s id and its data (if cache feature is enabled and the</span>
+    <span class="doccomment">/// data is available).</span>
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">guild_role_delete</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">_ctx</span>: <span class="ident">Context</span>,
@@ -828,17 +697,10 @@
     ) {
     }
 
-    <span class="doccomment">/// Dispatched when a role is deleted.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Provides the guild&#39;s id, the role&#39;s id.</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>))]</span>
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">guild_role_delete</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_ctx</span>: <span class="ident">Context</span>, <span class="ident">_guild_id</span>: <span class="ident">GuildId</span>, <span class="ident">_removed_role_id</span>: <span class="ident">RoleId</span>) {
-    }
-
     <span class="doccomment">/// Dispatched when a role is updated.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// Provides the guild&#39;s id, the role&#39;s old (if available) and new data.</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
+    <span class="doccomment">/// Provides the guild&#39;s id, the role&#39;s old (if cache feature is enabled and the data is</span>
+    <span class="doccomment">/// available) and new data.</span>
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">guild_role_update</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">_ctx</span>: <span class="ident">Context</span>,
@@ -846,12 +708,6 @@
         <span class="ident">_new</span>: <span class="ident">Role</span>,
     ) {
     }
-
-    <span class="doccomment">/// Dispatched when a role is updated.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Provides the guild&#39;s id and the role&#39;s new data.</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>))]</span>
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">guild_role_update</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_ctx</span>: <span class="ident">Context</span>, <span class="ident">_new_data</span>: <span class="ident">Role</span>) {}
 
     <span class="doccomment">/// Dispatched when the stickers are updated.</span>
     <span class="doccomment">///</span>
@@ -866,8 +722,8 @@
 
     <span class="doccomment">/// Dispatched when the guild is updated.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// Provides the guild&#39;s old full data (if available) and the new, albeit partial data.</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
+    <span class="doccomment">/// Provides the guild&#39;s old full data (if cache feature is enabled and the data is available)</span>
+    <span class="doccomment">/// and the new, albeit partial data.</span>
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">guild_update</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">_ctx</span>: <span class="ident">Context</span>,
@@ -875,12 +731,6 @@
         <span class="ident">_new_but_incomplete</span>: <span class="ident">PartialGuild</span>,
     ) {
     }
-
-    <span class="doccomment">/// Dispatched when the guild is updated.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Provides the guild&#39;s new, albeit partial data.</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>))]</span>
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">guild_update</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_ctx</span>: <span class="ident">Context</span>, <span class="ident">_new_but_incomplete_data</span>: <span class="ident">PartialGuild</span>) {}
 
     <span class="doccomment">/// Dispatched when a invite is created.</span>
     <span class="doccomment">///</span>
@@ -923,10 +773,8 @@
 
     <span class="doccomment">/// Dispatched when a message is updated.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// Provides the old message if available,</span>
-    <span class="doccomment">/// the new message as an option in case of cache inconsistencies,</span>
-    <span class="doccomment">/// and the raw [`MessageUpdateEvent`] as a fallback.</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
+    <span class="doccomment">/// Provides the message update data, as well as the actual old and new message if cache feature</span>
+    <span class="doccomment">/// is enabled and the data is available.</span>
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">message_update</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">_ctx</span>: <span class="ident">Context</span>,
@@ -935,12 +783,6 @@
         <span class="ident">_event</span>: <span class="ident">MessageUpdateEvent</span>,
     ) {
     }
-
-    <span class="doccomment">/// Dispatched when a message is updated.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Provides the new data of the message.</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>))]</span>
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">message_update</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_ctx</span>: <span class="ident">Context</span>, <span class="ident">_new_data</span>: <span class="ident">MessageUpdateEvent</span>) {}
 
     <span class="doccomment">/// Dispatched when a new reaction is attached to a message.</span>
     <span class="doccomment">///</span>
@@ -992,15 +834,8 @@
 
     <span class="doccomment">/// Dispatched when the bot&#39;s data is updated.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// Provides the old and new data.</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">user_update</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_ctx</span>: <span class="ident">Context</span>, <span class="ident">_old_data</span>: <span class="ident">CurrentUser</span>, <span class="ident">_new</span>: <span class="ident">CurrentUser</span>) {}
-
-    <span class="doccomment">/// Dispatched when the bot&#39;s data is updated.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Provides the new data.</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>))]</span>
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">user_update</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_ctx</span>: <span class="ident">Context</span>, <span class="ident">_new_data</span>: <span class="ident">CurrentUser</span>) {}
+    <span class="doccomment">/// Provides the old (if cache feature is enabled and the data is available) and new data.</span>
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">user_update</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_ctx</span>: <span class="ident">Context</span>, <span class="ident">_old_data</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">CurrentUser</span><span class="op">&gt;</span>, <span class="ident">_new</span>: <span class="ident">CurrentUser</span>) {}
 
     <span class="doccomment">/// Dispatched when a guild&#39;s voice server was updated (or changed to another one).</span>
     <span class="doccomment">///</span>
@@ -1010,16 +845,9 @@
     <span class="doccomment">/// Dispatched when a user joins, leaves or moves to a voice channel.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// Provides the guild&#39;s id (if available) and</span>
-    <span class="doccomment">/// the old and the new state of the guild&#39;s voice channels.</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
+    <span class="doccomment">/// the old (if cache feature is enabled and the data is available) and the new state of the</span>
+    <span class="doccomment">/// guild&#39;s voice channels.</span>
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">voice_state_update</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_ctx</span>: <span class="ident">Context</span>, <span class="ident">_old</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">VoiceState</span><span class="op">&gt;</span>, <span class="ident">_new</span>: <span class="ident">VoiceState</span>) {}
-
-    <span class="doccomment">/// Dispatched when a user joins, leaves or moves to a voice channel.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Provides the guild&#39;s id (if available) and</span>
-    <span class="doccomment">/// the new state of the guild&#39;s voice channels.</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>))]</span>
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">voice_state_update</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_ctx</span>: <span class="ident">Context</span>, <span class="kw">_</span>: <span class="ident">VoiceState</span>) {}
 
     <span class="doccomment">/// Dispatched when a guild&#39;s webhook is updated.</span>
     <span class="doccomment">///</span>
