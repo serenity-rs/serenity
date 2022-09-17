@@ -130,7 +130,7 @@ impl ModalSubmitInteraction {
     ///
     /// Refer to Discord's docs for Edit Webhook Message for field information.
     ///
-    /// **Note**:   Message contents must be under 2000 unicode code points.
+    /// **Note**: Message contents must be under 2000 unicode code points.
     ///
     /// [`UserId`]: crate::model::id::UserId
     ///
@@ -159,6 +159,8 @@ impl ModalSubmitInteraction {
     }
 
     /// Deletes the initial interaction response.
+    ///
+    /// Does not work on ephemeral messages.
     ///
     /// # Errors
     ///
