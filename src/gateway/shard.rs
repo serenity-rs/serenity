@@ -490,10 +490,7 @@ impl Shard {
     /// Returns a [`GatewayError::OverloadedShard`] if the shard would have too
     /// many guilds assigned to it.
     #[instrument(skip(self))]
-    pub(crate) fn handle_event(
-        &mut self,
-        event: &Result<GatewayEvent>,
-    ) -> Result<Option<ShardAction>> {
+    pub fn handle_event(&mut self, event: &Result<GatewayEvent>) -> Result<Option<ShardAction>> {
         match *event {
             Ok(GatewayEvent::Dispatch(seq, ref event)) => {
                 Ok(self.handle_gateway_dispatch(seq, event))
