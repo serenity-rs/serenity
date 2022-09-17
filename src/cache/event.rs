@@ -482,7 +482,7 @@ impl CacheUpdate for MessageUpdateEvent {
 
     #[rustfmt::skip]
     fn update(&mut self, cache: &Cache) -> Option<Self::Output> {
-        // Destructure, so we get an `unused` warning when we forgot to process one of the fields
+        // Destructure, so we get an `unused` warning when we forget to process one of the fields
         // in this method
         #[allow(deprecated)] // yes rust, exhaustive means exhaustive, even the deprecated ones
         let Self {
