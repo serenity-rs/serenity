@@ -81,15 +81,8 @@ pub trait EventHandler: Send + Sync {
 
     /// Dispatched when a channel is updated.
     ///
-    /// Provides the old channel data, and the new data.
-    #[cfg(feature = "cache")]
+    /// The old channel data is only provided when the cache feature is enabled.
     async fn channel_update(&self, _ctx: Context, _old: Option<Channel>, _new: Channel) {}
-
-    /// Dispatched when a channel is updated.
-    ///
-    /// Provides the new data.
-    #[cfg(not(feature = "cache"))]
-    async fn channel_update(&self, _ctx: Context, _new_data: Channel) {}
 
     /// Dispatched when a user is banned from a guild.
     ///
@@ -104,28 +97,19 @@ pub trait EventHandler: Send + Sync {
     /// Dispatched when a guild is created;
     /// or an existing guild's data is sent to us.
     ///
-    /// Provides the guild's data and whether the guild is new.
-    #[cfg(feature = "cache")]
-    async fn guild_create(&self, _ctx: Context, _guild: Guild, _is_new: bool) {}
-
-    /// Dispatched when a guild is created;
-    /// or an existing guild's data is sent to us.
-    ///
-    /// Provides the guild's data.
-    #[cfg(not(feature = "cache"))]
-    async fn guild_create(&self, _ctx: Context, _guild: Guild) {}
+    /// Provides the guild's data and whether the guild is new (only when cache feature is enabled).
+    async fn guild_create(&self, _ctx: Context, _guild: Guild, _is_new: Option<bool>) {}
 
     /// Dispatched when a guild is deleted.
     ///
     /// Provides the partial data of the guild sent by discord,
-    /// and the full data from the cache, if available.
+    /// and the full data from the cache, if cache feature is enabled and the data is available.
     ///
     /// The [`unavailable`] flag in the partial data determines the status of the guild.
     /// If the flag is false, the bot was removed from the guild, either by being
     /// kicked or banned. If the flag is true, the guild went offline.
     ///
     /// [`unavailable`]: UnavailableGuild::unavailable
-    #[cfg(feature = "cache")]
     async fn guild_delete(
         &self,
         _ctx: Context,
@@ -133,18 +117,6 @@ pub trait EventHandler: Send + Sync {
         _full: Option<Guild>,
     ) {
     }
-
-    /// Dispatched when a guild is deleted.
-    ///
-    /// Provides the partial data of the guild sent by discord.
-    ///
-    /// The [`unavailable`] flag in the partial data determines the status of the guild.
-    /// If the flag is false, the bot was removed from the guild, either by being
-    /// kicked or banned. If the flag is true, the guild went offline.
-    ///
-    /// [`unavailable`]: UnavailableGuild::unavailable
-    #[cfg(not(feature = "cache"))]
-    async fn guild_delete(&self, _ctx: Context, _incomplete: UnavailableGuild) {}
 
     // the emojis were updated.
 
@@ -174,11 +146,11 @@ pub trait EventHandler: Send + Sync {
 
     /// Dispatched when a user's membership ends by leaving, getting kicked, or being banned.
     ///
-    /// Provides the guild's id, the user's data, and the user's member data if available.
+    /// Provides the guild's id, the user's data, and the user's member data if cache feature is
+    /// enabled and the data is available.
     ///
     /// Note: This event will not trigger unless the "guild members" privileged intent
     /// is enabled on the bot application page.
-    #[cfg(feature = "cache")]
     async fn guild_member_removal(
         &self,
         _ctx: Context,
@@ -188,38 +160,21 @@ pub trait EventHandler: Send + Sync {
     ) {
     }
 
-    /// Dispatched when a user's membership ends by leaving, getting kicked, or being banned.
-    ///
-    /// Provides the guild's id, the user's data.
-    ///
-    /// Note: This event will not trigger unless the "guild members" privileged intent
-    /// is enabled on the bot application page.
-    #[cfg(not(feature = "cache"))]
-    async fn guild_member_removal(&self, _ctx: Context, _guild_id: GuildId, _kicked: User) {}
-
     /// Dispatched when a member is updated (e.g their nickname is updated).
     ///
-    /// Provides the member's old data (if available) and the new data.
+    /// Provides the member's old and new data (if cache feature is enabled and data is available) and the
+    /// new raw data about updated fields.
     ///
     /// Note: This event will not trigger unless the "guild members" privileged intent
     /// is enabled on the bot application page.
-    #[cfg(feature = "cache")]
     async fn guild_member_update(
         &self,
         _ctx: Context,
         _old_if_available: Option<Member>,
-        _new: Member,
+        _new: Option<Member>,
+        _event: GuildMemberUpdateEvent,
     ) {
     }
-
-    /// Dispatched when a member is updated (e.g their nickname is updated).
-    ///
-    /// Provides the new data.
-    ///
-    /// Note: This event will not trigger unless the "guild members" privileged intent
-    /// is enabled on the bot application page.
-    #[cfg(not(feature = "cache"))]
-    async fn guild_member_update(&self, _ctx: Context, _new: GuildMemberUpdateEvent) {}
 
     /// Dispatched when the data for offline members was requested.
     ///
@@ -233,8 +188,8 @@ pub trait EventHandler: Send + Sync {
 
     /// Dispatched when a role is deleted.
     ///
-    /// Provides the guild's id, the role's id and its data if available.
-    #[cfg(feature = "cache")]
+    /// Provides the guild's id, the role's id and its data (if cache feature is enabled and the
+    /// data is available).
     async fn guild_role_delete(
         &self,
         _ctx: Context,
@@ -244,17 +199,10 @@ pub trait EventHandler: Send + Sync {
     ) {
     }
 
-    /// Dispatched when a role is deleted.
-    ///
-    /// Provides the guild's id, the role's id.
-    #[cfg(not(feature = "cache"))]
-    async fn guild_role_delete(&self, _ctx: Context, _guild_id: GuildId, _removed_role_id: RoleId) {
-    }
-
     /// Dispatched when a role is updated.
     ///
-    /// Provides the guild's id, the role's old (if available) and new data.
-    #[cfg(feature = "cache")]
+    /// Provides the guild's id, the role's old (if cache feature is enabled and the data is
+    /// available) and new data.
     async fn guild_role_update(
         &self,
         _ctx: Context,
@@ -262,12 +210,6 @@ pub trait EventHandler: Send + Sync {
         _new: Role,
     ) {
     }
-
-    /// Dispatched when a role is updated.
-    ///
-    /// Provides the guild's id and the role's new data.
-    #[cfg(not(feature = "cache"))]
-    async fn guild_role_update(&self, _ctx: Context, _new_data: Role) {}
 
     /// Dispatched when the stickers are updated.
     ///
@@ -282,8 +224,8 @@ pub trait EventHandler: Send + Sync {
 
     /// Dispatched when the guild is updated.
     ///
-    /// Provides the guild's old full data (if available) and the new, albeit partial data.
-    #[cfg(feature = "cache")]
+    /// Provides the guild's old full data (if cache feature is enabled and the data is available)
+    /// and the new, albeit partial data.
     async fn guild_update(
         &self,
         _ctx: Context,
@@ -291,12 +233,6 @@ pub trait EventHandler: Send + Sync {
         _new_but_incomplete: PartialGuild,
     ) {
     }
-
-    /// Dispatched when the guild is updated.
-    ///
-    /// Provides the guild's new, albeit partial data.
-    #[cfg(not(feature = "cache"))]
-    async fn guild_update(&self, _ctx: Context, _new_but_incomplete_data: PartialGuild) {}
 
     /// Dispatched when a invite is created.
     ///
@@ -339,10 +275,8 @@ pub trait EventHandler: Send + Sync {
 
     /// Dispatched when a message is updated.
     ///
-    /// Provides the old message if available,
-    /// the new message as an option in case of cache inconsistencies,
-    /// and the raw [`MessageUpdateEvent`] as a fallback.
-    #[cfg(feature = "cache")]
+    /// Provides the message update data, as well as the actual old and new message if cache feature
+    /// is enabled and the data is available.
     async fn message_update(
         &self,
         _ctx: Context,
@@ -351,12 +285,6 @@ pub trait EventHandler: Send + Sync {
         _event: MessageUpdateEvent,
     ) {
     }
-
-    /// Dispatched when a message is updated.
-    ///
-    /// Provides the new data of the message.
-    #[cfg(not(feature = "cache"))]
-    async fn message_update(&self, _ctx: Context, _new_data: MessageUpdateEvent) {}
 
     /// Dispatched when a new reaction is attached to a message.
     ///
@@ -408,15 +336,8 @@ pub trait EventHandler: Send + Sync {
 
     /// Dispatched when the bot's data is updated.
     ///
-    /// Provides the old and new data.
-    #[cfg(feature = "cache")]
-    async fn user_update(&self, _ctx: Context, _old_data: CurrentUser, _new: CurrentUser) {}
-
-    /// Dispatched when the bot's data is updated.
-    ///
-    /// Provides the new data.
-    #[cfg(not(feature = "cache"))]
-    async fn user_update(&self, _ctx: Context, _new_data: CurrentUser) {}
+    /// Provides the old (if cache feature is enabled and the data is available) and new data.
+    async fn user_update(&self, _ctx: Context, _old_data: Option<CurrentUser>, _new: CurrentUser) {}
 
     /// Dispatched when a guild's voice server was updated (or changed to another one).
     ///
@@ -426,16 +347,9 @@ pub trait EventHandler: Send + Sync {
     /// Dispatched when a user joins, leaves or moves to a voice channel.
     ///
     /// Provides the guild's id (if available) and
-    /// the old and the new state of the guild's voice channels.
-    #[cfg(feature = "cache")]
+    /// the old (if cache feature is enabled and the data is available) and the new state of the
+    /// guild's voice channels.
     async fn voice_state_update(&self, _ctx: Context, _old: Option<VoiceState>, _new: VoiceState) {}
-
-    /// Dispatched when a user joins, leaves or moves to a voice channel.
-    ///
-    /// Provides the guild's id (if available) and
-    /// the new state of the guild's voice channels.
-    #[cfg(not(feature = "cache"))]
-    async fn voice_state_update(&self, _ctx: Context, _: VoiceState) {}
 
     /// Dispatched when a guild's webhook is updated.
     ///
