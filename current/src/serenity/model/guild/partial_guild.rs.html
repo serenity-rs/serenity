@@ -1925,7 +1925,6 @@
 <span id="1919">1919</span>
 <span id="1920">1920</span>
 <span id="1921">1921</span>
-<span id="1922">1922</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">serde::de::Error</span> <span class="kw">as</span> <span class="ident">DeError</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
 <span class="kw">use</span> <span class="ident">tracing</span>::{<span class="ident">error</span>, <span class="ident">warn</span>};
@@ -1979,8 +1978,7 @@
     <span class="kw">pub</span> <span class="ident">application_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ApplicationId</span><span class="op">&gt;</span>,
     <span class="doccomment">/// The unique Id identifying the guild.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// This is equivalent to the Id of the default role (`@everyone`) and also</span>
-    <span class="doccomment">/// that of the default channel (typically `#general`).</span>
+    <span class="doccomment">/// This is equivalent to the Id of the default role (`@everyone`).</span>
     <span class="kw">pub</span> <span class="ident">id</span>: <span class="ident">GuildId</span>,
     <span class="doccomment">/// Id of a voice channel that&#39;s considered the AFK channel.</span>
     <span class="kw">pub</span> <span class="ident">afk_channel_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ChannelId</span><span class="op">&gt;</span>,

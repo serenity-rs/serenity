@@ -1347,8 +1347,6 @@
 <span id="1341">1341</span>
 <span id="1342">1342</span>
 <span id="1343">1343</span>
-<span id="1344">1344</span>
-<span id="1345">1345</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::convert::TryFrom</span>;
 <span class="kw">use</span> <span class="ident">std::fmt</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
@@ -1411,8 +1409,6 @@
 <span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">GuildChannel</span> {
     <span class="doccomment">/// The unique Id of the channel.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The default channel Id shares the Id of the guild and the default role.</span>
     <span class="kw">pub</span> <span class="ident">id</span>: <span class="ident">ChannelId</span>,
     <span class="doccomment">/// The bitrate of the channel.</span>
     <span class="doccomment">///</span>

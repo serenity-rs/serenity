@@ -3357,7 +3357,6 @@
 <span id="3351">3351</span>
 <span id="3352">3352</span>
 <span id="3353">3353</span>
-<span id="3354">3354</span>
 </pre><pre class="rust"><code><span class="doccomment">//! Models relating to guilds and types that it owns.</span>
 
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">audit_log</span>;
@@ -3520,8 +3519,7 @@
     <span class="kw">pub</span> <span class="ident">icon</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
     <span class="doccomment">/// The unique Id identifying the guild.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// This is equivalent to the Id of the default role (`@everyone`) and also</span>
-    <span class="doccomment">/// that of the default channel (typically `#general`).</span>
+    <span class="doccomment">/// This is equivalent to the Id of the default role (`@everyone`).</span>
     <span class="kw">pub</span> <span class="ident">id</span>: <span class="ident">GuildId</span>,
     <span class="doccomment">/// The date that the current user joined the guild.</span>
     <span class="kw">pub</span> <span class="ident">joined_at</span>: <span class="ident">Timestamp</span>,
