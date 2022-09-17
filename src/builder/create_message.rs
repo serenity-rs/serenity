@@ -110,6 +110,7 @@ impl<'a> CreateMessage<'a> {
             }
         }
 
+        #[cfg_attr(not(feature = "cache"), allow(unused_mut))]
         let mut message = self._execute(cache_http.http(), channel_id).await?;
 
         // HTTP sent Messages don't have guild_id set, so we fill it in ourselves by best effort
