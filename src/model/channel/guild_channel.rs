@@ -60,8 +60,6 @@ fn message_count_patch<'de, D: serde::Deserializer<'de>>(
 #[non_exhaustive]
 pub struct GuildChannel {
     /// The unique Id of the channel.
-    ///
-    /// The default channel Id shares the Id of the guild and the default role.
     pub id: ChannelId,
     /// The bitrate of the channel.
     ///

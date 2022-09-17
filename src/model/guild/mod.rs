@@ -160,8 +160,7 @@ pub struct Guild {
     pub icon: Option<String>,
     /// The unique Id identifying the guild.
     ///
-    /// This is equivalent to the Id of the default role (`@everyone`) and also
-    /// that of the default channel (typically `#general`).
+    /// This is equivalent to the Id of the default role (`@everyone`).
     pub id: GuildId,
     /// The date that the current user joined the guild.
     pub joined_at: Timestamp,

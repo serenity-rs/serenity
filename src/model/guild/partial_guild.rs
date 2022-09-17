@@ -51,8 +51,7 @@ pub struct PartialGuild {
     pub application_id: Option<ApplicationId>,
     /// The unique Id identifying the guild.
     ///
-    /// This is equivalent to the Id of the default role (`@everyone`) and also
-    /// that of the default channel (typically `#general`).
+    /// This is equivalent to the Id of the default role (`@everyone`).
     pub id: GuildId,
     /// Id of a voice channel that's considered the AFK channel.
     pub afk_channel_id: Option<ChannelId>,
