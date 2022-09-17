@@ -1931,7 +1931,7 @@ impl Http {
         &self,
         guild_id: u64,
         role_id: u64,
-        position: u64,
+        position: u32,
         audit_log_reason: Option<&str>,
     ) -> Result<Vec<Role>> {
         let map = json!([{
