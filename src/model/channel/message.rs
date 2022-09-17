@@ -428,12 +428,16 @@ impl Message {
         cache.guild(self.guild_id?)
     }
 
-    /// If true, the message was sent in a guild. If false, the message was sent either in guild or
-    /// in DMs
+    /// True if message was sent using direct messages.
+    ///
+    /// **Only use this for messages from the
+    /// gateway (event handler)!** Not for returned Message objects from HTTP requests, like
+    /// [`ChannelId::send_message`], because [`Self::guild_id`] is never set for those, which this
+    /// method relies on.
     #[inline]
     #[must_use]
-    pub fn is_definitely_in_guild(&self) -> bool {
-        self.guild_id.is_some()
+    pub fn is_private(&self) -> bool {
+        self.guild_id.is_none()
     }
 
     /// Retrieves a clone of the author's Member instance, if this message was
