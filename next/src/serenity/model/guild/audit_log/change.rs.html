@@ -1106,8 +1106,8 @@
     },
     <span class="doccomment">/// Voice channel bitrate was changed.</span>
     <span class="ident">Bitrate</span> {
-        <span class="ident">old</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span>,
-        <span class="ident">new</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span>,
+        <span class="ident">old</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
+        <span class="ident">new</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
     },
     <span class="doccomment">/// Channel for invite code or guild scheduled event was changed.</span>
     <span class="ident">ChannelId</span> {
@@ -1307,8 +1307,8 @@
     },
     <span class="doccomment">/// Channel or role position was changed.</span>
     <span class="ident">Position</span> {
-        <span class="ident">old</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span>,
-        <span class="ident">new</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span>,
+        <span class="ident">old</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
+        <span class="ident">new</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
     },
     <span class="doccomment">/// Preferred locale of a guild was changed.</span>
     <span class="ident">PreferredLocale</span> {
@@ -1733,7 +1733,7 @@
             <span class="ident">Available</span>: <span class="ident">bool</span>,
             <span class="ident">AvatarHash</span>: <span class="ident">String</span>,
             <span class="ident">BannerHash</span>: <span class="ident">String</span>,
-            <span class="ident">Bitrate</span>: <span class="ident">u64</span>,
+            <span class="ident">Bitrate</span>: <span class="ident">u32</span>,
             <span class="ident">ChannelId</span>: <span class="ident">ChannelId</span>,
             <span class="ident">Code</span>: <span class="ident">String</span>,
             <span class="ident">Colour</span>: <span class="ident">u64</span>,
@@ -1774,7 +1774,7 @@
             <span class="ident">OwnerId</span>: <span class="ident">UserId</span>,
             <span class="ident">PermissionOverwrites</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">PermissionOverwrite</span><span class="op">&gt;</span>,
             <span class="ident">Permissions</span>: <span class="ident">Permissions</span>,
-            <span class="ident">Position</span>: <span class="ident">u64</span>,
+            <span class="ident">Position</span>: <span class="ident">u32</span>,
             <span class="ident">PreferredLocale</span>: <span class="ident">String</span>,
             <span class="ident">PrivacyLevel</span>: <span class="ident">u64</span>,
             <span class="ident">PruneDeleteDays</span>: <span class="ident">u64</span>,

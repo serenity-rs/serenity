@@ -1213,7 +1213,6 @@
 <span id="1207">1207</span>
 <span id="1208">1208</span>
 <span id="1209">1209</span>
-<span id="1210">1210</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::fmt</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
 <span class="kw">use</span> <span class="ident">std::sync::Arc</span>;
@@ -1263,7 +1262,7 @@
     <span class="doccomment">/// The bitrate of the channel.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// **Note**: This is only available for voice and stage channels.</span>
-    <span class="kw">pub</span> <span class="ident">bitrate</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">bitrate</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
     <span class="doccomment">/// The Id of the parent category for a channel, or of the parent text channel for a thread.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// **Note**: This is only available for channels in a category and thread channels.</span>
@@ -1293,10 +1292,9 @@
     <span class="kw">pub</span> <span class="ident">permission_overwrites</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">PermissionOverwrite</span><span class="op">&gt;</span>,
     <span class="doccomment">/// The position of the channel.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// The default text channel will _almost always_ have a position of `-1` or</span>
-    <span class="doccomment">/// `0`.</span>
+    <span class="doccomment">/// The default text channel will _almost always_ have a position of `0`.</span>
     <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">default</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">position</span>: <span class="ident">i64</span>,
+    <span class="kw">pub</span> <span class="ident">position</span>: <span class="ident">u32</span>,
     <span class="doccomment">/// The topic of the channel.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// **Note**: This is only available for text and stage channels.</span>
@@ -1304,7 +1302,7 @@
     <span class="doccomment">/// The maximum number of members allowed in the channel.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// **Note**: This is only available for voice channels.</span>
-    <span class="kw">pub</span> <span class="ident">user_limit</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">user_limit</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
     <span class="doccomment">/// Used to tell if the channel is not safe for work.</span>
     <span class="doccomment">/// Note however, it&#39;s recommended to use [`Self::is_nsfw`] as it&#39;s gonna be more accurate.</span>
     <span class="comment">// This field can or can not be present sometimes, but if it isn&#39;t</span>

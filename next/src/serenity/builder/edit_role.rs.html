@@ -274,7 +274,7 @@
     <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;Option::is_none&quot;</span>)]</span>
     <span class="ident">permissions</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span>,
     <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;Option::is_none&quot;</span>)]</span>
-    <span class="ident">position</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">i64</span><span class="op">&gt;</span>,
+    <span class="ident">position</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
     <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;Option::is_none&quot;</span>)]</span>
     <span class="ident">unicode_emoji</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
     <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;Option::is_none&quot;</span>)]</span>
@@ -345,7 +345,7 @@
         };
 
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">position</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">position</span> {
-            <span class="ident">guild_id</span>.<span class="ident">edit_role_position</span>(<span class="ident">http</span>, <span class="ident">role</span>.<span class="ident">id</span>, <span class="ident">position</span> <span class="kw">as</span> <span class="ident">u64</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+            <span class="ident">guild_id</span>.<span class="ident">edit_role_position</span>(<span class="ident">http</span>, <span class="ident">role</span>.<span class="ident">id</span>, <span class="ident">position</span>).<span class="kw">await</span><span class="question-mark">?</span>;
         }
         <span class="prelude-val">Ok</span>(<span class="ident">role</span>)
     }
@@ -383,7 +383,7 @@
 
     <span class="doccomment">/// Set the role&#39;s position in the role list. This correlates to the role&#39;s position in the</span>
     <span class="doccomment">/// user list.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">position</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">position</span>: <span class="ident">i64</span>) -&gt; <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">position</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">position</span>: <span class="ident">u32</span>) -&gt; <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">position</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">position</span>);
         <span class="self">self</span>
     }

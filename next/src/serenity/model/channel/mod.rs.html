@@ -719,7 +719,7 @@
     <span class="doccomment">/// In DMs (private channel) it will return None.</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="attribute">#[<span class="ident">must_use</span>]</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">position</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">i64</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">position</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="self">self</span> {
             <span class="ident"><span class="self">Self</span>::Guild</span>(<span class="ident">channel</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">channel</span>.<span class="ident">position</span>),
             <span class="ident"><span class="self">Self</span>::Private</span>(<span class="kw">_</span>) =&gt; <span class="prelude-val">None</span>,

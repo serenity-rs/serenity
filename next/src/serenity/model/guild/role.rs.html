@@ -454,7 +454,7 @@
     <span class="doccomment">/// hierarchy if their position is higher.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// The `@everyone` role is usually either `-1` or `0`.</span>
-    <span class="kw">pub</span> <span class="ident">position</span>: <span class="ident">i64</span>,
+    <span class="kw">pub</span> <span class="ident">position</span>: <span class="ident">u32</span>,
     <span class="doccomment">/// The tags this role has. It can be used to determine if this role is a special role in this guild</span>
     <span class="doccomment">/// such as guild subscriber role, or if the role is linked to an [`Integration`] or a bot.</span>
     <span class="doccomment">///</span>
@@ -486,7 +486,7 @@
     <span class="kw">pub</span> <span class="ident">mentionable</span>: <span class="ident">bool</span>,
     <span class="kw">pub</span> <span class="ident">name</span>: <span class="ident">String</span>,
     <span class="kw">pub</span> <span class="ident">permissions</span>: <span class="ident">Permissions</span>,
-    <span class="kw">pub</span> <span class="ident">position</span>: <span class="ident">i64</span>,
+    <span class="kw">pub</span> <span class="ident">position</span>: <span class="ident">u32</span>,
     <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">default</span>)]</span>
     <span class="kw">pub</span> <span class="ident">tags</span>: <span class="ident">RoleTags</span>,
 }
