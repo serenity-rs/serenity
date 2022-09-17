@@ -110,7 +110,16 @@ impl<'a> CreateMessage<'a> {
             }
         }
 
-        self._execute(cache_http.http(), channel_id).await
+        let message = self._execute(cache_http.http(), channel_id).await?;
+
+        // HTTP sent Messages don't have guild_id set, so we fill it in ourselves by best effort
+        #[cfg(feature = "cache")]
+        if message.guild_id.is_none() {
+            message.guild_id = guild_id
+                .or_else(|| cache_http.cache()?.guild_channel(message.channel_id)?.guild_id);
+        }
+
+        Ok(message)
     }
 
     #[cfg(feature = "http")]
