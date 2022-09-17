@@ -45,7 +45,7 @@ pub struct GuildChannel {
     /// The bitrate of the channel.
     ///
     /// **Note**: This is only available for voice and stage channels.
-    pub bitrate: Option<u64>,
+    pub bitrate: Option<u32>,
     /// The Id of the parent category for a channel, or of the parent text channel for a thread.
     ///
     /// **Note**: This is only available for channels in a category and thread channels.
@@ -79,10 +79,9 @@ pub struct GuildChannel {
     pub permission_overwrites: Vec<PermissionOverwrite>,
     /// The position of the channel.
     ///
-    /// The default text channel will _almost always_ have a position of `-1` or
-    /// `0`.
+    /// The default text channel will _almost always_ have a position of `0`.
     #[serde(default)]
-    pub position: i64,
+    pub position: u32,
     /// The topic of the channel.
     ///
     /// **Note**: This is only available for text, forum and stage channels.
@@ -90,7 +89,7 @@ pub struct GuildChannel {
     /// The maximum number of members allowed in the channel.
     ///
     /// **Note**: This is only available for voice channels.
-    pub user_limit: Option<u64>,
+    pub user_limit: Option<u32>,
     /// Used to tell if the channel is not safe for work.
     /// Note however, it's recommended to use [`Self::is_nsfw`] as it's gonna be more accurate.
     // This field can or can not be present sometimes, but if it isn't
