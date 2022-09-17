@@ -1347,6 +1347,10 @@
 <span id="1341">1341</span>
 <span id="1342">1342</span>
 <span id="1343">1343</span>
+<span id="1344">1344</span>
+<span id="1345">1345</span>
+<span id="1346">1346</span>
+<span id="1347">1347</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::convert::TryFrom</span>;
 <span class="kw">use</span> <span class="ident">std::fmt</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
@@ -2246,6 +2250,10 @@
     <span class="doccomment">/// user. This is useful for pagination.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// **Note**: Requires the [Read Message History] permission.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// **Note**: If the passed reaction_type is a custom guild emoji, it must contain the name. So,</span>
+    <span class="doccomment">/// [`Emoji`] or [`EmojiIdentifier`] will always work, [`ReactionType`] only if</span>
+    <span class="doccomment">/// [`ReactionType::Custom::name`] is Some, and **[`EmojiId`] will never work**.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// # Errors</span>
     <span class="doccomment">///</span>

@@ -1313,6 +1313,10 @@
 <span id="1307">1307</span>
 <span id="1308">1308</span>
 <span id="1309">1309</span>
+<span id="1310">1310</span>
+<span id="1311">1311</span>
+<span id="1312">1312</span>
+<span id="1313">1313</span>
 </pre><pre class="rust"><code><span class="doccomment">//! Models relating to Discord channels.</span>
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
@@ -1756,6 +1760,10 @@
     <span class="doccomment">/// user. This is useful for pagination.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// **Note**: Requires the [Read Message History] permission.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// **Note**: If the passed reaction_type is a custom guild emoji, it must contain the name. So,</span>
+    <span class="doccomment">/// [`Emoji`] or [`EmojiIdentifier`] will always work, [`ReactionType`] only if</span>
+    <span class="doccomment">/// [`ReactionType::Custom::name`] is Some, and **[`EmojiId`] will never work**.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// # Errors</span>
     <span class="doccomment">///</span>
