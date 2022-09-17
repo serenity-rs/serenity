@@ -62,7 +62,7 @@ pub struct Role {
     /// hierarchy if their position is higher.
     ///
     /// The `@everyone` role is usually either `-1` or `0`.
-    pub position: i64,
+    pub position: u32,
     /// The tags this role has. It can be used to determine if this role is a special role in this guild
     /// such as guild subscriber role, or if the role is linked to an [`Integration`] or a bot.
     ///
@@ -94,7 +94,7 @@ pub(crate) struct InterimRole {
     pub mentionable: bool,
     pub name: String,
     pub permissions: Permissions,
-    pub position: i64,
+    pub position: u32,
     #[serde(default)]
     pub tags: RoleTags,
 }

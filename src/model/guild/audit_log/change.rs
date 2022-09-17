@@ -91,8 +91,8 @@ pub enum Change {
     },
     /// Voice channel bitrate was changed.
     Bitrate {
-        old: Option<u64>,
-        new: Option<u64>,
+        old: Option<u32>,
+        new: Option<u32>,
     },
     /// Channel for invite code or guild scheduled event was changed.
     ChannelId {
@@ -292,8 +292,8 @@ pub enum Change {
     },
     /// Channel or role position was changed.
     Position {
-        old: Option<u64>,
-        new: Option<u64>,
+        old: Option<u32>,
+        new: Option<u32>,
     },
     /// Preferred locale of a guild was changed.
     PreferredLocale {
@@ -718,7 +718,7 @@ impl<'de> Visitor<'de> for ChangeVisitor {
             Available: bool,
             AvatarHash: String,
             BannerHash: String,
-            Bitrate: u64,
+            Bitrate: u32,
             ChannelId: ChannelId,
             Code: String,
             Colour: u64,
@@ -759,7 +759,7 @@ impl<'de> Visitor<'de> for ChangeVisitor {
             OwnerId: UserId,
             PermissionOverwrites: Vec<PermissionOverwrite>,
             Permissions: Permissions,
-            Position: u64,
+            Position: u32,
             PreferredLocale: String,
             PrivacyLevel: u64,
             PruneDeleteDays: u64,
