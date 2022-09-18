@@ -54,6 +54,7 @@ where
     map.into_iter().map(|(k, v)| (k.to_string(), v)).collect()
 }
 
+#[allow(clippy::missing_errors_doc)] // It's obvious
 pub fn to_string<T>(v: &T) -> Result<String>
 where
     T: Serialize,
@@ -65,6 +66,7 @@ where
     Ok(result)
 }
 
+#[allow(clippy::missing_errors_doc)] // It's obvious
 pub fn from_str<'a, T>(s: &'a mut str) -> Result<T>
 where
     T: Deserialize<'a>,
