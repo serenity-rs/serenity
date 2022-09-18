@@ -79,14 +79,6 @@ impl<'a> EditWebhook<'a> {
         Ok(self)
     }
 
-    #[cfg(not(feature = "http"))]
-    /// Set the webhook's default avatar. Requires the input be a base64-encoded image that is in
-    /// either JPG, GIF, or PNG format.
-    pub fn avatar(mut self, avatar: String) -> Self {
-        self.avatar = Some(Some(avatar));
-        self
-    }
-
     /// Delete the webhook's avatar, resetting it to the default logo.
     pub fn delete_avatar(mut self) -> Self {
         self.avatar = Some(None);
