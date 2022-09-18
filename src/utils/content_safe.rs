@@ -263,7 +263,6 @@ fn clean_mention(
                 .or_else(|| users.iter().find(|u| u.id == id).map(get_username))
                 .unwrap_or(Cow::Borrowed("@invalid-user"))
         },
-        Mention::Emoji(_, _) => unreachable!(),
     }
 }
 
