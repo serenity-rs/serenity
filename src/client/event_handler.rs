@@ -54,6 +54,10 @@ pub trait EventHandler: Send + Sync {
     #[cfg(feature = "cache")]
     async fn cache_ready(&self, _ctx: Context, _guilds: Vec<GuildId>) {}
 
+    /// Dispatched when every shard has received a Ready event
+    #[cfg(feature = "cache")]
+    async fn shards_ready(&self, _ctx: Context, _total_shards: u32) {}
+
     /// Dispatched when a channel is created.
     ///
     /// Provides said channel's data.
