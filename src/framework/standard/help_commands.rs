@@ -1059,7 +1059,7 @@ async fn send_single_command_embed(
                 }
 
                 if let Some(usage) = command.usage {
-                    let full_usage_text = if let Some(first_prefix) = command.group_prefixes.get(0)
+                    let full_usage_text = if let Some(first_prefix) = command.group_prefixes.first()
                     {
                         format!("`{} {} {}`", first_prefix, command.name, usage)
                     } else {
@@ -1071,7 +1071,7 @@ async fn send_single_command_embed(
 
                 if !command.usage_sample.is_empty() {
                     let full_example_text = if let Some(first_prefix) =
-                        command.group_prefixes.get(0)
+                        command.group_prefixes.first()
                     {
                         let format_example =
                             |example| format!("`{} {} {}`\n", first_prefix, command.name, example);
@@ -1200,7 +1200,7 @@ pub async fn with_embeds(
     let formatted_help =
         create_customised_help_data(ctx, msg, &args, groups, &owners, help_options).await;
 
-    let response_result = match formatted_help {
+    match formatted_help {
         CustomisedHelpData::SuggestedCommands {
             ref help_description,
             ref suggestions,
@@ -1251,9 +1251,7 @@ pub async fn with_embeds(
             )
             .await
         },
-    };
-
-    response_result
+    }
 }
 
 /// Turns grouped commands into a [`String`] taking plain help format into account.
@@ -1294,7 +1292,7 @@ fn single_command_to_plain_string(help_options: &HelpOptions, command: &Command<
     };
 
     if let Some(usage) = command.usage {
-        if let Some(first_prefix) = command.group_prefixes.get(0) {
+        if let Some(first_prefix) = command.group_prefixes.first() {
             writeln!(
                 result,
                 "**{}**: `{} {} {}`",
@@ -1308,7 +1306,7 @@ fn single_command_to_plain_string(help_options: &HelpOptions, command: &Command<
     }
 
     if !command.usage_sample.is_empty() {
-        if let Some(first_prefix) = command.group_prefixes.get(0) {
+        if let Some(first_prefix) = command.group_prefixes.first() {
             let format_example = |example| {
                 writeln!(
                     result,

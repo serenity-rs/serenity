@@ -43,7 +43,6 @@ use crate::builder::{
     CreateApplicationCommand,
     CreateApplicationCommandPermissionsData,
     CreateApplicationCommands,
-    CreateApplicationCommandsPermissions,
     CreateChannel,
     CreateScheduledEvent,
     CreateSticker,
@@ -826,6 +825,7 @@ impl Guild {
     ///
     /// If there is an error, it will be either [`Error::Http`] or [`Error::Json`].
     #[deprecated(note = "use `create_appliction_command_permission`.")]
+    #[allow(deprecated)]
     pub async fn set_application_commands_permissions<F>(
         &self,
         http: impl AsRef<Http>,
@@ -833,8 +833,8 @@ impl Guild {
     ) -> Result<Vec<CommandPermission>>
     where
         F: FnOnce(
-            &mut CreateApplicationCommandsPermissions,
-        ) -> &mut CreateApplicationCommandsPermissions,
+            &mut crate::builder::CreateApplicationCommandsPermissions,
+        ) -> &mut crate::builder::CreateApplicationCommandsPermissions,
     {
         self.id.set_application_commands_permissions(http, f).await
     }

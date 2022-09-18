@@ -353,7 +353,7 @@ pub fn help(attr: TokenStream, input: TokenStream) -> TokenStream {
             String::from("~~`Strikethrough commands`~~ are unavailable because they");
         let mut is_any_option_strike = false;
 
-        let mut concat_with_comma = if options.lacking_permissions == HelpBehaviour::Strike {
+        let mut concat_with_comma = if let HelpBehaviour::Strike = options.lacking_permissions {
             is_any_option_strike = true;
             strike_text.push_str(" require permissions");
 
@@ -362,7 +362,7 @@ pub fn help(attr: TokenStream, input: TokenStream) -> TokenStream {
             false
         };
 
-        if options.lacking_role == HelpBehaviour::Strike {
+        if let HelpBehaviour::Strike = options.lacking_role {
             is_any_option_strike = true;
 
             if concat_with_comma {
@@ -373,7 +373,7 @@ pub fn help(attr: TokenStream, input: TokenStream) -> TokenStream {
             }
         }
 
-        if options.lacking_conditions == HelpBehaviour::Strike {
+        if let HelpBehaviour::Strike = options.lacking_conditions {
             is_any_option_strike = true;
 
             if concat_with_comma {
@@ -384,7 +384,7 @@ pub fn help(attr: TokenStream, input: TokenStream) -> TokenStream {
             }
         }
 
-        if options.wrong_channel == HelpBehaviour::Strike {
+        if let HelpBehaviour::Strike = options.wrong_channel {
             is_any_option_strike = true;
 
             if concat_with_comma {

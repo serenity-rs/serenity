@@ -372,7 +372,7 @@ struct PermissionOverwriteData {
 /// A channel-specific permission overwrite for a member or role.
 ///
 /// [Discord docs](https://discord.com/developers/docs/resources/channel#overwrite-object).
-#[derive(Clone, Debug, PartialEq)]
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub struct PermissionOverwrite {
     pub allow: Permissions,
     pub deny: Permissions,

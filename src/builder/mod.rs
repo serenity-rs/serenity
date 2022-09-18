@@ -50,6 +50,8 @@ pub use self::create_application_command::{
     CreateApplicationCommandOption,
     CreateApplicationCommands,
 };
+// Remove deprecated types and this allow() attribute in next breaking release
+#[allow(deprecated)]
 pub use self::create_application_command_permission::{
     CreateApplicationCommandPermissionData,
     CreateApplicationCommandPermissions,
