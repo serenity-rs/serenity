@@ -77,7 +77,7 @@ where
     Ok(simd_json::to_string(v)?)
 }
 
-#[cfg(all(feature = "gateway", not(feature = "simd-json")))]
+#[cfg(not(feature = "simd-json"))]
 pub(crate) fn from_str<'a, T>(s: &'a mut str) -> Result<T>
 where
     T: Deserialize<'a>,
@@ -85,7 +85,7 @@ where
     Ok(serde_json::from_str(s)?)
 }
 
-#[cfg(all(feature = "gateway", feature = "simd-json"))]
+#[cfg(feature = "simd-json")]
 pub(crate) fn from_str<'a, T>(s: &'a mut str) -> Result<T>
 where
     T: Deserialize<'a>,
