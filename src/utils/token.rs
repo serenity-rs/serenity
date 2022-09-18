@@ -38,9 +38,10 @@ pub fn validate(token: impl AsRef<str>) -> Result<(), InvalidToken> {
         && parts.next().map_or(false, |p| !p.is_empty())
         && parts.next().is_none();
 
-    match is_valid {
-        true => Ok(()),
-        false => Err(InvalidToken),
+    if is_valid {
+        Ok(())
+    } else {
+        Err(InvalidToken)
     }
 }
 
