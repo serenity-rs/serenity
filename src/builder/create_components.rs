@@ -1,5 +1,6 @@
 use crate::model::application::component::{ButtonStyle, InputTextStyle};
 use crate::model::channel::ReactionType;
+use crate::model::prelude::component::{Button, ButtonKind, ComponentType};
 
 /// A builder for creating several [`ActionRow`]s.
 ///
@@ -96,77 +97,51 @@ impl CreateActionRow {
 /// [`Button`]: crate::model::application::component::Button
 #[derive(Clone, Debug, Serialize)]
 #[must_use]
-pub struct CreateButton {
-    style: ButtonStyle,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    label: Option<String>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    custom_id: Option<String>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    url: Option<String>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    emoji: Option<ReactionType>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    disabled: Option<bool>,
-
-    #[serde(rename = "type")]
-    kind: u8,
-}
-
-impl Default for CreateButton {
-    /// Creates a primary button.
-    fn default() -> Self {
-        Self {
-            style: ButtonStyle::Primary,
-            label: None,
-            custom_id: None,
-            url: None,
-            emoji: None,
-            disabled: None,
-            kind: 2,
-        }
-    }
-}
+pub struct CreateButton(Button);
 
 impl CreateButton {
-    /// Creates a primary button. Equivalent to [`Self::default`].
-    pub fn new() -> Self {
-        Self::default()
+    /// Creates a link button to the given URL.
+    pub fn new_link(url: impl Into<String>) -> Self {
+        Self(Button {
+            kind: ComponentType::Button,
+            data: ButtonKind::Link {
+                url: url.into(),
+            },
+            label: None,
+            emoji: None,
+            disabled: false,
+        })
     }
 
-    /// Sets the style of the button.
-    pub fn style(mut self, kind: ButtonStyle) -> Self {
-        self.style = kind;
-        self
+    /// Creates a normal button with the given custom ID
+    pub fn new(style: ButtonStyle, custom_id: impl Into<String>) -> Self {
+        Self(Button {
+            kind: ComponentType::Button,
+            data: ButtonKind::NonLink {
+                style,
+                custom_id: custom_id.into(),
+            },
+            label: None,
+            emoji: None,
+            disabled: false,
+        })
     }
 
     /// The label of the button.
     pub fn label(mut self, label: impl Into<String>) -> Self {
-        self.label = Some(label.into());
-        self
-    }
-
-    /// Sets the custom id of the button, a developer-defined identifier.
-    pub fn custom_id(mut self, id: impl Into<String>) -> Self {
-        self.custom_id = Some(id.into());
-        self
-    }
-
-    /// The url for url style button.
-    pub fn url(mut self, url: impl Into<String>) -> Self {
-        self.url = Some(url.into());
+        self.0.label = Some(label.into());
         self
     }
 
     /// Sets emoji of the button.
     pub fn emoji(mut self, emoji: impl Into<ReactionType>) -> Self {
-        self.emoji = Some(emoji.into());
+        self.0.emoji = Some(emoji.into());
         self
     }
 
     /// Sets the disabled state for the button.
     pub fn disabled(mut self, disabled: bool) -> Self {
-        self.disabled = Some(disabled);
+        self.0.disabled = disabled;
         self
     }
 }
