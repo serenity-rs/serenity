@@ -583,7 +583,11 @@ impl CacheUpdate for ReadyEvent {
             cache.presences.insert(*user_id, presence.clone());
         }
 
-        *cache.shard_count.write() = ready.shard.map_or(1, |s| s.total);
+        {
+            let mut cached_shard_data = cache.shard_data.write();
+            cached_shard_data.total = shard_data.total;
+            cached_shard_data.connected.insert(shard_data.id);
+        }
         *cache.user.write() = ready.user;
 
         None
