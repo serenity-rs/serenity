@@ -592,7 +592,6 @@
 <span id="586">586</span>
 <span id="587">587</span>
 <span id="588">588</span>
-<span id="589">589</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::collections::HashMap</span>;
 
 <span class="kw">use</span> <span class="ident">async_trait::async_trait</span>;
@@ -1031,15 +1030,14 @@
 
     <span class="doccomment">/// Dispatched when a user joins, leaves or moves to a voice channel.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// Provides the guild&#39;s id (if available) and</span>
-    <span class="doccomment">/// the old and the new state of the guild&#39;s voice channels.</span>
+    <span class="doccomment">/// Provides the old state (if [`GatewayIntents::GUILDS`] is enabled) and the new state of the</span>
+    <span class="doccomment">/// guild&#39;s voice channels.</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">voice_state_update</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_ctx</span>: <span class="ident">Context</span>, <span class="ident">_old</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">VoiceState</span><span class="op">&gt;</span>, <span class="ident">_new</span>: <span class="ident">VoiceState</span>) {}
 
     <span class="doccomment">/// Dispatched when a user joins, leaves or moves to a voice channel.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// Provides the guild&#39;s id (if available) and</span>
-    <span class="doccomment">/// the new state of the guild&#39;s voice channels.</span>
+    <span class="doccomment">/// Provides the the new state of the guild&#39;s voice channels.</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>))]</span>
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">voice_state_update</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_ctx</span>: <span class="ident">Context</span>, <span class="kw">_</span>: <span class="ident">VoiceState</span>) {}
 
