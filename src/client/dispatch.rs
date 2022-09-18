@@ -603,6 +603,23 @@ async fn handle_event(
         },
         Event::Ready(mut event) => {
             update(&cache_and_http, &mut event);
+
+            #[cfg(feature = "cache")]
+            {
+                let mut shards = cache_and_http.cache.shard_data.write();
+                if shards.connected.len() as u32 == shards.total && !shards.has_sent_shards_ready {
+                    shards.has_sent_shards_ready = true;
+                    let total = shards.total;
+                    drop(shards);
+
+                    let context = context.clone();
+                    let event_handler = event_handler.clone();
+                    spawn_named("dispatch::event_handler::shards_ready", async move {
+                        event_handler.shards_ready(context, total).await;
+                    });
+                }
+            }
+
             spawn_named("dispatch::event_handler::ready", async move {
                 event_handler.ready(context, event.ready).await;
             });
