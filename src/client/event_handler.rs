@@ -436,15 +436,14 @@ pub trait EventHandler: Send + Sync {
 
     /// Dispatched when a user joins, leaves or moves to a voice channel.
     ///
-    /// Provides the guild's id (if available) and
-    /// the old and the new state of the guild's voice channels.
+    /// Provides the old state (if [`GatewayIntents::GUILDS`] is enabled) and the new state of the
+    /// guild's voice channels.
     #[cfg(feature = "cache")]
     async fn voice_state_update(&self, _ctx: Context, _old: Option<VoiceState>, _new: VoiceState) {}
 
     /// Dispatched when a user joins, leaves or moves to a voice channel.
     ///
-    /// Provides the guild's id (if available) and
-    /// the new state of the guild's voice channels.
+    /// Provides the the new state of the guild's voice channels.
     #[cfg(not(feature = "cache"))]
     async fn voice_state_update(&self, _ctx: Context, _: VoiceState) {}
 
