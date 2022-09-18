@@ -172,7 +172,7 @@ where
 }
 
 macro_rules! mentionable {
-    ($i:ident: $($t:ty, $e:expr;)*) => {$(
+    ($i:ident: $t:ty, $e:expr) => {
         impl Mentionable for $t {
             #[inline(always)]
             fn mention(&self) -> Mention {
@@ -180,22 +180,20 @@ macro_rules! mentionable {
                 $e.into()
             }
         }
-    )*};
+    };
 }
 
 #[cfg(feature = "model")]
-mentionable!(value: Channel, value.id(););
+mentionable!(value: Channel, value.id());
 
-mentionable!(value:
-    GuildChannel, value.id;
-    PrivateChannel, value.id;
-    CurrentUser, value.id;
-    Member, value.user.id;
-    User, value.id;
-    Role, value.id;
-    Emoji, (value.id, value.animated);
-    EmojiIdentifier, (value.id, value.animated);
-);
+mentionable!(value: GuildChannel, value.id);
+mentionable!(value: PrivateChannel, value.id);
+mentionable!(value: CurrentUser, value.id);
+mentionable!(value: Member, value.user.id);
+mentionable!(value: User, value.id);
+mentionable!(value: Role, value.id);
+mentionable!(value: Emoji, (value.id, value.animated));
+mentionable!(value: EmojiIdentifier, (value.id, value.animated));
 
 #[cfg(feature = "utils")]
 #[cfg(test)]
