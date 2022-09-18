@@ -5,9 +5,7 @@
 use std::collections::HashMap;
 use std::hash::{BuildHasher, Hash};
 
-#[cfg(feature = "gateway")]
-use serde::de::Deserialize;
-use serde::de::DeserializeOwned;
+use serde::de::{Deserialize, DeserializeOwned};
 use serde::ser::Serialize;
 
 use crate::Result;
@@ -62,7 +60,7 @@ where
 }
 
 #[cfg(not(feature = "simd-json"))]
-pub(crate) fn to_string<T>(v: &T) -> Result<String>
+pub fn to_string<T>(v: &T) -> Result<String>
 where
     T: Serialize,
 {
@@ -70,7 +68,7 @@ where
 }
 
 #[cfg(feature = "simd-json")]
-pub(crate) fn to_string<T>(v: &T) -> Result<String>
+pub fn to_string<T>(v: &T) -> Result<String>
 where
     T: Serialize,
 {
@@ -78,7 +76,7 @@ where
 }
 
 #[cfg(not(feature = "simd-json"))]
-pub(crate) fn from_str<'a, T>(s: &'a mut str) -> Result<T>
+pub fn from_str<'a, T>(s: &'a mut str) -> Result<T>
 where
     T: Deserialize<'a>,
 {
@@ -86,7 +84,7 @@ where
 }
 
 #[cfg(feature = "simd-json")]
-pub(crate) fn from_str<'a, T>(s: &'a mut str) -> Result<T>
+pub fn from_str<'a, T>(s: &'a mut str) -> Result<T>
 where
     T: Deserialize<'a>,
 {
