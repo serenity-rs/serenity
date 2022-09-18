@@ -1302,7 +1302,7 @@
             <span class="ident">String::from</span>(<span class="string">&quot;~~`Strikethrough commands`~~ are unavailable because they&quot;</span>);
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">is_any_option_strike</span> <span class="op">=</span> <span class="bool-val">false</span>;
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">concat_with_comma</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">options</span>.<span class="ident">lacking_permissions</span> <span class="op">==</span> <span class="ident">HelpBehaviour::Strike</span> {
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">concat_with_comma</span> <span class="op">=</span> <span class="kw">if</span> <span class="kw">let</span> <span class="ident">HelpBehaviour::Strike</span> <span class="op">=</span> <span class="ident">options</span>.<span class="ident">lacking_permissions</span> {
             <span class="ident">is_any_option_strike</span> <span class="op">=</span> <span class="bool-val">true</span>;
             <span class="ident">strike_text</span>.<span class="ident">push_str</span>(<span class="string">&quot; require permissions&quot;</span>);
 
@@ -1311,7 +1311,7 @@
             <span class="bool-val">false</span>
         };
 
-        <span class="kw">if</span> <span class="ident">options</span>.<span class="ident">lacking_role</span> <span class="op">==</span> <span class="ident">HelpBehaviour::Strike</span> {
+        <span class="kw">if</span> <span class="kw">let</span> <span class="ident">HelpBehaviour::Strike</span> <span class="op">=</span> <span class="ident">options</span>.<span class="ident">lacking_role</span> {
             <span class="ident">is_any_option_strike</span> <span class="op">=</span> <span class="bool-val">true</span>;
 
             <span class="kw">if</span> <span class="ident">concat_with_comma</span> {
@@ -1322,7 +1322,7 @@
             }
         }
 
-        <span class="kw">if</span> <span class="ident">options</span>.<span class="ident">lacking_conditions</span> <span class="op">==</span> <span class="ident">HelpBehaviour::Strike</span> {
+        <span class="kw">if</span> <span class="kw">let</span> <span class="ident">HelpBehaviour::Strike</span> <span class="op">=</span> <span class="ident">options</span>.<span class="ident">lacking_conditions</span> {
             <span class="ident">is_any_option_strike</span> <span class="op">=</span> <span class="bool-val">true</span>;
 
             <span class="kw">if</span> <span class="ident">concat_with_comma</span> {
@@ -1333,7 +1333,7 @@
             }
         }
 
-        <span class="kw">if</span> <span class="ident">options</span>.<span class="ident">wrong_channel</span> <span class="op">==</span> <span class="ident">HelpBehaviour::Strike</span> {
+        <span class="kw">if</span> <span class="kw">let</span> <span class="ident">HelpBehaviour::Strike</span> <span class="op">=</span> <span class="ident">options</span>.<span class="ident">wrong_channel</span> {
             <span class="ident">is_any_option_strike</span> <span class="op">=</span> <span class="bool-val">true</span>;
 
             <span class="kw">if</span> <span class="ident">concat_with_comma</span> {

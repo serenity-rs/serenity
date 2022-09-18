@@ -656,7 +656,7 @@
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::consts::CHECK</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::util</span>::{<span class="self">self</span>, <span class="ident">Argument</span>, <span class="ident">AsOption</span>, <span class="ident">IdentExt2</span>, <span class="ident">Parenthesised</span>};
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">PartialEq</span>)]</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">OnlyIn</span> {
     <span class="ident">Dm</span>,
     <span class="ident">Guild</span>,
@@ -982,7 +982,7 @@
     }
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Default</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">PartialEq</span>)]</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Default</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Colour</span>(<span class="kw">pub</span> <span class="ident">u32</span>);
 
 <span class="kw">impl</span> <span class="ident">Colour</span> {
@@ -1083,7 +1083,7 @@
     }
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">PartialEq</span>, <span class="ident">Debug</span>)]</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">HelpBehaviour</span> {
     <span class="ident">Strike</span>,
     <span class="ident">Hide</span>,
@@ -1112,7 +1112,7 @@
     }
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">PartialEq</span>)]</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">HelpOptions</span> {
     <span class="kw">pub</span> <span class="ident">suggestion_text</span>: <span class="ident">String</span>,
     <span class="kw">pub</span> <span class="ident">no_help_available_text</span>: <span class="ident">String</span>,

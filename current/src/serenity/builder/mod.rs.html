@@ -103,6 +103,8 @@
 <span id="97">97</span>
 <span id="98">98</span>
 <span id="99">99</span>
+<span id="100">100</span>
+<span id="101">101</span>
 </pre><pre class="rust"><code><span class="doccomment">//! A set of builders used to make using methods on certain structs simpler to</span>
 <span class="doccomment">//! use.</span>
 <span class="doccomment">//!</span>
@@ -155,6 +157,8 @@
     <span class="ident">CreateApplicationCommandOption</span>,
     <span class="ident">CreateApplicationCommands</span>,
 };
+<span class="comment">// Remove deprecated types and this allow() attribute in next breaking release</span>
+<span class="attribute">#[<span class="ident">allow</span>(<span class="ident">deprecated</span>)]</span>
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="self">self</span>::create_application_command_permission</span>::{
     <span class="ident">CreateApplicationCommandPermissionData</span>,
     <span class="ident">CreateApplicationCommandPermissions</span>,
