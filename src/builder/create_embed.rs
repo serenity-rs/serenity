@@ -195,49 +195,21 @@ impl CreateEmbed {
 
     /// Set the timestamp.
     ///
-    /// You may pass a direct string:
+    /// You can pass a [`Timestamp`] or anything that converts into it (
+    /// [`chrono::DateTime`] or [`&str`]). If giving a string, it must be in RFC 3339 format:
     ///
-    /// - `2017-01-03T23:00:00`
-    /// - `2004-06-08T16:04:23`
-    /// - `2004-06-08T16:04:23`
-    ///
-    /// This timestamp must be in ISO-8601 format. It must also be in UTC format.
-    ///
-    /// You can also pass an instance of `chrono::DateTime<Utc>`,
-    /// which will construct the timestamp string out of it.
+    /// - `2017-01-03T23:00:00Z`
+    /// - `2004-06-08T16:04:23Z`
+    /// - `2004-06-08T16:04:23Z`
     ///
     /// # Examples
     ///
     /// Passing a string timestamp:
     ///
-    /// ```rust,no_run
-    /// # #[cfg(feature = "client")]
-    /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
-    /// use serenity::model::channel::Message;
-    /// use serenity::prelude::*;
-    ///
-    /// struct Handler;
-    ///
-    /// #[serenity::async_trait]
-    /// impl EventHandler for Handler {
-    ///     async fn message(&self, context: Context, mut msg: Message) {
-    ///         if msg.content == "~embed" {
-    ///             let _ = msg
-    ///                 .channel_id
-    ///                 .send_message(&context.http, |m| {
-    ///                     m.embed(|e| e.title("hello").timestamp("2004-06-08T16:04:23"))
-    ///                 })
-    ///                 .await;
-    ///         }
-    ///     }
-    /// }
-    ///
-    /// let mut client =
-    ///     Client::builder("token", GatewayIntents::default()).event_handler(Handler).await?;
-    ///
-    /// client.start().await?;
-    /// #     Ok(())
-    /// # }
+    /// ```rust
+    /// # use serenity::builder::CreateEmbed;
+    /// let mut embed = CreateEmbed::default();
+    /// embed.title("hello").timestamp("2004-06-08T16:04:23Z");
     /// ```
     ///
     /// Creating a join-log:
