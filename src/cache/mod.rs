@@ -30,7 +30,7 @@
 //! [`Shard`]: crate::gateway::Shard
 //! [`http`]: crate::http
 
-use std::collections::{HashMap, VecDeque};
+use std::collections::{HashMap, HashSet, VecDeque};
 use std::hash::{BuildHasher, Hash};
 use std::str::FromStr;
 #[cfg(feature = "temp_cache")]
@@ -151,6 +151,13 @@ impl<F: FromStr> FromStrAndCache for F {
     }
 }
 
+#[derive(Debug)]
+pub(crate) struct CachedShardData {
+    pub total: u32,
+    pub connected: HashSet<u32>,
+    pub has_sent_shards_ready: bool,
+}
+
 /// A cache containing data received from [`Shard`]s.
 ///
 /// Using the cache allows to avoid REST API requests via the [`http`] module
@@ -185,8 +192,8 @@ pub struct Cache {
     /// A map of direct message channels that the current user has open with
     /// other users.
     pub(crate) private_channels: DashMap<ChannelId, PrivateChannel, FxBuildHasher>,
-    /// The total number of shards being used by the bot.
-    pub(crate) shard_count: RwLock<u32>,
+    /// Information about running shards
+    pub(crate) shard_data: RwLock<CachedShardData>,
     /// A list of guilds which are "unavailable".
     ///
     /// Additionally, guilds are always unavailable for bot users when a Ready
@@ -669,7 +676,7 @@ impl Cache {
     /// Returns the number of shards.
     #[inline]
     pub fn shard_count(&self) -> u32 {
-        *self.shard_count.read()
+        self.shard_data.read().total
     }
 
     /// Retrieves a [`Channel`]'s message from the cache based on the channel's and
@@ -911,7 +918,11 @@ impl Default for Cache {
             presences: DashMap::default(),
             private_channels: DashMap::with_capacity_and_hasher(128, FxBuildHasher::default()),
             settings: RwLock::new(Settings::default()),
-            shard_count: RwLock::new(1),
+            shard_data: RwLock::new(CachedShardData {
+                total: 1,
+                connected: HashSet::new(),
+                has_sent_shards_ready: false,
+            }),
             unavailable_guilds: DashSet::default(),
             user: RwLock::new(CurrentUser::default()),
             users: DashMap::default(),
