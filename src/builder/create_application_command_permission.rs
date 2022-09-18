@@ -11,6 +11,7 @@ use crate::model::application::command::CommandPermissionType;
 #[deprecated(note = "use `CreateApplicationCommandPermissionsData`")]
 pub struct CreateApplicationCommandsPermissions(pub Vec<Value>);
 
+#[allow(deprecated)]
 impl CreateApplicationCommandsPermissions {
     /// Creates a new application command.
     pub fn create_application_command<F>(&mut self, f: F) -> &mut Self
@@ -61,6 +62,7 @@ impl CreateApplicationCommandsPermissions {
 #[deprecated(note = "use `CreateApplicationCommandPermissionsData`")]
 pub struct CreateApplicationCommandPermissions(pub HashMap<&'static str, Value>);
 
+#[allow(deprecated)]
 impl CreateApplicationCommandPermissions {
     /// The [`CommandId`] these permissions belong to.
     ///

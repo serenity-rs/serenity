@@ -16,7 +16,7 @@ use crate::model::id::{ChannelId, GuildId, MessageId, RoleId, RuleId, UserId};
 /// Configured auto moderation rule.
 ///
 /// [Discord docs](https://discord.com/developers/docs/resources/auto-moderation#auto-moderation-rule-object).
-#[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
+#[derive(Clone, Debug, PartialEq, Eq, Deserialize, Serialize)]
 pub struct Rule {
     /// ID of the rule.
     pub id: RuleId,
@@ -79,7 +79,7 @@ impl From<EventType> for u8 {
 /// Discord docs:
 /// [type](https://discord.com/developers/docs/resources/auto-moderation#auto-moderation-rule-object-trigger-types),
 /// [metadata](https://discord.com/developers/docs/resources/auto-moderation#auto-moderation-rule-object-trigger-metadata)
-#[derive(Clone, Debug, PartialEq)]
+#[derive(Clone, Debug, PartialEq, Eq)]
 #[non_exhaustive]
 pub enum Trigger {
     Keyword(Vec<String>),
@@ -212,7 +212,7 @@ impl From<TriggerType> for u8 {
 /// [`Change::TriggerMetadata`]: crate::model::guild::audit_log::Change::TriggerMetadata
 ///
 /// [Discord docs](https://discord.com/developers/docs/resources/auto-moderation#auto-moderation-rule-object-trigger-metadata).
-#[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
+#[derive(Clone, Debug, PartialEq, Eq, Deserialize, Serialize)]
 pub struct TriggerMetadata {
     keyword_filter: Option<Vec<String>>,
     presets: Option<Vec<KeywordPresetType>>,
@@ -256,7 +256,7 @@ impl From<KeywordPresetType> for u8 {
 /// An action which will execute whenever a rule is triggered.
 ///
 /// [Discord docs](https://discord.com/developers/docs/resources/auto-moderation#auto-moderation-action-object).
-#[derive(Clone, Debug, PartialEq)]
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub enum Action {
     /// Blocks the content of a message according to the rule.
     BlockMessage,

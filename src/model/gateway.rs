@@ -366,7 +366,7 @@ pub struct ActivityEmoji {
 }
 
 /// [Discord docs](https://discord.com/developers/docs/topics/gateway#activity-object-activity-types).
-#[derive(Clone, Copy, Debug, PartialEq)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
 #[non_exhaustive]
 pub enum ActivityType {
     /// An indicator that the user is playing a game.

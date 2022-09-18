@@ -17,14 +17,14 @@ use crate::model::id::{ApplicationId, ChannelId, GenericId, GuildId, RoleId, Use
 use crate::model::sticker::StickerFormatType;
 use crate::model::{Permissions, Timestamp};
 
-#[derive(Debug, PartialEq, Deserialize, Serialize)]
+#[derive(Debug, PartialEq, Eq, Deserialize, Serialize)]
 #[non_exhaustive]
 pub struct AffectedRole {
     pub id: RoleId,
     pub name: String,
 }
 
-#[derive(Debug, PartialEq, Deserialize, Serialize)]
+#[derive(Debug, PartialEq, Eq, Deserialize, Serialize)]
 #[serde(untagged)]
 #[non_exhaustive]
 pub enum EntityType {
@@ -33,6 +33,8 @@ pub enum EntityType {
 }
 
 #[derive(Debug, PartialEq)]
+// serde_json's Value impls Eq, simd-json's Value doesn't
+#[cfg_attr(not(feature = "simd-json"), derive(Eq))]
 #[non_exhaustive]
 pub enum Change {
     Actions {

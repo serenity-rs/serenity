@@ -98,6 +98,7 @@ impl Emoji {
     /// [Manage Emojis and Stickers]: crate::model::permissions::Permissions::MANAGE_EMOJIS_AND_STICKERS
     #[cfg(feature = "cache")]
     #[inline]
+    #[allow(clippy::trait_duplication_in_bounds)] // https://github.com/rust-lang/rust-clippy/issues/8757
     pub async fn delete<T: AsRef<Cache> + AsRef<Http>>(&self, cache_http: T) -> Result<()> {
         match self.find_guild_id(&cache_http) {
             Some(guild_id) => {
@@ -119,6 +120,7 @@ impl Emoji {
     ///
     /// [Manage Emojis and Stickers]: crate::model::permissions::Permissions::MANAGE_EMOJIS_AND_STICKERS
     #[cfg(feature = "cache")]
+    #[allow(clippy::trait_duplication_in_bounds)] // https://github.com/rust-lang/rust-clippy/issues/8757
     pub async fn edit<T: AsRef<Cache> + AsRef<Http>>(
         &mut self,
         cache_http: T,
