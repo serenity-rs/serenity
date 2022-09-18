@@ -28,7 +28,7 @@ use url::Url;
 pub use self::custom_message::CustomMessage;
 pub use self::message_builder::{Content, ContentModifier, EmbedMessageBuilding, MessageBuilder};
 #[doc(inline)]
-pub use self::token::{parse as parse_token, validate as validate_token};
+pub use self::token::validate as validate_token;
 #[cfg(all(feature = "cache", feature = "model"))]
 use crate::cache::Cache;
 #[cfg(all(feature = "cache", feature = "model"))]
