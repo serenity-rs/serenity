@@ -71,6 +71,8 @@
     clippy::cast_lossless,
     // Covered by other lints
     clippy::missing_panics_doc, // clippy::unwrap_used
+    // Callbacks with `+ 'static + Send + Sync`, trigger this pretty easily
+    clippy::type_complexity,
 )]
 #![deny(rustdoc::broken_intra_doc_links, rustdoc::private_intra_doc_links)]
 #![deny(
