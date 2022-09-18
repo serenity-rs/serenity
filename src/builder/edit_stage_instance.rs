@@ -6,6 +6,8 @@ use crate::internal::prelude::*;
 use crate::model::prelude::*;
 
 /// Edits a [`StageInstance`].
+///
+/// [Discord docs](https://discord.com/developers/docs/resources/stage-instance#modify-stage-instance-json-params).
 #[derive(Clone, Debug, Default, Serialize)]
 #[must_use]
 pub struct EditStageInstance<'a> {

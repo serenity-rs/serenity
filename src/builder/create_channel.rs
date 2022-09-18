@@ -7,6 +7,8 @@ use crate::model::prelude::*;
 /// A builder for creating a new [`GuildChannel`] in a [`Guild`].
 ///
 /// Except [`Self::name`], all fields are optional.
+///
+/// [Discord docs](https://discord.com/developers/docs/resources/guild#create-guild-channel-json-params).
 #[derive(Clone, Debug, Serialize)]
 #[must_use]
 pub struct CreateChannel<'a> {

@@ -5,6 +5,7 @@ use crate::internal::prelude::*;
 #[cfg(feature = "http")]
 use crate::model::prelude::*;
 
+/// [Discord docs](https://discord.com/developers/docs/resources/channel#modify-channel-json-params-thread).
 #[derive(Clone, Debug, Default, Serialize)]
 #[must_use]
 pub struct EditThread<'a> {

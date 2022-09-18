@@ -18,52 +18,7 @@
 use crate::internal::prelude::*;
 use crate::model::prelude::*;
 
-#[derive(Clone, Debug, Serialize)]
-struct HoldsUrl {
-    url: String,
-}
-
-impl HoldsUrl {
-    fn new(url: String) -> Self {
-        Self {
-            url,
-        }
-    }
-}
-
-/// A builder to create a fake [`Embed`] object, for use with the
-/// [`ChannelId::send_message`] and [`ExecuteWebhook::embeds`] methods.
-///
-/// [`ChannelId::send_message`]: crate::model::id::ChannelId::send_message
-/// [`Embed`]: crate::model::channel::Embed
-/// [`ExecuteWebhook::embeds`]: crate::builder::ExecuteWebhook::embeds
-#[derive(Clone, Debug, Serialize)]
-#[must_use]
-pub struct CreateEmbed {
-    fields: Vec<EmbedField>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    author: Option<CreateEmbedAuthor>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    description: Option<String>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    footer: Option<CreateEmbedFooter>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    image: Option<HoldsUrl>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    thumbnail: Option<HoldsUrl>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    timestamp: Option<Timestamp>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    title: Option<String>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    url: Option<String>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(rename = "color")]
-    colour: Option<Colour>,
-
-    #[serde(rename = "type")]
-    kind: &'static str,
-}
+pub type CreateEmbed = Embed;
 
 impl CreateEmbed {
     /// Equivalent to [`Self::default`].
@@ -145,14 +100,24 @@ impl CreateEmbed {
     /// Set the image associated with the embed. This only supports HTTP(S).
     #[inline]
     pub fn image(mut self, url: impl Into<String>) -> Self {
-        self.image = Some(HoldsUrl::new(url.into()));
+        self.image = Some(EmbedImage {
+            url: url.into(),
+            proxy_url: None,
+            height: None,
+            width: None,
+        });
         self
     }
 
     /// Set the thumbnail of the embed. This only supports HTTP(S).
     #[inline]
     pub fn thumbnail(mut self, url: impl Into<String>) -> Self {
-        self.thumbnail = Some(HoldsUrl::new(url.into()));
+        self.thumbnail = Some(EmbedThumbnail {
+            url: url.into(),
+            proxy_url: None,
+            height: None,
+            width: None,
+        });
         self
     }
 
@@ -270,7 +235,12 @@ impl CreateEmbed {
         let mut filename = filename.into();
         filename.insert_str(0, "attachment://");
 
-        self.image = Some(HoldsUrl::new(filename));
+        self.image = Some(EmbedImage {
+            url: filename,
+            proxy_url: None,
+            height: None,
+            width: None,
+        });
         self
     }
 
@@ -316,77 +286,29 @@ impl Default for CreateEmbed {
             description: None,
             thumbnail: None,
             timestamp: None,
-            kind: "rich",
+            kind: Some("rich".to_string()),
             author: None,
             colour: None,
             footer: None,
             image: None,
             title: None,
             url: None,
+            provider: None,
+            video: None,
         }
     }
 }
 
-impl From<Embed> for CreateEmbed {
-    /// Converts the fields of an embed into the values for a new embed builder.
-    ///
-    /// Some values - such as Proxy URLs - are not preserved.
-    fn from(embed: Embed) -> Self {
-        let mut b = CreateEmbed {
-            description: embed.description,
-            timestamp: embed.timestamp,
-            title: embed.title,
-            url: embed.url,
-            ..Default::default()
-        };
+pub type CreateEmbedAuthor = EmbedAuthor;
 
-        if let Some(colour) = embed.colour {
-            b = b.colour(colour);
-        }
-
-        if let Some(thumbnail) = embed.thumbnail {
-            b = b.thumbnail(thumbnail.url);
-        }
-
-        if let Some(image) = embed.image {
-            b = b.image(image.url);
-        }
-
-        if let Some(author) = embed.author {
-            b = b.author(author.into());
-        }
-
-        if let Some(footer) = embed.footer {
-            b = b.footer(footer.into());
-        }
-
-        for field in embed.fields {
-            b = b.field(field.name, field.value, field.inline);
-        }
-
-        b
-    }
-}
-
-/// A builder to create a fake [`Embed`] object's author, for use with the [`CreateEmbed::author`]
-/// method.
-#[derive(Clone, Debug, Serialize)]
-#[must_use]
-pub struct CreateEmbedAuthor {
-    name: String,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    icon_url: Option<String>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    url: Option<String>,
-}
-
-impl CreateEmbedAuthor {
+impl EmbedAuthor {
     /// Creates an author object with the given name, leaving all other fields empty.
     pub fn new(name: impl Into<String>) -> Self {
         Self {
             name: name.into(),
             icon_url: None,
             url: None,
+            proxy_icon_url: None,
         }
     }
 
@@ -409,27 +331,7 @@ impl CreateEmbedAuthor {
     }
 }
 
-impl From<EmbedAuthor> for CreateEmbedAuthor {
-    fn from(author: EmbedAuthor) -> Self {
-        Self {
-            name: author.name,
-            icon_url: author.icon_url,
-            url: author.url,
-        }
-    }
-}
-
-/// A builder to create a fake [`Embed`] object's footer, for use with the [`CreateEmbed::footer`]
-/// method.
-///
-/// This does not have any required fields.
-#[derive(Clone, Debug, Serialize)]
-#[must_use]
-pub struct CreateEmbedFooter {
-    text: String,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    icon_url: Option<String>,
-}
+pub type CreateEmbedFooter = EmbedFooter;
 
 impl CreateEmbedFooter {
     /// Creates a new footer object with the given text, leaving all other fields empty.
@@ -437,6 +339,7 @@ impl CreateEmbedFooter {
         Self {
             text: text.into(),
             icon_url: None,
+            proxy_icon_url: None,
         }
     }
 
@@ -453,18 +356,8 @@ impl CreateEmbedFooter {
     }
 }
 
-impl From<EmbedFooter> for CreateEmbedFooter {
-    fn from(footer: EmbedFooter) -> Self {
-        Self {
-            icon_url: footer.icon_url,
-            text: footer.text,
-        }
-    }
-}
-
 #[cfg(test)]
 mod test {
-    use super::CreateEmbed;
     use crate::json::{json, to_value};
     use crate::model::channel::{Embed, EmbedField, EmbedFooter, EmbedImage, EmbedVideo};
     use crate::model::colour::Colour;
@@ -512,14 +405,14 @@ mod test {
             }),
         };
 
-        let builder = CreateEmbed::from(embed)
+        let embed = embed
             .colour(0xFF0011)
             .description("This is a hakase description")
             .image("https://i.imgur.com/XfWpfCV.gif")
             .title("still a hakase")
             .url("https://i.imgur.com/XfWpfCV.gif");
 
-        let built = to_value(builder).unwrap();
+        let built = to_value(embed).unwrap();
 
         let obj = json!({
             "color": 0xFF0011,
@@ -545,6 +438,12 @@ mod test {
             "footer": {
                 "text": "This is a hakase footer",
                 "icon_url": "https://i.imgur.com/XfWpfCV.gif",
+            },
+            "video": {
+                "url": "https://i.imgur.com/XfWpfCV.mp4",
+                "proxy_url": "a",
+                "height": 213,
+                "width": 224
             }
         });
 

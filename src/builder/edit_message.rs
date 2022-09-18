@@ -1,4 +1,4 @@
-use super::{CreateAllowedMentions, CreateComponents, CreateEmbed};
+use super::{CreateActionRow, CreateAllowedMentions, CreateEmbed};
 #[cfg(feature = "http")]
 use crate::http::Http;
 #[cfg(feature = "http")]
@@ -29,6 +29,8 @@ use crate::model::prelude::*;
 /// # }
 /// ```
 ///
+/// [Discord docs](https://discord.com/developers/docs/resources/channel#edit-message-jsonform-params).
+///
 /// [`Message`]: crate::model::channel::Message
 #[derive(Clone, Debug, Default, Serialize)]
 #[must_use]
@@ -42,7 +44,7 @@ pub struct EditMessage<'a> {
     #[serde(skip_serializing_if = "Option::is_none")]
     allowed_mentions: Option<CreateAllowedMentions>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    components: Option<CreateComponents>,
+    components: Option<Vec<CreateActionRow>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     attachments: Option<Vec<AttachmentId>>,
 
@@ -183,7 +185,7 @@ impl<'a> EditMessage<'a> {
     }
 
     /// Sets the components of this message.
-    pub fn components(mut self, components: CreateComponents) -> Self {
+    pub fn components(mut self, components: Vec<CreateActionRow>) -> Self {
         self.components = Some(components);
         self
     }

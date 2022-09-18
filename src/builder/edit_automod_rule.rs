@@ -14,6 +14,8 @@ use crate::model::prelude::*;
 /// # Examples
 ///
 /// See [`GuildId::create_automod_rule`] for details.
+///
+/// [Discord docs](https://discord.com/developers/docs/resources/auto-moderation#modify-auto-moderation-rule-json-params).
 pub struct EditAutoModRule<'a> {
     event_type: EventType,
     #[serde(skip_serializing_if = "Option::is_none")]

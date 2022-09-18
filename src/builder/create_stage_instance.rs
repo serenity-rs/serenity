@@ -5,11 +5,15 @@ use crate::internal::prelude::*;
 use crate::model::prelude::*;
 
 /// Builder for creating a [`StageInstance`].
+///
+/// [Discord docs](https://discord.com/developers/docs/resources/stage-instance#create-stage-instance-json-params).
 #[derive(Clone, Debug, Serialize)]
 #[must_use]
+// Cannot be replaced with a model type
 pub struct CreateStageInstance<'a> {
     channel_id: ChannelId,
     topic: String,
+    send_start_notification: bool,
 
     #[serde(skip)]
     audit_log_reason: Option<&'a str>,
@@ -21,6 +25,7 @@ impl<'a> CreateStageInstance<'a> {
         Self {
             channel_id: channel_id.into(),
             topic: topic.into(),
+            send_start_notification: false,
             audit_log_reason: None,
         }
     }
@@ -65,6 +70,12 @@ impl<'a> CreateStageInstance<'a> {
     /// [`Self::new`].
     pub fn topic(mut self, topic: impl Into<String>) -> Self {
         self.topic = topic.into();
+        self
+    }
+
+    /// Notify @everyone that a Stage instance has started.
+    pub fn send_start_notification(mut self, value: bool) -> Self {
+        self.send_start_notification = value;
         self
     }
 

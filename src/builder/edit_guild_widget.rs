@@ -10,10 +10,8 @@ use crate::model::prelude::*;
 #[derive(Clone, Debug, Default, Serialize)]
 #[must_use]
 pub struct EditGuildWidget<'a> {
-    #[serde(skip_serializing_if = "Option::is_none")]
-    enabled: Option<bool>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    channel_id: Option<ChannelId>,
+    #[serde(flatten)]
+    widget: GuildWidget,
 
     #[serde(skip)]
     audit_log_reason: Option<&'a str>,
@@ -41,13 +39,13 @@ impl<'a> EditGuildWidget<'a> {
 
     /// Whether the widget is enabled or not.
     pub fn enabled(mut self, enabled: bool) -> Self {
-        self.enabled = Some(enabled);
+        self.widget.enabled = enabled;
         self
     }
 
     /// The server description shown in the welcome screen.
     pub fn channel_id(mut self, id: impl Into<ChannelId>) -> Self {
-        self.channel_id = Some(id.into());
+        self.widget.channel_id = Some(id.into());
         self
     }
 

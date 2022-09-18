@@ -88,12 +88,16 @@ pub struct Button {
     /// The button style.
     pub style: ButtonStyle,
     /// The text which appears on the button.
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub label: Option<String>,
     /// The emoji of this button, if there is one.
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub emoji: Option<ReactionType>,
     /// An identifier defined by the developer for the button.
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub custom_id: Option<String>,
     /// The url of the button, if there is one.
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub url: Option<String>,
     /// Whether the button is disabled.
     #[serde(default)]
@@ -124,7 +128,7 @@ pub struct SelectMenu {
     /// The placeholder shown when nothing is selected.
     pub placeholder: Option<String>,
     /// An identifier defined by the developer for the select menu.
-    pub custom_id: Option<String>,
+    pub custom_id: String,
     /// The minimum number of selections allowed.
     pub min_values: Option<u64>,
     /// The maximum number of selections allowed.
@@ -135,6 +139,8 @@ pub struct SelectMenu {
     /// The result location for modals
     #[serde(default)]
     pub values: Vec<String>,
+    #[serde(default)]
+    pub disabled: bool,
 }
 
 /// A select menu component options.
@@ -161,8 +167,20 @@ pub struct InputText {
     pub kind: ComponentType,
     /// An identifier defined by the developer for the select menu.
     pub custom_id: String,
-    /// The input from the user
+    /// The [`InputTextStyle`]
+    pub style: InputTextStyle,
+    /// The label for this component, max 45 characters.
+    pub label: String,
+    /// The minimum input length for a text input, min 0, max 4000.
+    pub min_length: Option<u64>,
+    /// The maximum input length for a text input, min 1, max 4000.
+    pub max_length: Option<u64>,
+    /// Whether this component is required to be filled, default true.
+    pub required: Option<bool>,
+    /// The input from the user.
     pub value: String,
+    /// Custom placeholder text if the input is empty, max 100 characters.
+    pub placeholder: Option<String>,
 }
 
 enum_number! {

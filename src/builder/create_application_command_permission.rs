@@ -10,6 +10,8 @@ use crate::model::id::{CommandId, GuildId};
 
 /// A builder for creating several [`CommandPermissionData`].
 ///
+/// [Discord docs](https://discord.com/developers/docs/interactions/application-commands#edit-application-command-permissions-json-params).
+///
 /// [`CommandPermissionData`]: crate::model::application::command::CommandPermissionData
 #[derive(Clone, Debug, Default, Serialize)]
 #[must_use]
@@ -66,6 +68,8 @@ impl CreateApplicationCommandPermissionsData {
 /// A builder for creating an [`CommandPermissionData`].
 ///
 /// All fields are required.
+///
+/// [Discord docs](https://discord.com/developers/docs/interactions/application-commands#application-command-permissions-object-application-command-permissions-structure).
 ///
 /// [`CommandPermissionData`]: crate::model::application::command::CommandPermissionData
 #[derive(Clone, Debug, Default, Serialize)]

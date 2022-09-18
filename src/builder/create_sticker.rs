@@ -11,6 +11,8 @@ use crate::model::prelude::*;
 /// - [`PartialGuild::create_sticker`]
 /// - [`Guild::create_sticker`]
 /// - [`GuildId::create_sticker`]
+///
+/// [Discord docs](https://discord.com/developers/docs/resources/channel#start-thread-without-message-json-params).
 #[derive(Clone, Debug)]
 #[must_use]
 pub struct CreateSticker<'a> {

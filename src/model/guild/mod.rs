@@ -2595,6 +2595,15 @@ pub struct GuildWidget {
     pub channel_id: Option<ChannelId>,
 }
 
+impl Default for GuildWidget {
+    fn default() -> Self {
+        Self {
+            enabled: true,
+            channel_id: None,
+        }
+    }
+}
+
 /// Representation of the number of members that would be pruned by a guild
 /// prune operation.
 ///

@@ -45,6 +45,8 @@ use crate::model::prelude::*;
 /// #     Ok(())
 /// # }
 /// ```
+///
+/// [Discord docs](https://discord.com/developers/docs/resources/channel#get-channel-messages-query-string-params).
 #[derive(Clone, Copy, Debug, Default)]
 #[must_use]
 pub struct GetMessages {

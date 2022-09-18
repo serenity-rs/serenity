@@ -4,6 +4,7 @@ use crate::http::Http;
 use crate::internal::prelude::*;
 use crate::model::prelude::*;
 
+/// [Discord docs](https://discord.com/developers/docs/resources/webhook#modify-webhook-json-params).
 #[derive(Debug, Default, Clone, Serialize)]
 #[must_use]
 pub struct EditWebhook<'a> {

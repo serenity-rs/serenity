@@ -1,4 +1,4 @@
-use super::{CreateAllowedMentions, CreateComponents, CreateEmbed};
+use super::{CreateActionRow, CreateAllowedMentions, CreateEmbed};
 #[cfg(feature = "http")]
 use crate::http::Http;
 #[cfg(feature = "http")]
@@ -43,6 +43,8 @@ use crate::model::prelude::*;
 /// #     Ok(())
 /// # }
 /// ```
+///
+/// [Discord docs](https://discord.com/developers/docs/resources/webhook#execute-webhook-jsonform-params).
 #[derive(Clone, Debug, Default, Serialize)]
 #[must_use]
 pub struct ExecuteWebhook<'a> {
@@ -55,7 +57,7 @@ pub struct ExecuteWebhook<'a> {
     #[serde(skip_serializing_if = "Option::is_none")]
     allowed_mentions: Option<CreateAllowedMentions>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    components: Option<CreateComponents>,
+    components: Option<Vec<CreateActionRow>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     username: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -253,7 +255,7 @@ impl<'a> ExecuteWebhook<'a> {
     ///
     /// [`WebhookType::Application`]: crate::model::webhook::WebhookType
     /// [`WebhookType::Incoming`]: crate::model::webhook::WebhookType
-    pub fn components(mut self, components: CreateComponents) -> Self {
+    pub fn components(mut self, components: Vec<CreateActionRow>) -> Self {
         self.components = Some(components);
         self
     }

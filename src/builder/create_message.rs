@@ -1,4 +1,4 @@
-use super::{CreateAllowedMentions, CreateComponents, CreateEmbed};
+use super::{CreateActionRow, CreateAllowedMentions, CreateEmbed};
 #[cfg(feature = "http")]
 use crate::constants;
 #[cfg(feature = "http")]
@@ -42,6 +42,8 @@ use crate::model::prelude::*;
 /// # }
 /// ```
 ///
+/// [Discord docs](https://discord.com/developers/docs/resources/channel#create-message-jsonform-params).
+///
 /// [`ChannelId::say`]: crate::model::id::ChannelId::say
 /// [`ChannelId::send_message`]: crate::model::id::ChannelId::send_message
 /// [`Http::send_message`]: crate::http::client::Http::send_message
@@ -58,7 +60,7 @@ pub struct CreateMessage<'a> {
     #[serde(skip_serializing_if = "Option::is_none")]
     message_reference: Option<MessageReference>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    components: Option<CreateComponents>,
+    components: Option<Vec<CreateActionRow>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     flags: Option<MessageFlags>,
 
@@ -272,7 +274,7 @@ impl<'a> CreateMessage<'a> {
     }
 
     /// Sets the components of this message.
-    pub fn components(mut self, components: CreateComponents) -> Self {
+    pub fn components(mut self, components: Vec<CreateActionRow>) -> Self {
         self.components = Some(components);
         self
     }

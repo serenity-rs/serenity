@@ -4,6 +4,7 @@ use crate::http::Http;
 use crate::internal::prelude::*;
 use crate::model::prelude::*;
 
+/// [Discord docs](https://discord.com/developers/docs/resources/channel#start-thread-without-message-json-params).
 #[derive(Clone, Debug, Serialize)]
 #[must_use]
 pub struct CreateThread<'a> {

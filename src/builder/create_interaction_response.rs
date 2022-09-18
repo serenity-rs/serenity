@@ -1,10 +1,15 @@
-use super::{CreateAllowedMentions, CreateComponents, CreateEmbed};
+use std::collections::HashMap;
+
+use application::command::CommandOptionChoice;
+
+use super::{CreateActionRow, CreateAllowedMentions, CreateEmbed};
 #[cfg(feature = "http")]
 use crate::http::Http;
 use crate::internal::prelude::*;
 use crate::model::application::interaction::InteractionResponseType;
 use crate::model::prelude::*;
 
+/// [Discord docs](https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-response-object-interaction-response-structure).
 #[derive(Clone, Debug, Serialize)]
 #[must_use]
 pub struct CreateInteractionResponse<'a> {
@@ -94,6 +99,7 @@ impl<'a> Default for CreateInteractionResponse<'a> {
     }
 }
 
+/// [Discord docs](https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-response-object-interaction-callback-data-structure).
 #[derive(Clone, Debug, Default, Serialize)]
 #[must_use]
 pub struct CreateInteractionResponseData<'a> {
@@ -107,7 +113,7 @@ pub struct CreateInteractionResponseData<'a> {
     #[serde(skip_serializing_if = "Option::is_none")]
     flags: Option<MessageFlags>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    components: Option<CreateComponents>,
+    components: Option<Vec<CreateActionRow>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     custom_id: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -225,7 +231,7 @@ impl<'a> CreateInteractionResponseData<'a> {
     }
 
     /// Sets the components of this message.
-    pub fn components(mut self, components: CreateComponents) -> Self {
+    pub fn components(mut self, components: Vec<CreateActionRow>) -> Self {
         self.components = Some(components);
         self
     }
@@ -243,12 +249,9 @@ impl<'a> CreateInteractionResponseData<'a> {
     }
 }
 
-#[derive(Clone, Default, Debug, Serialize)]
-pub struct AutocompleteChoice {
-    pub name: String,
-    pub value: Value,
-}
+pub type AutocompleteChoice = CommandOptionChoice;
 
+/// [Discord docs](https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-response-object-interaction-response-structure).
 #[derive(Clone, Debug, Serialize)]
 #[must_use]
 pub struct CreateAutocompleteResponse {
@@ -257,9 +260,10 @@ pub struct CreateAutocompleteResponse {
     kind: InteractionResponseType,
 }
 
+/// [Discord docs](https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-response-object-autocomplete).
 #[derive(Clone, Debug, Default, Serialize)]
 struct CreateAutocompleteResponseData {
-    choices: Vec<AutocompleteChoice>,
+    choices: Vec<CommandOptionChoice>,
 }
 
 impl CreateAutocompleteResponse {
@@ -300,6 +304,7 @@ impl CreateAutocompleteResponse {
         self.add_choice(AutocompleteChoice {
             name: name.into(),
             value: Value::from(value),
+            name_localizations: HashMap::new(),
         })
     }
 
@@ -310,6 +315,7 @@ impl CreateAutocompleteResponse {
         self.add_choice(AutocompleteChoice {
             name: name.into(),
             value: Value::String(value.into()),
+            name_localizations: HashMap::new(),
         })
     }
 
@@ -320,6 +326,7 @@ impl CreateAutocompleteResponse {
         self.add_choice(AutocompleteChoice {
             name: name.into(),
             value: Value::from(value),
+            name_localizations: HashMap::new(),
         })
     }
 

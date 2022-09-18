@@ -65,6 +65,8 @@ use crate::model::prelude::*;
 /// #     Ok(())
 /// # }
 /// ```
+///
+/// [Discord docs](https://discord.com/developers/docs/resources/channel#create-channel-invite-json-params).
 #[derive(Clone, Debug, Default, Serialize)]
 #[must_use]
 pub struct CreateInvite<'a> {

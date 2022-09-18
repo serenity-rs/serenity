@@ -6,6 +6,7 @@ use crate::model::prelude::*;
 #[cfg(feature = "http")]
 use crate::utils::encode_image;
 
+/// [Discord docs](https://discord.com/developers/docs/resources/guild-scheduled-event#modify-guild-scheduled-event-json-params).
 #[derive(Clone, Debug, Default, Serialize)]
 #[must_use]
 pub struct EditScheduledEvent<'a> {

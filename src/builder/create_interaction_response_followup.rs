@@ -1,12 +1,14 @@
-use super::{CreateAllowedMentions, CreateComponents, CreateEmbed};
+use super::{CreateActionRow, CreateAllowedMentions, CreateEmbed};
 #[cfg(feature = "http")]
 use crate::http::Http;
 #[cfg(feature = "http")]
 use crate::internal::prelude::*;
 use crate::model::prelude::*;
 
+/// [Discord docs](https://discord.com/developers/docs/resources/webhook#execute-webhook-jsonform-params).
 #[derive(Clone, Debug, Default, Serialize)]
 #[must_use]
+// TODO: look into deduplicating this with ExecuteWebhook (according to Discord its the same fields).
 pub struct CreateInteractionResponseFollowup<'a> {
     embeds: Vec<CreateEmbed>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -22,7 +24,7 @@ pub struct CreateInteractionResponseFollowup<'a> {
     #[serde(skip_serializing_if = "Option::is_none")]
     flags: Option<MessageFlags>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    components: Option<CreateComponents>,
+    components: Option<Vec<CreateActionRow>>,
 
     #[serde(skip)]
     files: Vec<AttachmentType<'a>>,
@@ -210,7 +212,7 @@ impl<'a> CreateInteractionResponseFollowup<'a> {
     }
 
     /// Sets the components of this message.
-    pub fn components(mut self, components: CreateComponents) -> Self {
+    pub fn components(mut self, components: Vec<CreateActionRow>) -> Self {
         self.components = Some(components);
         self
     }

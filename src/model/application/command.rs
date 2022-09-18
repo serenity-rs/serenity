@@ -233,13 +233,13 @@ pub struct CommandOption {
     /// The option name.
     pub name: String,
     /// Localizations of the option name with locale as the key
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub name_localizations: Option<std::collections::HashMap<String, String>>,
+    #[serde(skip_serializing_if = "HashMap::is_empty")]
+    pub name_localizations: HashMap<String, String>,
     /// The option description.
     pub description: String,
     /// Localizations of the option description with locale as the key
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub description_localizations: Option<std::collections::HashMap<String, String>>,
+    #[serde(skip_serializing_if = "HashMap::is_empty")]
+    pub description_localizations: HashMap<String, String>,
     /// Whether the parameter is optional or required.
     #[serde(default)]
     pub required: bool,
@@ -312,8 +312,8 @@ pub struct CommandOptionChoice {
     /// The choice name.
     pub name: String,
     /// Localizations of the choice name, with locale as key
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub name_localizations: Option<std::collections::HashMap<String, String>>,
+    #[serde(skip_serializing_if = "HashMap::is_empty")]
+    pub name_localizations: HashMap<String, String>,
     /// The choice value.
     pub value: Value,
 }

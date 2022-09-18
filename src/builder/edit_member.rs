@@ -6,6 +6,8 @@ use crate::model::prelude::*;
 
 /// A builder which edits the properties of a [`Member`], to be used in conjunction with
 /// [`Member::edit`].
+///
+/// [Discord docs](https://discord.com/developers/docs/resources/guild#modify-guild-member-json-params).
 #[derive(Clone, Debug, Default, Serialize)]
 #[must_use]
 pub struct EditMember<'a> {

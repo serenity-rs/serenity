@@ -25,6 +25,8 @@ use crate::model::prelude::*;
 /// #     Ok(())
 /// # }
 /// ```
+///
+/// [Discord docs](https://discord.com/developers/docs/resources/channel#modify-channel-json-params-guild-channel).
 #[derive(Clone, Debug, Default, Serialize)]
 #[must_use]
 pub struct EditChannel<'a> {

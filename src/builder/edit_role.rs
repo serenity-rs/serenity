@@ -40,6 +40,8 @@ use crate::utils::encode_image;
 /// # Ok(())
 /// # }
 /// ```
+///
+/// [Discord docs](https://discord.com/developers/docs/resources/guild#modify-guild-role-json-params).
 #[derive(Clone, Debug, Default, Serialize)]
 #[must_use]
 pub struct EditRole<'a> {

@@ -273,18 +273,8 @@ impl InviteGuild {
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 pub struct RichInvite {
-    /// A representation of the minimal amount of information needed about the
-    /// channel being invited to.
-    pub channel: InviteChannel,
-    /// The unique code for the invite.
-    pub code: String,
     /// When the invite was created.
     pub created_at: Timestamp,
-    /// A representation of the minimal amount of information needed about the
-    /// [`Guild`] being invited to.
-    pub guild: Option<InviteGuild>,
-    /// The user that created the invite.
-    pub inviter: Option<User>,
     /// The maximum age of the invite in seconds, from when it was created.
     pub max_age: u64,
     /// The maximum number of times that an invite may be used before it expires.
@@ -300,6 +290,8 @@ pub struct RichInvite {
     pub temporary: bool,
     /// The amount of times that an invite has been used.
     pub uses: u64,
+    #[serde(flatten)]
+    pub invite: Invite,
 }
 
 #[cfg(feature = "model")]
@@ -319,20 +311,7 @@ impl RichInvite {
     /// [Manage Guild]: Permissions::MANAGE_GUILD
     /// [permission]: super::permissions
     pub async fn delete(&self, cache_http: impl CacheHttp) -> Result<Invite> {
-        #[cfg(feature = "cache")]
-        {
-            if let Some(cache) = cache_http.cache() {
-                let guild_id = self.guild.as_ref().map(|g| g.id);
-                crate::utils::user_has_perms_cache(
-                    cache,
-                    self.channel.id,
-                    guild_id,
-                    Permissions::MANAGE_GUILD,
-                )?;
-            }
-        }
-
-        cache_http.http().as_ref().delete_invite(&self.code, None).await
+        self.invite.delete(cache_http).await
     }
 
     /// Returns a URL to use for the invite.
@@ -381,7 +360,7 @@ impl RichInvite {
     /// ```
     #[must_use]
     pub fn url(&self) -> String {
-        format!("https://discord.gg/{}", self.code)
+        self.invite.url()
     }
 }
 

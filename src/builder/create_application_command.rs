@@ -1,5 +1,7 @@
 use std::collections::HashMap;
 
+use application::command::{CommandOption, CommandOptionChoice};
+
 #[cfg(feature = "http")]
 use crate::http::Http;
 use crate::internal::prelude::*;
@@ -8,53 +10,7 @@ use crate::model::application::command::Command;
 use crate::model::application::command::{CommandOptionType, CommandType};
 use crate::model::prelude::*;
 
-#[derive(Clone, Debug, Serialize)]
-pub struct CommandOptionChoice {
-    name: String,
-    value: Value,
-    name_localizations: HashMap<String, String>,
-}
-
-#[derive(Clone, Debug, Serialize)]
-#[serde(untagged)]
-enum Number {
-    Float(f64),
-    Integer(u64),
-}
-
-/// A builder for creating a new [`CommandOption`].
-///
-/// [`Self::kind`], [`Self::name`], and [`Self::description`] are required fields.
-///
-/// [`CommandOption`]: crate::model::application::command::CommandOption
-#[derive(Clone, Debug, Serialize)]
-#[must_use]
-pub struct CreateApplicationCommandOption {
-    #[serde(rename = "type")]
-    kind: CommandOptionType,
-    name: String,
-    name_localizations: HashMap<String, String>,
-    description: String,
-    description_localizations: HashMap<String, String>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    default: Option<bool>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    required: Option<bool>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    autocomplete: Option<bool>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    min_value: Option<Number>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    max_value: Option<Number>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    min_length: Option<u16>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    max_length: Option<u16>,
-
-    channel_types: Vec<ChannelType>,
-    choices: Vec<CommandOptionChoice>,
-    options: Vec<CreateApplicationCommandOption>,
-}
+pub type CreateApplicationCommandOption = CommandOption;
 
 impl CreateApplicationCommandOption {
     /// Creates a new builder with the given option type, name, and description, leaving all other
@@ -70,9 +26,8 @@ impl CreateApplicationCommandOption {
             name_localizations: HashMap::new(),
             description: description.into(),
             description_localizations: HashMap::new(),
-            default: None,
-            required: None,
-            autocomplete: None,
+            required: false,
+            autocomplete: false,
             min_value: None,
             max_value: None,
             min_length: None,
@@ -139,19 +94,11 @@ impl CreateApplicationCommandOption {
         self
     }
 
-    /// The first required option for the user to complete.
-    ///
-    /// **Note**: Only one option can be `default`.
-    pub fn default_option(mut self, default: bool) -> Self {
-        self.default = Some(default);
-        self
-    }
-
     /// Sets if this option is required or optional.
     ///
     /// **Note**: This defaults to `false`.
     pub fn required(mut self, required: bool) -> Self {
-        self.required = Some(required);
+        self.required = required;
         self
     }
 
@@ -244,7 +191,7 @@ impl CreateApplicationCommandOption {
     /// - May not be set to `true` if `choices` are set
     /// - Options using `autocomplete` are not confined to only use given choices
     pub fn set_autocomplete(mut self, value: bool) -> Self {
-        self.autocomplete = Some(value);
+        self.autocomplete = value;
         self
     }
 
@@ -270,25 +217,25 @@ impl CreateApplicationCommandOption {
 
     /// Sets the minimum permitted value for this integer option
     pub fn min_int_value(mut self, value: u64) -> Self {
-        self.min_value = Some(Number::Integer(value));
+        self.min_value = Some(value.into());
         self
     }
 
     /// Sets the maximum permitted value for this integer option
     pub fn max_int_value(mut self, value: u64) -> Self {
-        self.max_value = Some(Number::Integer(value));
+        self.max_value = Some(value.into());
         self
     }
 
     /// Sets the minimum permitted value for this number option
     pub fn min_number_value(mut self, value: f64) -> Self {
-        self.min_value = Some(Number::Float(value));
+        self.min_value = serde_json::Number::from_f64(value);
         self
     }
 
     /// Sets the maximum permitted value for this number option
     pub fn max_number_value(mut self, value: f64) -> Self {
-        self.max_value = Some(Number::Float(value));
+        self.max_value = serde_json::Number::from_f64(value);
         self
     }
 
@@ -313,7 +260,9 @@ impl CreateApplicationCommandOption {
 
 /// A builder for creating a new [`Command`].
 ///
-/// [`Self::name`] and [`Self::description`] are required fields.
+/// [`Self::description`] is a required field for slash commands (not for context menu commands).
+///
+/// [Discord docs](https://discord.com/developers/docs/interactions/application-commands#create-global-application-command-json-params).
 ///
 /// [`Command`]: crate::model::application::command::Command
 #[derive(Clone, Debug, Serialize)]

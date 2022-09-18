@@ -5,6 +5,8 @@ use crate::internal::prelude::*;
 use crate::model::prelude::*;
 
 /// A builder to optionally edit certain fields of a [`Guild`].
+///
+/// [Discord docs](https://discord.com/developers/docs/resources/guild#modify-guild-json-params).
 #[derive(Clone, Debug, Default, Serialize)]
 #[must_use]
 pub struct EditGuild<'a> {

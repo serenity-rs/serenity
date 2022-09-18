@@ -2,6 +2,7 @@ use serde::{Deserialize, Serialize};
 
 use crate::model::id::{RoleId, UserId};
 
+/// [Discord docs](https://discord.com/developers/docs/resources/channel#allowed-mentions-object-allowed-mention-types).
 #[derive(Clone, Copy, Debug, Deserialize, Serialize)]
 #[serde(rename_all = "lowercase")]
 pub enum ParseValue {
@@ -55,6 +56,8 @@ pub enum ParseValue {
 /// # }
 /// ```
 ///
+/// [Discord docs](https://discord.com/developers/docs/resources/channel#allowed-mentions-object-allowed-mentions-structure).
+///
 /// [`ChannelId::send_message`]: crate::model::id::ChannelId::send_message
 /// [`ChannelId::edit_message`]: crate::model::id::ChannelId::edit_message
 #[derive(Clone, Debug, Default, Serialize)]
@@ -63,8 +66,7 @@ pub struct CreateAllowedMentions {
     parse: Vec<ParseValue>,
     users: Vec<UserId>,
     roles: Vec<RoleId>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    replied_user: Option<bool>,
+    replied_user: bool,
 }
 
 impl CreateAllowedMentions {
@@ -125,7 +127,7 @@ impl CreateAllowedMentions {
     /// Makes the reply mention/ping the user.
     #[inline]
     pub fn replied_user(mut self, mention_user: bool) -> Self {
-        self.replied_user = Some(mention_user);
+        self.replied_user = mention_user;
         self
     }
 }

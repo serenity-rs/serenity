@@ -14,6 +14,8 @@ use crate::model::prelude::*;
 /// - [`GuildId::edit_sticker`]
 /// - [`Sticker::edit`]
 ///
+/// [Discord docs](https://discord.com/developers/docs/resources/sticker#modify-guild-sticker-json-params).
+///
 /// [`Sticker`]: crate::model::sticker::Sticker
 /// [`PartialGuild::edit_sticker`]: crate::model::guild::PartialGuild::edit_sticker
 /// [`Guild::edit_sticker`]: crate::model::guild::Guild::edit_sticker

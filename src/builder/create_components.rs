@@ -1,67 +1,22 @@
 use crate::model::application::component::{ButtonStyle, InputTextStyle};
 use crate::model::channel::ReactionType;
+use crate::model::prelude::component::{
+    ActionRow,
+    ActionRowComponent,
+    Button,
+    ComponentType,
+    InputText,
+    SelectMenu,
+    SelectMenuOption,
+};
 
-/// A builder for creating several [`ActionRow`]s.
-///
-/// [`ActionRow`]: crate::model::application::component::ActionRow
-#[derive(Clone, Debug, Default, Serialize)]
-#[must_use]
-pub struct CreateComponents(pub Vec<CreateActionRow>);
-
-impl CreateComponents {
-    /// Equivalent to [`Self::default`].
-    pub fn new() -> Self {
-        Self::default()
-    }
-
-    /// Adds an action row.
-    pub fn add_action_row(mut self, row: CreateActionRow) -> Self {
-        self.0.push(row);
-        self
-    }
-
-    pub fn add_action_rows(mut self, rows: Vec<CreateActionRow>) -> Self {
-        self.0.extend(rows);
-        self
-    }
-
-    /// Set a single action row. Calling this will overwrite all action rows.
-    pub fn set_action_row(mut self, row: CreateActionRow) -> Self {
-        self.0 = vec![row];
-        self
-    }
-
-    /// Sets all the action rows. Calling this will overwrite all action rows.
-    pub fn set_action_rows(mut self, rows: Vec<CreateActionRow>) -> Self {
-        self.0 = rows;
-        self
-    }
-}
-
-#[derive(Clone, Debug, Serialize)]
-#[serde(untagged)]
-enum ComponentBuilder {
-    Button(CreateButton),
-    SelectMenu(CreateSelectMenu),
-    InputText(CreateInputText),
-}
-
-/// A builder for creating an [`ActionRow`].
-///
-/// [`ActionRow`]: crate::model::application::component::ActionRow
-#[derive(Clone, Debug, Serialize)]
-#[must_use]
-pub struct CreateActionRow {
-    components: Vec<ComponentBuilder>,
-    #[serde(rename = "type")]
-    kind: u8,
-}
+pub type CreateActionRow = ActionRow;
 
 impl Default for CreateActionRow {
     fn default() -> Self {
-        CreateActionRow {
+        Self {
             components: Vec::new(),
-            kind: 1,
+            kind: ComponentType::ActionRow,
         }
     }
 }
@@ -74,44 +29,24 @@ impl CreateActionRow {
 
     /// Adds a button.
     pub fn add_button(mut self, button: CreateButton) -> Self {
-        self.components.push(ComponentBuilder::Button(button));
+        self.components.push(ActionRowComponent::Button(button));
         self
     }
 
     /// Adds a select menu.
     pub fn add_select_menu(mut self, menu: CreateSelectMenu) -> Self {
-        self.components.push(ComponentBuilder::SelectMenu(menu));
+        self.components.push(ActionRowComponent::SelectMenu(menu));
         self
     }
 
     /// Adds an input text.
     pub fn add_input_text(mut self, input_text: CreateInputText) -> Self {
-        self.components.push(ComponentBuilder::InputText(input_text));
+        self.components.push(ActionRowComponent::InputText(input_text));
         self
     }
 }
 
-/// A builder for creating a [`Button`].
-///
-/// [`Button`]: crate::model::application::component::Button
-#[derive(Clone, Debug, Serialize)]
-#[must_use]
-pub struct CreateButton {
-    style: ButtonStyle,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    label: Option<String>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    custom_id: Option<String>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    url: Option<String>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    emoji: Option<ReactionType>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    disabled: Option<bool>,
-
-    #[serde(rename = "type")]
-    kind: u8,
-}
+pub type CreateButton = Button;
 
 impl Default for CreateButton {
     /// Creates a primary button.
@@ -122,8 +57,8 @@ impl Default for CreateButton {
             custom_id: None,
             url: None,
             emoji: None,
-            disabled: None,
-            kind: 2,
+            disabled: false,
+            kind: ComponentType::Button,
         }
     }
 }
@@ -166,31 +101,12 @@ impl CreateButton {
 
     /// Sets the disabled state for the button.
     pub fn disabled(mut self, disabled: bool) -> Self {
-        self.disabled = Some(disabled);
+        self.disabled = disabled;
         self
     }
 }
 
-/// A builder for creating a [`SelectMenu`].
-///
-/// [`SelectMenu`]: crate::model::application::component::SelectMenu
-#[derive(Clone, Debug, Serialize)]
-#[must_use]
-pub struct CreateSelectMenu {
-    custom_id: String,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    placeholder: Option<String>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    min_values: Option<u64>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    max_values: Option<u64>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    disabled: Option<bool>,
-    options: Vec<CreateSelectMenuOption>,
-
-    #[serde(rename = "type")]
-    kind: u8,
-}
+pub type CreateSelectMenu = SelectMenu;
 
 impl CreateSelectMenu {
     /// Creates a builder with given custom id (a developer-defined identifier), and a list of
@@ -201,9 +117,10 @@ impl CreateSelectMenu {
             placeholder: None,
             min_values: None,
             max_values: None,
-            disabled: None,
+            disabled: false,
+            values: vec![],
             options,
-            kind: 3,
+            kind: ComponentType::SelectMenu,
         }
     }
 
@@ -234,7 +151,7 @@ impl CreateSelectMenu {
 
     /// Sets the disabled state for the button.
     pub fn disabled(mut self, disabled: bool) -> Self {
-        self.disabled = Some(disabled);
+        self.disabled = disabled;
         self
     }
 
@@ -244,21 +161,7 @@ impl CreateSelectMenu {
     }
 }
 
-/// A builder for creating a [`SelectMenuOption`].
-///
-/// [`SelectMenuOption`]: crate::model::application::component::SelectMenuOption
-#[derive(Clone, Debug, Serialize)]
-#[must_use]
-pub struct CreateSelectMenuOption {
-    label: String,
-    value: String,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    description: Option<String>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    emoji: Option<ReactionType>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    default: Option<bool>,
-}
+pub type CreateSelectMenuOption = SelectMenuOption;
 
 impl CreateSelectMenuOption {
     /// Creates a select menu option with the given label and value, leaving all other fields
@@ -269,7 +172,7 @@ impl CreateSelectMenuOption {
             value: value.into(),
             description: None,
             emoji: None,
-            default: None,
+            default: false,
         }
     }
 
@@ -299,35 +202,12 @@ impl CreateSelectMenuOption {
 
     /// Sets this option as selected by default.
     pub fn default_selection(mut self, disabled: bool) -> Self {
-        self.default = Some(disabled);
+        self.default = disabled;
         self
     }
 }
 
-/// A builder for creating an [`InputText`].
-///
-/// [`InputText`]: crate::model::application::component::InputText
-#[derive(Clone, Debug, Serialize)]
-#[must_use]
-pub struct CreateInputText {
-    style: InputTextStyle,
-    label: String,
-    custom_id: String,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    placeholder: Option<String>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    min_length: Option<u64>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    max_length: Option<u64>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    value: Option<String>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    required: Option<bool>,
-
-    #[serde(rename = "type")]
-    kind: u8,
-}
+pub type CreateInputText = InputText;
 
 impl CreateInputText {
     /// Creates a text input with the given style, label, and custom id (a developer-defined
@@ -345,10 +225,10 @@ impl CreateInputText {
             placeholder: None,
             min_length: None,
             max_length: None,
-            value: None,
+            value: String::new(),
             required: None,
 
-            kind: 4,
+            kind: ComponentType::InputText,
         }
     }
 
@@ -391,7 +271,7 @@ impl CreateInputText {
 
     /// Sets the value of this input text.
     pub fn value(mut self, value: impl Into<String>) -> Self {
-        self.value = Some(value.into());
+        self.value = value.into();
         self
     }
 

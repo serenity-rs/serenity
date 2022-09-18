@@ -7,6 +7,8 @@ use crate::model::{channel::AttachmentType, user::CurrentUser};
 
 /// A builder to edit the current user's settings, to be used in conjunction with
 /// [`CurrentUser::edit`].
+///
+/// [Discord docs](https://discord.com/developers/docs/resources/user#modify-current-user-json-params).
 #[derive(Clone, Debug, Default, Serialize)]
 #[must_use]
 pub struct EditProfile {

@@ -6,6 +6,8 @@ use crate::model::prelude::*;
 
 /// A builder to specify the fields to edit in a [`GuildWelcomeScreen`].
 ///
+/// [Discord docs](https://discord.com/developers/docs/resources/guild#modify-guild-welcome-screen-json-params).
+///
 /// [`GuildWelcomeScreen`]: crate::model::guild::GuildWelcomeScreen
 #[derive(Clone, Debug, Default, Serialize)]
 #[must_use]
@@ -75,6 +77,8 @@ impl<'a> EditGuildWelcomeScreen<'a> {
 }
 
 /// A builder for creating a [`GuildWelcomeChannel`].
+///
+/// [Discord docs](https://discord.com/developers/docs/resources/guild#welcome-screen-object-welcome-screen-channel-structure).
 ///
 /// [`GuildWelcomeChannel`]: crate::model::guild::GuildWelcomeChannel
 #[derive(Clone, Debug, Default, Serialize)]

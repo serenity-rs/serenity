@@ -1,4 +1,4 @@
-use super::{CreateAllowedMentions, CreateComponents, CreateEmbed};
+use super::{CreateActionRow, CreateAllowedMentions, CreateEmbed};
 #[cfg(feature = "http")]
 use crate::http::Http;
 #[cfg(feature = "http")]
@@ -7,6 +7,8 @@ use crate::internal::prelude::*;
 use crate::model::prelude::*;
 
 /// A builder to specify the fields to edit in an existing [`Webhook`]'s message.
+///
+/// [Discord docs](https://discord.com/developers/docs/resources/webhook#edit-webhook-message-jsonform-params).
 ///
 /// [`Webhook`]: crate::model::webhook::Webhook
 #[derive(Clone, Debug, Default, Serialize)]
@@ -19,7 +21,7 @@ pub struct EditWebhookMessage {
     #[serde(skip_serializing_if = "Option::is_none")]
     allowed_mentions: Option<CreateAllowedMentions>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    components: Option<CreateComponents>,
+    components: Option<Vec<CreateActionRow>>,
 }
 
 impl EditWebhookMessage {
@@ -110,7 +112,7 @@ impl EditWebhookMessage {
     ///
     /// [`WebhookType::Application`]: crate::model::webhook::WebhookType
     /// [`WebhookType::Incoming`]: crate::model::webhook::WebhookType
-    pub fn components(mut self, components: CreateComponents) -> Self {
+    pub fn components(mut self, components: Vec<CreateActionRow>) -> Self {
         self.components = Some(components);
         self
     }

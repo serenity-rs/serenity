@@ -6,6 +6,8 @@ use crate::model::prelude::*;
 
 /// A builder which edits a user's voice state, to be used in conjunction with
 /// [`GuildChannel::edit_voice_state`].
+///
+/// [Discord docs](https://discord.com/developers/docs/resources/guild#modify-user-voice-state-json-params).
 #[derive(Clone, Debug, Default, Serialize)]
 #[must_use]
 pub struct EditVoiceState {
