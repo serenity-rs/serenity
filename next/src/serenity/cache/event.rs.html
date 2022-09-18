@@ -676,6 +676,10 @@
 <span id="670">670</span>
 <span id="671">671</span>
 <span id="672">672</span>
+<span id="673">673</span>
+<span id="674">674</span>
+<span id="675">675</span>
+<span id="676">676</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::collections::HashSet</span>;
 
 <span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">Cache</span>, <span class="ident">CacheUpdate</span>};
@@ -1261,7 +1265,11 @@
             <span class="ident">cache</span>.<span class="ident">presences</span>.<span class="ident">insert</span>(<span class="kw-2">*</span><span class="ident">user_id</span>, <span class="ident">presence</span>.<span class="ident">clone</span>());
         }
 
-        <span class="kw-2">*</span><span class="ident">cache</span>.<span class="ident">shard_count</span>.<span class="ident">write</span>() <span class="op">=</span> <span class="ident">ready</span>.<span class="ident">shard</span>.<span class="ident">map_or</span>(<span class="number">1</span>, <span class="op">|</span><span class="ident">s</span><span class="op">|</span> <span class="ident">s</span>.<span class="ident">total</span>);
+        {
+            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">cached_shard_data</span> <span class="op">=</span> <span class="ident">cache</span>.<span class="ident">shard_data</span>.<span class="ident">write</span>();
+            <span class="ident">cached_shard_data</span>.<span class="ident">total</span> <span class="op">=</span> <span class="ident">shard_data</span>.<span class="ident">total</span>;
+            <span class="ident">cached_shard_data</span>.<span class="ident">connected</span>.<span class="ident">insert</span>(<span class="ident">shard_data</span>.<span class="ident">id</span>);
+        }
         <span class="kw-2">*</span><span class="ident">cache</span>.<span class="ident">user</span>.<span class="ident">write</span>() <span class="op">=</span> <span class="ident">ready</span>.<span class="ident">user</span>;
 
         <span class="prelude-val">None</span>
