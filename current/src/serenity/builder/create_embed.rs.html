@@ -525,34 +525,6 @@
 <span id="519">519</span>
 <span id="520">520</span>
 <span id="521">521</span>
-<span id="522">522</span>
-<span id="523">523</span>
-<span id="524">524</span>
-<span id="525">525</span>
-<span id="526">526</span>
-<span id="527">527</span>
-<span id="528">528</span>
-<span id="529">529</span>
-<span id="530">530</span>
-<span id="531">531</span>
-<span id="532">532</span>
-<span id="533">533</span>
-<span id="534">534</span>
-<span id="535">535</span>
-<span id="536">536</span>
-<span id="537">537</span>
-<span id="538">538</span>
-<span id="539">539</span>
-<span id="540">540</span>
-<span id="541">541</span>
-<span id="542">542</span>
-<span id="543">543</span>
-<span id="544">544</span>
-<span id="545">545</span>
-<span id="546">546</span>
-<span id="547">547</span>
-<span id="548">548</span>
-<span id="549">549</span>
 </pre><pre class="rust"><code><span class="doccomment">//! Developer note:</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! This is a set of embed builders for rich embeds.</span>
@@ -750,49 +722,21 @@
 
     <span class="doccomment">/// Set the timestamp.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// You may pass a direct string:</span>
+    <span class="doccomment">/// You can pass a [`Timestamp`] or anything that converts into it (</span>
+    <span class="doccomment">/// [`chrono::DateTime`] or [`&amp;str`]). If giving a string, it must be in RFC 3339 format:</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// - `2017-01-03T23:00:00`</span>
-    <span class="doccomment">/// - `2004-06-08T16:04:23`</span>
-    <span class="doccomment">/// - `2004-06-08T16:04:23`</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This timestamp must be in ISO-8601 format. It must also be in UTC format.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// You can also pass an instance of `chrono::DateTime&lt;Utc&gt;`,</span>
-    <span class="doccomment">/// which will construct the timestamp string out of it.</span>
+    <span class="doccomment">/// - `2017-01-03T23:00:00Z`</span>
+    <span class="doccomment">/// - `2004-06-08T16:04:23Z`</span>
+    <span class="doccomment">/// - `2004-06-08T16:04:23Z`</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// # Examples</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// Passing a string timestamp:</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// ```rust,no_run</span>
-    <span class="doccomment">/// # #[cfg(feature = &quot;client&quot;)]</span>
-    <span class="doccomment">/// # async fn run() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {</span>
-    <span class="doccomment">/// use serenity::model::channel::Message;</span>
-    <span class="doccomment">/// use serenity::prelude::*;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// struct Handler;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// #[serenity::async_trait]</span>
-    <span class="doccomment">/// impl EventHandler for Handler {</span>
-    <span class="doccomment">///     async fn message(&amp;self, context: Context, mut msg: Message) {</span>
-    <span class="doccomment">///         if msg.content == &quot;~embed&quot; {</span>
-    <span class="doccomment">///             let _ = msg</span>
-    <span class="doccomment">///                 .channel_id</span>
-    <span class="doccomment">///                 .send_message(&amp;context.http, |m| {</span>
-    <span class="doccomment">///                     m.embed(|e| e.title(&quot;hello&quot;).timestamp(&quot;2004-06-08T16:04:23&quot;))</span>
-    <span class="doccomment">///                 })</span>
-    <span class="doccomment">///                 .await;</span>
-    <span class="doccomment">///         }</span>
-    <span class="doccomment">///     }</span>
-    <span class="doccomment">/// }</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let mut client =</span>
-    <span class="doccomment">///     Client::builder(&quot;token&quot;, GatewayIntents::default()).event_handler(Handler).await?;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// client.start().await?;</span>
-    <span class="doccomment">/// #     Ok(())</span>
-    <span class="doccomment">/// # }</span>
+    <span class="doccomment">/// ```rust</span>
+    <span class="doccomment">/// # use serenity::builder::CreateEmbed;</span>
+    <span class="doccomment">/// let mut embed = CreateEmbed::default();</span>
+    <span class="doccomment">/// embed.title(&quot;hello&quot;).timestamp(&quot;2004-06-08T16:04:23Z&quot;);</span>
     <span class="doccomment">/// ```</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// Creating a join-log:</span>
