@@ -34,20 +34,15 @@ pub const NULL: Value = Value::Null;
 #[cfg(feature = "simd-json")]
 pub const NULL: Value = Value::Static(simd_json::StaticNode::Null);
 
-#[cfg(all(feature = "http", not(feature = "simd-json")))]
+#[cfg(feature = "http")]
 pub(crate) async fn decode_resp<T: serde::de::DeserializeOwned>(
     resp: reqwest::Response,
 ) -> Result<T> {
-    let bytes = resp.bytes().await?;
-    serde_json::from_slice(&bytes).map_err(From::from)
-}
-
-#[cfg(all(feature = "http", feature = "simd-json"))]
-pub(crate) async fn decode_resp<T: serde::de::DeserializeOwned>(
-    resp: reqwest::Response,
-) -> Result<T> {
-    let mut bytes = resp.bytes().await?.to_vec();
-    simd_json::from_slice(&mut bytes).map_err(From::from)
+    #[cfg(not(feature = "simd-json"))]
+    let result = serde_json::from_slice(&resp.bytes().await?)?;
+    #[cfg(feature = "simd-json")]
+    let result = simd_json::from_slice(&mut resp.bytes().await?.to_vec())?;
+    Ok(result)
 }
 
 /// Converts a HashMap into a final [`JsonMap`] representation.
@@ -59,68 +54,49 @@ where
     map.into_iter().map(|(k, v)| (k.to_string(), v)).collect()
 }
 
-#[cfg(not(feature = "simd-json"))]
 pub fn to_string<T>(v: &T) -> Result<String>
 where
     T: Serialize,
 {
-    Ok(serde_json::to_string(v)?)
+    #[cfg(not(feature = "simd-json"))]
+    let result = serde_json::to_string(v)?;
+    #[cfg(feature = "simd-json")]
+    let result = simd_json::to_string(v)?;
+    Ok(result)
 }
 
-#[cfg(feature = "simd-json")]
-pub fn to_string<T>(v: &T) -> Result<String>
-where
-    T: Serialize,
-{
-    Ok(simd_json::to_string(v)?)
-}
-
-#[cfg(not(feature = "simd-json"))]
 pub fn from_str<'a, T>(s: &'a mut str) -> Result<T>
 where
     T: Deserialize<'a>,
 {
-    Ok(serde_json::from_str(s)?)
+    #[cfg(not(feature = "simd-json"))]
+    let result = serde_json::from_str(s)?;
+    #[cfg(feature = "simd-json")]
+    let result = simd_json::from_str(s)?;
+    Ok(result)
 }
 
-#[cfg(feature = "simd-json")]
-pub fn from_str<'a, T>(s: &'a mut str) -> Result<T>
-where
-    T: Deserialize<'a>,
-{
-    Ok(simd_json::from_str(s)?)
-}
-
-#[cfg(not(feature = "simd-json"))]
 pub(crate) fn from_value<T>(v: Value) -> Result<T>
 where
     T: DeserializeOwned,
 {
-    Ok(serde_json::from_value(v)?)
+    #[cfg(not(feature = "simd-json"))]
+    let result = serde_json::from_value(v)?;
+    #[cfg(feature = "simd-json")]
+    let result = simd_json::serde::from_owned_value(v)?;
+    Ok(result)
 }
 
-#[cfg(feature = "simd-json")]
-pub(crate) fn from_value<T>(v: Value) -> Result<T>
-where
-    T: DeserializeOwned,
-{
-    Ok(simd_json::serde::from_owned_value(v)?)
-}
-
-#[cfg(all(any(feature = "builder", feature = "http"), not(feature = "simd-json"), test))]
+#[cfg(all(any(feature = "builder", feature = "http"), test))]
 pub(crate) fn to_value<T>(value: T) -> Result<Value>
 where
     T: Serialize,
 {
-    Ok(serde_json::to_value(value)?)
-}
-
-#[cfg(all(any(feature = "builder", feature = "http"), feature = "simd-json", test))]
-pub(crate) fn to_value<T>(value: T) -> Result<Value>
-where
-    T: Serialize,
-{
-    Ok(simd_json::serde::to_owned_value(value)?)
+    #[cfg(not(feature = "simd-json"))]
+    let result = serde_json::to_value(value)?;
+    #[cfg(feature = "simd-json")]
+    let result = simd_json::serde::to_owned_value(value)?;
+    Ok(result)
 }
 
 pub mod prelude {
