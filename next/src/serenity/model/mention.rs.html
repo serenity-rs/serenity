@@ -270,29 +270,6 @@
 <span id="264">264</span>
 <span id="265">265</span>
 <span id="266">266</span>
-<span id="267">267</span>
-<span id="268">268</span>
-<span id="269">269</span>
-<span id="270">270</span>
-<span id="271">271</span>
-<span id="272">272</span>
-<span id="273">273</span>
-<span id="274">274</span>
-<span id="275">275</span>
-<span id="276">276</span>
-<span id="277">277</span>
-<span id="278">278</span>
-<span id="279">279</span>
-<span id="280">280</span>
-<span id="281">281</span>
-<span id="282">282</span>
-<span id="283">283</span>
-<span id="284">284</span>
-<span id="285">285</span>
-<span id="286">286</span>
-<span id="287">287</span>
-<span id="288">288</span>
-<span id="289">289</span>
 </pre><pre class="rust"><code><span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;utils&quot;</span>))]</span>
 <span class="kw">use</span> <span class="ident">std::error::Error</span> <span class="kw">as</span> <span class="ident">StdError</span>;
 <span class="kw">use</span> <span class="ident">std::fmt</span>;
@@ -385,7 +362,6 @@
     <span class="ident">Channel</span>(<span class="ident">ChannelId</span>),
     <span class="ident">Role</span>(<span class="ident">RoleId</span>),
     <span class="ident">User</span>(<span class="ident">UserId</span>),
-    <span class="ident">Emoji</span>(<span class="ident">EmojiId</span>, <span class="ident">bool</span>),
 }
 
 <span class="macro">macro_rules!</span> <span class="ident">mention</span> {
@@ -403,8 +379,6 @@
     <span class="ident">ChannelId</span>, <span class="ident">Mention::Channel</span>(<span class="ident">value</span>);
     <span class="ident">RoleId</span>, <span class="ident">Mention::Role</span>(<span class="ident">value</span>);
     <span class="ident">UserId</span>, <span class="ident">Mention::User</span>(<span class="ident">value</span>);
-    <span class="ident">EmojiId</span>, <span class="ident">Mention::Emoji</span>(<span class="ident">value</span>, <span class="bool-val">false</span>);
-    (<span class="ident">EmojiId</span>, <span class="ident">bool</span>), <span class="ident">Mention::Emoji</span>(<span class="ident">value</span>.<span class="number">0</span>, <span class="ident">value</span>.<span class="number">1</span>);
 );
 
 <span class="kw">impl</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">Mention</span> {
@@ -413,9 +387,6 @@
             <span class="ident">Mention::Channel</span>(<span class="ident">id</span>) =&gt; <span class="ident">f</span>.<span class="ident">write_fmt</span>(<span class="macro">format_args!</span>(<span class="string">&quot;&lt;#{}&gt;&quot;</span>, <span class="ident">id</span>.<span class="number">0</span>)),
             <span class="ident">Mention::Role</span>(<span class="ident">id</span>) =&gt; <span class="ident">f</span>.<span class="ident">write_fmt</span>(<span class="macro">format_args!</span>(<span class="string">&quot;&lt;@&amp;{}&gt;&quot;</span>, <span class="ident">id</span>.<span class="number">0</span>)),
             <span class="ident">Mention::User</span>(<span class="ident">id</span>) =&gt; <span class="ident">f</span>.<span class="ident">write_fmt</span>(<span class="macro">format_args!</span>(<span class="string">&quot;&lt;@{}&gt;&quot;</span>, <span class="ident">id</span>.<span class="number">0</span>)),
-            <span class="ident">Mention::Emoji</span>(<span class="ident">id</span>, <span class="ident">animated</span>) =&gt; {
-                <span class="ident">f</span>.<span class="ident">write_fmt</span>(<span class="macro">format_args!</span>(<span class="string">&quot;&lt;{}:omitted:{}&gt;&quot;</span>, <span class="kw">if</span> <span class="ident">animated</span> { <span class="string">&quot;a&quot;</span> } <span class="kw">else</span> { <span class="string">&quot;&quot;</span> }, <span class="ident">id</span>.<span class="number">0</span>,))
-            },
         }
     }
 }
@@ -447,8 +418,6 @@
             <span class="ident">id</span>.<span class="ident">mention</span>()
         } <span class="kw">else</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">id</span>) <span class="op">=</span> <span class="ident">utils::parse_username</span>(<span class="ident">s</span>) {
             <span class="ident">id</span>.<span class="ident">mention</span>()
-        } <span class="kw">else</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">emoji_ident</span>) <span class="op">=</span> <span class="ident">utils::parse_emoji</span>(<span class="ident">s</span>) {
-            <span class="ident">emoji_ident</span>.<span class="ident">mention</span>()
         } <span class="kw">else</span> {
             <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">MentionParseError::InvalidMention</span>);
         };
@@ -467,7 +436,7 @@
 }
 
 <span class="macro">macro_rules!</span> <span class="ident">mentionable</span> {
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">i</span>:<span class="ident">ident</span>: $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span>:<span class="ident">ty</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">e</span>:<span class="ident">expr</span>;)<span class="kw-2">*</span>) =&gt; {$(
+    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">i</span>:<span class="ident">ident</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span>:<span class="ident">ty</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">e</span>:<span class="ident">expr</span>) =&gt; {
         <span class="kw">impl</span> <span class="ident">Mentionable</span> <span class="kw">for</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span> {
             <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
             <span class="kw">fn</span> <span class="ident">mention</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Mention</span> {
@@ -475,22 +444,18 @@
                 <span class="macro-nonterminal">$</span><span class="macro-nonterminal">e</span>.<span class="ident">into</span>()
             }
         }
-    )<span class="kw-2">*</span>};
+    };
 }
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
-<span class="macro">mentionable!</span>(<span class="ident">value</span>: <span class="ident">Channel</span>, <span class="ident">value</span>.<span class="ident">id</span>(););
+<span class="macro">mentionable!</span>(<span class="ident">value</span>: <span class="ident">Channel</span>, <span class="ident">value</span>.<span class="ident">id</span>());
 
-<span class="macro">mentionable!</span>(<span class="ident">value</span>:
-    <span class="ident">GuildChannel</span>, <span class="ident">value</span>.<span class="ident">id</span>;
-    <span class="ident">PrivateChannel</span>, <span class="ident">value</span>.<span class="ident">id</span>;
-    <span class="ident">CurrentUser</span>, <span class="ident">value</span>.<span class="ident">id</span>;
-    <span class="ident">Member</span>, <span class="ident">value</span>.<span class="ident">user</span>.<span class="ident">id</span>;
-    <span class="ident">User</span>, <span class="ident">value</span>.<span class="ident">id</span>;
-    <span class="ident">Role</span>, <span class="ident">value</span>.<span class="ident">id</span>;
-    <span class="ident">Emoji</span>, (<span class="ident">value</span>.<span class="ident">id</span>, <span class="ident">value</span>.<span class="ident">animated</span>);
-    <span class="ident">EmojiIdentifier</span>, (<span class="ident">value</span>.<span class="ident">id</span>, <span class="ident">value</span>.<span class="ident">animated</span>);
-);
+<span class="macro">mentionable!</span>(<span class="ident">value</span>: <span class="ident">GuildChannel</span>, <span class="ident">value</span>.<span class="ident">id</span>);
+<span class="macro">mentionable!</span>(<span class="ident">value</span>: <span class="ident">PrivateChannel</span>, <span class="ident">value</span>.<span class="ident">id</span>);
+<span class="macro">mentionable!</span>(<span class="ident">value</span>: <span class="ident">CurrentUser</span>, <span class="ident">value</span>.<span class="ident">id</span>);
+<span class="macro">mentionable!</span>(<span class="ident">value</span>: <span class="ident">Member</span>, <span class="ident">value</span>.<span class="ident">user</span>.<span class="ident">id</span>);
+<span class="macro">mentionable!</span>(<span class="ident">value</span>: <span class="ident">User</span>, <span class="ident">value</span>.<span class="ident">id</span>);
+<span class="macro">mentionable!</span>(<span class="ident">value</span>: <span class="ident">Role</span>, <span class="ident">value</span>.<span class="ident">id</span>);
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;utils&quot;</span>)]</span>
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
@@ -522,16 +487,6 @@
             <span class="ident">member</span>: <span class="prelude-val">None</span>,
             <span class="ident">default_auto_archive_duration</span>: <span class="prelude-val">None</span>,
         });
-        <span class="kw">let</span> <span class="ident">emoji</span> <span class="op">=</span> <span class="ident">Emoji</span> {
-            <span class="ident">animated</span>: <span class="bool-val">false</span>,
-            <span class="ident">available</span>: <span class="bool-val">true</span>,
-            <span class="ident">id</span>: <span class="ident">EmojiId::new</span>(<span class="number">5</span>),
-            <span class="ident">name</span>: <span class="string">&quot;a&quot;</span>.<span class="ident">to_string</span>(),
-            <span class="ident">managed</span>: <span class="bool-val">true</span>,
-            <span class="ident">require_colons</span>: <span class="bool-val">true</span>,
-            <span class="ident">roles</span>: <span class="macro">vec!</span>[],
-            <span class="ident">user</span>: <span class="prelude-val">None</span>,
-        };
         <span class="kw">let</span> <span class="ident">role</span> <span class="op">=</span> <span class="ident">Role</span> {
             <span class="ident">id</span>: <span class="ident">RoleId::new</span>(<span class="number">2</span>),
             <span class="ident">guild_id</span>: <span class="ident">GuildId::new</span>(<span class="number">1</span>),
@@ -574,7 +529,6 @@
         <span class="macro">assert_eq!</span>(<span class="ident">ChannelId::new</span>(<span class="number">1</span>).<span class="ident">mention</span>().<span class="ident">to_string</span>(), <span class="string">&quot;&lt;#1&gt;&quot;</span>);
         <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
         <span class="macro">assert_eq!</span>(<span class="ident">channel</span>.<span class="ident">mention</span>().<span class="ident">to_string</span>(), <span class="string">&quot;&lt;#4&gt;&quot;</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">emoji</span>.<span class="ident">mention</span>().<span class="ident">to_string</span>(), <span class="string">&quot;&lt;:omitted:5&gt;&quot;</span>);
         <span class="macro">assert_eq!</span>(<span class="ident">member</span>.<span class="ident">mention</span>().<span class="ident">to_string</span>(), <span class="string">&quot;&lt;@6&gt;&quot;</span>);
         <span class="macro">assert_eq!</span>(<span class="ident">role</span>.<span class="ident">mention</span>().<span class="ident">to_string</span>(), <span class="string">&quot;&lt;@&amp;2&gt;&quot;</span>);
         <span class="macro">assert_eq!</span>(<span class="ident">role</span>.<span class="ident">id</span>.<span class="ident">mention</span>().<span class="ident">to_string</span>(), <span class="string">&quot;&lt;@&amp;2&gt;&quot;</span>);

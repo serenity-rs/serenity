@@ -540,7 +540,6 @@
 <span id="534">534</span>
 <span id="535">535</span>
 <span id="536">536</span>
-<span id="537">537</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::borrow::Cow</span>;
 
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::cache::Cache</span>;
@@ -806,7 +805,6 @@
                 .<span class="ident">or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">users</span>.<span class="ident">iter</span>().<span class="ident">find</span>(<span class="op">|</span><span class="ident">u</span><span class="op">|</span> <span class="ident">u</span>.<span class="ident">id</span> <span class="op">==</span> <span class="ident">id</span>).<span class="ident">map</span>(<span class="ident">get_username</span>))
                 .<span class="ident">unwrap_or</span>(<span class="ident">Cow::Borrowed</span>(<span class="string">&quot;@invalid-user&quot;</span>))
         },
-        <span class="ident">Mention::Emoji</span>(<span class="kw">_</span>, <span class="kw">_</span>) =&gt; <span class="macro">unreachable!</span>(),
     }
 }
 
