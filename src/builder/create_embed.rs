@@ -301,7 +301,7 @@ impl Default for CreateEmbed {
 
 pub type CreateEmbedAuthor = EmbedAuthor;
 
-impl EmbedAuthor {
+impl CreateEmbedAuthor {
     /// Creates an author object with the given name, leaving all other fields empty.
     pub fn new(name: impl Into<String>) -> Self {
         Self {
