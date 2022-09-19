@@ -967,7 +967,7 @@ impl GuildChannel {
     /// ```
     #[allow(clippy::missing_errors_doc)]
     pub fn start_typing(&self, http: &Arc<Http>) -> Result<Typing> {
-        http.start_typing(self.id.get())
+        http.start_typing(self.id)
     }
 
     /// Unpins a [`Message`] in the channel given by its Id.

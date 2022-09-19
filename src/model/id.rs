@@ -324,8 +324,7 @@ mod tests {
 
         #[derive(Debug, PartialEq, Deserialize, Serialize)]
         struct S {
-            #[serde(with = "snowflake")]
-            id: NonZeroU64,
+            id: GenericId,
         }
 
         #[derive(Debug, PartialEq, Deserialize, Serialize)]

@@ -1096,7 +1096,7 @@ impl UserId {
             }
         }
 
-        let user = cache_http.http().get_user(self.get()).await?;
+        let user = cache_http.http().get_user(self).await?;
 
         #[cfg(all(feature = "cache", feature = "temp_cache"))]
         {

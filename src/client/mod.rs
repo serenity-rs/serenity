@@ -144,7 +144,7 @@ impl ClientBuilder {
     }
 
     /// Sets the application id.
-    pub fn application_id(self, application_id: u64) -> Self {
+    pub fn application_id(self, application_id: ApplicationId) -> Self {
         if let Some(http) = &self.http {
             http.set_application_id(application_id);
         }
@@ -154,7 +154,7 @@ impl ClientBuilder {
 
     /// Gets the application ID, if already initialized. See [`Self::application_id`] for more info.
     pub fn get_application_id(&self) -> Option<ApplicationId> {
-        self.http.as_ref().and_then(Http::application_id).map(ApplicationId)
+        self.http.as_ref().and_then(Http::application_id)
     }
 
     /// Sets the entire [`TypeMap`] that will be available in [`Context`]s.

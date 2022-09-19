@@ -366,7 +366,7 @@ impl PrivateChannel {
     /// May return [`Error::Http`] if the current user cannot send a direct message
     /// to this user.
     pub fn start_typing(self, http: &Arc<Http>) -> Result<Typing> {
-        http.start_typing(self.id.get())
+        http.start_typing(self.id)
     }
 
     /// Unpins a [`Message`] in the channel given by its Id.

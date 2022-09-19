@@ -536,7 +536,7 @@ impl Member {
     /// [Ban Members]: Permissions::BAN_MEMBERS
     #[inline]
     pub async fn unban(&self, http: impl AsRef<Http>) -> Result<()> {
-        http.as_ref().remove_ban(self.guild_id.get(), self.user.id.get(), None).await
+        http.as_ref().remove_ban(self.guild_id, self.user.id, None).await
     }
 
     /// Returns the formatted URL of the member's per guild avatar, if one exists.

@@ -51,7 +51,7 @@ impl GuildId {
     /// [Manage Guild]: Permissions::MANAGE_GUILD
     #[inline]
     pub async fn automod_rules(self, http: impl AsRef<Http>) -> Result<Vec<Rule>> {
-        http.as_ref().get_automod_rules(self.get()).await
+        http.as_ref().get_automod_rules(self).await
     }
 
     /// Gets an auto moderation [`Rule`] of this guild by its ID via HTTP.
@@ -69,7 +69,7 @@ impl GuildId {
         http: impl AsRef<Http>,
         rule_id: impl Into<RuleId>,
     ) -> Result<Rule> {
-        http.as_ref().get_automod_rule(self.get(), rule_id.into().get()).await
+        http.as_ref().get_automod_rule(self, rule_id.into()).await
     }
 
     /// Creates an auto moderation [`Rule`] in the guild.
@@ -147,7 +147,7 @@ impl GuildId {
         http: impl AsRef<Http>,
         rule_id: impl Into<RuleId>,
     ) -> Result<()> {
-        http.as_ref().delete_automod_rule(self.get(), rule_id.into().get(), None).await
+        http.as_ref().delete_automod_rule(self, rule_id.into(), None).await
     }
 
     /// Adds a [`User`] to this guild with a valid OAuth2 access token.
@@ -237,7 +237,7 @@ impl GuildId {
             return Err(Error::ExceededLimit(reason.to_string(), 512));
         }
 
-        http.as_ref().ban_user(self.get(), user.get(), dmd, reason).await
+        http.as_ref().ban_user(self, user, dmd, reason).await
     }
 
     /// Gets a list of the guild's bans.
@@ -251,7 +251,7 @@ impl GuildId {
     /// [Ban Members]: Permissions::BAN_MEMBERS
     #[inline]
     pub async fn bans(self, http: impl AsRef<Http>) -> Result<Vec<Ban>> {
-        http.as_ref().get_bans(self.get()).await
+        http.as_ref().get_bans(self).await
     }
 
     /// Gets a list of the guild's audit log entries
@@ -274,13 +274,7 @@ impl GuildId {
         limit: Option<u8>,
     ) -> Result<AuditLogs> {
         http.as_ref()
-            .get_audit_logs(
-                self.get(),
-                action_type,
-                user_id.map(UserId::get),
-                before.map(AuditLogEntryId::get),
-                limit,
-            )
+            .get_audit_logs(self, action_type, user_id, before.map(AuditLogEntryId::get), limit)
             .await
     }
 
@@ -294,7 +288,7 @@ impl GuildId {
         self,
         http: impl AsRef<Http>,
     ) -> Result<HashMap<ChannelId, GuildChannel>> {
-        let channels = http.as_ref().get_channels(self.get()).await?;
+        let channels = http.as_ref().get_channels(self).await?;
 
         Ok(channels.into_iter().map(|c| (c.id, c)).collect())
     }
@@ -370,7 +364,7 @@ impl GuildId {
             "image": image,
         });
 
-        http.as_ref().create_emoji(self.get(), &map, None).await
+        http.as_ref().create_emoji(self, &map, None).await
     }
 
     /// Creates an integration for the guild.
@@ -395,7 +389,7 @@ impl GuildId {
             "type": kind,
         });
 
-        http.as_ref().create_guild_integration(self.get(), integration_id.get(), &map, None).await
+        http.as_ref().create_guild_integration(self, integration_id, &map, None).await
     }
 
     /// Creates a new role in the guild with the data set, if any.
@@ -468,7 +462,7 @@ impl GuildId {
     /// Returns [`Error::Http`] if the current user is not the owner of the guild.
     #[inline]
     pub async fn delete(self, http: impl AsRef<Http>) -> Result<()> {
-        http.as_ref().delete_guild(self.get()).await
+        http.as_ref().delete_guild(self).await
     }
 
     /// Deletes an [`Emoji`] from the guild.
@@ -487,7 +481,7 @@ impl GuildId {
         http: impl AsRef<Http>,
         emoji_id: impl Into<EmojiId>,
     ) -> Result<()> {
-        http.as_ref().delete_emoji(self.get(), emoji_id.into().get(), None).await
+        http.as_ref().delete_emoji(self, emoji_id.into(), None).await
     }
 
     /// Deletes an integration by Id from the guild.
@@ -506,7 +500,7 @@ impl GuildId {
         http: impl AsRef<Http>,
         integration_id: impl Into<IntegrationId>,
     ) -> Result<()> {
-        http.as_ref().delete_guild_integration(self.get(), integration_id.into().get(), None).await
+        http.as_ref().delete_guild_integration(self, integration_id.into(), None).await
     }
 
     /// Deletes a [`Role`] by Id from the guild.
@@ -528,7 +522,7 @@ impl GuildId {
         http: impl AsRef<Http>,
         role_id: impl Into<RoleId>,
     ) -> Result<()> {
-        http.as_ref().delete_role(self.get(), role_id.into().get(), None).await
+        http.as_ref().delete_role(self, role_id.into(), None).await
     }
 
     /// Deletes a specified scheduled event in the guild.
@@ -546,7 +540,7 @@ impl GuildId {
         http: impl AsRef<Http>,
         event_id: impl Into<ScheduledEventId>,
     ) -> Result<()> {
-        http.as_ref().delete_scheduled_event(self.get(), event_id.into().get()).await
+        http.as_ref().delete_scheduled_event(self, event_id.into()).await
     }
 
     /// Deletes a [`Sticker`] by Id from the guild.
@@ -565,7 +559,7 @@ impl GuildId {
         http: impl AsRef<Http>,
         sticker_id: impl Into<StickerId>,
     ) -> Result<()> {
-        http.as_ref().delete_sticker(self.get(), sticker_id.into().get(), None).await
+        http.as_ref().delete_sticker(self, sticker_id.into(), None).await
     }
 
     /// Edits the current guild with new data where specified.
@@ -610,7 +604,7 @@ impl GuildId {
             "name": name,
         });
 
-        http.as_ref().edit_emoji(self.get(), emoji_id.into().get(), &map, None).await
+        http.as_ref().edit_emoji(self, emoji_id.into(), &map, None).await
     }
 
     /// Edits the properties a guild member, such as muting or nicknaming them. Returns the new
@@ -668,7 +662,7 @@ impl GuildId {
         http: impl AsRef<Http>,
         new_nickname: Option<&str>,
     ) -> Result<()> {
-        http.as_ref().edit_nickname(self.get(), new_nickname, None).await
+        http.as_ref().edit_nickname(self, new_nickname, None).await
     }
 
     /// Edits a [`Role`], optionally setting its new fields.
@@ -791,7 +785,7 @@ impl GuildId {
         role_id: impl Into<RoleId>,
         position: u32,
     ) -> Result<Vec<Role>> {
-        http.as_ref().edit_role_position(self.get(), role_id.into().get(), position, None).await
+        http.as_ref().edit_role_position(self, role_id.into(), position, None).await
     }
 
     /// Edits the guild's welcome screen.
@@ -835,7 +829,7 @@ impl GuildId {
     /// Returns [`Error::Http`] if the current user is not in
     /// the guild.
     pub async fn roles(self, http: impl AsRef<Http>) -> Result<HashMap<RoleId, Role>> {
-        let roles = http.as_ref().get_guild_roles(self.get()).await?;
+        let roles = http.as_ref().get_guild_roles(self).await?;
 
         Ok(roles.into_iter().map(|r| (r.id, r)).collect())
     }
@@ -866,7 +860,7 @@ impl GuildId {
             }
         }
 
-        cache_http.http().get_guild(self.get()).await
+        cache_http.http().get_guild(self).await
     }
 
     /// Requests [`PartialGuild`] over REST API with counts.
@@ -882,7 +876,7 @@ impl GuildId {
         self,
         http: impl AsRef<Http>,
     ) -> Result<PartialGuild> {
-        http.as_ref().get_guild_with_counts(self.get()).await
+        http.as_ref().get_guild_with_counts(self).await
     }
 
     /// Gets all [`Emoji`]s of this guild via HTTP.
@@ -891,8 +885,8 @@ impl GuildId {
     ///
     /// Returns an [`Error::Http`] if the guild is unavailable.
     #[inline]
-    pub async fn emojis(&self, http: impl AsRef<Http>) -> Result<Vec<Emoji>> {
-        http.as_ref().get_emojis(self.get()).await
+    pub async fn emojis(self, http: impl AsRef<Http>) -> Result<Vec<Emoji>> {
+        http.as_ref().get_emojis(self).await
     }
 
     /// Gets an [`Emoji`] of this guild by its ID via HTTP.
@@ -901,8 +895,8 @@ impl GuildId {
     ///
     /// Returns an [`Error::Http`] if an emoji with that Id does not exist.
     #[inline]
-    pub async fn emoji(&self, http: impl AsRef<Http>, emoji_id: EmojiId) -> Result<Emoji> {
-        http.as_ref().get_emoji(self.get(), emoji_id.get()).await
+    pub async fn emoji(self, http: impl AsRef<Http>, emoji_id: EmojiId) -> Result<Emoji> {
+        http.as_ref().get_emoji(self, emoji_id).await
     }
 
     /// Gets all [`Sticker`]s of this guild via HTTP.
@@ -911,8 +905,8 @@ impl GuildId {
     ///
     /// Returns an [`Error::Http`] if the guild is unavailable.
     #[inline]
-    pub async fn stickers(&self, http: impl AsRef<Http>) -> Result<Vec<Sticker>> {
-        http.as_ref().get_guild_stickers(self.get()).await
+    pub async fn stickers(self, http: impl AsRef<Http>) -> Result<Vec<Sticker>> {
+        http.as_ref().get_guild_stickers(self).await
     }
 
     /// Gets an [`Sticker`] of this guild by its ID via HTTP.
@@ -921,8 +915,8 @@ impl GuildId {
     ///
     /// Returns an [`Error::Http`] if an sticker with that Id does not exist.
     #[inline]
-    pub async fn sticker(&self, http: impl AsRef<Http>, sticker_id: StickerId) -> Result<Sticker> {
-        http.as_ref().get_guild_sticker(self.get(), sticker_id.get()).await
+    pub async fn sticker(self, http: impl AsRef<Http>, sticker_id: StickerId) -> Result<Sticker> {
+        http.as_ref().get_guild_sticker(self, sticker_id).await
     }
 
     /// Gets all integration of the guild.
@@ -938,7 +932,7 @@ impl GuildId {
     /// [Manage Guild]: Permissions::MANAGE_GUILD
     #[inline]
     pub async fn integrations(self, http: impl AsRef<Http>) -> Result<Vec<Integration>> {
-        http.as_ref().get_guild_integrations(self.get()).await
+        http.as_ref().get_guild_integrations(self).await
     }
 
     /// Gets all of the guild's invites.
@@ -954,7 +948,7 @@ impl GuildId {
     /// [Manage Guild]: Permissions::MANAGE_GUILD
     #[inline]
     pub async fn invites(self, http: impl AsRef<Http>) -> Result<Vec<RichInvite>> {
-        http.as_ref().get_guild_invites(self.get()).await
+        http.as_ref().get_guild_invites(self).await
     }
 
     /// Kicks a [`Member`] from the guild.
@@ -969,7 +963,7 @@ impl GuildId {
     /// [Kick Members]: Permissions::KICK_MEMBERS
     #[inline]
     pub async fn kick(self, http: impl AsRef<Http>, user_id: impl Into<UserId>) -> Result<()> {
-        http.as_ref().kick_member(self.get(), user_id.into().get()).await
+        http.as_ref().kick_member(self, user_id.into()).await
     }
 
     /// # Errors
@@ -983,7 +977,7 @@ impl GuildId {
         user_id: impl Into<UserId>,
         reason: &str,
     ) -> Result<()> {
-        http.as_ref().kick_member_with_reason(self.get(), user_id.into().get(), reason).await
+        http.as_ref().kick_member_with_reason(self, user_id.into(), reason).await
     }
 
     /// Leaves the guild.
@@ -994,7 +988,7 @@ impl GuildId {
     /// cannot leave the guild, or currently is not in the guild.
     #[inline]
     pub async fn leave(self, http: impl AsRef<Http>) -> Result<()> {
-        http.as_ref().leave_guild(self.get()).await
+        http.as_ref().leave_guild(self).await
     }
 
     /// Gets a user's [`Member`] for the guild by Id.
@@ -1023,7 +1017,7 @@ impl GuildId {
             }
         }
 
-        cache_http.http().get_member(self.get(), user_id.get()).await
+        cache_http.http().get_member(self, user_id).await
     }
 
     /// Gets a list of the guild's members.
@@ -1046,7 +1040,7 @@ impl GuildId {
         limit: Option<u64>,
         after: impl Into<Option<UserId>>,
     ) -> Result<Vec<Member>> {
-        http.as_ref().get_guild_members(self.get(), limit, after.into().map(UserId::get)).await
+        http.as_ref().get_guild_members(self, limit, after.into().map(UserId::get)).await
     }
 
     /// Streams over all the members in a guild.
@@ -1138,7 +1132,7 @@ impl GuildId {
     /// [Kick Members]: Permissions::KICK_MEMBERS
     #[inline]
     pub async fn prune_count(self, http: impl AsRef<Http>, days: u8) -> Result<GuildPrune> {
-        http.as_ref().get_guild_prune_count(self.get(), days).await
+        http.as_ref().get_guild_prune_count(self, days).await
     }
 
     /// Re-orders the channels of the guild.
@@ -1172,7 +1166,7 @@ impl GuildId {
             })
             .collect::<Vec<_>>();
 
-        http.as_ref().edit_guild_channel_positions(self.get(), &Value::from(items)).await
+        http.as_ref().edit_guild_channel_positions(self, &Value::from(items)).await
     }
 
     /// Returns a list of [`Member`]s in a [`Guild`] whose username or nickname
@@ -1191,7 +1185,7 @@ impl GuildId {
         query: &str,
         limit: Option<u64>,
     ) -> Result<Vec<Member>> {
-        http.as_ref().search_guild_members(self.get(), query, limit).await
+        http.as_ref().search_guild_members(self, query, limit).await
     }
 
     /// Fetches a specified scheduled event in the guild, by Id. If `with_user_count` is set to
@@ -1212,7 +1206,7 @@ impl GuildId {
         event_id: impl Into<ScheduledEventId>,
         with_user_count: bool,
     ) -> Result<ScheduledEvent> {
-        http.as_ref().get_scheduled_event(self.get(), event_id.into().get(), with_user_count).await
+        http.as_ref().get_scheduled_event(self, event_id.into(), with_user_count).await
     }
 
     /// Fetches a list of all scheduled events in the guild. If `with_user_count` is set to `true`,
@@ -1230,7 +1224,7 @@ impl GuildId {
         http: impl AsRef<Http>,
         with_user_count: bool,
     ) -> Result<Vec<ScheduledEvent>> {
-        http.as_ref().get_scheduled_events(self.get(), with_user_count).await
+        http.as_ref().get_scheduled_events(self, with_user_count).await
     }
 
     /// Fetches a list of interested users for the specified event.
@@ -1251,9 +1245,7 @@ impl GuildId {
         event_id: impl Into<ScheduledEventId>,
         limit: Option<u64>,
     ) -> Result<Vec<ScheduledEventUser>> {
-        http.as_ref()
-            .get_scheduled_event_users(self.get(), event_id.into().get(), limit, None, None)
-            .await
+        http.as_ref().get_scheduled_event_users(self, event_id.into(), limit, None, None).await
     }
 
     /// Fetches a list of interested users for the specified event, with additional options and
@@ -1276,13 +1268,7 @@ impl GuildId {
         with_member: Option<bool>,
     ) -> Result<Vec<ScheduledEventUser>> {
         http.as_ref()
-            .get_scheduled_event_users(
-                self.get(),
-                event_id.into().get(),
-                limit,
-                target,
-                with_member,
-            )
+            .get_scheduled_event_users(self, event_id.into(), limit, target, with_member)
             .await
     }
 
@@ -1347,7 +1333,7 @@ impl GuildId {
         http: impl AsRef<Http>,
         integration_id: impl Into<IntegrationId>,
     ) -> Result<()> {
-        http.as_ref().start_integration_sync(self.get(), integration_id.into().get()).await
+        http.as_ref().start_integration_sync(self, integration_id.into()).await
     }
 
     /// Starts a prune of [`Member`]s.
@@ -1363,7 +1349,7 @@ impl GuildId {
     /// [Kick Members]: Permissions::KICK_MEMBERS
     #[inline]
     pub async fn start_prune(self, http: impl AsRef<Http>, days: u8) -> Result<GuildPrune> {
-        http.as_ref().start_guild_prune(self.get(), days, None).await
+        http.as_ref().start_guild_prune(self, days, None).await
     }
 
     /// Unbans a [`User`] from the guild.
@@ -1377,7 +1363,7 @@ impl GuildId {
     /// [Ban Members]: Permissions::BAN_MEMBERS
     #[inline]
     pub async fn unban(self, http: impl AsRef<Http>, user_id: impl Into<UserId>) -> Result<()> {
-        http.as_ref().remove_ban(self.get(), user_id.into().get(), None).await
+        http.as_ref().remove_ban(self, user_id.into(), None).await
     }
 
     /// Retrieve's the guild's vanity URL.
@@ -1393,7 +1379,7 @@ impl GuildId {
     /// [Manage Guild]: Permissions::MANAGE_GUILD
     #[inline]
     pub async fn vanity_url(self, http: impl AsRef<Http>) -> Result<String> {
-        http.as_ref().get_guild_vanity_url(self.get()).await
+        http.as_ref().get_guild_vanity_url(self).await
     }
 
     /// Retrieves the guild's webhooks.
@@ -1409,12 +1395,12 @@ impl GuildId {
     /// the API response.
     #[inline]
     pub async fn webhooks(self, http: impl AsRef<Http>) -> Result<Vec<Webhook>> {
-        http.as_ref().get_guild_webhooks(self.get()).await
+        http.as_ref().get_guild_webhooks(self).await
     }
     /// Returns a builder which can be awaited to obtain a message or stream of messages in this guild.
     #[cfg(feature = "collector")]
     pub fn reply_collector<'a>(
-        &self,
+        self,
         shard_messenger: &'a ShardMessenger,
     ) -> MessageCollectorBuilder<'a> {
         MessageCollectorBuilder::new(shard_messenger).guild_id(self.0)
@@ -1423,7 +1409,7 @@ impl GuildId {
     /// Returns a builder which can be awaited to obtain a message or stream of reactions sent in this guild.
     #[cfg(feature = "collector")]
     pub fn reaction_collector<'a>(
-        &self,
+        self,
         shard_messenger: &'a ShardMessenger,
     ) -> ReactionCollectorBuilder<'a> {
         ReactionCollectorBuilder::new(shard_messenger).guild_id(self.0)
@@ -1454,7 +1440,7 @@ impl GuildId {
         http: impl AsRef<Http>,
         commands: Vec<CreateApplicationCommand>,
     ) -> Result<Vec<Command>> {
-        http.as_ref().create_guild_application_commands(self.get(), &commands).await
+        http.as_ref().create_guild_application_commands(self, &commands).await
     }
 
     /// Create a guild specific [`CommandPermission`].
@@ -1478,8 +1464,8 @@ impl GuildId {
     /// # Errors
     ///
     /// If there is an error, it will be either [`Error::Http`] or [`Error::Json`].
-    pub async fn get_application_commands(&self, http: impl AsRef<Http>) -> Result<Vec<Command>> {
-        http.as_ref().get_guild_application_commands(self.get()).await
+    pub async fn get_application_commands(self, http: impl AsRef<Http>) -> Result<Vec<Command>> {
+        http.as_ref().get_guild_application_commands(self).await
     }
 
     /// Get a specific guild application command by its Id.
@@ -1488,11 +1474,11 @@ impl GuildId {
     ///
     /// If there is an error, it will be either [`Error::Http`] or [`Error::Json`].
     pub async fn get_application_command(
-        &self,
+        self,
         http: impl AsRef<Http>,
         command_id: CommandId,
     ) -> Result<Command> {
-        http.as_ref().get_guild_application_command(self.get(), command_id.into()).await
+        http.as_ref().get_guild_application_command(self, command_id.into()).await
     }
 
     /// Edit a guild application command, given its Id.
@@ -1515,11 +1501,11 @@ impl GuildId {
     ///
     /// If there is an error, it will be either [`Error::Http`] or [`Error::Json`].
     pub async fn delete_application_command(
-        &self,
+        self,
         http: impl AsRef<Http>,
         command_id: CommandId,
     ) -> Result<()> {
-        http.as_ref().delete_guild_application_command(self.get(), command_id.into()).await
+        http.as_ref().delete_guild_application_command(self, command_id.into()).await
     }
 
     /// Get all guild application commands permissions only.
@@ -1528,10 +1514,10 @@ impl GuildId {
     ///
     /// If there is an error, it will be either [`Error::Http`] or [`Error::Json`].
     pub async fn get_application_commands_permissions(
-        &self,
+        self,
         http: impl AsRef<Http>,
     ) -> Result<Vec<CommandPermission>> {
-        http.as_ref().get_guild_application_commands_permissions(self.get()).await
+        http.as_ref().get_guild_application_commands_permissions(self).await
     }
 
     /// Get permissions for specific guild application command by its Id.
@@ -1540,11 +1526,11 @@ impl GuildId {
     ///
     /// If there is an error, it will be either [`Error::Http`] or [`Error::Json`].
     pub async fn get_application_command_permissions(
-        &self,
+        self,
         http: impl AsRef<Http>,
         command_id: CommandId,
     ) -> Result<CommandPermission> {
-        http.as_ref().get_guild_application_command_permissions(self.get(), command_id.into()).await
+        http.as_ref().get_guild_application_command_permissions(self, command_id.into()).await
     }
 
     /// Get the guild welcome screen.
@@ -1552,8 +1538,8 @@ impl GuildId {
     /// # Errors
     ///
     /// Returns [`Error::Http`] if the guild does not have a welcome screen.
-    pub async fn get_welcome_screen(&self, http: impl AsRef<Http>) -> Result<GuildWelcomeScreen> {
-        http.as_ref().get_guild_welcome_screen(self.get()).await
+    pub async fn get_welcome_screen(self, http: impl AsRef<Http>) -> Result<GuildWelcomeScreen> {
+        http.as_ref().get_guild_welcome_screen(self).await
     }
 
     /// Get the guild preview.
@@ -1564,8 +1550,8 @@ impl GuildId {
     /// # Errors
     ///
     /// Returns [`Error::Http`] if the bot cannot see the guild preview, see the note.
-    pub async fn get_preview(&self, http: impl AsRef<Http>) -> Result<GuildPreview> {
-        http.as_ref().get_guild_preview(self.get()).await
+    pub async fn get_preview(self, http: impl AsRef<Http>) -> Result<GuildPreview> {
+        http.as_ref().get_guild_preview(self).await
     }
 
     /// Get the guild widget.
@@ -1573,14 +1559,14 @@ impl GuildId {
     /// # Errors
     ///
     /// Returns [`Error::Http`] if the bot does not have `MANAGE_MESSAGES` permission.
-    pub async fn get_widget(&self, http: impl AsRef<Http>) -> Result<GuildWidget> {
-        http.as_ref().get_guild_widget(self.get()).await
+    pub async fn get_widget(self, http: impl AsRef<Http>) -> Result<GuildWidget> {
+        http.as_ref().get_guild_widget(self).await
     }
 
     /// Get the widget image URL.
     #[must_use]
-    pub fn widget_image_url(&self, style: GuildWidgetStyle) -> String {
-        api!("/guilds/{}/widget.png?style={}", self.get(), style)
+    pub fn widget_image_url(self, style: GuildWidgetStyle) -> String {
+        api!("/guilds/{}/widget.png?style={}", self, style)
     }
 
     /// Gets the guild active threads.
@@ -1589,8 +1575,8 @@ impl GuildId {
     ///
     /// Returns [`Error::Http`] if there is an error in the deserialization, or
     /// if the bot issuing the request is not in the guild.
-    pub async fn get_active_threads(&self, http: impl AsRef<Http>) -> Result<ThreadsData> {
-        http.as_ref().get_guild_active_threads(self.get()).await
+    pub async fn get_active_threads(self, http: impl AsRef<Http>) -> Result<ThreadsData> {
+        http.as_ref().get_guild_active_threads(self).await
     }
 }
 

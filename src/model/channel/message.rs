@@ -248,11 +248,7 @@ impl Message {
             }
         }
 
-        cache_http
-            .http()
-            .as_ref()
-            .delete_message_reactions(self.channel_id.get(), self.id.get())
-            .await
+        cache_http.http().as_ref().delete_message_reactions(self.channel_id, self.id).await
     }
 
     /// Deletes all of the [`Reaction`]s of a given emoji associated with the message.
@@ -286,11 +282,7 @@ impl Message {
         cache_http
             .http()
             .as_ref()
-            .delete_message_reaction_emoji(
-                self.channel_id.get(),
-                self.id.get(),
-                &reaction_type.into(),
-            )
+            .delete_message_reaction_emoji(self.channel_id, self.id, &reaction_type.into())
             .await
     }
 
@@ -553,10 +545,7 @@ impl Message {
             }
         }
 
-        cache_http
-            .http()
-            .create_reaction(self.channel_id.get(), self.id.get(), &reaction_type)
-            .await?;
+        cache_http.http().create_reaction(self.channel_id, self.id, &reaction_type).await?;
 
         Ok(Reaction {
             channel_id: self.channel_id,
@@ -744,7 +733,7 @@ impl Message {
             }
         }
 
-        cache_http.http().unpin_message(self.channel_id.get(), self.id.get(), None).await
+        cache_http.http().unpin_message(self.channel_id, self.id, None).await
     }
 
     /// Tries to return author's nickname in the current channel's guild.

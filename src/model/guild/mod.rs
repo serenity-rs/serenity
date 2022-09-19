@@ -1546,7 +1546,7 @@ impl Guild {
         if let Some(member) = self.members.get(&user_id) {
             Ok(Cow::Borrowed(member))
         } else {
-            cache_http.http().get_member(self.id.get(), user_id.get()).await.map(Cow::Owned)
+            cache_http.http().get_member(self.id, user_id).await.map(Cow::Owned)
         }
     }
 

@@ -3,162 +3,73 @@ use std::fmt::{Display, Write};
 
 use super::LightMethod;
 use crate::constants;
+use crate::model::id::*;
 
 /// A representation of all routes registered within the library. These are safe
 /// and memory-efficient representations of each path that functions exist for
 /// in the [`http`] module.
+///
+/// Used as ratelimit buckets.
 ///
 /// [`http`]: crate::http
 #[derive(Clone, Copy, Debug, Eq, Hash, PartialEq)]
 #[non_exhaustive]
 pub enum Route {
     /// Route for the `/channels/:channel_id` path.
-    ///
-    /// The data is the relevant [`ChannelId`].
-    ///
-    /// [`ChannelId`]: crate::model::id::ChannelId
-    ChannelsId(u64),
+    ChannelsId(ChannelId),
     /// Route for the `/channels/:channel_id/invites` path.
-    ///
-    /// The data is the relevant [`ChannelId`].
-    ///
-    /// [`ChannelId`]: crate::model::id::ChannelId
-    ChannelsIdInvites(u64),
+    ChannelsIdInvites(ChannelId),
     /// Route for the `/channels/:channel_id/messages` path.
-    ///
-    /// The data is the relevant [`ChannelId`].
-    ///
-    /// [`ChannelId`]: crate::model::id::ChannelId
-    ChannelsIdMessages(u64),
+    ChannelsIdMessages(ChannelId),
     /// Route for the `/channels/:channel_id/messages/bulk-delete` path.
-    ///
-    /// The data is the relevant [`ChannelId`].
-    ///
-    /// [`ChannelId`]: crate::model::id::ChannelId
-    ChannelsIdMessagesBulkDelete(u64),
+    ChannelsIdMessagesBulkDelete(ChannelId),
     /// Route for the `/channels/:channel_id/messages/:message_id` path.
-    ///
-    /// The data is the relevant [`ChannelId`].
     ///
     /// This route is a unique case. The ratelimit for message _deletions_ is
     /// different than the overall route ratelimit.
     ///
     /// Refer to the docs on [Rate Limits] in the yellow warning section.
-    ///
-    /// [`ChannelId`]: crate::model::id::ChannelId
     /// [Rate Limits]: https://discord.com/developers/docs/topics/rate-limits
-    ChannelsIdMessagesId(LightMethod, u64),
+    ChannelsIdMessagesId(LightMethod, ChannelId),
     /// Route for the `/channels/:channel_id/messages/:message_id/ack` path.
-    ///
-    /// The data is the relevant [`ChannelId`].
-    ///
-    /// [`ChannelId`]: crate::model::id::ChannelId
-    ChannelsIdMessagesIdAck(u64),
+    ChannelsIdMessagesIdAck(ChannelId),
     /// Route for the `/channels/:channel_id/messages/:message_id/reactions`
     /// path.
-    ///
-    /// The data is the relevant [`ChannelId`].
-    ///
-    /// [`ChannelId`]: crate::model::id::ChannelId
-    ChannelsIdMessagesIdReactions(u64),
+    ChannelsIdMessagesIdReactions(ChannelId),
     /// Route for the
     /// `/channels/:channel_id/messages/:message_id/reactions/:reaction/@me`
     /// path.
-    ///
-    /// The data is the relevant [`ChannelId`].
-    ///
-    /// [`ChannelId`]: crate::model::id::ChannelId
-    ChannelsIdMessagesIdReactionsUserIdType(u64),
+    ChannelsIdMessagesIdReactionsUserIdType(ChannelId),
     /// Route for the `/channels/:channel_id/permissions/:target_id` path.
-    ///
-    /// The data is the relevant [`ChannelId`].
-    ///
-    /// [`ChannelId`]: crate::model::id::ChannelId
-    ChannelsIdPermissionsOverwriteId(u64),
+    ChannelsIdPermissionsOverwriteId(ChannelId),
     /// Route for the `/channels/:channel_id/pins` path.
-    ///
-    /// The data is the relevant [`ChannelId`].
-    ///
-    /// [`ChannelId`]: crate::model::id::ChannelId
-    ChannelsIdPins(u64),
+    ChannelsIdPins(ChannelId),
     /// Route for the `/channels/:channel_id/pins/:message_id` path.
-    ///
-    /// The data is the relevant [`ChannelId`].
-    ///
-    /// [`ChannelId`]: crate::model::id::ChannelId
-    ChannelsIdPinsMessageId(u64),
+    ChannelsIdPinsMessageId(ChannelId),
     /// Route for the `/channels/:channel_id/message/:message_id/crosspost` path.
-    ///
-    /// The data is the relevant [`ChannelId`].
-    ///
-    /// [`ChannelId`]: crate::model::id::ChannelId
-    ChannelsIdCrosspostsMessageId(u64),
+    ChannelsIdCrosspostsMessageId(ChannelId),
     /// Route for the `/channels/:channel_id/typing` path.
-    ///
-    /// The data is the relevant [`ChannelId`].
-    ///
-    /// [`ChannelId`]: crate::model::id::ChannelId
-    ChannelsIdTyping(u64),
+    ChannelsIdTyping(ChannelId),
     /// Route for the `/channels/:channel_id/webhooks` path.
-    ///
-    /// The data is the relevant [`ChannelId`].
-    ///
-    /// [`ChannelId`]: crate::model::id::ChannelId
-    ChannelsIdWebhooks(u64),
+    ChannelsIdWebhooks(ChannelId),
     /// Route for the `/channels/:channel_id/messages/:message_id/threads` path.
-    ///
-    /// The data is the relevant [`ChannelId`].
-    ///
-    /// [`ChannelId`]: crate::model::id::ChannelId
-    ChannelsIdMessagesIdThreads(u64),
+    ChannelsIdMessagesIdThreads(ChannelId),
     /// Route for the `/channels/:channel_id/threads` path.
-    ///
-    /// The data is the relevant [`ChannelId`].
-    ///
-    /// [`ChannelId`]: crate::model::id::ChannelId
-    ChannelsIdThreads(u64),
+    ChannelsIdThreads(ChannelId),
     /// Route for the `/channels/:channel_id/thread-members/@me` path.
-    ///
-    /// The data is the relevant [`ChannelId`].
-    ///
-    /// [`ChannelId`]: crate::model::id::ChannelId
-    ChannelsIdThreadMembersMe(u64),
+    ChannelsIdThreadMembersMe(ChannelId),
     /// Route for the `/channels/:channel_id/thread-members/:user_id` path.
-    ///
-    /// The data is the relevant [`ChannelId`].
-    ///
-    /// [`ChannelId`]: crate::model::id::ChannelId
-    ChannelsIdThreadMembersUserId(u64),
+    ChannelsIdThreadMembersUserId(ChannelId),
     /// Route for the `/channels/channel_id/thread-members` path.
-    ///
-    /// The data is the relevant [`ChannelId`].
-    ///
-    /// [`ChannelId`]: crate::model::id::ChannelId
-    ChannelsIdThreadMembers(u64),
+    ChannelsIdThreadMembers(ChannelId),
     /// Route for the `/channels/:channel_id/threads/archived/public` path.
-    ///
-    /// The data is the relevant [`ChannelId`].
-    ///
-    /// [`ChannelId`]: crate::model::id::ChannelId
-    ChannelsIdArchivedPublicThreads(u64),
+    ChannelsIdArchivedPublicThreads(ChannelId),
     /// Route for the `/channels/:channel_id/threads/archived/private` path.
-    ///
-    /// The data is the relevant [`ChannelId`].
-    ///
-    /// [`ChannelId`]: crate::model::id::ChannelId
-    ChannelsIdArchivedPrivateThreads(u64),
+    ChannelsIdArchivedPrivateThreads(ChannelId),
     /// Route for the `/channels/:channel_id/users/@me/threads/archived/private` path.
-    ///
-    /// The data is the relevant [`ChannelId`].
-    ///
-    /// [`ChannelId`]: crate::model::id::ChannelId
-    ChannelsIdMeJoindedArchivedPrivateThreads(u64),
+    ChannelsIdMeJoindedArchivedPrivateThreads(ChannelId),
     /// Route for the `/channels/{channel.id}/followers` path.
-    ///
-    /// The data is the relevant [`ChannelId`].
-    ///
-    /// [`ChannelId`]: crate::model::id::ChannelId
-    FollowNewsChannel(u64),
+    FollowNewsChannel(ChannelId),
     /// Route for the `/gateway` path.
     Gateway,
     /// Route for the `/gateway/bot` path.
@@ -166,212 +77,78 @@ pub enum Route {
     /// Route for the `/guilds` path.
     Guilds,
     /// Route for the `/guilds/:guild_id` path.
-    ///
-    /// The data is the relevant [`GuildId`].
-    ///
-    /// [`GuildId`]: crate::model::id::GuildId
-    GuildsId(u64),
+    GuildsId(GuildId),
     /// Route for the `/guilds/:guild_id/auto-moderation/rules` path.
-    GuildsIdAutoModRules(u64),
+    GuildsIdAutoModRules(GuildId),
     /// Route for the `/guilds/:guild_id/auto-moderation/rules/:rule_id` path.
-    GuildsIdAutoModRulesId(u64),
+    GuildsIdAutoModRulesId(GuildId),
     /// Route for the `/guilds/:guild_id/bans` path.
-    ///
-    /// The data is the relevant [`GuildId`].
-    ///
-    /// [`GuildId`]: crate::model::id::GuildId
-    GuildsIdBans(u64),
-    /// Route for the `/guilds/:guild_id/audit-logs` path.
-    /// The data is the relevant [`GuildId`].
-    ///
-    /// [`GuildId`]: crate::model::id::GuildId
-    GuildsIdAuditLogs(u64),
+    GuildsIdBans(GuildId),
+    GuildsIdAuditLogs(GuildId),
     /// Route for the `/guilds/:guild_id/bans/:user_id` path.
-    ///
-    /// The data is the relevant [`GuildId`].
-    ///
-    /// [`GuildId`]: crate::model::id::GuildId
-    GuildsIdBansUserId(u64),
+    GuildsIdBansUserId(GuildId),
     /// Route for the `/guilds/:guild_id/channels/:channel_id` path.
-    ///
-    /// The data is the relevant [`GuildId`].
-    ///
-    /// [`GuildId`]: crate::model::id::GuildId
-    GuildsIdChannels(u64),
+    GuildsIdChannels(GuildId),
     /// Route for the `/guilds/:guild_id/widget` path.
-    ///
-    /// The data is the relevant [`GuildId`].
-    ///
-    /// [`GuildId`]: crate::model::id::GuildId
-    GuildsIdWidget(u64),
+    GuildsIdWidget(GuildId),
     /// Route for the `/guilds/:guild_id/preview` path.
     ///
-    /// The data is the relevant [`GuildPreview`].
-    ///
     /// [`GuildPreview`]: crate::model::guild::GuildPreview
-    GuildsIdPreview(u64),
+    GuildsIdPreview(GuildId),
     /// Route for the `/guilds/:guild_id/emojis` path.
-    ///
-    /// The data is the relevant [`GuildId`].
-    ///
-    /// [`GuildId`]: crate::model::id::GuildId
-    GuildsIdEmojis(u64),
+    GuildsIdEmojis(GuildId),
     /// Route for the `/guilds/:guild_id/emojis/:emoji_id` path.
-    ///
-    /// The data is the relevant [`GuildId`].
-    ///
-    /// [`GuildId`]: crate::model::id::GuildId
-    GuildsIdEmojisId(u64),
+    GuildsIdEmojisId(GuildId),
     /// Route for the `/guilds/:guild_id/integrations` path.
-    ///
-    /// The data is the relevant [`GuildId`].
-    ///
-    /// [`GuildId`]: crate::model::id::GuildId
-    GuildsIdIntegrations(u64),
+    GuildsIdIntegrations(GuildId),
     /// Route for the `/guilds/:guild_id/integrations/:integration_id` path.
-    ///
-    /// The data is the relevant [`GuildId`].
-    ///
-    /// [`GuildId`]: crate::model::id::GuildId
-    GuildsIdIntegrationsId(u64),
+    GuildsIdIntegrationsId(GuildId),
     /// Route for the `/guilds/:guild_id/integrations/:integration_id/sync`
     /// path.
-    ///
-    /// The data is the relevant [`GuildId`].
-    ///
-    /// [`GuildId`]: crate::model::id::GuildId
-    GuildsIdIntegrationsIdSync(u64),
+    GuildsIdIntegrationsIdSync(GuildId),
     /// Route for the `/guilds/:guild_id/invites` path.
-    ///
-    /// The data is the relevant [`GuildId`].
-    ///
-    /// [`GuildId`]: crate::model::id::GuildId
-    GuildsIdInvites(u64),
+    GuildsIdInvites(GuildId),
     /// Route for the `/guilds/:guild_id/members` path.
-    ///
-    /// The data is the relevant [`GuildId`].
-    ///
-    /// [`GuildId`]: crate::model::id::GuildId
-    GuildsIdMembers(u64),
+    GuildsIdMembers(GuildId),
     /// Route for the `/guilds/:guild_id/members/:user_id` path.
-    ///
-    /// The data is the relevant [`GuildId`].
-    ///
-    /// [`GuildId`]: crate::model::id::GuildId
-    GuildsIdMembersId(u64),
+    GuildsIdMembersId(GuildId),
     /// Route for the `/guilds/:guild_id/members/:user_id/roles/:role_id` path.
-    ///
-    /// The data is the relevant [`GuildId`].
-    ///
-    /// [`GuildId`]: crate::model::id::GuildId
-    GuildsIdMembersIdRolesId(u64),
+    GuildsIdMembersIdRolesId(GuildId),
     /// Route for the `/guilds/:guild_id/members/@me` path.
-    ///
-    /// The data is the relevant [`GuildId`].
-    ///
-    /// [`GuildId`]: crate::model::id::GuildId
-    GuildsIdMembersMe(u64),
+    GuildsIdMembersMe(GuildId),
     /// Route for the `/guilds/:guild_id/members/@me/nick` path.
-    ///
-    /// The data is the relevant [`GuildId`].
-    ///
-    /// [`GuildId`]: crate::model::id::GuildId
-    GuildsIdMembersMeNick(u64),
+    GuildsIdMembersMeNick(GuildId),
     /// Route for the `/guilds/:guild_id/members/search` path.
-    ///
-    /// The data is the relevant [`GuildId`].
-    ///
-    /// [`GuildId`]: crate::model::id::GuildId
-    GuildsIdMembersSearch(u64),
+    GuildsIdMembersSearch(GuildId),
     /// Route for the `/guilds/:guild_id/prune` path.
-    ///
-    /// The data is the relevant [`GuildId`].
-    ///
-    /// [`GuildId`]: crate::model::id::GuildId
-    GuildsIdPrune(u64),
+    GuildsIdPrune(GuildId),
     /// Route for the `/guilds/:guild_id/regions` path.
-    ///
-    /// The data is the relevant [`GuildId`].
-    ///
-    /// [`GuildId`]: crate::model::id::GuildId
-    GuildsIdRegions(u64),
+    GuildsIdRegions(GuildId),
     /// Route for the `/guilds/:guild_id/roles` path.
-    ///
-    /// The data is the relevant [`GuildId`].
-    ///
-    /// [`GuildId`]: crate::model::id::GuildId
-    GuildsIdRoles(u64),
+    GuildsIdRoles(GuildId),
     /// Route for the `/guilds/:guild_id/roles/:role_id` path.
-    ///
-    /// The data is the relevant [`GuildId`].
-    ///
-    /// [`GuildId`]: crate::model::id::GuildId
-    GuildsIdRolesId(u64),
+    GuildsIdRolesId(GuildId),
     /// Route for the `/guilds/:guild_id/scheduled-events` path.
-    ///
-    /// The data is the relevant [`GuildId`].
-    ///
-    /// [`GuildId`]: crate::model::id::GuildId
-    GuildsIdScheduledEvents(u64),
+    GuildsIdScheduledEvents(GuildId),
     /// Route for the `/guilds/:guild_id/scheduled-events/:event_id` path.
-    ///
-    /// The data is the relevant [`GuildId`].
-    ///
-    /// [`GuildId`]: crate::model::id::GuildId
-    GuildsIdScheduledEventsId(u64),
+    GuildsIdScheduledEventsId(GuildId),
     /// Route for the `/guilds/:guild_id/scheduled-events/:event_id/users` path.
-    ///
-    /// The data is the relevant [`GuildId`].
-    ///
-    /// [`GuildId`]: crate::model::id::GuildId
-    GuildsIdScheduledEventsIdUsers(u64),
+    GuildsIdScheduledEventsIdUsers(GuildId),
     /// Route for the `/guilds/:guild_id/stickers` path.
-    ///
-    /// The data is the relevant [`GuildId`].
-    ///
-    /// [`GuildId`]: crate::model::id::GuildId
-    GuildsIdStickers(u64),
+    GuildsIdStickers(GuildId),
     /// Route for the `/guilds/:guild_id/stickers/:sticker_id` path.
-    ///
-    /// The data is the relevant [`GuildId`].
-    ///
-    /// [`GuildId`]: crate::model::id::GuildId
-    GuildsIdStickersId(u64),
+    GuildsIdStickersId(GuildId),
     /// Route for the `/guilds/:guild_id/vanity-url` path.
-    ///
-    /// The data is the relevant [`GuildId`].
-    ///
-    /// [`GuildId`]: crate::model::id::GuildId
-    GuildsIdVanityUrl(u64),
+    GuildsIdVanityUrl(GuildId),
     /// Route for the `/guilds/:guild_id/voice-states/:user_id` path.
-    ///
-    /// The data is the relevant [`GuildId`].
-    ///
-    /// [`GuildId`]: crate::model::id::GuildId
-    GuildsIdVoiceStates(u64),
+    GuildsIdVoiceStates(GuildId),
     /// Route for the `/guilds/:guild_id/voice-states/@me` path.
-    ///
-    /// The data is the relevant [`GuildId`].
-    ///
-    /// [`GuildId`]: crate::model::id::GuildId
-    GuildsIdVoiceStatesMe(u64),
+    GuildsIdVoiceStatesMe(GuildId),
     /// Route for the `/guilds/:guild_id/webhooks` path.
-    ///
-    /// The data is the relevant [`GuildId`].
-    ///
-    /// [`GuildId`]: crate::model::id::GuildId
-    GuildsIdWebhooks(u64),
+    GuildsIdWebhooks(GuildId),
     /// Route for the `/guilds/:guild_id/welcome-screen` path.
-    ///
-    /// The data is the relevant [`GuildId`].
-    ///
-    /// [`GuildId`]: crate::model::id::GuildId
-    GuildsIdWelcomeScreen(u64),
+    GuildsIdWelcomeScreen(GuildId),
     /// Route for the `/guilds/:guild_id/threads/active` path.
-    ///
-    /// The data is the relevant [`GuildId`].
-    ///
-    /// [`GuildId`]: crate::model::id::GuildId
     GuildsIdThreadsActive,
     /// Route for the `/invites/:code` path.
     InvitesCode,
@@ -394,73 +171,29 @@ pub enum Route {
     /// Route for the `/voice/regions` path.
     VoiceRegions,
     /// Route for the `/webhooks/:webhook_id` path.
-    WebhooksId(u64),
+    WebhooksId(WebhookId),
     /// Route for the `/webhooks/:webhook_id/:token/messages/:message_id` path.
-    ///
-    /// The data is the relevant [`WebhookId`].
-    ///
-    /// [`WebhookId`]: crate::model::id::WebhookId
-    WebhooksIdMessagesId(u64),
+    WebhooksIdMessagesId(WebhookId),
     /// Route for the `/webhooks/:application_id` path.
-    ///
-    /// The data is the relevant [`ApplicationId`].
-    ///
-    /// [`ApplicationId`]: crate::model::id::ApplicationId
-    WebhooksApplicationId(u64),
+    WebhooksApplicationId(ApplicationId),
     /// Route for the `/interactions/:interaction_id` path.
-    ///
-    /// The data is the relevant [`InteractionId`].
-    ///
-    /// [`InteractionId`]: crate::model::id::InteractionId
-    InteractionsId(u64),
+    InteractionsId(InteractionId),
     /// Route for the `/applications/:application_id` path.
-    ///
-    /// The data is the relevant [`ApplicationId`].
-    ///
-    /// [`ApplicationId`]: crate::model::id::ApplicationId
-    ApplicationsIdCommands(u64),
+    ApplicationsIdCommands(ApplicationId),
     /// Route for the `/applications/:application_id/commands/:command_id` path.
-    ///
-    /// The data is the relevant [`ApplicationId`].
-    ///
-    /// [`ApplicationId`]: crate::model::id::ApplicationId
-    ApplicationsIdCommandsId(u64),
+    ApplicationsIdCommandsId(ApplicationId),
     /// Route for the `/applications/:application_id/guilds/:guild_id` path.
-    ///
-    /// The data is the relevant [`ApplicationId`].
-    ///
-    /// [`ApplicationId`]: crate::model::id::ApplicationId
-    ApplicationsIdGuildsIdCommands(u64),
+    ApplicationsIdGuildsIdCommands(ApplicationId),
     /// Route for the `/applications/:application_id/guilds/:guild_id/commands/permissions` path.
-    ///
-    /// The data is the relevant [`ApplicationId`].
-    ///
-    /// [`ApplicationId`]: crate::model::id::ApplicationId
-    ApplicationsIdGuildsIdCommandsPermissions(u64),
+    ApplicationsIdGuildsIdCommandsPermissions(ApplicationId),
     /// Route for the `/applications/:application_id/guilds/:guild_id/commands/:command_id/permissions` path.
-    ///
-    /// The data is the relevant [`ApplicationId`].
-    ///
-    /// [`ApplicationId`]: crate::model::id::ApplicationId
-    ApplicationsIdGuildsIdCommandIdPermissions(u64),
+    ApplicationsIdGuildsIdCommandIdPermissions(ApplicationId),
     /// Route for the `/applications/:application_id/guilds/:guild_id` path.
-    ///
-    /// The data is the relevant [`ApplicationId`].
-    ///
-    /// [`ApplicationId`]: crate::model::id::ApplicationId
-    ApplicationsIdGuildsIdCommandsId(u64),
+    ApplicationsIdGuildsIdCommandsId(ApplicationId),
     /// Route for the `/stage-instances` path.
-    ///
-    /// The data is the relevant [`ChannelId`].
-    ///
-    /// [`ChannelId`]: crate::model::id::ChannelId
     StageInstances,
     /// Route for the `/stage-instances/:channel_id` path.
-    ///
-    /// The data is the relevant [`ChannelId`].
-    ///
-    /// [`ChannelId`]: crate::model::id::ChannelId
-    StageInstancesChannelId(u64),
+    StageInstancesChannelId(ChannelId),
     /// Route where no ratelimit headers are in place (i.e. user account-only
     /// routes).
     ///
@@ -471,29 +204,29 @@ pub enum Route {
 
 impl Route {
     #[must_use]
-    pub fn channel(channel_id: u64) -> String {
+    pub fn channel(channel_id: ChannelId) -> String {
         api!("/channels/{}", channel_id)
     }
 
     #[must_use]
-    pub fn channel_invites(channel_id: u64) -> String {
+    pub fn channel_invites(channel_id: ChannelId) -> String {
         api!("/channels/{}/invites", channel_id)
     }
 
     #[must_use]
-    pub fn channel_message(channel_id: u64, message_id: u64) -> String {
+    pub fn channel_message(channel_id: ChannelId, message_id: MessageId) -> String {
         api!("/channels/{}/messages/{}", channel_id, message_id)
     }
 
     #[must_use]
-    pub fn channel_message_crosspost(channel_id: u64, message_id: u64) -> String {
+    pub fn channel_message_crosspost(channel_id: ChannelId, message_id: MessageId) -> String {
         api!("/channels/{}/messages/{}/crosspost", channel_id, message_id)
     }
 
     #[must_use]
     pub fn channel_message_reaction<D, T>(
-        channel_id: u64,
-        message_id: u64,
+        channel_id: ChannelId,
+        message_id: MessageId,
         user_id: D,
         reaction_type: T,
     ) -> String
@@ -512,8 +245,8 @@ impl Route {
 
     #[must_use]
     pub fn channel_message_reaction_emoji<T>(
-        channel_id: u64,
-        message_id: u64,
+        channel_id: ChannelId,
+        message_id: MessageId,
         reaction_type: T,
     ) -> String
     where
@@ -523,14 +256,14 @@ impl Route {
     }
 
     #[must_use]
-    pub fn channel_message_reactions(channel_id: u64, message_id: u64) -> String {
+    pub fn channel_message_reactions(channel_id: ChannelId, message_id: MessageId) -> String {
         api!("/channels/{}/messages/{}/reactions", channel_id, message_id)
     }
 
     #[must_use]
     pub fn channel_message_reactions_list(
-        channel_id: u64,
-        message_id: u64,
+        channel_id: ChannelId,
+        message_id: MessageId,
         reaction: &str,
         limit: u8,
         after: Option<u64>,
@@ -551,73 +284,73 @@ impl Route {
     }
 
     #[must_use]
-    pub fn channel_messages(channel_id: u64, query: Option<&str>) -> String {
+    pub fn channel_messages(channel_id: ChannelId, query: Option<&str>) -> String {
         api!("/channels/{}/messages{}", channel_id, query.unwrap_or(""))
     }
 
     #[must_use]
-    pub fn channel_messages_bulk_delete(channel_id: u64) -> String {
+    pub fn channel_messages_bulk_delete(channel_id: ChannelId) -> String {
         api!("/channels/{}/messages/bulk-delete", channel_id)
     }
 
     #[must_use]
-    pub fn channel_follow_news(channel_id: u64) -> String {
+    pub fn channel_follow_news(channel_id: ChannelId) -> String {
         api!("/channels/{}/followers", channel_id)
     }
 
     #[must_use]
-    pub fn channel_permission(channel_id: u64, target_id: u64) -> String {
+    pub fn channel_permission(channel_id: ChannelId, target_id: TargetId) -> String {
         api!("/channels/{}/permissions/{}", channel_id, target_id)
     }
 
     #[must_use]
-    pub fn channel_pin(channel_id: u64, message_id: u64) -> String {
+    pub fn channel_pin(channel_id: ChannelId, message_id: MessageId) -> String {
         api!("/channels/{}/pins/{}", channel_id, message_id)
     }
 
     #[must_use]
-    pub fn channel_pins(channel_id: u64) -> String {
+    pub fn channel_pins(channel_id: ChannelId) -> String {
         api!("/channels/{}/pins", channel_id)
     }
 
     #[must_use]
-    pub fn channel_typing(channel_id: u64) -> String {
+    pub fn channel_typing(channel_id: ChannelId) -> String {
         api!("/channels/{}/typing", channel_id)
     }
 
     #[must_use]
-    pub fn channel_webhooks(channel_id: u64) -> String {
+    pub fn channel_webhooks(channel_id: ChannelId) -> String {
         api!("/channels/{}/webhooks", channel_id)
     }
 
     #[must_use]
-    pub fn channel_public_threads(channel_id: u64, message_id: u64) -> String {
+    pub fn channel_public_threads(channel_id: ChannelId, message_id: MessageId) -> String {
         api!("/channels/{}/messages/{}/threads", channel_id, message_id)
     }
 
     #[must_use]
-    pub fn channel_private_threads(channel_id: u64) -> String {
+    pub fn channel_private_threads(channel_id: ChannelId) -> String {
         api!("/channels/{}/threads", channel_id)
     }
 
     #[must_use]
-    pub fn channel_thread_member(channel_id: u64, user_id: u64) -> String {
+    pub fn channel_thread_member(channel_id: ChannelId, user_id: UserId) -> String {
         api!("/channels/{}/thread-members/{}", channel_id, user_id)
     }
 
     #[must_use]
-    pub fn channel_thread_member_me(channel_id: u64) -> String {
+    pub fn channel_thread_member_me(channel_id: ChannelId) -> String {
         api!("/channels/{}/thread-members/@me", channel_id)
     }
 
     #[must_use]
-    pub fn channel_thread_members(channel_id: u64) -> String {
+    pub fn channel_thread_members(channel_id: ChannelId) -> String {
         api!("/channels/{}/thread-members", channel_id)
     }
 
     #[must_use]
     pub fn channel_archived_public_threads(
-        channel_id: u64,
+        channel_id: ChannelId,
         before: Option<u64>,
         limit: Option<u64>,
     ) -> String {
@@ -636,7 +369,7 @@ impl Route {
 
     #[must_use]
     pub fn channel_archived_private_threads(
-        channel_id: u64,
+        channel_id: ChannelId,
         before: Option<u64>,
         limit: Option<u64>,
     ) -> String {
@@ -655,7 +388,7 @@ impl Route {
 
     #[must_use]
     pub fn channel_joined_private_threads(
-        channel_id: u64,
+        channel_id: ChannelId,
         before: Option<u64>,
         limit: Option<u64>,
     ) -> String {
@@ -683,20 +416,20 @@ impl Route {
     }
 
     #[must_use]
-    pub fn guild(guild_id: u64) -> String {
+    pub fn guild(guild_id: GuildId) -> String {
         api!("/guilds/{}", guild_id)
     }
 
     #[must_use]
-    pub fn guild_with_counts(guild_id: u64) -> String {
+    pub fn guild_with_counts(guild_id: GuildId) -> String {
         api!("/guilds/{}?with_counts=true", guild_id)
     }
 
     #[must_use]
     pub fn guild_audit_logs(
-        guild_id: u64,
+        guild_id: GuildId,
         action_type: Option<u8>,
-        user_id: Option<u64>,
+        user_id: Option<UserId>,
         before: Option<u64>,
         limit: Option<u8>,
     ) -> String {
@@ -722,97 +455,101 @@ impl Route {
     }
 
     #[must_use]
-    pub fn guild_automod_rule(guild_id: u64, rule_id: u64) -> String {
+    pub fn guild_automod_rule(guild_id: GuildId, rule_id: RuleId) -> String {
         api!("/guilds/{}/auto-moderation/rules/{}", guild_id, rule_id)
     }
 
     #[must_use]
-    pub fn guild_automod_rules(guild_id: u64) -> String {
+    pub fn guild_automod_rules(guild_id: GuildId) -> String {
         api!("/guilds/{}/auto-moderation/rules", guild_id)
     }
 
     #[must_use]
-    pub fn guild_ban(guild_id: u64, user_id: u64) -> String {
+    pub fn guild_ban(guild_id: GuildId, user_id: UserId) -> String {
         api!("/guilds/{}/bans/{}", guild_id, user_id)
     }
 
     #[must_use]
-    pub fn guild_ban_optioned(guild_id: u64, user_id: u64, delete_message_days: u8) -> String {
+    pub fn guild_ban_optioned(
+        guild_id: GuildId,
+        user_id: UserId,
+        delete_message_days: u8,
+    ) -> String {
         api!("/guilds/{}/bans/{}?delete_message_days={}", guild_id, user_id, delete_message_days)
     }
 
     #[must_use]
-    pub fn guild_kick_optioned(guild_id: u64, user_id: u64) -> String {
+    pub fn guild_kick_optioned(guild_id: GuildId, user_id: UserId) -> String {
         api!("/guilds/{}/members/{}", guild_id, user_id)
     }
 
     #[must_use]
-    pub fn guild_bans(guild_id: u64) -> String {
+    pub fn guild_bans(guild_id: GuildId) -> String {
         api!("/guilds/{}/bans", guild_id)
     }
 
     #[must_use]
-    pub fn guild_channels(guild_id: u64) -> String {
+    pub fn guild_channels(guild_id: GuildId) -> String {
         api!("/guilds/{}/channels", guild_id)
     }
 
     #[must_use]
-    pub fn guild_widget(guild_id: u64) -> String {
+    pub fn guild_widget(guild_id: GuildId) -> String {
         api!("/guilds/{}/widget", guild_id)
     }
 
     #[must_use]
-    pub fn guild_preview(guild_id: u64) -> String {
+    pub fn guild_preview(guild_id: GuildId) -> String {
         api!("/guilds/{}/preview", guild_id)
     }
 
     #[must_use]
-    pub fn guild_emojis(guild_id: u64) -> String {
+    pub fn guild_emojis(guild_id: GuildId) -> String {
         api!("/guilds/{}/emojis", guild_id)
     }
 
     #[must_use]
-    pub fn guild_emoji(guild_id: u64, emoji_id: u64) -> String {
+    pub fn guild_emoji(guild_id: GuildId, emoji_id: EmojiId) -> String {
         api!("/guilds/{}/emojis/{}", guild_id, emoji_id)
     }
 
     #[must_use]
-    pub fn guild_integration(guild_id: u64, integration_id: u64) -> String {
+    pub fn guild_integration(guild_id: GuildId, integration_id: IntegrationId) -> String {
         api!("/guilds/{}/integrations/{}", guild_id, integration_id)
     }
 
     #[must_use]
-    pub fn guild_integration_sync(guild_id: u64, integration_id: u64) -> String {
+    pub fn guild_integration_sync(guild_id: GuildId, integration_id: IntegrationId) -> String {
         api!("/guilds/{}/integrations/{}/sync", guild_id, integration_id)
     }
 
     #[must_use]
-    pub fn guild_integrations(guild_id: u64) -> String {
+    pub fn guild_integrations(guild_id: GuildId) -> String {
         api!("/guilds/{}/integrations", guild_id)
     }
 
     #[must_use]
-    pub fn guild_invites(guild_id: u64) -> String {
+    pub fn guild_invites(guild_id: GuildId) -> String {
         api!("/guilds/{}/invites", guild_id)
     }
 
     #[must_use]
-    pub fn guild_member(guild_id: u64, user_id: u64) -> String {
+    pub fn guild_member(guild_id: GuildId, user_id: UserId) -> String {
         api!("/guilds/{}/members/{}", guild_id, user_id)
     }
 
     #[must_use]
-    pub fn guild_member_role(guild_id: u64, user_id: u64, role_id: u64) -> String {
+    pub fn guild_member_role(guild_id: GuildId, user_id: UserId, role_id: RoleId) -> String {
         api!("/guilds/{}/members/{}/roles/{}", guild_id, user_id, role_id)
     }
 
     #[must_use]
-    pub fn guild_members(guild_id: u64) -> String {
+    pub fn guild_members(guild_id: GuildId) -> String {
         api!("/guilds/{}/members", guild_id)
     }
 
     #[must_use]
-    pub fn guild_members_search(guild_id: u64, query: &str, limit: Option<u64>) -> String {
+    pub fn guild_members_search(guild_id: GuildId, query: &str, limit: Option<u64>) -> String {
         let mut s = api!("/guilds/{}/members/search?", guild_id);
 
         write!(s, "&query={}&limit={}", query, limit.unwrap_or(constants::MEMBER_FETCH_LIMIT))
@@ -821,7 +558,11 @@ impl Route {
     }
 
     #[must_use]
-    pub fn guild_members_optioned(guild_id: u64, after: Option<u64>, limit: Option<u64>) -> String {
+    pub fn guild_members_optioned(
+        guild_id: GuildId,
+        after: Option<u64>,
+        limit: Option<u64>,
+    ) -> String {
         let mut s = api!("/guilds/{}/members?", guild_id);
 
         if let Some(after) = after {
@@ -833,39 +574,39 @@ impl Route {
     }
 
     #[must_use]
-    pub fn guild_member_me(guild_id: u64) -> String {
+    pub fn guild_member_me(guild_id: GuildId) -> String {
         api!("/guilds/{}/members/@me", guild_id)
     }
 
     #[must_use]
-    pub fn guild_nickname(guild_id: u64) -> String {
+    pub fn guild_nickname(guild_id: GuildId) -> String {
         api!("/guilds/{}/members/@me/nick", guild_id)
     }
 
     #[must_use]
-    pub fn guild_prune(guild_id: u64, days: u8) -> String {
+    pub fn guild_prune(guild_id: GuildId, days: u8) -> String {
         api!("/guilds/{}/prune?days={}", guild_id, days)
     }
 
     #[must_use]
-    pub fn guild_regions(guild_id: u64) -> String {
+    pub fn guild_regions(guild_id: GuildId) -> String {
         api!("/guilds/{}/regions", guild_id)
     }
 
     #[must_use]
-    pub fn guild_role(guild_id: u64, role_id: u64) -> String {
+    pub fn guild_role(guild_id: GuildId, role_id: RoleId) -> String {
         api!("/guilds/{}/roles/{}", guild_id, role_id)
     }
 
     #[must_use]
-    pub fn guild_roles(guild_id: u64) -> String {
+    pub fn guild_roles(guild_id: GuildId) -> String {
         api!("/guilds/{}/roles", guild_id)
     }
 
     #[must_use]
     pub fn guild_scheduled_event(
-        guild_id: u64,
-        event_id: u64,
+        guild_id: GuildId,
+        event_id: ScheduledEventId,
         with_user_count: Option<bool>,
     ) -> String {
         let mut s = api!("/guilds/{}/scheduled-events/{}", guild_id, event_id);
@@ -876,7 +617,7 @@ impl Route {
     }
 
     #[must_use]
-    pub fn guild_scheduled_events(guild_id: u64, with_user_count: Option<bool>) -> String {
+    pub fn guild_scheduled_events(guild_id: GuildId, with_user_count: Option<bool>) -> String {
         let mut s = api!("/guilds/{}/scheduled-events", guild_id);
         if let Some(b) = with_user_count {
             write!(s, "?with_user_count={}", b).unwrap();
@@ -886,8 +627,8 @@ impl Route {
 
     #[must_use]
     pub fn guild_scheduled_event_users(
-        guild_id: u64,
-        event_id: u64,
+        guild_id: GuildId,
+        event_id: ScheduledEventId,
         after: Option<u64>,
         before: Option<u64>,
         limit: Option<u64>,
@@ -915,42 +656,42 @@ impl Route {
     }
 
     #[must_use]
-    pub fn guild_sticker(guild_id: u64, sticker_id: u64) -> String {
+    pub fn guild_sticker(guild_id: GuildId, sticker_id: StickerId) -> String {
         api!("/guilds/{}/stickers/{}", guild_id, sticker_id)
     }
 
     #[must_use]
-    pub fn guild_stickers(guild_id: u64) -> String {
+    pub fn guild_stickers(guild_id: GuildId) -> String {
         api!("/guilds/{}/stickers", guild_id)
     }
 
     #[must_use]
-    pub fn guild_vanity_url(guild_id: u64) -> String {
+    pub fn guild_vanity_url(guild_id: GuildId) -> String {
         api!("/guilds/{}/vanity-url", guild_id)
     }
 
     #[must_use]
-    pub fn guild_voice_states(guild_id: u64, user_id: u64) -> String {
+    pub fn guild_voice_states(guild_id: GuildId, user_id: UserId) -> String {
         api!("/guilds/{}/voice-states/{}", guild_id, user_id)
     }
 
     #[must_use]
-    pub fn guild_voice_states_me(guild_id: u64) -> String {
+    pub fn guild_voice_states_me(guild_id: GuildId) -> String {
         api!("/guilds/{}/voice-states/@me", guild_id)
     }
 
     #[must_use]
-    pub fn guild_webhooks(guild_id: u64) -> String {
+    pub fn guild_webhooks(guild_id: GuildId) -> String {
         api!("/guilds/{}/webhooks", guild_id)
     }
 
     #[must_use]
-    pub fn guild_welcome_screen(guild_id: u64) -> String {
+    pub fn guild_welcome_screen(guild_id: GuildId) -> String {
         api!("/guilds/{}/welcome-screen", guild_id)
     }
 
     #[must_use]
-    pub fn guild_threads_active(guild_id: u64) -> String {
+    pub fn guild_threads_active(guild_id: GuildId) -> String {
         api!("/guilds/{}/threads/active", guild_id)
     }
 
@@ -969,7 +710,7 @@ impl Route {
         code: &str,
         member_counts: bool,
         expiration: bool,
-        event_id: Option<u64>,
+        event_id: Option<ScheduledEventId>,
     ) -> String {
         api!(
             "/invites/{}?with_counts={}&with_expiration={}{}",
@@ -1006,7 +747,7 @@ impl Route {
     }
 
     #[must_use]
-    pub fn sticker(sticker_id: u64) -> String {
+    pub fn sticker(sticker_id: StickerId) -> String {
         api!("/stickers/{}", sticker_id)
     }
 
@@ -1031,7 +772,7 @@ impl Route {
     }
 
     #[must_use]
-    pub fn user_guild<D: Display>(target: D, guild_id: u64) -> String {
+    pub fn user_guild<D: Display>(target: D, guild_id: GuildId) -> String {
         api!("/users/{}/guilds/{}", target, guild_id)
     }
 
@@ -1070,12 +811,12 @@ impl Route {
     }
 
     #[must_use]
-    pub fn webhook(webhook_id: u64) -> String {
+    pub fn webhook(webhook_id: WebhookId) -> String {
         api!("/webhooks/{}", webhook_id)
     }
 
     #[must_use]
-    pub fn webhook_with_token<D>(webhook_id: u64, token: D) -> String
+    pub fn webhook_with_token<D>(webhook_id: WebhookId, token: D) -> String
     where
         D: Display,
     {
@@ -1084,8 +825,8 @@ impl Route {
 
     #[must_use]
     pub fn webhook_with_token_optioned<D>(
-        webhook_id: u64,
-        thread_id: Option<u64>,
+        webhook_id: WebhookId,
+        thread_id: Option<ChannelId>,
         token: D,
         wait: bool,
     ) -> String
@@ -1102,7 +843,7 @@ impl Route {
     }
 
     #[must_use]
-    pub fn webhook_message<D>(webhook_id: u64, token: D, message_id: u64) -> String
+    pub fn webhook_message<D>(webhook_id: WebhookId, token: D, message_id: MessageId) -> String
     where
         D: Display,
     {
@@ -1111,7 +852,7 @@ impl Route {
 
     #[must_use]
     pub fn webhook_original_interaction_response<D: Display>(
-        application_id: u64,
+        application_id: ApplicationId,
         token: D,
     ) -> String {
         api!("/webhooks/{}/{}/messages/@original", application_id, token)
@@ -1119,47 +860,50 @@ impl Route {
 
     #[must_use]
     pub fn webhook_followup_message<D: Display>(
-        application_id: u64,
+        application_id: ApplicationId,
         token: D,
-        message_id: u64,
+        message_id: MessageId,
     ) -> String {
         api!("/webhooks/{}/{}/messages/{}", application_id, token, message_id)
     }
 
     #[must_use]
-    pub fn webhook_followup_messages<D: Display>(application_id: u64, token: D) -> String {
+    pub fn webhook_followup_messages<D: Display>(
+        application_id: ApplicationId,
+        token: D,
+    ) -> String {
         api!("/webhooks/{}/{}", application_id, token)
     }
 
     #[must_use]
-    pub fn interaction_response<D: Display>(application_id: u64, token: D) -> String {
-        api!("/interactions/{}/{}/callback", application_id, token)
+    pub fn interaction_response<D: Display>(interaction_id: InteractionId, token: D) -> String {
+        api!("/interactions/{}/{}/callback", interaction_id, token)
     }
 
     #[must_use]
-    pub fn application_command(application_id: u64, command_id: u64) -> String {
+    pub fn application_command(application_id: ApplicationId, command_id: CommandId) -> String {
         api!("/applications/{}/commands/{}", application_id, command_id)
     }
 
     #[must_use]
-    pub fn application_commands(application_id: u64) -> String {
+    pub fn application_commands(application_id: ApplicationId) -> String {
         api!("/applications/{}/commands", application_id)
     }
 
     #[must_use]
     pub fn application_guild_command(
-        application_id: u64,
-        guild_id: u64,
-        command_id: u64,
+        application_id: ApplicationId,
+        guild_id: GuildId,
+        command_id: CommandId,
     ) -> String {
         api!("/applications/{}/guilds/{}/commands/{}", application_id, guild_id, command_id)
     }
 
     #[must_use]
     pub fn application_guild_command_permissions(
-        application_id: u64,
-        guild_id: u64,
-        command_id: u64,
+        application_id: ApplicationId,
+        guild_id: GuildId,
+        command_id: CommandId,
     ) -> String {
         api!(
             "/applications/{}/guilds/{}/commands/{}/permissions",
@@ -1170,12 +914,15 @@ impl Route {
     }
 
     #[must_use]
-    pub fn application_guild_commands(application_id: u64, guild_id: u64) -> String {
+    pub fn application_guild_commands(application_id: ApplicationId, guild_id: GuildId) -> String {
         api!("/applications/{}/guilds/{}/commands", application_id, guild_id)
     }
 
     #[must_use]
-    pub fn application_guild_commands_permissions(application_id: u64, guild_id: u64) -> String {
+    pub fn application_guild_commands_permissions(
+        application_id: ApplicationId,
+        guild_id: GuildId,
+    ) -> String {
         api!("/applications/{}/guilds/{}/commands/permissions", application_id, guild_id)
     }
 
@@ -1185,7 +932,7 @@ impl Route {
     }
 
     #[must_use]
-    pub fn stage_instance(channel_id: u64) -> String {
+    pub fn stage_instance(channel_id: ChannelId) -> String {
         api!("/stage-instances/{}", channel_id)
     }
 }
@@ -1194,478 +941,478 @@ impl Route {
 #[non_exhaustive]
 pub enum RouteInfo<'a> {
     AddGuildMember {
-        guild_id: u64,
-        user_id: u64,
+        guild_id: GuildId,
+        user_id: UserId,
     },
     AddMemberRole {
-        guild_id: u64,
-        role_id: u64,
-        user_id: u64,
+        guild_id: GuildId,
+        role_id: RoleId,
+        user_id: UserId,
     },
     GuildBanUser {
-        guild_id: u64,
-        user_id: u64,
+        guild_id: GuildId,
+        user_id: UserId,
         delete_message_days: Option<u8>,
     },
     BroadcastTyping {
-        channel_id: u64,
+        channel_id: ChannelId,
     },
     CreateAutoModRule {
-        guild_id: u64,
+        guild_id: GuildId,
     },
     CreateChannel {
-        guild_id: u64,
+        guild_id: GuildId,
     },
     CreateStageInstance,
     CreatePublicThread {
-        channel_id: u64,
-        message_id: u64,
+        channel_id: ChannelId,
+        message_id: MessageId,
     },
     CreatePrivateThread {
-        channel_id: u64,
+        channel_id: ChannelId,
     },
     CreateEmoji {
-        guild_id: u64,
+        guild_id: GuildId,
     },
     CreateFollowupMessage {
-        application_id: u64,
+        application_id: ApplicationId,
         interaction_token: &'a str,
     },
     CreateGlobalApplicationCommand {
-        application_id: u64,
+        application_id: ApplicationId,
     },
     CreateGlobalApplicationCommands {
-        application_id: u64,
+        application_id: ApplicationId,
     },
     CreateGuild,
     CreateGuildApplicationCommand {
-        application_id: u64,
-        guild_id: u64,
+        application_id: ApplicationId,
+        guild_id: GuildId,
     },
     CreateGuildApplicationCommands {
-        application_id: u64,
-        guild_id: u64,
+        application_id: ApplicationId,
+        guild_id: GuildId,
     },
     CreateGuildIntegration {
-        guild_id: u64,
-        integration_id: u64,
+        guild_id: GuildId,
+        integration_id: IntegrationId,
     },
     CreateInteractionResponse {
-        interaction_id: u64,
+        interaction_id: InteractionId,
         interaction_token: &'a str,
     },
     CreateInvite {
-        channel_id: u64,
+        channel_id: ChannelId,
     },
     CreateMessage {
-        channel_id: u64,
+        channel_id: ChannelId,
     },
     CreatePermission {
-        channel_id: u64,
-        target_id: u64,
+        channel_id: ChannelId,
+        target_id: TargetId,
     },
     CreatePrivateChannel,
     CreateReaction {
-        channel_id: u64,
-        message_id: u64,
+        channel_id: ChannelId,
+        message_id: MessageId,
         reaction: &'a str,
     },
     CreateRole {
-        guild_id: u64,
+        guild_id: GuildId,
     },
     CreateScheduledEvent {
-        guild_id: u64,
+        guild_id: GuildId,
     },
     CreateSticker {
-        guild_id: u64,
+        guild_id: GuildId,
     },
     CreateWebhook {
-        channel_id: u64,
+        channel_id: ChannelId,
     },
     DeleteAutoModRule {
-        guild_id: u64,
-        rule_id: u64,
+        guild_id: GuildId,
+        rule_id: RuleId,
     },
     DeleteChannel {
-        channel_id: u64,
+        channel_id: ChannelId,
     },
     DeleteStageInstance {
-        channel_id: u64,
+        channel_id: ChannelId,
     },
     DeleteEmoji {
-        guild_id: u64,
-        emoji_id: u64,
+        guild_id: GuildId,
+        emoji_id: EmojiId,
     },
     DeleteFollowupMessage {
-        application_id: u64,
+        application_id: ApplicationId,
         interaction_token: &'a str,
-        message_id: u64,
+        message_id: MessageId,
     },
     DeleteGlobalApplicationCommand {
-        application_id: u64,
-        command_id: u64,
+        application_id: ApplicationId,
+        command_id: CommandId,
     },
     DeleteGuild {
-        guild_id: u64,
+        guild_id: GuildId,
     },
     DeleteGuildApplicationCommand {
-        application_id: u64,
-        guild_id: u64,
-        command_id: u64,
+        application_id: ApplicationId,
+        guild_id: GuildId,
+        command_id: CommandId,
     },
     DeleteGuildIntegration {
-        guild_id: u64,
-        integration_id: u64,
+        guild_id: GuildId,
+        integration_id: IntegrationId,
     },
     DeleteInvite {
         code: &'a str,
     },
     DeleteMessage {
-        channel_id: u64,
-        message_id: u64,
+        channel_id: ChannelId,
+        message_id: MessageId,
     },
     DeleteMessages {
-        channel_id: u64,
+        channel_id: ChannelId,
     },
     DeleteMessageReactions {
-        channel_id: u64,
-        message_id: u64,
+        channel_id: ChannelId,
+        message_id: MessageId,
     },
     DeleteMessageReactionEmoji {
-        channel_id: u64,
-        message_id: u64,
+        channel_id: ChannelId,
+        message_id: MessageId,
         reaction: &'a str,
     },
     DeleteOriginalInteractionResponse {
-        application_id: u64,
+        application_id: ApplicationId,
         interaction_token: &'a str,
     },
     DeletePermission {
-        channel_id: u64,
-        target_id: u64,
+        channel_id: ChannelId,
+        target_id: TargetId,
     },
     DeleteReaction {
-        channel_id: u64,
-        message_id: u64,
+        channel_id: ChannelId,
+        message_id: MessageId,
         user: &'a str,
         reaction: &'a str,
     },
     DeleteRole {
-        guild_id: u64,
-        role_id: u64,
+        guild_id: GuildId,
+        role_id: RoleId,
     },
     DeleteScheduledEvent {
-        guild_id: u64,
-        event_id: u64,
+        guild_id: GuildId,
+        event_id: ScheduledEventId,
     },
     DeleteSticker {
-        guild_id: u64,
-        sticker_id: u64,
+        guild_id: GuildId,
+        sticker_id: StickerId,
     },
     DeleteWebhook {
-        webhook_id: u64,
+        webhook_id: WebhookId,
     },
     DeleteWebhookWithToken {
         token: &'a str,
-        webhook_id: u64,
+        webhook_id: WebhookId,
     },
     DeleteWebhookMessage {
         token: &'a str,
-        webhook_id: u64,
-        message_id: u64,
+        webhook_id: WebhookId,
+        message_id: MessageId,
     },
     EditAutoModRule {
-        guild_id: u64,
-        rule_id: u64,
+        guild_id: GuildId,
+        rule_id: RuleId,
     },
     EditChannel {
-        channel_id: u64,
+        channel_id: ChannelId,
     },
     EditStageInstance {
-        channel_id: u64,
+        channel_id: ChannelId,
     },
     EditEmoji {
-        guild_id: u64,
-        emoji_id: u64,
+        guild_id: GuildId,
+        emoji_id: EmojiId,
     },
     EditFollowupMessage {
-        application_id: u64,
+        application_id: ApplicationId,
         interaction_token: &'a str,
-        message_id: u64,
+        message_id: MessageId,
     },
     EditGlobalApplicationCommand {
-        application_id: u64,
-        command_id: u64,
+        application_id: ApplicationId,
+        command_id: CommandId,
     },
     EditGuild {
-        guild_id: u64,
+        guild_id: GuildId,
     },
     EditGuildApplicationCommand {
-        application_id: u64,
-        guild_id: u64,
-        command_id: u64,
+        application_id: ApplicationId,
+        guild_id: GuildId,
+        command_id: CommandId,
     },
     EditGuildApplicationCommandPermission {
-        application_id: u64,
-        guild_id: u64,
-        command_id: u64,
+        application_id: ApplicationId,
+        guild_id: GuildId,
+        command_id: CommandId,
     },
     EditGuildApplicationCommandsPermissions {
-        application_id: u64,
-        guild_id: u64,
+        application_id: ApplicationId,
+        guild_id: GuildId,
     },
     EditGuildChannels {
-        guild_id: u64,
+        guild_id: GuildId,
     },
     EditGuildWidget {
-        guild_id: u64,
+        guild_id: GuildId,
     },
     EditGuildWelcomeScreen {
-        guild_id: u64,
+        guild_id: GuildId,
     },
     EditMember {
-        guild_id: u64,
-        user_id: u64,
+        guild_id: GuildId,
+        user_id: UserId,
     },
     EditMessage {
-        channel_id: u64,
-        message_id: u64,
+        channel_id: ChannelId,
+        message_id: MessageId,
     },
     CrosspostMessage {
-        channel_id: u64,
-        message_id: u64,
+        channel_id: ChannelId,
+        message_id: MessageId,
     },
     EditMemberMe {
-        guild_id: u64,
+        guild_id: GuildId,
     },
     EditNickname {
-        guild_id: u64,
+        guild_id: GuildId,
     },
     GetOriginalInteractionResponse {
-        application_id: u64,
+        application_id: ApplicationId,
         interaction_token: &'a str,
     },
     EditOriginalInteractionResponse {
-        application_id: u64,
+        application_id: ApplicationId,
         interaction_token: &'a str,
     },
     EditProfile,
     EditRole {
-        guild_id: u64,
-        role_id: u64,
+        guild_id: GuildId,
+        role_id: RoleId,
     },
     EditRolePosition {
-        guild_id: u64,
+        guild_id: GuildId,
     },
     EditScheduledEvent {
-        guild_id: u64,
-        event_id: u64,
+        guild_id: GuildId,
+        event_id: ScheduledEventId,
     },
     EditSticker {
-        guild_id: u64,
-        sticker_id: u64,
+        guild_id: GuildId,
+        sticker_id: StickerId,
     },
     EditThread {
-        channel_id: u64,
+        channel_id: ChannelId,
     },
     EditVoiceState {
-        guild_id: u64,
-        user_id: u64,
+        guild_id: GuildId,
+        user_id: UserId,
     },
     EditVoiceStateMe {
-        guild_id: u64,
+        guild_id: GuildId,
     },
     EditWebhook {
-        webhook_id: u64,
+        webhook_id: WebhookId,
     },
     EditWebhookWithToken {
         token: &'a str,
-        webhook_id: u64,
+        webhook_id: WebhookId,
     },
     EditWebhookMessage {
         token: &'a str,
-        webhook_id: u64,
-        message_id: u64,
+        webhook_id: WebhookId,
+        message_id: MessageId,
     },
     ExecuteWebhook {
         token: &'a str,
         wait: bool,
-        webhook_id: u64,
-        thread_id: Option<u64>,
+        webhook_id: WebhookId,
+        thread_id: Option<ChannelId>,
     },
     FollowNewsChannel {
-        channel_id: u64,
+        channel_id: ChannelId,
     },
     JoinThread {
-        channel_id: u64,
+        channel_id: ChannelId,
     },
     LeaveThread {
-        channel_id: u64,
+        channel_id: ChannelId,
     },
     AddThreadMember {
-        channel_id: u64,
-        user_id: u64,
+        channel_id: ChannelId,
+        user_id: UserId,
     },
     RemoveThreadMember {
-        channel_id: u64,
-        user_id: u64,
+        channel_id: ChannelId,
+        user_id: UserId,
     },
     GetActiveMaintenance,
     GetAuditLogs {
         action_type: Option<u8>,
         before: Option<u64>,
-        guild_id: u64,
+        guild_id: GuildId,
         limit: Option<u8>,
-        user_id: Option<u64>,
+        user_id: Option<UserId>,
     },
     GetAutoModRules {
-        guild_id: u64,
+        guild_id: GuildId,
     },
     GetAutoModRule {
-        guild_id: u64,
-        rule_id: u64,
+        guild_id: GuildId,
+        rule_id: RuleId,
     },
     GetBans {
-        guild_id: u64,
+        guild_id: GuildId,
     },
     GetBotGateway,
     GetChannel {
-        channel_id: u64,
+        channel_id: ChannelId,
     },
     GetChannelInvites {
-        channel_id: u64,
+        channel_id: ChannelId,
     },
     GetChannelWebhooks {
-        channel_id: u64,
+        channel_id: ChannelId,
     },
     GetChannels {
-        guild_id: u64,
+        guild_id: GuildId,
     },
     GetStageInstance {
-        channel_id: u64,
+        channel_id: ChannelId,
     },
     GetChannelThreadMembers {
-        channel_id: u64,
+        channel_id: ChannelId,
     },
     GetChannelArchivedPublicThreads {
-        channel_id: u64,
+        channel_id: ChannelId,
         before: Option<u64>,
         limit: Option<u64>,
     },
     GetChannelArchivedPrivateThreads {
-        channel_id: u64,
+        channel_id: ChannelId,
         before: Option<u64>,
         limit: Option<u64>,
     },
     GetChannelJoinedPrivateArchivedThreads {
-        channel_id: u64,
+        channel_id: ChannelId,
         before: Option<u64>,
         limit: Option<u64>,
     },
     GetCurrentApplicationInfo,
     GetCurrentUser,
     GetEmojis {
-        guild_id: u64,
+        guild_id: GuildId,
     },
     GetEmoji {
-        guild_id: u64,
-        emoji_id: u64,
+        guild_id: GuildId,
+        emoji_id: EmojiId,
     },
     GetFollowupMessage {
-        application_id: u64,
+        application_id: ApplicationId,
         interaction_token: &'a str,
-        message_id: u64,
+        message_id: MessageId,
     },
     GetGateway,
     GetGlobalApplicationCommands {
-        application_id: u64,
+        application_id: ApplicationId,
     },
     GetGlobalApplicationCommand {
-        application_id: u64,
-        command_id: u64,
+        application_id: ApplicationId,
+        command_id: CommandId,
     },
     GetGuild {
-        guild_id: u64,
+        guild_id: GuildId,
     },
     GetGuildWithCounts {
-        guild_id: u64,
+        guild_id: GuildId,
     },
     GetGuildApplicationCommands {
-        application_id: u64,
-        guild_id: u64,
+        application_id: ApplicationId,
+        guild_id: GuildId,
     },
     GetGuildApplicationCommand {
-        application_id: u64,
-        guild_id: u64,
-        command_id: u64,
+        application_id: ApplicationId,
+        guild_id: GuildId,
+        command_id: CommandId,
     },
     GetGuildApplicationCommandsPermissions {
-        application_id: u64,
-        guild_id: u64,
+        application_id: ApplicationId,
+        guild_id: GuildId,
     },
     GetGuildApplicationCommandPermissions {
-        application_id: u64,
-        guild_id: u64,
-        command_id: u64,
+        application_id: ApplicationId,
+        guild_id: GuildId,
+        command_id: CommandId,
     },
     GetGuildWidget {
-        guild_id: u64,
+        guild_id: GuildId,
     },
     GetGuildActiveThreads {
-        guild_id: u64,
+        guild_id: GuildId,
     },
     GetGuildPreview {
-        guild_id: u64,
+        guild_id: GuildId,
     },
     GetGuildWelcomeScreen {
-        guild_id: u64,
+        guild_id: GuildId,
     },
     GetGuildIntegrations {
-        guild_id: u64,
+        guild_id: GuildId,
     },
     GetGuildInvites {
-        guild_id: u64,
+        guild_id: GuildId,
     },
     GetGuildMembers {
         after: Option<u64>,
         limit: Option<u64>,
-        guild_id: u64,
+        guild_id: GuildId,
     },
     GetGuildPruneCount {
         days: u8,
-        guild_id: u64,
+        guild_id: GuildId,
     },
     GetGuildRegions {
-        guild_id: u64,
+        guild_id: GuildId,
     },
     GetGuildRoles {
-        guild_id: u64,
+        guild_id: GuildId,
     },
     GetScheduledEvent {
-        guild_id: u64,
-        event_id: u64,
+        guild_id: GuildId,
+        event_id: ScheduledEventId,
         with_user_count: bool,
     },
     GetScheduledEvents {
-        guild_id: u64,
+        guild_id: GuildId,
         with_user_count: bool,
     },
     GetScheduledEventUsers {
-        guild_id: u64,
-        event_id: u64,
+        guild_id: GuildId,
+        event_id: ScheduledEventId,
         after: Option<u64>,
         before: Option<u64>,
         limit: Option<u64>,
         with_member: Option<bool>,
     },
     GetGuildStickers {
-        guild_id: u64,
+        guild_id: GuildId,
     },
     GetGuildVanityUrl {
-        guild_id: u64,
+        guild_id: GuildId,
     },
     GetGuildWebhooks {
-        guild_id: u64,
+        guild_id: GuildId,
     },
     GetGuilds {
         after: Option<u64>,
@@ -1676,100 +1423,97 @@ pub enum RouteInfo<'a> {
         code: &'a str,
         member_counts: bool,
         expiration: bool,
-        event_id: Option<u64>,
+        event_id: Option<ScheduledEventId>,
     },
     GetMember {
-        guild_id: u64,
-        user_id: u64,
+        guild_id: GuildId,
+        user_id: UserId,
     },
     GetMessage {
-        channel_id: u64,
-        message_id: u64,
+        channel_id: ChannelId,
+        message_id: MessageId,
     },
     GetMessages {
-        channel_id: u64,
+        channel_id: ChannelId,
         query: String,
     },
     GetPins {
-        channel_id: u64,
+        channel_id: ChannelId,
     },
     GetReactionUsers {
         after: Option<u64>,
-        channel_id: u64,
+        channel_id: ChannelId,
         limit: u8,
-        message_id: u64,
+        message_id: MessageId,
         reaction: String,
     },
     GetSticker {
-        sticker_id: u64,
+        sticker_id: StickerId,
     },
     GetStickerPacks,
     GetGuildSticker {
-        guild_id: u64,
-        sticker_id: u64,
+        guild_id: GuildId,
+        sticker_id: StickerId,
     },
     GetUnresolvedIncidents,
     GetUpcomingMaintenances,
     GetUser {
-        user_id: u64,
+        user_id: UserId,
     },
     GetUserConnections,
     GetUserDmChannels,
     GetVoiceRegions,
     GetWebhook {
-        webhook_id: u64,
+        webhook_id: WebhookId,
     },
     GetWebhookWithToken {
         token: &'a str,
-        webhook_id: u64,
+        webhook_id: WebhookId,
     },
     GetWebhookMessage {
         token: &'a str,
-        webhook_id: u64,
-        message_id: u64,
+        webhook_id: WebhookId,
+        message_id: MessageId,
     },
     KickMember {
-        guild_id: u64,
-        user_id: u64,
-    },
-    LeaveGroup {
-        group_id: u64,
+        guild_id: GuildId,
+        user_id: UserId,
     },
     LeaveGuild {
-        guild_id: u64,
+        guild_id: GuildId,
     },
     PinMessage {
-        channel_id: u64,
-        message_id: u64,
+        channel_id: ChannelId,
+        message_id: MessageId,
     },
     RemoveBan {
-        guild_id: u64,
-        user_id: u64,
+        guild_id: GuildId,
+        user_id: UserId,
     },
     RemoveMemberRole {
-        guild_id: u64,
-        role_id: u64,
-        user_id: u64,
+        guild_id: GuildId,
+        role_id: RoleId,
+        user_id: UserId,
     },
     SearchGuildMembers {
-        guild_id: u64,
+        guild_id: GuildId,
         query: &'a str,
         limit: Option<u64>,
     },
     StartGuildPrune {
         days: u8,
-        guild_id: u64,
+        guild_id: GuildId,
     },
     StartIntegrationSync {
-        guild_id: u64,
-        integration_id: u64,
+        guild_id: GuildId,
+        integration_id: IntegrationId,
     },
     StatusIncidentsUnresolved,
     StatusMaintenancesActive,
     StatusMaintenancesUpcoming,
     UnpinMessage {
-        channel_id: u64,
-        message_id: u64,
+        channel_id: ChannelId,
+        message_id: MessageId,
     },
 }
 
@@ -1859,7 +1603,7 @@ impl<'a> RouteInfo<'a> {
                 interaction_token,
             } => (
                 LightMethod::Post,
-                Route::WebhooksId(application_id),
+                Route::WebhooksId(WebhookId(application_id.0)),
                 Cow::from(Route::webhook_followup_messages(application_id, interaction_token)),
             ),
             RouteInfo::CreateGlobalApplicationCommand {
@@ -2081,7 +1825,7 @@ impl<'a> RouteInfo<'a> {
                 message_id,
             } => (
                 LightMethod::Delete,
-                Route::ChannelsIdMessagesId(LightMethod::Delete, message_id),
+                Route::ChannelsIdMessagesId(LightMethod::Delete, channel_id),
                 Cow::from(Route::channel_message(channel_id, message_id)),
             ),
             RouteInfo::DeleteMessages {
@@ -2907,13 +2651,6 @@ impl<'a> RouteInfo<'a> {
                 LightMethod::Delete,
                 Route::GuildsIdMembersId(guild_id),
                 Cow::from(Route::guild_kick_optioned(guild_id, user_id)),
-            ),
-            RouteInfo::LeaveGroup {
-                group_id,
-            } => (
-                LightMethod::Delete,
-                Route::ChannelsId(group_id),
-                Cow::from(Route::channel(group_id)),
             ),
             RouteInfo::LeaveGuild {
                 guild_id,

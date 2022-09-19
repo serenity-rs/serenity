@@ -433,7 +433,7 @@ pub fn parse_quotes(s: impl AsRef<str>) -> Vec<String> {
 /// assert_eq!(token, "ig5AO-wdVWpCBtUUMxmgsWryqgsW3DChbKYOINftJ4DCrUbnkedoYZD0VOH1QLr-S3sV");
 /// ```
 #[must_use]
-pub fn parse_webhook(url: &Url) -> Option<(u64, &str)> {
+pub fn parse_webhook(url: &Url) -> Option<(WebhookId, &str)> {
     let (webhook_id, token) = url.path().strip_prefix("/api/webhooks/")?.split_once('/')?;
     if !["http", "https"].contains(&url.scheme())
         || !["discord.com", "discordapp.com"].contains(&url.domain()?)
@@ -442,7 +442,7 @@ pub fn parse_webhook(url: &Url) -> Option<(u64, &str)> {
     {
         return None;
     }
-    Some((webhook_id.parse().ok()?, token))
+    Some((WebhookId(webhook_id.parse().ok()?), token))
 }
 
 #[cfg(all(feature = "cache", feature = "model"))]
