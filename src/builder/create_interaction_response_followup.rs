@@ -60,7 +60,7 @@ impl<'a> CreateInteractionResponseFollowup<'a> {
         let files = std::mem::take(&mut self.files);
 
         match message_id {
-            Some(id) => http.as_ref().edit_followup_message(token, id.into(), &self, files).await,
+            Some(id) => http.as_ref().edit_followup_message(token, id, &self, files).await,
             None => http.as_ref().create_followup_message(token, &self, files).await,
         }
     }

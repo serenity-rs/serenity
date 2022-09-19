@@ -190,7 +190,7 @@ impl Command {
         http: impl AsRef<Http>,
         command_id: CommandId,
     ) -> Result<Command> {
-        http.as_ref().get_global_application_command(command_id.into()).await
+        http.as_ref().get_global_application_command(command_id).await
     }
 
     /// Deletes a global command by its Id.
@@ -202,7 +202,7 @@ impl Command {
         http: impl AsRef<Http>,
         command_id: CommandId,
     ) -> Result<()> {
-        http.as_ref().delete_global_application_command(command_id.into()).await
+        http.as_ref().delete_global_application_command(command_id).await
     }
 }
 

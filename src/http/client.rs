@@ -148,7 +148,7 @@ impl HttpBuilder {
     pub fn build(self) -> Http {
         let token = self.token;
 
-        let application_id = AtomicU64::new(self.application_id.map_or(0, |id| id.get()));
+        let application_id = AtomicU64::new(self.application_id.map_or(0, ApplicationId::get));
 
         let client = self.client.unwrap_or_else(|| {
             let builder = configure_client_backend(Client::builder());

@@ -967,7 +967,7 @@ impl ChannelId {
     ///
     /// It may return an [`Error::Http`] if the channel is not a thread channel
     pub async fn add_thread_member(self, http: impl AsRef<Http>, user_id: UserId) -> Result<()> {
-        http.as_ref().add_thread_channel_member(self, user_id.into()).await
+        http.as_ref().add_thread_channel_member(self, user_id).await
     }
 
     /// Removes a thread member, if this channel is a thread.
@@ -976,7 +976,7 @@ impl ChannelId {
     ///
     /// It may return an [`Error::Http`] if the channel is not a thread channel
     pub async fn remove_thread_member(self, http: impl AsRef<Http>, user_id: UserId) -> Result<()> {
-        http.as_ref().remove_thread_channel_member(self, user_id.into()).await
+        http.as_ref().remove_thread_channel_member(self, user_id).await
     }
 
     /// Gets private archived threads of a channel.

@@ -42,9 +42,7 @@ impl CreateApplicationCommandPermissionsData {
         guild_id: GuildId,
         command_id: CommandId,
     ) -> Result<CommandPermission> {
-        http.as_ref()
-            .edit_guild_application_command_permissions(guild_id.into(), command_id.into(), &self)
-            .await
+        http.as_ref().edit_guild_application_command_permissions(guild_id, command_id, &self).await
     }
 
     /// Adds a permission for the application command.

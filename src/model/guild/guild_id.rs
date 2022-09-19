@@ -1478,7 +1478,7 @@ impl GuildId {
         http: impl AsRef<Http>,
         command_id: CommandId,
     ) -> Result<Command> {
-        http.as_ref().get_guild_application_command(self, command_id.into()).await
+        http.as_ref().get_guild_application_command(self, command_id).await
     }
 
     /// Edit a guild application command, given its Id.
@@ -1505,7 +1505,7 @@ impl GuildId {
         http: impl AsRef<Http>,
         command_id: CommandId,
     ) -> Result<()> {
-        http.as_ref().delete_guild_application_command(self, command_id.into()).await
+        http.as_ref().delete_guild_application_command(self, command_id).await
     }
 
     /// Get all guild application commands permissions only.
@@ -1530,7 +1530,7 @@ impl GuildId {
         http: impl AsRef<Http>,
         command_id: CommandId,
     ) -> Result<CommandPermission> {
-        http.as_ref().get_guild_application_command_permissions(self, command_id.into()).await
+        http.as_ref().get_guild_application_command_permissions(self, command_id).await
     }
 
     /// Get the guild welcome screen.

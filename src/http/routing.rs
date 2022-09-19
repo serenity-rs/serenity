@@ -29,7 +29,7 @@ pub enum Route {
     /// different than the overall route ratelimit.
     ///
     /// Refer to the docs on [Rate Limits] in the yellow warning section.
-    /// [Rate Limits]: https://discord.com/developers/docs/topics/rate-limits
+    /// [Rate Limits]: <https://discord.com/developers/docs/topics/rate-limits>
     ChannelsIdMessagesId(LightMethod, ChannelId),
     /// Route for the `/channels/:channel_id/messages/:message_id/ack` path.
     ChannelsIdMessagesIdAck(ChannelId),
