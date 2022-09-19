@@ -249,6 +249,8 @@ impl<'a> CreateInteractionResponseData<'a> {
     }
 }
 
+// Discord docs link to the exact same object for autocomplete choices and command option choices
+// So we do, too
 pub type AutocompleteChoice = CommandOptionChoice;
 
 /// [Discord docs](https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-response-object-interaction-response-structure).

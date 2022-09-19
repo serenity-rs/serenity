@@ -10,7 +10,14 @@ use crate::model::application::command::Command;
 use crate::model::application::command::{CommandOptionType, CommandType};
 use crate::model::prelude::*;
 
-pub type CreateApplicationCommandOption = CommandOption;
+/// A builder for creating a new [`CommandOption`].
+///
+/// [`Self::kind`], [`Self::name`], and [`Self::description`] are required fields.
+///
+/// [`CommandOption`]: crate::model::application::command::CommandOption
+#[derive(Clone, Debug, Serialize)]
+#[must_use]
+pub struct CreateApplicationCommandOption(CommandOption);
 
 impl CreateApplicationCommandOption {
     /// Creates a new builder with the given option type, name, and description, leaving all other
@@ -20,7 +27,7 @@ impl CreateApplicationCommandOption {
         name: impl Into<String>,
         description: impl Into<String>,
     ) -> Self {
-        Self {
+        Self(CommandOption {
             kind,
             name: name.into(),
             name_localizations: HashMap::new(),
@@ -36,12 +43,12 @@ impl CreateApplicationCommandOption {
             channel_types: Vec::new(),
             choices: Vec::new(),
             options: Vec::new(),
-        }
+        })
     }
 
     /// Sets the `CommandOptionType`, replacing the current value as set in [`Self::new`].
     pub fn kind(mut self, kind: CommandOptionType) -> Self {
-        self.kind = kind;
+        self.0.kind = kind;
         self
     }
 
@@ -49,7 +56,7 @@ impl CreateApplicationCommandOption {
     ///
     /// **Note**: Must be between 1 and 32 lowercase characters, matching `r"^[\w-]{1,32}$"`.
     pub fn name(mut self, name: impl Into<String>) -> Self {
-        self.name = name.into();
+        self.0.name = name.into();
         self
     }
 
@@ -64,7 +71,7 @@ impl CreateApplicationCommandOption {
     /// # ;
     /// ```
     pub fn name_localized(mut self, locale: impl Into<String>, name: impl Into<String>) -> Self {
-        self.name_localizations.insert(locale.into(), name.into());
+        self.0.name_localizations.insert(locale.into(), name.into());
         self
     }
 
@@ -72,7 +79,7 @@ impl CreateApplicationCommandOption {
     ///
     /// **Note**: Must be between 1 and 100 characters.
     pub fn description(mut self, description: impl Into<String>) -> Self {
-        self.description = description.into();
+        self.0.description = description.into();
         self
     }
     /// Specifies a localized description of the option.
@@ -90,7 +97,7 @@ impl CreateApplicationCommandOption {
         locale: impl Into<String>,
         description: impl Into<String>,
     ) -> Self {
-        self.description_localizations.insert(locale.into(), description.into());
+        self.0.description_localizations.insert(locale.into(), description.into());
         self
     }
 
@@ -98,7 +105,7 @@ impl CreateApplicationCommandOption {
     ///
     /// **Note**: This defaults to `false`.
     pub fn required(mut self, required: bool) -> Self {
-        self.required = required;
+        self.0.required = required;
         self
     }
 
@@ -181,7 +188,7 @@ impl CreateApplicationCommandOption {
     }
 
     fn add_choice(mut self, value: CommandOptionChoice) -> Self {
-        self.choices.push(value);
+        self.0.choices.push(value);
         self
     }
 
@@ -191,7 +198,7 @@ impl CreateApplicationCommandOption {
     /// - May not be set to `true` if `choices` are set
     /// - Options using `autocomplete` are not confined to only use given choices
     pub fn set_autocomplete(mut self, value: bool) -> Self {
-        self.autocomplete = value;
+        self.0.autocomplete = value;
         self
     }
 
@@ -203,7 +210,7 @@ impl CreateApplicationCommandOption {
     /// [`SubCommandGroup`]: crate::model::application::command::CommandOptionType::SubCommandGroup
     /// [`SubCommand`]: crate::model::application::command::CommandOptionType::SubCommand
     pub fn add_sub_option(mut self, sub_option: CreateApplicationCommandOption) -> Self {
-        self.options.push(sub_option);
+        self.0.options.push(sub_option.0);
         self
     }
 
@@ -211,31 +218,31 @@ impl CreateApplicationCommandOption {
     ///
     /// [`Channel`]: crate::model::application::command::CommandOptionType::Channel
     pub fn channel_types(mut self, channel_types: Vec<ChannelType>) -> Self {
-        self.channel_types = channel_types;
+        self.0.channel_types = channel_types;
         self
     }
 
     /// Sets the minimum permitted value for this integer option
     pub fn min_int_value(mut self, value: u64) -> Self {
-        self.min_value = Some(value.into());
+        self.0.min_value = Some(value.into());
         self
     }
 
     /// Sets the maximum permitted value for this integer option
     pub fn max_int_value(mut self, value: u64) -> Self {
-        self.max_value = Some(value.into());
+        self.0.max_value = Some(value.into());
         self
     }
 
     /// Sets the minimum permitted value for this number option
     pub fn min_number_value(mut self, value: f64) -> Self {
-        self.min_value = serde_json::Number::from_f64(value);
+        self.0.min_value = serde_json::Number::from_f64(value);
         self
     }
 
     /// Sets the maximum permitted value for this number option
     pub fn max_number_value(mut self, value: f64) -> Self {
-        self.max_value = serde_json::Number::from_f64(value);
+        self.0.max_value = serde_json::Number::from_f64(value);
         self
     }
 
@@ -243,7 +250,7 @@ impl CreateApplicationCommandOption {
     ///
     /// The value of `min_length` must be greater or equal to `0`.
     pub fn min_length(&mut self, value: u16) -> &mut Self {
-        self.min_length = Some(value);
+        self.0.min_length = Some(value);
 
         self
     }
@@ -252,7 +259,7 @@ impl CreateApplicationCommandOption {
     ///
     /// The value of `max_length` must be greater or equal to `1`.
     pub fn max_length(&mut self, value: u16) -> &mut Self {
-        self.max_length = Some(value);
+        self.0.max_length = Some(value);
 
         self
     }

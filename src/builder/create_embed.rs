@@ -18,7 +18,15 @@
 use crate::internal::prelude::*;
 use crate::model::prelude::*;
 
-pub type CreateEmbed = Embed;
+/// A builder to create a fake [`Embed`] object, for use with the
+/// [`ChannelId::send_message`] and [`ExecuteWebhook::embeds`] methods.
+///
+/// [`ChannelId::send_message`]: crate::model::id::ChannelId::send_message
+/// [`Embed`]: crate::model::channel::Embed
+/// [`ExecuteWebhook::embeds`]: crate::builder::ExecuteWebhook::embeds
+#[derive(Clone, Debug, Serialize)]
+#[must_use]
+pub struct CreateEmbed(Embed);
 
 impl CreateEmbed {
     /// Equivalent to [`Self::default`].
@@ -30,24 +38,22 @@ impl CreateEmbed {
     ///
     /// Refer to the documentation for [`CreateEmbedAuthor`] for more information.
     pub fn author(mut self, author: CreateEmbedAuthor) -> Self {
-        self.author = Some(author);
+        self.0.author = Some(author.0);
         self
     }
 
     /// Set the colour of the left-hand side of the embed.
     ///
     /// This is an alias of [`Self::colour`].
-    #[cfg(feature = "utils")]
     #[inline]
     pub fn color<C: Into<Colour>>(self, colour: C) -> Self {
         self.colour(colour)
     }
 
     /// Set the colour of the left-hand side of the embed.
-    #[cfg(feature = "utils")]
     #[inline]
     pub fn colour<C: Into<Colour>>(mut self, colour: C) -> Self {
-        self.colour = Some(colour.into());
+        self.0.colour = Some(colour.into());
         self
     }
 
@@ -56,7 +62,7 @@ impl CreateEmbed {
     /// **Note**: This can't be longer than 4096 characters.
     #[inline]
     pub fn description(mut self, description: impl Into<String>) -> Self {
-        self.description = Some(description.into());
+        self.0.description = Some(description.into());
         self
     }
 
@@ -71,7 +77,7 @@ impl CreateEmbed {
         value: impl Into<String>,
         inline: bool,
     ) -> Self {
-        self.fields.push(EmbedField::new(name, value, inline));
+        self.0.fields.push(EmbedField::new(name, value, inline));
         self
     }
 
@@ -85,7 +91,7 @@ impl CreateEmbed {
     {
         let fields =
             fields.into_iter().map(|(name, value, inline)| EmbedField::new(name, value, inline));
-        self.fields.extend(fields);
+        self.0.fields.extend(fields);
         self
     }
 
@@ -93,14 +99,14 @@ impl CreateEmbed {
     ///
     /// Refer to the documentation for [`CreateEmbedFooter`] for more information.
     pub fn footer(mut self, footer: CreateEmbedFooter) -> Self {
-        self.footer = Some(footer);
+        self.0.footer = Some(footer.0);
         self
     }
 
     /// Set the image associated with the embed. This only supports HTTP(S).
     #[inline]
     pub fn image(mut self, url: impl Into<String>) -> Self {
-        self.image = Some(EmbedImage {
+        self.0.image = Some(EmbedImage {
             url: url.into(),
             proxy_url: None,
             height: None,
@@ -112,7 +118,7 @@ impl CreateEmbed {
     /// Set the thumbnail of the embed. This only supports HTTP(S).
     #[inline]
     pub fn thumbnail(mut self, url: impl Into<String>) -> Self {
-        self.thumbnail = Some(EmbedThumbnail {
+        self.0.thumbnail = Some(EmbedThumbnail {
             url: url.into(),
             proxy_url: None,
             height: None,
@@ -206,21 +212,21 @@ impl CreateEmbed {
     /// ```
     #[inline]
     pub fn timestamp<T: Into<Timestamp>>(mut self, timestamp: T) -> Self {
-        self.timestamp = Some(timestamp.into());
+        self.0.timestamp = Some(timestamp.into());
         self
     }
 
     /// Set the title of the embed.
     #[inline]
     pub fn title(mut self, title: impl Into<String>) -> Self {
-        self.title = Some(title.into());
+        self.0.title = Some(title.into());
         self
     }
 
     /// Set the URL to direct to when clicking on the title.
     #[inline]
     pub fn url(mut self, url: impl Into<String>) -> Self {
-        self.url = Some(url.into());
+        self.0.url = Some(url.into());
         self
     }
 
@@ -235,7 +241,7 @@ impl CreateEmbed {
         let mut filename = filename.into();
         filename.insert_str(0, "attachment://");
 
-        self.image = Some(EmbedImage {
+        self.0.image = Some(EmbedImage {
             url: filename,
             proxy_url: None,
             height: None,
@@ -247,24 +253,24 @@ impl CreateEmbed {
     #[cfg(feature = "http")]
     pub(super) fn check_length(&self) -> Result<()> {
         let mut length = 0;
-        if let Some(ref author) = self.author {
+        if let Some(ref author) = self.0.author {
             length += author.name.chars().count();
         }
 
-        if let Some(ref description) = self.description {
+        if let Some(ref description) = self.0.description {
             length += description.chars().count();
         }
 
-        for field in &self.fields {
+        for field in &self.0.fields {
             length += field.name.chars().count();
             length += field.value.chars().count();
         }
 
-        if let Some(ref footer) = self.footer {
+        if let Some(ref footer) = self.0.footer {
             length += footer.text.chars().count();
         }
 
-        if let Some(ref title) = self.title {
+        if let Some(ref title) = self.0.title {
             length += title.chars().count();
         }
 
@@ -281,7 +287,7 @@ impl CreateEmbed {
 impl Default for CreateEmbed {
     /// Creates a builder with default values, setting the `type` to `rich`.
     fn default() -> Self {
-        Self {
+        Self(Embed {
             fields: Vec::new(),
             description: None,
             thumbnail: None,
@@ -295,64 +301,86 @@ impl Default for CreateEmbed {
             url: None,
             provider: None,
             video: None,
-        }
+        })
     }
 }
 
-pub type CreateEmbedAuthor = EmbedAuthor;
+impl From<Embed> for CreateEmbed {
+    fn from(embed: Embed) -> Self {
+        Self(embed)
+    }
+}
+
+/// A builder to create a fake [`Embed`] object's author, for use with the [`CreateEmbed::author`]
+/// method.
+#[derive(Clone, Debug, Serialize)]
+#[must_use]
+pub struct CreateEmbedAuthor(EmbedAuthor);
 
 impl CreateEmbedAuthor {
     /// Creates an author object with the given name, leaving all other fields empty.
     pub fn new(name: impl Into<String>) -> Self {
-        Self {
+        Self(EmbedAuthor {
             name: name.into(),
             icon_url: None,
             url: None,
             proxy_icon_url: None,
-        }
+        })
     }
 
     /// Set the author's name, replacing the current value as set in [`Self::new`].
     pub fn name(mut self, name: impl Into<String>) -> Self {
-        self.name = name.into();
+        self.0.name = name.into();
         self
     }
 
     /// Set the URL of the author's icon.
     pub fn icon_url(mut self, icon_url: impl Into<String>) -> Self {
-        self.icon_url = Some(icon_url.into());
+        self.0.icon_url = Some(icon_url.into());
         self
     }
 
     /// Set the author's URL.
     pub fn url(mut self, url: impl Into<String>) -> Self {
-        self.url = Some(url.into());
+        self.0.url = Some(url.into());
         self
     }
 }
 
-pub type CreateEmbedFooter = EmbedFooter;
+impl From<EmbedAuthor> for CreateEmbedAuthor {
+    fn from(author: EmbedAuthor) -> Self {
+        Self(author)
+    }
+}
+
+pub struct CreateEmbedFooter(EmbedFooter);
 
 impl CreateEmbedFooter {
     /// Creates a new footer object with the given text, leaving all other fields empty.
     pub fn new(text: impl Into<String>) -> Self {
-        Self {
+        Self(EmbedFooter {
             text: text.into(),
             icon_url: None,
             proxy_icon_url: None,
-        }
+        })
     }
 
     /// Set the footer's text, replacing the current value as set in [`Self::new`].
     pub fn text(mut self, text: impl Into<String>) -> Self {
-        self.text = text.into();
+        self.0.text = text.into();
         self
     }
 
     /// Set the icon URL's value. This only supports HTTP(S).
     pub fn icon_url(mut self, icon_url: impl Into<String>) -> Self {
-        self.icon_url = Some(icon_url.into());
+        self.0.icon_url = Some(icon_url.into());
         self
+    }
+}
+
+impl From<EmbedFooter> for CreateEmbedFooter {
+    fn from(footer: EmbedFooter) -> Self {
+        Self(footer)
     }
 }
 
@@ -405,14 +433,14 @@ mod test {
             }),
         };
 
-        let embed = embed
+        let builder = CreateEmbed::from(embed)
             .colour(0xFF0011)
             .description("This is a hakase description")
             .image("https://i.imgur.com/XfWpfCV.gif")
             .title("still a hakase")
             .url("https://i.imgur.com/XfWpfCV.gif");
 
-        let built = to_value(embed).unwrap();
+        let built = to_value(builder).unwrap();
 
         let obj = json!({
             "color": 0xFF0011,
