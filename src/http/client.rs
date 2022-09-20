@@ -880,10 +880,11 @@ impl Http {
     /// ```rust,no_run
     /// use serenity::http::Http;
     /// use serenity::json::json;
+    /// use serenity::model::prelude::*;
     ///
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// #    let http = Http::new("token");
-    /// let channel_id = 81384788765712384;
+    /// let channel_id = ChannelId::new(81384788765712384);
     /// let map = json!({"name": "test"});
     ///
     /// let webhook = http.create_webhook(channel_id, &map, None).await?;
@@ -1114,7 +1115,7 @@ impl Http {
     /// let channel_id = ChannelId::new(7);
     /// let message_id = MessageId::new(8);
     ///
-    /// http.delete_message_reactions(channel_id.get(), message_id.get()).await?;
+    /// http.delete_message_reactions(channel_id, message_id).await?;
     /// #     Ok(())
     /// # }
     /// ```
@@ -1292,13 +1293,15 @@ impl Http {
     ///
     /// ```rust,no_run
     /// use serenity::http::Http;
+    /// use serenity::model::prelude::*;
     ///
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// // Due to the `delete_webhook` function requiring you to authenticate, you must have set
     /// // the token first.
     /// let http = Http::new("token");
     ///
-    /// http.delete_webhook(245037420704169985, None).await?;
+    /// let webhook_id = WebhookId::new(245037420704169985);
+    /// http.delete_webhook(webhook_id, None).await?;
     /// Ok(())
     /// # }
     /// ```
@@ -1328,10 +1331,11 @@ impl Http {
     ///
     /// ```rust,no_run
     /// # use serenity::http::Http;
+    /// # use serenity::model::prelude::*;
     /// #
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// # let http = Http::new("token");
-    /// let id = 245037420704169985;
+    /// let id = WebhookId::new(245037420704169985);
     /// let token = "ig5AO-wdVWpCBtUUMxmgsWryqgsW3DChbKYOINftJ4DCrUbnkedoYZD0VOH1QLr-S3sV";
     ///
     /// http.delete_webhook_with_token(id, token, None).await?;
@@ -2018,11 +2022,12 @@ impl Http {
     /// ```rust,no_run
     /// use serenity::http::Http;
     /// use serenity::json::{json, prelude::*};
+    /// use serenity::model::prelude::*;
     ///
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// #     let http = Http::new("token");
-    /// let guild_id = 187450744427773963;
-    /// let user_id = 150443906511667200;
+    /// let guild_id = GuildId::new(187450744427773963);
+    /// let user_id = UserId::new(150443906511667200);
     /// let map = json!({
     ///     "channel_id": "826929611849334784",
     ///     "suppress": true,
@@ -2069,10 +2074,11 @@ impl Http {
     /// ```rust,no_run
     /// use serenity::http::Http;
     /// use serenity::json::{json, prelude::*};
+    /// use serenity::model::prelude::*;
     ///
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// #     let http = Http::new("token");
-    /// let guild_id = 187450744427773963;
+    /// let guild_id = GuildId::new(187450744427773963);
     /// let map = json!({
     ///     "channel_id": "826929611849334784",
     ///     "suppress": false,
@@ -2118,10 +2124,11 @@ impl Http {
     /// ```rust,no_run
     /// use serenity::http::Http;
     /// use serenity::json::json;
+    /// use serenity::model::prelude::*;
     ///
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// #     let http = Http::new("token");
-    /// let id = 245037420704169985;
+    /// let id = WebhookId::new(245037420704169985);
     /// let image = serenity::utils::read_image("./webhook_img.png")?;
     /// let map = json!({
     ///     "avatar": image,
@@ -2161,10 +2168,11 @@ impl Http {
     /// ```rust,no_run
     /// use serenity::http::Http;
     /// use serenity::json::prelude::*;
+    /// use serenity::model::prelude::*;
     ///
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// #     let http = Http::new("token");
-    /// let id = 245037420704169985;
+    /// let id = WebhookId::new(245037420704169985);
     /// let token = "ig5AO-wdVWpCBtUUMxmgsWryqgsW3DChbKYOINftJ4DCrUbnkedoYZD0VOH1QLr-S3sV";
     /// let value = json!({"name": "new name"});
     /// let map = value.as_object().unwrap();
@@ -2230,10 +2238,11 @@ impl Http {
     /// ```rust,no_run
     /// use serenity::http::Http;
     /// use serenity::json::prelude::*;
+    /// use serenity::model::prelude::*;
     ///
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// #     let http = Http::new("token");
-    /// let id = 245037420704169985;
+    /// let id = WebhookId::new(245037420704169985);
     /// let token = "ig5AO-wdVWpCBtUUMxmgsWryqgsW3DChbKYOINftJ4DCrUbnkedoYZD0VOH1QLr-S3sV";
     /// let value = json!({"content": "test"});
     /// let map = value.as_object().unwrap();
@@ -2690,10 +2699,11 @@ impl Http {
     ///
     /// ```rust,no_run
     /// # use serenity::http::Http;
+    /// # use serenity::model::prelude::*;
     /// #
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// # let http = Http::new("token");
-    /// let channel_id = 81384788765712384;
+    /// let channel_id = ChannelId::new(81384788765712384);
     ///
     /// let webhooks = http.get_channel_webhooks(channel_id).await?;
     /// #     Ok(())
@@ -3262,10 +3272,11 @@ impl Http {
     ///
     /// ```rust,no_run
     /// # use serenity::http::Http;
+    /// # use serenity::model::prelude::*;
     /// #
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// #     let http = Http::new("token");
-    /// let guild_id = 81384788765712384;
+    /// let guild_id = GuildId::new(81384788765712384);
     ///
     /// let webhooks = http.get_guild_webhooks(guild_id).await?;
     /// #     Ok(())
@@ -3599,10 +3610,11 @@ impl Http {
     ///
     /// ```rust,no_run
     /// # use serenity::http::Http;
-    /// #
+    /// # use serenity::model::prelude::*;
+    ///
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// #     let http = Http::new("token");
-    /// let id = 245037420704169985;
+    /// let id = WebhookId::new(245037420704169985);
     /// let webhook = http.get_webhook(id).await?;
     /// #     Ok(())
     /// # }
@@ -3629,10 +3641,11 @@ impl Http {
     ///
     /// ```rust,no_run
     /// # use serenity::http::Http;
+    /// # use serenity::model::prelude::*;
     /// #
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// #     let http = Http::new("token");
-    /// let id = 245037420704169985;
+    /// let id = WebhookId::new(245037420704169985);
     /// let token = "ig5AO-wdVWpCBtUUMxmgsWryqgsW3DChbKYOINftJ4DCrUbnkedoYZD0VOH1QLr-S3sV";
     ///
     /// let webhook = http.get_webhook_with_token(id, token).await?;
@@ -3915,12 +3928,14 @@ impl Http {
     /// # use std::sync::Arc;
     /// # use serenity::http::{Http, Typing};
     /// # use serenity::Result;
+    /// # use serenity::model::prelude::*;
     /// #
     /// # fn long_process() {}
     /// # fn main() -> Result<()> {
     /// # let http = Arc::new(Http::new("token"));
     /// // Initiate typing (assuming http is `Arc<Http>`)
-    /// let typing = http.start_typing(7)?;
+    /// let channel_id = ChannelId::new(7);
+    /// let typing = http.start_typing(channel_id)?;
     ///
     /// // Run some long-running process
     /// long_process();
@@ -3975,13 +3990,13 @@ impl Http {
     ///         routing::RouteInfo,
     ///         request::Request,
     ///     },
-    ///     model::channel::Message,
+    ///     model::prelude::*,
     /// };
     ///
     /// let bytes = vec![
     ///     // payload bytes here
     /// ];
-    /// let channel_id = 381880193700069377;
+    /// let channel_id = ChannelId::new(381880193700069377);
     /// let route_info = RouteInfo::CreateMessage { channel_id };
     ///
     /// let mut request = Request::new(route_info);
@@ -4014,6 +4029,7 @@ impl Http {
     ///
     /// ```rust,no_run
     /// # use serenity::http::Http;
+    /// # use serenity::model::prelude::*;
     /// #
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// #     let http = Http::new("token");
@@ -4025,7 +4041,7 @@ impl Http {
     /// let bytes = vec![
     ///     // payload bytes here
     /// ];
-    /// let channel_id = 381880193700069377;
+    /// let channel_id = ChannelId::new(381880193700069377);
     /// let route_info = RouteInfo::CreateMessage { channel_id };
     ///
     /// let mut request = Request::new(route_info);

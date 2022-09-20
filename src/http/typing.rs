@@ -27,14 +27,15 @@ use crate::model::id::ChannelId;
 /// ## Examples
 ///
 /// ```rust,no_run
-/// # use serenity::{http::{Http, Typing}, Result};
+/// # use serenity::{http::{Http, Typing}, Result, model::prelude::*};
 /// # use std::sync::Arc;
 /// #
 /// # fn long_process() {}
 /// # fn main() -> Result<()> {
 /// # let http = Http::new("token");
+/// let channel_id = ChannelId::new(7);
 /// // Initiate typing (assuming `http` is bound)
-/// let typing = Typing::start(Arc::new(http), 7)?;
+/// let typing = Typing::start(Arc::new(http), channel_id)?;
 ///
 /// // Run some long-running process
 /// long_process();
