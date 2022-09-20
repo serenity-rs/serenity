@@ -9,10 +9,13 @@
 //! ```rust,no_run
 //! use serenity::model::prelude::*;
 //! ```
-#[allow(deprecated)]
 #[doc(inline)]
 pub use super::{
+    application::interaction::MessageFlags as InteractionApplicationCommandCallbackDataFlags,
+    application::interaction::*,
+    application::oauth::*,
     application::*,
+    channel::MessageFlags,
     channel::*,
     connection::*,
     event::*,
@@ -20,11 +23,9 @@ pub use super::{
     guild::audit_log::*,
     guild::*,
     id::*,
-    interactions::*,
     invite::*,
     mention::*,
     misc::*,
-    oauth2::*,
     permissions::*,
     sticker::*,
     user::*,
