@@ -196,6 +196,15 @@ impl<'a> EditRole<'a> {
         Ok(self)
     }
 
+    /// Set the role icon to custom image. Requires the input be a base64-encoded image that is in
+    /// either JPG, GIF, or PNG format.
+    #[cfg(not(feature = "http"))]
+    pub fn icon(mut self, icon: String) -> Self {
+        self.icon = Some(icon);
+        self.unicode_emoji = None;
+        self
+    }
+
     /// Sets the request's audit log reason.
     pub fn audit_log_reason(mut self, reason: &'a str) -> Self {
         self.audit_log_reason = Some(reason);

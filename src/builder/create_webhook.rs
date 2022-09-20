@@ -97,6 +97,14 @@ impl<'a> CreateWebhook<'a> {
         Ok(self)
     }
 
+    #[cfg(not(feature = "http"))]
+    /// Set the webhook's default avatar. Requires the input be a base64-encoded image that is in
+    /// either JPG, GIF, or PNG format.
+    pub fn avatar(mut self, avatar: String) -> Self {
+        self.avatar = Some(avatar);
+        self
+    }
+
     /// Sets the request's audit log reason.
     pub fn audit_log_reason(mut self, reason: &'a str) -> Self {
         self.audit_log_reason = Some(reason);

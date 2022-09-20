@@ -154,6 +154,14 @@ impl<'a> CreateScheduledEvent<'a> {
         Ok(self)
     }
 
+    /// Sets the cover image for the scheduled event. Requires the input be a base64-encoded image
+    /// that is in either JPG, GIF, or PNG format.
+    #[cfg(not(feature = "http"))]
+    pub fn image(mut self, image: String) -> Self {
+        self.image = Some(image);
+        self
+    }
+
     /// Sets the request's audit log reason.
     pub fn audit_log_reason(mut self, reason: &'a str) -> Self {
         self.audit_log_reason = Some(reason);
