@@ -109,7 +109,6 @@ version = "1.0"
 [dependencies.tokio]
 version = "1"
 default-features = true
-optional = true
 features = ["fs", "macros", "rt", "sync", "time"]
 
 [dependencies.futures]
@@ -220,7 +219,6 @@ temp_cache = ["cache", "moka"]
 rustls_backend = [
     "reqwest/rustls-tls",
     "tokio-tungstenite/rustls-tls-webpki-roots",
-    "tokio",
     "bytes",
 ]
 
@@ -228,7 +226,6 @@ rustls_backend = [
 native_tls_backend = [
     "reqwest/native-tls",
     "tokio-tungstenite/native-tls",
-    "tokio",
     "bytes",
 ]
 

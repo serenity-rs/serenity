@@ -52,7 +52,9 @@ mod ws;
 
 use std::fmt;
 
-use reqwest::{IntoUrl, Url};
+#[cfg(feature = "http")]
+use reqwest::IntoUrl;
+use reqwest::Url;
 #[cfg(feature = "client")]
 use tokio_tungstenite::tungstenite;
 
@@ -61,6 +63,7 @@ pub use self::shard::Shard;
 pub use self::ws::WsClient;
 #[cfg(feature = "client")]
 use crate::client::bridge::gateway::{ShardClientMessage, ShardRunnerMessage};
+#[cfg(feature = "http")]
 use crate::internal::prelude::*;
 use crate::model::gateway::{Activity, ActivityType};
 use crate::model::id::UserId;
@@ -103,6 +106,7 @@ impl ActivityData {
     /// # Errors
     ///
     /// Returns an error if the URL parsing fails.
+    #[cfg(feature = "http")]
     pub fn streaming(name: impl Into<String>, url: impl IntoUrl) -> Result<Self> {
         Ok(Self {
             name: name.into(),

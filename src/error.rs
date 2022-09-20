@@ -2,13 +2,12 @@ use std::error::Error as StdError;
 use std::fmt::{self, Error as FormatError};
 use std::io::Error as IoError;
 
-use reqwest::header::InvalidHeaderValue;
-use reqwest::Error as ReqwestError;
+#[cfg(feature = "http")]
+use reqwest::{header::InvalidHeaderValue, Error as ReqwestError};
 use serde_json::Error as JsonError;
 #[cfg(feature = "gateway")]
 use tokio_tungstenite::tungstenite::error::Error as TungsteniteError;
 use tracing::instrument;
-use url::ParseError as UrlError;
 
 #[cfg(feature = "client")]
 use crate::client::ClientError;
@@ -17,7 +16,7 @@ use crate::collector::CollectorError;
 #[cfg(feature = "gateway")]
 use crate::gateway::GatewayError;
 #[cfg(feature = "http")]
-use crate::http::error::ErrorResponse;
+use crate::http::HttpError;
 use crate::internal::prelude::*;
 use crate::model::ModelError;
 
@@ -92,9 +91,10 @@ pub enum Error {
     /// [`gateway`]: crate::gateway
     #[cfg(feature = "gateway")]
     Gateway(GatewayError),
-    /// An HTTP error. Mostly from the `http` module, but can also be from `gateway`.
+    /// An error from the [`http`] module.
     ///
     /// [`http`]: crate::http
+    #[cfg(feature = "http")]
     Http(HttpError),
     /// An error from the `tungstenite` crate.
     #[cfg(feature = "gateway")]
@@ -146,18 +146,21 @@ impl From<TungsteniteError> for Error {
     }
 }
 
+#[cfg(feature = "http")]
 impl From<HttpError> for Error {
     fn from(e: HttpError) -> Error {
         Error::Http(e)
     }
 }
 
+#[cfg(feature = "http")]
 impl From<InvalidHeaderValue> for Error {
     fn from(e: InvalidHeaderValue) -> Error {
         HttpError::InvalidHeader(e).into()
     }
 }
 
+#[cfg(feature = "http")]
 impl From<ReqwestError> for Error {
     fn from(e: ReqwestError) -> Error {
         HttpError::Request(e).into()
@@ -183,6 +186,7 @@ impl fmt::Display for Error {
             Self::Collector(inner) => fmt::Display::fmt(&inner, f),
             #[cfg(feature = "gateway")]
             Self::Gateway(inner) => fmt::Display::fmt(&inner, f),
+            #[cfg(feature = "http")]
             Self::Http(inner) => fmt::Display::fmt(&inner, f),
             #[cfg(feature = "gateway")]
             Self::Tungstenite(inner) => fmt::Display::fmt(&inner, f),
@@ -208,102 +212,6 @@ impl StdError for Error {
             Self::Http(inner) => Some(inner),
             #[cfg(feature = "gateway")]
             Self::Tungstenite(inner) => Some(inner),
-            _ => None,
-        }
-    }
-}
-
-// This lives here instead of in http/ because the gateway can throw HTTP errors too
-// But the impl is in http/
-#[derive(Debug)]
-#[non_exhaustive]
-pub enum HttpError {
-    /// When a non-successful status code was received for a request.
-    #[cfg(feature = "http")]
-    UnsuccessfulRequest(ErrorResponse),
-    /// When the decoding of a ratelimit header could not be properly decoded
-    /// into an `i64` or `f64`.
-    RateLimitI64F64,
-    /// When the decoding of a ratelimit header could not be properly decoded
-    /// from UTF-8.
-    RateLimitUtf8,
-    /// When parsing an URL failed due to invalid input.
-    Url(UrlError),
-    /// When parsing a Webhook fails due to invalid input.
-    InvalidWebhook,
-    /// Header value contains invalid input.
-    InvalidHeader(InvalidHeaderValue),
-    /// Reqwest's Error contain information on why sending a request failed.
-    Request(ReqwestError),
-    /// When using a proxy with an invalid scheme.
-    InvalidScheme,
-    /// When using a proxy with an invalid port.
-    InvalidPort,
-    /// When an application id was expected but missing.
-    ApplicationIdMissing,
-}
-
-impl From<ReqwestError> for HttpError {
-    fn from(error: ReqwestError) -> HttpError {
-        HttpError::Request(error)
-    }
-}
-
-impl From<UrlError> for HttpError {
-    fn from(error: UrlError) -> HttpError {
-        HttpError::Url(error)
-    }
-}
-
-impl From<InvalidHeaderValue> for HttpError {
-    fn from(error: InvalidHeaderValue) -> HttpError {
-        HttpError::InvalidHeader(error)
-    }
-}
-
-impl fmt::Display for HttpError {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        match self {
-            #[cfg(feature = "http")]
-            Self::UnsuccessfulRequest(e) => {
-                f.write_str(&e.error.message)?;
-
-                // Put Discord's human readable error explanations in parentheses
-                let mut errors_iter = e.error.errors.iter();
-                if let Some(error) = errors_iter.next() {
-                    f.write_str(" (")?;
-                    f.write_str(&error.path)?;
-                    f.write_str(": ")?;
-                    f.write_str(&error.message)?;
-                    for error in errors_iter {
-                        f.write_str(", ")?;
-                        f.write_str(&error.path)?;
-                        f.write_str(": ")?;
-                        f.write_str(&error.message)?;
-                    }
-                    f.write_str(")")?;
-                }
-
-                Ok(())
-            },
-            Self::RateLimitI64F64 => f.write_str("Error decoding a header into an i64 or f64"),
-            Self::RateLimitUtf8 => f.write_str("Error decoding a header from UTF-8"),
-            Self::Url(_) => f.write_str("Provided URL is incorrect."),
-            Self::InvalidWebhook => f.write_str("Provided URL is not a valid webhook."),
-            Self::InvalidHeader(_) => f.write_str("Provided value is an invalid header value."),
-            Self::Request(_) => f.write_str("Error while sending HTTP request."),
-            Self::InvalidScheme => f.write_str("Invalid Url scheme."),
-            Self::InvalidPort => f.write_str("Invalid port."),
-            Self::ApplicationIdMissing => f.write_str("Application id was expected but missing."),
-        }
-    }
-}
-
-impl StdError for HttpError {
-    fn source(&self) -> Option<&(dyn StdError + 'static)> {
-        match self {
-            Self::Url(inner) => Some(inner),
-            Self::Request(inner) => Some(inner),
             _ => None,
         }
     }
