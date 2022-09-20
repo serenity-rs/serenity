@@ -353,6 +353,12 @@ impl From<EmbedAuthor> for CreateEmbedAuthor {
     }
 }
 
+/// A builder to create a fake [`Embed`] object's footer, for use with the [`CreateEmbed::footer`]
+/// method.
+///
+/// This does not have any required fields.
+#[derive(Clone, Debug, Serialize)]
+#[must_use]
 pub struct CreateEmbedFooter(EmbedFooter);
 
 impl CreateEmbedFooter {
@@ -386,6 +392,7 @@ impl From<EmbedFooter> for CreateEmbedFooter {
 
 #[cfg(test)]
 mod test {
+    use super::CreateEmbed;
     use crate::json::{json, to_value};
     use crate::model::channel::{Embed, EmbedField, EmbedFooter, EmbedImage, EmbedVideo};
     use crate::model::colour::Colour;
