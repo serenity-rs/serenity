@@ -119,7 +119,7 @@ use std::sync::Arc;
 use crate::cache::Cache;
 #[cfg(all(feature = "client", feature = "gateway"))]
 pub use crate::client::Client;
-pub use crate::error::{Error, Result};
+pub use crate::error::{Error, HttpError, Result};
 #[cfg(feature = "client")]
 use crate::http::Http;
 

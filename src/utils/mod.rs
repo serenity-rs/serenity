@@ -34,13 +34,6 @@ use crate::http::CacheHttp;
 use crate::internal::prelude::*;
 use crate::model::prelude::*;
 
-#[cfg(feature = "model")]
-pub(crate) fn encode_image(raw: &[u8]) -> String {
-    let mut encoded = base64::encode(raw);
-    encoded.insert_str(0, "data:image/png;base64,");
-    encoded
-}
-
 /// Retrieves the "code" part of an invite out of a URL.
 ///
 /// # Examples

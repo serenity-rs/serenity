@@ -63,6 +63,7 @@ pub use self::ws::WsClient;
 use crate::client::bridge::gateway::{ShardClientMessage, ShardRunnerMessage};
 use crate::internal::prelude::*;
 use crate::model::gateway::{Activity, ActivityType};
+use crate::model::id::UserId;
 use crate::model::user::OnlineStatus;
 
 /// Presence data of the current user.
@@ -270,4 +271,14 @@ pub enum ReconnectType {
     Reidentify,
     /// Indicator that a new connection should be made by sending a RESUME.
     Resume,
+}
+
+#[derive(Clone, Debug)]
+pub enum ChunkGuildFilter {
+    /// Returns all members of the guilds specified. Requires GUILD_MEMBERS intent.
+    None,
+    /// A common username prefix filter for the members returned.
+    Query(String),
+    /// A set of exact user IDs to query for.
+    UserIds(Vec<UserId>),
 }

@@ -1,9 +1,4 @@
-use std::error::Error as StdError;
-use std::fmt;
-
-use reqwest::header::InvalidHeaderValue;
-use reqwest::{Error as ReqwestError, Response, StatusCode, Url};
-use url::ParseError as UrlError;
+use reqwest::{Response, StatusCode, Url};
 
 use crate::http::utils::deserialize_errors;
 use crate::json::decode_resp;
@@ -54,32 +49,7 @@ impl ErrorResponse {
     }
 }
 
-#[derive(Debug)]
-#[non_exhaustive]
-pub enum Error {
-    /// When a non-successful status code was received for a request.
-    UnsuccessfulRequest(ErrorResponse),
-    /// When the decoding of a ratelimit header could not be properly decoded
-    /// into an `i64` or `f64`.
-    RateLimitI64F64,
-    /// When the decoding of a ratelimit header could not be properly decoded
-    /// from UTF-8.
-    RateLimitUtf8,
-    /// When parsing an URL failed due to invalid input.
-    Url(UrlError),
-    /// When parsing a Webhook fails due to invalid input.
-    InvalidWebhook,
-    /// Header value contains invalid input.
-    InvalidHeader(InvalidHeaderValue),
-    /// Reqwest's Error contain information on why sending a request failed.
-    Request(ReqwestError),
-    /// When using a proxy with an invalid scheme.
-    InvalidScheme,
-    /// When using a proxy with an invalid port.
-    InvalidPort,
-    /// When an application id was expected but missing.
-    ApplicationIdMissing,
-}
+pub use crate::HttpError as Error;
 
 impl Error {
     // We need a freestanding from-function since we cannot implement an async
@@ -119,71 +89,6 @@ impl Error {
 impl From<ErrorResponse> for Error {
     fn from(error: ErrorResponse) -> Error {
         Error::UnsuccessfulRequest(error)
-    }
-}
-
-impl From<ReqwestError> for Error {
-    fn from(error: ReqwestError) -> Error {
-        Error::Request(error)
-    }
-}
-
-impl From<UrlError> for Error {
-    fn from(error: UrlError) -> Error {
-        Error::Url(error)
-    }
-}
-
-impl From<InvalidHeaderValue> for Error {
-    fn from(error: InvalidHeaderValue) -> Error {
-        Error::InvalidHeader(error)
-    }
-}
-
-impl fmt::Display for Error {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        match self {
-            Self::UnsuccessfulRequest(e) => {
-                f.write_str(&e.error.message)?;
-
-                // Put Discord's human readable error explanations in parentheses
-                let mut errors_iter = e.error.errors.iter();
-                if let Some(error) = errors_iter.next() {
-                    f.write_str(" (")?;
-                    f.write_str(&error.path)?;
-                    f.write_str(": ")?;
-                    f.write_str(&error.message)?;
-                    for error in errors_iter {
-                        f.write_str(", ")?;
-                        f.write_str(&error.path)?;
-                        f.write_str(": ")?;
-                        f.write_str(&error.message)?;
-                    }
-                    f.write_str(")")?;
-                }
-
-                Ok(())
-            },
-            Self::RateLimitI64F64 => f.write_str("Error decoding a header into an i64 or f64"),
-            Self::RateLimitUtf8 => f.write_str("Error decoding a header from UTF-8"),
-            Self::Url(_) => f.write_str("Provided URL is incorrect."),
-            Self::InvalidWebhook => f.write_str("Provided URL is not a valid webhook."),
-            Self::InvalidHeader(_) => f.write_str("Provided value is an invalid header value."),
-            Self::Request(_) => f.write_str("Error while sending HTTP request."),
-            Self::InvalidScheme => f.write_str("Invalid Url scheme."),
-            Self::InvalidPort => f.write_str("Invalid port."),
-            Self::ApplicationIdMissing => f.write_str("Application id was expected but missing."),
-        }
-    }
-}
-
-impl StdError for Error {
-    fn source(&self) -> Option<&(dyn StdError + 'static)> {
-        match self {
-            Self::Url(inner) => Some(inner),
-            Self::Request(inner) => Some(inner),
-            _ => None,
-        }
     }
 }
 

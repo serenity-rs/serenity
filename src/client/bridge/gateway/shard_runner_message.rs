@@ -9,18 +9,9 @@ use crate::collector::{
     ReactionFilter,
 };
 use crate::gateway::ActivityData;
-use crate::model::id::{GuildId, UserId};
+pub use crate::gateway::ChunkGuildFilter;
+use crate::model::id::GuildId;
 use crate::model::user::OnlineStatus;
-
-#[derive(Clone, Debug)]
-pub enum ChunkGuildFilter {
-    /// Returns all members of the guilds specified. Requires GUILD_MEMBERS intent.
-    None,
-    /// A common username prefix filter for the members returned.
-    Query(String),
-    /// A set of exact user IDs to query for.
-    UserIds(Vec<UserId>),
-}
 
 /// A message to send from a shard over a WebSocket.
 #[derive(Clone, Debug)]
