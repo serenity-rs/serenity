@@ -3,7 +3,6 @@ use crate::http::{CacheHttp, Http};
 #[cfg(feature = "http")]
 use crate::internal::prelude::*;
 use crate::model::prelude::*;
-#[cfg(feature = "http")]
 use crate::utils::encode_image;
 
 #[derive(Clone, Debug, Default, Serialize)]
@@ -178,27 +177,8 @@ impl<'a> EditScheduledEvent<'a> {
     }
 
     /// Sets the cover image for the scheduled event.
-    ///
-    /// # Errors
-    ///
-    /// May error if the input is a URL and the HTTP request fails, or if it is a path to a file
-    /// that does not exist.
-    #[cfg(feature = "http")]
-    pub async fn image(
-        mut self,
-        http: impl AsRef<Http>,
-        image: impl Into<AttachmentType<'a>>,
-    ) -> Result<EditScheduledEvent<'a>> {
-        let image_data = image.into().data(&http.as_ref().client).await?;
-        self.image = Some(encode_image(&image_data));
-        Ok(self)
-    }
-
-    /// Sets the cover image for the scheduled event. Requires the input be a base64-encoded image
-    /// that is in either JPG, GIF, or PNG format.
-    #[cfg(not(feature = "http"))]
-    pub fn image(mut self, image: String) -> Self {
-        self.image = Some(image);
+    pub fn image(mut self, image: AttachmentType<'_>) -> Self {
+        self.image = Some(encode_image(&image.data));
         self
     }
 

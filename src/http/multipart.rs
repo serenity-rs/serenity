@@ -1,7 +1,6 @@
 use std::borrow::Cow;
 
 use reqwest::multipart::{Form, Part};
-use reqwest::Client;
 
 use super::AttachmentType;
 use crate::internal::prelude::*;
@@ -20,7 +19,7 @@ pub struct Multipart<'a> {
 }
 
 impl<'a> Multipart<'a> {
-    pub(crate) async fn build_form(&mut self, client: &Client) -> Result<Form> {
+    pub(crate) async fn build_form(&mut self) -> Result<Form> {
         let mut multipart = Form::new();
 
         for (file_num, file) in self.files.iter_mut().enumerate() {
@@ -30,20 +29,8 @@ impl<'a> Multipart<'a> {
             let part_name =
                 if file_num == 0 { "file".to_string() } else { format!("file{}", file_num) };
 
-            let data = file.data(client).await?;
-            let filename = file.filename()?;
-
-            // Modify current AttachmentType to Bytes variant to prevent the
-            // need for another disk read or network request when retrying
-            if let AttachmentType::Path(_) | AttachmentType::Image(_) = file {
-                *file = AttachmentType::Bytes {
-                    data: data.clone().into(),
-                    filename: filename.clone().unwrap_or_default(),
-                };
-            }
-
-            let mut part = Part::bytes(data);
-            if let Some(filename) = filename {
+            let mut part = Part::bytes(file.data.to_vec());
+            if let Some(filename) = file.filename.clone() {
                 part = guess_mime_str(part, &filename)?;
                 part = part.file_name(filename);
             }

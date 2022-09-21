@@ -63,27 +63,8 @@ impl<'a> EditWebhook<'a> {
     }
 
     /// Set the webhook's default avatar.
-    ///
-    /// # Errors
-    ///
-    /// May error if the input is a URL and the HTTP request fails, or if it is a path to a file
-    /// that does not exist.
-    #[cfg(feature = "http")]
-    pub async fn avatar(
-        mut self,
-        http: impl AsRef<Http>,
-        avatar: impl Into<AttachmentType<'a>>,
-    ) -> Result<EditWebhook<'a>> {
-        let avatar_data = avatar.into().data(&http.as_ref().client).await?;
-        self.avatar = Some(Some(crate::utils::encode_image(&avatar_data)));
-        Ok(self)
-    }
-
-    #[cfg(not(feature = "http"))]
-    /// Set the webhook's default avatar. Requires the input be a base64-encoded image that is in
-    /// either JPG, GIF, or PNG format.
-    pub fn avatar(mut self, avatar: String) -> Self {
-        self.avatar = Some(Some(avatar));
+    pub fn avatar(mut self, avatar: AttachmentType<'_>) -> Self {
+        self.avatar = Some(Some(crate::utils::encode_image(&avatar.data)));
         self
     }
 

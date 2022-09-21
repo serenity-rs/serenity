@@ -3,7 +3,6 @@ use crate::http::{CacheHttp, Http};
 #[cfg(feature = "http")]
 use crate::internal::prelude::*;
 use crate::model::prelude::*;
-#[cfg(feature = "http")]
 use crate::utils::encode_image;
 
 /// A builder to create or edit a [`Role`] for use via a number of model methods.
@@ -177,30 +176,8 @@ impl<'a> EditRole<'a> {
     }
 
     /// Set the role icon to a custom image.
-    ///
-    /// # Errors
-    ///
-    /// May error if the icon is a URL and the HTTP request fails, or if the icon is a file
-    /// on a path that doesn't exist.
-    #[cfg(feature = "http")]
-    pub async fn icon(
-        mut self,
-        http: impl AsRef<Http>,
-        icon: impl Into<AttachmentType<'a>>,
-    ) -> Result<EditRole<'a>> {
-        let icon_data = icon.into().data(&http.as_ref().client).await?;
-
-        self.icon = Some(encode_image(&icon_data));
-        self.unicode_emoji = None;
-
-        Ok(self)
-    }
-
-    /// Set the role icon to custom image. Requires the input be a base64-encoded image that is in
-    /// either JPG, GIF, or PNG format.
-    #[cfg(not(feature = "http"))]
-    pub fn icon(mut self, icon: String) -> Self {
-        self.icon = Some(icon);
+    pub fn icon(mut self, icon: AttachmentType<'_>) -> Self {
+        self.icon = Some(encode_image(&icon.data));
         self.unicode_emoji = None;
         self
     }

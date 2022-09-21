@@ -128,7 +128,7 @@ impl<'a> Request<'a> {
 
         if let Some(multipart) = multipart {
             // Setting multipart adds the content-length header
-            builder = builder.multipart(multipart.build_form(client).await?);
+            builder = builder.multipart(multipart.build_form().await?);
         } else {
             let length = body
                 .as_ref()
