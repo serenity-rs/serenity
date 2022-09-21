@@ -64,7 +64,7 @@ impl<'a> EditWebhook<'a> {
     }
 
     /// Set the webhook's default avatar.
-    pub fn avatar(mut self, avatar: CreateAttachment<'_>) -> Self {
+    pub fn avatar(mut self, avatar: &CreateAttachment<'_>) -> Self {
         self.avatar = Some(Some(crate::utils::encode_image(&avatar.data)));
         self
     }

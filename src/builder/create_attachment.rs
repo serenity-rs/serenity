@@ -24,6 +24,7 @@ pub struct CreateAttachment<'a> {
 
 impl<'a> CreateAttachment<'a> {
     /// Builds an [`CreateAttachment`] from the raw attachment data.
+    #[must_use]
     pub fn bytes(data: &'a [u8], filename: &str) -> CreateAttachment<'a> {
         CreateAttachment {
             data: Cow::Borrowed(data),
@@ -32,6 +33,10 @@ impl<'a> CreateAttachment<'a> {
     }
 
     /// Builds an [`CreateAttachment`] by reading a local file.
+    ///
+    /// # Errors
+    ///
+    /// [`Error::Io`] if reading the file fails.
     pub async fn path(path: impl AsRef<Path>) -> Result<CreateAttachment<'static>> {
         let mut file = File::open(path.as_ref()).await?;
         let mut data = Vec::new();
@@ -47,6 +52,10 @@ impl<'a> CreateAttachment<'a> {
     }
 
     /// Builds an [`CreateAttachment`] by reading from a file handler.
+    ///
+    /// # Errors
+    ///
+    /// [`Error::Io`] error if reading the file fails.
     pub async fn file(file: &File, filename: &str) -> Result<CreateAttachment<'static>> {
         let mut data = Vec::new();
         file.try_clone().await?.read_to_end(&mut data).await?;
@@ -58,6 +67,10 @@ impl<'a> CreateAttachment<'a> {
     }
 
     /// Builds an [`CreateAttachment`] by downloading attachment data from a URL.
+    ///
+    /// # Errors
+    ///
+    /// [`Error::Url`] if the URL is invalid, [`Error::Http`] if downloading the data fails.
     #[cfg(feature = "http")]
     pub async fn url(client: &Client, url: &str) -> Result<CreateAttachment<'static>> {
         let url = Url::parse(url).map_err(|_| Error::Url(url.to_string()))?;

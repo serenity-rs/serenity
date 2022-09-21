@@ -138,7 +138,7 @@ impl<'a> CreateScheduledEvent<'a> {
     }
 
     /// Sets the cover image for the scheduled event.
-    pub fn image(mut self, image: CreateAttachment<'_>) -> Self {
+    pub fn image(mut self, image: &CreateAttachment<'_>) -> Self {
         self.image = Some(encode_image(&image.data));
         self
     }
