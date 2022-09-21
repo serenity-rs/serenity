@@ -75,9 +75,10 @@ impl EditProfile {
         Ok(self)
     }
 
+    #[cfg(not(feature = "http"))]
     /// Set the current user's avatar. Requires the input be a base64-encoded image that is in
     /// either JPG, GIF, or PNG format.
-    pub fn avatar_base64(mut self, avatar: String) -> Self {
+    pub fn avatar(mut self, avatar: String) -> Self {
         self.avatar = Some(Some(avatar));
         self
     }

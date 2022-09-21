@@ -156,7 +156,8 @@ impl<'a> CreateScheduledEvent<'a> {
 
     /// Sets the cover image for the scheduled event. Requires the input be a base64-encoded image
     /// that is in either JPG, GIF, or PNG format.
-    pub fn image_base64(mut self, image: String) -> Self {
+    #[cfg(not(feature = "http"))]
+    pub fn image(mut self, image: String) -> Self {
         self.image = Some(image);
         self
     }

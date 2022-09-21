@@ -198,7 +198,8 @@ impl<'a> EditRole<'a> {
 
     /// Set the role icon to custom image. Requires the input be a base64-encoded image that is in
     /// either JPG, GIF, or PNG format.
-    pub fn icon_base64(mut self, icon: String) -> Self {
+    #[cfg(not(feature = "http"))]
+    pub fn icon(mut self, icon: String) -> Self {
         self.icon = Some(icon);
         self.unicode_emoji = None;
         self
