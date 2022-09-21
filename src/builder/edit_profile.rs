@@ -40,25 +40,17 @@ impl EditProfile {
     ///
     /// ```rust,no_run
     /// # #[cfg(all(feature = "client", feature = "cache", feature = "gateway"))]
-    /// # {
-    /// # use serenity::builder::EditProfile;
+    /// # use serenity::builder::{EditProfile, CreateAttachment};
     /// # use serenity::prelude::*;
     /// # use serenity::model::prelude::*;
     /// #
-    /// # struct Handler;
-    /// #
-    /// # #[serenity::async_trait]
-    /// # impl EventHandler for Handler {
-    /// #     async fn message(&self, context: Context, _: Message) {
+    /// # async fn _foo(context: Context) -> Result<(), SerenityError> {
     /// // assuming a `context` has been bound
     /// let mut user = context.cache.current_user().clone();
     ///
-    /// let builder =
-    ///     EditProfile::new().avatar(&context, "./my_image.jpg").await.expect("Failed to read image.");
-    /// let _ = user.edit(&context, builder).await;
-    /// #     }
-    /// # }
-    /// # }
+    /// let avatar = CreateAttachment::path("./my_image.jpg").await.expect("Failed to read image.");
+    /// user.edit(&context, EditProfile::new().avatar(&avatar)).await?;
+    /// # Ok(()) }
     /// ```
     pub fn avatar(mut self, avatar: &CreateAttachment<'_>) -> Self {
         self.avatar = Some(Some(crate::utils::encode_image(&avatar.data)));

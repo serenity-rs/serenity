@@ -705,7 +705,7 @@ impl GuildChannel {
     /// for demonstrative purposes):
     ///
     /// ```rust,no_run
-    /// use serenity::builder::CreateMessage;
+    /// use serenity::builder::{CreateAttachment, CreateMessage};
     /// use serenity::model::channel::Channel;
     /// use serenity::model::prelude::*;
     /// use serenity::prelude::*;
@@ -727,20 +727,10 @@ impl GuildChannel {
     ///                 return;
     ///             }
     ///
-    ///             let file = match File::open("./cat.png").await {
-    ///                 Ok(file) => file,
-    ///                 Err(why) => {
-    ///                     println!("Err opening file: {:?}", why);
-    ///
-    ///                     return;
-    ///                 },
-    ///             };
+    ///             let file = CreateAttachment::path("cat.png").await.unwrap();
     ///
     ///             let builder = CreateMessage::new().content("here's a cat");
-    ///             let _ = msg
-    ///                 .channel_id
-    ///                 .send_files(&context.http, vec![(&file, "cat.png")], builder)
-    ///                 .await;
+    ///             let _ = msg.channel_id.send_files(&context.http, vec![file], builder).await;
     ///         }
     ///     }
     /// }

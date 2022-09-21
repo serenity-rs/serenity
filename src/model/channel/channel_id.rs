@@ -654,18 +654,21 @@ impl ChannelId {
     /// # use serenity::http::Http;
     /// # use std::sync::Arc;
     /// #
-    /// # async fn run() {
+    /// # async fn run() -> Result<(), serenity::Error> {
     /// # let http = Arc::new(Http::new("token"));
-    /// use serenity::builder::CreateMessage;
+    /// use serenity::builder::{CreateAttachment, CreateMessage};
     /// use serenity::model::id::ChannelId;
     ///
     /// let channel_id = ChannelId::new(7);
     ///
-    /// let paths = vec!["/path/to/file.jpg", "path/to/file2.jpg"];
+    /// let paths = vec![
+    ///     CreateAttachment::path("/path/to/file.jpg").await?,
+    ///     CreateAttachment::path("path/to/file2.jpg").await?,
+    /// ];
     ///
     /// let builder = CreateMessage::new().content("some files");
-    /// let _ = channel_id.send_files(&http, paths, builder).await;
-    /// # }
+    /// channel_id.send_files(&http, paths, builder).await?;
+    /// # Ok(()) }
     /// ```
     ///
     /// Send files using [`File`]:
@@ -676,7 +679,7 @@ impl ChannelId {
     /// #
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// # let http = Arc::new(Http::new("token"));
-    /// use serenity::builder::CreateMessage;
+    /// use serenity::builder::{CreateAttachment, CreateMessage};
     /// use serenity::model::id::ChannelId;
     /// use tokio::fs::File;
     ///
@@ -685,7 +688,10 @@ impl ChannelId {
     /// let f1 = File::open("my_file.jpg").await?;
     /// let f2 = File::open("my_file2.jpg").await?;
     ///
-    /// let files = vec![(&f1, "my_file.jpg"), (&f2, "my_file2.jpg")];
+    /// let files = vec![
+    ///     CreateAttachment::file(&f1, "my_file.jpg").await?,
+    ///     CreateAttachment::file(&f2, "my_file2.jpg").await?,
+    /// ];
     ///
     /// let builder = CreateMessage::new().content("some files");
     /// let _ = channel_id.send_files(&http, files, builder).await;
