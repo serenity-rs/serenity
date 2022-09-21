@@ -1,4 +1,4 @@
-use super::{CreateAllowedMentions, CreateComponents, CreateEmbed};
+use super::{CreateAllowedMentions, CreateAttachment, CreateComponents, CreateEmbed};
 #[cfg(feature = "http")]
 use crate::http::Http;
 use crate::internal::prelude::*;
@@ -114,7 +114,7 @@ pub struct CreateInteractionResponseData<'a> {
     title: Option<String>,
 
     #[serde(skip)]
-    files: Vec<AttachmentType<'a>>,
+    files: Vec<CreateAttachment<'a>>,
 }
 
 impl<'a> CreateInteractionResponseData<'a> {
@@ -134,17 +134,14 @@ impl<'a> CreateInteractionResponseData<'a> {
     }
 
     /// Appends a file to the message.
-    pub fn add_file<T: Into<AttachmentType<'a>>>(mut self, file: T) -> Self {
-        self.files.push(file.into());
+    pub fn add_file(mut self, file: CreateAttachment<'a>) -> Self {
+        self.files.push(file);
         self
     }
 
     /// Appends a list of files to the message.
-    pub fn add_files<T: Into<AttachmentType<'a>>, It: IntoIterator<Item = T>>(
-        mut self,
-        files: It,
-    ) -> Self {
-        self.files.extend(files.into_iter().map(Into::into));
+    pub fn add_files(mut self, files: impl IntoIterator<Item = CreateAttachment<'a>>) -> Self {
+        self.files.extend(files);
         self
     }
 
@@ -152,11 +149,8 @@ impl<'a> CreateInteractionResponseData<'a> {
     ///
     /// Calling this multiple times will overwrite the file list. To append files, call
     /// [`Self::add_file`] or [`Self::add_files`] instead.
-    pub fn files<T: Into<AttachmentType<'a>>, It: IntoIterator<Item = T>>(
-        mut self,
-        files: It,
-    ) -> Self {
-        self.files = files.into_iter().map(Into::into).collect();
+    pub fn files(mut self, files: impl IntoIterator<Item = CreateAttachment<'a>>) -> Self {
+        self.files = files.into_iter().collect();
         self
     }
 

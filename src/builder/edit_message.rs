@@ -1,4 +1,4 @@
-use super::{CreateAllowedMentions, CreateComponents, CreateEmbed};
+use super::{CreateAllowedMentions, CreateAttachment, CreateComponents, CreateEmbed};
 #[cfg(feature = "http")]
 use crate::http::Http;
 #[cfg(feature = "http")]
@@ -47,7 +47,7 @@ pub struct EditMessage<'a> {
     attachments: Option<Vec<AttachmentId>>,
 
     #[serde(skip)]
-    files: Vec<AttachmentType<'a>>,
+    files: Vec<CreateAttachment<'a>>,
 }
 
 impl<'a> EditMessage<'a> {
@@ -197,8 +197,8 @@ impl<'a> EditMessage<'a> {
     /// Add a new attachment for the message.
     ///
     /// This can be called multiple times.
-    pub fn attachment(mut self, attachment: impl Into<AttachmentType<'a>>) -> Self {
-        self.files.push(attachment.into());
+    pub fn attachment(mut self, attachment: CreateAttachment<'a>) -> Self {
+        self.files.push(attachment);
         self
     }
 

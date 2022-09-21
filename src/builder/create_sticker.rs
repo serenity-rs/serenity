@@ -1,3 +1,4 @@
+use super::CreateAttachment;
 #[cfg(feature = "http")]
 use crate::http::{CacheHttp, Http};
 #[cfg(feature = "http")]
@@ -17,7 +18,7 @@ pub struct CreateSticker<'a> {
     name: String,
     tags: String,
     description: String,
-    file: AttachmentType<'a>,
+    file: CreateAttachment<'a>,
     audit_log_reason: Option<&'a str>,
 }
 
@@ -27,13 +28,13 @@ impl<'a> CreateSticker<'a> {
         name: impl Into<String>,
         tags: impl Into<String>,
         description: impl Into<String>,
-        file: impl Into<AttachmentType<'a>>,
+        file: CreateAttachment<'a>,
     ) -> Self {
         Self {
             name: name.into(),
             tags: tags.into(),
             description: description.into(),
-            file: file.into(),
+            file,
             audit_log_reason: None,
         }
     }
@@ -100,8 +101,8 @@ impl<'a> CreateSticker<'a> {
     /// Set the sticker file. Replaces the current value as set in [`Self::new`].
     ///
     /// **Note**: Must be a PNG, APNG, or Lottie JSON file, max 500 KB.
-    pub fn file(mut self, file: impl Into<AttachmentType<'a>>) -> Self {
-        self.file = file.into();
+    pub fn file(mut self, file: CreateAttachment<'a>) -> Self {
+        self.file = file;
         self
     }
 

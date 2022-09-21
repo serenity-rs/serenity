@@ -4,6 +4,7 @@ use std::sync::Arc;
 
 #[cfg(feature = "model")]
 use crate::builder::{
+    CreateAttachment,
     CreateInvite,
     CreateMessage,
     CreateStageInstance,
@@ -26,8 +27,6 @@ use crate::collector::{MessageCollectorBuilder, ReactionCollectorBuilder};
 use crate::http::{CacheHttp, Http, Typing};
 #[cfg(all(feature = "cache", feature = "model"))]
 use crate::internal::prelude::*;
-#[cfg(feature = "model")]
-use crate::model::channel::AttachmentType;
 use crate::model::prelude::*;
 use crate::model::Timestamp;
 
@@ -888,16 +887,12 @@ impl GuildChannel {
     /// See [`CreateMessage::execute`] for a list of possible errors, and their corresponding
     /// reasons.
     #[inline]
-    pub async fn send_files<'a, T, It>(
-        &self,
+    pub async fn send_files<'a>(
+        self,
         cache_http: impl CacheHttp,
-        files: It,
+        files: impl IntoIterator<Item = CreateAttachment<'a>>,
         builder: CreateMessage<'a>,
-    ) -> Result<Message>
-    where
-        T: Into<AttachmentType<'a>>,
-        It: IntoIterator<Item = T>,
-    {
+    ) -> Result<Message> {
         builder
             .files(files)
             .execute(

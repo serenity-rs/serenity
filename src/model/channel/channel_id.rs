@@ -6,6 +6,7 @@ use futures::stream::Stream;
 
 #[cfg(feature = "model")]
 use crate::builder::{
+    CreateAttachment,
     CreateInvite,
     CreateMessage,
     CreateStageInstance,
@@ -27,8 +28,6 @@ use crate::collector::{MessageCollectorBuilder, ReactionCollectorBuilder};
 use crate::http::{CacheHttp, Http, Typing};
 #[cfg(feature = "model")]
 use crate::json::json;
-#[cfg(feature = "model")]
-use crate::model::channel::AttachmentType;
 use crate::model::prelude::*;
 
 #[cfg(feature = "model")]
@@ -700,16 +699,12 @@ impl ChannelId {
     /// reasons.
     ///
     /// [`File`]: tokio::fs::File
-    pub async fn send_files<'a, T, It>(
+    pub async fn send_files<'a>(
         self,
         cache_http: impl CacheHttp,
-        files: It,
+        files: impl IntoIterator<Item = CreateAttachment<'a>>,
         builder: CreateMessage<'a>,
-    ) -> Result<Message>
-    where
-        T: Into<AttachmentType<'a>>,
-        It: IntoIterator<Item = T>,
-    {
+    ) -> Result<Message> {
         builder
             .files(files)
             .execute(

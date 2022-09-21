@@ -2,14 +2,14 @@ use std::borrow::Cow;
 
 use reqwest::multipart::{Form, Part};
 
-use super::AttachmentType;
+use crate::builder::CreateAttachment;
 use crate::internal::prelude::*;
 
 /// Holder for multipart body. Contains files, multipart fields, and
 /// payload_json for creating requests with attachments.
 #[derive(Clone, Debug)]
 pub struct Multipart<'a> {
-    pub files: Vec<AttachmentType<'a>>,
+    pub files: Vec<CreateAttachment<'a>>,
     /// Multipart text fields that are sent with the form data as individual
     /// fields. If a certain endpoint does not support passing JSON body via
     /// `payload_json`, this must be used instead.

@@ -1,3 +1,4 @@
+use super::CreateAttachment;
 #[cfg(feature = "http")]
 use crate::http::{CacheHttp, Http};
 #[cfg(feature = "http")]
@@ -177,7 +178,7 @@ impl<'a> EditScheduledEvent<'a> {
     }
 
     /// Sets the cover image for the scheduled event.
-    pub fn image(mut self, image: AttachmentType<'_>) -> Self {
+    pub fn image(mut self, image: CreateAttachment<'_>) -> Self {
         self.image = Some(encode_image(&image.data));
         self
     }

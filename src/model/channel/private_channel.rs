@@ -3,13 +3,11 @@ use std::fmt;
 use std::sync::Arc;
 
 #[cfg(feature = "model")]
-use crate::builder::{CreateMessage, EditMessage, GetMessages};
+use crate::builder::{CreateAttachment, CreateMessage, EditMessage, GetMessages};
 #[cfg(all(feature = "model", feature = "http"))]
 use crate::http::CacheHttp;
 #[cfg(feature = "http")]
 use crate::http::{Http, Typing};
-#[cfg(feature = "model")]
-use crate::model::channel::AttachmentType;
 use crate::model::prelude::*;
 use crate::model::utils::single_recipient;
 use crate::model::Timestamp;
@@ -291,16 +289,12 @@ impl PrivateChannel {
     /// See [`CreateMessage::execute`] for a list of possible errors, and their corresponding
     /// reasons.
     #[inline]
-    pub async fn send_files<'a, T, It>(
-        &self,
+    pub async fn send_files<'a>(
+        self,
         cache_http: impl CacheHttp,
-        files: It,
+        files: impl IntoIterator<Item = CreateAttachment<'a>>,
         builder: CreateMessage<'a>,
-    ) -> Result<Message>
-    where
-        T: Into<AttachmentType<'a>>,
-        It: IntoIterator<Item = T>,
-    {
+    ) -> Result<Message> {
         self.id.send_files(cache_http, files, builder).await
     }
 

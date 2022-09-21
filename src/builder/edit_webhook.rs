@@ -1,3 +1,4 @@
+use super::CreateAttachment;
 #[cfg(feature = "http")]
 use crate::http::Http;
 #[cfg(feature = "http")]
@@ -63,7 +64,7 @@ impl<'a> EditWebhook<'a> {
     }
 
     /// Set the webhook's default avatar.
-    pub fn avatar(mut self, avatar: AttachmentType<'_>) -> Self {
+    pub fn avatar(mut self, avatar: CreateAttachment<'_>) -> Self {
         self.avatar = Some(Some(crate::utils::encode_image(&avatar.data)));
         self
     }

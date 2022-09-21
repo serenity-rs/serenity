@@ -1,9 +1,10 @@
+use super::CreateAttachment;
 #[cfg(feature = "http")]
 use crate::http::Http;
 #[cfg(feature = "http")]
 use crate::internal::prelude::*;
 #[cfg(feature = "http")]
-use crate::model::{channel::AttachmentType, user::CurrentUser};
+use crate::model::user::CurrentUser;
 
 /// A builder to edit the current user's settings, to be used in conjunction with
 /// [`CurrentUser::edit`].
@@ -59,7 +60,7 @@ impl EditProfile {
     /// # }
     /// # }
     /// ```
-    pub fn avatar(mut self, avatar: AttachmentType<'_>) -> Self {
+    pub fn avatar(mut self, avatar: CreateAttachment<'_>) -> Self {
         self.avatar = Some(Some(crate::utils::encode_image(&avatar.data)));
         self
     }

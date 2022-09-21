@@ -19,7 +19,8 @@ use super::ratelimiting::{RatelimitedRequest, Ratelimiter};
 use super::request::Request;
 use super::routing::RouteInfo;
 use super::typing::Typing;
-use super::{AttachmentType, GuildPagination, HttpError, UserPagination};
+use super::{GuildPagination, HttpError, UserPagination};
+use crate::builder::CreateAttachment;
 use crate::internal::prelude::*;
 use crate::json::prelude::*;
 use crate::model::application::command::{Command, CommandPermission};
@@ -502,7 +503,7 @@ impl Http {
         &self,
         interaction_token: &str,
         map: &impl serde::Serialize,
-        files: impl IntoIterator<Item = AttachmentType<'_>>,
+        files: impl IntoIterator<Item = CreateAttachment<'_>>,
     ) -> Result<Message> {
         self.fire(Request {
             body: None,
@@ -709,7 +710,7 @@ impl Http {
         interaction_id: u64,
         interaction_token: &str,
         map: &impl serde::Serialize,
-        files: impl IntoIterator<Item = AttachmentType<'_>>,
+        files: impl IntoIterator<Item = CreateAttachment<'_>>,
     ) -> Result<()> {
         self.wind(204, Request {
             body: None,
@@ -874,13 +875,13 @@ impl Http {
         &self,
         guild_id: u64,
         map: Vec<(String, String)>,
-        file: impl Into<AttachmentType<'a>>,
+        file: CreateAttachment<'a>,
         audit_log_reason: Option<&str>,
     ) -> Result<Sticker> {
         self.fire(Request {
             body: None,
             multipart: Some(Multipart {
-                files: vec![file.into()],
+                files: vec![file],
                 fields: map.into_iter().map(|(k, v)| (k.into(), v.into())).collect(),
                 payload_json: None,
             }),
@@ -1473,7 +1474,7 @@ impl Http {
         interaction_token: &str,
         message_id: u64,
         map: &impl serde::Serialize,
-        new_attachments: impl IntoIterator<Item = AttachmentType<'_>>,
+        new_attachments: impl IntoIterator<Item = CreateAttachment<'_>>,
     ) -> Result<Message> {
         self.fire(Request {
             body: None,
@@ -1750,7 +1751,7 @@ impl Http {
         channel_id: u64,
         message_id: u64,
         map: &impl serde::Serialize,
-        new_attachments: impl IntoIterator<Item = AttachmentType<'_>>,
+        new_attachments: impl IntoIterator<Item = CreateAttachment<'_>>,
     ) -> Result<Message> {
         self.fire(Request {
             body: None,
@@ -2322,13 +2323,13 @@ impl Http {
         thread_id: Option<u64>,
         token: &str,
         wait: bool,
-        files: impl IntoIterator<Item = impl Into<AttachmentType<'a>>>,
+        files: impl IntoIterator<Item = CreateAttachment<'a>>,
         map: &impl serde::Serialize,
     ) -> Result<Option<Message>> {
         self.fire(Request {
             body: None,
             multipart: Some(Multipart {
-                files: files.into_iter().map(Into::into).collect(),
+                files: files.into_iter().collect(),
                 payload_json: Some(to_string(map)?),
                 fields: vec![],
             }),
@@ -3773,13 +3774,13 @@ impl Http {
     pub async fn send_files(
         &self,
         channel_id: u64,
-        files: impl IntoIterator<Item = impl Into<AttachmentType<'_>>>,
+        files: impl IntoIterator<Item = CreateAttachment<'_>>,
         map: &impl serde::Serialize,
     ) -> Result<Message> {
         self.fire(Request {
             body: None,
             multipart: Some(Multipart {
-                files: files.into_iter().map(Into::into).collect(),
+                files: files.into_iter().collect(),
                 payload_json: Some(to_string(map)?),
                 fields: vec![],
             }),
