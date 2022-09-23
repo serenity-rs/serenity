@@ -79,22 +79,63 @@ impl From<SelectMenu> for ActionRowComponent {
     }
 }
 
+#[derive(Clone, Debug, Deserialize)]
+#[serde(untagged)]
+pub enum ButtonKind {
+    Link { url: String },
+    NonLink { custom_id: String, style: ButtonStyle },
+}
+
+impl Serialize for ButtonKind {
+    fn serialize<S>(&self, serializer: S) -> StdResult<S::Ok, S::Error>
+    where
+        S: Serializer,
+    {
+        #[derive(Serialize)]
+        struct Helper<'a> {
+            style: u8,
+            #[serde(skip_serializing_if = "Option::is_none")]
+            url: Option<&'a str>,
+            #[serde(skip_serializing_if = "Option::is_none")]
+            custom_id: Option<&'a str>,
+        }
+
+        let helper = match self {
+            ButtonKind::Link {
+                url,
+            } => Helper {
+                style: 5,
+                url: Some(url),
+                custom_id: None,
+            },
+            ButtonKind::NonLink {
+                custom_id,
+                style,
+            } => Helper {
+                style: (*style).into(),
+                url: None,
+                custom_id: Some(custom_id),
+            },
+        };
+        helper.serialize(serializer)
+    }
+}
+
 /// A button component.
 #[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct Button {
     /// The component type, it will always be [`ComponentType::Button`].
     #[serde(rename = "type")]
     pub kind: ComponentType,
-    /// The button style.
-    pub style: ButtonStyle,
+    /// The button kind and style.
+    #[serde(flatten)]
+    pub data: ButtonKind,
     /// The text which appears on the button.
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub label: Option<String>,
     /// The emoji of this button, if there is one.
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub emoji: Option<ReactionType>,
-    /// An identifier defined by the developer for the button.
-    pub custom_id: Option<String>,
-    /// The url of the button, if there is one.
-    pub url: Option<String>,
     /// Whether the button is disabled.
     #[serde(default)]
     pub disabled: bool,
@@ -110,7 +151,7 @@ enum_number! {
         Secondary = 2,
         Success = 3,
         Danger = 4,
-        Link = 5,
+        // No Link, because we represent Link using enum variants
         _ => Unknown(u8),
     }
 }
@@ -174,5 +215,41 @@ enum_number! {
         Short = 1,
         Paragraph = 2,
         _ => Unknown(u8),
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_non_link_button_serde() {
+        let json = r#"{"type":2,"style":4,"custom_id":"hello","disabled":false}"#;
+
+        let button = crate::json::from_str::<Button>(&mut json.to_string()).unwrap();
+        assert!(matches!(
+            &button.data,
+            ButtonKind::NonLink {
+                custom_id,
+                style: ButtonStyle::Danger
+            }
+            if custom_id == "hello"
+        ));
+
+        let reconstructed_json = crate::json::to_string(&button).unwrap();
+        assert_eq!(&reconstructed_json, json);
+    }
+
+    #[test]
+    fn test_link_button_serde() {
+        let json = r#"{"type":2,"style":5,"url":"https://google.com","disabled":false}"#;
+
+        let button = crate::json::from_str::<Button>(&mut json.to_string()).unwrap();
+        assert!(matches!(&button.data, ButtonKind::Link {
+            url,
+        } if url == "https://google.com"));
+
+        let reconstructed_json = crate::json::to_string(&button).unwrap();
+        assert_eq!(&reconstructed_json, json);
     }
 }
