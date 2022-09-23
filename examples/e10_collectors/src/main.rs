@@ -121,7 +121,7 @@ async fn challenge(ctx: &Context, msg: &Message, _: Args) -> CommandResult {
         // In this case we will just get the inner reaction.
         let emoji = &reaction.as_inner_ref().emoji;
 
-        let _ = match emoji.as_data().as_str() {
+        let _ = match &*emoji.as_data() {
             "1️⃣" => {
                 score += 1;
                 msg.reply(ctx, "That's correct!").await

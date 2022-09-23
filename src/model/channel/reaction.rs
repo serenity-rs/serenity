@@ -1,3 +1,4 @@
+use std::borrow::Cow;
 #[cfg(feature = "model")]
 use std::cmp::Ordering;
 use std::convert::TryFrom;
@@ -403,16 +404,16 @@ impl ReactionType {
     /// likely little use for it.
     #[inline]
     #[must_use]
-    pub fn as_data(&self) -> String {
+    pub fn as_data(&self) -> Cow<'_, str> {
         match self {
             ReactionType::Custom {
                 id,
                 name,
                 ..
             } => {
-                format!("{}:{}", name.as_deref().unwrap_or(""), id)
+                format!("{}:{}", name.as_deref().unwrap_or(""), id).into()
             },
-            ReactionType::Unicode(unicode) => unicode.clone(),
+            ReactionType::Unicode(unicode) => unicode.into(),
         }
     }
 

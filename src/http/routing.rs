@@ -1193,7 +1193,7 @@ impl Route {
     }
 }
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Copy, Debug)]
 #[non_exhaustive]
 pub enum RouteInfo<'a> {
     AddGuildMember {
@@ -1691,7 +1691,7 @@ pub enum RouteInfo<'a> {
     },
     GetMessages {
         channel_id: u64,
-        query: String,
+        query: &'a str,
     },
     GetPins {
         channel_id: u64,
@@ -1701,7 +1701,7 @@ pub enum RouteInfo<'a> {
         channel_id: u64,
         limit: u8,
         message_id: u64,
-        reaction: String,
+        reaction: &'a str,
     },
     GetSticker {
         sticker_id: u64,
