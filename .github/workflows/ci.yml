@@ -178,8 +178,20 @@ jobs:
           latest_version=$(cargo search --limit 1 time | head -1 | cut -d'"' -f2)
           cargo update -p time:$latest_version --precise 0.3.9
 
+      # once_cell 1.15.0+ MSRV is 1.56
+      - name: Pin once_cell to 1.14.0
+        run: cargo update -p once_cell --precise 1.14.0
+
+      # halfbrown 0.1.13+ requires hashbrown 0.12 (MSRV 1.56)
+      - name: Pin halfbrown to 0.1.12
+        run: cargo update -p halfbrown --precise 0.1.12
+
+      # value-trait 0.2.12+ MSRV is 1.59
+      - name: Pin value-trait to 0.2.10
+        run: cargo update -p value-trait --precise 0.2.10
+
       - name: Check
-        run: cargo check --features collector,unstable_discord_api
+        run: cargo check --all-features
 
   min_versions:
     name: Check minimal versions
