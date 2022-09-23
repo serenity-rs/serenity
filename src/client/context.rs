@@ -122,6 +122,7 @@ impl Context {
     ///
     /// [`Online`]: OnlineStatus::Online
     #[cfg(feature = "gateway")]
+    #[allow(clippy::unused_async)]
     #[inline]
     pub async fn online(&self) {
         self.shard.set_status(OnlineStatus::Online);
@@ -160,6 +161,7 @@ impl Context {
     ///
     /// [`Idle`]: OnlineStatus::Idle
     #[cfg(feature = "gateway")]
+    #[allow(clippy::unused_async)]
     #[inline]
     pub async fn idle(&self) {
         self.shard.set_status(OnlineStatus::Idle);
@@ -198,6 +200,7 @@ impl Context {
     ///
     /// [`DoNotDisturb`]: OnlineStatus::DoNotDisturb
     #[cfg(feature = "gateway")]
+    #[allow(clippy::unused_async)]
     #[inline]
     pub async fn dnd(&self) {
         self.shard.set_status(OnlineStatus::DoNotDisturb);
@@ -236,6 +239,7 @@ impl Context {
     /// [`Event::Ready`]: crate::model::event::Event::Ready
     /// [`Invisible`]: OnlineStatus::Invisible
     #[cfg(feature = "gateway")]
+    #[allow(clippy::unused_async)]
     #[inline]
     pub async fn invisible(&self) {
         self.shard.set_status(OnlineStatus::Invisible);
@@ -275,6 +279,7 @@ impl Context {
     /// [`Event::Resumed`]: crate::model::event::Event::Resumed
     /// [`Online`]: OnlineStatus::Online
     #[cfg(feature = "gateway")]
+    #[allow(clippy::unused_async)]
     #[inline]
     pub async fn reset_presence(&self) {
         self.shard.set_presence(None::<Activity>, OnlineStatus::Online);
@@ -317,6 +322,7 @@ impl Context {
     ///
     /// [`Online`]: OnlineStatus::Online
     #[cfg(feature = "gateway")]
+    #[allow(clippy::unused_async)]
     #[inline]
     pub async fn set_activity(&self, activity: Activity) {
         self.shard.set_presence(Some(activity), OnlineStatus::Online);
@@ -386,6 +392,7 @@ impl Context {
     /// [`DoNotDisturb`]: OnlineStatus::DoNotDisturb
     /// [`Idle`]: OnlineStatus::Idle
     #[cfg(feature = "gateway")]
+    #[allow(clippy::unused_async)]
     #[inline]
     pub async fn set_presence(&self, activity: Option<Activity>, status: OnlineStatus) {
         self.shard.set_presence(activity, status);
@@ -393,24 +400,27 @@ impl Context {
 
     /// Sets a new `filter` for the shard to check if a message event shall be
     /// sent back to `filter`'s paired receiver.
-    #[inline]
     #[cfg(feature = "collector")]
+    #[allow(clippy::unused_async)]
+    #[inline]
     pub async fn set_message_filter(&self, filter: MessageFilter) {
         self.shard.set_message_filter(filter);
     }
 
     /// Sets a new `filter` for the shard to check if a reaction event shall be
     /// sent back to `filter`'s paired receiver.
-    #[inline]
     #[cfg(feature = "collector")]
+    #[allow(clippy::unused_async)]
+    #[inline]
     pub async fn set_reaction_filter(&self, filter: ReactionFilter) {
         self.shard.set_reaction_filter(filter);
     }
 
     /// Sets a new `filter` for the shard to check if an interaction event shall be
     /// sent back to `filter`'s paired receiver.
-    #[inline]
     #[cfg(feature = "collector")]
+    #[allow(clippy::unused_async)]
+    #[inline]
     pub async fn set_component_interaction_filter(&self, filter: ComponentInteractionFilter) {
         self.shard.set_component_interaction_filter(filter);
     }
