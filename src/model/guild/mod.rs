@@ -415,10 +415,13 @@ impl Guild {
     pub fn default_channel_guaranteed(&self) -> Option<&GuildChannel> {
         for channel in self.channels.values() {
             if let Channel::Guild(channel) = channel {
-                for member in self.members.values() {
-                    if self.user_permissions_in(channel, member).ok()?.view_channel() {
-                        return Some(channel);
+                if self.members.values().all(|member| {
+                    match self.user_permissions_in(channel, member) {
+                        Ok(permissions) => permissions.view_channel(),
+                        Err(_) => true, // We ignore any members with non-existent roles
                     }
+                }) {
+                    return Some(channel);
                 }
             }
         }
