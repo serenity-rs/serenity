@@ -94,16 +94,16 @@ impl<'a> Request<'a> {
 
     #[instrument(skip(token))]
     pub async fn build(
-        mut self,
+        self,
         client: &Client,
         token: &str,
         proxy: Option<&Url>,
     ) -> Result<ReqwestRequestBuilder> {
         let Request {
             body,
-            ref mut multipart,
-            headers: ref request_headers,
-            route: ref route_info,
+            multipart,
+            headers: request_headers,
+            route: route_info,
         } = self;
 
         let (method, _, mut path) = route_info.deconstruct();
@@ -115,7 +115,10 @@ impl<'a> Request<'a> {
         let mut builder =
             client.request(method.reqwest_method(), Url::parse(&path).map_err(HttpError::Url)?);
 
-        let mut headers = Headers::with_capacity(4);
+        let mut headers = Headers::with_capacity({
+            2 + (body.is_some() as usize) + (multipart.is_none() as usize)
+        });
+
         headers.insert(USER_AGENT, HeaderValue::from_static(constants::USER_AGENT));
         headers
             .insert(AUTHORIZATION, HeaderValue::from_str(token).map_err(HttpError::InvalidHeader)?);
@@ -139,7 +142,7 @@ impl<'a> Request<'a> {
             headers.insert(CONTENT_LENGTH, length.unwrap_or_else(|| HeaderValue::from_static("0")));
         }
 
-        if let Some(request_headers) = request_headers.clone() {
+        if let Some(request_headers) = request_headers {
             headers.extend(request_headers);
         }
 

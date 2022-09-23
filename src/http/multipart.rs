@@ -20,27 +20,20 @@ pub struct Multipart<'a> {
 }
 
 impl<'a> Multipart<'a> {
-    pub(crate) async fn build_form(&mut self, client: &Client) -> Result<Form> {
+    pub(crate) async fn build_form(self, client: &Client) -> Result<Form> {
         let mut multipart = Form::new();
 
-        for (file_num, file) in self.files.iter_mut().enumerate() {
+        for (file_num, file) in self.files.into_iter().enumerate() {
             // For endpoints that require a single file (e.g. create sticker),
             // it will error if the part name is not `file`.
             // https://github.com/discord/discord-api-docs/issues/2064#issuecomment-691650970
-            let part_name =
-                if file_num == 0 { "file".to_string() } else { format!("file{}", file_num) };
+            let part_name = if file_num == 0 {
+                Cow::Borrowed("file")
+            } else {
+                Cow::Owned(format!("file{}", file_num))
+            };
 
-            let data = file.data(client).await?;
-            let filename = file.filename()?;
-
-            // Modify current AttachmentType to Bytes variant to prevent the
-            // need for another disk read or network request when retrying
-            if let AttachmentType::Path(_) | AttachmentType::Image(_) = file {
-                *file = AttachmentType::Bytes {
-                    data: data.clone().into(),
-                    filename: filename.clone().unwrap_or_default(),
-                };
-            }
+            let (data, filename) = file.deconstruct(client).await?;
 
             let mut part = Part::bytes(data);
             if let Some(filename) = filename {
@@ -50,11 +43,11 @@ impl<'a> Multipart<'a> {
             multipart = multipart.part(part_name, part);
         }
 
-        for (name, value) in &self.fields {
-            multipart = multipart.text(name.clone(), value.clone());
+        for (name, value) in self.fields {
+            multipart = multipart.text(name, value);
         }
 
-        if let Some(payload_json) = self.payload_json.clone() {
+        if let Some(payload_json) = self.payload_json {
             multipart = multipart.text("payload_json", payload_json);
         }
 

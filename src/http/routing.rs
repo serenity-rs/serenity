@@ -1778,8 +1778,8 @@ pub enum RouteInfo<'a> {
 
 impl<'a> RouteInfo<'a> {
     #[must_use]
-    pub fn deconstruct(&self) -> (LightMethod, Route, Cow<'_, str>) {
-        match *self {
+    pub fn deconstruct(self) -> (LightMethod, Route, Cow<'static, str>) {
+        match self {
             RouteInfo::AddGuildMember {
                 guild_id,
                 user_id,
