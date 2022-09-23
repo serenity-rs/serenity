@@ -410,9 +410,7 @@ impl ReactionType {
                 id,
                 name,
                 ..
-            } => {
-                format!("{}:{}", name.as_deref().unwrap_or(""), id).into()
-            },
+            } => format!("{}:{}", name.as_deref().unwrap_or(""), id).into(),
             ReactionType::Unicode(unicode) => unicode.into(),
         }
     }
