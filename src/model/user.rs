@@ -1129,6 +1129,7 @@ impl UserId {
 
     /// Attempts to find a [`User`] by its Id in the cache.
     #[cfg(feature = "cache")]
+    #[allow(clippy::unused_async)]
     #[inline]
     pub async fn to_user_cached(self, cache: impl AsRef<Cache>) -> Option<User> {
         cache.as_ref().user(self)
