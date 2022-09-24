@@ -7,6 +7,8 @@ use crate::http::Http;
 use crate::internal::prelude::*;
 #[cfg(feature = "http")]
 use crate::model::prelude::*;
+#[cfg(feature = "http")]
+use crate::utils::check_overflow;
 
 /// A builder to specify the fields to edit in an existing [`Webhook`]'s message.
 ///
@@ -58,16 +60,13 @@ impl EditWebhookMessage {
     #[cfg(feature = "http")]
     fn check_length(&self) -> Result<()> {
         if let Some(content) = &self.content {
-            let overflow = content.chars().count().saturating_sub(constants::MESSAGE_CODE_LIMIT);
-            if overflow > 0 {
-                return Err(Error::Model(ModelError::MessageTooLong(overflow)));
-            }
+            check_overflow(content.chars().count(), constants::MESSAGE_CODE_LIMIT)
+                .map_err(|overflow| Error::Model(ModelError::MessageTooLong(overflow)))?;
         }
 
         if let Some(embeds) = &self.embeds {
-            if embeds.len() > constants::EMBED_MAX_COUNT {
-                return Err(Error::Model(ModelError::EmbedAmount));
-            }
+            check_overflow(embeds.len(), constants::EMBED_MAX_COUNT)
+                .map_err(|_| Error::Model(ModelError::EmbedAmount))?;
             for embed in embeds {
                 embed.check_length()?;
             }
