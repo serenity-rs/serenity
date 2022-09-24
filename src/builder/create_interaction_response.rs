@@ -53,10 +53,10 @@ impl<'a> CreateInteractionResponse<'a> {
     fn check_length(&self) -> Result<()> {
         if let Some(data) = &self.data {
             if let Some(content) = &data.content {
-                let length = content.chars().count();
-                let max_length = crate::constants::MESSAGE_CODE_LIMIT;
-                if length > max_length {
-                    return Err(Error::Model(ModelError::MessageTooLong(length - max_length)));
+                let overflow =
+                    content.chars().count().saturating_sub(crate::constants::MESSAGE_CODE_LIMIT);
+                if overflow > 0 {
+                    return Err(Error::Model(ModelError::MessageTooLong(overflow)));
                 }
             }
 

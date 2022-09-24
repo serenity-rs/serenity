@@ -298,9 +298,8 @@ impl CreateEmbed {
             length += title.chars().count();
         }
 
-        let max_length = crate::constants::EMBED_MAX_LENGTH;
-        if length > max_length {
-            let overflow = length - max_length;
+        let overflow = length.saturating_sub(crate::constants::EMBED_MAX_LENGTH);
+        if overflow > 0 {
             return Err(Error::Model(ModelError::EmbedTooLarge(overflow)));
         }
 
