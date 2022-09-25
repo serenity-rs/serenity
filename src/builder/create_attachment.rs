@@ -19,16 +19,16 @@ use crate::error::{Error, Result};
 #[non_exhaustive]
 pub struct CreateAttachment<'a> {
     pub data: Cow<'a, [u8]>,
-    pub filename: Option<String>,
+    pub filename: String,
 }
 
 impl<'a> CreateAttachment<'a> {
     /// Builds an [`CreateAttachment`] from the raw attachment data.
     #[must_use]
-    pub fn bytes(data: &'a [u8], filename: &str) -> CreateAttachment<'a> {
+    pub fn bytes(data: &'a [u8], filename: impl Into<String>) -> CreateAttachment<'a> {
         CreateAttachment {
             data: Cow::Borrowed(data),
-            filename: Some(filename.to_string()),
+            filename: filename.into(),
         }
     }
 
@@ -42,12 +42,16 @@ impl<'a> CreateAttachment<'a> {
         let mut data = Vec::new();
         file.read_to_end(&mut data).await?;
 
-        let filename =
-            path.as_ref().file_name().map(|filename| filename.to_string_lossy().to_string());
+        let filename = path.as_ref().file_name().ok_or_else(|| {
+            std::io::Error::new(
+                std::io::ErrorKind::Other,
+                "attachment path must not be a directory",
+            )
+        })?;
 
         Ok(CreateAttachment {
             data: Cow::Owned(data),
-            filename,
+            filename: filename.to_string_lossy().to_string(),
         })
     }
 
@@ -56,13 +60,16 @@ impl<'a> CreateAttachment<'a> {
     /// # Errors
     ///
     /// [`Error::Io`] error if reading the file fails.
-    pub async fn file(file: &File, filename: &str) -> Result<CreateAttachment<'static>> {
+    pub async fn file(
+        file: &File,
+        filename: impl Into<String>,
+    ) -> Result<CreateAttachment<'static>> {
         let mut data = Vec::new();
         file.try_clone().await?.read_to_end(&mut data).await?;
 
         Ok(CreateAttachment {
             data: Cow::Owned(data),
-            filename: Some(filename.to_string()),
+            filename: filename.into(),
         })
     }
 
@@ -85,7 +92,7 @@ impl<'a> CreateAttachment<'a> {
 
         Ok(CreateAttachment {
             data: Cow::Owned(data),
-            filename: Some(filename.to_string()),
+            filename: filename.to_string(),
         })
     }
 }

@@ -30,10 +30,9 @@ impl<'a> Multipart<'a> {
                 if file_num == 0 { "file".to_string() } else { format!("file{}", file_num) };
 
             let mut part = Part::bytes(file.data.to_vec());
-            if let Some(filename) = file.filename.clone() {
-                part = guess_mime_str(part, &filename)?;
-                part = part.file_name(filename);
-            }
+            let filename = file.filename.clone();
+            part = guess_mime_str(part, &filename)?;
+            part = part.file_name(filename);
             multipart = multipart.part(part_name, part);
         }
 
