@@ -22,7 +22,7 @@ fn sound_button(name: &str, emoji: ReactionType) -> CreateButton {
     // To add an emoji to buttons, use .emoji(). The method accepts anything ReactionType or
     // anything that can be converted to it. For a list of that, search Trait Implementations in the
     // docs for From<...>.
-    CreateButton::default().custom_id(name).emoji(emoji).label(name).style(ButtonStyle::Primary)
+    CreateButton::new(ButtonStyle::Primary, name).emoji(emoji).label(name)
 }
 
 struct Handler;

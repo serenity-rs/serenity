@@ -4,6 +4,7 @@ use crate::model::prelude::component::{
     ActionRow,
     ActionRowComponent,
     Button,
+    ButtonKind,
     ComponentType,
     InputText,
     SelectMenu,
@@ -58,48 +59,37 @@ impl CreateActionRow {
 #[must_use]
 pub struct CreateButton(Button);
 
-impl Default for CreateButton {
-    /// Creates a primary button.
-    fn default() -> Self {
+impl CreateButton {
+    /// Creates a link button to the given URL.
+    pub fn new_link(url: impl Into<String>) -> Self {
         Self(Button {
-            style: ButtonStyle::Primary,
+            kind: ComponentType::Button,
+            data: ButtonKind::Link {
+                url: url.into(),
+            },
             label: None,
-            custom_id: None,
-            url: None,
             emoji: None,
             disabled: false,
-            kind: ComponentType::Button,
         })
     }
-}
 
-impl CreateButton {
-    /// Creates a primary button. Equivalent to [`Self::default`].
-    pub fn new() -> Self {
-        Self::default()
-    }
-
-    /// Sets the style of the button.
-    pub fn style(mut self, kind: ButtonStyle) -> Self {
-        self.0.style = kind;
-        self
+    /// Creates a normal button with the given custom ID
+    pub fn new(style: ButtonStyle, custom_id: impl Into<String>) -> Self {
+        Self(Button {
+            kind: ComponentType::Button,
+            data: ButtonKind::NonLink {
+                style,
+                custom_id: custom_id.into(),
+            },
+            label: None,
+            emoji: None,
+            disabled: false,
+        })
     }
 
     /// The label of the button.
     pub fn label(mut self, label: impl Into<String>) -> Self {
         self.0.label = Some(label.into());
-        self
-    }
-
-    /// Sets the custom id of the button, a developer-defined identifier.
-    pub fn custom_id(mut self, id: impl Into<String>) -> Self {
-        self.0.custom_id = Some(id.into());
-        self
-    }
-
-    /// The url for url style button.
-    pub fn url(mut self, url: impl Into<String>) -> Self {
-        self.0.url = Some(url.into());
         self
     }
 
