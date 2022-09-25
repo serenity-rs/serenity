@@ -38,6 +38,7 @@ use crate::model::Timestamp;
 use crate::utils::parse_channel;
 
 #[deprecated = "use CreateAttachment instead"]
+#[cfg(feature = "model")]
 pub type AttachmentType<'a> = crate::builder::CreateAttachment<'a>;
 
 /// A container for any channel.
