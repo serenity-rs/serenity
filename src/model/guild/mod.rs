@@ -419,7 +419,7 @@ impl Guild {
                     .members
                     .values()
                     .filter_map(|member| self.user_permissions_in(channel, member).ok())
-                    .all(|permissions| permissions.view_channel())
+                    .all(Permissions::view_channel)
                 {
                     return Some(channel);
                 }
