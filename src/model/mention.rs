@@ -90,7 +90,6 @@ pub enum Mention {
     Channel(ChannelId),
     Role(RoleId),
     User(UserId),
-    Emoji(EmojiId, bool),
 }
 
 macro_rules! mention {
@@ -108,8 +107,6 @@ mention!(value:
     ChannelId, Mention::Channel(value);
     RoleId, Mention::Role(value);
     UserId, Mention::User(value);
-    EmojiId, Mention::Emoji(value, false);
-    (EmojiId, bool), Mention::Emoji(value.0, value.1);
 );
 
 impl fmt::Display for Mention {
@@ -118,9 +115,6 @@ impl fmt::Display for Mention {
             Mention::Channel(id) => f.write_fmt(format_args!("<#{}>", id.0)),
             Mention::Role(id) => f.write_fmt(format_args!("<@&{}>", id.0)),
             Mention::User(id) => f.write_fmt(format_args!("<@{}>", id.0)),
-            Mention::Emoji(id, animated) => {
-                f.write_fmt(format_args!("<{}:omitted:{}>", if animated { "a" } else { "" }, id.0,))
-            },
         }
     }
 }
@@ -152,8 +146,6 @@ impl FromStr for Mention {
             id.mention()
         } else if let Some(id) = utils::parse_username(s) {
             id.mention()
-        } else if let Some(emoji_ident) = utils::parse_emoji(s) {
-            emoji_ident.mention()
         } else {
             return Err(MentionParseError::InvalidMention);
         };
@@ -172,7 +164,7 @@ where
 }
 
 macro_rules! mentionable {
-    ($i:ident: $($t:ty, $e:expr;)*) => {$(
+    ($i:ident: $t:ty, $e:expr) => {
         impl Mentionable for $t {
             #[inline(always)]
             fn mention(&self) -> Mention {
@@ -180,22 +172,18 @@ macro_rules! mentionable {
                 $e.into()
             }
         }
-    )*};
+    };
 }
 
 #[cfg(feature = "model")]
-mentionable!(value: Channel, value.id(););
+mentionable!(value: Channel, value.id());
 
-mentionable!(value:
-    GuildChannel, value.id;
-    PrivateChannel, value.id;
-    CurrentUser, value.id;
-    Member, value.user.id;
-    User, value.id;
-    Role, value.id;
-    Emoji, (value.id, value.animated);
-    EmojiIdentifier, (value.id, value.animated);
-);
+mentionable!(value: GuildChannel, value.id);
+mentionable!(value: PrivateChannel, value.id);
+mentionable!(value: CurrentUser, value.id);
+mentionable!(value: Member, value.user.id);
+mentionable!(value: User, value.id);
+mentionable!(value: Role, value.id);
 
 #[cfg(feature = "utils")]
 #[cfg(test)]
@@ -227,16 +215,6 @@ mod test {
             member: None,
             default_auto_archive_duration: None,
         });
-        let emoji = Emoji {
-            animated: false,
-            available: true,
-            id: EmojiId::new(5),
-            name: "a".to_string(),
-            managed: true,
-            require_colons: true,
-            roles: vec![],
-            user: None,
-        };
         let role = Role {
             id: RoleId::new(2),
             guild_id: GuildId::new(1),
@@ -279,7 +257,6 @@ mod test {
         assert_eq!(ChannelId::new(1).mention().to_string(), "<#1>");
         #[cfg(feature = "model")]
         assert_eq!(channel.mention().to_string(), "<#4>");
-        assert_eq!(emoji.mention().to_string(), "<:omitted:5>");
         assert_eq!(member.mention().to_string(), "<@6>");
         assert_eq!(role.mention().to_string(), "<@&2>");
         assert_eq!(role.id.mention().to_string(), "<@&2>");

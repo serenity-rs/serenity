@@ -26,7 +26,7 @@ use url::Url;
 pub use self::custom_message::CustomMessage;
 pub use self::message_builder::{Content, ContentModifier, EmbedMessageBuilding, MessageBuilder};
 #[doc(inline)]
-pub use self::token::{parse as parse_token, validate as validate_token};
+pub use self::token::validate as validate_token;
 #[cfg(all(feature = "cache", feature = "model"))]
 use crate::cache::Cache;
 #[cfg(all(feature = "cache", feature = "model"))]
@@ -34,11 +34,21 @@ use crate::http::CacheHttp;
 use crate::internal::prelude::*;
 use crate::model::prelude::*;
 
-#[cfg(feature = "model")]
+#[cfg(all(feature = "builder", feature = "http"))]
 pub(crate) fn encode_image(raw: &[u8]) -> String {
     let mut encoded = base64::encode(raw);
     encoded.insert_str(0, "data:image/png;base64,");
     encoded
+}
+
+#[cfg(all(feature = "builder", feature = "http"))]
+pub(crate) fn check_overflow(len: usize, max: usize) -> StdResult<(), usize> {
+    let overflow = len.saturating_sub(max);
+    if overflow > 0 {
+        Err(overflow)
+    } else {
+        Ok(())
+    }
 }
 
 /// Retrieves the "code" part of an invite out of a URL.
