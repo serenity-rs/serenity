@@ -335,9 +335,6 @@
 <span id="329">329</span>
 <span id="330">330</span>
 <span id="331">331</span>
-<span id="332">332</span>
-<span id="333">333</span>
-<span id="334">334</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">CreateAllowedMentions</span>, <span class="ident">CreateComponents</span>, <span class="ident">CreateEmbed</span>};
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http&quot;</span>)]</span>
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::constants</span>;
@@ -346,6 +343,8 @@
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http&quot;</span>)]</span>
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::internal::prelude</span>::<span class="kw-2">*</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::prelude</span>::<span class="kw-2">*</span>;
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http&quot;</span>)]</span>
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::utils::check_overflow</span>;
 
 <span class="doccomment">/// A builder to specify the contents of an [`Http::send_message`] request, primarily meant for use</span>
 <span class="doccomment">/// through [`ChannelId::send_message`].</span>
@@ -474,23 +473,18 @@
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http&quot;</span>)]</span>
     <span class="kw">fn</span> <span class="ident">check_length</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">content</span>) <span class="op">=</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">content</span> {
-            <span class="kw">let</span> <span class="ident">length</span> <span class="op">=</span> <span class="ident">content</span>.<span class="ident">chars</span>().<span class="ident">count</span>();
-            <span class="kw">let</span> <span class="ident">max_length</span> <span class="op">=</span> <span class="ident">constants::MESSAGE_CODE_LIMIT</span>;
-            <span class="kw">if</span> <span class="ident">length</span> <span class="op">&gt;</span> <span class="ident">max_length</span> {
-                <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::Model</span>(<span class="ident">ModelError::MessageTooLong</span>(<span class="ident">length</span> <span class="op">-</span> <span class="ident">max_length</span>)));
-            }
+            <span class="ident">check_overflow</span>(<span class="ident">content</span>.<span class="ident">chars</span>().<span class="ident">count</span>(), <span class="ident">constants::MESSAGE_CODE_LIMIT</span>)
+                .<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">overflow</span><span class="op">|</span> <span class="ident">Error::Model</span>(<span class="ident">ModelError::MessageTooLong</span>(<span class="ident">overflow</span>)))<span class="question-mark">?</span>;
         }
 
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">embeds</span>.<span class="ident">len</span>() <span class="op">&gt;</span> <span class="ident">constants::EMBED_MAX_COUNT</span> {
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::Model</span>(<span class="ident">ModelError::EmbedAmount</span>));
-        }
+        <span class="ident">check_overflow</span>(<span class="self">self</span>.<span class="ident">embeds</span>.<span class="ident">len</span>(), <span class="ident">constants::EMBED_MAX_COUNT</span>)
+            .<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">Error::Model</span>(<span class="ident">ModelError::EmbedAmount</span>))<span class="question-mark">?</span>;
         <span class="kw">for</span> <span class="ident">embed</span> <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">embeds</span> {
             <span class="ident">embed</span>.<span class="ident">check_length</span>()<span class="question-mark">?</span>;
         }
 
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">sticker_ids</span>.<span class="ident">len</span>() <span class="op">&gt;</span> <span class="ident">constants::STICKER_MAX_COUNT</span> {
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::Model</span>(<span class="ident">ModelError::StickerAmount</span>));
-        }
+        <span class="ident">check_overflow</span>(<span class="self">self</span>.<span class="ident">sticker_ids</span>.<span class="ident">len</span>(), <span class="ident">constants::STICKER_MAX_COUNT</span>)
+            .<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">Error::Model</span>(<span class="ident">ModelError::StickerAmount</span>))<span class="question-mark">?</span>;
 
         <span class="prelude-val">Ok</span>(())
     }
