@@ -3,14 +3,14 @@ use std::borrow::Cow;
 use std::fs::File;
 use std::path::Path;
 
-#[cfg(feature = "http")]
-use reqwest::Client;
 use tokio::fs::File;
 use tokio::io::AsyncReadExt;
 use url::Url;
 
 #[cfg(feature = "http")]
 use crate::error::{Error, Result};
+#[cfg(feature = "http")]
+use crate::http::Http;
 
 /// Enum that allows a user to pass a [`Path`] or a [`File`] type to [`send_files`]
 ///
@@ -79,10 +79,10 @@ impl<'a> CreateAttachment<'a> {
     ///
     /// [`Error::Url`] if the URL is invalid, [`Error::Http`] if downloading the data fails.
     #[cfg(feature = "http")]
-    pub async fn url(client: &Client, url: &str) -> Result<CreateAttachment<'static>> {
+    pub async fn url(http: impl AsRef<Http>, url: &str) -> Result<CreateAttachment<'static>> {
         let url = Url::parse(url).map_err(|_| Error::Url(url.to_string()))?;
 
-        let response = client.get(url.clone()).send().await?;
+        let response = http.as_ref().client.get(url.clone()).send().await?;
         let data = response.bytes().await?.to_vec();
 
         let filename = url
