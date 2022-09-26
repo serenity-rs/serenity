@@ -55,14 +55,8 @@ impl<'a> EditInteractionResponse<'a> {
     #[cfg(feature = "http")]
     pub async fn execute(mut self, http: impl AsRef<Http>, token: &str) -> Result<Message> {
         self.check_length()?;
-        if self.files.is_empty() {
-            http.as_ref().edit_original_interaction_response(token, &self).await
-        } else {
-            let files = std::mem::take(&mut self.files);
-            http.as_ref()
-                .edit_original_interaction_response_and_attachments(token, &self, files)
-                .await
-        }
+        let files = std::mem::take(&mut self.files);
+        http.as_ref().edit_original_interaction_response(token, &self, files).await
     }
 
     #[cfg(feature = "http")]

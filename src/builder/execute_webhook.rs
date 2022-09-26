@@ -101,14 +101,7 @@ impl<'a> ExecuteWebhook<'a> {
         let webhook_id = webhook_id.into();
         let thread_id = self.thread_id.map(Into::into);
         let files = std::mem::take(&mut self.files);
-
-        if files.is_empty() {
-            http.as_ref().execute_webhook(webhook_id, thread_id, token, wait, &self).await
-        } else {
-            http.as_ref()
-                .execute_webhook_with_files(webhook_id, thread_id, token, wait, files, &self)
-                .await
-        }
+        http.as_ref().execute_webhook(webhook_id, thread_id, token, wait, files, &self).await
     }
 
     #[cfg(feature = "http")]

@@ -44,13 +44,7 @@ impl<'a> CreateInteractionResponse<'a> {
         self.check_length()?;
         let files = self.data.as_mut().map_or_else(Vec::new, |d| std::mem::take(&mut d.files));
 
-        if files.is_empty() {
-            http.as_ref().create_interaction_response(interaction_id.into(), token, &self).await
-        } else {
-            http.as_ref()
-                .create_interaction_response_with_files(interaction_id.into(), token, &self, files)
-                .await
-        }
+        http.as_ref().create_interaction_response(interaction_id.into(), token, &self, files).await
     }
 
     #[cfg(feature = "http")]
@@ -275,7 +269,9 @@ impl CreateAutocompleteResponse {
         interaction_id: InteractionId,
         token: &str,
     ) -> Result<()> {
-        http.as_ref().create_interaction_response(interaction_id.into(), token, &self).await
+        http.as_ref()
+            .create_interaction_response(interaction_id.into(), token, &self, Vec::new())
+            .await
     }
 
     /// For autocomplete responses this sets their autocomplete suggestions.

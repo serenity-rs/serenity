@@ -60,22 +60,8 @@ impl<'a> CreateInteractionResponseFollowup<'a> {
         let files = std::mem::take(&mut self.files);
 
         match message_id {
-            Some(id) => {
-                if files.is_empty() {
-                    http.as_ref().edit_followup_message(token, id.into(), &self).await
-                } else {
-                    http.as_ref()
-                        .edit_followup_message_and_attachments(token, id.into(), &self, files)
-                        .await
-                }
-            },
-            None => {
-                if files.is_empty() {
-                    http.as_ref().create_followup_message(token, &self).await
-                } else {
-                    http.as_ref().create_followup_message_with_files(token, &self, files).await
-                }
-            },
+            Some(id) => http.as_ref().edit_followup_message(token, id.into(), &self, files).await,
+            None => http.as_ref().create_followup_message(token, &self, files).await,
         }
     }
 

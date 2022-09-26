@@ -483,42 +483,29 @@ impl Http {
         &self,
         interaction_token: &str,
         map: &impl serde::Serialize,
+        files: Vec<CreateAttachment<'_>>,
     ) -> Result<Message> {
-        self.fire(Request {
-            body: Some(to_vec(map)?),
+        let mut request = Request {
+            body: None,
             multipart: None,
             headers: None,
             route: RouteInfo::CreateFollowupMessage {
                 application_id: self.try_application_id()?,
                 interaction_token,
             },
-        })
-        .await
-    }
+        };
 
-    /// Create a follow-up message with attachments for an Interaction.
-    ///
-    /// Functions the same as [`Self::execute_webhook`]
-    pub async fn create_followup_message_with_files(
-        &self,
-        interaction_token: &str,
-        map: &impl serde::Serialize,
-        files: impl IntoIterator<Item = CreateAttachment<'_>>,
-    ) -> Result<Message> {
-        self.fire(Request {
-            body: None,
-            multipart: Some(Multipart {
+        if files.is_empty() {
+            request.body = Some(to_vec(map)?);
+        } else {
+            request.multipart = Some(Multipart {
                 files: files.into_iter().map(Into::into).collect(),
                 payload_json: Some(to_string(map)?),
                 fields: vec![],
-            }),
-            headers: None,
-            route: RouteInfo::CreateFollowupMessage {
-                application_id: self.try_application_id()?,
-                interaction_token,
-            },
-        })
-        .await
+            });
+        }
+
+        self.fire(request).await
     }
 
     /// Creates a new global command.
@@ -686,46 +673,29 @@ impl Http {
         interaction_id: u64,
         interaction_token: &str,
         map: &impl serde::Serialize,
+        files: Vec<CreateAttachment<'_>>,
     ) -> Result<()> {
-        self.wind(204, Request {
-            body: Some(to_vec(map)?),
+        let mut request = Request {
+            body: None,
             multipart: None,
             headers: None,
             route: RouteInfo::CreateInteractionResponse {
                 interaction_id,
                 interaction_token,
             },
-        })
-        .await
-    }
+        };
 
-    /// Creates a response to an [`Interaction`] from the gateway with files.
-    ///
-    /// Refer to Discord's [docs] for the object it takes.
-    ///
-    /// [`Interaction`]: crate::model::application::interaction::Interaction
-    /// [docs]: https://discord.com/developers/docs/interactions/slash-commands#interaction-interaction-response
-    pub async fn create_interaction_response_with_files(
-        &self,
-        interaction_id: u64,
-        interaction_token: &str,
-        map: &impl serde::Serialize,
-        files: impl IntoIterator<Item = CreateAttachment<'_>>,
-    ) -> Result<()> {
-        self.wind(204, Request {
-            body: None,
-            multipart: Some(Multipart {
+        if files.is_empty() {
+            request.body = Some(to_vec(map)?);
+        } else {
+            request.multipart = Some(Multipart {
                 files: files.into_iter().map(Into::into).collect(),
                 payload_json: Some(to_string(map)?),
                 fields: vec![],
-            }),
-            headers: None,
-            route: RouteInfo::CreateInteractionResponse {
-                interaction_id,
-                interaction_token,
-            },
-        })
-        .await
+            });
+        }
+
+        self.wind(204, request).await
     }
 
     /// Creates a [`RichInvite`] for the given [channel][`GuildChannel`].
@@ -1450,9 +1420,10 @@ impl Http {
         interaction_token: &str,
         message_id: u64,
         map: &impl serde::Serialize,
+        new_attachments: Vec<CreateAttachment<'_>>,
     ) -> Result<Message> {
-        self.fire(Request {
-            body: Some(to_vec(map)?),
+        let mut request = Request {
+            body: None,
             multipart: None,
             headers: None,
             route: RouteInfo::EditFollowupMessage {
@@ -1460,37 +1431,19 @@ impl Http {
                 interaction_token,
                 message_id,
             },
-        })
-        .await
-    }
+        };
 
-    /// Edits a follow-up message and its attachments for an interaction.
-    ///
-    /// Refer to Discord's [docs] for Edit Webhook Message for field information.
-    ///
-    /// [docs]: https://discord.com/developers/docs/resources/webhook#edit-webhook-message
-    pub async fn edit_followup_message_and_attachments(
-        &self,
-        interaction_token: &str,
-        message_id: u64,
-        map: &impl serde::Serialize,
-        new_attachments: impl IntoIterator<Item = CreateAttachment<'_>>,
-    ) -> Result<Message> {
-        self.fire(Request {
-            body: None,
-            multipart: Some(Multipart {
+        if new_attachments.is_empty() {
+            request.body = Some(to_vec(map)?);
+        } else {
+            request.multipart = Some(Multipart {
                 files: new_attachments.into_iter().map(Into::into).collect(),
                 payload_json: Some(to_string(map)?),
                 fields: vec![],
-            }),
-            headers: None,
-            route: RouteInfo::EditFollowupMessage {
-                application_id: self.try_application_id()?,
-                interaction_token,
-                message_id,
-            },
-        })
-        .await
+            });
+        }
+
+        self.fire(request).await
     }
 
     /// Get a follow-up message for an interaction.
@@ -1728,45 +1681,29 @@ impl Http {
         channel_id: u64,
         message_id: u64,
         map: &impl serde::Serialize,
+        new_attachments: Vec<CreateAttachment<'_>>,
     ) -> Result<Message> {
-        let body = to_vec(map)?;
-
-        self.fire(Request {
-            body: Some(body),
+        let mut request = Request {
+            body: None,
             multipart: None,
             headers: None,
             route: RouteInfo::EditMessage {
                 channel_id,
                 message_id,
             },
-        })
-        .await
-    }
+        };
 
-    /// Edits a message and its attachments by Id.
-    ///
-    /// **Note**: Only the author of a message can modify it.
-    pub async fn edit_message_and_attachments(
-        &self,
-        channel_id: u64,
-        message_id: u64,
-        map: &impl serde::Serialize,
-        new_attachments: impl IntoIterator<Item = CreateAttachment<'_>>,
-    ) -> Result<Message> {
-        self.fire(Request {
-            body: None,
-            multipart: Some(Multipart {
-                files: new_attachments.into_iter().map(Into::into).collect(),
+        if new_attachments.is_empty() {
+            request.body = Some(to_vec(map)?);
+        } else {
+            request.multipart = Some(Multipart {
+                files: new_attachments,
                 payload_json: Some(to_string(map)?),
                 fields: vec![],
-            }),
-            headers: None,
-            route: RouteInfo::EditMessage {
-                channel_id,
-                message_id,
-            },
-        })
-        .await
+            });
+        }
+
+        self.fire(request).await
     }
 
     /// Crossposts a message by Id.
@@ -1874,44 +1811,29 @@ impl Http {
         &self,
         interaction_token: &str,
         map: &impl serde::Serialize,
+        new_attachments: Vec<CreateAttachment<'_>>,
     ) -> Result<Message> {
-        self.fire(Request {
-            body: Some(to_vec(map)?),
+        let mut request = Request {
+            body: None,
             multipart: None,
             headers: None,
             route: RouteInfo::EditOriginalInteractionResponse {
                 application_id: self.try_application_id()?,
                 interaction_token,
             },
-        })
-        .await
-    }
+        };
 
-    /// Edits the initial interaction response.
-    ///
-    /// Refer to Discord's [docs] for Edit Webhook Message for field information.
-    ///
-    /// [docs]: https://discord.com/developers/docs/resources/webhook#edit-webhook-message
-    pub async fn edit_original_interaction_response_and_attachments(
-        &self,
-        interaction_token: &str,
-        map: &impl serde::Serialize,
-        new_attachments: impl IntoIterator<Item = CreateAttachment<'_>>,
-    ) -> Result<Message> {
-        self.fire(Request {
-            body: None,
-            multipart: Some(Multipart {
+        if new_attachments.is_empty() {
+            request.body = Some(to_vec(map)?);
+        } else {
+            request.multipart = Some(Multipart {
                 files: new_attachments.into_iter().collect(),
                 payload_json: Some(to_string(map)?),
                 fields: vec![],
-            }),
-            headers: None,
-            route: RouteInfo::EditOriginalInteractionResponse {
-                application_id: self.try_application_id()?,
-                interaction_token,
-            },
-        })
-        .await
+            });
+        }
+
+        self.fire(request).await
     }
 
     /// Edits the current user's profile settings.
@@ -2314,52 +2236,12 @@ impl Http {
         thread_id: Option<u64>,
         token: &str,
         wait: bool,
+        files: Vec<CreateAttachment<'_>>,
         map: &impl serde::Serialize,
     ) -> Result<Option<Message>> {
-        let body = to_vec(map)?;
-
-        let response = self
-            .request(Request {
-                body: Some(body),
-                multipart: None,
-                headers: None,
-                route: RouteInfo::ExecuteWebhook {
-                    token,
-                    wait,
-                    webhook_id,
-                    thread_id,
-                },
-            })
-            .await?;
-
-        if response.status() == StatusCode::NO_CONTENT {
-            return Ok(None);
-        }
-
-        decode_resp(response).await.map(Some)
-    }
-
-    /// Send file(s) over a webhook.
-    ///
-    /// # Errors
-    ///
-    /// Returns an [`HttpError::UnsuccessfulRequest`] if the files are too large to send.
-    pub async fn execute_webhook_with_files<'a>(
-        &self,
-        webhook_id: u64,
-        thread_id: Option<u64>,
-        token: &str,
-        wait: bool,
-        files: impl IntoIterator<Item = CreateAttachment<'a>>,
-        map: &impl serde::Serialize,
-    ) -> Result<Option<Message>> {
-        self.fire(Request {
+        let mut request = Request {
             body: None,
-            multipart: Some(Multipart {
-                files: files.into_iter().collect(),
-                payload_json: Some(to_string(map)?),
-                fields: vec![],
-            }),
+            multipart: None,
             headers: None,
             route: RouteInfo::ExecuteWebhook {
                 token,
@@ -2367,8 +2249,25 @@ impl Http {
                 webhook_id,
                 thread_id,
             },
+        };
+
+        if files.is_empty() {
+            request.body = Some(to_vec(map)?);
+        } else {
+            request.multipart = Some(Multipart {
+                files: files.into_iter().collect(),
+                payload_json: Some(to_string(map)?),
+                fields: vec![],
+            });
+        }
+
+        let response = self.request(request).await?;
+
+        Ok(if response.status() == StatusCode::NO_CONTENT {
+            None
+        } else {
+            decode_resp(response).await?
         })
-        .await
     }
 
     // Gets a webhook's message by Id
@@ -3791,51 +3690,39 @@ impl Http {
         .await
     }
 
-    /// Sends file(s) to a channel.
+    /// Sends a message to a channel.
     ///
     /// # Errors
     ///
     /// Returns an
     /// [`HttpError::UnsuccessfulRequest(ErrorResponse)`][`HttpError::UnsuccessfulRequest`]
     /// if the files are too large to send.
-    pub async fn send_files(
-        &self,
-        channel_id: u64,
-        files: impl IntoIterator<Item = CreateAttachment<'_>>,
-        map: &impl serde::Serialize,
-    ) -> Result<Message> {
-        self.fire(Request {
-            body: None,
-            multipart: Some(Multipart {
-                files: files.into_iter().collect(),
-                payload_json: Some(to_string(map)?),
-                fields: vec![],
-            }),
-            headers: None,
-            route: RouteInfo::CreateMessage {
-                channel_id,
-            },
-        })
-        .await
-    }
-
-    /// Sends a message to a channel.
     pub async fn send_message(
         &self,
         channel_id: u64,
+        files: Vec<CreateAttachment<'_>>,
         map: &impl serde::Serialize,
     ) -> Result<Message> {
-        let body = to_vec(map)?;
-
-        self.fire(Request {
-            body: Some(body),
+        let mut request = Request {
+            body: None,
             multipart: None,
             headers: None,
             route: RouteInfo::CreateMessage {
                 channel_id,
             },
-        })
-        .await
+        };
+
+        if files.is_empty() {
+            request.body = Some(to_vec(map)?);
+        } else {
+            request.multipart = Some(Multipart {
+                files: files.into_iter().collect(),
+                payload_json: Some(to_string(map)?),
+                fields: vec![],
+            });
+        }
+
+        self.fire(request).await
     }
 
     /// Pins a message in a channel.

@@ -98,14 +98,7 @@ impl<'a> EditMessage<'a> {
     ) -> Result<Message> {
         self.check_length()?;
         let files = std::mem::take(&mut self.files);
-
-        if files.is_empty() {
-            http.as_ref().edit_message(channel_id.into(), message_id.into(), &self).await
-        } else {
-            http.as_ref()
-                .edit_message_and_attachments(channel_id.into(), message_id.into(), &self, files)
-                .await
-        }
+        http.as_ref().edit_message(channel_id.into(), message_id.into(), &self, files).await
     }
 
     #[cfg(feature = "http")]

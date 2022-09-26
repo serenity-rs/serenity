@@ -8,6 +8,7 @@ const IMAGE_URL_2: &str = "https://rustacean.net/assets/rustlogo.png";
 
 async fn message(ctx: &Context, msg: Message) -> Result<(), serenity::Error> {
     let guild_id = msg.guild_id.unwrap();
+    let channel_id = msg.channel_id;
     if msg.content == "register" {
         guild_id
             .create_application_command(
@@ -15,9 +16,20 @@ async fn message(ctx: &Context, msg: Message) -> Result<(), serenity::Error> {
                 CreateApplicationCommand::new("editattachments").description("test command"),
             )
             .await?;
+        guild_id
+            .create_application_command(
+                &ctx,
+                CreateApplicationCommand::new("unifiedattachments1").description("test command"),
+            )
+            .await?;
+        guild_id
+            .create_application_command(
+                &ctx,
+                CreateApplicationCommand::new("unifiedattachments2").description("test command"),
+            )
+            .await?;
     } else if msg.content == "edit" {
-        let mut msg = msg
-            .channel_id
+        let mut msg = channel_id
             .send_message(
                 &ctx,
                 CreateMessage::new().add_file(CreateAttachment::url(ctx, IMAGE_URL).await?),
@@ -25,6 +37,23 @@ async fn message(ctx: &Context, msg: Message) -> Result<(), serenity::Error> {
             .await?;
         // Pre-PR, this falsely triggered a MODEL_TYPE_CONVERT Discord error
         msg.edit(&ctx, EditMessage::new().add_existing_attachment(msg.attachments[0].id)).await?;
+    } else if msg.content == "unifiedattachments" {
+        let mut msg = channel_id.send_message(ctx, CreateMessage::new().content("works")).await?;
+        msg.edit(ctx, EditMessage::new().content("works still")).await?;
+
+        let mut msg = channel_id
+            .send_message(
+                ctx,
+                CreateMessage::new().add_file(CreateAttachment::url(ctx, IMAGE_URL).await?),
+            )
+            .await?;
+        msg.edit(
+            ctx,
+            EditMessage::new()
+                .attachment(CreateAttachment::url(ctx, IMAGE_URL_2).await?)
+                .add_existing_attachment(msg.attachments[0].id),
+        )
+        .await?;
     } else {
         return Ok(());
     }
@@ -71,6 +100,55 @@ async fn interaction(
                 EditInteractionResponse::new()
                     .clear_existing_attachments()
                     .keep_existing_attachment(msg.attachments[1].id),
+            )
+            .await?;
+    } else if interaction.data.name == "unifiedattachments1" {
+        interaction
+            .create_interaction_response(
+                ctx,
+                CreateInteractionResponse::new().interaction_response_data(
+                    CreateInteractionResponseData::new().content("works"),
+                ),
+            )
+            .await?;
+
+        interaction
+            .edit_original_interaction_response(
+                ctx,
+                EditInteractionResponse::new().content("works still"),
+            )
+            .await?;
+
+        interaction
+            .create_followup_message(
+                ctx,
+                CreateInteractionResponseFollowup::new().content("still works still"),
+            )
+            .await?;
+    } else if interaction.data.name == "unifiedattachments2" {
+        interaction
+            .create_interaction_response(
+                ctx,
+                CreateInteractionResponse::new().interaction_response_data(
+                    CreateInteractionResponseData::new()
+                        .add_file(CreateAttachment::url(ctx, IMAGE_URL).await?),
+                ),
+            )
+            .await?;
+
+        interaction
+            .edit_original_interaction_response(
+                ctx,
+                EditInteractionResponse::new()
+                    .new_attachment(CreateAttachment::url(ctx, IMAGE_URL_2).await?),
+            )
+            .await?;
+
+        interaction
+            .create_followup_message(
+                ctx,
+                CreateInteractionResponseFollowup::new()
+                    .add_file(CreateAttachment::url(ctx, IMAGE_URL).await?),
             )
             .await?;
     }
