@@ -3,8 +3,6 @@ use crate::http::{CacheHttp, Http};
 #[cfg(feature = "http")]
 use crate::internal::prelude::*;
 use crate::model::prelude::*;
-#[cfg(feature = "http")]
-use crate::utils::encode_image;
 
 /// A builder to create or edit a [`Role`] for use via a number of model methods.
 ///
@@ -188,9 +186,7 @@ impl<'a> EditRole<'a> {
         http: impl AsRef<Http>,
         icon: impl Into<AttachmentType<'a>>,
     ) -> Result<EditRole<'a>> {
-        let icon_data = icon.into().data(&http.as_ref().client).await?;
-
-        self.icon = Some(encode_image(&icon_data));
+        self.icon = Some(icon.into().to_base64(&http.as_ref().client).await?);
         self.unicode_emoji = None;
 
         Ok(self)
