@@ -1,23 +1,23 @@
 use serde::de::{Deserialize, Deserializer, Error as DeError};
 use serde::Serialize;
 
-#[cfg(feature = "http")]
+#[cfg(feature = "model")]
 use crate::builder::{
     CreateInteractionResponse,
     CreateInteractionResponseData,
     CreateInteractionResponseFollowup,
     EditInteractionResponse,
 };
-#[cfg(feature = "http")]
+#[cfg(feature = "model")]
 use crate::http::Http;
 use crate::internal::prelude::*;
 use crate::model::application::component::ComponentType;
 use crate::model::application::interaction::add_guild_id_to_resolved;
-#[cfg(feature = "http")]
+#[cfg(feature = "model")]
 use crate::model::application::interaction::InteractionResponseType;
 use crate::model::channel::Message;
 use crate::model::guild::Member;
-#[cfg(feature = "http")]
+#[cfg(feature = "model")]
 use crate::model::id::MessageId;
 use crate::model::id::{ApplicationId, ChannelId, GuildId, InteractionId};
 use crate::model::user::User;
@@ -63,7 +63,7 @@ pub struct MessageComponentInteraction {
     pub guild_locale: Option<String>,
 }
 
-#[cfg(feature = "http")]
+#[cfg(feature = "model")]
 impl MessageComponentInteraction {
     /// Gets the interaction response.
     ///

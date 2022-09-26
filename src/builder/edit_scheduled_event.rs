@@ -3,8 +3,6 @@ use crate::http::{CacheHttp, Http};
 #[cfg(feature = "http")]
 use crate::internal::prelude::*;
 use crate::model::prelude::*;
-#[cfg(feature = "http")]
-use crate::utils::encode_image;
 
 #[derive(Clone, Debug, Default, Serialize)]
 #[must_use]
@@ -189,8 +187,7 @@ impl<'a> EditScheduledEvent<'a> {
         http: impl AsRef<Http>,
         image: impl Into<AttachmentType<'a>>,
     ) -> Result<EditScheduledEvent<'a>> {
-        let image_data = image.into().data(&http.as_ref().client).await?;
-        self.image = Some(encode_image(&image_data));
+        self.image = Some(image.into().to_base64(&http.as_ref().client).await?);
         Ok(self)
     }
 

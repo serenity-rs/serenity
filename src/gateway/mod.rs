@@ -52,7 +52,9 @@ mod ws;
 
 use std::fmt;
 
-use reqwest::{IntoUrl, Url};
+#[cfg(feature = "http")]
+use reqwest::IntoUrl;
+use reqwest::Url;
 #[cfg(feature = "client")]
 use tokio_tungstenite::tungstenite;
 
@@ -61,8 +63,10 @@ pub use self::shard::Shard;
 pub use self::ws::WsClient;
 #[cfg(feature = "client")]
 use crate::client::bridge::gateway::{ShardClientMessage, ShardRunnerMessage};
+#[cfg(feature = "http")]
 use crate::internal::prelude::*;
 use crate::model::gateway::{Activity, ActivityType};
+use crate::model::id::UserId;
 use crate::model::user::OnlineStatus;
 
 /// Presence data of the current user.
@@ -102,6 +106,7 @@ impl ActivityData {
     /// # Errors
     ///
     /// Returns an error if the URL parsing fails.
+    #[cfg(feature = "http")]
     pub fn streaming(name: impl Into<String>, url: impl IntoUrl) -> Result<Self> {
         Ok(Self {
             name: name.into(),
@@ -270,4 +275,14 @@ pub enum ReconnectType {
     Reidentify,
     /// Indicator that a new connection should be made by sending a RESUME.
     Resume,
+}
+
+#[derive(Clone, Debug)]
+pub enum ChunkGuildFilter {
+    /// Returns all members of the guilds specified. Requires GUILD_MEMBERS intent.
+    None,
+    /// A common username prefix filter for the members returned.
+    Query(String),
+    /// A set of exact user IDs to query for.
+    UserIds(Vec<UserId>),
 }
