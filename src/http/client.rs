@@ -2223,8 +2223,9 @@ impl Http {
     /// let token = "ig5AO-wdVWpCBtUUMxmgsWryqgsW3DChbKYOINftJ4DCrUbnkedoYZD0VOH1QLr-S3sV";
     /// let value = json!({"content": "test"});
     /// let map = value.as_object().unwrap();
+    /// let files = vec![];
     ///
-    /// let message = http.execute_webhook(id, None, token, true, map).await?;
+    /// let message = http.execute_webhook(id, None, token, true, files, map).await?;
     /// #     Ok(())
     /// # }
     /// ```
@@ -3931,7 +3932,7 @@ impl Http {
     /// use serenity::{
     ///     http::{
     ///         routing::RouteInfo,
-    ///         request::RequestBuilder,
+    ///         request::Request,
     ///     },
     ///     model::channel::Message,
     /// };
@@ -3942,10 +3943,10 @@ impl Http {
     /// let channel_id = 381880193700069377;
     /// let route_info = RouteInfo::CreateMessage { channel_id };
     ///
-    /// let mut request = RequestBuilder::new(route_info);
+    /// let mut request = Request::new(route_info);
     /// request.body(Some(bytes));
     ///
-    /// let message = http.fire::<Message>(request.build()).await?;
+    /// let message = http.fire::<Message>(request).await?;
     ///
     /// println!("Message content: {}", message.content);
     /// #
@@ -3976,7 +3977,7 @@ impl Http {
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// #     let http = Http::new("token");
     /// use serenity::http::{
-    ///     request::RequestBuilder,
+    ///     request::Request,
     ///     routing::RouteInfo,
     /// };
     ///
@@ -3986,10 +3987,10 @@ impl Http {
     /// let channel_id = 381880193700069377;
     /// let route_info = RouteInfo::CreateMessage { channel_id };
     ///
-    /// let mut request = RequestBuilder::new(route_info);
+    /// let mut request = Request::new(route_info);
     /// request.body(Some(bytes));
     ///
-    /// let response = http.request(request.build()).await?;
+    /// let response = http.request(request).await?;
     ///
     /// println!("Response successful?: {}", response.status().is_success());
     /// #

@@ -3,6 +3,7 @@ use super::CreateAttachment;
 use crate::http::{CacheHttp, Http};
 #[cfg(feature = "http")]
 use crate::internal::prelude::*;
+#[cfg(feature = "http")]
 use crate::model::prelude::*;
 
 /// A builder to create a [`Sticker`] for use via a number of model methods.

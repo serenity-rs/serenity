@@ -1,7 +1,7 @@
 use std::env;
 
 use serenity::async_trait;
-use serenity::builder::{CreateEmbed, CreateEmbedFooter, CreateMessage};
+use serenity::builder::{CreateAttachment, CreateEmbed, CreateEmbedFooter, CreateMessage};
 use serenity::model::channel::Message;
 use serenity::model::gateway::Ready;
 use serenity::model::Timestamp;
@@ -34,7 +34,7 @@ impl EventHandler for Handler {
             let builder = CreateMessage::new()
                 .content("Hello, World!")
                 .embed(embed)
-                .add_file("./ferris_eyes.png");
+                .add_file(CreateAttachment::path("./ferris_eyes.png").await.unwrap());
             let msg = msg.channel_id.send_message(&ctx.http, builder).await;
 
             if let Err(why) = msg {

@@ -11,7 +11,6 @@ use crate::constants;
 use crate::http::Http;
 #[cfg(feature = "http")]
 use crate::internal::prelude::*;
-#[cfg(feature = "http")]
 use crate::model::prelude::*;
 #[cfg(feature = "http")]
 use crate::utils::check_overflow;
@@ -134,7 +133,7 @@ impl<'a> EditInteractionResponse<'a> {
     /// This can be called multiple times.
     ///
     /// If this is called one or more times, existing attachments will reset. To keep them, provide
-    /// their IDs to [`Self::add_existing_attachment`].
+    /// their IDs to [`Self::keep_existing_attachment`].
     pub fn new_attachment(mut self, attachment: CreateAttachment<'a>) -> Self {
         self.files.push(attachment);
         self
@@ -142,7 +141,7 @@ impl<'a> EditInteractionResponse<'a> {
 
     /// Keeps an existing attachment by id.
     ///
-    /// To be used after [`Self::attachment`] or [`Self::clear_existing_attachments`].
+    /// To be used after [`Self::new_attachment`] or [`Self::clear_existing_attachments`].
     pub fn keep_existing_attachment(mut self, id: AttachmentId) -> Self {
         self.attachments.get_or_insert_with(Vec::new).push(ExistingAttachment {
             id,

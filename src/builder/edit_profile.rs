@@ -39,17 +39,15 @@ impl EditProfile {
     /// # Examples
     ///
     /// ```rust,no_run
-    /// # #[cfg(all(feature = "client", feature = "cache", feature = "gateway"))]
     /// # use serenity::builder::{EditProfile, CreateAttachment};
     /// # use serenity::prelude::*;
     /// # use serenity::model::prelude::*;
+    /// # use serenity::http::Http;
     /// #
-    /// # async fn _foo(context: Context) -> Result<(), SerenityError> {
-    /// // assuming a `context` has been bound
-    /// let mut user = context.cache.current_user().clone();
-    ///
+    /// # #[cfg(feature = "http")]
+    /// # async fn _foo(http: &Http, current_user: &mut CurrentUser) -> Result<(), SerenityError> {
     /// let avatar = CreateAttachment::path("./my_image.jpg").await.expect("Failed to read image.");
-    /// user.edit(&context, EditProfile::new().avatar(&avatar)).await?;
+    /// current_user.edit(http, EditProfile::new().avatar(&avatar)).await?;
     /// # Ok(()) }
     /// ```
     pub fn avatar(mut self, avatar: &CreateAttachment<'_>) -> Self {

@@ -1,14 +1,18 @@
 use std::borrow::Cow;
-#[cfg(not(feature = "http"))]
-use std::fs::File;
+#[cfg(feature = "tokio")]
 use std::path::Path;
 
+#[cfg(feature = "tokio")]
 use tokio::fs::File;
+#[cfg(feature = "tokio")]
 use tokio::io::AsyncReadExt;
+#[cfg(feature = "http")]
 use url::Url;
 
 #[cfg(feature = "http")]
-use crate::error::{Error, Result};
+use crate::error::Error;
+#[cfg(feature = "tokio")]
+use crate::error::Result;
 #[cfg(feature = "http")]
 use crate::http::Http;
 use crate::model::id::AttachmentId;
@@ -47,6 +51,7 @@ impl<'a> CreateAttachment<'a> {
     /// # Errors
     ///
     /// [`Error::Io`] if reading the file fails.
+    #[cfg(feature = "tokio")]
     pub async fn path(path: impl AsRef<Path>) -> Result<CreateAttachment<'static>> {
         let mut file = File::open(path.as_ref()).await?;
         let mut data = Vec::new();
@@ -70,6 +75,7 @@ impl<'a> CreateAttachment<'a> {
     /// # Errors
     ///
     /// [`Error::Io`] error if reading the file fails.
+    #[cfg(feature = "tokio")]
     pub async fn file(
         file: &File,
         filename: impl Into<String>,
