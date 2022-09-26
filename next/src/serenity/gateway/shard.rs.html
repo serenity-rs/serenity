@@ -800,6 +800,8 @@
 <span id="794">794</span>
 <span id="795">795</span>
 <span id="796">796</span>
+<span id="797">797</span>
+<span id="798">798</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::sync::Arc</span>;
 <span class="kw">use</span> <span class="ident">std::time</span>::{<span class="ident">Duration</span> <span class="kw">as</span> <span class="ident">StdDuration</span>, <span class="ident">Instant</span>};
 
@@ -811,6 +813,7 @@
 
 <span class="kw">use</span> <span class="kw">super</span>::{
     <span class="ident">ActivityData</span>,
+    <span class="ident">ChunkGuildFilter</span>,
     <span class="ident">ConnectionStage</span>,
     <span class="ident">GatewayError</span>,
     <span class="ident">PresenceData</span>,
@@ -818,13 +821,11 @@
     <span class="ident">ShardAction</span>,
     <span class="ident">WsClient</span>,
 };
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::client::bridge::gateway::ChunkGuildFilter</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::constants</span>::{<span class="self">self</span>, <span class="ident">close_codes</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::http::Http</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::internal::prelude</span>::<span class="kw-2">*</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::event</span>::{<span class="ident">Event</span>, <span class="ident">GatewayEvent</span>};
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::gateway</span>::{<span class="ident">GatewayIntents</span>, <span class="ident">ShardInfo</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::id::GuildId</span>;
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::id</span>::{<span class="ident">ApplicationId</span>, <span class="ident">GuildId</span>};
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::user::OnlineStatus</span>;
 
 <span class="doccomment">/// A Shard is a higher-level handler for a websocket connection to Discord&#39;s</span>
@@ -872,7 +873,7 @@
     <span class="doccomment">/// [`latency`]: fn@Self::latency</span>
     <span class="ident">heartbeat_instants</span>: (<span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Instant</span><span class="op">&gt;</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Instant</span><span class="op">&gt;</span>),
     <span class="ident">heartbeat_interval</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span>,
-    <span class="ident">http</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+    <span class="ident">application_id_callback</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">FnOnce</span>(<span class="ident">ApplicationId</span>) <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span><span class="op">&gt;</span><span class="op">&gt;</span>,
     <span class="doccomment">/// This is used by the heartbeater to determine whether the last</span>
     <span class="doccomment">/// heartbeat was sent without an acknowledgement, and whether to reconnect.</span>
     <span class="comment">// This _must_ be set to `true` in `Shard::handle_event`&#39;s</span>
@@ -955,7 +956,7 @@
             <span class="ident">presence</span>,
             <span class="ident">heartbeat_instants</span>,
             <span class="ident">heartbeat_interval</span>,
-            <span class="ident">http</span>: <span class="prelude-val">None</span>,
+            <span class="ident">application_id_callback</span>: <span class="prelude-val">None</span>,
             <span class="ident">last_heartbeat_acknowledged</span>,
             <span class="ident">seq</span>,
             <span class="ident">stage</span>,
@@ -968,11 +969,14 @@
         })
     }
 
-    <span class="doccomment">/// Sets the associated [`Http`] client.</span>
+    <span class="doccomment">/// Sets a callback to be called when the gateway receives the application&#39;s ID from Discord.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// This will update the client&#39;s application id after the shard receives a READY payload.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_http</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">http</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>) {
-        <span class="self">self</span>.<span class="ident">http</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">http</span>);
+    <span class="doccomment">/// Used internally by serenity to set the Http&#39;s internal application ID automatically.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_application_id_callback</span>(
+        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
+        <span class="ident">callback</span>: <span class="kw">impl</span> <span class="ident">FnOnce</span>(<span class="ident">ApplicationId</span>) <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
+    ) {
+        <span class="self">self</span>.<span class="ident">application_id_callback</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">Box::new</span>(<span class="ident">callback</span>));
     }
 
     <span class="doccomment">/// Retrieves the current presence of the shard.</span>
@@ -1106,8 +1110,8 @@
                 <span class="self">self</span>.<span class="ident">session_id</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">ready</span>.<span class="ident">ready</span>.<span class="ident">session_id</span>.<span class="ident">clone</span>());
                 <span class="self">self</span>.<span class="ident">stage</span> <span class="op">=</span> <span class="ident">ConnectionStage::Connected</span>;
 
-                <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">http</span>) <span class="op">=</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">http</span> {
-                    <span class="ident">http</span>.<span class="ident">set_application_id</span>(<span class="ident">ready</span>.<span class="ident">ready</span>.<span class="ident">application</span>.<span class="ident">id</span>.<span class="ident">get</span>());
+                <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">callback</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">application_id_callback</span>.<span class="ident">take</span>() {
+                    <span class="ident">callback</span>(<span class="ident">ready</span>.<span class="ident">ready</span>.<span class="ident">application</span>.<span class="ident">id</span>);
                 }
             },
             <span class="ident">Event::Resumed</span>(<span class="kw">_</span>) =&gt; {

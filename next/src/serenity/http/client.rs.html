@@ -4161,12 +4161,12 @@
 <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::routing::RouteInfo</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::typing::Typing</span>;
 <span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">AttachmentType</span>, <span class="ident">GuildPagination</span>, <span class="ident">HttpError</span>, <span class="ident">UserPagination</span>};
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::constants</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::internal::prelude</span>::<span class="kw-2">*</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::json::prelude</span>::<span class="kw-2">*</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::application::command</span>::{<span class="ident">Command</span>, <span class="ident">CommandPermission</span>};
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::guild::automod::Rule</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::prelude</span>::<span class="kw-2">*</span>;
-<span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">constants</span>, <span class="ident">utils</span>};
 
 <span class="doccomment">/// A builder for the underlying [`Http`] client that performs requests</span>
 <span class="doccomment">/// to Discord&#39;s HTTP API. If you do not need to use a proxy or do not</span>
@@ -7533,15 +7533,13 @@
     <span class="doccomment">/// [API documentation](https://discord.com/developers/docs/resources/invite#get-invite).</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_invite</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="kw-2">mut</span> <span class="ident">code</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
+        <span class="ident">code</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
         <span class="ident">member_counts</span>: <span class="ident">bool</span>,
         <span class="ident">expiration</span>: <span class="ident">bool</span>,
         <span class="ident">event_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span>,
     ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Invite</span><span class="op">&gt;</span> {
         <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;utils&quot;</span>)]</span>
-        {
-            <span class="ident">code</span> <span class="op">=</span> <span class="ident">utils::parse_invite</span>(<span class="ident">code</span>);
-        }
+        <span class="kw">let</span> <span class="ident">code</span> <span class="op">=</span> <span class="ident"><span class="kw">crate</span>::utils::parse_invite</span>(<span class="ident">code</span>);
 
         <span class="self">self</span>.<span class="ident">fire</span>(<span class="ident">Request</span> {
             <span class="ident">body</span>: <span class="prelude-val">None</span>,
@@ -7852,9 +7850,11 @@
     <span class="doccomment">/// #     Ok(())</span>
     <span class="doccomment">/// # }</span>
     <span class="doccomment">/// ```</span>
+    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;utils&quot;</span>)]</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_webhook_from_url</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">url</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Webhook</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">url</span> <span class="op">=</span> <span class="ident">Url::parse</span>(<span class="ident">url</span>).<span class="ident">map_err</span>(<span class="ident">HttpError::Url</span>)<span class="question-mark">?</span>;
-        <span class="kw">let</span> (<span class="ident">webhook_id</span>, <span class="ident">token</span>) <span class="op">=</span> <span class="ident">utils::parse_webhook</span>(<span class="kw-2">&amp;</span><span class="ident">url</span>).<span class="ident">ok_or</span>(<span class="ident">HttpError::InvalidWebhook</span>)<span class="question-mark">?</span>;
+        <span class="kw">let</span> (<span class="ident">webhook_id</span>, <span class="ident">token</span>) <span class="op">=</span>
+            <span class="ident"><span class="kw">crate</span>::utils::parse_webhook</span>(<span class="kw-2">&amp;</span><span class="ident">url</span>).<span class="ident">ok_or</span>(<span class="ident">HttpError::InvalidWebhook</span>)<span class="question-mark">?</span>;
         <span class="self">self</span>.<span class="ident">fire</span>(<span class="ident">Request</span> {
             <span class="ident">body</span>: <span class="prelude-val">None</span>,
             <span class="ident">multipart</span>: <span class="prelude-val">None</span>,

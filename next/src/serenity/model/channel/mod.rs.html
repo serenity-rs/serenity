@@ -605,6 +605,7 @@
     <span class="ident">Private</span>(<span class="ident">PrivateChannel</span>),
 }
 
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
 <span class="kw">impl</span> <span class="ident">Channel</span> {
     <span class="doccomment">/// Converts from [`Channel`] to `Option&lt;GuildChannel&gt;`.</span>
     <span class="doccomment">///</span>
@@ -678,7 +679,6 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// Otherwise will return [`Error::Http`] if the current user does not</span>
     <span class="doccomment">/// have permission.</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http&quot;</span>)]</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">delete</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">cache_http</span>: <span class="kw">impl</span> <span class="ident">CacheHttp</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="self">self</span> {
             <span class="ident"><span class="self">Self</span>::Guild</span>(<span class="ident">public_channel</span>) =&gt; {

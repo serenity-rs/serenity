@@ -74,15 +74,6 @@
 <span id="68">68</span>
 <span id="69">69</span>
 <span id="70">70</span>
-<span id="71">71</span>
-<span id="72">72</span>
-<span id="73">73</span>
-<span id="74">74</span>
-<span id="75">75</span>
-<span id="76">76</span>
-<span id="77">77</span>
-<span id="78">78</span>
-<span id="79">79</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">tokio_tungstenite::tungstenite::Message</span>;
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;collector&quot;</span>)]</span>
@@ -94,18 +85,9 @@
     <span class="ident">ReactionFilter</span>,
 };
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::gateway::ActivityData</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::id</span>::{<span class="ident">GuildId</span>, <span class="ident">UserId</span>};
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::gateway::ChunkGuildFilter</span>;
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::id::GuildId</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::user::OnlineStatus</span>;
-
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">ChunkGuildFilter</span> {
-    <span class="doccomment">/// Returns all members of the guilds specified. Requires GUILD_MEMBERS intent.</span>
-    <span class="prelude-val">None</span>,
-    <span class="doccomment">/// A common username prefix filter for the members returned.</span>
-    <span class="ident">Query</span>(<span class="ident">String</span>),
-    <span class="doccomment">/// A set of exact user IDs to query for.</span>
-    <span class="ident">UserIds</span>(<span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">UserId</span><span class="op">&gt;</span>),
-}
 
 <span class="doccomment">/// A message to send from a shard over a WebSocket.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>)]</span>

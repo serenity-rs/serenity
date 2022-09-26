@@ -264,6 +264,7 @@
 <span id="258">258</span>
 <span id="259">259</span>
 <span id="260">260</span>
+<span id="261">261</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::collections</span>::{<span class="ident">HashMap</span>, <span class="ident">VecDeque</span>};
 <span class="kw">use</span> <span class="ident">std::sync::Arc</span>;
 
@@ -449,7 +450,8 @@
         )
         .<span class="kw">await</span><span class="question-mark">?</span>;
 
-        <span class="ident">shard</span>.<span class="ident">set_http</span>(<span class="ident">Arc::clone</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">cache_and_http</span>.<span class="ident">http</span>));
+        <span class="kw">let</span> <span class="ident">cloned_http</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">cache_and_http</span>.<span class="ident">http</span>.<span class="ident">clone</span>();
+        <span class="ident">shard</span>.<span class="ident">set_application_id_callback</span>(<span class="kw">move</span> <span class="op">|</span><span class="ident">id</span><span class="op">|</span> <span class="ident">cloned_http</span>.<span class="ident">set_application_id</span>(<span class="ident">id</span>.<span class="ident">get</span>()));
 
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">runner</span> <span class="op">=</span> <span class="ident">ShardRunner::new</span>(<span class="ident">ShardRunnerOptions</span> {
             <span class="ident">data</span>: <span class="ident">Arc::clone</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">data</span>),

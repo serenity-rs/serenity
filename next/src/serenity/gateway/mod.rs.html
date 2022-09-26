@@ -277,6 +277,21 @@
 <span id="271">271</span>
 <span id="272">272</span>
 <span id="273">273</span>
+<span id="274">274</span>
+<span id="275">275</span>
+<span id="276">276</span>
+<span id="277">277</span>
+<span id="278">278</span>
+<span id="279">279</span>
+<span id="280">280</span>
+<span id="281">281</span>
+<span id="282">282</span>
+<span id="283">283</span>
+<span id="284">284</span>
+<span id="285">285</span>
+<span id="286">286</span>
+<span id="287">287</span>
+<span id="288">288</span>
 </pre><pre class="rust"><code><span class="doccomment">//! The gateway module contains the pieces - primarily the `Shard` -</span>
 <span class="doccomment">//! responsible for maintaining a WebSocket connection with Discord.</span>
 <span class="doccomment">//!</span>
@@ -331,7 +346,9 @@
 
 <span class="kw">use</span> <span class="ident">std::fmt</span>;
 
-<span class="kw">use</span> <span class="ident">reqwest</span>::{<span class="ident">IntoUrl</span>, <span class="ident">Url</span>};
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http&quot;</span>)]</span>
+<span class="kw">use</span> <span class="ident">reqwest::IntoUrl</span>;
+<span class="kw">use</span> <span class="ident">reqwest::Url</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;client&quot;</span>)]</span>
 <span class="kw">use</span> <span class="ident">tokio_tungstenite::tungstenite</span>;
 
@@ -340,8 +357,10 @@
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="self">self</span>::ws::WsClient</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;client&quot;</span>)]</span>
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::client::bridge::gateway</span>::{<span class="ident">ShardClientMessage</span>, <span class="ident">ShardRunnerMessage</span>};
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http&quot;</span>)]</span>
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::internal::prelude</span>::<span class="kw-2">*</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::gateway</span>::{<span class="ident">Activity</span>, <span class="ident">ActivityType</span>};
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::id::UserId</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::user::OnlineStatus</span>;
 
 <span class="doccomment">/// Presence data of the current user.</span>
@@ -381,6 +400,7 @@
     <span class="doccomment">/// # Errors</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// Returns an error if the URL parsing fails.</span>
+    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http&quot;</span>)]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">streaming</span>(<span class="ident">name</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>, <span class="ident">url</span>: <span class="kw">impl</span> <span class="ident">IntoUrl</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
         <span class="prelude-val">Ok</span>(<span class="self">Self</span> {
             <span class="ident">name</span>: <span class="ident">name</span>.<span class="ident">into</span>(),
@@ -549,6 +569,16 @@
     <span class="ident">Reidentify</span>,
     <span class="doccomment">/// Indicator that a new connection should be made by sending a RESUME.</span>
     <span class="ident">Resume</span>,
+}
+
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>)]</span>
+<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">ChunkGuildFilter</span> {
+    <span class="doccomment">/// Returns all members of the guilds specified. Requires GUILD_MEMBERS intent.</span>
+    <span class="prelude-val">None</span>,
+    <span class="doccomment">/// A common username prefix filter for the members returned.</span>
+    <span class="ident">Query</span>(<span class="ident">String</span>),
+    <span class="doccomment">/// A set of exact user IDs to query for.</span>
+    <span class="ident">UserIds</span>(<span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">UserId</span><span class="op">&gt;</span>),
 }
 </code></pre></div>
 </section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.63.0-nightly (10f4ce324 2022-06-22)" ></div>
