@@ -109,7 +109,6 @@ version = "1.0"
 [dependencies.tokio]
 version = "1"
 default-features = true
-optional = true
 features = ["fs", "macros", "rt", "sync", "time"]
 
 [dependencies.futures]
@@ -173,25 +172,43 @@ default_no_backend = [
     "utils",
 ]
 
+# Enables builder structs to configure Discord HTTP requests. Without this feature, you have to
+# construct JSON manually at some places.
+# TODO: does this really need "utils"?
 builder = ["utils"]
+# Enables the cache, which stores the data received from Discord gateway to provide access to
+# complete guild data, channels, users and more without needing HTTP requests.
 cache = ["dashmap", "parking_lot"]
+# Enables collectors, a utility feature that lets you await interaction events in code with
+# zero setup, without needing to setup an InteractionCreate event listener.
 collector = ["gateway", "model", "derivative", "nougat"]
+# Wraps the gateway and http functionality into a single interface
+# TODO: should this require "gateway"?
 client = ["http", "typemap_rev"]
-extras = []
+# Enables the Framework trait which is an abstraction for old-style text commands.
 framework = ["client", "model", "utils"]
-gateway = ["flate2", "http", "utils"]
+# Enables gateway support, which allows bots to listen for Discord events.
+gateway = ["flate2"]
+# Enables HTTP, which enables bots to execute actions on Discord.
 http = []
 absolute_ratelimits = ["http"]
+# Enables wrapper methods around HTTP requests on model types.
+# Requires "builder" to configure the requests and "http" to execute them.
+# Note: the model type definitions themselves are always active, regardless of this feature.
 model = ["builder", "http"]
 voice_model = ["serenity-voice-model"]
 standard_framework = ["framework", "uwl", "levenshtein", "command_attr", "static_assertions", "parking_lot"]
+# Enables support for Discord API functionality that's not stable yet, as well as serenity APIs that
+# are allowed to change even in semver non-breaking updates.
 unstable_discord_api = []
+# Enables some utility functions that can be useful for bot creators.
 utils = ["base64"]
 voice = ["client", "model"]
 tokio_task_builder = ["tokio/tracing"]
+# Configures serenity to use types from the `time` crate to store datetimes.
 time = []
 
-# Enables simd accelerated parsing
+# Enables simd accelerated parsing.
 simd_json = ["simd-json"]
 
 # Enables temporary caching in functions that retrieve data via the HTTP API.
@@ -202,7 +219,6 @@ temp_cache = ["cache", "moka"]
 rustls_backend = [
     "reqwest/rustls-tls",
     "tokio-tungstenite/rustls-tls-webpki-roots",
-    "tokio",
     "bytes",
 ]
 
@@ -210,7 +226,6 @@ rustls_backend = [
 native_tls_backend = [
     "reqwest/native-tls",
     "tokio-tungstenite/native-tls",
-    "tokio",
     "bytes",
 ]
 
