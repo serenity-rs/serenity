@@ -2,8 +2,6 @@ use super::{CreateAllowedMentions, CreateAttachment, CreateComponents, CreateEmb
 #[cfg(feature = "http")]
 use crate::constants;
 #[cfg(feature = "http")]
-use crate::constants;
-#[cfg(feature = "http")]
 use crate::http::Http;
 #[cfg(feature = "http")]
 use crate::internal::prelude::*;
