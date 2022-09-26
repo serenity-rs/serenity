@@ -6,7 +6,7 @@ use std::fmt::Display;
 use std::fmt::Write;
 
 #[cfg(all(feature = "model", feature = "utils"))]
-use crate::builder::{CreateAllowedMentions, CreateMessage, EditMessage, ParseValue};
+use crate::builder::{CreateAllowedMentions, CreateMessage, EditMessage};
 #[cfg(all(feature = "cache", feature = "model"))]
 use crate::cache::{Cache, GuildRef};
 #[cfg(feature = "collector")]
@@ -671,9 +671,9 @@ impl Message {
                 .replied_user(ping_user)
                 // By providing allowed_mentions, Discord disabled _all_ pings by default so we
                 // need to re-enable them
-                .parse(ParseValue::Everyone)
-                .parse(ParseValue::Users)
-                .parse(ParseValue::Roles);
+                .everyone(true)
+                .all_users(true)
+                .all_roles(true);
             builder = builder.reference_message(self).allowed_mentions(allowed_mentions);
         }
         self.channel_id.send_message(cache_http, builder).await
