@@ -20,12 +20,12 @@ use super::request::Request;
 use super::routing::RouteInfo;
 use super::typing::Typing;
 use super::{AttachmentType, GuildPagination, HttpError, UserPagination};
+use crate::constants;
 use crate::internal::prelude::*;
 use crate::json::prelude::*;
 use crate::model::application::command::{Command, CommandPermission};
 use crate::model::guild::automod::Rule;
 use crate::model::prelude::*;
-use crate::{constants, utils};
 
 /// A builder for the underlying [`Http`] client that performs requests
 /// to Discord's HTTP API. If you do not need to use a proxy or do not
@@ -3390,15 +3390,13 @@ impl Http {
     /// [API documentation](https://discord.com/developers/docs/resources/invite#get-invite).
     pub async fn get_invite(
         &self,
-        mut code: &str,
+        code: &str,
         member_counts: bool,
         expiration: bool,
         event_id: Option<u64>,
     ) -> Result<Invite> {
         #[cfg(feature = "utils")]
-        {
-            code = utils::parse_invite(code);
-        }
+        let code = crate::utils::parse_invite(code);
 
         self.fire(Request {
             body: None,
@@ -3709,9 +3707,11 @@ impl Http {
     /// #     Ok(())
     /// # }
     /// ```
+    #[cfg(feature = "utils")]
     pub async fn get_webhook_from_url(&self, url: &str) -> Result<Webhook> {
         let url = Url::parse(url).map_err(HttpError::Url)?;
-        let (webhook_id, token) = utils::parse_webhook(&url).ok_or(HttpError::InvalidWebhook)?;
+        let (webhook_id, token) =
+            crate::utils::parse_webhook(&url).ok_or(HttpError::InvalidWebhook)?;
         self.fire(Request {
             body: None,
             multipart: None,
