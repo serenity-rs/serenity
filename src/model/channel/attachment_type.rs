@@ -1,12 +1,11 @@
 use std::borrow::Cow;
-#[cfg(not(feature = "http"))]
-use std::fs::File;
 use std::path::{Path, PathBuf};
 
 #[cfg(feature = "http")]
 use reqwest::Client;
+use tokio::fs::File;
 #[cfg(feature = "http")]
-use tokio::{fs::File, io::AsyncReadExt};
+use tokio::io::AsyncReadExt;
 use url::Url;
 
 #[cfg(feature = "http")]
@@ -28,8 +27,8 @@ pub enum AttachmentType<'a> {
     Image(Url),
 }
 
-#[cfg(feature = "http")]
 impl<'a> AttachmentType<'a> {
+    #[cfg(feature = "http")]
     pub(crate) async fn data(&self, client: &Client) -> Result<Vec<u8>> {
         let data = match self {
             Self::Bytes {
@@ -56,6 +55,7 @@ impl<'a> AttachmentType<'a> {
         Ok(data)
     }
 
+    #[cfg(feature = "http")]
     pub(crate) fn filename(&self) -> Result<Option<String>> {
         match self {
             Self::Bytes {
@@ -72,6 +72,13 @@ impl<'a> AttachmentType<'a> {
                 None => Err(Error::Url(url.to_string())),
             },
         }
+    }
+
+    #[cfg(feature = "model")]
+    pub(crate) async fn to_base64(&self, client: &reqwest::Client) -> Result<String> {
+        let mut encoded = base64::encode(self.data(client).await?);
+        encoded.insert_str(0, "data:image/png;base64,");
+        Ok(encoded)
     }
 }
 
