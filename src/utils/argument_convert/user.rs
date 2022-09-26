@@ -24,7 +24,7 @@ impl fmt::Display for UserParseError {
 }
 
 #[cfg(feature = "cache")]
-fn lookup_by_global_cache(ctx: &Context, s: &str) -> Option<User> {
+fn lookup_by_global_cache(ctx: &CacheAndHttp, s: &str) -> Option<User> {
     let users = &ctx.cache.users;
 
     let lookup_by_id = || users.get(&UserId(s.parse().ok()?)).map(|u| u.clone());
@@ -74,7 +74,7 @@ impl ArgumentConvert for User {
     type Err = UserParseError;
 
     async fn convert(
-        ctx: &Context,
+        ctx: &CacheAndHttp,
         guild_id: Option<GuildId>,
         channel_id: Option<ChannelId>,
         s: &str,

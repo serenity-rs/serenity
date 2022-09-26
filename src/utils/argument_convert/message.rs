@@ -50,7 +50,7 @@ impl ArgumentConvert for Message {
     type Err = MessageParseError;
 
     async fn convert(
-        ctx: &Context,
+        ctx: &CacheAndHttp,
         _guild_id: Option<GuildId>,
         channel_id: Option<ChannelId>,
         s: &str,

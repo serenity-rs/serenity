@@ -41,7 +41,7 @@ fn channel_belongs_to_guild(channel: &Channel, guild: GuildId) -> bool {
 }
 
 async fn lookup_channel_global(
-    ctx: &Context,
+    ctx: &CacheAndHttp,
     guild_id: Option<GuildId>,
     s: &str,
 ) -> Result<Channel, ChannelParseError> {
@@ -91,7 +91,7 @@ impl ArgumentConvert for Channel {
     type Err = ChannelParseError;
 
     async fn convert(
-        ctx: &Context,
+        ctx: &CacheAndHttp,
         guild_id: Option<GuildId>,
         _channel_id: Option<ChannelId>,
         s: &str,
@@ -151,7 +151,7 @@ impl ArgumentConvert for GuildChannel {
     type Err = GuildChannelParseError;
 
     async fn convert(
-        ctx: &Context,
+        ctx: &CacheAndHttp,
         guild_id: Option<GuildId>,
         channel_id: Option<ChannelId>,
         s: &str,

@@ -44,7 +44,7 @@ impl ArgumentConvert for Member {
     type Err = MemberParseError;
 
     async fn convert(
-        ctx: &Context,
+        ctx: &CacheAndHttp,
         guild_id: Option<GuildId>,
         _channel_id: Option<ChannelId>,
         s: &str,

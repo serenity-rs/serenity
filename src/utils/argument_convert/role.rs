@@ -52,7 +52,7 @@ impl ArgumentConvert for Role {
     type Err = RoleParseError;
 
     async fn convert(
-        ctx: &Context,
+        ctx: &CacheAndHttp,
         guild_id: Option<GuildId>,
         _channel_id: Option<ChannelId>,
         s: &str,
