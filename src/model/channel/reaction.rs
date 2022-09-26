@@ -395,7 +395,6 @@ impl Serialize for ReactionType {
     }
 }
 
-#[cfg(feature = "model")]
 impl ReactionType {
     /// Creates a data-esque display of the type. This is not very useful for
     /// displaying, as the primary client can not render it, but can be useful
@@ -424,6 +423,7 @@ impl ReactionType {
     /// having to perform any allocation.
     /// Will always return false if the reaction was not a unicode reaction.
     #[must_use]
+    #[cfg(feature = "model")]
     pub fn unicode_eq(&self, other: &str) -> bool {
         if let ReactionType::Unicode(unicode) = &self {
             unicode == other
@@ -437,6 +437,7 @@ impl ReactionType {
     /// to perform any allocation.
     /// Will return None if the reaction was not a unicode reaction.
     #[must_use]
+    #[cfg(feature = "model")]
     pub fn unicode_partial_cmp(&self, other: &str) -> Option<Ordering> {
         if let ReactionType::Unicode(unicode) = &self {
             Some(unicode.as_str().cmp(other))
