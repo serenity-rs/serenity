@@ -1,11 +1,21 @@
 use serenity::builder::*;
+use serenity::model::prelude::interaction::application_command::*;
 use serenity::model::prelude::*;
 use serenity::prelude::*;
 
 const IMAGE_URL: &str = "https://raw.githubusercontent.com/serenity-rs/serenity/current/logo.png";
+const IMAGE_URL_2: &str = "https://rustacean.net/assets/rustlogo.png";
 
 async fn message(ctx: &Context, msg: Message) -> Result<(), serenity::Error> {
-    if msg.content == "edit" {
+    let guild_id = msg.guild_id.unwrap();
+    if msg.content == "register" {
+        guild_id
+            .create_application_command(
+                &ctx,
+                CreateApplicationCommand::new("editattachments").description("test command"),
+            )
+            .await?;
+    } else if msg.content == "edit" {
         let mut msg = msg
             .channel_id
             .send_message(
@@ -23,11 +33,62 @@ async fn message(ctx: &Context, msg: Message) -> Result<(), serenity::Error> {
     Ok(())
 }
 
+async fn interaction(
+    ctx: &Context,
+    interaction: ApplicationCommandInteraction,
+) -> Result<(), serenity::Error> {
+    if interaction.data.name == "editattachments" {
+        // Respond with an image
+        interaction
+            .create_interaction_response(
+                &ctx,
+                CreateInteractionResponse::new().interaction_response_data(
+                    CreateInteractionResponseData::new()
+                        .add_file(CreateAttachment::url(ctx, IMAGE_URL).await?),
+                ),
+            )
+            .await?;
+
+        // We need to know the attachments' IDs in order to not lose them in the subsequent edit
+        let msg = interaction.get_interaction_response(ctx).await?;
+
+        // Add another image
+        let msg = interaction
+            .edit_original_interaction_response(
+                &ctx,
+                EditInteractionResponse::new()
+                    .new_attachment(CreateAttachment::url(ctx, IMAGE_URL_2).await?)
+                    .keep_existing_attachment(msg.attachments[0].id),
+            )
+            .await?;
+
+        tokio::time::sleep(tokio::time::Duration::from_secs(1)).await;
+
+        // Only keep the new image, removing the first image
+        let _msg = interaction
+            .edit_original_interaction_response(
+                &ctx,
+                EditInteractionResponse::new()
+                    .clear_existing_attachments()
+                    .keep_existing_attachment(msg.attachments[1].id),
+            )
+            .await?;
+    }
+
+    Ok(())
+}
+
 struct Handler;
 #[serenity::async_trait]
 impl EventHandler for Handler {
     async fn message(&self, ctx: Context, msg: Message) {
         message(&ctx, msg).await.unwrap();
+    }
+
+    async fn interaction_create(&self, ctx: Context, i: Interaction) {
+        if let Interaction::ApplicationCommand(i) = i {
+            interaction(&ctx, i).await.unwrap();
+        }
     }
 }
 

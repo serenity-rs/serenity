@@ -1887,6 +1887,33 @@ impl Http {
         .await
     }
 
+    /// Edits the initial interaction response.
+    ///
+    /// Refer to Discord's [docs] for Edit Webhook Message for field information.
+    ///
+    /// [docs]: https://discord.com/developers/docs/resources/webhook#edit-webhook-message
+    pub async fn edit_original_interaction_response_and_attachments(
+        &self,
+        interaction_token: &str,
+        map: &impl serde::Serialize,
+        new_attachments: impl IntoIterator<Item = CreateAttachment<'_>>,
+    ) -> Result<Message> {
+        self.fire(Request {
+            body: None,
+            multipart: Some(Multipart {
+                files: new_attachments.into_iter().collect(),
+                payload_json: Some(to_string(map)?),
+                fields: vec![],
+            }),
+            headers: None,
+            route: RouteInfo::EditOriginalInteractionResponse {
+                application_id: self.try_application_id()?,
+                interaction_token,
+            },
+        })
+        .await
+    }
+
     /// Edits the current user's profile settings.
     pub async fn edit_profile(&self, map: &impl serde::Serialize) -> Result<CurrentUser> {
         let body = to_vec(map)?;

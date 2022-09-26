@@ -1,4 +1,10 @@
-use super::{CreateAllowedMentions, CreateComponents, CreateEmbed};
+use super::{
+    CreateAllowedMentions,
+    CreateAttachment,
+    CreateComponents,
+    CreateEmbed,
+    ExistingAttachment,
+};
 #[cfg(feature = "http")]
 use crate::constants;
 #[cfg(feature = "http")]
@@ -12,7 +18,7 @@ use crate::utils::check_overflow;
 
 #[derive(Clone, Debug, Default, Serialize)]
 #[must_use]
-pub struct EditInteractionResponse {
+pub struct EditInteractionResponse<'a> {
     embeds: Vec<CreateEmbed>,
     #[serde(skip_serializing_if = "Option::is_none")]
     content: Option<String>,
@@ -20,9 +26,14 @@ pub struct EditInteractionResponse {
     allowed_mentions: Option<CreateAllowedMentions>,
     #[serde(skip_serializing_if = "Option::is_none")]
     components: Option<CreateComponents>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    attachments: Option<Vec<ExistingAttachment>>,
+
+    #[serde(skip)]
+    files: Vec<CreateAttachment<'a>>,
 }
 
-impl EditInteractionResponse {
+impl<'a> EditInteractionResponse<'a> {
     /// Equivalent to [`Self::default`].
     pub fn new() -> Self {
         Self::default()
@@ -42,9 +53,16 @@ impl EditInteractionResponse {
     /// [`Error::Http`] if the API returns an error, or an [`Error::Json`] if there is an error in
     /// deserializing the API response.
     #[cfg(feature = "http")]
-    pub async fn execute(self, http: impl AsRef<Http>, token: &str) -> Result<Message> {
+    pub async fn execute(mut self, http: impl AsRef<Http>, token: &str) -> Result<Message> {
         self.check_length()?;
-        http.as_ref().edit_original_interaction_response(token, &self).await
+        if self.files.is_empty() {
+            http.as_ref().edit_original_interaction_response(token, &self).await
+        } else {
+            let files = std::mem::take(&mut self.files);
+            http.as_ref()
+                .edit_original_interaction_response_and_attachments(token, &self, files)
+                .await
+        }
     }
 
     #[cfg(feature = "http")]
@@ -114,6 +132,36 @@ impl EditInteractionResponse {
     /// Sets the components of this message.
     pub fn components(mut self, components: CreateComponents) -> Self {
         self.components = Some(components);
+        self
+    }
+
+    /// Add a new attachment for the message.
+    ///
+    /// This can be called multiple times.
+    ///
+    /// If this is called one or more times, existing attachments will reset. To keep them, provide
+    /// their IDs to [`Self::add_existing_attachment`].
+    pub fn new_attachment(mut self, attachment: CreateAttachment<'a>) -> Self {
+        self.files.push(attachment);
+        self
+    }
+
+    /// Keeps an existing attachment by id.
+    ///
+    /// To be used after [`Self::attachment`] or [`Self::clear_existing_attachments`].
+    pub fn keep_existing_attachment(mut self, id: AttachmentId) -> Self {
+        self.attachments.get_or_insert_with(Vec::new).push(ExistingAttachment {
+            id,
+        });
+        self
+    }
+
+    /// Clears existing attachments.
+    ///
+    /// In combination with [`Self::keep_existing_attachment`], this can be used to selectively
+    /// keep only some existing attachments.
+    pub fn clear_existing_attachments(mut self) -> Self {
+        self.attachments = Some(Vec::new());
         self
     }
 }

@@ -61,6 +61,7 @@ pub use self::create_application_command_permission::{
     CreateApplicationCommandPermissionsData,
 };
 pub use self::create_attachment::CreateAttachment;
+pub(crate) use self::create_attachment::ExistingAttachment;
 pub use self::create_channel::CreateChannel;
 pub use self::create_components::{
     CreateActionRow,

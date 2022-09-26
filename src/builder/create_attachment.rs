@@ -11,6 +11,16 @@ use url::Url;
 use crate::error::{Error, Result};
 #[cfg(feature = "http")]
 use crate::http::Http;
+use crate::model::id::AttachmentId;
+
+/// [Discord docs](https://discord.com/developers/docs/resources/channel#attachment-object-attachment-structure)
+/// with the caveat at the top "For the attachments array in Message Create/Edit requests, only the id is required."
+#[derive(Clone, Debug, Serialize)]
+pub(crate) struct ExistingAttachment {
+    pub id: AttachmentId,
+    // TODO: add the other non-required attachment fields? Like content_type, description, ephemeral
+    // (ephemeral in particular seems pretty interesting)
+}
 
 /// Enum that allows a user to pass a [`Path`] or a [`File`] type to [`send_files`]
 ///

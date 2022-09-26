@@ -1,4 +1,10 @@
-use super::{CreateAllowedMentions, CreateAttachment, CreateComponents, CreateEmbed};
+use super::{
+    CreateAllowedMentions,
+    CreateAttachment,
+    CreateComponents,
+    CreateEmbed,
+    ExistingAttachment,
+};
 #[cfg(feature = "http")]
 use crate::constants;
 #[cfg(feature = "http")]
@@ -8,15 +14,6 @@ use crate::internal::prelude::*;
 use crate::model::prelude::*;
 #[cfg(feature = "http")]
 use crate::utils::check_overflow;
-
-/// [Discord docs](https://discord.com/developers/docs/resources/channel#attachment-object-attachment-structure)
-/// with the caveat at the top "For the attachments array in Message Create/Edit requests, only the id is required."
-#[derive(Clone, Debug, Serialize)]
-struct ExistingAttachment {
-    id: AttachmentId,
-    // TODO: add the other non-required attachment fields? Like content_type, description, ephemeral
-    // (ephemeral in particular seems pretty interesting)
-}
 
 /// A builder to specify the fields to edit in an existing message.
 ///
