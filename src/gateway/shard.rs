@@ -9,6 +9,7 @@ use url::Url;
 
 use super::{
     ActivityData,
+    ChunkGuildFilter,
     ConnectionStage,
     GatewayError,
     PresenceData,
@@ -16,13 +17,11 @@ use super::{
     ShardAction,
     WsClient,
 };
-use crate::client::bridge::gateway::ChunkGuildFilter;
 use crate::constants::{self, close_codes};
-use crate::http::Http;
 use crate::internal::prelude::*;
 use crate::model::event::{Event, GatewayEvent};
 use crate::model::gateway::{GatewayIntents, ShardInfo};
-use crate::model::id::GuildId;
+use crate::model::id::{ApplicationId, GuildId};
 use crate::model::user::OnlineStatus;
 
 /// A Shard is a higher-level handler for a websocket connection to Discord's
@@ -70,7 +69,7 @@ pub struct Shard {
     /// [`latency`]: fn@Self::latency
     heartbeat_instants: (Option<Instant>, Option<Instant>),
     heartbeat_interval: Option<u64>,
-    http: Option<Arc<Http>>,
+    application_id_callback: Option<Box<dyn FnOnce(ApplicationId) + Send + Sync>>,
     /// This is used by the heartbeater to determine whether the last
     /// heartbeat was sent without an acknowledgement, and whether to reconnect.
     // This _must_ be set to `true` in `Shard::handle_event`'s
@@ -153,7 +152,7 @@ impl Shard {
             presence,
             heartbeat_instants,
             heartbeat_interval,
-            http: None,
+            application_id_callback: None,
             last_heartbeat_acknowledged,
             seq,
             stage,
@@ -166,11 +165,14 @@ impl Shard {
         })
     }
 
-    /// Sets the associated [`Http`] client.
+    /// Sets a callback to be called when the gateway receives the application's ID from Discord.
     ///
-    /// This will update the client's application id after the shard receives a READY payload.
-    pub fn set_http(&mut self, http: Arc<Http>) {
-        self.http = Some(http);
+    /// Used internally by serenity to set the Http's internal application ID automatically.
+    pub fn set_application_id_callback(
+        &mut self,
+        callback: impl FnOnce(ApplicationId) + Send + Sync + 'static,
+    ) {
+        self.application_id_callback = Some(Box::new(callback));
     }
 
     /// Retrieves the current presence of the shard.
@@ -304,8 +306,8 @@ impl Shard {
                 self.session_id = Some(ready.ready.session_id.clone());
                 self.stage = ConnectionStage::Connected;
 
-                if let Some(http) = &self.http {
-                    http.set_application_id(ready.ready.application.id.get());
+                if let Some(callback) = self.application_id_callback.take() {
+                    callback(ready.ready.application.id);
                 }
             },
             Event::Resumed(_) => {
