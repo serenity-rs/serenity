@@ -35,13 +35,6 @@ use crate::internal::prelude::*;
 use crate::model::prelude::*;
 
 #[cfg(all(feature = "builder", feature = "http"))]
-pub(crate) fn encode_image(raw: &[u8]) -> String {
-    let mut encoded = base64::encode(raw);
-    encoded.insert_str(0, "data:image/png;base64,");
-    encoded
-}
-
-#[cfg(all(feature = "builder", feature = "http"))]
 pub(crate) fn check_overflow(len: usize, max: usize) -> StdResult<(), usize> {
     let overflow = len.saturating_sub(max);
     if overflow > 0 {
