@@ -1925,6 +1925,7 @@
 <span id="1919">1919</span>
 <span id="1920">1920</span>
 <span id="1921">1921</span>
+<span id="1922">1922</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">serde::de::Error</span> <span class="kw">as</span> <span class="ident">DeError</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
 <span class="kw">use</span> <span class="ident">tracing</span>::{<span class="ident">error</span>, <span class="ident">warn</span>};
@@ -2950,6 +2951,7 @@
     }
 
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
+    <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::unused_async</span>)]</span>
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">_greater_member_hierarchy</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">cache</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Cache</span><span class="op">&gt;</span>,
