@@ -1070,7 +1070,7 @@
 <span class="kw">use</span> <span class="ident">std::fmt::Write</span>;
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;utils&quot;</span>))]</span>
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::builder</span>::{<span class="ident">CreateAllowedMentions</span>, <span class="ident">CreateMessage</span>, <span class="ident">EditMessage</span>, <span class="ident">ParseValue</span>};
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::builder</span>::{<span class="ident">CreateAllowedMentions</span>, <span class="ident">CreateMessage</span>, <span class="ident">EditMessage</span>};
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>))]</span>
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::cache</span>::{<span class="ident">Cache</span>, <span class="ident">GuildRef</span>};
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;collector&quot;</span>)]</span>
@@ -1731,9 +1731,9 @@
                 .<span class="ident">replied_user</span>(<span class="ident">ping_user</span>)
                 <span class="comment">// By providing allowed_mentions, Discord disabled _all_ pings by default so we</span>
                 <span class="comment">// need to re-enable them</span>
-                .<span class="ident">parse</span>(<span class="ident">ParseValue::Everyone</span>)
-                .<span class="ident">parse</span>(<span class="ident">ParseValue::Users</span>)
-                .<span class="ident">parse</span>(<span class="ident">ParseValue::Roles</span>);
+                .<span class="ident">everyone</span>(<span class="bool-val">true</span>)
+                .<span class="ident">all_users</span>(<span class="bool-val">true</span>)
+                .<span class="ident">all_roles</span>(<span class="bool-val">true</span>);
             <span class="ident">builder</span> <span class="op">=</span> <span class="ident">builder</span>.<span class="ident">reference_message</span>(<span class="self">self</span>).<span class="ident">allowed_mentions</span>(<span class="ident">allowed_mentions</span>);
         }
         <span class="self">self</span>.<span class="ident">channel_id</span>.<span class="ident">send_message</span>(<span class="ident">cache_http</span>, <span class="ident">builder</span>).<span class="kw">await</span>
