@@ -416,10 +416,13 @@ impl Guild {
     pub fn default_channel_guaranteed(&self) -> Option<&GuildChannel> {
         for channel in self.channels.values() {
             if let Channel::Guild(channel) = channel {
-                for member in self.members.values() {
-                    if self.user_permissions_in(channel, member).ok()?.view_channel() {
-                        return Some(channel);
-                    }
+                if self
+                    .members
+                    .values()
+                    .filter_map(|member| self.user_permissions_in(channel, member).ok())
+                    .all(Permissions::view_channel)
+                {
+                    return Some(channel);
                 }
             }
         }
