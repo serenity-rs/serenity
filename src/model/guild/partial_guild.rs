@@ -1023,6 +1023,7 @@ impl PartialGuild {
     }
 
     #[cfg(feature = "cache")]
+    #[allow(clippy::unused_async)]
     async fn _greater_member_hierarchy(
         &self,
         cache: impl AsRef<Cache>,

@@ -211,7 +211,7 @@ If you use the `native_tls_backend` and you are not developing on macOS or Windo
 
 # Hosting
 
-If you want a quick and easy way to host your bot, you can use [shuttle.rs][project:shuttle],
+If you want a quick and easy way to host your bot, you can use [shuttle][project:shuttle],
 a Rust-native cloud development platform that allows deploying Serenity bots for free.
 
 # Projects extending Serenity
@@ -246,7 +246,7 @@ a Rust-native cloud development platform that allows deploying Serenity bots for
 [project:lavalink-rs]: https://gitlab.com/vicky5124/lavalink-rs/
 [project:songbird]: https://github.com/serenity-rs/songbird
 [project:poise]: https://github.com/kangalioo/poise
-[project:shuttle]: https://shuttle.rs
+[project:shuttle]: https://github.com/shuttle-hq/shuttle
 [repo:lavalink]: https://github.com/freyacodes/Lavalink
 [repo:andesite]: https://github.com/natanbc/andesite
 [repo:lavaplayer]: https://github.com/sedmelluq/lavaplayer
