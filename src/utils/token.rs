@@ -22,6 +22,7 @@ use crate::model::id::UserId;
 ///
 /// // ensure a valid token is in fact a valid format:
 /// assert!(validate("Mjg4NzYwMjQxMzYzODc3ODg4.C_ikow.j3VupLBuE1QWZng3TMGH0z_UAwg").is_ok());
+/// assert!(validate("Mjg4NzYwMjQxMzYzODc3ODg4.GzRABc.j3VupLBuE1QWZng3TMGH0z_UAwg").is_ok());
 ///
 /// assert!(validate("Mjg4NzYwMjQxMzYzODc3ODg4").is_err());
 /// assert!(validate("").is_err());
@@ -50,12 +51,16 @@ impl fmt::Display for InvalidToken {
 /// Verifies that the token adheres to the Discord token format and extracts the bot user ID and
 /// the token generation unix timestamp.
 pub fn parse(token: impl AsRef<str>) -> Option<(UserId, i64)> {
+    // The default non-forgiving behavior of the base64 decoder can't parse some token base64 as
+    // returned by Discord. This is a workaround for that.
+    let config = base64::Config::decode_allow_trailing_bits(base64::URL_SAFE, true);
+
     // The token consists of three base64-encoded parts
     // Tokens can be preceded by "Bot " (that's how the Discord API expects them)
     let mut parts = token.as_ref().trim_start_matches("Bot ").split('.');
 
     // First part must be a base64-encoded stringified user ID
-    let user_id = base64::decode_config(parts.next()?, base64::URL_SAFE).ok()?;
+    let user_id = base64::decode_config(parts.next()?, config).ok()?;
     let user_id = UserId(str::from_utf8(&user_id).ok()?.parse().ok()?);
 
     // Second part must be a base64-encoded token generation timestamp
@@ -64,7 +69,7 @@ pub fn parse(token: impl AsRef<str>) -> Option<(UserId, i64)> {
     if timestamp.len() < 6 {
         return None;
     }
-    let timestamp_bytes = base64::decode_config(timestamp, base64::URL_SAFE).ok()?;
+    let timestamp_bytes = base64::decode_config(timestamp, config).ok()?;
     let mut timestamp = 0;
     for byte in timestamp_bytes {
         timestamp *= 256;
@@ -76,7 +81,7 @@ pub fn parse(token: impl AsRef<str>) -> Option<(UserId, i64)> {
     }
 
     // Third part is a base64-encoded HMAC that's not interesting on its own
-    base64::decode_config(parts.next()?, base64::URL_SAFE).ok()?;
+    base64::decode_config(parts.next()?, config).ok()?;
 
     Some((user_id, timestamp))
 }
