@@ -12,8 +12,8 @@ fn parse_hex<const N: usize>(s: &str) -> Option<[u8; N]> {
     }
 
     let mut res = [0; N];
-    for i in 0..N {
-        res[i] = u8::from_str_radix(s.get(2 * i..2 * (i + 1))?, 16).ok()?;
+    for (i, byte) in res.iter_mut().enumerate() {
+        *byte = u8::from_str_radix(s.get(2 * i..2 * (i + 1))?, 16).ok()?;
     }
     Some(res)
 }
@@ -60,12 +60,17 @@ impl Verifier {
     ///
     /// Panics if the given key is invalid. For a low-level, non-panicking variant, see
     /// [`Self::try_new()`].
+    #[must_use]
     pub fn new(public_key: &str) -> Self {
         Self::try_new(parse_hex(public_key).expect("public key must be a 64 digit hex string"))
             .expect("invalid public key")
     }
 
     /// Creates a new [`Verifier`] from the public key bytes.
+    ///
+    /// # Errors
+    ///
+    /// [`InvalidKey`] if the key isn't cryptographically valid.
     pub fn try_new(public_key: [u8; 32]) -> Result<Self, InvalidKey> {
         Ok(Self {
             public_key: ed25519_dalek::PublicKey::from_bytes(&public_key).map_err(InvalidKey)?,
@@ -74,6 +79,8 @@ impl Verifier {
 
     /// Verifies a Discord request for authenticity, given the `X-Signature-Ed25519` HTTP header,
     /// `X-Signature-Timestamp` HTTP headers and request body.
+    // We just need to differentiate "pass" and "failure". There's deliberately no data besides ().
+    #[allow(clippy::result_unit_err, clippy::missing_errors_doc)]
     pub fn verify(&self, signature: &str, timestamp: &str, body: &[u8]) -> Result<(), ()> {
         use ed25519_dalek::Verifier as _;
 
