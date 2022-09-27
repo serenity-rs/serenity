@@ -125,12 +125,13 @@ impl EventFilter {
     }
 }
 
+// TODO: inline this struct
 #[derive(Clone)]
-struct FilterFn(Arc<dyn Fn(&Arc<Event>) -> bool + 'static + Send + Sync>);
+struct FilterFn(super::FilterFn<Event>);
 
 impl fmt::Debug for FilterFn {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        f.write_str("Arc<dyn Fn(&Arc<Event>) -> bool + 'static + Send + Sync>")
+        f.write_str("super::FilterFn<Event>")
     }
 }
 

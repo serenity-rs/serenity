@@ -19,6 +19,8 @@ pub use message_collector::*;
 pub use modal_interaction_collector::*;
 pub use reaction_collector::*;
 
+type FilterFn<T> = Arc<dyn Fn(&Arc<T>) -> bool + 'static + Send + Sync>;
+
 /// Wraps a &T and clones the value into an Arc<T> lazily. Used with collectors to allow inspecting
 /// the value in filters while only cloning values that actually match.
 #[derive(Debug)]
