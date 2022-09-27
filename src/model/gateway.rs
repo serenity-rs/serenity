@@ -733,7 +733,6 @@ bitflags! {
     }
 }
 
-#[cfg(feature = "model")]
 impl GatewayIntents {
     /// Gets all of the intents that aren't considered privileged by Discord.
     #[must_use]
@@ -751,7 +750,10 @@ impl GatewayIntents {
         // See: https://github.com/bitflags/bitflags/issues/180
         Self::GUILD_MEMBERS.union(Self::GUILD_PRESENCES).union(Self::MESSAGE_CONTENT)
     }
+}
 
+#[cfg(feature = "model")]
+impl GatewayIntents {
     /// Checks if any of the included intents are privileged.
     #[must_use]
     pub fn is_privileged(self) -> bool {
