@@ -72,7 +72,6 @@
     // Covered by other lints
     clippy::missing_panics_doc, // clippy::unwrap_used
 )]
-#![deny(rustdoc::broken_intra_doc_links, rustdoc::private_intra_doc_links)]
 #![deny(
     clippy::unwrap_used,
     clippy::non_ascii_literal,
