@@ -590,7 +590,6 @@ bitflags! {
     /// [gateway intent]: https://discord.com/developers/docs/topics/gateway#privileged-intents
     /// [Privileged Intents]: https://discord.com/developers/docs/topics/gateway#privileged-intents
     /// [the bot must be verified]: https://support.discord.com/hc/en-us/articles/360040720412-Bot-Verification-and-Data-Whitelisting
-    #[derive(Default)]
     pub struct GatewayIntents: u64 {
         /// Enables following gateway events:
         ///
@@ -919,5 +918,11 @@ impl GatewayIntents {
     #[must_use]
     pub fn auto_moderation_execution(self) -> bool {
         self.contains(Self::AUTO_MODERATION_EXECUTION)
+    }
+}
+
+impl Default for GatewayIntents {
+    fn default() -> Self {
+        Self::non_privileged()
     }
 }
