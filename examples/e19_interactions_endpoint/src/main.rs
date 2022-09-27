@@ -60,10 +60,13 @@ fn handle_request(
 }
 
 fn main() -> Result<(), Error> {
+    // Change this string to the Public Key value in your bot dashboard
     let verifier =
         Verifier::new("67c6bd767ca099e79efac9fcce4d2022a63bf7dea780e7f3d813f694c1597089");
 
     // Setup an HTTP server and listen for incoming interaction requests
+    // Choose any port here (but be consistent with the interactions endpoint URL in your bot
+    // dashboard)
     let server = tiny_http::Server::http("0.0.0.0:8787")?;
     let mut body = Vec::new();
     loop {
