@@ -52,7 +52,7 @@
 //! [gateway docs]: crate::gateway
 #![doc(html_root_url = "https://docs.rs/serenity/*")]
 #![cfg_attr(docsrs, feature(doc_auto_cfg))]
-#![deny(rust_2018_idioms)]
+#![warn(rust_2018_idioms)]
 #![warn(clippy::pedantic)]
 #![allow(
     // Allowed to avoid breaking changes.
@@ -73,14 +73,6 @@
     clippy::missing_panics_doc, // clippy::unwrap_used
 )]
 #![deny(rustdoc::broken_intra_doc_links, rustdoc::private_intra_doc_links)]
-#![deny(
-    clippy::unwrap_used,
-    clippy::non_ascii_literal,
-    clippy::missing_errors_doc,
-    clippy::let_underscore_must_use,
-    clippy::unused_async,
-    unused
-)]
 #![cfg_attr(test, allow(clippy::unwrap_used))]
 #![type_length_limit = "3294819"] // needed so ShardRunner::run compiles with instrument.
 
