@@ -14,6 +14,8 @@ pub enum GuildParseError {
     /// The provided guild string failed to parse, or the parsed result cannot be found in the
     /// cache.
     NotFoundOrMalformed,
+    /// No cache, so no guild search could be done.
+    NoCache,
 }
 
 impl std::error::Error for GuildParseError {}
@@ -22,6 +24,7 @@ impl fmt::Display for GuildParseError {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
             Self::NotFoundOrMalformed => f.write_str("Guild not found or unknown format"),
+            Self::NoCache => f.write_str("No cached list of guilds was provided"),
         }
     }
 }
@@ -34,12 +37,12 @@ impl ArgumentConvert for Guild {
     type Err = GuildParseError;
 
     async fn convert(
-        ctx: &CacheAndHttp,
+        ctx: impl CacheHttp,
         _guild_id: Option<GuildId>,
         _channel_id: Option<ChannelId>,
         s: &str,
     ) -> Result<Self, Self::Err> {
-        let guilds = &ctx.cache.guilds;
+        let guilds = &ctx.cache().ok_or(GuildParseError::NoCache)?.guilds;
 
         let lookup_by_id = || guilds.get(&GuildId(s.parse().ok()?)).map(|g| g.clone());
 

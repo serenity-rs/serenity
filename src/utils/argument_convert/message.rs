@@ -50,7 +50,7 @@ impl ArgumentConvert for Message {
     type Err = MessageParseError;
 
     async fn convert(
-        ctx: &CacheAndHttp,
+        ctx: impl CacheHttp,
         _guild_id: Option<GuildId>,
         channel_id: Option<ChannelId>,
         s: &str,
@@ -68,12 +68,14 @@ impl ArgumentConvert for Message {
             .ok_or(MessageParseError::Malformed)?;
 
         #[cfg(feature = "cache")]
-        if let Some(msg) = ctx.cache.message(channel_id, message_id) {
-            return Ok(msg);
+        if let Some(cache) = ctx.cache() {
+            if let Some(msg) = cache.message(channel_id, message_id) {
+                return Ok(msg);
+            }
         }
 
         if cfg!(feature = "http") {
-            ctx.http
+            ctx.http()
                 .get_message(channel_id.get(), message_id.get())
                 .await
                 .map_err(MessageParseError::Http)

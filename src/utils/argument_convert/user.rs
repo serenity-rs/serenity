@@ -24,8 +24,8 @@ impl fmt::Display for UserParseError {
 }
 
 #[cfg(feature = "cache")]
-fn lookup_by_global_cache(ctx: &CacheAndHttp, s: &str) -> Option<User> {
-    let users = &ctx.cache.users;
+fn lookup_by_global_cache(ctx: impl CacheHttp, s: &str) -> Option<User> {
+    let users = &ctx.cache()?.users;
 
     let lookup_by_id = || users.get(&UserId(s.parse().ok()?)).map(|u| u.clone());
 
@@ -74,19 +74,19 @@ impl ArgumentConvert for User {
     type Err = UserParseError;
 
     async fn convert(
-        ctx: &CacheAndHttp,
+        ctx: impl CacheHttp,
         guild_id: Option<GuildId>,
         channel_id: Option<ChannelId>,
         s: &str,
     ) -> Result<Self, Self::Err> {
         // Try to look up in global user cache via a variety of methods
         #[cfg(feature = "cache")]
-        if let Some(user) = lookup_by_global_cache(ctx, s) {
+        if let Some(user) = lookup_by_global_cache(&ctx, s) {
             return Ok(user);
         }
 
         // If not successful, convert as a Member which uses HTTP endpoints instead of cache
-        if let Ok(member) = Member::convert(ctx, guild_id, channel_id, s).await {
+        if let Ok(member) = Member::convert(&ctx, guild_id, channel_id, s).await {
             return Ok(member.user);
         }
 
@@ -94,7 +94,7 @@ impl ArgumentConvert for User {
         if let Some(user_id) = s.parse().ok().or_else(|| crate::utils::parse_username(s)) {
             // Now, we can still try UserId::to_user because it works for all users from all guilds the
             // bot is joined
-            if let Ok(user) = user_id.to_user(ctx).await {
+            if let Ok(user) = user_id.to_user(&ctx).await {
                 return Ok(user);
             }
         }

@@ -29,7 +29,7 @@ impl ArgumentConvert for PLACEHOLDER {
     type Err = PLACEHOLDERParseError;
 
     async fn convert(
-        ctx: &CacheAndHttp,
+        ctx: impl CacheHttp,
         guild_id: Option<GuildId>,
         _channel_id: Option<ChannelId>,
         s: &str,

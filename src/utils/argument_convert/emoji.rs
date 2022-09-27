@@ -42,18 +42,17 @@ impl ArgumentConvert for Emoji {
     type Err = EmojiParseError;
 
     async fn convert(
-        ctx: &CacheAndHttp,
+        ctx: impl CacheHttp,
         guild_id: Option<GuildId>,
         _channel_id: Option<ChannelId>,
         s: &str,
     ) -> Result<Self, Self::Err> {
         // Get Guild or PartialGuild
         let guild_id = guild_id.ok_or(EmojiParseError::OutsideGuild)?;
-        #[cfg(feature = "cache")]
-        let guild = ctx.cache.guilds.get(&guild_id);
-        #[cfg(not(feature = "cache"))]
-        let guild = ctx.http.get_guild(guild_id.get()).await.ok();
-        let guild = guild.ok_or(EmojiParseError::FailedToRetrieveGuild)?;
+        let guild = guild_id
+            .to_partial_guild(&ctx)
+            .await
+            .map_err(|_| EmojiParseError::FailedToRetrieveGuild)?;
 
         let direct_id = s.parse().ok().map(EmojiId);
         let id_from_mention = crate::utils::parse_emoji(s).map(|e| e.id);

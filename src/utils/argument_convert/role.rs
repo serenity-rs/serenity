@@ -52,7 +52,7 @@ impl ArgumentConvert for Role {
     type Err = RoleParseError;
 
     async fn convert(
-        ctx: &CacheAndHttp,
+        ctx: impl CacheHttp,
         guild_id: Option<GuildId>,
         _channel_id: Option<ChannelId>,
         s: &str,
@@ -60,9 +60,11 @@ impl ArgumentConvert for Role {
         let guild_id = guild_id.ok_or(RoleParseError::NotInGuild)?;
 
         #[cfg(feature = "cache")]
-        let roles = ctx.cache.guild_roles(guild_id).ok_or(RoleParseError::NotInCache)?;
+        let roles =
+            ctx.cache().and_then(|c| c.guild_roles(guild_id)).ok_or(RoleParseError::NotInCache)?;
         #[cfg(not(feature = "cache"))]
-        let roles = ctx.http.get_guild_roles(guild_id.get()).await.map_err(RoleParseError::Http)?;
+        let roles =
+            ctx.http().get_guild_roles(guild_id.get()).await.map_err(RoleParseError::Http)?;
 
         if let Some(role_id) = s.parse().ok().map(RoleId).or_else(|| crate::utils::parse_role(s)) {
             #[cfg(feature = "cache")]
