@@ -856,8 +856,17 @@ impl GuildId {
     ///
     /// Returns an [`Error::Http`] if the current user is not in the guild.
     #[inline]
-    pub async fn to_partial_guild(self, http: impl AsRef<Http>) -> Result<PartialGuild> {
-        http.as_ref().get_guild(self.get()).await
+    pub async fn to_partial_guild(self, cache_http: impl CacheHttp) -> Result<PartialGuild> {
+        #[cfg(feature = "cache")]
+        {
+            if let Some(cache) = cache_http.cache() {
+                if let Some(guild) = cache.guild(self) {
+                    return Ok(guild.clone().into());
+                }
+            }
+        }
+
+        cache_http.http().get_guild(self.get()).await
     }
 
     /// Requests [`PartialGuild`] over REST API with counts.
