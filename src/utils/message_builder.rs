@@ -1150,10 +1150,6 @@ fn normalize(text: &str) -> String {
         .replace("discordservers.com", "discordservers\u{2024}com")
         .replace("discord.com/invite", "discord\u{2024}com/invite")
         .replace("discordapp.com/invite", "discordapp\u{2024}com/invite")
-        // Remove everyone and here mentions. Has to be put after ZWS replacement
-        // because it utilises it itself.
-        .replace("@everyone", "@\u{200B}everyone")
-        .replace("@here", "@\u{200B}here")
         // Remove right-to-left override and other similar annoying symbols
         .replace([
             '\u{202E}', // RTL Override
@@ -1163,6 +1159,10 @@ fn normalize(text: &str) -> String {
             '\u{200D}', // Zero-width joiner
             '\u{200C}', // Zero-width non-joiner
         ], " ")
+        // Remove everyone and here mentions. Has to be put after ZWS replacement
+        // because it utilises it itself.
+        .replace("@everyone", "@\u{200B}everyone")
+        .replace("@here", "@\u{200B}here")
 }
 
 #[cfg(test)]
