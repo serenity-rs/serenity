@@ -73,6 +73,7 @@
     clippy::missing_panics_doc, // clippy::unwrap_used
 )]
 #![deny(rustdoc::broken_intra_doc_links, rustdoc::private_intra_doc_links)]
+#![warn(clippy::unwrap_used, clippy::non_ascii_literal, clippy::let_underscore_must_use)]
 #![cfg_attr(test, allow(clippy::unwrap_used))]
 #![type_length_limit = "3294819"] // needed so ShardRunner::run compiles with instrument.
 
