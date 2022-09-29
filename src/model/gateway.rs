@@ -590,7 +590,6 @@ bitflags! {
     /// [gateway intent]: https://discord.com/developers/docs/topics/gateway#privileged-intents
     /// [Privileged Intents]: https://discord.com/developers/docs/topics/gateway#privileged-intents
     /// [the bot must be verified]: https://support.discord.com/hc/en-us/articles/360040720412-Bot-Verification-and-Data-Whitelisting
-    #[derive(Default)]
     pub struct GatewayIntents: u64 {
         /// Enables following gateway events:
         ///
@@ -734,7 +733,6 @@ bitflags! {
     }
 }
 
-#[cfg(feature = "model")]
 impl GatewayIntents {
     /// Gets all of the intents that aren't considered privileged by Discord.
     #[must_use]
@@ -752,7 +750,10 @@ impl GatewayIntents {
         // See: https://github.com/bitflags/bitflags/issues/180
         Self::GUILD_MEMBERS.union(Self::GUILD_PRESENCES).union(Self::MESSAGE_CONTENT)
     }
+}
 
+#[cfg(feature = "model")]
+impl GatewayIntents {
     /// Checks if any of the included intents are privileged.
     #[must_use]
     pub fn is_privileged(self) -> bool {
@@ -919,5 +920,11 @@ impl GatewayIntents {
     #[must_use]
     pub fn auto_moderation_execution(self) -> bool {
         self.contains(Self::AUTO_MODERATION_EXECUTION)
+    }
+}
+
+impl Default for GatewayIntents {
+    fn default() -> Self {
+        Self::non_privileged()
     }
 }
