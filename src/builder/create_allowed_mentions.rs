@@ -1,11 +1,13 @@
+use std::collections::HashSet;
+
 use serde::{Deserialize, Serialize};
 
 use crate::model::id::{RoleId, UserId};
 
 /// [Discord docs](https://discord.com/developers/docs/resources/channel#allowed-mentions-object-allowed-mention-types).
-#[derive(Clone, Copy, Debug, Deserialize, Serialize)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, Deserialize, Serialize)]
 #[serde(rename_all = "lowercase")]
-pub enum ParseValue {
+enum ParseValue {
     Everyone,
     Users,
     Roles,
@@ -25,7 +27,7 @@ pub enum ParseValue {
 /// # let http = Http::new("token");
 /// # let b = CreateMessage::new();
 /// # let msg = ChannelId::new(7).message(&http, MessageId::new(8)).await?;
-/// use serenity::builder::{CreateAllowedMentions as Am, ParseValue};
+/// use serenity::builder::CreateAllowedMentions as Am;
 ///
 /// // Mention only the user 110372470472613888
 /// # let m = b.clone();
@@ -33,25 +35,25 @@ pub enum ParseValue {
 ///
 /// // Mention all users and the role 182894738100322304
 /// # let m = b.clone();
-/// m.allowed_mentions(Am::new().parse(ParseValue::Users).roles(vec![182894738100322304]));
+/// m.allowed_mentions(Am::new().all_users(true).roles(vec![182894738100322304]));
 ///
 /// // Mention all roles and nothing else
 /// # let m = b.clone();
-/// m.allowed_mentions(Am::new().parse(ParseValue::Roles));
+/// m.allowed_mentions(Am::new().all_roles(true));
 ///
 /// // Mention all roles and users, but not everyone
 /// # let m = b.clone();
-/// m.allowed_mentions(Am::new().parse(ParseValue::Users).parse(ParseValue::Roles));
+/// m.allowed_mentions(Am::new().all_users(true).all_roles(true));
 ///
 /// // Mention everyone and the users 182891574139682816, 110372470472613888
 /// # let m = b.clone();
 /// m.allowed_mentions(
-///     Am::new().parse(ParseValue::Everyone).users(vec![182891574139682816, 110372470472613888]),
+///     Am::new().everyone(true).users(vec![182891574139682816, 110372470472613888]),
 /// );
 ///
 /// // Mention everyone and the message author.
 /// # let m = b.clone();
-/// m.allowed_mentions(Am::new().parse(ParseValue::Everyone).users(vec![msg.author.id]));
+/// m.allowed_mentions(Am::new().everyone(true).users(vec![msg.author.id]));
 /// # Ok(())
 /// # }
 /// ```
@@ -63,7 +65,7 @@ pub enum ParseValue {
 #[derive(Clone, Debug, Default, Serialize)]
 #[must_use]
 pub struct CreateAllowedMentions {
-    parse: Vec<ParseValue>,
+    parse: HashSet<ParseValue>,
     users: Vec<UserId>,
     roles: Vec<RoleId>,
     replied_user: bool,
@@ -75,24 +77,33 @@ impl CreateAllowedMentions {
         Self::default()
     }
 
-    /// Add a value that's allowed to be mentioned.
-    ///
-    /// If passing in [`ParseValue::Users`] or [`ParseValue::Roles`], note that later calling
-    /// [`Self::users`] or [`Self::roles`] will then not work as intended, as the [`ParseValue`]
-    /// will take precedence.
-    #[inline]
-    pub fn parse(mut self, value: ParseValue) -> Self {
-        self.parse.push(value);
+    /// Toggles mentions for all users. Overrides [`Self::users`] if it was previously set.
+    pub fn all_users(mut self, allow: bool) -> Self {
+        if allow {
+            self.parse.insert(ParseValue::Users);
+        } else {
+            self.parse.remove(&ParseValue::Users);
+        }
         self
     }
 
-    /// Clear all the values that would be mentioned.
-    ///
-    /// Will disable all mentions, except for any specific ones added with [`Self::users`] or
-    /// [`Self::roles`].
-    #[inline]
-    pub fn empty_parse(mut self) -> Self {
-        self.parse.clear();
+    /// Toggles mentions for all roles. Overrides [`Self::roles`] if it was previously set.
+    pub fn all_roles(mut self, allow: bool) -> Self {
+        if allow {
+            self.parse.insert(ParseValue::Roles);
+        } else {
+            self.parse.remove(&ParseValue::Roles);
+        }
+        self
+    }
+
+    /// Toggles @everyone and @here mentions.
+    pub fn everyone(mut self, allow: bool) -> Self {
+        if allow {
+            self.parse.insert(ParseValue::Everyone);
+        } else {
+            self.parse.remove(&ParseValue::Everyone);
+        }
         self
     }
 

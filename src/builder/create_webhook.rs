@@ -93,8 +93,7 @@ impl<'a> CreateWebhook<'a> {
         http: impl AsRef<Http>,
         avatar: impl Into<AttachmentType<'a>>,
     ) -> Result<CreateWebhook<'a>> {
-        let avatar_data = avatar.into().data(&http.as_ref().client).await?;
-        self.avatar = Some(crate::utils::encode_image(&avatar_data));
+        self.avatar = Some(avatar.into().to_base64(&http.as_ref().client).await?);
         Ok(self)
     }
 

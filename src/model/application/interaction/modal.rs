@@ -11,11 +11,11 @@ use crate::builder::{
 use crate::http::Http;
 use crate::internal::prelude::*;
 use crate::model::application::component::ActionRow;
-#[cfg(feature = "http")]
+#[cfg(feature = "model")]
 use crate::model::application::interaction::InteractionResponseType;
 use crate::model::channel::Message;
 use crate::model::guild::Member;
-#[cfg(feature = "http")]
+#[cfg(feature = "model")]
 use crate::model::id::MessageId;
 use crate::model::id::{ApplicationId, ChannelId, GuildId, InteractionId};
 use crate::model::user::User;

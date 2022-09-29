@@ -1,17 +1,22 @@
 use super::{CreateActionRow, CreateAllowedMentions, CreateEmbed};
 #[cfg(feature = "http")]
+use crate::constants;
+#[cfg(feature = "http")]
 use crate::http::Http;
 #[cfg(feature = "http")]
 use crate::internal::prelude::*;
 #[cfg(feature = "http")]
 use crate::model::prelude::*;
+#[cfg(feature = "http")]
+use crate::utils::check_overflow;
 
 /// [Discord docs](https://discord.com/developers/docs/resources/webhook#edit-webhook-message-jsonform-params).
 #[derive(Clone, Debug, Default, Serialize)]
 #[must_use]
 // TODO: look into deduplicating with EditWebhook; Discord says the two "function the same"
 pub struct EditInteractionResponse {
-    embeds: Vec<CreateEmbed>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    embeds: Option<Vec<CreateEmbed>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     content: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -48,19 +53,18 @@ impl EditInteractionResponse {
     #[cfg(feature = "http")]
     fn check_length(&self) -> Result<()> {
         if let Some(content) = &self.content {
-            let length = content.chars().count();
-            let max_length = crate::constants::MESSAGE_CODE_LIMIT;
-            if length > max_length {
-                return Err(Error::Model(ModelError::MessageTooLong(length - max_length)));
+            check_overflow(content.chars().count(), constants::MESSAGE_CODE_LIMIT)
+                .map_err(|overflow| Error::Model(ModelError::MessageTooLong(overflow)))?;
+        }
+
+        if let Some(embeds) = &self.embeds {
+            check_overflow(embeds.len(), constants::EMBED_MAX_COUNT)
+                .map_err(|_| Error::Model(ModelError::EmbedAmount))?;
+            for embed in embeds {
+                embed.check_length()?;
             }
         }
 
-        if self.embeds.len() > crate::constants::EMBED_MAX_COUNT {
-            return Err(Error::Model(ModelError::EmbedAmount));
-        }
-        for embed in &self.embeds {
-            embed.check_length()?;
-        }
         Ok(())
     }
 
@@ -76,14 +80,18 @@ impl EditInteractionResponse {
     }
 
     /// Adds an embed for the message.
+    ///
+    /// Embeds from the original message are reset when adding new embeds and must be re-added.
     pub fn add_embed(mut self, embed: CreateEmbed) -> Self {
-        self.embeds.push(embed);
+        self.embeds.get_or_insert(Vec::new()).push(embed);
         self
     }
 
     /// Adds multiple embeds to the message.
+    ///
+    /// Embeds from the original message are reset when adding new embeds and must be re-added.
     pub fn add_embeds(mut self, embeds: Vec<CreateEmbed>) -> Self {
-        self.embeds.extend(embeds);
+        self.embeds.get_or_insert(Vec::new()).extend(embeds);
         self
     }
 
@@ -91,8 +99,9 @@ impl EditInteractionResponse {
     ///
     /// Calling this will overwrite the embed list. To append embeds, call [`Self::add_embed`]
     /// instead.
-    pub fn embed(self, embed: CreateEmbed) -> Self {
-        self.embeds(vec![embed])
+    pub fn embed(mut self, embed: CreateEmbed) -> Self {
+        self.embeds = Some(vec![embed]);
+        self
     }
 
     /// Sets the embeds for the message.
@@ -102,7 +111,7 @@ impl EditInteractionResponse {
     /// Calling this will overwrite the embed list. To append embeds, call [`Self::add_embeds`]
     /// instead.
     pub fn embeds(mut self, embeds: Vec<CreateEmbed>) -> Self {
-        self.embeds = embeds;
+        self.embeds = Some(embeds);
         self
     }
 

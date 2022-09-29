@@ -4,10 +4,14 @@ use application::command::CommandOptionChoice;
 
 use super::{CreateActionRow, CreateAllowedMentions, CreateEmbed};
 #[cfg(feature = "http")]
+use crate::constants;
+#[cfg(feature = "http")]
 use crate::http::Http;
 use crate::internal::prelude::*;
 use crate::model::application::interaction::InteractionResponseType;
 use crate::model::prelude::*;
+#[cfg(feature = "http")]
+use crate::utils::check_overflow;
 
 /// [Discord docs](https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-response-object-interaction-response-structure).
 #[derive(Clone, Debug, Serialize)]
@@ -58,16 +62,13 @@ impl<'a> CreateInteractionResponse<'a> {
     fn check_length(&self) -> Result<()> {
         if let Some(data) = &self.data {
             if let Some(content) = &data.content {
-                let length = content.chars().count();
-                let max_length = crate::constants::MESSAGE_CODE_LIMIT;
-                if length > max_length {
-                    return Err(Error::Model(ModelError::MessageTooLong(length - max_length)));
-                }
+                check_overflow(content.chars().count(), constants::MESSAGE_CODE_LIMIT)
+                    .map_err(|overflow| Error::Model(ModelError::MessageTooLong(overflow)))?;
             }
 
-            if data.embeds.len() > crate::constants::EMBED_MAX_COUNT {
-                return Err(Error::Model(ModelError::EmbedAmount));
-            }
+            check_overflow(data.embeds.len(), constants::EMBED_MAX_COUNT)
+                .map_err(|_| Error::Model(ModelError::EmbedAmount))?;
+
             for embed in &data.embeds {
                 embed.check_length()?;
             }

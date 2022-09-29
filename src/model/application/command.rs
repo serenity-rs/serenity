@@ -2,11 +2,11 @@ use std::collections::HashMap;
 
 use serde::{Deserialize, Serialize};
 
-#[cfg(feature = "http")]
+#[cfg(feature = "model")]
 use crate::builder::CreateApplicationCommand;
-#[cfg(feature = "http")]
+#[cfg(feature = "model")]
 use crate::http::Http;
-#[cfg(feature = "http")]
+#[cfg(feature = "model")]
 use crate::internal::prelude::*;
 use crate::json::Value;
 use crate::model::channel::ChannelType;
@@ -79,7 +79,7 @@ pub struct Command {
     pub version: CommandVersionId,
 }
 
-#[cfg(feature = "http")]
+#[cfg(feature = "model")]
 impl Command {
     /// Create a global [`Command`], overriding an existing one with the same name if it exists.
     ///

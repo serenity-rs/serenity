@@ -75,8 +75,7 @@ impl<'a> EditWebhook<'a> {
         http: impl AsRef<Http>,
         avatar: impl Into<AttachmentType<'a>>,
     ) -> Result<EditWebhook<'a>> {
-        let avatar_data = avatar.into().data(&http.as_ref().client).await?;
-        self.avatar = Some(Some(crate::utils::encode_image(&avatar_data)));
+        self.avatar = Some(Some(avatar.into().to_base64(&http.as_ref().client).await?));
         Ok(self)
     }
 

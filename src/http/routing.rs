@@ -976,10 +976,7 @@ impl Route {
             code,
             member_counts,
             expiration,
-            match event_id {
-                Some(id) => format!("&event_id={}", id),
-                None => "".to_string(),
-            }
+            event_id.map(|id| format!("&event_id={}", id)).unwrap_or_default()
         )
     }
 
