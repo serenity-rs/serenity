@@ -381,3 +381,22 @@ args = ["make", "run_example", "e18_webhook"]
 [tasks.dev_build_18]
 command = "cargo"
 args = ["make", "build_example", "e18_webhook"]
+
+[tasks.19]
+alias = "run_19"
+
+[tasks.run_19]
+command = "cargo"
+args = ["make", "run_example_release", "e19_interactions_endpoint"]
+
+[tasks.build_19]
+command = "cargo"
+args = ["make", "build_example_release", "e19_interactions_endpoint"]
+
+[tasks.dev_run_19]
+command = "cargo"
+args = ["make", "run_example", "e19_interactions_endpoint"]
+
+[tasks.dev_build_19]
+command = "cargo"
+args = ["make", "build_example", "e19_interactions_endpoint"]
