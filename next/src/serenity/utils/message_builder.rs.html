@@ -1456,6 +1456,8 @@
 <span id="1450">1450</span>
 <span id="1451">1451</span>
 <span id="1452">1452</span>
+<span id="1453">1453</span>
+<span id="1454">1454</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::fmt</span>::{<span class="self">self</span> <span class="kw">as</span> <span class="ident">fmt</span>, <span class="ident">Write</span>};
 <span class="kw">use</span> <span class="ident">std::ops::Add</span>;
 
@@ -2609,12 +2611,14 @@
         .<span class="ident">replace</span>(<span class="string">&quot;discord.com/invite&quot;</span>, <span class="string">&quot;discord\u{2024}com/invite&quot;</span>)
         .<span class="ident">replace</span>(<span class="string">&quot;discordapp.com/invite&quot;</span>, <span class="string">&quot;discordapp\u{2024}com/invite&quot;</span>)
         <span class="comment">// Remove right-to-left override and other similar annoying symbols</span>
-        .<span class="ident">replace</span>(<span class="string">&#39;\u{202E}&#39;</span>, <span class="string">&quot; &quot;</span>) <span class="comment">// RTL Override</span>
-        .<span class="ident">replace</span>(<span class="string">&#39;\u{200F}&#39;</span>, <span class="string">&quot; &quot;</span>) <span class="comment">// RTL Mark</span>
-        .<span class="ident">replace</span>(<span class="string">&#39;\u{202B}&#39;</span>, <span class="string">&quot; &quot;</span>) <span class="comment">// RTL Embedding</span>
-        .<span class="ident">replace</span>(<span class="string">&#39;\u{200B}&#39;</span>, <span class="string">&quot; &quot;</span>) <span class="comment">// Zero-width space</span>
-        .<span class="ident">replace</span>(<span class="string">&#39;\u{200D}&#39;</span>, <span class="string">&quot; &quot;</span>) <span class="comment">// Zero-width joiner</span>
-        .<span class="ident">replace</span>(<span class="string">&#39;\u{200C}&#39;</span>, <span class="string">&quot; &quot;</span>) <span class="comment">// Zero-width non-joiner</span>
+        .<span class="ident">replace</span>([
+            <span class="string">&#39;\u{202E}&#39;</span>, <span class="comment">// RTL Override</span>
+            <span class="string">&#39;\u{200F}&#39;</span>, <span class="comment">// RTL Mark</span>
+            <span class="string">&#39;\u{202B}&#39;</span>, <span class="comment">// RTL Embedding</span>
+            <span class="string">&#39;\u{200B}&#39;</span>, <span class="comment">// Zero-width space</span>
+            <span class="string">&#39;\u{200D}&#39;</span>, <span class="comment">// Zero-width joiner</span>
+            <span class="string">&#39;\u{200C}&#39;</span>, <span class="comment">// Zero-width non-joiner</span>
+        ], <span class="string">&quot; &quot;</span>)
         <span class="comment">// Remove everyone and here mentions. Has to be put after ZWS replacement</span>
         <span class="comment">// because it utilises it itself.</span>
         .<span class="ident">replace</span>(<span class="string">&quot;@everyone&quot;</span>, <span class="string">&quot;@\u{200B}everyone&quot;</span>)

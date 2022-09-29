@@ -1640,14 +1640,14 @@
     <span class="kw">let</span> <span class="ident">cache</span> <span class="op">=</span> <span class="ident">cache</span>.<span class="ident">as_ref</span>();
 
     <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">guild_id</span>) <span class="op">=</span> <span class="ident">msg</span>.<span class="ident">guild_id</span> {
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">member</span>) <span class="op">=</span> <span class="ident">cache</span>.<span class="ident">member</span>(<span class="ident">guild_id</span>, <span class="kw-2">&amp;</span><span class="ident">msg</span>.<span class="ident">author</span>.<span class="ident">id</span>) {
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Ok</span>(<span class="ident">permissions</span>) <span class="op">=</span> <span class="ident">member</span>.<span class="ident">permissions</span>(<span class="kw-2">&amp;</span><span class="ident">cache</span>) {
+        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">member</span>) <span class="op">=</span> <span class="ident">cache</span>.<span class="ident">member</span>(<span class="ident">guild_id</span>, <span class="ident">msg</span>.<span class="ident">author</span>.<span class="ident">id</span>) {
+            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Ok</span>(<span class="ident">permissions</span>) <span class="op">=</span> <span class="ident">member</span>.<span class="ident">permissions</span>(<span class="ident">cache</span>) {
                 <span class="kw">return</span> <span class="kw">if</span> <span class="ident">cmd</span>.<span class="ident">allowed_roles</span>.<span class="ident">is_empty</span>() {
-                    <span class="ident">permissions</span>.<span class="ident">administrator</span>() <span class="op">|</span><span class="op">|</span> <span class="ident">has_correct_permissions</span>(<span class="kw-2">&amp;</span><span class="ident">cache</span>, <span class="kw-2">&amp;</span><span class="ident">cmd</span>, <span class="ident">msg</span>)
+                    <span class="ident">permissions</span>.<span class="ident">administrator</span>() <span class="op">|</span><span class="op">|</span> <span class="ident">has_correct_permissions</span>(<span class="ident">cache</span>, <span class="kw-2">&amp;</span><span class="ident">cmd</span>, <span class="ident">msg</span>)
                 } <span class="kw">else</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">roles</span>) <span class="op">=</span> <span class="ident">cache</span>.<span class="ident">guild_roles</span>(<span class="ident">guild_id</span>) {
                     <span class="ident">permissions</span>.<span class="ident">administrator</span>()
                         <span class="op">|</span><span class="op">|</span> (<span class="ident">has_correct_roles</span>(<span class="kw-2">&amp;</span><span class="ident">cmd</span>, <span class="kw-2">&amp;</span><span class="ident">roles</span>, <span class="kw-2">&amp;</span><span class="ident">member</span>)
-                            <span class="op">&amp;&amp;</span> <span class="ident">has_correct_permissions</span>(<span class="kw-2">&amp;</span><span class="ident">cache</span>, <span class="kw-2">&amp;</span><span class="ident">cmd</span>, <span class="ident">msg</span>))
+                            <span class="op">&amp;&amp;</span> <span class="ident">has_correct_permissions</span>(<span class="ident">cache</span>, <span class="kw-2">&amp;</span><span class="ident">cmd</span>, <span class="ident">msg</span>))
                 } <span class="kw">else</span> {
                     <span class="macro">warn!</span>(<span class="string">&quot;Failed to find the guild and its roles.&quot;</span>);
 
@@ -1722,7 +1722,7 @@
     <span class="ident">owners</span>: <span class="kw-2">&amp;</span><span class="ident">HashSet</span><span class="op">&lt;</span><span class="ident">UserId</span>, <span class="kw">impl</span> <span class="ident">std::hash::BuildHasher</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span><span class="op">&gt;</span>,
     <span class="ident">help_options</span>: <span class="kw-2">&amp;</span><span class="ident">HelpOptions</span>,
 ) -&gt; <span class="ident">HelpBehaviour</span> {
-    <span class="kw">let</span> <span class="ident">behaviour</span> <span class="op">=</span> <span class="ident">check_common_behaviour</span>(<span class="kw-2">&amp;</span><span class="ident">ctx</span>, <span class="ident">msg</span>, <span class="kw-2">&amp;</span><span class="ident">options</span>, <span class="ident">owners</span>, <span class="ident">help_options</span>);
+    <span class="kw">let</span> <span class="ident">behaviour</span> <span class="op">=</span> <span class="ident">check_common_behaviour</span>(<span class="ident">ctx</span>, <span class="ident">msg</span>, <span class="kw-2">&amp;</span><span class="ident">options</span>, <span class="ident">owners</span>, <span class="ident">help_options</span>);
 
     <span class="kw">if</span> <span class="ident">behaviour</span> <span class="op">==</span> <span class="ident">HelpBehaviour::Nothing</span>
         <span class="op">&amp;&amp;</span> (<span class="op">!</span><span class="ident">options</span>.<span class="ident">owner_privilege</span> <span class="op">|</span><span class="op">|</span> <span class="op">!</span><span class="ident">owners</span>.<span class="ident">contains</span>(<span class="kw-2">&amp;</span><span class="ident">msg</span>.<span class="ident">author</span>.<span class="ident">id</span>))
@@ -1901,7 +1901,7 @@
         <span class="kw">for</span> <span class="ident">group</span> <span class="kw">in</span> <span class="ident">groups</span> {
             <span class="kw">let</span> <span class="ident">group</span> <span class="op">=</span> <span class="kw-2">*</span><span class="ident">group</span>;
             <span class="kw">let</span> <span class="ident">group_behaviour</span> <span class="op">=</span>
-                <span class="ident">check_common_behaviour</span>(<span class="kw-2">&amp;</span><span class="ident">ctx</span>, <span class="ident">msg</span>, <span class="kw-2">&amp;</span><span class="ident">group</span>.<span class="ident">options</span>, <span class="ident">owners</span>, <span class="ident">help_options</span>);
+                <span class="ident">check_common_behaviour</span>(<span class="ident">ctx</span>, <span class="ident">msg</span>, <span class="kw-2">&amp;</span><span class="ident">group</span>.<span class="ident">options</span>, <span class="ident">owners</span>, <span class="ident">help_options</span>);
 
             <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="ident">group_behaviour</span> {
                 <span class="ident">HelpBehaviour::Nothing</span> =&gt; (),
@@ -1968,8 +1968,8 @@
                     .<span class="ident">sub_commands</span>
                     .<span class="ident">iter</span>()
                     .<span class="ident">filter_map</span>(<span class="op">|</span><span class="ident">cmd</span><span class="op">|</span> {
-                        <span class="kw">if</span> (<span class="kw-2">*</span><span class="ident">cmd</span>).<span class="ident">options</span>.<span class="ident">help_available</span> {
-                            <span class="prelude-val">Some</span>((<span class="kw-2">*</span><span class="ident">cmd</span>).<span class="ident">options</span>.<span class="ident">names</span>[<span class="number">0</span>].<span class="ident">to_string</span>())
+                        <span class="kw">if</span> <span class="ident">cmd</span>.<span class="ident">options</span>.<span class="ident">help_available</span> {
+                            <span class="prelude-val">Some</span>(<span class="ident">cmd</span>.<span class="ident">options</span>.<span class="ident">names</span>[<span class="number">0</span>].<span class="ident">to_string</span>())
                         } <span class="kw">else</span> {
                             <span class="prelude-val">None</span>
                         }
@@ -2060,7 +2060,7 @@
         } <span class="kw">else</span> {
             <span class="ident">std::cmp::max</span>(
                 <span class="kw-2">*</span><span class="ident">highest_formatter</span>,
-                <span class="ident">check_common_behaviour</span>(<span class="kw-2">&amp;</span><span class="ident">ctx</span>, <span class="ident">msg</span>, <span class="kw-2">&amp;</span><span class="ident">group</span>.<span class="ident">options</span>, <span class="ident">owners</span>, <span class="ident">help_options</span>),
+                <span class="ident">check_common_behaviour</span>(<span class="ident">ctx</span>, <span class="ident">msg</span>, <span class="kw-2">&amp;</span><span class="ident">group</span>.<span class="ident">options</span>, <span class="ident">owners</span>, <span class="ident">help_options</span>),
             )
         }
     };

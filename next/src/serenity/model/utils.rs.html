@@ -328,8 +328,6 @@
 <span id="322">322</span>
 <span id="323">323</span>
 <span id="324">324</span>
-<span id="325">325</span>
-<span id="326">326</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::collections::HashMap</span>;
 <span class="kw">use</span> <span class="ident">std::fmt</span>;
 <span class="kw">use</span> <span class="ident">std::hash::Hash</span>;
@@ -460,17 +458,15 @@
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">deserialize_buttons</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span>, <span class="ident">D</span>: <span class="ident">Deserializer</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span><span class="op">&gt;</span>(
     <span class="ident">deserializer</span>: <span class="ident">D</span>,
 ) -&gt; <span class="ident">StdResult</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ActivityButton</span><span class="op">&gt;</span>, <span class="ident">D::Error</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="ident">labels</span> <span class="op">=</span> <span class="ident">Vec::deserialize</span>(<span class="ident">deserializer</span>)<span class="question-mark">?</span>;
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">buttons</span> <span class="op">=</span> <span class="macro">vec!</span>[];
-
-    <span class="kw">for</span> <span class="ident">label</span> <span class="kw">in</span> <span class="ident">labels</span> {
-        <span class="ident">buttons</span>.<span class="ident">push</span>(<span class="ident">ActivityButton</span> {
-            <span class="ident">label</span>,
-            <span class="ident">url</span>: <span class="string">&quot;&quot;</span>.<span class="ident">to_owned</span>(),
-        });
-    }
-
-    <span class="prelude-val">Ok</span>(<span class="ident">buttons</span>)
+    <span class="ident">Vec::deserialize</span>(<span class="ident">deserializer</span>).<span class="ident">map</span>(<span class="op">|</span><span class="ident">labels</span><span class="op">|</span> {
+        <span class="ident">labels</span>
+            .<span class="ident">into_iter</span>()
+            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">l</span><span class="op">|</span> <span class="ident">ActivityButton</span> {
+                <span class="ident">label</span>: <span class="ident">l</span>,
+                <span class="ident">url</span>: <span class="ident">String::new</span>(),
+            })
+            .<span class="ident">collect</span>()
+    })
 }
 
 <span class="doccomment">/// Used with `#[serde(with = &quot;private_channels&quot;)]`</span>
