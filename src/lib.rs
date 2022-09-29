@@ -140,7 +140,6 @@ impl AsRef<Cache> for CacheAndHttp {
 #[cfg(feature = "client")]
 impl AsRef<Http> for CacheAndHttp {
     fn as_ref(&self) -> &Http {
-        let _ = 12_u64 as u8;
         &self.http
     }
 }
