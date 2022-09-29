@@ -111,7 +111,6 @@ Thanks to the following for their contributions:
 - Enable `Invite::expires_at` field ([@mkrasnitski])
 - Fix "missing field `discriminator`" serde error for presence updates ([@nickelc])
 - Add webhook example ([@NotNorom])
-- Introduce `rustversion` dependency and `backports` module ([@GnomedDev])
 - Add `MessageType::AutoModerationAction` enum variant ([@nickelc])
 - Attempt to fix lifetime bug around `CustomisedHelpData` ([@mkrasnitski])
 - Auto-impl `CacheHttp` for `Arc<T>` if `T` also implements it ([@mkrasnitski])
