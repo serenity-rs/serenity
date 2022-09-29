@@ -1,3 +1,4 @@
+use serenity::builder::*;
 use serenity::model::prelude::command::*;
 use serenity::model::prelude::interaction::application_command::*;
 use serenity::model::prelude::*;
@@ -9,10 +10,19 @@ async fn message(ctx: &Context, msg: Message) -> Result<(), serenity::Error> {
     } else if msg.content == "globalcommand" {
         // Tests https://github.com/serenity-rs/serenity/issues/2259
         // Activate simd_json feature for this
-        Command::create_global_application_command(&ctx, |b| {
-            b.name("ping").description("A simple ping command")
-        })
+        Command::create_global_application_command(
+            &ctx,
+            CreateApplicationCommand::new("ping").description("test command"),
+        )
         .await?;
+    } else if msg.content == "register" {
+        let guild_id = msg.guild_id.unwrap();
+        guild_id
+            .create_application_command(
+                &ctx,
+                CreateApplicationCommand::new("editembeds").description("test command"),
+            )
+            .await?;
     } else {
         return Ok(());
     }
@@ -22,9 +32,27 @@ async fn message(ctx: &Context, msg: Message) -> Result<(), serenity::Error> {
 }
 
 async fn interaction(
-    _ctx: &Context,
-    _interaction: ApplicationCommandInteraction,
+    ctx: &Context,
+    interaction: ApplicationCommandInteraction,
 ) -> Result<(), serenity::Error> {
+    if interaction.data.name == "editembeds" {
+        interaction
+            .create_interaction_response(
+                &ctx,
+                CreateInteractionResponse::new().interaction_response_data(
+                    CreateInteractionResponseData::new()
+                        .content("hi")
+                        .embed(CreateEmbed::new().description("hi")),
+                ),
+            )
+            .await?;
+
+        // Pre-PR, this falsely deleted the embed
+        interaction
+            .edit_original_interaction_response(&ctx, EditInteractionResponse::new())
+            .await?;
+    }
+
     Ok(())
 }
 
