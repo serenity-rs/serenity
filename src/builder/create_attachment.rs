@@ -108,7 +108,7 @@ impl<'a> CreateAttachment<'a> {
         })
     }
 
-    #[cfg(feature = "model")]
+    #[cfg(feature = "builder")]
     pub(crate) fn to_base64(&self) -> String {
         let mut encoded = base64::encode(&self.data);
         encoded.insert_str(0, "data:image/png;base64,");
