@@ -123,6 +123,14 @@
 <span id="117">117</span>
 <span id="118">118</span>
 <span id="119">119</span>
+<span id="120">120</span>
+<span id="121">121</span>
+<span id="122">122</span>
+<span id="123">123</span>
+<span id="124">124</span>
+<span id="125">125</span>
+<span id="126">126</span>
+<span id="127">127</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">CreateAllowedMentions</span>, <span class="ident">CreateComponents</span>, <span class="ident">CreateEmbed</span>};
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http&quot;</span>)]</span>
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::constants</span>;
@@ -138,7 +146,8 @@
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Default</span>, <span class="ident">Serialize</span>)]</span>
 <span class="attribute">#[<span class="ident">must_use</span>]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">EditInteractionResponse</span> {
-    <span class="ident">embeds</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">CreateEmbed</span><span class="op">&gt;</span>,
+    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;Option::is_none&quot;</span>)]</span>
+    <span class="ident">embeds</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">CreateEmbed</span><span class="op">&gt;</span><span class="op">&gt;</span>,
     <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;Option::is_none&quot;</span>)]</span>
     <span class="ident">content</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
     <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;Option::is_none&quot;</span>)]</span>
@@ -179,10 +188,12 @@
                 .<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">overflow</span><span class="op">|</span> <span class="ident">Error::Model</span>(<span class="ident">ModelError::MessageTooLong</span>(<span class="ident">overflow</span>)))<span class="question-mark">?</span>;
         }
 
-        <span class="ident">check_overflow</span>(<span class="self">self</span>.<span class="ident">embeds</span>.<span class="ident">len</span>(), <span class="ident">constants::EMBED_MAX_COUNT</span>)
-            .<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">Error::Model</span>(<span class="ident">ModelError::EmbedAmount</span>))<span class="question-mark">?</span>;
-        <span class="kw">for</span> <span class="ident">embed</span> <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">embeds</span> {
-            <span class="ident">embed</span>.<span class="ident">check_length</span>()<span class="question-mark">?</span>;
+        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">embeds</span>) <span class="op">=</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">embeds</span> {
+            <span class="ident">check_overflow</span>(<span class="ident">embeds</span>.<span class="ident">len</span>(), <span class="ident">constants::EMBED_MAX_COUNT</span>)
+                .<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">Error::Model</span>(<span class="ident">ModelError::EmbedAmount</span>))<span class="question-mark">?</span>;
+            <span class="kw">for</span> <span class="ident">embed</span> <span class="kw">in</span> <span class="ident">embeds</span> {
+                <span class="ident">embed</span>.<span class="ident">check_length</span>()<span class="question-mark">?</span>;
+            }
         }
 
         <span class="prelude-val">Ok</span>(())
@@ -200,14 +211,18 @@
     }
 
     <span class="doccomment">/// Adds an embed for the message.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// Embeds from the original message are reset when adding new embeds and must be re-added.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">add_embed</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">embed</span>: <span class="ident">CreateEmbed</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">embeds</span>.<span class="ident">push</span>(<span class="ident">embed</span>);
+        <span class="self">self</span>.<span class="ident">embeds</span>.<span class="ident">get_or_insert</span>(<span class="ident">Vec::new</span>()).<span class="ident">push</span>(<span class="ident">embed</span>);
         <span class="self">self</span>
     }
 
     <span class="doccomment">/// Adds multiple embeds to the message.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// Embeds from the original message are reset when adding new embeds and must be re-added.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">add_embeds</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">embeds</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">CreateEmbed</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">embeds</span>.<span class="ident">extend</span>(<span class="ident">embeds</span>);
+        <span class="self">self</span>.<span class="ident">embeds</span>.<span class="ident">get_or_insert</span>(<span class="ident">Vec::new</span>()).<span class="ident">extend</span>(<span class="ident">embeds</span>);
         <span class="self">self</span>
     }
 
@@ -215,8 +230,9 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// Calling this will overwrite the embed list. To append embeds, call [`Self::add_embed`]</span>
     <span class="doccomment">/// instead.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">embed</span>(<span class="self">self</span>, <span class="ident">embed</span>: <span class="ident">CreateEmbed</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">embeds</span>(<span class="macro">vec!</span>[<span class="ident">embed</span>])
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">embed</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">embed</span>: <span class="ident">CreateEmbed</span>) -&gt; <span class="self">Self</span> {
+        <span class="self">self</span>.<span class="ident">embeds</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="macro">vec!</span>[<span class="ident">embed</span>]);
+        <span class="self">self</span>
     }
 
     <span class="doccomment">/// Sets the embeds for the message.</span>
@@ -226,7 +242,7 @@
     <span class="doccomment">/// Calling this will overwrite the embed list. To append embeds, call [`Self::add_embeds`]</span>
     <span class="doccomment">/// instead.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">embeds</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">embeds</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">CreateEmbed</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">embeds</span> <span class="op">=</span> <span class="ident">embeds</span>;
+        <span class="self">self</span>.<span class="ident">embeds</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">embeds</span>);
         <span class="self">self</span>
     }
 
