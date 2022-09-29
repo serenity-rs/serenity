@@ -214,7 +214,7 @@ time = []
 interactions_endpoint = ["ed25519-dalek"]
 
 # Note: all feature-gated APIs to be documented should have their features listed here!
-_docs = ["default", "collector", "unstable_discord_api", "voice", "voice-model"]
+_docs = ["default", "collector", "unstable_discord_api", "voice", "voice_model", "interactions_endpoint"]
 
 # Enables simd accelerated parsing.
 simd_json = ["simd-json"]
