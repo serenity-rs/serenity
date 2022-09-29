@@ -374,15 +374,12 @@ impl Guild {
     #[must_use]
     pub fn default_channel(&self, uid: UserId) -> Option<&GuildChannel> {
         let member = self.members.get(&uid)?;
-        for channel in self.channels.values() {
-            if channel.kind != ChannelType::Category
-                && self.user_permissions_in(channel, member).ok()?.view_channel()
-            {
-                return Some(channel);
-            }
-        }
-
-        None
+        self.channels.values().find(|&channel| {
+            channel.kind != ChannelType::Category
+                && self
+                    .user_permissions_in(channel, member)
+                    .map_or(false, Permissions::view_channel)
+        })
     }
 
     /// Returns the guaranteed "default" channel of the guild.
@@ -431,7 +428,7 @@ impl Guild {
         name: impl AsRef<str>,
     ) -> Option<ChannelId> {
         let name = name.as_ref();
-        let guild_channels = cache.as_ref().guild_channels(&self.id)?;
+        let guild_channels = cache.as_ref().guild_channels(self.id)?;
 
         for channel_entry in guild_channels.iter() {
             let (id, channel) = channel_entry.pair();

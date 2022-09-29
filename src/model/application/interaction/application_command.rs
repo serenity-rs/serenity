@@ -381,7 +381,7 @@ impl CommandData {
             options
         }
 
-        resolve_options(&*self.options, &self.resolved)
+        resolve_options(&self.options, &self.resolved)
     }
 
     /// The target resolved data of [`target_id`]
