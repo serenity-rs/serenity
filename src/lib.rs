@@ -52,8 +52,14 @@
 //! [gateway docs]: crate::gateway
 #![doc(html_root_url = "https://docs.rs/serenity/*")]
 #![cfg_attr(docsrs, feature(doc_auto_cfg))]
-#![warn(rust_2018_idioms)]
-#![warn(clippy::pedantic)]
+#![warn(
+    unused,
+    rust_2018_idioms,
+    clippy::unwrap_used,
+    clippy::non_ascii_literal,
+    clippy::let_underscore_must_use,
+    clippy::pedantic
+)]
 #![allow(
     // Allowed to avoid breaking changes.
     clippy::module_name_repetitions,
@@ -72,7 +78,6 @@
     // Covered by other lints
     clippy::missing_panics_doc, // clippy::unwrap_used
 )]
-#![warn(clippy::unwrap_used, clippy::non_ascii_literal, clippy::let_underscore_must_use, unused)]
 #![cfg_attr(test, allow(clippy::unwrap_used))]
 #![type_length_limit = "3294819"] // needed so ShardRunner::run compiles with instrument.
 
@@ -135,6 +140,7 @@ impl AsRef<Cache> for CacheAndHttp {
 #[cfg(feature = "client")]
 impl AsRef<Http> for CacheAndHttp {
     fn as_ref(&self) -> &Http {
+        let _ = 12_u64 as u8;
         &self.http
     }
 }
