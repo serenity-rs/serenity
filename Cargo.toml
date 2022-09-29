@@ -143,6 +143,10 @@ optional = true
 [dependencies.cfg-if]
 version = "1.0.0"
 
+[dependencies.ed25519-dalek]
+version = "1.0.1"
+optional = true
+
 [dev-dependencies.http_crate]
 version = "0.2"
 package = "http"
@@ -207,6 +211,7 @@ voice = ["client", "model"]
 tokio_task_builder = ["tokio/tracing"]
 # Configures serenity to use types from the `time` crate to store datetimes.
 time = []
+interactions_endpoint = ["ed25519-dalek"]
 
 # Enables simd accelerated parsing.
 simd_json = ["simd-json"]
