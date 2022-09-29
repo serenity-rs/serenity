@@ -53,6 +53,7 @@ pub enum Channel {
     Private(PrivateChannel),
 }
 
+#[cfg(feature = "model")]
 impl Channel {
     /// Converts from [`Channel`] to `Option<GuildChannel>`.
     ///
@@ -126,7 +127,6 @@ impl Channel {
     ///
     /// Otherwise will return [`Error::Http`] if the current user does not
     /// have permission.
-    #[cfg(feature = "http")]
     pub async fn delete(&self, cache_http: impl CacheHttp) -> Result<()> {
         match self {
             Self::Guild(public_channel) => {

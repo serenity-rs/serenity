@@ -3,7 +3,6 @@
 
 #[cfg(feature = "client")]
 mod argument_convert;
-pub(crate) mod backports;
 #[cfg(feature = "cache")]
 mod content_safe;
 mod custom_message;
@@ -33,13 +32,6 @@ use crate::cache::Cache;
 use crate::http::CacheHttp;
 use crate::internal::prelude::*;
 use crate::model::prelude::*;
-
-#[cfg(feature = "builder")]
-pub(crate) fn encode_image(raw: &[u8]) -> String {
-    let mut encoded = base64::encode(raw);
-    encoded.insert_str(0, "data:image/png;base64,");
-    encoded
-}
 
 #[cfg(all(feature = "builder", feature = "http"))]
 pub(crate) fn check_overflow(len: usize, max: usize) -> StdResult<(), usize> {

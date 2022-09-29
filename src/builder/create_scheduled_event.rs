@@ -4,7 +4,6 @@ use crate::http::{CacheHttp, Http};
 #[cfg(feature = "http")]
 use crate::internal::prelude::*;
 use crate::model::prelude::*;
-use crate::utils::encode_image;
 
 #[derive(Clone, Debug, Serialize)]
 #[must_use]
@@ -139,7 +138,7 @@ impl<'a> CreateScheduledEvent<'a> {
 
     /// Sets the cover image for the scheduled event.
     pub fn image(mut self, image: &CreateAttachment<'_>) -> Self {
-        self.image = Some(encode_image(&image.data));
+        self.image = Some(image.to_base64());
         self
     }
 

@@ -1,17 +1,13 @@
 use std::borrow::Cow;
-#[cfg(feature = "tokio")]
 use std::path::Path;
 
-#[cfg(feature = "tokio")]
 use tokio::fs::File;
-#[cfg(feature = "tokio")]
 use tokio::io::AsyncReadExt;
 #[cfg(feature = "http")]
 use url::Url;
 
 #[cfg(feature = "http")]
 use crate::error::Error;
-#[cfg(feature = "tokio")]
 use crate::error::Result;
 #[cfg(feature = "http")]
 use crate::http::Http;
@@ -51,7 +47,7 @@ impl<'a> CreateAttachment<'a> {
     /// # Errors
     ///
     /// [`Error::Io`] if reading the file fails.
-    #[cfg(feature = "tokio")]
+
     pub async fn path(path: impl AsRef<Path>) -> Result<CreateAttachment<'static>> {
         let mut file = File::open(path.as_ref()).await?;
         let mut data = Vec::new();
@@ -75,7 +71,7 @@ impl<'a> CreateAttachment<'a> {
     /// # Errors
     ///
     /// [`Error::Io`] error if reading the file fails.
-    #[cfg(feature = "tokio")]
+
     pub async fn file(
         file: &File,
         filename: impl Into<String>,
@@ -110,5 +106,12 @@ impl<'a> CreateAttachment<'a> {
             data: Cow::Owned(data),
             filename: filename.to_string(),
         })
+    }
+
+    #[cfg(feature = "model")]
+    pub(crate) fn to_base64(&self) -> String {
+        let mut encoded = base64::encode(&self.data);
+        encoded.insert_str(0, "data:image/png;base64,");
+        encoded
     }
 }

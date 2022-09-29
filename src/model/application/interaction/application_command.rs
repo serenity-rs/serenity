@@ -6,19 +6,19 @@ use serde::ser::{SerializeStruct, Serializer};
 use serde::{Deserialize, Serialize};
 use serde_value::{DeserializerError, Value};
 
-#[cfg(feature = "http")]
+#[cfg(feature = "model")]
 use crate::builder::{
     CreateAutocompleteResponse,
     CreateInteractionResponse,
     CreateInteractionResponseFollowup,
     EditInteractionResponse,
 };
-#[cfg(feature = "http")]
+#[cfg(feature = "model")]
 use crate::http::Http;
 use crate::internal::prelude::*;
 use crate::model::application::command::{CommandOptionType, CommandType};
 use crate::model::application::interaction::add_guild_id_to_resolved;
-#[cfg(feature = "http")]
+#[cfg(feature = "model")]
 use crate::model::application::interaction::InteractionResponseType;
 use crate::model::channel::{Attachment, Message, PartialChannel};
 use crate::model::guild::{Member, PartialMember, Role};
@@ -75,7 +75,7 @@ pub struct ApplicationCommandInteraction {
     pub guild_locale: Option<String>,
 }
 
-#[cfg(feature = "http")]
+#[cfg(feature = "model")]
 impl ApplicationCommandInteraction {
     /// Gets the interaction response.
     ///
@@ -379,7 +379,7 @@ impl CommandData {
             options
         }
 
-        resolve_options(&*self.options, &self.resolved)
+        resolve_options(&self.options, &self.resolved)
     }
 
     /// The target resolved data of [`target_id`]

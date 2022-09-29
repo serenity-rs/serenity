@@ -403,11 +403,11 @@ pub fn help(attr: TokenStream, input: TokenStream) -> TokenStream {
         }
     }
 
-    if options.strikethrough_commands_tip_in_dm == None {
+    if options.strikethrough_commands_tip_in_dm.is_none() {
         options.strikethrough_commands_tip_in_dm = produce_strike_text(&options, "server messages");
     }
 
-    if options.strikethrough_commands_tip_in_guild == None {
+    if options.strikethrough_commands_tip_in_guild.is_none() {
         options.strikethrough_commands_tip_in_guild =
             produce_strike_text(&options, "direct messages");
     }

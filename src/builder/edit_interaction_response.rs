@@ -18,7 +18,8 @@ use crate::utils::check_overflow;
 #[derive(Clone, Debug, Default, Serialize)]
 #[must_use]
 pub struct EditInteractionResponse<'a> {
-    embeds: Vec<CreateEmbed>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    embeds: Option<Vec<CreateEmbed>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     content: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -65,10 +66,12 @@ impl<'a> EditInteractionResponse<'a> {
                 .map_err(|overflow| Error::Model(ModelError::MessageTooLong(overflow)))?;
         }
 
-        check_overflow(self.embeds.len(), constants::EMBED_MAX_COUNT)
-            .map_err(|_| Error::Model(ModelError::EmbedAmount))?;
-        for embed in &self.embeds {
-            embed.check_length()?;
+        if let Some(embeds) = &self.embeds {
+            check_overflow(embeds.len(), constants::EMBED_MAX_COUNT)
+                .map_err(|_| Error::Model(ModelError::EmbedAmount))?;
+            for embed in embeds {
+                embed.check_length()?;
+            }
         }
 
         Ok(())
@@ -86,14 +89,18 @@ impl<'a> EditInteractionResponse<'a> {
     }
 
     /// Adds an embed for the message.
+    ///
+    /// Embeds from the original message are reset when adding new embeds and must be re-added.
     pub fn add_embed(mut self, embed: CreateEmbed) -> Self {
-        self.embeds.push(embed);
+        self.embeds.get_or_insert(Vec::new()).push(embed);
         self
     }
 
     /// Adds multiple embeds to the message.
+    ///
+    /// Embeds from the original message are reset when adding new embeds and must be re-added.
     pub fn add_embeds(mut self, embeds: Vec<CreateEmbed>) -> Self {
-        self.embeds.extend(embeds);
+        self.embeds.get_or_insert(Vec::new()).extend(embeds);
         self
     }
 
@@ -101,8 +108,9 @@ impl<'a> EditInteractionResponse<'a> {
     ///
     /// Calling this will overwrite the embed list. To append embeds, call [`Self::add_embed`]
     /// instead.
-    pub fn embed(self, embed: CreateEmbed) -> Self {
-        self.embeds(vec![embed])
+    pub fn embed(mut self, embed: CreateEmbed) -> Self {
+        self.embeds = Some(vec![embed]);
+        self
     }
 
     /// Sets the embeds for the message.
@@ -112,7 +120,7 @@ impl<'a> EditInteractionResponse<'a> {
     /// Calling this will overwrite the embed list. To append embeds, call [`Self::add_embeds`]
     /// instead.
     pub fn embeds(mut self, embeds: Vec<CreateEmbed>) -> Self {
-        self.embeds = embeds;
+        self.embeds = Some(embeds);
         self
     }
 

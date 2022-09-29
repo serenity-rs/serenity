@@ -4,9 +4,9 @@ use std::sync::Arc;
 
 #[cfg(feature = "model")]
 use crate::builder::{CreateAttachment, CreateMessage, EditMessage, GetMessages};
-#[cfg(all(feature = "model", feature = "http"))]
+#[cfg(feature = "model")]
 use crate::http::CacheHttp;
-#[cfg(feature = "http")]
+#[cfg(feature = "model")]
 use crate::http::{Http, Typing};
 use crate::model::prelude::*;
 use crate::model::utils::single_recipient;

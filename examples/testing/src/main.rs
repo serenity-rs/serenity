@@ -28,6 +28,12 @@ async fn message(ctx: &Context, msg: Message) -> Result<(), serenity::Error> {
                 CreateApplicationCommand::new("unifiedattachments2").description("test command"),
             )
             .await?;
+        guild_id
+            .create_application_command(
+                &ctx,
+                CreateApplicationCommand::new("editembeds").description("test command"),
+            )
+            .await?;
     } else if msg.content == "edit" {
         let mut msg = channel_id
             .send_message(
@@ -150,6 +156,22 @@ async fn interaction(
                 CreateInteractionResponseFollowup::new()
                     .add_file(CreateAttachment::url(ctx, IMAGE_URL).await?),
             )
+            .await?;
+    } else if interaction.data.name == "editembeds" {
+        interaction
+            .create_interaction_response(
+                &ctx,
+                CreateInteractionResponse::new().interaction_response_data(
+                    CreateInteractionResponseData::new()
+                        .content("hi")
+                        .embed(CreateEmbed::new().description("hi")),
+                ),
+            )
+            .await?;
+
+        // Pre-PR, this falsely deleted the embed
+        interaction
+            .edit_original_interaction_response(&ctx, EditInteractionResponse::new())
             .await?;
     }
 
