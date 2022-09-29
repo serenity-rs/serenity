@@ -351,7 +351,7 @@ impl PartialGuild {
         name: impl AsRef<str>,
     ) -> Option<ChannelId> {
         let name = name.as_ref();
-        let guild_channels = cache.as_ref().guild_channels(&self.id)?;
+        let guild_channels = cache.as_ref().guild_channels(self.id)?;
 
         for channel_entry in guild_channels.iter() {
             let (id, channel) = channel_entry.pair();

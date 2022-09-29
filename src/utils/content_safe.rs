@@ -225,18 +225,18 @@ fn clean_mention(
     let cache = cache.as_ref();
     match mention {
         Mention::Channel(id) => {
-            if let Some(Channel::Guild(channel)) = id.to_channel_cached(&cache) {
+            if let Some(Channel::Guild(channel)) = id.to_channel_cached(cache) {
                 format!("#{}", channel.name).into()
             } else {
                 "#deleted-channel".into()
             }
         },
         Mention::Role(id) => id
-            .to_role_cached(&cache)
+            .to_role_cached(cache)
             .map_or(Cow::Borrowed("@deleted-role"), |role| format!("@{}", role.name).into()),
         Mention::User(id) => {
             if let Some(guild_id) = options.guild_reference {
-                if let Some(guild) = cache.guild(&guild_id) {
+                if let Some(guild) = cache.guild(guild_id) {
                     if let Some(member) = guild.members.get(&id) {
                         return if options.show_discriminator {
                             format!("@{}", member.distinct())

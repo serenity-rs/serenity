@@ -128,17 +128,15 @@ pub mod presences {
 pub fn deserialize_buttons<'de, D: Deserializer<'de>>(
     deserializer: D,
 ) -> StdResult<Vec<ActivityButton>, D::Error> {
-    let labels = Vec::deserialize(deserializer)?;
-    let mut buttons = vec![];
-
-    for label in labels {
-        buttons.push(ActivityButton {
-            label,
-            url: "".to_owned(),
-        });
-    }
-
-    Ok(buttons)
+    Vec::deserialize(deserializer).map(|labels| {
+        labels
+            .into_iter()
+            .map(|l| ActivityButton {
+                label: l,
+                url: String::new(),
+            })
+            .collect()
+    })
 }
 
 /// Used with `#[serde(with = "private_channels")]`
