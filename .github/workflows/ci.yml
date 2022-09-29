@@ -298,3 +298,5 @@ jobs:
         run: cargo check -p e17_message_components
       - name: 'Check example 18'
         run: cargo check -p e18_webhook
+      - name: 'Check example 19'
+        run: cargo check -p e19_interactions_endpoint

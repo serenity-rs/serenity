@@ -106,6 +106,8 @@ pub mod framework;
 pub mod gateway;
 #[cfg(feature = "http")]
 pub mod http;
+#[cfg(feature = "interactions_endpoint")]
+pub mod interactions_endpoint;
 #[cfg(feature = "utils")]
 pub mod utils;
 
