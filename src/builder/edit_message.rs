@@ -1,4 +1,10 @@
-use super::{CreateAllowedMentions, CreateComponents, CreateEmbed};
+use super::{
+    CreateAllowedMentions,
+    CreateAttachment,
+    CreateComponents,
+    CreateEmbed,
+    ExistingAttachment,
+};
 #[cfg(feature = "http")]
 use crate::constants;
 #[cfg(feature = "http")]
@@ -48,10 +54,10 @@ pub struct EditMessage<'a> {
     #[serde(skip_serializing_if = "Option::is_none")]
     components: Option<CreateComponents>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    attachments: Option<Vec<AttachmentId>>,
+    attachments: Option<Vec<ExistingAttachment>>,
 
     #[serde(skip)]
-    files: Vec<AttachmentType<'a>>,
+    files: Vec<CreateAttachment<'a>>,
 }
 
 impl<'a> EditMessage<'a> {
@@ -92,14 +98,7 @@ impl<'a> EditMessage<'a> {
     ) -> Result<Message> {
         self.check_length()?;
         let files = std::mem::take(&mut self.files);
-
-        if files.is_empty() {
-            http.as_ref().edit_message(channel_id.into(), message_id.into(), &self).await
-        } else {
-            http.as_ref()
-                .edit_message_and_attachments(channel_id.into(), message_id.into(), &self, files)
-                .await
-        }
+        http.as_ref().edit_message(channel_id.into(), message_id.into(), &self, files).await
     }
 
     #[cfg(feature = "http")]
@@ -197,21 +196,23 @@ impl<'a> EditMessage<'a> {
     /// Add a new attachment for the message.
     ///
     /// This can be called multiple times.
-    pub fn attachment(mut self, attachment: impl Into<AttachmentType<'a>>) -> Self {
-        self.files.push(attachment.into());
+    pub fn attachment(mut self, attachment: CreateAttachment<'a>) -> Self {
+        self.files.push(attachment);
         self
     }
 
     /// Add an existing attachment by id.
-    pub fn add_existing_attachment(mut self, attachment: AttachmentId) -> Self {
-        self.attachments.get_or_insert_with(Vec::new).push(attachment);
+    pub fn add_existing_attachment(mut self, id: AttachmentId) -> Self {
+        self.attachments.get_or_insert_with(Vec::new).push(ExistingAttachment {
+            id,
+        });
         self
     }
 
     /// Remove an existing attachment by id.
-    pub fn remove_existing_attachment(mut self, attachment: AttachmentId) -> Self {
+    pub fn remove_existing_attachment(mut self, id: AttachmentId) -> Self {
         if let Some(attachments) = &mut self.attachments {
-            if let Some(attachment_index) = attachments.iter().position(|a| *a == attachment) {
+            if let Some(attachment_index) = attachments.iter().position(|a| a.id == id) {
                 attachments.remove(attachment_index);
             };
         }

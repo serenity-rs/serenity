@@ -109,7 +109,7 @@ version = "1.0"
 [dependencies.tokio]
 version = "1"
 default-features = true
-features = ["fs", "macros", "rt", "sync", "time"]
+features = ["fs", "macros", "rt", "sync", "time", "io-util"]
 
 [dependencies.futures]
 version = "0.3"
