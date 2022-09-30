@@ -44,7 +44,7 @@ impl ArgumentConvert for Member {
     type Err = MemberParseError;
 
     async fn convert(
-        ctx: &Context,
+        ctx: impl CacheHttp,
         guild_id: Option<GuildId>,
         _channel_id: Option<ChannelId>,
         s: &str,
@@ -57,7 +57,7 @@ impl ArgumentConvert for Member {
         if let Some(user_id) =
             s.parse().ok().map(UserId).or_else(|| crate::utils::parse_username(s))
         {
-            if let Ok(member) = guild_id.member(ctx, user_id).await {
+            if let Ok(member) = guild_id.member(&ctx, user_id).await {
                 return Ok(member);
             }
         }
@@ -66,7 +66,7 @@ impl ArgumentConvert for Member {
 
         // If string is a username+discriminator
         if let Some((name, discrim)) = crate::utils::parse_user_tag(s) {
-            if let Ok(member_results) = guild_id.search_members(ctx, name, Some(100)).await {
+            if let Ok(member_results) = guild_id.search_members(ctx.http(), name, Some(100)).await {
                 if let Some(member) = member_results.into_iter().find(|m| {
                     m.user.name.eq_ignore_ascii_case(name) && m.user.discriminator == discrim
                 }) {
@@ -76,7 +76,7 @@ impl ArgumentConvert for Member {
         }
 
         // If string is username or nickname
-        if let Ok(member_results) = guild_id.search_members(ctx, s, Some(100)).await {
+        if let Ok(member_results) = guild_id.search_members(ctx.http(), s, Some(100)).await {
             if let Some(member) = member_results.into_iter().find(|m| {
                 m.user.name.eq_ignore_ascii_case(s)
                     || m.nick.as_ref().map_or(false, |nick| nick.eq_ignore_ascii_case(s))
