@@ -1,4 +1,4 @@
-use super::{CreateAllowedMentions, CreateComponents, CreateEmbed};
+use super::{CreateAllowedMentions, CreateAttachment, CreateComponents, CreateEmbed};
 #[cfg(feature = "http")]
 use crate::constants;
 #[cfg(feature = "http")]
@@ -44,13 +44,7 @@ impl<'a> CreateInteractionResponse<'a> {
         self.check_length()?;
         let files = self.data.as_mut().map_or_else(Vec::new, |d| std::mem::take(&mut d.files));
 
-        if files.is_empty() {
-            http.as_ref().create_interaction_response(interaction_id.into(), token, &self).await
-        } else {
-            http.as_ref()
-                .create_interaction_response_with_files(interaction_id.into(), token, &self, files)
-                .await
-        }
+        http.as_ref().create_interaction_response(interaction_id.into(), token, &self, files).await
     }
 
     #[cfg(feature = "http")]
@@ -115,7 +109,7 @@ pub struct CreateInteractionResponseData<'a> {
     title: Option<String>,
 
     #[serde(skip)]
-    files: Vec<AttachmentType<'a>>,
+    files: Vec<CreateAttachment<'a>>,
 }
 
 impl<'a> CreateInteractionResponseData<'a> {
@@ -135,17 +129,14 @@ impl<'a> CreateInteractionResponseData<'a> {
     }
 
     /// Appends a file to the message.
-    pub fn add_file<T: Into<AttachmentType<'a>>>(mut self, file: T) -> Self {
-        self.files.push(file.into());
+    pub fn add_file(mut self, file: CreateAttachment<'a>) -> Self {
+        self.files.push(file);
         self
     }
 
     /// Appends a list of files to the message.
-    pub fn add_files<T: Into<AttachmentType<'a>>, It: IntoIterator<Item = T>>(
-        mut self,
-        files: It,
-    ) -> Self {
-        self.files.extend(files.into_iter().map(Into::into));
+    pub fn add_files(mut self, files: impl IntoIterator<Item = CreateAttachment<'a>>) -> Self {
+        self.files.extend(files);
         self
     }
 
@@ -153,11 +144,8 @@ impl<'a> CreateInteractionResponseData<'a> {
     ///
     /// Calling this multiple times will overwrite the file list. To append files, call
     /// [`Self::add_file`] or [`Self::add_files`] instead.
-    pub fn files<T: Into<AttachmentType<'a>>, It: IntoIterator<Item = T>>(
-        mut self,
-        files: It,
-    ) -> Self {
-        self.files = files.into_iter().map(Into::into).collect();
+    pub fn files(mut self, files: impl IntoIterator<Item = CreateAttachment<'a>>) -> Self {
+        self.files = files.into_iter().collect();
         self
     }
 
@@ -281,7 +269,9 @@ impl CreateAutocompleteResponse {
         interaction_id: InteractionId,
         token: &str,
     ) -> Result<()> {
-        http.as_ref().create_interaction_response(interaction_id.into(), token, &self).await
+        http.as_ref()
+            .create_interaction_response(interaction_id.into(), token, &self, Vec::new())
+            .await
     }
 
     /// For autocomplete responses this sets their autocomplete suggestions.
