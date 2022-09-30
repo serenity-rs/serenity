@@ -213,6 +213,9 @@ tokio_task_builder = ["tokio/tracing"]
 time = []
 interactions_endpoint = ["ed25519-dalek"]
 
+# Note: all feature-gated APIs to be documented should have their features listed here!
+_docs = ["default", "collector", "unstable_discord_api", "voice", "voice_model", "interactions_endpoint"]
+
 # Enables simd accelerated parsing.
 simd_json = ["simd-json"]
 
@@ -236,5 +239,5 @@ native_tls_backend = [
 
 
 [package.metadata.docs.rs]
-features = ["default", "collector", "unstable_discord_api", "voice", "voice-model"]
+features = ["_docs"]
 rustdoc-args = ["--cfg", "docsrs"]
