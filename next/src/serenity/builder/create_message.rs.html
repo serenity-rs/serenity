@@ -324,6 +324,18 @@
 <span id="318">318</span>
 <span id="319">319</span>
 <span id="320">320</span>
+<span id="321">321</span>
+<span id="322">322</span>
+<span id="323">323</span>
+<span id="324">324</span>
+<span id="325">325</span>
+<span id="326">326</span>
+<span id="327">327</span>
+<span id="328">328</span>
+<span id="329">329</span>
+<span id="330">330</span>
+<span id="331">331</span>
+<span id="332">332</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">CreateAllowedMentions</span>, <span class="ident">CreateAttachment</span>, <span class="ident">CreateComponents</span>, <span class="ident">CreateEmbed</span>};
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http&quot;</span>)]</span>
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::constants</span>;
@@ -438,7 +450,19 @@
             }
         }
 
-        <span class="self">self</span>.<span class="ident">_execute</span>(<span class="ident">cache_http</span>.<span class="ident">http</span>(), <span class="ident">channel_id</span>).<span class="kw">await</span>
+        <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>), <span class="ident">allow</span>(<span class="ident">unused_mut</span>))]</span>
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">message</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">_execute</span>(<span class="ident">cache_http</span>.<span class="ident">http</span>(), <span class="ident">channel_id</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+
+        <span class="comment">// HTTP sent Messages don&#39;t have guild_id set, so we fill it in ourselves by best effort</span>
+        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
+        <span class="kw">if</span> <span class="ident">message</span>.<span class="ident">guild_id</span>.<span class="ident">is_none</span>() {
+            <span class="comment">// Use either the passed in guild ID (e.g. if we were called from GuildChannel directly</span>
+            <span class="comment">// we already know our guild ID), and otherwise find the guild ID in cache</span>
+            <span class="ident">message</span>.<span class="ident">guild_id</span> <span class="op">=</span> <span class="ident">guild_id</span>
+                .<span class="ident">or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="prelude-val">Some</span>(<span class="ident">cache_http</span>.<span class="ident">cache</span>()<span class="question-mark">?</span>.<span class="ident">guild_channel</span>(<span class="ident">message</span>.<span class="ident">channel_id</span>)<span class="question-mark">?</span>.<span class="ident">guild_id</span>));
+        }
+
+        <span class="prelude-val">Ok</span>(<span class="ident">message</span>)
     }
 
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http&quot;</span>)]</span>

@@ -1062,6 +1062,13 @@
 <span id="1056">1056</span>
 <span id="1057">1057</span>
 <span id="1058">1058</span>
+<span id="1059">1059</span>
+<span id="1060">1060</span>
+<span id="1061">1061</span>
+<span id="1062">1062</span>
+<span id="1063">1063</span>
+<span id="1064">1064</span>
+<span id="1065">1065</span>
 </pre><pre class="rust"><code><span class="doccomment">//! Models relating to Discord channels.</span>
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
@@ -1114,7 +1121,12 @@
     <span class="doccomment">/// Array of embeds sent with the message.</span>
     <span class="kw">pub</span> <span class="ident">embeds</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Embed</span><span class="op">&gt;</span>,
     <span class="doccomment">/// The Id of the [`Guild`] that the message was sent in. This value will</span>
-    <span class="doccomment">/// only be present if this message was received over the gateway.</span>
+    <span class="doccomment">/// only be present if this message was received over the gateway, therefore **do not use this</span>
+    <span class="doccomment">/// to check if message is in DMs**, it is not a reliable method.</span>
+    <span class="comment">// TODO: maybe introduce an `enum MessageLocation { Dm, Guild(GuildId) }` and store</span>
+    <span class="comment">// `Option&lt;MessageLocation` here. Instead of None being ambiguous (is it in DMs? Or do we just</span>
+    <span class="comment">// not know because HTTP retrieved Messages don&#39;t have guild ID?), we&#39;d set</span>
+    <span class="comment">// Some(MessageLocation::Dm) in gateway and None in HTTP.</span>
     <span class="kw">pub</span> <span class="ident">guild_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">GuildId</span><span class="op">&gt;</span>,
     <span class="doccomment">/// Indicator of the type of message this is, i.e. whether it is a regular</span>
     <span class="doccomment">/// message or a system message.</span>
@@ -1270,9 +1282,6 @@
         {
             <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">cache</span>) <span class="op">=</span> <span class="ident">cache_http</span>.<span class="ident">cache</span>() {
                 <span class="kw">if</span> <span class="self">self</span>.<span class="ident">author</span>.<span class="ident">id</span> <span class="op">!</span><span class="op">=</span> <span class="ident">cache</span>.<span class="ident">current_user</span>().<span class="ident">id</span> {
-                    <span class="kw">if</span> <span class="self">self</span>.<span class="ident">is_private</span>() {
-                        <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::Model</span>(<span class="ident">ModelError::NotAuthor</span>));
-                    }
                     <span class="ident">utils::user_has_perms_cache</span>(
                         <span class="ident">cache</span>,
                         <span class="self">self</span>.<span class="ident">channel_id</span>,
@@ -1491,6 +1500,11 @@
     }
 
     <span class="doccomment">/// True if message was sent using direct messages.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// **Only use this for messages from the</span>
+    <span class="doccomment">/// gateway (event handler)!** Not for returned Message objects from HTTP requests, like</span>
+    <span class="doccomment">/// [`ChannelId::send_message`], because [`Self::guild_id`] is never set for those, which this</span>
+    <span class="doccomment">/// method relies on.</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="attribute">#[<span class="ident">must_use</span>]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_private</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
