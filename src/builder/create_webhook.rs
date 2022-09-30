@@ -1,3 +1,4 @@
+use super::CreateAttachment;
 #[cfg(feature = "http")]
 use crate::http::{CacheHttp, Http};
 #[cfg(feature = "http")]
@@ -81,26 +82,8 @@ impl<'a> CreateWebhook<'a> {
     }
 
     /// Set the webhook's default avatar.
-    ///
-    /// # Errors
-    ///
-    /// May error if the input is a URL and the HTTP request fails, or if it is a path to a file
-    /// that does not exist.
-    #[cfg(feature = "http")]
-    pub async fn avatar(
-        mut self,
-        http: impl AsRef<Http>,
-        avatar: impl Into<AttachmentType<'a>>,
-    ) -> Result<CreateWebhook<'a>> {
-        self.avatar = Some(avatar.into().to_base64(&http.as_ref().client).await?);
-        Ok(self)
-    }
-
-    #[cfg(not(feature = "http"))]
-    /// Set the webhook's default avatar. Requires the input be a base64-encoded image that is in
-    /// either JPG, GIF, or PNG format.
-    pub fn avatar(mut self, avatar: String) -> Self {
-        self.avatar = Some(avatar);
+    pub fn avatar(mut self, avatar: &CreateAttachment<'_>) -> Self {
+        self.avatar = Some(avatar.to_base64());
         self
     }
 
