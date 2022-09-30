@@ -1,7 +1,6 @@
 //! Models relating to channels and types within channels.
 
 mod attachment;
-mod attachment_type;
 mod channel_id;
 mod embed;
 mod guild_channel;
@@ -18,7 +17,6 @@ use std::num::NonZeroU64;
 use serde::de::{Error as DeError, Unexpected};
 
 pub use self::attachment::*;
-pub use self::attachment_type::*;
 pub use self::channel_id::*;
 pub use self::embed::*;
 pub use self::guild_channel::*;
@@ -38,6 +36,10 @@ use crate::model::utils::is_false;
 use crate::model::Timestamp;
 #[cfg(all(feature = "cache", feature = "model", feature = "utils"))]
 use crate::utils::parse_channel;
+
+#[deprecated = "use CreateAttachment instead"]
+#[cfg(feature = "model")]
+pub type AttachmentType<'a> = crate::builder::CreateAttachment<'a>;
 
 /// A container for any channel.
 #[derive(Clone, Debug, Serialize)]

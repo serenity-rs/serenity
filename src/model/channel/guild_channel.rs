@@ -4,6 +4,7 @@ use std::sync::Arc;
 
 #[cfg(feature = "model")]
 use crate::builder::{
+    CreateAttachment,
     CreateInvite,
     CreateMessage,
     CreateStageInstance,
@@ -26,8 +27,6 @@ use crate::collector::{MessageCollectorBuilder, ReactionCollectorBuilder};
 use crate::http::{CacheHttp, Http, Typing};
 #[cfg(all(feature = "cache", feature = "model"))]
 use crate::internal::prelude::*;
-#[cfg(feature = "model")]
-use crate::model::channel::AttachmentType;
 use crate::model::prelude::*;
 use crate::model::Timestamp;
 
@@ -704,7 +703,7 @@ impl GuildChannel {
     /// for demonstrative purposes):
     ///
     /// ```rust,no_run
-    /// use serenity::builder::CreateMessage;
+    /// use serenity::builder::{CreateAttachment, CreateMessage};
     /// use serenity::model::channel::Channel;
     /// use serenity::model::prelude::*;
     /// use serenity::prelude::*;
@@ -726,20 +725,10 @@ impl GuildChannel {
     ///                 return;
     ///             }
     ///
-    ///             let file = match File::open("./cat.png").await {
-    ///                 Ok(file) => file,
-    ///                 Err(why) => {
-    ///                     println!("Err opening file: {:?}", why);
-    ///
-    ///                     return;
-    ///                 },
-    ///             };
+    ///             let file = CreateAttachment::path("cat.png").await.unwrap();
     ///
     ///             let builder = CreateMessage::new().content("here's a cat");
-    ///             let _ = msg
-    ///                 .channel_id
-    ///                 .send_files(&context.http, vec![(&file, "cat.png")], builder)
-    ///                 .await;
+    ///             let _ = msg.channel_id.send_files(&context.http, vec![file], builder).await;
     ///         }
     ///     }
     /// }
@@ -890,16 +879,12 @@ impl GuildChannel {
     /// See [`CreateMessage::execute`] for a list of possible errors, and their corresponding
     /// reasons.
     #[inline]
-    pub async fn send_files<'a, T, It>(
-        &self,
+    pub async fn send_files<'a>(
+        self,
         cache_http: impl CacheHttp,
-        files: It,
+        files: impl IntoIterator<Item = CreateAttachment<'a>>,
         builder: CreateMessage<'a>,
-    ) -> Result<Message>
-    where
-        T: Into<AttachmentType<'a>>,
-        It: IntoIterator<Item = T>,
-    {
+    ) -> Result<Message> {
         builder
             .files(files)
             .execute(
