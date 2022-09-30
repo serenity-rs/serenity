@@ -18,14 +18,18 @@ use super::HttpError;
 use crate::constants;
 use crate::internal::prelude::*;
 
-pub struct RequestBuilder<'a> {
-    body: Option<Vec<u8>>,
-    multipart: Option<Multipart<'a>>,
-    headers: Option<Headers>,
-    route: RouteInfo<'a>,
+#[deprecated = "use Request directly now"]
+pub type RequestBuilder<'a> = Request<'a>;
+
+#[derive(Clone, Debug)]
+pub struct Request<'a> {
+    pub(super) body: Option<Vec<u8>>,
+    pub(super) multipart: Option<Multipart<'a>>,
+    pub(super) headers: Option<Headers>,
+    pub(super) route: RouteInfo<'a>,
 }
 
-impl<'a> RequestBuilder<'a> {
+impl<'a> Request<'a> {
     #[must_use]
     pub const fn new(route_info: RouteInfo<'a>) -> Self {
         Self {
@@ -34,11 +38,6 @@ impl<'a> RequestBuilder<'a> {
             headers: None,
             route: route_info,
         }
-    }
-
-    #[must_use]
-    pub fn build(self) -> Request<'a> {
-        Request::new(self)
     }
 
     pub fn body(&mut self, body: Option<Vec<u8>>) -> &mut Self {
@@ -64,36 +63,9 @@ impl<'a> RequestBuilder<'a> {
 
         self
     }
-}
-
-#[derive(Clone, Debug)]
-pub struct Request<'a> {
-    pub(super) body: Option<Vec<u8>>,
-    pub(super) multipart: Option<Multipart<'a>>,
-    pub(super) headers: Option<Headers>,
-    pub(super) route: RouteInfo<'a>,
-}
-
-impl<'a> Request<'a> {
-    #[must_use]
-    pub fn new(builder: RequestBuilder<'a>) -> Self {
-        let RequestBuilder {
-            body,
-            multipart,
-            headers,
-            route,
-        } = builder;
-
-        Self {
-            body,
-            multipart,
-            headers,
-            route,
-        }
-    }
 
     #[instrument(skip(token))]
-    pub async fn build(
+    pub fn build(
         mut self,
         client: &Client,
         token: &str,
@@ -128,7 +100,7 @@ impl<'a> Request<'a> {
 
         if let Some(multipart) = multipart {
             // Setting multipart adds the content-length header
-            builder = builder.multipart(multipart.build_form(client).await?);
+            builder = builder.multipart(multipart.build_form()?);
         } else {
             let length = body
                 .as_ref()
