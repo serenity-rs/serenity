@@ -1,16 +1,15 @@
 use std::borrow::Cow;
 
 use reqwest::multipart::{Form, Part};
-use reqwest::Client;
 
-use super::AttachmentType;
+use crate::builder::CreateAttachment;
 use crate::internal::prelude::*;
 
 /// Holder for multipart body. Contains files, multipart fields, and
 /// payload_json for creating requests with attachments.
 #[derive(Clone, Debug)]
 pub struct Multipart<'a> {
-    pub files: Vec<AttachmentType<'a>>,
+    pub files: Vec<CreateAttachment<'a>>,
     /// Multipart text fields that are sent with the form data as individual
     /// fields. If a certain endpoint does not support passing JSON body via
     /// `payload_json`, this must be used instead.
@@ -20,7 +19,7 @@ pub struct Multipart<'a> {
 }
 
 impl<'a> Multipart<'a> {
-    pub(crate) async fn build_form(&mut self, client: &Client) -> Result<Form> {
+    pub(crate) fn build_form(&mut self) -> Result<Form> {
         let mut multipart = Form::new();
 
         for (file_num, file) in self.files.iter_mut().enumerate() {
@@ -30,23 +29,10 @@ impl<'a> Multipart<'a> {
             let part_name =
                 if file_num == 0 { "file".to_string() } else { format!("file{}", file_num) };
 
-            let data = file.data(client).await?;
-            let filename = file.filename()?;
-
-            // Modify current AttachmentType to Bytes variant to prevent the
-            // need for another disk read or network request when retrying
-            if let AttachmentType::Path(_) | AttachmentType::Image(_) = file {
-                *file = AttachmentType::Bytes {
-                    data: data.clone().into(),
-                    filename: filename.clone().unwrap_or_default(),
-                };
-            }
-
-            let mut part = Part::bytes(data);
-            if let Some(filename) = filename {
-                part = guess_mime_str(part, &filename)?;
-                part = part.file_name(filename);
-            }
+            let mut part = Part::bytes(file.data.to_vec());
+            let filename = file.filename.clone();
+            part = guess_mime_str(part, &filename)?;
+            part = part.file_name(filename);
             multipart = multipart.part(part_name, part);
         }
 

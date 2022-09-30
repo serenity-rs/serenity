@@ -102,7 +102,7 @@ impl MessageComponentInteraction {
     pub async fn edit_original_interaction_response(
         &self,
         http: impl AsRef<Http>,
-        builder: EditInteractionResponse,
+        builder: EditInteractionResponse<'_>,
     ) -> Result<Message> {
         builder.execute(http, &self.token).await
     }

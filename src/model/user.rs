@@ -235,15 +235,15 @@ impl CurrentUser {
     /// Change the avatar:
     ///
     /// ```rust,no_run
-    /// # use serenity::builder::EditProfile;
+    /// # use serenity::builder::{EditProfile, CreateAttachment};
     /// # use serenity::http::Http;
     /// # use serenity::model::user::CurrentUser;
     /// #
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// #     let http = Http::new("token");
     /// #     let mut user = CurrentUser::default();
-    /// let builder = EditProfile::new().avatar(&http, "./avatar.png").await?;
-    /// user.edit(&http, builder).await;
+    /// let avatar = CreateAttachment::path("./avatar.png").await?;
+    /// user.edit(&http, EditProfile::new().avatar(&avatar)).await;
     /// #     Ok(())
     /// # }
     /// ```
