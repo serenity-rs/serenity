@@ -38,6 +38,7 @@
 <span id="32">32</span>
 <span id="33">33</span>
 <span id="34">34</span>
+<span id="35">35</span>
 </pre><pre class="rust"><code><span class="doccomment">//! The model prelude re-exports all types in the model sub-modules.</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! This allows for quick and easy access to all of the model types.</span>
@@ -49,10 +50,13 @@
 <span class="doccomment">//! ```rust,no_run</span>
 <span class="doccomment">//! use serenity::model::prelude::*;</span>
 <span class="doccomment">//! ```</span>
-<span class="attribute">#[<span class="ident">allow</span>(<span class="ident">deprecated</span>)]</span>
 <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">inline</span>)]</span>
 <span class="kw">pub</span> <span class="kw">use</span> <span class="kw">super</span>::{
+    <span class="ident">application::interaction::MessageFlags</span> <span class="kw">as</span> <span class="ident">InteractionApplicationCommandCallbackDataFlags</span>,
+    <span class="ident">application::interaction</span>::<span class="kw-2">*</span>,
+    <span class="ident">application::oauth</span>::<span class="kw-2">*</span>,
     <span class="ident">application</span>::<span class="kw-2">*</span>,
+    <span class="ident">channel::MessageFlags</span>,
     <span class="ident">channel</span>::<span class="kw-2">*</span>,
     <span class="ident">connection</span>::<span class="kw-2">*</span>,
     <span class="ident">event</span>::<span class="kw-2">*</span>,
@@ -60,11 +64,9 @@
     <span class="ident">guild::audit_log</span>::<span class="kw-2">*</span>,
     <span class="ident">guild</span>::<span class="kw-2">*</span>,
     <span class="ident">id</span>::<span class="kw-2">*</span>,
-    <span class="ident">interactions</span>::<span class="kw-2">*</span>,
     <span class="ident">invite</span>::<span class="kw-2">*</span>,
     <span class="ident">mention</span>::<span class="kw-2">*</span>,
     <span class="ident">misc</span>::<span class="kw-2">*</span>,
-    <span class="ident">oauth2</span>::<span class="kw-2">*</span>,
     <span class="ident">permissions</span>::<span class="kw-2">*</span>,
     <span class="ident">sticker</span>::<span class="kw-2">*</span>,
     <span class="ident">user</span>::<span class="kw-2">*</span>,

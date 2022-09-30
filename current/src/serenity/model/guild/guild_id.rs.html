@@ -1900,6 +1900,8 @@
 <span id="1894">1894</span>
 <span id="1895">1895</span>
 <span id="1896">1896</span>
+<span id="1897">1897</span>
+<span id="1898">1898</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::fmt</span>;
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
@@ -3264,6 +3266,7 @@
     <span class="doccomment">/// [`utils::shard_id`]: crate::utils::shard_id</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;utils&quot;</span>))]</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
+    <span class="attribute">#[<span class="ident">must_use</span>]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">shard_id</span>(<span class="self">self</span>, <span class="ident">cache</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Cache</span><span class="op">&gt;</span>) -&gt; <span class="ident">u64</span> {
         <span class="ident"><span class="kw">crate</span>::utils::shard_id</span>(<span class="self">self</span>.<span class="number">0</span>, <span class="ident">cache</span>.<span class="ident">as_ref</span>().<span class="ident">shard_count</span>())
     }
@@ -3291,6 +3294,7 @@
     <span class="doccomment">/// ```</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;utils&quot;</span>, <span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)))]</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
+    <span class="attribute">#[<span class="ident">must_use</span>]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">shard_id</span>(<span class="self">self</span>, <span class="ident">shard_count</span>: <span class="ident">u64</span>) -&gt; <span class="ident">u64</span> {
         <span class="ident"><span class="kw">crate</span>::utils::shard_id</span>(<span class="self">self</span>.<span class="number">0</span>, <span class="ident">shard_count</span>)
     }
