@@ -1,3 +1,4 @@
+use super::CreateAttachment;
 #[cfg(feature = "http")]
 use crate::http::{CacheHttp, Http};
 #[cfg(feature = "http")]
@@ -175,28 +176,8 @@ impl<'a> EditRole<'a> {
     }
 
     /// Set the role icon to a custom image.
-    ///
-    /// # Errors
-    ///
-    /// May error if the icon is a URL and the HTTP request fails, or if the icon is a file
-    /// on a path that doesn't exist.
-    #[cfg(feature = "http")]
-    pub async fn icon(
-        mut self,
-        http: impl AsRef<Http>,
-        icon: impl Into<AttachmentType<'a>>,
-    ) -> Result<EditRole<'a>> {
-        self.icon = Some(icon.into().to_base64(&http.as_ref().client).await?);
-        self.unicode_emoji = None;
-
-        Ok(self)
-    }
-
-    /// Set the role icon to custom image. Requires the input be a base64-encoded image that is in
-    /// either JPG, GIF, or PNG format.
-    #[cfg(not(feature = "http"))]
-    pub fn icon(mut self, icon: String) -> Self {
-        self.icon = Some(icon);
+    pub fn icon(mut self, icon: &CreateAttachment<'_>) -> Self {
+        self.icon = Some(icon.to_base64());
         self.unicode_emoji = None;
         self
     }

@@ -1,4 +1,4 @@
-use super::{CreateAllowedMentions, CreateComponents, CreateEmbed};
+use super::{CreateAllowedMentions, CreateAttachment, CreateComponents, CreateEmbed};
 #[cfg(feature = "http")]
 use crate::constants;
 #[cfg(feature = "http")]
@@ -66,7 +66,7 @@ pub struct CreateMessage<'a> {
 
     // The following fields are handled separately.
     #[serde(skip)]
-    files: Vec<AttachmentType<'a>>,
+    files: Vec<CreateAttachment<'a>>,
     #[serde(skip)]
     reactions: Vec<ReactionType>,
 }
@@ -119,12 +119,7 @@ impl<'a> CreateMessage<'a> {
     async fn _execute(mut self, http: &Http, channel_id: ChannelId) -> Result<Message> {
         self.check_length()?;
         let files = std::mem::take(&mut self.files);
-
-        let message = if files.is_empty() {
-            http.send_message(channel_id.into(), &self).await?
-        } else {
-            http.send_files(channel_id.into(), files, &self).await?
-        };
+        let message = http.send_message(channel_id.into(), files, &self).await?;
 
         for reaction in self.reactions {
             channel_id.create_reaction(http, message.id, reaction).await?;
@@ -221,8 +216,8 @@ impl<'a> CreateMessage<'a> {
     /// **Note**: Requires the [Attach Files] permission.
     ///
     /// [Attach Files]: Permissions::ATTACH_FILES
-    pub fn add_file<T: Into<AttachmentType<'a>>>(mut self, file: T) -> Self {
-        self.files.push(file.into());
+    pub fn add_file(mut self, file: CreateAttachment<'a>) -> Self {
+        self.files.push(file);
         self
     }
 
@@ -231,11 +226,8 @@ impl<'a> CreateMessage<'a> {
     /// **Note**: Requires the [Attach Files] permission.
     ///
     /// [Attach Files]: Permissions::ATTACH_FILES
-    pub fn add_files<T: Into<AttachmentType<'a>>, It: IntoIterator<Item = T>>(
-        mut self,
-        files: It,
-    ) -> Self {
-        self.files.extend(files.into_iter().map(Into::into));
+    pub fn add_files(mut self, files: impl IntoIterator<Item = CreateAttachment<'a>>) -> Self {
+        self.files.extend(files);
         self
     }
 
@@ -247,11 +239,8 @@ impl<'a> CreateMessage<'a> {
     /// **Note**: Requires the [Attach Files] permission.
     ///
     /// [Attach Files]: Permissions::ATTACH_FILES
-    pub fn files<T: Into<AttachmentType<'a>>, It: IntoIterator<Item = T>>(
-        mut self,
-        files: It,
-    ) -> Self {
-        self.files = files.into_iter().map(Into::into).collect();
+    pub fn files(mut self, files: impl IntoIterator<Item = CreateAttachment<'a>>) -> Self {
+        self.files = files.into_iter().collect();
         self
     }
 

@@ -204,7 +204,7 @@ impl Ratelimiter {
 
             bucket.lock().await.pre_hook(&req.route, &self.ratelimit_callback).await;
 
-            let request = req.clone().build(&self.client, &self.token, None).await?.build()?;
+            let request = req.clone().build(&self.client, &self.token, None)?.build()?;
 
             let response = self.client.execute(request).await?;
 

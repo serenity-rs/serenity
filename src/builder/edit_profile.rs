@@ -1,9 +1,10 @@
+use super::CreateAttachment;
 #[cfg(feature = "http")]
 use crate::http::Http;
 #[cfg(feature = "http")]
 use crate::internal::prelude::*;
 #[cfg(feature = "http")]
-use crate::model::{channel::AttachmentType, user::CurrentUser};
+use crate::model::user::CurrentUser;
 
 /// A builder to edit the current user's settings, to be used in conjunction with
 /// [`CurrentUser::edit`].
@@ -38,47 +39,19 @@ impl EditProfile {
     /// # Examples
     ///
     /// ```rust,no_run
-    /// # #[cfg(all(feature = "client", feature = "cache", feature = "gateway"))]
-    /// # {
-    /// # use serenity::builder::EditProfile;
+    /// # use serenity::builder::{EditProfile, CreateAttachment};
     /// # use serenity::prelude::*;
     /// # use serenity::model::prelude::*;
+    /// # use serenity::http::Http;
     /// #
-    /// # struct Handler;
-    /// #
-    /// # #[serenity::async_trait]
-    /// # impl EventHandler for Handler {
-    /// #     async fn message(&self, context: Context, _: Message) {
-    /// // assuming a `context` has been bound
-    /// let mut user = context.cache.current_user().clone();
-    ///
-    /// let builder =
-    ///     EditProfile::new().avatar(&context, "./my_image.jpg").await.expect("Failed to read image.");
-    /// let _ = user.edit(&context, builder).await;
-    /// #     }
-    /// # }
-    /// # }
+    /// # #[cfg(feature = "http")]
+    /// # async fn _foo(http: &Http, current_user: &mut CurrentUser) -> Result<(), SerenityError> {
+    /// let avatar = CreateAttachment::path("./my_image.jpg").await.expect("Failed to read image.");
+    /// current_user.edit(http, EditProfile::new().avatar(&avatar)).await?;
+    /// # Ok(()) }
     /// ```
-    ///
-    /// # Errors
-    ///
-    /// May error if the input is a URL and the HTTP request fails, or if it is a path to a file
-    /// that does not exist.
-    #[cfg(feature = "http")]
-    pub async fn avatar<'a>(
-        mut self,
-        http: impl AsRef<Http>,
-        avatar: impl Into<AttachmentType<'a>>,
-    ) -> Result<Self> {
-        self.avatar = Some(Some(avatar.into().to_base64(&http.as_ref().client).await?));
-        Ok(self)
-    }
-
-    #[cfg(not(feature = "http"))]
-    /// Set the current user's avatar. Requires the input be a base64-encoded image that is in
-    /// either JPG, GIF, or PNG format.
-    pub fn avatar(mut self, avatar: String) -> Self {
-        self.avatar = Some(Some(avatar));
+    pub fn avatar(mut self, avatar: &CreateAttachment<'_>) -> Self {
+        self.avatar = Some(Some(avatar.to_base64()));
         self
     }
 
