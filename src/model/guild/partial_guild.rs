@@ -945,8 +945,11 @@ impl PartialGuild {
     /// Returns [`Error::Http`] if the current user is not
     /// in the guild.
     #[inline]
-    pub async fn get(http: impl AsRef<Http>, guild_id: impl Into<GuildId>) -> Result<PartialGuild> {
-        guild_id.into().to_partial_guild(&http).await
+    pub async fn get(
+        cache_http: impl CacheHttp,
+        guild_id: impl Into<GuildId>,
+    ) -> Result<PartialGuild> {
+        guild_id.into().to_partial_guild(cache_http).await
     }
 
     /// Returns which of two [`User`]s has a higher [`Member`] hierarchy.

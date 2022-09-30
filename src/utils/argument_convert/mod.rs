@@ -38,7 +38,7 @@ pub trait ArgumentConvert: Sized {
 
     /// Parses a string `s` as a command parameter of this type.
     async fn convert(
-        ctx: &Context,
+        ctx: impl CacheHttp,
         guild_id: Option<GuildId>,
         channel_id: Option<ChannelId>,
         s: &str,
@@ -50,7 +50,7 @@ impl<T: std::str::FromStr> ArgumentConvert for T {
     type Err = <T as std::str::FromStr>::Err;
 
     async fn convert(
-        _: &Context,
+        _: impl CacheHttp,
         _: Option<GuildId>,
         _: Option<ChannelId>,
         s: &str,
