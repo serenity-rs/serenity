@@ -1198,27 +1198,13 @@
 <span id="1192">1192</span>
 <span id="1193">1193</span>
 <span id="1194">1194</span>
-<span id="1195">1195</span>
-<span id="1196">1196</span>
-<span id="1197">1197</span>
-<span id="1198">1198</span>
-<span id="1199">1199</span>
-<span id="1200">1200</span>
-<span id="1201">1201</span>
-<span id="1202">1202</span>
-<span id="1203">1203</span>
-<span id="1204">1204</span>
-<span id="1205">1205</span>
-<span id="1206">1206</span>
-<span id="1207">1207</span>
-<span id="1208">1208</span>
-<span id="1209">1209</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::fmt</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
 <span class="kw">use</span> <span class="ident">std::sync::Arc</span>;
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::builder</span>::{
+    <span class="ident">CreateAttachment</span>,
     <span class="ident">CreateInvite</span>,
     <span class="ident">CreateMessage</span>,
     <span class="ident">CreateStageInstance</span>,
@@ -1241,8 +1227,6 @@
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::http</span>::{<span class="ident">CacheHttp</span>, <span class="ident">Http</span>, <span class="ident">Typing</span>};
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>))]</span>
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::internal::prelude</span>::<span class="kw-2">*</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::channel::AttachmentType</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::prelude</span>::<span class="kw-2">*</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::Timestamp</span>;
 
@@ -1921,7 +1905,7 @@
     <span class="doccomment">/// for demonstrative purposes):</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// ```rust,no_run</span>
-    <span class="doccomment">/// use serenity::builder::CreateMessage;</span>
+    <span class="doccomment">/// use serenity::builder::{CreateAttachment, CreateMessage};</span>
     <span class="doccomment">/// use serenity::model::channel::Channel;</span>
     <span class="doccomment">/// use serenity::model::prelude::*;</span>
     <span class="doccomment">/// use serenity::prelude::*;</span>
@@ -1943,20 +1927,10 @@
     <span class="doccomment">///                 return;</span>
     <span class="doccomment">///             }</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">///             let file = match File::open(&quot;./cat.png&quot;).await {</span>
-    <span class="doccomment">///                 Ok(file) =&gt; file,</span>
-    <span class="doccomment">///                 Err(why) =&gt; {</span>
-    <span class="doccomment">///                     println!(&quot;Err opening file: {:?}&quot;, why);</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">///                     return;</span>
-    <span class="doccomment">///                 },</span>
-    <span class="doccomment">///             };</span>
+    <span class="doccomment">///             let file = CreateAttachment::path(&quot;cat.png&quot;).await.unwrap();</span>
     <span class="doccomment">///</span>
     <span class="doccomment">///             let builder = CreateMessage::new().content(&quot;here&#39;s a cat&quot;);</span>
-    <span class="doccomment">///             let _ = msg</span>
-    <span class="doccomment">///                 .channel_id</span>
-    <span class="doccomment">///                 .send_files(&amp;context.http, vec![(&amp;file, &quot;cat.png&quot;)], builder)</span>
-    <span class="doccomment">///                 .await;</span>
+    <span class="doccomment">///             let _ = msg.channel_id.send_files(&amp;context.http, vec![file], builder).await;</span>
     <span class="doccomment">///         }</span>
     <span class="doccomment">///     }</span>
     <span class="doccomment">/// }</span>
@@ -2103,16 +2077,12 @@
     <span class="doccomment">/// See [`CreateMessage::execute`] for a list of possible errors, and their corresponding</span>
     <span class="doccomment">/// reasons.</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">send_files</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span>, <span class="ident">It</span><span class="op">&gt;</span>(
-        <span class="kw-2">&amp;</span><span class="self">self</span>,
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">send_files</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(
+        <span class="self">self</span>,
         <span class="ident">cache_http</span>: <span class="kw">impl</span> <span class="ident">CacheHttp</span>,
-        <span class="ident">files</span>: <span class="ident">It</span>,
+        <span class="ident">files</span>: <span class="kw">impl</span> <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">CreateAttachment</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>,
         <span class="ident">builder</span>: <span class="ident">CreateMessage</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Message</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">AttachmentType</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-        <span class="ident">It</span>: <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">T</span><span class="op">&gt;</span>,
-    {
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Message</span><span class="op">&gt;</span> {
         <span class="ident">builder</span>
             .<span class="ident">files</span>(<span class="ident">files</span>)
             .<span class="ident">execute</span>(

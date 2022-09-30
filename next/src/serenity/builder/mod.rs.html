@@ -108,6 +108,9 @@
 <span id="102">102</span>
 <span id="103">103</span>
 <span id="104">104</span>
+<span id="105">105</span>
+<span id="106">106</span>
+<span id="107">107</span>
 </pre><pre class="rust"><code><span class="doccomment">//! A set of builders used to make using methods on certain structs simpler to</span>
 <span class="doccomment">//! use.</span>
 <span class="doccomment">//!</span>
@@ -128,6 +131,7 @@
 <span class="kw">mod</span> <span class="ident">add_member</span>;
 <span class="kw">mod</span> <span class="ident">bot_auth_parameters</span>;
 <span class="kw">mod</span> <span class="ident">create_allowed_mentions</span>;
+<span class="kw">mod</span> <span class="ident">create_attachment</span>;
 <span class="kw">mod</span> <span class="ident">create_components</span>;
 <span class="kw">mod</span> <span class="ident">create_interaction_response</span>;
 <span class="kw">mod</span> <span class="ident">create_interaction_response_followup</span>;
@@ -169,6 +173,8 @@
     <span class="ident">CreateApplicationCommandPermissionData</span>,
     <span class="ident">CreateApplicationCommandPermissionsData</span>,
 };
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="self">self</span>::create_attachment::CreateAttachment</span>;
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use</span> <span class="ident"><span class="self">self</span>::create_attachment::ExistingAttachment</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="self">self</span>::create_channel::CreateChannel</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="self">self</span>::create_components</span>::{
     <span class="ident">CreateActionRow</span>,

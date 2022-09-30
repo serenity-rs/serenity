@@ -1194,6 +1194,7 @@
 <span id="1188">1188</span>
 <span id="1189">1189</span>
 <span id="1190">1190</span>
+<span id="1191">1191</span>
 </pre><pre class="rust"><code><span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
 <span class="kw">use</span> <span class="ident">std::sync::Arc</span>;
 
@@ -1202,6 +1203,7 @@
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::builder</span>::{
+    <span class="ident">CreateAttachment</span>,
     <span class="ident">CreateInvite</span>,
     <span class="ident">CreateMessage</span>,
     <span class="ident">CreateStageInstance</span>,
@@ -1223,8 +1225,6 @@
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::http</span>::{<span class="ident">CacheHttp</span>, <span class="ident">Http</span>, <span class="ident">Typing</span>};
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::json::json</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::channel::AttachmentType</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::prelude</span>::<span class="kw-2">*</span>;
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
@@ -1851,18 +1851,21 @@
     <span class="doccomment">/// # use serenity::http::Http;</span>
     <span class="doccomment">/// # use std::sync::Arc;</span>
     <span class="doccomment">/// #</span>
-    <span class="doccomment">/// # async fn run() {</span>
+    <span class="doccomment">/// # async fn run() -&gt; Result&lt;(), serenity::Error&gt; {</span>
     <span class="doccomment">/// # let http = Arc::new(Http::new(&quot;token&quot;));</span>
-    <span class="doccomment">/// use serenity::builder::CreateMessage;</span>
+    <span class="doccomment">/// use serenity::builder::{CreateAttachment, CreateMessage};</span>
     <span class="doccomment">/// use serenity::model::id::ChannelId;</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// let channel_id = ChannelId::new(7);</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// let paths = vec![&quot;/path/to/file.jpg&quot;, &quot;path/to/file2.jpg&quot;];</span>
+    <span class="doccomment">/// let paths = vec![</span>
+    <span class="doccomment">///     CreateAttachment::path(&quot;/path/to/file.jpg&quot;).await?,</span>
+    <span class="doccomment">///     CreateAttachment::path(&quot;path/to/file2.jpg&quot;).await?,</span>
+    <span class="doccomment">/// ];</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// let builder = CreateMessage::new().content(&quot;some files&quot;);</span>
-    <span class="doccomment">/// let _ = channel_id.send_files(&amp;http, paths, builder).await;</span>
-    <span class="doccomment">/// # }</span>
+    <span class="doccomment">/// channel_id.send_files(&amp;http, paths, builder).await?;</span>
+    <span class="doccomment">/// # Ok(()) }</span>
     <span class="doccomment">/// ```</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// Send files using [`File`]:</span>
@@ -1873,7 +1876,7 @@
     <span class="doccomment">/// #</span>
     <span class="doccomment">/// # async fn run() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {</span>
     <span class="doccomment">/// # let http = Arc::new(Http::new(&quot;token&quot;));</span>
-    <span class="doccomment">/// use serenity::builder::CreateMessage;</span>
+    <span class="doccomment">/// use serenity::builder::{CreateAttachment, CreateMessage};</span>
     <span class="doccomment">/// use serenity::model::id::ChannelId;</span>
     <span class="doccomment">/// use tokio::fs::File;</span>
     <span class="doccomment">///</span>
@@ -1882,7 +1885,10 @@
     <span class="doccomment">/// let f1 = File::open(&quot;my_file.jpg&quot;).await?;</span>
     <span class="doccomment">/// let f2 = File::open(&quot;my_file2.jpg&quot;).await?;</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// let files = vec![(&amp;f1, &quot;my_file.jpg&quot;), (&amp;f2, &quot;my_file2.jpg&quot;)];</span>
+    <span class="doccomment">/// let files = vec![</span>
+    <span class="doccomment">///     CreateAttachment::file(&amp;f1, &quot;my_file.jpg&quot;).await?,</span>
+    <span class="doccomment">///     CreateAttachment::file(&amp;f2, &quot;my_file2.jpg&quot;).await?,</span>
+    <span class="doccomment">/// ];</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// let builder = CreateMessage::new().content(&quot;some files&quot;);</span>
     <span class="doccomment">/// let _ = channel_id.send_files(&amp;http, files, builder).await;</span>
@@ -1896,16 +1902,12 @@
     <span class="doccomment">/// reasons.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// [`File`]: tokio::fs::File</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">send_files</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span>, <span class="ident">It</span><span class="op">&gt;</span>(
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">send_files</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(
         <span class="self">self</span>,
         <span class="ident">cache_http</span>: <span class="kw">impl</span> <span class="ident">CacheHttp</span>,
-        <span class="ident">files</span>: <span class="ident">It</span>,
+        <span class="ident">files</span>: <span class="kw">impl</span> <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">CreateAttachment</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>,
         <span class="ident">builder</span>: <span class="ident">CreateMessage</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Message</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">AttachmentType</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-        <span class="ident">It</span>: <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">T</span><span class="op">&gt;</span>,
-    {
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Message</span><span class="op">&gt;</span> {
         <span class="ident">builder</span>
             .<span class="ident">files</span>(<span class="ident">files</span>)
             .<span class="ident">execute</span>(

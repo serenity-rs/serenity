@@ -1590,15 +1590,15 @@
     <span class="doccomment">/// Change the avatar:</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// ```rust,no_run</span>
-    <span class="doccomment">/// # use serenity::builder::EditProfile;</span>
+    <span class="doccomment">/// # use serenity::builder::{EditProfile, CreateAttachment};</span>
     <span class="doccomment">/// # use serenity::http::Http;</span>
     <span class="doccomment">/// # use serenity::model::user::CurrentUser;</span>
     <span class="doccomment">/// #</span>
     <span class="doccomment">/// # async fn run() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {</span>
     <span class="doccomment">/// #     let http = Http::new(&quot;token&quot;);</span>
     <span class="doccomment">/// #     let mut user = CurrentUser::default();</span>
-    <span class="doccomment">/// let builder = EditProfile::new().avatar(&amp;http, &quot;./avatar.png&quot;).await?;</span>
-    <span class="doccomment">/// user.edit(&amp;http, builder).await;</span>
+    <span class="doccomment">/// let avatar = CreateAttachment::path(&quot;./avatar.png&quot;).await?;</span>
+    <span class="doccomment">/// user.edit(&amp;http, EditProfile::new().avatar(&amp;avatar)).await;</span>
     <span class="doccomment">/// #     Ok(())</span>
     <span class="doccomment">/// # }</span>
     <span class="doccomment">/// ```</span>
