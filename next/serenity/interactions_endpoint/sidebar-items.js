@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"struct":[["InvalidKey","The byte array couldn’t be parsed into a valid cryptographic public key."],["Verifier","Used to cryptographically verify incoming interactions HTTP request for authenticity."]]};
