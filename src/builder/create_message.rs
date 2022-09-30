@@ -112,7 +112,19 @@ impl<'a> CreateMessage<'a> {
             }
         }
 
-        self._execute(cache_http.http(), channel_id).await
+        #[cfg_attr(not(feature = "cache"), allow(unused_mut))]
+        let mut message = self._execute(cache_http.http(), channel_id).await?;
+
+        // HTTP sent Messages don't have guild_id set, so we fill it in ourselves by best effort
+        #[cfg(feature = "cache")]
+        if message.guild_id.is_none() {
+            // Use either the passed in guild ID (e.g. if we were called from GuildChannel directly
+            // we already know our guild ID), and otherwise find the guild ID in cache
+            message.guild_id = guild_id
+                .or_else(|| Some(cache_http.cache()?.guild_channel(message.channel_id)?.guild_id));
+        }
+
+        Ok(message)
     }
 
     #[cfg(feature = "http")]
