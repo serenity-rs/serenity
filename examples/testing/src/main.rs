@@ -4,7 +4,11 @@ use serenity::model::prelude::interaction::application_command::*;
 use serenity::model::prelude::*;
 use serenity::prelude::*;
 
+const IMAGE_URL: &str = "https://raw.githubusercontent.com/serenity-rs/serenity/current/logo.png";
+const IMAGE_URL_2: &str = "https://rustacean.net/assets/rustlogo.png";
+
 async fn message(ctx: &Context, msg: Message) -> Result<(), serenity::Error> {
+    let channel_id = msg.channel_id;
     if let Some(_args) = msg.content.strip_prefix("testmessage ") {
         println!("command message: {:#?}", msg);
     } else if msg.content == "globalcommand" {
@@ -20,9 +24,53 @@ async fn message(ctx: &Context, msg: Message) -> Result<(), serenity::Error> {
         guild_id
             .create_application_command(
                 &ctx,
+                CreateApplicationCommand::new("editattachments").description("test command"),
+            )
+            .await?;
+        guild_id
+            .create_application_command(
+                &ctx,
+                CreateApplicationCommand::new("unifiedattachments1").description("test command"),
+            )
+            .await?;
+        guild_id
+            .create_application_command(
+                &ctx,
+                CreateApplicationCommand::new("unifiedattachments2").description("test command"),
+            )
+            .await?;
+        guild_id
+            .create_application_command(
+                &ctx,
                 CreateApplicationCommand::new("editembeds").description("test command"),
             )
             .await?;
+    } else if msg.content == "edit" {
+        let mut msg = channel_id
+            .send_message(
+                &ctx,
+                CreateMessage::new().add_file(CreateAttachment::url(ctx, IMAGE_URL).await?),
+            )
+            .await?;
+        // Pre-PR, this falsely triggered a MODEL_TYPE_CONVERT Discord error
+        msg.edit(&ctx, EditMessage::new().add_existing_attachment(msg.attachments[0].id)).await?;
+    } else if msg.content == "unifiedattachments" {
+        let mut msg = channel_id.send_message(ctx, CreateMessage::new().content("works")).await?;
+        msg.edit(ctx, EditMessage::new().content("works still")).await?;
+
+        let mut msg = channel_id
+            .send_message(
+                ctx,
+                CreateMessage::new().add_file(CreateAttachment::url(ctx, IMAGE_URL).await?),
+            )
+            .await?;
+        msg.edit(
+            ctx,
+            EditMessage::new()
+                .attachment(CreateAttachment::url(ctx, IMAGE_URL_2).await?)
+                .add_existing_attachment(msg.attachments[0].id),
+        )
+        .await?;
     } else {
         return Ok(());
     }
@@ -35,7 +83,92 @@ async fn interaction(
     ctx: &Context,
     interaction: ApplicationCommandInteraction,
 ) -> Result<(), serenity::Error> {
-    if interaction.data.name == "editembeds" {
+    if interaction.data.name == "editattachments" {
+        // Respond with an image
+        interaction
+            .create_interaction_response(
+                &ctx,
+                CreateInteractionResponse::new().interaction_response_data(
+                    CreateInteractionResponseData::new()
+                        .add_file(CreateAttachment::url(ctx, IMAGE_URL).await?),
+                ),
+            )
+            .await?;
+
+        // We need to know the attachments' IDs in order to not lose them in the subsequent edit
+        let msg = interaction.get_interaction_response(ctx).await?;
+
+        // Add another image
+        let msg = interaction
+            .edit_original_interaction_response(
+                &ctx,
+                EditInteractionResponse::new()
+                    .new_attachment(CreateAttachment::url(ctx, IMAGE_URL_2).await?)
+                    .keep_existing_attachment(msg.attachments[0].id),
+            )
+            .await?;
+
+        tokio::time::sleep(tokio::time::Duration::from_secs(1)).await;
+
+        // Only keep the new image, removing the first image
+        let _msg = interaction
+            .edit_original_interaction_response(
+                &ctx,
+                EditInteractionResponse::new()
+                    .clear_existing_attachments()
+                    .keep_existing_attachment(msg.attachments[1].id),
+            )
+            .await?;
+    } else if interaction.data.name == "unifiedattachments1" {
+        interaction
+            .create_interaction_response(
+                ctx,
+                CreateInteractionResponse::new().interaction_response_data(
+                    CreateInteractionResponseData::new().content("works"),
+                ),
+            )
+            .await?;
+
+        interaction
+            .edit_original_interaction_response(
+                ctx,
+                EditInteractionResponse::new().content("works still"),
+            )
+            .await?;
+
+        interaction
+            .create_followup_message(
+                ctx,
+                CreateInteractionResponseFollowup::new().content("still works still"),
+            )
+            .await?;
+    } else if interaction.data.name == "unifiedattachments2" {
+        interaction
+            .create_interaction_response(
+                ctx,
+                CreateInteractionResponse::new().interaction_response_data(
+                    CreateInteractionResponseData::new()
+                        .add_file(CreateAttachment::url(ctx, IMAGE_URL).await?),
+                ),
+            )
+            .await?;
+
+        interaction
+            .edit_original_interaction_response(
+                ctx,
+                EditInteractionResponse::new()
+                    .new_attachment(CreateAttachment::url(ctx, IMAGE_URL_2).await?),
+            )
+            .await?;
+
+        interaction
+            .create_followup_message(
+                ctx,
+                CreateInteractionResponseFollowup::new()
+                    .add_file(CreateAttachment::url(ctx, IMAGE_URL).await?),
+            )
+            .await?;
+    } else if interaction.data.name == "editembeds" {
         interaction
             .create_interaction_response(
                 &ctx,
