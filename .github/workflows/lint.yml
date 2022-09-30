@@ -24,7 +24,7 @@ jobs:
         uses: Swatinem/rust-cache@v1
 
       - name: Run clippy
-        run: cargo clippy --workspace --tests
+        run: cargo clippy --workspace --tests -- -D warnings
 
   rustfmt:
     name: Format

@@ -258,7 +258,7 @@ impl ReactionFilter {
 struct FilterOptions {
     filter_limit: Option<u32>,
     collect_limit: Option<u32>,
-    filter: Option<Arc<dyn Fn(&Arc<Reaction>) -> bool + 'static + Send + Sync>>,
+    filter: Option<super::FilterFn<Reaction>>,
     channel_id: Option<u64>,
     guild_id: Option<u64>,
     author_id: Option<u64>,
@@ -372,7 +372,7 @@ impl fmt::Debug for FilterOptions {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         f.debug_struct("ReactionFilter")
             .field("collect_limit", &self.collect_limit)
-            .field("filter", &"Option<Arc<dyn Fn(&Arc<Reaction>) -> bool + 'static + Send + Sync>>")
+            .field("filter", &"Option<super::FilterFn<Reaction>>")
             .field("channel_id", &self.channel_id)
             .field("guild_id", &self.guild_id)
             .field("author_id", &self.author_id)
