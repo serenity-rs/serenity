@@ -121,7 +121,12 @@ pub struct Message {
     pub sticker_items: Vec<StickerItem>,
     // Field omitted: stickers (it's deprecated by Discord)
     /// The Id of the [`Guild`] that the message was sent in. This value will
-    /// only be present if this message was received over the gateway.
+    /// only be present if this message was received over the gateway, therefore **do not use this
+    /// to check if message is in DMs**, it is not a reliable method.
+    // TODO: maybe introduce an `enum MessageLocation { Dm, Guild(GuildId) }` and store
+    // `Option<MessageLocation` here. Instead of None being ambiguous (is it in DMs? Or do we just
+    // not know because HTTP retrieved Messages don't have guild ID?), we'd set
+    // Some(MessageLocation::Dm) in gateway and None in HTTP.
     pub guild_id: Option<GuildId>,
     /// A partial amount of data about the user's member data, if this message
     /// was sent in a guild.
@@ -435,6 +440,11 @@ impl Message {
     }
 
     /// True if message was sent using direct messages.
+    ///
+    /// **Only use this for messages from the
+    /// gateway (event handler)!** Not for returned Message objects from HTTP requests, like
+    /// [`ChannelId::send_message`], because [`Self::guild_id`] is never set for those, which this
+    /// method relies on.
     #[inline]
     #[must_use]
     pub fn is_private(&self) -> bool {
