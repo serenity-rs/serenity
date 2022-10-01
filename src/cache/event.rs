@@ -78,9 +78,9 @@ impl CacheUpdate for ChannelCreateEvent {
 }
 
 impl CacheUpdate for ChannelDeleteEvent {
-    type Output = ();
+    type Output = Vec<Message>;
 
-    fn update(&mut self, cache: &Cache) -> Option<()> {
+    fn update(&mut self, cache: &Cache) -> Option<Vec<Message>> {
         match &self.channel {
             Channel::Guild(channel) => {
                 let (guild_id, channel_id) = (channel.guild_id, channel.id);
@@ -97,9 +97,12 @@ impl CacheUpdate for ChannelDeleteEvent {
         };
 
         // Remove the cached messages for the channel.
-        cache.messages.remove(&self.channel.id());
-
-        None
+        match cache.messages.remove(&self.channel.id()) {
+            Some((_, messages)) => {
+                Some(messages.values().map(|msg| msg.to_owned()).collect::<Vec<_>>())
+            },
+            None => None,
+        }
     }
 }
 
