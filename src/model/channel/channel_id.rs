@@ -828,7 +828,7 @@ impl ChannelId {
     /// Returns a builder which can be awaited to obtain a message or stream of messages in this channel.
     #[cfg(feature = "collector")]
     pub fn reply_collector(self, shard_messenger: &ShardMessenger) -> MessageCollectorBuilder<'_> {
-        MessageCollectorBuilder::new(shard_messenger).channel_id(self.0)
+        MessageCollectorBuilder::new(shard_messenger).channel_id(self)
     }
 
     /// Returns a builder which can be awaited to obtain a reaction or stream of reactions sent in this channel.
@@ -837,7 +837,7 @@ impl ChannelId {
         self,
         shard_messenger: &ShardMessenger,
     ) -> ReactionCollectorBuilder<'_> {
-        ReactionCollectorBuilder::new(shard_messenger).channel_id(self.0)
+        ReactionCollectorBuilder::new(shard_messenger).channel_id(self)
     }
 
     /// Gets a stage instance.

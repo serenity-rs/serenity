@@ -767,7 +767,7 @@ impl Message {
         &self,
         shard_messenger: &'a ShardMessenger,
     ) -> ReactionCollectorBuilder<'a> {
-        ReactionCollectorBuilder::new(shard_messenger).message_id(self.id.0)
+        ReactionCollectorBuilder::new(shard_messenger).message_id(self.id)
     }
 
     /// Returns a builder which can be awaited to obtain a reaction or stream of component interactions on this message.
@@ -776,7 +776,7 @@ impl Message {
         &self,
         shard_messenger: &'a ShardMessenger,
     ) -> ComponentInteractionCollectorBuilder<'a> {
-        ComponentInteractionCollectorBuilder::new(shard_messenger).message_id(self.id.0)
+        ComponentInteractionCollectorBuilder::new(shard_messenger).message_id(self.id)
     }
 
     /// Returns a builder which can be awaited to obtain a model submit interaction or stream of modal submit interactions on this message.
@@ -785,7 +785,7 @@ impl Message {
         &self,
         shard_messenger: &'a ShardMessenger,
     ) -> ModalInteractionCollectorBuilder<'a> {
-        ModalInteractionCollectorBuilder::new(shard_messenger).message_id(self.id.0)
+        ModalInteractionCollectorBuilder::new(shard_messenger).message_id(self.id)
     }
 
     /// Retrieves the message channel's category ID if the channel has one.

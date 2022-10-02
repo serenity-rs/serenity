@@ -2522,7 +2522,7 @@ impl Guild {
         &self,
         shard_messenger: &'a ShardMessenger,
     ) -> MessageCollectorBuilder<'a> {
-        MessageCollectorBuilder::new(shard_messenger).guild_id(self.id.0)
+        MessageCollectorBuilder::new(shard_messenger).guild_id(self.id)
     }
 
     /// Returns a builder which can be awaited to obtain a message or stream of reactions sent in this guild.
@@ -2531,7 +2531,7 @@ impl Guild {
         &self,
         shard_messenger: &'a ShardMessenger,
     ) -> ReactionCollectorBuilder<'a> {
-        ReactionCollectorBuilder::new(shard_messenger).guild_id(self.id.0)
+        ReactionCollectorBuilder::new(shard_messenger).guild_id(self.id)
     }
 
     /// Gets the guild active threads.
