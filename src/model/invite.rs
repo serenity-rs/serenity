@@ -134,7 +134,7 @@ impl Invite {
         code: &str,
         member_counts: bool,
         expiration: bool,
-        event_id: Option<u64>,
+        event_id: Option<ScheduledEventId>,
     ) -> Result<Invite> {
         let mut invite = code;
 

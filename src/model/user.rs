@@ -1007,7 +1007,7 @@ impl User {
         &self,
         shard_messenger: &'a ShardMessenger,
     ) -> MessageCollectorBuilder<'a> {
-        MessageCollectorBuilder::new(shard_messenger).author_id(self.id.0)
+        MessageCollectorBuilder::new(shard_messenger).author_id(self.id)
     }
 
     /// Returns a builder which can be awaited to obtain a reaction or stream of reactions sent by this user.
@@ -1016,7 +1016,7 @@ impl User {
         &self,
         shard_messenger: &'a ShardMessenger,
     ) -> ReactionCollectorBuilder<'a> {
-        ReactionCollectorBuilder::new(shard_messenger).author_id(self.id.0)
+        ReactionCollectorBuilder::new(shard_messenger).author_id(self.id)
     }
 }
 
@@ -1096,7 +1096,7 @@ impl UserId {
             }
         }
 
-        let user = cache_http.http().get_user(self.get()).await?;
+        let user = cache_http.http().get_user(self).await?;
 
         #[cfg(all(feature = "cache", feature = "temp_cache"))]
         {

@@ -64,9 +64,9 @@ impl EditVoiceState {
     #[cfg(feature = "http")]
     async fn _execute(self, http: &Http, guild_id: GuildId, user_id: Option<UserId>) -> Result<()> {
         if let Some(user_id) = user_id {
-            http.edit_voice_state(guild_id.into(), user_id.into(), &self).await
+            http.edit_voice_state(guild_id, user_id, &self).await
         } else {
-            http.edit_voice_state_me(guild_id.into(), &self).await
+            http.edit_voice_state_me(guild_id, &self).await
         }
     }
 

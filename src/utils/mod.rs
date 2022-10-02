@@ -433,7 +433,7 @@ pub fn parse_quotes(s: impl AsRef<str>) -> Vec<String> {
 /// assert_eq!(token, "ig5AO-wdVWpCBtUUMxmgsWryqgsW3DChbKYOINftJ4DCrUbnkedoYZD0VOH1QLr-S3sV");
 /// ```
 #[must_use]
-pub fn parse_webhook(url: &Url) -> Option<(u64, &str)> {
+pub fn parse_webhook(url: &Url) -> Option<(WebhookId, &str)> {
     let (webhook_id, token) = url.path().strip_prefix("/api/webhooks/")?.split_once('/')?;
     if !["http", "https"].contains(&url.scheme())
         || !["discord.com", "discordapp.com"].contains(&url.domain()?)
@@ -442,7 +442,7 @@ pub fn parse_webhook(url: &Url) -> Option<(u64, &str)> {
     {
         return None;
     }
-    Some((webhook_id.parse().ok()?, token))
+    Some((WebhookId(webhook_id.parse().ok()?), token))
 }
 
 #[cfg(all(feature = "cache", feature = "model"))]
@@ -542,13 +542,15 @@ pub(crate) fn user_has_perms(
 /// 17 shards:
 ///
 /// ```rust
+/// use serenity::model::id::GuildId;
 /// use serenity::utils;
 ///
-/// assert_eq!(utils::shard_id(81384788765712384 as u64, 17), 7);
+/// assert_eq!(utils::shard_id(GuildId::new(81384788765712384), 17), 7);
 /// ```
 #[inline]
-pub fn shard_id(guild_id: impl Into<u64>, shard_count: u32) -> u32 {
-    ((guild_id.into() >> 22) % (shard_count as u64)) as u32
+#[must_use]
+pub fn shard_id(guild_id: GuildId, shard_count: u32) -> u32 {
+    ((guild_id.get() >> 22) % (shard_count as u64)) as u32
 }
 
 #[cfg(test)]

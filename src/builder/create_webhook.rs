@@ -70,7 +70,7 @@ impl<'a> CreateWebhook<'a> {
             return Err(Error::Model(ModelError::NameTooLong));
         }
 
-        http.create_webhook(channel_id.into(), &self, self.audit_log_reason).await
+        http.create_webhook(channel_id, &self, self.audit_log_reason).await
     }
 
     /// Set the webhook's name, replacing the current value as set in [`Self::new`].

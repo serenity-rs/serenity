@@ -125,12 +125,7 @@ impl Reaction {
 
         cache_http
             .http()
-            .delete_reaction(
-                self.channel_id.get(),
-                self.message_id.get(),
-                user_id.map(UserId::get),
-                &self.emoji,
-            )
+            .delete_reaction(self.channel_id, self.message_id, user_id, &self.emoji)
             .await
     }
 
@@ -163,11 +158,7 @@ impl Reaction {
         cache_http
             .http()
             .as_ref()
-            .delete_message_reaction_emoji(
-                self.channel_id.get(),
-                self.message_id.get(),
-                &self.emoji,
-            )
+            .delete_message_reaction_emoji(self.channel_id, self.message_id, &self.emoji)
             .await
     }
 
@@ -265,8 +256,8 @@ impl Reaction {
 
         http.as_ref()
             .get_reaction_users(
-                self.channel_id.get(),
-                self.message_id.get(),
+                self.channel_id,
+                self.message_id,
                 reaction_type,
                 limit,
                 after.map(UserId::get),
