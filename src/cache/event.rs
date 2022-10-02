@@ -97,12 +97,10 @@ impl CacheUpdate for ChannelDeleteEvent {
         };
 
         // Remove the cached messages for the channel.
-        match cache.messages.remove(&self.channel.id()) {
-            Some((_, messages)) => {
-                Some(messages.values().map(|msg| msg.to_owned()).collect::<Vec<_>>())
-            },
-            None => None,
-        }
+        cache
+            .messages
+            .remove(&self.channel.id())
+            .map(|(_, messages)| messages.values().cloned().collect())
     }
 }
 
