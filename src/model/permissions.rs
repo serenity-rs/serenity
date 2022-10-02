@@ -827,13 +827,12 @@ impl fmt::Display for Permissions {
 
 #[cfg(test)]
 mod tests {
-    use serde_test::{assert_tokens, Token};
-
     use super::*;
+    use crate::json::{assert_json, json};
 
     #[test]
     fn permissions_serde() {
         let value = Permissions::MANAGE_GUILD | Permissions::MANAGE_ROLES;
-        assert_tokens(&value, &[Token::Str("268435488")]);
+        assert_json(&value, json!("268435488"));
     }
 }

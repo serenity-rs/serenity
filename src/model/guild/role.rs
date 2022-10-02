@@ -336,9 +336,8 @@ mod premium_subscriber {
 
 #[cfg(test)]
 mod tests {
-    use serde_test::{assert_tokens, Token};
-
     use super::RoleTags;
+    use crate::json::{assert_json, json};
 
     #[test]
     fn premium_subscriber_role_serde() {
@@ -348,19 +347,10 @@ mod tests {
             premium_subscriber: true,
         };
 
-        assert_tokens(&value, &[
-            Token::Struct {
-                name: "RoleTags",
-                len: 3,
-            },
-            Token::Str("bot_id"),
-            Token::None,
-            Token::Str("integration_id"),
-            Token::None,
-            Token::Str("premium_subscriber"),
-            Token::None,
-            Token::StructEnd,
-        ]);
+        assert_json(
+            &value,
+            json!({"bot_id": null, "integration_id": null, "premium_subscriber": null}),
+        );
     }
 
     #[test]
@@ -371,16 +361,6 @@ mod tests {
             premium_subscriber: false,
         };
 
-        assert_tokens(&value, &[
-            Token::Struct {
-                name: "RoleTags",
-                len: 2,
-            },
-            Token::Str("bot_id"),
-            Token::None,
-            Token::Str("integration_id"),
-            Token::None,
-            Token::StructEnd,
-        ]);
+        assert_json(&value, json!({"bot_id": null, "integration_id": null}));
     }
 }

@@ -95,9 +95,8 @@ pub mod optional_string {
 
 #[cfg(test)]
 mod tests {
-    use serde_test::Token;
-
     use super::optional_string;
+    use crate::json::{assert_json, json};
 
     #[test]
     fn optional_string_module() {
@@ -111,25 +110,6 @@ mod tests {
             opt: Some(12345),
         };
 
-        serde_test::assert_tokens(&value, &[
-            Token::Struct {
-                name: "T",
-                len: 1,
-            },
-            Token::Str("opt"),
-            Token::Some,
-            Token::Str("12345"),
-            Token::StructEnd,
-        ]);
-
-        serde_test::assert_de_tokens(&value, &[
-            Token::Struct {
-                name: "T",
-                len: 1,
-            },
-            Token::Str("opt"),
-            Token::Str("12345"),
-            Token::StructEnd,
-        ]);
+        assert_json(&value, json!({"opt": "12345"}));
     }
 }
