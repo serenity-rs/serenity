@@ -1002,7 +1002,7 @@ impl GuildChannel {
     /// ```
     #[allow(clippy::missing_errors_doc)]
     pub fn start_typing(&self, http: &Arc<Http>) -> Result<Typing> {
-        http.start_typing(self.id.get())
+        http.start_typing(self.id)
     }
 
     /// Unpins a [`Message`] in the channel given by its Id.
@@ -1094,7 +1094,7 @@ impl GuildChannel {
         &self,
         shard_messenger: &'a ShardMessenger,
     ) -> MessageCollectorBuilder<'a> {
-        MessageCollectorBuilder::new(shard_messenger).channel_id(self.id.0)
+        MessageCollectorBuilder::new(shard_messenger).channel_id(self.id)
     }
 
     /// Returns a stream builder which can be awaited to obtain a reaction or stream of reactions sent by this guild channel.
@@ -1103,7 +1103,7 @@ impl GuildChannel {
         &self,
         shard_messenger: &'a ShardMessenger,
     ) -> ReactionCollectorBuilder<'a> {
-        ReactionCollectorBuilder::new(shard_messenger).channel_id(self.id.0)
+        ReactionCollectorBuilder::new(shard_messenger).channel_id(self.id)
     }
 
     /// Creates a webhook in the channel.

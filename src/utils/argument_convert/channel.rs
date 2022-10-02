@@ -66,8 +66,7 @@ async fn lookup_channel_global(
     }
 
     if let Some(guild_id) = guild_id {
-        let channels =
-            ctx.http().get_channels(guild_id.get()).await.map_err(ChannelParseError::Http)?;
+        let channels = ctx.http().get_channels(guild_id).await.map_err(ChannelParseError::Http)?;
         if let Some(channel) =
             channels.into_iter().find(|channel| channel.name.eq_ignore_ascii_case(s))
         {

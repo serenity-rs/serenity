@@ -184,7 +184,7 @@ impl ShardQueuer {
         .await?;
 
         let cloned_http = self.cache_and_http.http.clone();
-        shard.set_application_id_callback(move |id| cloned_http.set_application_id(id.get()));
+        shard.set_application_id_callback(move |id| cloned_http.set_application_id(id));
 
         let mut runner = ShardRunner::new(ShardRunnerOptions {
             data: Arc::clone(&self.data),

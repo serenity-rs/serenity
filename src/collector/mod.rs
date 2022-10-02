@@ -2,6 +2,10 @@
 //! filter lets them pass, and collects if the receive, collect, or time limits
 //! are not reached yet.
 
+// triggered by Derivative
+// can't put it on the derived type itself for some reason
+#![allow(clippy::let_underscore_must_use)]
+
 use std::fmt;
 use std::num::NonZeroU32;
 use std::pin::Pin;

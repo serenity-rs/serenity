@@ -377,13 +377,11 @@ impl CreateApplicationCommand {
         let http = http.as_ref();
         match (guild_id, command_id) {
             (Some(guild_id), Some(command_id)) => {
-                http.edit_guild_application_command(guild_id.into(), command_id.into(), &self).await
+                http.edit_guild_application_command(guild_id, command_id, &self).await
             },
-            (Some(guild_id), None) => {
-                http.create_guild_application_command(guild_id.into(), &self).await
-            },
+            (Some(guild_id), None) => http.create_guild_application_command(guild_id, &self).await,
             (None, Some(command_id)) => {
-                http.edit_global_application_command(command_id.into(), &self).await
+                http.edit_global_application_command(command_id, &self).await
             },
             (None, None) => http.create_global_application_command(&self).await,
         }

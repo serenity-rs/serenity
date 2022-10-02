@@ -170,5 +170,5 @@ fn sticker_url(sticker_id: StickerId, sticker_format_type: StickerFormatType) ->
         StickerFormatType::Unknown(_) => return None,
     };
 
-    Some(cdn!("/stickers/{}.{}", sticker_id.get(), ext))
+    Some(cdn!("/stickers/{}.{}", sticker_id, ext))
 }

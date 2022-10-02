@@ -105,7 +105,7 @@ impl<'a> EditChannel<'a> {
 
     #[cfg(feature = "http")]
     async fn _execute(self, http: &Http, channel_id: ChannelId) -> Result<GuildChannel> {
-        http.edit_channel(channel_id.into(), &self, self.audit_log_reason).await
+        http.edit_channel(channel_id, &self, self.audit_log_reason).await
     }
 
     /// The bitrate of the channel in bits.

@@ -128,7 +128,7 @@ impl<'a> CreateInvite<'a> {
 
     #[cfg(feature = "http")]
     async fn _execute(self, http: &Http, channel_id: ChannelId) -> Result<RichInvite> {
-        http.create_invite(channel_id.into(), &self, self.audit_log_reason).await
+        http.create_invite(channel_id, &self, self.audit_log_reason).await
     }
 
     /// The duration that the invite will be valid for.
