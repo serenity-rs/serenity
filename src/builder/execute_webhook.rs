@@ -98,10 +98,8 @@ impl<'a> ExecuteWebhook<'a> {
         wait: bool,
     ) -> Result<Option<Message>> {
         self.check_length()?;
-        let webhook_id = webhook_id.into();
-        let thread_id = self.thread_id.map(Into::into);
         let files = std::mem::take(&mut self.files);
-        http.as_ref().execute_webhook(webhook_id, thread_id, token, wait, files, &self).await
+        http.as_ref().execute_webhook(webhook_id, self.thread_id, token, wait, files, &self).await
     }
 
     #[cfg(feature = "http")]

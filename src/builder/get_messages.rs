@@ -87,7 +87,7 @@ impl GetMessages {
             }
         }
 
-        http.as_ref().get_messages(channel_id.into(), &query).await
+        http.as_ref().get_messages(channel_id, &query).await
     }
 
     /// Indicates to retrieve the messages after a specific message, given its Id.
