@@ -76,7 +76,13 @@ pub trait EventHandler: Send + Sync {
     /// Dispatched when a channel is deleted.
     ///
     /// Provides said channel's data.
-    async fn channel_delete(&self, _ctx: Context, _channel: &GuildChannel) {}
+    async fn channel_delete(
+        &self,
+        _ctx: Context,
+        _channel: &GuildChannel,
+        _messages: Option<Vec<Message>>,
+    ) {
+    }
 
     /// Dispatched when a pin is added, deleted.
     ///
