@@ -89,7 +89,7 @@ where
     Ok(result)
 }
 
-#[cfg(all(any(feature = "builder", feature = "http"), test))]
+#[cfg(test)]
 pub(crate) fn to_value<T>(value: T) -> Result<Value>
 where
     T: Serialize,
@@ -99,6 +99,15 @@ where
     #[cfg(feature = "simd-json")]
     let result = simd_json::serde::to_owned_value(value)?;
     Ok(result)
+}
+
+#[cfg(test)]
+pub(crate) fn assert_json<T>(data: &T, json: crate::json::Value)
+where
+    T: serde::Serialize + for<'de> serde::Deserialize<'de> + PartialEq + std::fmt::Debug,
+{
+    assert_eq!(to_value(data).unwrap(), json); // test deserialization
+    assert_eq!(&from_value::<T>(json).unwrap(), data); // test deserialization
 }
 
 pub mod prelude {
