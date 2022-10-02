@@ -191,7 +191,7 @@ macro_rules! bitflags {
 
 #[cfg(test)]
 mod tests {
-    use serde_test::Token;
+    use crate::json::{assert_json, json};
 
     #[test]
     fn enum_number() {
@@ -209,9 +209,9 @@ mod tests {
             }
         }
 
-        serde_test::assert_tokens(&T::A, &[Token::U8(1)]);
-        serde_test::assert_tokens(&T::B, &[Token::U8(2)]);
-        serde_test::assert_tokens(&T::C, &[Token::U8(3)]);
-        serde_test::assert_tokens(&T::Unknown(123), &[Token::U8(123)]);
+        assert_json(&T::A, json!(1));
+        assert_json(&T::B, json!(2));
+        assert_json(&T::C, json!(3));
+        assert_json(&T::Unknown(123), json!(123));
     }
 }
