@@ -46,10 +46,10 @@ impl<'a> CreateThread<'a> {
         message_id: Option<MessageId>,
     ) -> Result<GuildChannel> {
         let http = http.as_ref();
-        let id = channel_id.into();
+        let id = channel_id;
         match message_id {
             Some(msg_id) => {
-                http.create_public_thread(id, msg_id.into(), &self, self.audit_log_reason).await
+                http.create_public_thread(id, msg_id, &self, self.audit_log_reason).await
             },
             None => http.create_private_thread(id, &self, self.audit_log_reason).await,
         }

@@ -1,10 +1,9 @@
-use std::num::NonZeroU64;
-
 use super::Filter;
 use crate::client::bridge::gateway::ShardMessenger;
 use crate::collector::macros::*;
 use crate::collector::LazyArc;
 use crate::model::channel::Message;
+use crate::model::id::{ChannelId, GuildId, UserId};
 
 impl super::FilterTrait<Message> for Filter<Message> {
     fn register(self, messenger: &ShardMessenger) {
@@ -15,18 +14,18 @@ impl super::FilterTrait<Message> for Filter<Message> {
     /// Constraints are optional, as it is possible to limit messages to
     /// be sent by a specific author or in a specific guild.
     fn is_passing_constraints(&self, message: &mut LazyArc<'_, Message>) -> bool {
-        self.options.guild_id.map_or(true, |g| Some(g) == message.guild_id.map(|g| g.0))
-            && self.options.channel_id.map_or(true, |g| g == message.channel_id.0)
-            && self.options.author_id.map_or(true, |g| g == message.author.id.0)
+        self.options.guild_id.map_or(true, |g| Some(g) == message.guild_id)
+            && self.options.channel_id.map_or(true, |g| g == message.channel_id)
+            && self.options.author_id.map_or(true, |g| g == message.author.id)
             && self.common_options.filter.as_ref().map_or(true, |f| f.0(message))
     }
 }
 
 #[derive(Clone, Debug, Default)]
 pub struct FilterOptions {
-    channel_id: Option<NonZeroU64>,
-    guild_id: Option<NonZeroU64>,
-    author_id: Option<NonZeroU64>,
+    channel_id: Option<ChannelId>,
+    guild_id: Option<GuildId>,
+    author_id: Option<UserId>,
 }
 
 impl super::CollectorBuilder<'_, Message> {

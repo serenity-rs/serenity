@@ -49,7 +49,7 @@ impl AddMember {
         guild_id: GuildId,
         user_id: UserId,
     ) -> Result<Option<Member>> {
-        http.as_ref().add_guild_member(guild_id.into(), user_id.into(), &self).await
+        http.as_ref().add_guild_member(guild_id, user_id, &self).await
     }
 
     /// Sets the OAuth2 access token for this request, replacing the current one.
