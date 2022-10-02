@@ -42,7 +42,7 @@ impl<'a> EditGuildWelcomeScreen<'a> {
         http: impl AsRef<Http>,
         guild_id: GuildId,
     ) -> Result<GuildWelcomeScreen> {
-        http.as_ref().edit_guild_welcome_screen(guild_id.into(), &self, self.audit_log_reason).await
+        http.as_ref().edit_guild_welcome_screen(guild_id, &self, self.audit_log_reason).await
     }
 
     /// Whether the welcome screen is enabled or not.

@@ -1,10 +1,10 @@
-use std::num::NonZeroU64;
 use std::sync::Arc;
 
 use crate::client::bridge::gateway::ShardMessenger;
 use crate::collector::macros::*;
 use crate::collector::{Filter, LazyArc};
 use crate::model::channel::Reaction;
+use crate::model::id::{ChannelId, GuildId, MessageId, UserId};
 
 /// Marks whether the reaction has been added or removed.
 #[derive(Debug, Clone)]
@@ -90,20 +90,20 @@ impl super::FilterTrait<ReactionAction> for Filter<ReactionAction> {
             },
         };
 
-        self.options.guild_id.map_or(true, |id| Some(id) == reaction.guild_id.map(|g| g.0))
-            && self.options.message_id.map_or(true, |id| id == reaction.message_id.0)
-            && self.options.channel_id.map_or(true, |id| id == reaction.channel_id.0)
-            && self.options.author_id.map_or(true, |id| Some(id) == reaction.user_id.map(|u| u.0))
+        self.options.guild_id.map_or(true, |id| Some(id) == reaction.guild_id)
+            && self.options.message_id.map_or(true, |id| id == reaction.message_id)
+            && self.options.channel_id.map_or(true, |id| id == reaction.channel_id)
+            && self.options.author_id.map_or(true, |id| Some(id) == reaction.user_id)
             && self.common_options.filter.as_ref().map_or(true, |f| f.0(reaction))
     }
 }
 
 #[derive(Clone, Debug)]
 pub struct FilterOptions {
-    channel_id: Option<NonZeroU64>,
-    guild_id: Option<NonZeroU64>,
-    author_id: Option<NonZeroU64>,
-    message_id: Option<NonZeroU64>,
+    channel_id: Option<ChannelId>,
+    guild_id: Option<GuildId>,
+    author_id: Option<UserId>,
+    message_id: Option<MessageId>,
     accept_added: bool,
     accept_removed: bool,
 }

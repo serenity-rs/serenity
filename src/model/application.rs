@@ -5,8 +5,6 @@ pub mod component;
 pub mod interaction;
 pub mod oauth;
 
-use std::num::NonZeroU64;
-
 pub use interaction::{
     Interaction,
     InteractionResponseType,
@@ -16,7 +14,7 @@ pub use interaction::{
 };
 
 use self::oauth::Scope;
-use super::id::{snowflake, ApplicationId, GuildId, SkuId, UserId};
+use super::id::{ApplicationId, GenericId, GuildId, SkuId, UserId};
 use super::user::User;
 use super::Permissions;
 
@@ -77,8 +75,7 @@ pub struct Team {
     /// The icon of the team.
     pub icon: Option<String>,
     /// The snowflake ID of the team.
-    #[serde(with = "snowflake")]
-    pub id: NonZeroU64,
+    pub id: GenericId,
     /// The name of the team.
     pub name: String,
     /// The members of the team
@@ -99,8 +96,7 @@ pub struct TeamMember {
     /// NOTE: Will always be ["*"] for now.
     pub permissions: Vec<String>,
     /// The ID of the team they are a member of.
-    #[serde(with = "snowflake")]
-    pub team_id: NonZeroU64,
+    pub team_id: GenericId,
     /// The user type of the team member.
     pub user: User,
 }

@@ -40,7 +40,7 @@ impl<'a> EditThread<'a> {
         http: impl AsRef<Http>,
         channel_id: ChannelId,
     ) -> Result<GuildChannel> {
-        http.as_ref().edit_thread(channel_id.into(), &self, self.audit_log_reason).await
+        http.as_ref().edit_thread(channel_id, &self, self.audit_log_reason).await
     }
 
     /// The name of the thread.

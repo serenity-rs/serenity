@@ -68,9 +68,7 @@ impl<'a> EditScheduledEvent<'a> {
         guild_id: GuildId,
         event_id: ScheduledEventId,
     ) -> Result<ScheduledEvent> {
-        http.as_ref()
-            .edit_scheduled_event(guild_id.into(), event_id.into(), &self, self.audit_log_reason)
-            .await
+        http.as_ref().edit_scheduled_event(guild_id, event_id, &self, self.audit_log_reason).await
     }
 
     /// Sets the channel id of the scheduled event. If the [`kind`] of the event is changed from

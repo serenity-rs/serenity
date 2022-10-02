@@ -131,7 +131,7 @@ impl<'a> CreateMessage<'a> {
     async fn _execute(mut self, http: &Http, channel_id: ChannelId) -> Result<Message> {
         self.check_length()?;
         let files = std::mem::take(&mut self.files);
-        let message = http.send_message(channel_id.into(), files, &self).await?;
+        let message = http.send_message(channel_id, files, &self).await?;
 
         for reaction in self.reactions {
             channel_id.create_reaction(http, message.id, reaction).await?;

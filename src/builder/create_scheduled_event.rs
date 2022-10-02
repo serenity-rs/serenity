@@ -82,7 +82,7 @@ impl<'a> CreateScheduledEvent<'a> {
 
     #[cfg(feature = "http")]
     async fn _execute(self, http: &Http, guild_id: GuildId) -> Result<ScheduledEvent> {
-        http.create_scheduled_event(guild_id.into(), &self, self.audit_log_reason).await
+        http.create_scheduled_event(guild_id, &self, self.audit_log_reason).await
     }
 
     /// Sets the channel id of the scheduled event. Required if [`Self::kind`] is
