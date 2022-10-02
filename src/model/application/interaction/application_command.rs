@@ -192,7 +192,7 @@ impl ApplicationCommandInteraction {
         http: impl AsRef<Http>,
         message_id: M,
     ) -> Result<()> {
-        http.as_ref().delete_followup_message(&self.token, message_id.into().into()).await
+        http.as_ref().delete_followup_message(&self.token, message_id.into()).await
     }
 
     /// Gets a followup message.
@@ -206,7 +206,7 @@ impl ApplicationCommandInteraction {
         http: impl AsRef<Http>,
         message_id: M,
     ) -> Result<Message> {
-        http.as_ref().get_followup_message(&self.token, message_id.into().into()).await
+        http.as_ref().get_followup_message(&self.token, message_id.into()).await
     }
 
     /// Helper function to defer an interaction.

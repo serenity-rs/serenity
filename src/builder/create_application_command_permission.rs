@@ -5,6 +5,7 @@ use crate::internal::prelude::*;
 #[cfg(feature = "http")]
 use crate::model::application::command::CommandPermission;
 use crate::model::application::command::CommandPermissionType;
+use crate::model::id::CommandPermissionId;
 #[cfg(feature = "http")]
 use crate::model::id::{CommandId, GuildId};
 
@@ -42,9 +43,7 @@ impl CreateApplicationCommandPermissionsData {
         guild_id: GuildId,
         command_id: CommandId,
     ) -> Result<CommandPermission> {
-        http.as_ref()
-            .edit_guild_application_command_permissions(guild_id.into(), command_id.into(), &self)
-            .await
+        http.as_ref().edit_guild_application_command_permissions(guild_id, command_id, &self).await
     }
 
     /// Adds a permission for the application command.
@@ -75,7 +74,7 @@ pub struct CreateApplicationCommandPermissionData {
     #[serde(skip_serializing_if = "Option::is_none")]
     kind: Option<CommandPermissionType>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    id: Option<String>,
+    id: Option<CommandPermissionId>,
     #[serde(skip_serializing_if = "Option::is_none")]
     permission: Option<bool>,
 }
@@ -97,8 +96,8 @@ impl CreateApplicationCommandPermissionData {
     /// Sets the CommandPermissionId for the [`CommandPermissionData`].
     ///
     /// [`CommandPermissionData`]: crate::model::application::command::CommandPermissionData
-    pub fn id(mut self, id: u64) -> Self {
-        self.id = Some(id.to_string());
+    pub fn id(mut self, id: CommandPermissionId) -> Self {
+        self.id = Some(id);
         self
     }
 

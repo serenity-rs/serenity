@@ -53,7 +53,7 @@ impl<'a> EditStageInstance<'a> {
 
     #[cfg(feature = "http")]
     async fn _execute(self, http: &Http, channel_id: ChannelId) -> Result<StageInstance> {
-        http.edit_stage_instance(channel_id.into(), &self, self.audit_log_reason).await
+        http.edit_stage_instance(channel_id, &self, self.audit_log_reason).await
     }
 
     /// Sets the topic of the stage channel instance.

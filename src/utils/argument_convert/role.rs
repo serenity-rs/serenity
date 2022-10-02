@@ -63,8 +63,7 @@ impl ArgumentConvert for Role {
         let roles =
             ctx.cache().and_then(|c| c.guild_roles(guild_id)).ok_or(RoleParseError::NotInCache)?;
         #[cfg(not(feature = "cache"))]
-        let roles =
-            ctx.http().get_guild_roles(guild_id.get()).await.map_err(RoleParseError::Http)?;
+        let roles = ctx.http().get_guild_roles(guild_id).await.map_err(RoleParseError::Http)?;
 
         if let Some(role_id) = s.parse().ok().map(RoleId).or_else(|| crate::utils::parse_role(s)) {
             #[cfg(feature = "cache")]

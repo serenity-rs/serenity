@@ -71,7 +71,7 @@ impl<'a> CreateSticker<'a> {
         map.push(("tags".to_string(), self.tags));
         map.push(("description".to_string(), self.description));
 
-        http.create_sticker(guild_id.into(), map, self.file, self.audit_log_reason).await
+        http.create_sticker(guild_id, map, self.file, self.audit_log_reason).await
     }
 
     /// Set the name of the sticker, replacing the current value as set in [`Self::new`].

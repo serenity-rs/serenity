@@ -148,13 +148,15 @@ impl Ratelimiter {
     /// ```rust,no_run
     /// use serenity::http::ratelimiting::Route;
     /// # use serenity::http::Http;
+    /// # use serenity::model::prelude::*;
     ///
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// #     let http = Http::new("token");
     /// let routes = http.ratelimiter.routes();
     /// let reader = routes.read().await;
     ///
-    /// if let Some(route) = reader.get(&Route::ChannelsId(7)) {
+    /// let channel_id = ChannelId::new(7);
+    /// if let Some(route) = reader.get(&Route::ChannelsId(channel_id)) {
     ///     if let Some(reset) = route.lock().await.reset() {
     ///         println!("Reset time at: {:?}", reset);
     ///     }

@@ -46,9 +46,7 @@ impl<'a> EditMember<'a> {
         guild_id: GuildId,
         user_id: UserId,
     ) -> Result<Member> {
-        http.as_ref()
-            .edit_member(guild_id.into(), user_id.into(), &self, self.audit_log_reason)
-            .await
+        http.as_ref().edit_member(guild_id, user_id, &self, self.audit_log_reason).await
     }
 
     /// Whether to deafen the member.
