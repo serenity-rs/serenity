@@ -54,7 +54,7 @@ impl EditWebhookMessage {
         token: &str,
     ) -> Result<Message> {
         self.check_length()?;
-        http.as_ref().edit_webhook_message(webhook_id.into(), token, message_id.into(), &self).await
+        http.as_ref().edit_webhook_message(webhook_id, token, message_id, &self).await
     }
 
     #[cfg(feature = "http")]

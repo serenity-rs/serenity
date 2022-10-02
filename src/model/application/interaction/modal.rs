@@ -168,7 +168,7 @@ impl ModalSubmitInteraction {
         http: impl AsRef<Http>,
         message_id: M,
     ) -> Result<()> {
-        http.as_ref().delete_followup_message(&self.token, message_id.into().into()).await
+        http.as_ref().delete_followup_message(&self.token, message_id.into()).await
     }
 
     /// Helper function to defer an interaction.

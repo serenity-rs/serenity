@@ -59,17 +59,11 @@ impl<'a> EditAutoModRule<'a> {
         let http = http.as_ref();
         match rule_id {
             Some(rule_id) => {
-                http.edit_automod_rule(
-                    guild_id.into(),
-                    rule_id.into(),
-                    &self,
-                    self.audit_log_reason,
-                )
-                .await
+                http.edit_automod_rule(guild_id, rule_id, &self, self.audit_log_reason).await
             },
             // Automod Rule creation has required fields, whereas modifying a rule does not.
             // TODO: Enforce these fields (maybe with a separate CreateAutoModRule builder).
-            None => http.create_automod_rule(guild_id.into(), &self, self.audit_log_reason).await,
+            None => http.create_automod_rule(guild_id, &self, self.audit_log_reason).await,
         }
     }
 
