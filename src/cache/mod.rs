@@ -1043,7 +1043,7 @@ mod test {
         let mut delete = ChannelDeleteEvent {
             channel: Channel::Guild(channel.clone()),
         };
-        assert!(cache.update(&mut delete).is_none());
+        assert!(cache.update(&mut delete).is_some());
         assert!(!cache.messages.contains_key(&delete.channel.id()));
 
         // Test deletion of a guild channel's message cache when a GuildDeleteEvent
