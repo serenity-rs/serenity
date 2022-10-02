@@ -77,7 +77,7 @@ impl<'a> CreateChannel<'a> {
 
     #[cfg(feature = "http")]
     async fn _execute(self, http: &Http, guild_id: GuildId) -> Result<GuildChannel> {
-        http.create_channel(guild_id.into(), &self, self.audit_log_reason).await
+        http.create_channel(guild_id, &self, self.audit_log_reason).await
     }
 
     /// Specify how to call this new channel, replacing the current value as set in [`Self::new`].

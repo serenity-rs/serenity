@@ -1,9 +1,8 @@
-use std::num::NonZeroU64;
-
 use crate::client::bridge::gateway::ShardMessenger;
 use crate::collector::macros::*;
 use crate::collector::{Filter, LazyArc};
 use crate::model::application::interaction::modal::ModalSubmitInteraction;
+use crate::model::id::{ChannelId, GuildId, MessageId, UserId};
 
 impl super::FilterTrait<ModalSubmitInteraction> for Filter<ModalSubmitInteraction> {
     fn register(self, messenger: &ShardMessenger) {
@@ -14,23 +13,23 @@ impl super::FilterTrait<ModalSubmitInteraction> for Filter<ModalSubmitInteractio
         &self,
         interaction: &mut LazyArc<'_, ModalSubmitInteraction>,
     ) -> bool {
-        self.options.guild_id.map_or(true, |id| Some(id) == interaction.guild_id.map(|g| g.0))
+        self.options.guild_id.map_or(true, |id| Some(id) == interaction.guild_id)
             && self
                 .options
                 .message_id
-                .map_or(true, |id| Some(id) == interaction.message.as_ref().map(|m| m.id.0))
-            && self.options.channel_id.map_or(true, |id| id == interaction.channel_id.as_ref().0)
-            && self.options.author_id.map_or(true, |id| id == interaction.user.id.0)
+                .map_or(true, |id| Some(id) == interaction.message.as_ref().map(|m| m.id))
+            && self.options.channel_id.map_or(true, |id| id == interaction.channel_id)
+            && self.options.author_id.map_or(true, |id| id == interaction.user.id)
             && self.common_options.filter.as_ref().map_or(true, |f| f.0(interaction))
     }
 }
 
 #[derive(Clone, Debug, Default)]
 pub struct FilterOptions {
-    channel_id: Option<NonZeroU64>,
-    guild_id: Option<NonZeroU64>,
-    author_id: Option<NonZeroU64>,
-    message_id: Option<NonZeroU64>,
+    channel_id: Option<ChannelId>,
+    guild_id: Option<GuildId>,
+    author_id: Option<UserId>,
+    message_id: Option<MessageId>,
 }
 
 impl super::CollectorBuilder<'_, ModalSubmitInteraction> {

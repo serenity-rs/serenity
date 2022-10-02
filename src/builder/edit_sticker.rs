@@ -55,9 +55,7 @@ impl<'a> EditSticker<'a> {
         guild_id: GuildId,
         sticker_id: StickerId,
     ) -> Result<Sticker> {
-        http.as_ref()
-            .edit_sticker(guild_id.into(), sticker_id.into(), &self, self.audit_log_reason)
-            .await
+        http.as_ref().edit_sticker(guild_id, sticker_id, &self, self.audit_log_reason).await
     }
 
     /// The name of the sticker to set.
