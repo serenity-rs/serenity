@@ -255,11 +255,7 @@ impl Message {
             }
         }
 
-        cache_http
-            .http()
-            .as_ref()
-            .delete_message_reactions(self.channel_id.get(), self.id.get())
-            .await
+        cache_http.http().as_ref().delete_message_reactions(self.channel_id, self.id).await
     }
 
     /// Deletes all of the [`Reaction`]s of a given emoji associated with the message.
@@ -293,11 +289,7 @@ impl Message {
         cache_http
             .http()
             .as_ref()
-            .delete_message_reaction_emoji(
-                self.channel_id.get(),
-                self.id.get(),
-                &reaction_type.into(),
-            )
+            .delete_message_reaction_emoji(self.channel_id, self.id, &reaction_type.into())
             .await
     }
 
@@ -560,10 +552,7 @@ impl Message {
             }
         }
 
-        cache_http
-            .http()
-            .create_reaction(self.channel_id.get(), self.id.get(), &reaction_type)
-            .await?;
+        cache_http.http().create_reaction(self.channel_id, self.id, &reaction_type).await?;
 
         Ok(Reaction {
             channel_id: self.channel_id,
@@ -751,7 +740,7 @@ impl Message {
             }
         }
 
-        cache_http.http().unpin_message(self.channel_id.get(), self.id.get(), None).await
+        cache_http.http().unpin_message(self.channel_id, self.id, None).await
     }
 
     /// Tries to return author's nickname in the current channel's guild.
@@ -785,7 +774,7 @@ impl Message {
         &self,
         shard_messenger: &'a ShardMessenger,
     ) -> ReactionCollectorBuilder<'a> {
-        ReactionCollectorBuilder::new(shard_messenger).message_id(self.id.0)
+        ReactionCollectorBuilder::new(shard_messenger).message_id(self.id)
     }
 
     /// Returns a builder which can be awaited to obtain a reaction or stream of component interactions on this message.
@@ -794,7 +783,7 @@ impl Message {
         &self,
         shard_messenger: &'a ShardMessenger,
     ) -> ComponentInteractionCollectorBuilder<'a> {
-        ComponentInteractionCollectorBuilder::new(shard_messenger).message_id(self.id.0)
+        ComponentInteractionCollectorBuilder::new(shard_messenger).message_id(self.id)
     }
 
     /// Returns a builder which can be awaited to obtain a model submit interaction or stream of modal submit interactions on this message.
@@ -803,7 +792,7 @@ impl Message {
         &self,
         shard_messenger: &'a ShardMessenger,
     ) -> ModalInteractionCollectorBuilder<'a> {
-        ModalInteractionCollectorBuilder::new(shard_messenger).message_id(self.id.0)
+        ModalInteractionCollectorBuilder::new(shard_messenger).message_id(self.id)
     }
 
     /// Retrieves the message channel's category ID if the channel has one.

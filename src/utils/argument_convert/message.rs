@@ -75,10 +75,7 @@ impl ArgumentConvert for Message {
         }
 
         if cfg!(feature = "http") {
-            ctx.http()
-                .get_message(channel_id.get(), message_id.get())
-                .await
-                .map_err(MessageParseError::Http)
+            ctx.http().get_message(channel_id, message_id).await.map_err(MessageParseError::Http)
         } else {
             Err(MessageParseError::HttpNotAvailable)
         }

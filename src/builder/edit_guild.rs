@@ -80,7 +80,7 @@ impl<'a> EditGuild<'a> {
 
     #[cfg(feature = "http")]
     async fn _execute(self, http: &Http, guild_id: GuildId) -> Result<PartialGuild> {
-        http.as_ref().edit_guild(guild_id.into(), &self, self.audit_log_reason).await
+        http.as_ref().edit_guild(guild_id, &self, self.audit_log_reason).await
     }
 
     /// Set the "AFK voice channel" that users are to move to if they have been AFK for an amount

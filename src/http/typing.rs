@@ -7,6 +7,7 @@ use tokio::time::{sleep, Duration};
 use crate::http::Http;
 use crate::internal::prelude::*;
 use crate::internal::tokio::spawn_named;
+use crate::model::id::ChannelId;
 
 /// A struct to start typing in a [`Channel`] for an indefinite period of time.
 ///
@@ -26,14 +27,15 @@ use crate::internal::tokio::spawn_named;
 /// ## Examples
 ///
 /// ```rust,no_run
-/// # use serenity::{http::{Http, Typing}, Result};
+/// # use serenity::{http::{Http, Typing}, Result, model::prelude::*};
 /// # use std::sync::Arc;
 /// #
 /// # fn long_process() {}
 /// # fn main() -> Result<()> {
 /// # let http = Http::new("token");
+/// let channel_id = ChannelId::new(7);
 /// // Initiate typing (assuming `http` is bound)
-/// let typing = Typing::start(Arc::new(http), 7)?;
+/// let typing = Typing::start(Arc::new(http), channel_id)?;
 ///
 /// // Run some long-running process
 /// long_process();
@@ -61,7 +63,7 @@ impl Typing {
     /// Returns an  [`Error::Http`] if there is an error.
     ///
     /// [`Channel`]: crate::model::channel::Channel
-    pub fn start(http: Arc<Http>, channel_id: u64) -> Result<Self> {
+    pub fn start(http: Arc<Http>, channel_id: ChannelId) -> Result<Self> {
         let (sx, mut rx) = oneshot::channel();
 
         spawn_named("typing::start", async move {

@@ -40,7 +40,7 @@ impl<'a> EditWebhook<'a> {
         webhook_id: WebhookId,
         token: Option<&str>,
     ) -> Result<Webhook> {
-        let id = webhook_id.into();
+        let id = webhook_id;
         match token {
             Some(token) => {
                 http.as_ref().edit_webhook_with_token(id, token, &self, self.audit_log_reason).await
