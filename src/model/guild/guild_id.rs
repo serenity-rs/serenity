@@ -1399,19 +1399,16 @@ impl GuildId {
     }
     /// Returns a builder which can be awaited to obtain a message or stream of messages in this guild.
     #[cfg(feature = "collector")]
-    pub fn reply_collector<'a>(
-        self,
-        shard_messenger: &'a ShardMessenger,
-    ) -> MessageCollectorBuilder<'a> {
+    pub fn reply_collector(self, shard_messenger: &ShardMessenger) -> MessageCollectorBuilder<'_> {
         MessageCollectorBuilder::new(shard_messenger).guild_id(self.0)
     }
 
     /// Returns a builder which can be awaited to obtain a message or stream of reactions sent in this guild.
     #[cfg(feature = "collector")]
-    pub fn reaction_collector<'a>(
+    pub fn reaction_collector(
         self,
-        shard_messenger: &'a ShardMessenger,
-    ) -> ReactionCollectorBuilder<'a> {
+        shard_messenger: &ShardMessenger,
+    ) -> ReactionCollectorBuilder<'_> {
         ReactionCollectorBuilder::new(shard_messenger).guild_id(self.0)
     }
 
