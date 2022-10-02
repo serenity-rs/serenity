@@ -318,9 +318,9 @@ mod tests {
     #[test]
     fn test_id_serde() {
         use serde::{Deserialize, Serialize};
-        use serde_test::{assert_de_tokens, assert_tokens, Token};
 
         use super::snowflake;
+        use crate::json::{assert_json, json};
 
         #[derive(Debug, PartialEq, Deserialize, Serialize)]
         struct S {
@@ -334,47 +334,16 @@ mod tests {
         }
 
         let id = GuildId::new(17_5928_8472_9911_7063);
-        assert_tokens(&id, &[
-            Token::NewtypeStruct {
-                name: "GuildId",
-            },
-            Token::Str("175928847299117063"),
-        ]);
-        assert_de_tokens(&id, &[
-            Token::NewtypeStruct {
-                name: "GuildId",
-            },
-            Token::U64(17_5928_8472_9911_7063),
-        ]);
+        assert_json(&id, json!("175928847299117063"));
 
         let s = S {
             id: NonZeroU64::new(17_5928_8472_9911_7063).unwrap(),
         };
-        assert_tokens(&s, &[
-            Token::Struct {
-                name: "S",
-                len: 1,
-            },
-            Token::Str("id"),
-            Token::Str("175928847299117063"),
-            Token::StructEnd,
-        ]);
+        assert_json(&s, json!({"id": "175928847299117063"}));
 
         let s = Opt {
             id: Some(GuildId::new(17_5928_8472_9911_7063)),
         };
-        assert_tokens(&s, &[
-            Token::Struct {
-                name: "Opt",
-                len: 1,
-            },
-            Token::Str("id"),
-            Token::Some,
-            Token::NewtypeStruct {
-                name: "GuildId",
-            },
-            Token::Str("175928847299117063"),
-            Token::StructEnd,
-        ]);
+        assert_json(&s, json!({"id": "175928847299117063"}));
     }
 }
