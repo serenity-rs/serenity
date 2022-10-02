@@ -382,7 +382,7 @@ async fn handle_event(
             }
         },
         Event::ChannelDelete(mut event) => {
-            update(&cache_and_http, &mut event);
+            let cached_messages = if_cache!(update(&cache_and_http, &mut event));
 
             match event.channel {
                 Channel::Private(_) => {},
@@ -393,7 +393,7 @@ async fn handle_event(
                         });
                     } else {
                         spawn_named("dispatch::event_handler::channel_delete", async move {
-                            event_handler.channel_delete(context, &channel).await;
+                            event_handler.channel_delete(context, &channel, cached_messages).await;
                         });
                     }
                 },
