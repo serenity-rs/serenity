@@ -100,7 +100,7 @@ impl CacheUpdate for ChannelDeleteEvent {
         cache
             .messages
             .remove(&self.channel.id())
-            .map(|(_, messages)| messages.values().cloned().collect())
+            .map(|(_, messages)| messages.into_values().collect())
     }
 }
 
