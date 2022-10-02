@@ -888,9 +888,8 @@ enum Key {
 
 #[cfg(test)]
 mod tests {
-    use serde_test::{assert_tokens, Token};
-
     use super::*;
+    use crate::json::{assert_json, json};
 
     #[test]
     fn afk_channel_id_variant() {
@@ -898,27 +897,7 @@ mod tests {
             old: Some(ChannelId::new(1)),
             new: Some(ChannelId::new(2)),
         };
-        assert_tokens(&value, &[
-            Token::Struct {
-                name: "Change",
-                len: 3,
-            },
-            Token::Str("key"),
-            Token::Str("afk_channel_id"),
-            Token::Str("old_value"),
-            Token::Some,
-            Token::NewtypeStruct {
-                name: "ChannelId",
-            },
-            Token::Str("1"),
-            Token::Str("new_value"),
-            Token::Some,
-            Token::NewtypeStruct {
-                name: "ChannelId",
-            },
-            Token::Str("2"),
-            Token::StructEnd,
-        ]);
+        assert_json(&value, json!({"key": "afk_channel_id", "old_value": "1", "new_value": "2"}));
     }
 
     #[test]
@@ -927,40 +906,12 @@ mod tests {
             old: None,
             new: Some(ChannelId::new(2)),
         };
-        assert_tokens(&value, &[
-            Token::Struct {
-                name: "Change",
-                len: 2,
-            },
-            Token::Str("key"),
-            Token::Str("afk_channel_id"),
-            Token::Str("new_value"),
-            Token::Some,
-            Token::NewtypeStruct {
-                name: "ChannelId",
-            },
-            Token::Str("2"),
-            Token::StructEnd,
-        ]);
+        assert_json(&value, json!({"key": "afk_channel_id", "new_value": "2"}));
         let value = Change::AfkChannelId {
             old: Some(ChannelId::new(1)),
             new: None,
         };
-        assert_tokens(&value, &[
-            Token::Struct {
-                name: "Change",
-                len: 2,
-            },
-            Token::Str("key"),
-            Token::Str("afk_channel_id"),
-            Token::Str("old_value"),
-            Token::Some,
-            Token::NewtypeStruct {
-                name: "ChannelId",
-            },
-            Token::Str("1"),
-            Token::StructEnd,
-        ]);
+        assert_json(&value, json!({"key": "afk_channel_id", "old_value": "1"}));
     }
 
     #[test]
@@ -969,21 +920,7 @@ mod tests {
             old: Some(EntityType::Int(123)),
             new: Some(EntityType::Str("discord".into())),
         };
-        assert_tokens(&value, &[
-            Token::Struct {
-                name: "Change",
-                len: 3,
-            },
-            Token::Str("key"),
-            Token::Str("type"),
-            Token::Str("old_value"),
-            Token::Some,
-            Token::U64(123),
-            Token::Str("new_value"),
-            Token::Some,
-            Token::Str("discord"),
-            Token::StructEnd,
-        ]);
+        assert_json(&value, json!({"key": "type", "old_value": 123, "new_value": "discord"}));
     }
 
     #[test]
@@ -992,20 +929,6 @@ mod tests {
             old: Some(Permissions::default()),
             new: Some(Permissions::MANAGE_GUILD),
         };
-        assert_tokens(&value, &[
-            Token::Struct {
-                name: "Change",
-                len: 3,
-            },
-            Token::Str("key"),
-            Token::Str("permissions"),
-            Token::Str("old_value"),
-            Token::Some,
-            Token::Str("0"),
-            Token::Str("new_value"),
-            Token::Some,
-            Token::Str("32"),
-            Token::StructEnd,
-        ]);
+        assert_json(&value, json!({"key": "permissions", "old_value": "0", "new_value": "32"}));
     }
 }
