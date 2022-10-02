@@ -542,9 +542,10 @@ pub(crate) fn user_has_perms(
 /// 17 shards:
 ///
 /// ```rust
+/// use serenity::model::id::GuildId;
 /// use serenity::utils;
 ///
-/// assert_eq!(utils::shard_id(81384788765712384 as u64, 17), 7);
+/// assert_eq!(utils::shard_id(GuildId::new(81384788765712384), 17), 7);
 /// ```
 #[inline]
 #[must_use]
