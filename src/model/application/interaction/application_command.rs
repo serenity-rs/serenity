@@ -872,9 +872,8 @@ impl From<TargetId> for UserId {
 
 #[cfg(test)]
 mod tests {
-    use serde_test::Token;
-
     use super::*;
+    use crate::json::{assert_json, json};
 
     #[test]
     fn nested_options() {
@@ -889,50 +888,18 @@ mod tests {
             }]),
         };
 
-        serde_test::assert_tokens(&value, &[
-            Token::Struct {
-                name: "CommandDataOption",
-                len: 3,
-            },
-            Token::Str("name"),
-            Token::Str("subcommand_group"),
-            Token::Str("type"),
-            Token::U8(CommandOptionType::SubCommandGroup.into()),
-            Token::Str("options"),
-            Token::Seq {
-                len: Some(1),
-            },
-            Token::Struct {
-                name: "CommandDataOption",
-                len: 3,
-            },
-            Token::Str("name"),
-            Token::Str("subcommand"),
-            Token::Str("type"),
-            Token::U8(CommandOptionType::SubCommand.into()),
-            Token::Str("options"),
-            Token::Seq {
-                len: Some(1),
-            },
-            Token::Struct {
-                name: "CommandDataOption",
-                len: 3,
-            },
-            Token::Str("name"),
-            Token::Str("channel"),
-            Token::Str("type"),
-            Token::U8(CommandOptionType::Channel.into()),
-            Token::Str("value"),
-            Token::NewtypeStruct {
-                name: "ChannelId",
-            },
-            Token::Str("3"),
-            Token::StructEnd,
-            Token::SeqEnd,
-            Token::StructEnd,
-            Token::SeqEnd,
-            Token::StructEnd,
-        ]);
+        assert_json(
+            &value,
+            json!({
+                "name": "subcommand_group",
+                "type": 2,
+                "options": [{
+                    "name": "subcommand",
+                    "type": 1,
+                    "options": [{"name": "channel", "type": 7, "value": "3"}],
+                }]
+            }),
+        );
     }
 
     #[test]
@@ -967,82 +934,16 @@ mod tests {
             },
         ];
 
-        serde_test::assert_tokens(&value, &[
-            Token::Seq {
-                len: Some(value.len()),
-            },
-            Token::Struct {
-                name: "CommandDataOption",
-                len: 3,
-            },
-            Token::Str("name"),
-            Token::Str("boolean"),
-            Token::Str("type"),
-            Token::U8(CommandOptionType::Boolean.into()),
-            Token::Str("value"),
-            Token::Bool(true),
-            Token::StructEnd,
-            Token::Struct {
-                name: "CommandDataOption",
-                len: 3,
-            },
-            Token::Str("name"),
-            Token::Str("integer"),
-            Token::Str("type"),
-            Token::U8(CommandOptionType::Integer.into()),
-            Token::Str("value"),
-            Token::I64(1),
-            Token::StructEnd,
-            Token::Struct {
-                name: "CommandDataOption",
-                len: 3,
-            },
-            Token::Str("name"),
-            Token::Str("number"),
-            Token::Str("type"),
-            Token::U8(CommandOptionType::Number.into()),
-            Token::Str("value"),
-            Token::F64(2.0),
-            Token::StructEnd,
-            Token::Struct {
-                name: "CommandDataOption",
-                len: 3,
-            },
-            Token::Str("name"),
-            Token::Str("string"),
-            Token::Str("type"),
-            Token::U8(CommandOptionType::String.into()),
-            Token::Str("value"),
-            Token::Str("foobar"),
-            Token::StructEnd,
-            Token::Struct {
-                name: "CommandDataOption",
-                len: 2,
-            },
-            Token::Str("name"),
-            Token::Str("empty_subcommand"),
-            Token::Str("type"),
-            Token::U8(CommandOptionType::SubCommand.into()),
-            Token::Str("options"),
-            Token::Seq {
-                len: Some(0),
-            },
-            Token::SeqEnd,
-            Token::StructEnd,
-            Token::Struct {
-                name: "CommandDataOption",
-                len: 4,
-            },
-            Token::Str("name"),
-            Token::Str("autocomplete"),
-            Token::Str("type"),
-            Token::U8(CommandOptionType::Integer.into()),
-            Token::Str("value"),
-            Token::Str("not an integer"),
-            Token::Str("focused"),
-            Token::Bool(true),
-            Token::StructEnd,
-            Token::SeqEnd,
-        ]);
+        assert_json(
+            &value,
+            json!([
+                {"name": "boolean", "type": 5, "value": true},
+                {"name": "integer", "type": 4, "value": 1},
+                {"name": "number", "type": 10, "value": 2.0},
+                {"name": "string", "type": 3, "value": "foobar"},
+                {"name": "empty_subcommand", "type": 1, "options": []},
+                {"name": "autocomplete", "type": 4, "value": "not an integer", "focused": true},
+            ]),
+        );
     }
 }

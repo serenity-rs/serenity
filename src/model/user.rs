@@ -1237,9 +1237,9 @@ mod test {
     #[test]
     fn test_discriminator_serde() {
         use serde::{Deserialize, Serialize};
-        use serde_test::{assert_de_tokens, assert_tokens, Token};
 
         use super::discriminator;
+        use crate::json::{assert_json, json};
 
         #[derive(Debug, PartialEq, Deserialize, Serialize)]
         struct User {
@@ -1259,59 +1259,17 @@ mod test {
         let user = User {
             discriminator: 123,
         };
-        assert_tokens(&user, &[
-            Token::Struct {
-                name: "User",
-                len: 1,
-            },
-            Token::Str("discriminator"),
-            Token::Str("0123"),
-            Token::StructEnd,
-        ]);
-        assert_de_tokens(&user, &[
-            Token::Struct {
-                name: "User",
-                len: 1,
-            },
-            Token::Str("discriminator"),
-            Token::U16(123),
-            Token::StructEnd,
-        ]);
+        assert_json(&user, json!({"discriminator": "0123"}));
 
         let user = UserOpt {
             discriminator: Some(123),
         };
-        assert_tokens(&user, &[
-            Token::Struct {
-                name: "UserOpt",
-                len: 1,
-            },
-            Token::Str("discriminator"),
-            Token::Some,
-            Token::Str("0123"),
-            Token::StructEnd,
-        ]);
-        assert_de_tokens(&user, &[
-            Token::Struct {
-                name: "UserOpt",
-                len: 1,
-            },
-            Token::Str("discriminator"),
-            Token::Some,
-            Token::U16(123),
-            Token::StructEnd,
-        ]);
+        assert_json(&user, json!({"discriminator": "0123"}));
 
         let user_no_discriminator = UserOpt {
             discriminator: None,
         };
-        assert_tokens(&user_no_discriminator, &[
-            Token::Struct {
-                name: "UserOpt",
-                len: 0,
-            },
-            Token::StructEnd,
-        ]);
+        assert_json(&user_no_discriminator, json!({}));
     }
 
     #[cfg(feature = "model")]
