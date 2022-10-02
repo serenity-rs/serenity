@@ -12,7 +12,6 @@ mod reaction;
 #[cfg(all(feature = "cache", feature = "model", feature = "utils"))]
 use std::error::Error as StdError;
 use std::fmt;
-use std::num::NonZeroU64;
 
 use serde::de::{Error as DeError, Unexpected};
 
@@ -281,8 +280,7 @@ impl ChannelType {
 pub(crate) struct PermissionOverwriteData {
     allow: Permissions,
     deny: Permissions,
-    #[serde(with = "snowflake")]
-    id: NonZeroU64,
+    id: TargetId,
     #[serde(rename = "type")]
     kind: u8,
 }
@@ -300,8 +298,8 @@ impl std::convert::TryFrom<PermissionOverwriteData> for PermissionOverwrite {
 
     fn try_from(data: PermissionOverwriteData) -> StdResult<Self, Self::Error> {
         let kind = match data.kind {
-            0 => PermissionOverwriteType::Role(RoleId(data.id)),
-            1 => PermissionOverwriteType::Member(UserId(data.id)),
+            0 => PermissionOverwriteType::Role(RoleId(data.id.0)),
+            1 => PermissionOverwriteType::Member(UserId(data.id.0)),
             raw => return Err(InvalidPermissionOverwriteType(raw)),
         };
 
@@ -316,8 +314,8 @@ impl std::convert::TryFrom<PermissionOverwriteData> for PermissionOverwrite {
 impl From<PermissionOverwrite> for PermissionOverwriteData {
     fn from(data: PermissionOverwrite) -> Self {
         let (kind, id) = match data.kind {
-            PermissionOverwriteType::Role(id) => (0, id.0),
-            PermissionOverwriteType::Member(id) => (1, id.0),
+            PermissionOverwriteType::Role(id) => (0, TargetId(id.0)),
+            PermissionOverwriteType::Member(id) => (1, TargetId(id.0)),
         };
 
         PermissionOverwriteData {

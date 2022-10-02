@@ -1558,7 +1558,7 @@ impl Guild {
         if let Some(member) = self.members.get(&user_id) {
             Ok(Cow::Borrowed(member))
         } else {
-            cache_http.http().get_member(self.id.get(), user_id.get()).await.map(Cow::Owned)
+            cache_http.http().get_member(self.id, user_id).await.map(Cow::Owned)
         }
     }
 
@@ -2534,7 +2534,7 @@ impl Guild {
         &self,
         shard_messenger: &'a ShardMessenger,
     ) -> MessageCollectorBuilder<'a> {
-        MessageCollectorBuilder::new(shard_messenger).guild_id(self.id.0)
+        MessageCollectorBuilder::new(shard_messenger).guild_id(self.id)
     }
 
     /// Returns a builder which can be awaited to obtain a message or stream of reactions sent in this guild.
@@ -2543,7 +2543,7 @@ impl Guild {
         &self,
         shard_messenger: &'a ShardMessenger,
     ) -> ReactionCollectorBuilder<'a> {
-        ReactionCollectorBuilder::new(shard_messenger).guild_id(self.id.0)
+        ReactionCollectorBuilder::new(shard_messenger).guild_id(self.id)
     }
 
     /// Gets the guild active threads.

@@ -53,7 +53,7 @@ pub struct HttpBuilder {
     ratelimiter_disabled: bool,
     token: String,
     proxy: Option<Url>,
-    application_id: Option<u64>,
+    application_id: Option<ApplicationId>,
 }
 
 impl HttpBuilder {
@@ -72,7 +72,7 @@ impl HttpBuilder {
 
     /// Sets the application_id to use interactions.
     #[must_use]
-    pub fn application_id(mut self, application_id: u64) -> Self {
+    pub fn application_id(mut self, application_id: ApplicationId) -> Self {
         self.application_id = Some(application_id);
 
         self
@@ -148,7 +148,7 @@ impl HttpBuilder {
     pub fn build(self) -> Http {
         let token = self.token;
 
-        let application_id = AtomicU64::new(self.application_id.unwrap_or_default());
+        let application_id = AtomicU64::new(self.application_id.map_or(0, ApplicationId::get));
 
         let client = self.client.unwrap_or_else(|| {
             let builder = configure_client_backend(Client::builder());
@@ -239,7 +239,7 @@ impl Http {
     }
 
     #[must_use]
-    pub fn new_with_application_id(token: &str, application_id: u64) -> Self {
+    pub fn new_with_application_id(token: &str, application_id: ApplicationId) -> Self {
         let http = Self::new(token);
 
         http.set_application_id(application_id);
@@ -247,19 +247,17 @@ impl Http {
         http
     }
 
-    pub fn application_id(&self) -> Option<NonZeroU64> {
+    pub fn application_id(&self) -> Option<ApplicationId> {
         let application_id = self.application_id.load(Ordering::Relaxed);
-        NonZeroU64::new(application_id)
+        NonZeroU64::new(application_id).map(ApplicationId)
     }
 
-    fn try_application_id(&self) -> Result<u64> {
-        self.application_id()
-            .map(NonZeroU64::get)
-            .ok_or_else(|| HttpError::ApplicationIdMissing.into())
+    fn try_application_id(&self) -> Result<ApplicationId> {
+        self.application_id().ok_or_else(|| HttpError::ApplicationIdMissing.into())
     }
 
-    pub fn set_application_id(&self, application_id: u64) {
-        self.application_id.store(application_id, Ordering::Relaxed);
+    pub fn set_application_id(&self, application_id: ApplicationId) {
+        self.application_id.store(application_id.get(), Ordering::Relaxed);
     }
 
     /// Adds a [`User`] to a [`Guild`] with a valid OAuth2 access token.
@@ -267,8 +265,8 @@ impl Http {
     /// Returns the created [`Member`] object, or nothing if the user is already a member of the guild.
     pub async fn add_guild_member(
         &self,
-        guild_id: u64,
-        user_id: u64,
+        guild_id: GuildId,
+        user_id: UserId,
         map: &impl serde::Serialize,
     ) -> Result<Option<Member>> {
         let body = to_vec(map)?;
@@ -300,9 +298,9 @@ impl Http {
     /// [Manage Roles]: Permissions::MANAGE_ROLES
     pub async fn add_member_role(
         &self,
-        guild_id: u64,
-        user_id: u64,
-        role_id: u64,
+        guild_id: GuildId,
+        user_id: UserId,
+        role_id: RoleId,
         audit_log_reason: Option<&str>,
     ) -> Result<()> {
         self.wind(204, Request {
@@ -329,8 +327,8 @@ impl Http {
     /// [Ban Members]: Permissions::BAN_MEMBERS
     pub async fn ban_user(
         &self,
-        guild_id: u64,
-        user_id: u64,
+        guild_id: GuildId,
+        user_id: UserId,
         delete_message_days: u8,
         reason: &str,
     ) -> Result<()> {
@@ -354,7 +352,7 @@ impl Http {
     ///
     /// This should rarely be used for bots, although it is a good indicator that a
     /// long-running command is still being processed.
-    pub async fn broadcast_typing(&self, channel_id: u64) -> Result<()> {
+    pub async fn broadcast_typing(&self, channel_id: ChannelId) -> Result<()> {
         self.wind(204, Request {
             body: None,
             multipart: None,
@@ -376,7 +374,7 @@ impl Http {
     /// [Manage Channels]: Permissions::MANAGE_CHANNELS
     pub async fn create_channel(
         &self,
-        guild_id: u64,
+        guild_id: GuildId,
         map: &impl serde::Serialize,
         audit_log_reason: Option<&str>,
     ) -> Result<GuildChannel> {
@@ -412,8 +410,8 @@ impl Http {
     /// with a base message Id.
     pub async fn create_public_thread(
         &self,
-        channel_id: u64,
-        message_id: u64,
+        channel_id: ChannelId,
+        message_id: MessageId,
         map: &impl serde::Serialize,
         audit_log_reason: Option<&str>,
     ) -> Result<GuildChannel> {
@@ -434,7 +432,7 @@ impl Http {
     /// Creates a private thread channel in the [`GuildChannel`] given its Id.
     pub async fn create_private_thread(
         &self,
-        channel_id: u64,
+        channel_id: ChannelId,
         map: &impl serde::Serialize,
         audit_log_reason: Option<&str>,
     ) -> Result<GuildChannel> {
@@ -461,7 +459,7 @@ impl Http {
     /// [Manage Emojis and Stickers]: Permissions::MANAGE_EMOJIS_AND_STICKERS
     pub async fn create_emoji(
         &self,
-        guild_id: u64,
+        guild_id: GuildId,
         map: &Value,
         audit_log_reason: Option<&str>,
     ) -> Result<Emoji> {
@@ -553,7 +551,7 @@ impl Http {
     /// Creates new guild application commands.
     pub async fn create_guild_application_commands(
         &self,
-        guild_id: u64,
+        guild_id: GuildId,
         map: &impl serde::Serialize,
     ) -> Result<Vec<Command>> {
         self.fire(Request {
@@ -620,7 +618,7 @@ impl Http {
     /// [docs]: https://discord.com/developers/docs/interactions/slash-commands#create-guild-application-command
     pub async fn create_guild_application_command(
         &self,
-        guild_id: u64,
+        guild_id: GuildId,
         map: &impl serde::Serialize,
     ) -> Result<Command> {
         self.fire(Request {
@@ -645,8 +643,8 @@ impl Http {
     /// [docs]: https://discord.com/developers/docs/resources/guild#create-guild-integration
     pub async fn create_guild_integration(
         &self,
-        guild_id: u64,
-        integration_id: u64,
+        guild_id: GuildId,
+        integration_id: IntegrationId,
         map: &Value,
         audit_log_reason: Option<&str>,
     ) -> Result<()> {
@@ -670,7 +668,7 @@ impl Http {
     /// [docs]: https://discord.com/developers/docs/interactions/slash-commands#interaction-interaction-response
     pub async fn create_interaction_response(
         &self,
-        interaction_id: u64,
+        interaction_id: InteractionId,
         interaction_token: &str,
         map: &impl serde::Serialize,
         files: Vec<CreateAttachment<'_>>,
@@ -710,7 +708,7 @@ impl Http {
     /// [docs]: https://discord.com/developers/docs/resources/channel#create-channel-invite
     pub async fn create_invite(
         &self,
-        channel_id: u64,
+        channel_id: ChannelId,
         map: &impl serde::Serialize,
         audit_log_reason: Option<&str>,
     ) -> Result<RichInvite> {
@@ -730,8 +728,8 @@ impl Http {
     /// Creates a permission override for a member or a role in a channel.
     pub async fn create_permission(
         &self,
-        channel_id: u64,
-        target_id: u64,
+        channel_id: ChannelId,
+        target_id: TargetId,
         map: &impl serde::Serialize,
         audit_log_reason: Option<&str>,
     ) -> Result<()> {
@@ -765,8 +763,8 @@ impl Http {
     /// Reacts to a message.
     pub async fn create_reaction(
         &self,
-        channel_id: u64,
-        message_id: u64,
+        channel_id: ChannelId,
+        message_id: MessageId,
         reaction_type: &ReactionType,
     ) -> Result<()> {
         self.wind(204, Request {
@@ -785,7 +783,7 @@ impl Http {
     /// Creates a role.
     pub async fn create_role(
         &self,
-        guild_id: u64,
+        guild_id: GuildId,
         body: &impl serde::Serialize,
         audit_log_reason: Option<&str>,
     ) -> Result<Role> {
@@ -801,7 +799,7 @@ impl Http {
             .await?;
 
         if let Some(map) = value.as_object_mut() {
-            map.insert("guild_id".to_string(), guild_id.into());
+            map.insert("guild_id".to_string(), guild_id.get().into());
         }
 
         from_value(value).map_err(From::from)
@@ -816,7 +814,7 @@ impl Http {
     /// [Manage Events]: Permissions::MANAGE_EVENTS
     pub async fn create_scheduled_event(
         &self,
-        guild_id: u64,
+        guild_id: GuildId,
         map: &impl serde::Serialize,
         audit_log_reason: Option<&str>,
     ) -> Result<ScheduledEvent> {
@@ -842,7 +840,7 @@ impl Http {
     // Relevant issue: https://github.com/rust-lang/rust/issues/63033
     pub async fn create_sticker<'a>(
         &self,
-        guild_id: u64,
+        guild_id: GuildId,
         map: Vec<(String, String)>,
         file: CreateAttachment<'a>,
         audit_log_reason: Option<&str>,
@@ -881,10 +879,11 @@ impl Http {
     /// ```rust,no_run
     /// use serenity::http::Http;
     /// use serenity::json::json;
+    /// use serenity::model::prelude::*;
     ///
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// #    let http = Http::new("token");
-    /// let channel_id = 81384788765712384;
+    /// let channel_id = ChannelId::new(81384788765712384);
     /// let map = json!({"name": "test"});
     ///
     /// let webhook = http.create_webhook(channel_id, &map, None).await?;
@@ -893,7 +892,7 @@ impl Http {
     /// ```
     pub async fn create_webhook(
         &self,
-        channel_id: u64,
+        channel_id: ChannelId,
         map: &impl serde::Serialize,
         audit_log_reason: Option<&str>,
     ) -> Result<Webhook> {
@@ -913,7 +912,7 @@ impl Http {
     /// Deletes a private channel or a channel in a guild.
     pub async fn delete_channel(
         &self,
-        channel_id: u64,
+        channel_id: ChannelId,
         audit_log_reason: Option<&str>,
     ) -> Result<Channel> {
         self.fire(Request {
@@ -930,7 +929,7 @@ impl Http {
     /// Deletes a stage instance.
     pub async fn delete_stage_instance(
         &self,
-        channel_id: u64,
+        channel_id: ChannelId,
         audit_log_reason: Option<&str>,
     ) -> Result<()> {
         self.wind(204, Request {
@@ -947,8 +946,8 @@ impl Http {
     /// Deletes an emoji from a server.
     pub async fn delete_emoji(
         &self,
-        guild_id: u64,
-        emoji_id: u64,
+        guild_id: GuildId,
+        emoji_id: EmojiId,
         audit_log_reason: Option<&str>,
     ) -> Result<()> {
         self.wind(204, Request {
@@ -967,7 +966,7 @@ impl Http {
     pub async fn delete_followup_message(
         &self,
         interaction_token: &str,
-        message_id: u64,
+        message_id: MessageId,
     ) -> Result<()> {
         self.wind(204, Request {
             body: None,
@@ -983,7 +982,7 @@ impl Http {
     }
 
     /// Deletes a global command.
-    pub async fn delete_global_application_command(&self, command_id: u64) -> Result<()> {
+    pub async fn delete_global_application_command(&self, command_id: CommandId) -> Result<()> {
         self.wind(204, Request {
             body: None,
             multipart: None,
@@ -997,7 +996,7 @@ impl Http {
     }
 
     /// Deletes a guild, only if connected account owns it.
-    pub async fn delete_guild(&self, guild_id: u64) -> Result<()> {
+    pub async fn delete_guild(&self, guild_id: GuildId) -> Result<()> {
         self.wind(204, Request {
             body: None,
             multipart: None,
@@ -1012,8 +1011,8 @@ impl Http {
     /// Deletes a guild command.
     pub async fn delete_guild_application_command(
         &self,
-        guild_id: u64,
-        command_id: u64,
+        guild_id: GuildId,
+        command_id: CommandId,
     ) -> Result<()> {
         self.wind(204, Request {
             body: None,
@@ -1031,8 +1030,8 @@ impl Http {
     /// Removes an integration from a guild.
     pub async fn delete_guild_integration(
         &self,
-        guild_id: u64,
-        integration_id: u64,
+        guild_id: GuildId,
+        integration_id: IntegrationId,
         audit_log_reason: Option<&str>,
     ) -> Result<()> {
         self.wind(204, Request {
@@ -1067,8 +1066,8 @@ impl Http {
     /// Deletes a message if created by us or we have specific permissions.
     pub async fn delete_message(
         &self,
-        channel_id: u64,
-        message_id: u64,
+        channel_id: ChannelId,
+        message_id: MessageId,
         audit_log_reason: Option<&str>,
     ) -> Result<()> {
         self.wind(204, Request {
@@ -1086,7 +1085,7 @@ impl Http {
     /// Deletes a bunch of messages, only works for bots.
     pub async fn delete_messages(
         &self,
-        channel_id: u64,
+        channel_id: ChannelId,
         map: &Value,
         audit_log_reason: Option<&str>,
     ) -> Result<()> {
@@ -1115,11 +1114,15 @@ impl Http {
     /// let channel_id = ChannelId::new(7);
     /// let message_id = MessageId::new(8);
     ///
-    /// http.delete_message_reactions(channel_id.get(), message_id.get()).await?;
+    /// http.delete_message_reactions(channel_id, message_id).await?;
     /// #     Ok(())
     /// # }
     /// ```
-    pub async fn delete_message_reactions(&self, channel_id: u64, message_id: u64) -> Result<()> {
+    pub async fn delete_message_reactions(
+        &self,
+        channel_id: ChannelId,
+        message_id: MessageId,
+    ) -> Result<()> {
         self.wind(204, Request {
             body: None,
             multipart: None,
@@ -1135,8 +1138,8 @@ impl Http {
     /// Deletes all the reactions for a given emoji on a message.
     pub async fn delete_message_reaction_emoji(
         &self,
-        channel_id: u64,
-        message_id: u64,
+        channel_id: ChannelId,
+        message_id: MessageId,
         reaction_type: &ReactionType,
     ) -> Result<()> {
         self.wind(204, Request {
@@ -1172,8 +1175,8 @@ impl Http {
     /// Deletes a permission override from a role or a member in a channel.
     pub async fn delete_permission(
         &self,
-        channel_id: u64,
-        target_id: u64,
+        channel_id: ChannelId,
+        target_id: TargetId,
         audit_log_reason: Option<&str>,
     ) -> Result<()> {
         self.wind(204, Request {
@@ -1192,9 +1195,9 @@ impl Http {
     /// we have specific permissions.
     pub async fn delete_reaction(
         &self,
-        channel_id: u64,
-        message_id: u64,
-        user_id: Option<u64>,
+        channel_id: ChannelId,
+        message_id: MessageId,
+        user_id: Option<UserId>,
         reaction_type: &ReactionType,
     ) -> Result<()> {
         let user = user_id.map_or_else(|| "@me".to_string(), |uid| uid.to_string());
@@ -1216,8 +1219,8 @@ impl Http {
     /// Deletes a role from a server. Can't remove the default everyone role.
     pub async fn delete_role(
         &self,
-        guild_id: u64,
-        role_id: u64,
+        guild_id: GuildId,
+        role_id: RoleId,
         audit_log_reason: Option<&str>,
     ) -> Result<()> {
         self.wind(204, Request {
@@ -1238,7 +1241,11 @@ impl Http {
     ///
     /// [Scheduled Event]: crate::model::guild::ScheduledEvent
     /// [Manage Events]: Permissions::MANAGE_EVENTS
-    pub async fn delete_scheduled_event(&self, guild_id: u64, event_id: u64) -> Result<()> {
+    pub async fn delete_scheduled_event(
+        &self,
+        guild_id: GuildId,
+        event_id: ScheduledEventId,
+    ) -> Result<()> {
         self.wind(204, Request {
             body: None,
             multipart: None,
@@ -1258,8 +1265,8 @@ impl Http {
     /// [Manage Emojis and Stickers]: Permissions::MANAGE_EMOJIS_AND_STICKERS
     pub async fn delete_sticker(
         &self,
-        guild_id: u64,
-        sticker_id: u64,
+        guild_id: GuildId,
+        sticker_id: StickerId,
         audit_log_reason: Option<&str>,
     ) -> Result<()> {
         self.wind(204, Request {
@@ -1284,19 +1291,21 @@ impl Http {
     ///
     /// ```rust,no_run
     /// use serenity::http::Http;
+    /// use serenity::model::prelude::*;
     ///
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// // Due to the `delete_webhook` function requiring you to authenticate, you must have set
     /// // the token first.
     /// let http = Http::new("token");
     ///
-    /// http.delete_webhook(245037420704169985, None).await?;
+    /// let webhook_id = WebhookId::new(245037420704169985);
+    /// http.delete_webhook(webhook_id, None).await?;
     /// Ok(())
     /// # }
     /// ```
     pub async fn delete_webhook(
         &self,
-        webhook_id: u64,
+        webhook_id: WebhookId,
         audit_log_reason: Option<&str>,
     ) -> Result<()> {
         self.wind(204, Request {
@@ -1320,10 +1329,11 @@ impl Http {
     ///
     /// ```rust,no_run
     /// # use serenity::http::Http;
+    /// # use serenity::model::prelude::*;
     /// #
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// # let http = Http::new("token");
-    /// let id = 245037420704169985;
+    /// let id = WebhookId::new(245037420704169985);
     /// let token = "ig5AO-wdVWpCBtUUMxmgsWryqgsW3DChbKYOINftJ4DCrUbnkedoYZD0VOH1QLr-S3sV";
     ///
     /// http.delete_webhook_with_token(id, token, None).await?;
@@ -1332,7 +1342,7 @@ impl Http {
     /// ```
     pub async fn delete_webhook_with_token(
         &self,
-        webhook_id: u64,
+        webhook_id: WebhookId,
         token: &str,
         audit_log_reason: Option<&str>,
     ) -> Result<()> {
@@ -1351,7 +1361,7 @@ impl Http {
     /// Changes channel information.
     pub async fn edit_channel(
         &self,
-        channel_id: u64,
+        channel_id: ChannelId,
         map: &impl serde::Serialize,
         audit_log_reason: Option<&str>,
     ) -> Result<GuildChannel> {
@@ -1371,7 +1381,7 @@ impl Http {
     /// Edits a stage instance.
     pub async fn edit_stage_instance(
         &self,
-        channel_id: u64,
+        channel_id: ChannelId,
         map: &impl serde::Serialize,
         audit_log_reason: Option<&str>,
     ) -> Result<StageInstance> {
@@ -1389,8 +1399,8 @@ impl Http {
     /// Changes emoji information.
     pub async fn edit_emoji(
         &self,
-        guild_id: u64,
-        emoji_id: u64,
+        guild_id: GuildId,
+        emoji_id: EmojiId,
         map: &Value,
         audit_log_reason: Option<&str>,
     ) -> Result<Emoji> {
@@ -1416,7 +1426,7 @@ impl Http {
     pub async fn edit_followup_message(
         &self,
         interaction_token: &str,
-        message_id: u64,
+        message_id: MessageId,
         map: &impl serde::Serialize,
         new_attachments: Vec<CreateAttachment<'_>>,
     ) -> Result<Message> {
@@ -1452,7 +1462,7 @@ impl Http {
     pub async fn get_followup_message(
         &self,
         interaction_token: &str,
-        message_id: u64,
+        message_id: MessageId,
     ) -> Result<Message> {
         self.fire(Request {
             body: None,
@@ -1476,7 +1486,7 @@ impl Http {
     /// [docs]: https://discord.com/developers/docs/interactions/slash-commands#edit-global-application-command
     pub async fn edit_global_application_command(
         &self,
-        command_id: u64,
+        command_id: CommandId,
         map: &impl serde::Serialize,
     ) -> Result<Command> {
         self.fire(Request {
@@ -1494,7 +1504,7 @@ impl Http {
     /// Changes guild information.
     pub async fn edit_guild(
         &self,
-        guild_id: u64,
+        guild_id: GuildId,
         map: &impl serde::Serialize,
         audit_log_reason: Option<&str>,
     ) -> Result<PartialGuild> {
@@ -1520,8 +1530,8 @@ impl Http {
     /// [docs]: https://discord.com/developers/docs/interactions/slash-commands#edit-guild-application-command
     pub async fn edit_guild_application_command(
         &self,
-        guild_id: u64,
-        command_id: u64,
+        guild_id: GuildId,
+        command_id: CommandId,
         map: &impl serde::Serialize,
     ) -> Result<Command> {
         self.fire(Request {
@@ -1546,8 +1556,8 @@ impl Http {
     /// [documentation]: https://discord.com/developers/docs/interactions/slash-commands#edit-guild-application-command
     pub async fn edit_guild_application_command_permissions(
         &self,
-        guild_id: u64,
-        command_id: u64,
+        guild_id: GuildId,
+        command_id: CommandId,
         map: &impl serde::Serialize,
     ) -> Result<CommandPermission> {
         self.fire(Request {
@@ -1572,7 +1582,7 @@ impl Http {
     /// [documentation]: https://discord.com/developers/docs/interactions/slash-commands#edit-guild-application-command
     pub async fn edit_guild_application_commands_permissions(
         &self,
-        guild_id: u64,
+        guild_id: GuildId,
         map: &impl serde::Serialize,
     ) -> Result<Vec<CommandPermission>> {
         self.fire(Request {
@@ -1588,7 +1598,11 @@ impl Http {
     }
 
     /// Edits the positions of a guild's channels.
-    pub async fn edit_guild_channel_positions(&self, guild_id: u64, value: &Value) -> Result<()> {
+    pub async fn edit_guild_channel_positions(
+        &self,
+        guild_id: GuildId,
+        value: &Value,
+    ) -> Result<()> {
         let body = to_vec(value)?;
 
         self.wind(204, Request {
@@ -1605,7 +1619,7 @@ impl Http {
     /// Edits a [`Guild`]'s widget.
     pub async fn edit_guild_widget(
         &self,
-        guild_id: u64,
+        guild_id: GuildId,
         map: &impl serde::Serialize,
         audit_log_reason: Option<&str>,
     ) -> Result<GuildWidget> {
@@ -1625,7 +1639,7 @@ impl Http {
     /// Edits a guild welcome screen.
     pub async fn edit_guild_welcome_screen(
         &self,
-        guild_id: u64,
+        guild_id: GuildId,
         map: &impl serde::Serialize,
         audit_log_reason: Option<&str>,
     ) -> Result<GuildWelcomeScreen> {
@@ -1645,8 +1659,8 @@ impl Http {
     /// Does specific actions to a member.
     pub async fn edit_member(
         &self,
-        guild_id: u64,
-        user_id: u64,
+        guild_id: GuildId,
+        user_id: UserId,
         map: &impl serde::Serialize,
         audit_log_reason: Option<&str>,
     ) -> Result<Member> {
@@ -1665,7 +1679,7 @@ impl Http {
             .await?;
 
         if let Some(map) = value.as_object_mut() {
-            map.insert("guild_id".to_string(), guild_id.into());
+            map.insert("guild_id".to_string(), guild_id.get().into());
         }
 
         from_value::<Member>(value).map_err(From::from)
@@ -1676,8 +1690,8 @@ impl Http {
     /// **Note**: Only the author of a message can modify it.
     pub async fn edit_message(
         &self,
-        channel_id: u64,
-        message_id: u64,
+        channel_id: ChannelId,
+        message_id: MessageId,
         map: &impl serde::Serialize,
         new_attachments: Vec<CreateAttachment<'_>>,
     ) -> Result<Message> {
@@ -1707,7 +1721,11 @@ impl Http {
     /// Crossposts a message by Id.
     ///
     /// **Note**: Only available on news channels.
-    pub async fn crosspost_message(&self, channel_id: u64, message_id: u64) -> Result<Message> {
+    pub async fn crosspost_message(
+        &self,
+        channel_id: ChannelId,
+        message_id: MessageId,
+    ) -> Result<Message> {
         self.fire(Request {
             body: None,
             multipart: None,
@@ -1723,7 +1741,7 @@ impl Http {
     /// Edits the current member for the provided [`Guild`] via its Id.
     pub async fn edit_member_me(
         &self,
-        guild_id: u64,
+        guild_id: GuildId,
         map: &JsonMap,
         audit_log_reason: Option<&str>,
     ) -> Result<Member> {
@@ -1745,7 +1763,7 @@ impl Http {
     /// Pass [`None`] to reset the nickname.
     pub async fn edit_nickname(
         &self,
-        guild_id: u64,
+        guild_id: GuildId,
         new_nickname: Option<&str>,
         audit_log_reason: Option<&str>,
     ) -> Result<()> {
@@ -1766,8 +1784,8 @@ impl Http {
     /// Follow a News Channel to send messages to a target channel.
     pub async fn follow_news_channel(
         &self,
-        news_channel_id: u64,
-        target_channel_id: u64,
+        news_channel_id: ChannelId,
+        target_channel_id: ChannelId,
     ) -> Result<FollowedChannel> {
         let map = json!({ "webhook_channel_id": target_channel_id });
         let body = to_vec(&map)?;
@@ -1850,8 +1868,8 @@ impl Http {
     /// Changes a role in a guild.
     pub async fn edit_role(
         &self,
-        guild_id: u64,
-        role_id: u64,
+        guild_id: GuildId,
+        role_id: RoleId,
         map: &impl serde::Serialize,
         audit_log_reason: Option<&str>,
     ) -> Result<Role> {
@@ -1868,7 +1886,7 @@ impl Http {
             .await?;
 
         if let Some(map) = value.as_object_mut() {
-            map.insert("guild_id".to_string(), guild_id.into());
+            map.insert("guild_id".to_string(), guild_id.get().into());
         }
 
         from_value(value).map_err(From::from)
@@ -1877,8 +1895,8 @@ impl Http {
     /// Changes the position of a role in a guild.
     pub async fn edit_role_position(
         &self,
-        guild_id: u64,
-        role_id: u64,
+        guild_id: GuildId,
+        role_id: RoleId,
         position: u32,
         audit_log_reason: Option<&str>,
     ) -> Result<Vec<Role>> {
@@ -1902,7 +1920,7 @@ impl Http {
         if let Some(array) = value.as_array_mut() {
             for role in array {
                 if let Some(map) = role.as_object_mut() {
-                    map.insert("guild_id".to_string(), guild_id.into());
+                    map.insert("guild_id".to_string(), guild_id.get().into());
                 }
             }
         }
@@ -1917,8 +1935,8 @@ impl Http {
     /// [Manage Events]: Permissions::MANAGE_EVENTS
     pub async fn edit_scheduled_event(
         &self,
-        guild_id: u64,
-        event_id: u64,
+        guild_id: GuildId,
+        event_id: ScheduledEventId,
         map: &impl serde::Serialize,
         audit_log_reason: Option<&str>,
     ) -> Result<ScheduledEvent> {
@@ -1942,8 +1960,8 @@ impl Http {
     /// [Manage Emojis and Stickers]: Permissions::MANAGE_EMOJIS_AND_STICKERS
     pub async fn edit_sticker(
         &self,
-        guild_id: u64,
-        sticker_id: u64,
+        guild_id: GuildId,
+        sticker_id: StickerId,
         map: &impl serde::Serialize,
         audit_log_reason: Option<&str>,
     ) -> Result<Sticker> {
@@ -1962,7 +1980,7 @@ impl Http {
             .await?;
 
         if let Some(map) = value.as_object_mut() {
-            map.insert("guild_id".to_string(), guild_id.into());
+            map.insert("guild_id".to_string(), guild_id.get().into());
         }
 
         from_value(value).map_err(From::from)
@@ -1971,7 +1989,7 @@ impl Http {
     /// Edits a thread channel in the [`GuildChannel`] given its Id.
     pub async fn edit_thread(
         &self,
-        channel_id: u64,
+        channel_id: ChannelId,
         map: &impl serde::Serialize,
         audit_log_reason: Option<&str>,
     ) -> Result<GuildChannel> {
@@ -2002,11 +2020,12 @@ impl Http {
     /// ```rust,no_run
     /// use serenity::http::Http;
     /// use serenity::json::{json, prelude::*};
+    /// use serenity::model::prelude::*;
     ///
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// #     let http = Http::new("token");
-    /// let guild_id = 187450744427773963;
-    /// let user_id = 150443906511667200;
+    /// let guild_id = GuildId::new(187450744427773963);
+    /// let user_id = UserId::new(150443906511667200);
     /// let map = json!({
     ///     "channel_id": "826929611849334784",
     ///     "suppress": true,
@@ -2019,8 +2038,8 @@ impl Http {
     /// ```
     pub async fn edit_voice_state(
         &self,
-        guild_id: u64,
-        user_id: u64,
+        guild_id: GuildId,
+        user_id: UserId,
         map: &impl serde::Serialize,
     ) -> Result<()> {
         self.wind(204, Request {
@@ -2053,10 +2072,11 @@ impl Http {
     /// ```rust,no_run
     /// use serenity::http::Http;
     /// use serenity::json::{json, prelude::*};
+    /// use serenity::model::prelude::*;
     ///
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// #     let http = Http::new("token");
-    /// let guild_id = 187450744427773963;
+    /// let guild_id = GuildId::new(187450744427773963);
     /// let map = json!({
     ///     "channel_id": "826929611849334784",
     ///     "suppress": false,
@@ -2070,7 +2090,7 @@ impl Http {
     /// ```
     pub async fn edit_voice_state_me(
         &self,
-        guild_id: u64,
+        guild_id: GuildId,
         map: &impl serde::Serialize,
     ) -> Result<()> {
         self.wind(204, Request {
@@ -2102,10 +2122,11 @@ impl Http {
     /// ```rust,no_run
     /// use serenity::http::Http;
     /// use serenity::json::json;
+    /// use serenity::model::prelude::*;
     ///
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// #     let http = Http::new("token");
-    /// let id = 245037420704169985;
+    /// let id = WebhookId::new(245037420704169985);
     /// let image = serenity::utils::read_image("./webhook_img.png")?;
     /// let map = json!({
     ///     "avatar": image,
@@ -2117,7 +2138,7 @@ impl Http {
     /// ```
     pub async fn edit_webhook(
         &self,
-        webhook_id: u64,
+        webhook_id: WebhookId,
         map: &impl serde::Serialize,
         audit_log_reason: Option<&str>,
     ) -> Result<Webhook> {
@@ -2145,10 +2166,11 @@ impl Http {
     /// ```rust,no_run
     /// use serenity::http::Http;
     /// use serenity::json::prelude::*;
+    /// use serenity::model::prelude::*;
     ///
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// #     let http = Http::new("token");
-    /// let id = 245037420704169985;
+    /// let id = WebhookId::new(245037420704169985);
     /// let token = "ig5AO-wdVWpCBtUUMxmgsWryqgsW3DChbKYOINftJ4DCrUbnkedoYZD0VOH1QLr-S3sV";
     /// let value = json!({"name": "new name"});
     /// let map = value.as_object().unwrap();
@@ -2159,7 +2181,7 @@ impl Http {
     /// ```
     pub async fn edit_webhook_with_token(
         &self,
-        webhook_id: u64,
+        webhook_id: WebhookId,
         token: &str,
         map: &impl serde::Serialize,
         audit_log_reason: Option<&str>,
@@ -2214,10 +2236,11 @@ impl Http {
     /// ```rust,no_run
     /// use serenity::http::Http;
     /// use serenity::json::prelude::*;
+    /// use serenity::model::prelude::*;
     ///
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// #     let http = Http::new("token");
-    /// let id = 245037420704169985;
+    /// let id = WebhookId::new(245037420704169985);
     /// let token = "ig5AO-wdVWpCBtUUMxmgsWryqgsW3DChbKYOINftJ4DCrUbnkedoYZD0VOH1QLr-S3sV";
     /// let value = json!({"content": "test"});
     /// let map = value.as_object().unwrap();
@@ -2231,8 +2254,8 @@ impl Http {
     /// [Discord docs]: https://discord.com/developers/docs/resources/webhook#execute-webhook-query-string-params
     pub async fn execute_webhook(
         &self,
-        webhook_id: u64,
-        thread_id: Option<u64>,
+        webhook_id: WebhookId,
+        thread_id: Option<ChannelId>,
         token: &str,
         wait: bool,
         files: Vec<CreateAttachment<'_>>,
@@ -2272,9 +2295,9 @@ impl Http {
     // Gets a webhook's message by Id
     pub async fn get_webhook_message(
         &self,
-        webhook_id: u64,
+        webhook_id: WebhookId,
         token: &str,
-        message_id: u64,
+        message_id: MessageId,
     ) -> Result<Message> {
         self.fire(Request {
             body: None,
@@ -2292,9 +2315,9 @@ impl Http {
     /// Edits a webhook's message by Id.
     pub async fn edit_webhook_message(
         &self,
-        webhook_id: u64,
+        webhook_id: WebhookId,
         token: &str,
-        message_id: u64,
+        message_id: MessageId,
         map: &impl serde::Serialize,
     ) -> Result<Message> {
         let body = to_vec(map)?;
@@ -2315,9 +2338,9 @@ impl Http {
     /// Deletes a webhook's message by Id.
     pub async fn delete_webhook_message(
         &self,
-        webhook_id: u64,
+        webhook_id: WebhookId,
         token: &str,
-        message_id: u64,
+        message_id: MessageId,
     ) -> Result<()> {
         self.wind(204, Request {
             body: None,
@@ -2355,7 +2378,7 @@ impl Http {
     }
 
     /// Gets all the users that are banned in specific guild.
-    pub async fn get_bans(&self, guild_id: u64) -> Result<Vec<Ban>> {
+    pub async fn get_bans(&self, guild_id: GuildId) -> Result<Vec<Ban>> {
         self.fire(Request {
             body: None,
             multipart: None,
@@ -2370,9 +2393,9 @@ impl Http {
     /// Gets all audit logs in a specific guild.
     pub async fn get_audit_logs(
         &self,
-        guild_id: u64,
+        guild_id: GuildId,
         action_type: Option<u8>,
-        user_id: Option<u64>,
+        user_id: Option<UserId>,
         before: Option<u64>,
         limit: Option<u8>,
     ) -> Result<AuditLogs> {
@@ -2394,7 +2417,7 @@ impl Http {
     /// Retrieves all auto moderation rules in a guild.
     ///
     /// This method requires `MANAGE_GUILD` permissions.
-    pub async fn get_automod_rules(&self, guild_id: u64) -> Result<Vec<Rule>> {
+    pub async fn get_automod_rules(&self, guild_id: GuildId) -> Result<Vec<Rule>> {
         self.fire(Request {
             body: None,
             multipart: None,
@@ -2409,7 +2432,7 @@ impl Http {
     /// Retrieves an auto moderation rule in a guild.
     ///
     /// This method requires `MANAGE_GUILD` permissions.
-    pub async fn get_automod_rule(&self, guild_id: u64, rule_id: u64) -> Result<Rule> {
+    pub async fn get_automod_rule(&self, guild_id: GuildId, rule_id: RuleId) -> Result<Rule> {
         self.fire(Request {
             body: None,
             multipart: None,
@@ -2427,7 +2450,7 @@ impl Http {
     /// This method requires `MANAGE_GUILD` permissions.
     pub async fn create_automod_rule(
         &self,
-        guild_id: u64,
+        guild_id: GuildId,
         map: &impl serde::Serialize,
         audit_log_reason: Option<&str>,
     ) -> Result<Rule> {
@@ -2449,8 +2472,8 @@ impl Http {
     /// This method requires `MANAGE_GUILD` permissions.
     pub async fn edit_automod_rule(
         &self,
-        guild_id: u64,
-        rule_id: u64,
+        guild_id: GuildId,
+        rule_id: RuleId,
         map: &impl serde::Serialize,
         audit_log_reason: Option<&str>,
     ) -> Result<Rule> {
@@ -2473,8 +2496,8 @@ impl Http {
     /// This method requires `MANAGE_GUILD` permissions.
     pub async fn delete_automod_rule(
         &self,
-        guild_id: u64,
-        rule_id: u64,
+        guild_id: GuildId,
+        rule_id: RuleId,
         audit_log_reason: Option<&str>,
     ) -> Result<()> {
         self.wind(204, Request {
@@ -2501,7 +2524,7 @@ impl Http {
     }
 
     /// Gets all invites for a channel.
-    pub async fn get_channel_invites(&self, channel_id: u64) -> Result<Vec<RichInvite>> {
+    pub async fn get_channel_invites(&self, channel_id: ChannelId) -> Result<Vec<RichInvite>> {
         self.fire(Request {
             body: None,
             multipart: None,
@@ -2514,7 +2537,10 @@ impl Http {
     }
 
     /// Gets all thread members for a thread.
-    pub async fn get_channel_thread_members(&self, channel_id: u64) -> Result<Vec<ThreadMember>> {
+    pub async fn get_channel_thread_members(
+        &self,
+        channel_id: ChannelId,
+    ) -> Result<Vec<ThreadMember>> {
         self.fire(Request {
             body: None,
             multipart: None,
@@ -2527,7 +2553,7 @@ impl Http {
     }
 
     /// Gets all active threads from a guild.
-    pub async fn get_guild_active_threads(&self, guild_id: u64) -> Result<ThreadsData> {
+    pub async fn get_guild_active_threads(&self, guild_id: GuildId) -> Result<ThreadsData> {
         self.fire(Request {
             body: None,
             multipart: None,
@@ -2542,7 +2568,7 @@ impl Http {
     /// Gets all archived public threads from a channel.
     pub async fn get_channel_archived_public_threads(
         &self,
-        channel_id: u64,
+        channel_id: ChannelId,
         before: Option<u64>,
         limit: Option<u64>,
     ) -> Result<ThreadsData> {
@@ -2562,7 +2588,7 @@ impl Http {
     /// Gets all archived private threads from a channel.
     pub async fn get_channel_archived_private_threads(
         &self,
-        channel_id: u64,
+        channel_id: ChannelId,
         before: Option<u64>,
         limit: Option<u64>,
     ) -> Result<ThreadsData> {
@@ -2582,7 +2608,7 @@ impl Http {
     /// Gets all archived private threads joined from a channel.
     pub async fn get_channel_joined_archived_private_threads(
         &self,
-        channel_id: u64,
+        channel_id: ChannelId,
         before: Option<u64>,
         limit: Option<u64>,
     ) -> Result<ThreadsData> {
@@ -2600,7 +2626,7 @@ impl Http {
     }
 
     /// Joins a thread channel.
-    pub async fn join_thread_channel(&self, channel_id: u64) -> Result<()> {
+    pub async fn join_thread_channel(&self, channel_id: ChannelId) -> Result<()> {
         self.wind(204, Request {
             body: None,
             multipart: None,
@@ -2613,7 +2639,7 @@ impl Http {
     }
 
     /// Leaves a thread channel.
-    pub async fn leave_thread_channel(&self, channel_id: u64) -> Result<()> {
+    pub async fn leave_thread_channel(&self, channel_id: ChannelId) -> Result<()> {
         self.wind(204, Request {
             body: None,
             multipart: None,
@@ -2626,7 +2652,11 @@ impl Http {
     }
 
     /// Adds a member to a thread channel.
-    pub async fn add_thread_channel_member(&self, channel_id: u64, user_id: u64) -> Result<()> {
+    pub async fn add_thread_channel_member(
+        &self,
+        channel_id: ChannelId,
+        user_id: UserId,
+    ) -> Result<()> {
         self.wind(204, Request {
             body: None,
             multipart: None,
@@ -2640,7 +2670,11 @@ impl Http {
     }
 
     /// Removes a member from a thread channel.
-    pub async fn remove_thread_channel_member(&self, channel_id: u64, user_id: u64) -> Result<()> {
+    pub async fn remove_thread_channel_member(
+        &self,
+        channel_id: ChannelId,
+        user_id: UserId,
+    ) -> Result<()> {
         self.wind(204, Request {
             body: None,
             multipart: None,
@@ -2663,16 +2697,17 @@ impl Http {
     ///
     /// ```rust,no_run
     /// # use serenity::http::Http;
+    /// # use serenity::model::prelude::*;
     /// #
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// # let http = Http::new("token");
-    /// let channel_id = 81384788765712384;
+    /// let channel_id = ChannelId::new(81384788765712384);
     ///
     /// let webhooks = http.get_channel_webhooks(channel_id).await?;
     /// #     Ok(())
     /// # }
     /// ```
-    pub async fn get_channel_webhooks(&self, channel_id: u64) -> Result<Vec<Webhook>> {
+    pub async fn get_channel_webhooks(&self, channel_id: ChannelId) -> Result<Vec<Webhook>> {
         self.fire(Request {
             body: None,
             multipart: None,
@@ -2685,7 +2720,7 @@ impl Http {
     }
 
     /// Gets channel information.
-    pub async fn get_channel(&self, channel_id: u64) -> Result<Channel> {
+    pub async fn get_channel(&self, channel_id: ChannelId) -> Result<Channel> {
         self.fire(Request {
             body: None,
             multipart: None,
@@ -2698,7 +2733,7 @@ impl Http {
     }
 
     /// Gets all channels in a guild.
-    pub async fn get_channels(&self, guild_id: u64) -> Result<Vec<GuildChannel>> {
+    pub async fn get_channels(&self, guild_id: GuildId) -> Result<Vec<GuildChannel>> {
         self.fire(Request {
             body: None,
             multipart: None,
@@ -2711,7 +2746,7 @@ impl Http {
     }
 
     /// Gets a stage instance.
-    pub async fn get_stage_instance(&self, channel_id: u64) -> Result<StageInstance> {
+    pub async fn get_stage_instance(&self, channel_id: ChannelId) -> Result<StageInstance> {
         self.fire(Request {
             body: None,
             multipart: None,
@@ -2748,7 +2783,7 @@ impl Http {
     }
 
     /// Gets all emojis of a guild.
-    pub async fn get_emojis(&self, guild_id: u64) -> Result<Vec<Emoji>> {
+    pub async fn get_emojis(&self, guild_id: GuildId) -> Result<Vec<Emoji>> {
         self.fire(Request {
             body: None,
             multipart: None,
@@ -2761,7 +2796,7 @@ impl Http {
     }
 
     /// Gets information about an emoji in a guild.
-    pub async fn get_emoji(&self, guild_id: u64, emoji_id: u64) -> Result<Emoji> {
+    pub async fn get_emoji(&self, guild_id: GuildId, emoji_id: EmojiId) -> Result<Emoji> {
         self.fire(Request {
             body: None,
             multipart: None,
@@ -2814,7 +2849,7 @@ impl Http {
     }
 
     /// Fetches a global commands for your application by its Id.
-    pub async fn get_global_application_command(&self, command_id: u64) -> Result<Command> {
+    pub async fn get_global_application_command(&self, command_id: CommandId) -> Result<Command> {
         self.fire(Request {
             body: None,
             multipart: None,
@@ -2828,7 +2863,7 @@ impl Http {
     }
 
     /// Gets guild information.
-    pub async fn get_guild(&self, guild_id: u64) -> Result<PartialGuild> {
+    pub async fn get_guild(&self, guild_id: GuildId) -> Result<PartialGuild> {
         self.fire(Request {
             body: None,
             multipart: None,
@@ -2841,7 +2876,7 @@ impl Http {
     }
 
     /// Gets guild information with counts.
-    pub async fn get_guild_with_counts(&self, guild_id: u64) -> Result<PartialGuild> {
+    pub async fn get_guild_with_counts(&self, guild_id: GuildId) -> Result<PartialGuild> {
         self.fire(Request {
             body: None,
             multipart: None,
@@ -2854,7 +2889,7 @@ impl Http {
     }
 
     /// Fetches all of the guild commands for your application for a specific guild.
-    pub async fn get_guild_application_commands(&self, guild_id: u64) -> Result<Vec<Command>> {
+    pub async fn get_guild_application_commands(&self, guild_id: GuildId) -> Result<Vec<Command>> {
         self.fire(Request {
             body: None,
             multipart: None,
@@ -2871,7 +2906,7 @@ impl Http {
     /// Fetches all of the guild commands with localizations for your application for a specific guild.
     pub async fn get_guild_application_commands_with_localizations(
         &self,
-        guild_id: u64,
+        guild_id: GuildId,
     ) -> Result<Vec<Command>> {
         self.fire(Request {
             body: None,
@@ -2889,8 +2924,8 @@ impl Http {
     /// Fetches a guild command by its Id.
     pub async fn get_guild_application_command(
         &self,
-        guild_id: u64,
-        command_id: u64,
+        guild_id: GuildId,
+        command_id: CommandId,
     ) -> Result<Command> {
         self.fire(Request {
             body: None,
@@ -2908,7 +2943,7 @@ impl Http {
     /// Fetches all of the guild commands permissions for your application for a specific guild.
     pub async fn get_guild_application_commands_permissions(
         &self,
-        guild_id: u64,
+        guild_id: GuildId,
     ) -> Result<Vec<CommandPermission>> {
         self.fire(Request {
             body: None,
@@ -2925,8 +2960,8 @@ impl Http {
     /// Gives the guild command permission for your application for a specific guild.
     pub async fn get_guild_application_command_permissions(
         &self,
-        guild_id: u64,
-        command_id: u64,
+        guild_id: GuildId,
+        command_id: CommandId,
     ) -> Result<CommandPermission> {
         self.fire(Request {
             body: None,
@@ -2944,7 +2979,7 @@ impl Http {
     /// Gets a guild widget information.
     // TODO: according to Discord, this returns different data; namely https://discord.com/developers/docs/resources/guild#guild-widget-object-guild-widget-structure.
     // Should investigate if this endpoint actually works
-    pub async fn get_guild_widget(&self, guild_id: u64) -> Result<GuildWidget> {
+    pub async fn get_guild_widget(&self, guild_id: GuildId) -> Result<GuildWidget> {
         self.fire(Request {
             body: None,
             multipart: None,
@@ -2957,7 +2992,7 @@ impl Http {
     }
 
     /// Gets a guild preview.
-    pub async fn get_guild_preview(&self, guild_id: u64) -> Result<GuildPreview> {
+    pub async fn get_guild_preview(&self, guild_id: GuildId) -> Result<GuildPreview> {
         self.fire(Request {
             body: None,
             multipart: None,
@@ -2970,7 +3005,7 @@ impl Http {
     }
 
     /// Gets a guild welcome screen information.
-    pub async fn get_guild_welcome_screen(&self, guild_id: u64) -> Result<GuildWelcomeScreen> {
+    pub async fn get_guild_welcome_screen(&self, guild_id: GuildId) -> Result<GuildWelcomeScreen> {
         self.fire(Request {
             body: None,
             multipart: None,
@@ -2983,7 +3018,7 @@ impl Http {
     }
 
     /// Gets integrations that a guild has.
-    pub async fn get_guild_integrations(&self, guild_id: u64) -> Result<Vec<Integration>> {
+    pub async fn get_guild_integrations(&self, guild_id: GuildId) -> Result<Vec<Integration>> {
         self.fire(Request {
             body: None,
             multipart: None,
@@ -2996,7 +3031,7 @@ impl Http {
     }
 
     /// Gets all invites to a guild.
-    pub async fn get_guild_invites(&self, guild_id: u64) -> Result<Vec<RichInvite>> {
+    pub async fn get_guild_invites(&self, guild_id: GuildId) -> Result<Vec<RichInvite>> {
         self.fire(Request {
             body: None,
             multipart: None,
@@ -3009,7 +3044,7 @@ impl Http {
     }
 
     /// Gets a guild's vanity URL if it has one.
-    pub async fn get_guild_vanity_url(&self, guild_id: u64) -> Result<String> {
+    pub async fn get_guild_vanity_url(&self, guild_id: GuildId) -> Result<String> {
         #[derive(Deserialize)]
         struct GuildVanityUrl {
             code: String,
@@ -3031,7 +3066,7 @@ impl Http {
     /// user to offset the result by.
     pub async fn get_guild_members(
         &self,
-        guild_id: u64,
+        guild_id: GuildId,
         limit: Option<u64>,
         after: Option<u64>,
     ) -> Result<Vec<Member>> {
@@ -3057,7 +3092,7 @@ impl Http {
         if let Some(values) = value.as_array_mut() {
             for value in values {
                 if let Some(element) = value.as_object_mut() {
-                    element.insert("guild_id".to_string(), guild_id.into());
+                    element.insert("guild_id".to_string(), guild_id.get().into());
                 }
             }
         }
@@ -3066,7 +3101,7 @@ impl Http {
     }
 
     /// Gets the amount of users that can be pruned.
-    pub async fn get_guild_prune_count(&self, guild_id: u64, days: u8) -> Result<GuildPrune> {
+    pub async fn get_guild_prune_count(&self, guild_id: GuildId, days: u8) -> Result<GuildPrune> {
         self.fire(Request {
             body: None,
             multipart: None,
@@ -3081,7 +3116,7 @@ impl Http {
 
     /// Gets regions that a guild can use. If a guild has the `VIP_REGIONS` feature
     /// enabled, then additional VIP-only regions are returned.
-    pub async fn get_guild_regions(&self, guild_id: u64) -> Result<Vec<VoiceRegion>> {
+    pub async fn get_guild_regions(&self, guild_id: GuildId) -> Result<Vec<VoiceRegion>> {
         self.fire(Request {
             body: None,
             multipart: None,
@@ -3094,7 +3129,7 @@ impl Http {
     }
 
     /// Retrieves a list of roles in a [`Guild`].
-    pub async fn get_guild_roles(&self, guild_id: u64) -> Result<Vec<Role>> {
+    pub async fn get_guild_roles(&self, guild_id: GuildId) -> Result<Vec<Role>> {
         let mut value: Value = self
             .fire(Request {
                 body: None,
@@ -3109,7 +3144,7 @@ impl Http {
         if let Some(array) = value.as_array_mut() {
             for sticker in array {
                 if let Some(map) = sticker.as_object_mut() {
-                    map.insert("guild_id".to_string(), guild_id.into());
+                    map.insert("guild_id".to_string(), guild_id.get().into());
                 }
             }
         }
@@ -3124,8 +3159,8 @@ impl Http {
     /// [Manage Events]: Permissions::MANAGE_EVENTS
     pub async fn get_scheduled_event(
         &self,
-        guild_id: u64,
-        event_id: u64,
+        guild_id: GuildId,
+        event_id: ScheduledEventId,
         with_user_count: bool,
     ) -> Result<ScheduledEvent> {
         self.fire(Request {
@@ -3148,7 +3183,7 @@ impl Http {
     /// [Manage Events]: Permissions::MANAGE_EVENTS
     pub async fn get_scheduled_events(
         &self,
-        guild_id: u64,
+        guild_id: GuildId,
         with_user_count: bool,
     ) -> Result<Vec<ScheduledEvent>> {
         self.fire(Request {
@@ -3180,8 +3215,8 @@ impl Http {
     /// [`Guild Member`]: crate::model::guild::Member
     pub async fn get_scheduled_event_users(
         &self,
-        guild_id: u64,
-        event_id: u64,
+        guild_id: GuildId,
+        event_id: ScheduledEventId,
         limit: Option<u64>,
         target: Option<UserPagination>,
         with_member: Option<bool>,
@@ -3211,7 +3246,7 @@ impl Http {
     }
 
     /// Retrieves a list of stickers in a [`Guild`].
-    pub async fn get_guild_stickers(&self, guild_id: u64) -> Result<Vec<Sticker>> {
+    pub async fn get_guild_stickers(&self, guild_id: GuildId) -> Result<Vec<Sticker>> {
         let mut value: Value = self
             .fire(Request {
                 body: None,
@@ -3226,7 +3261,7 @@ impl Http {
         if let Some(array) = value.as_array_mut() {
             for role in array {
                 if let Some(map) = role.as_object_mut() {
-                    map.insert("guild_id".to_string(), guild_id.into());
+                    map.insert("guild_id".to_string(), guild_id.get().into());
                 }
             }
         }
@@ -3235,7 +3270,11 @@ impl Http {
     }
 
     /// Retrieves a single sticker in a [`Guild`].
-    pub async fn get_guild_sticker(&self, guild_id: u64, sticker_id: u64) -> Result<Sticker> {
+    pub async fn get_guild_sticker(
+        &self,
+        guild_id: GuildId,
+        sticker_id: StickerId,
+    ) -> Result<Sticker> {
         let mut value: Value = self
             .fire(Request {
                 body: None,
@@ -3249,7 +3288,7 @@ impl Http {
             .await?;
 
         if let Some(map) = value.as_object_mut() {
-            map.insert("guild_id".to_string(), guild_id.into());
+            map.insert("guild_id".to_string(), guild_id.get().into());
         }
 
         from_value(value).map_err(From::from)
@@ -3265,16 +3304,17 @@ impl Http {
     ///
     /// ```rust,no_run
     /// # use serenity::http::Http;
+    /// # use serenity::model::prelude::*;
     /// #
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// #     let http = Http::new("token");
-    /// let guild_id = 81384788765712384;
+    /// let guild_id = GuildId::new(81384788765712384);
     ///
     /// let webhooks = http.get_guild_webhooks(guild_id).await?;
     /// #     Ok(())
     /// # }
     /// ```
-    pub async fn get_guild_webhooks(&self, guild_id: u64) -> Result<Vec<Webhook>> {
+    pub async fn get_guild_webhooks(&self, guild_id: GuildId) -> Result<Vec<Webhook>> {
         self.fire(Request {
             body: None,
             multipart: None,
@@ -3355,7 +3395,7 @@ impl Http {
         code: &str,
         member_counts: bool,
         expiration: bool,
-        event_id: Option<u64>,
+        event_id: Option<ScheduledEventId>,
     ) -> Result<Invite> {
         #[cfg(feature = "utils")]
         let code = crate::utils::parse_invite(code);
@@ -3375,7 +3415,7 @@ impl Http {
     }
 
     /// Gets member of a guild.
-    pub async fn get_member(&self, guild_id: u64, user_id: u64) -> Result<Member> {
+    pub async fn get_member(&self, guild_id: GuildId, user_id: UserId) -> Result<Member> {
         let mut value: Value = self
             .fire(Request {
                 body: None,
@@ -3389,14 +3429,18 @@ impl Http {
             .await?;
 
         if let Some(map) = value.as_object_mut() {
-            map.insert("guild_id".to_string(), guild_id.into());
+            map.insert("guild_id".to_string(), guild_id.get().into());
         }
 
         from_value(value).map_err(From::from)
     }
 
     /// Gets a message by an Id, bots only.
-    pub async fn get_message(&self, channel_id: u64, message_id: u64) -> Result<Message> {
+    pub async fn get_message(
+        &self,
+        channel_id: ChannelId,
+        message_id: MessageId,
+    ) -> Result<Message> {
         self.fire(Request {
             body: None,
             multipart: None,
@@ -3410,7 +3454,7 @@ impl Http {
     }
 
     /// Gets X messages from a channel.
-    pub async fn get_messages(&self, channel_id: u64, query: &str) -> Result<Vec<Message>> {
+    pub async fn get_messages(&self, channel_id: ChannelId, query: &str) -> Result<Vec<Message>> {
         self.fire(Request {
             body: None,
             multipart: None,
@@ -3441,7 +3485,7 @@ impl Http {
     }
 
     /// Gets all pins of a channel.
-    pub async fn get_pins(&self, channel_id: u64) -> Result<Vec<Message>> {
+    pub async fn get_pins(&self, channel_id: ChannelId) -> Result<Vec<Message>> {
         self.fire(Request {
             body: None,
             multipart: None,
@@ -3456,8 +3500,8 @@ impl Http {
     /// Gets user Ids based on their reaction to a message. This endpoint is dumb.
     pub async fn get_reaction_users(
         &self,
-        channel_id: u64,
-        message_id: u64,
+        channel_id: ChannelId,
+        message_id: MessageId,
         reaction_type: &ReactionType,
         limit: u8,
         after: Option<u64>,
@@ -3480,7 +3524,7 @@ impl Http {
     }
 
     /// Gets a sticker.
-    pub async fn get_sticker(&self, sticker_id: u64) -> Result<Sticker> {
+    pub async fn get_sticker(&self, sticker_id: StickerId) -> Result<Sticker> {
         self.fire(Request {
             body: None,
             multipart: None,
@@ -3537,7 +3581,7 @@ impl Http {
     }
 
     /// Gets a user by Id.
-    pub async fn get_user(&self, user_id: u64) -> Result<User> {
+    pub async fn get_user(&self, user_id: UserId) -> Result<User> {
         self.fire(Request {
             body: None,
             multipart: None,
@@ -3598,15 +3642,16 @@ impl Http {
     ///
     /// ```rust,no_run
     /// # use serenity::http::Http;
-    /// #
+    /// # use serenity::model::prelude::*;
+    ///
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// #     let http = Http::new("token");
-    /// let id = 245037420704169985;
+    /// let id = WebhookId::new(245037420704169985);
     /// let webhook = http.get_webhook(id).await?;
     /// #     Ok(())
     /// # }
     /// ```
-    pub async fn get_webhook(&self, webhook_id: u64) -> Result<Webhook> {
+    pub async fn get_webhook(&self, webhook_id: WebhookId) -> Result<Webhook> {
         self.fire(Request {
             body: None,
             multipart: None,
@@ -3628,17 +3673,22 @@ impl Http {
     ///
     /// ```rust,no_run
     /// # use serenity::http::Http;
+    /// # use serenity::model::prelude::*;
     /// #
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// #     let http = Http::new("token");
-    /// let id = 245037420704169985;
+    /// let id = WebhookId::new(245037420704169985);
     /// let token = "ig5AO-wdVWpCBtUUMxmgsWryqgsW3DChbKYOINftJ4DCrUbnkedoYZD0VOH1QLr-S3sV";
     ///
     /// let webhook = http.get_webhook_with_token(id, token).await?;
     /// #     Ok(())
     /// # }
     /// ```
-    pub async fn get_webhook_with_token(&self, webhook_id: u64, token: &str) -> Result<Webhook> {
+    pub async fn get_webhook_with_token(
+        &self,
+        webhook_id: WebhookId,
+        token: &str,
+    ) -> Result<Webhook> {
         self.fire(Request {
             body: None,
             multipart: None,
@@ -3687,15 +3737,15 @@ impl Http {
     }
 
     /// Kicks a member from a guild.
-    pub async fn kick_member(&self, guild_id: u64, user_id: u64) -> Result<()> {
+    pub async fn kick_member(&self, guild_id: GuildId, user_id: UserId) -> Result<()> {
         self.kick_member_with_reason(guild_id, user_id, "").await
     }
 
     /// Kicks a member from a guild with a provided reason.
     pub async fn kick_member_with_reason(
         &self,
-        guild_id: u64,
-        user_id: u64,
+        guild_id: GuildId,
+        user_id: UserId,
         reason: &str,
     ) -> Result<()> {
         self.wind(204, Request {
@@ -3711,7 +3761,7 @@ impl Http {
     }
 
     /// Leaves a guild.
-    pub async fn leave_guild(&self, guild_id: u64) -> Result<()> {
+    pub async fn leave_guild(&self, guild_id: GuildId) -> Result<()> {
         self.wind(204, Request {
             body: None,
             multipart: None,
@@ -3732,7 +3782,7 @@ impl Http {
     /// if the files are too large to send.
     pub async fn send_message(
         &self,
-        channel_id: u64,
+        channel_id: ChannelId,
         files: Vec<CreateAttachment<'_>>,
         map: &impl serde::Serialize,
     ) -> Result<Message> {
@@ -3761,8 +3811,8 @@ impl Http {
     /// Pins a message in a channel.
     pub async fn pin_message(
         &self,
-        channel_id: u64,
-        message_id: u64,
+        channel_id: ChannelId,
+        message_id: MessageId,
         audit_log_reason: Option<&str>,
     ) -> Result<()> {
         self.wind(204, Request {
@@ -3780,8 +3830,8 @@ impl Http {
     /// Unbans a user from a guild.
     pub async fn remove_ban(
         &self,
-        guild_id: u64,
-        user_id: u64,
+        guild_id: GuildId,
+        user_id: UserId,
         audit_log_reason: Option<&str>,
     ) -> Result<()> {
         self.wind(204, Request {
@@ -3804,9 +3854,9 @@ impl Http {
     /// [Manage Roles]: Permissions::MANAGE_ROLES
     pub async fn remove_member_role(
         &self,
-        guild_id: u64,
-        user_id: u64,
-        role_id: u64,
+        guild_id: GuildId,
+        user_id: UserId,
+        role_id: RoleId,
         audit_log_reason: Option<&str>,
     ) -> Result<()> {
         self.wind(204, Request {
@@ -3826,7 +3876,7 @@ impl Http {
     /// starts with a provided string.
     pub async fn search_guild_members(
         &self,
-        guild_id: u64,
+        guild_id: GuildId,
         query: &str,
         limit: Option<u64>,
     ) -> Result<Vec<Member>> {
@@ -3846,7 +3896,7 @@ impl Http {
         if let Some(members) = value.as_array_mut() {
             for member in members {
                 if let Some(map) = member.as_object_mut() {
-                    map.insert("guild_id".to_string(), guild_id.into());
+                    map.insert("guild_id".to_string(), guild_id.get().into());
                 }
             }
         }
@@ -3857,7 +3907,7 @@ impl Http {
     /// Starts removing some members from a guild based on the last time they've been online.
     pub async fn start_guild_prune(
         &self,
-        guild_id: u64,
+        guild_id: GuildId,
         days: u8,
         audit_log_reason: Option<&str>,
     ) -> Result<GuildPrune> {
@@ -3874,7 +3924,11 @@ impl Http {
     }
 
     /// Starts syncing an integration with a guild.
-    pub async fn start_integration_sync(&self, guild_id: u64, integration_id: u64) -> Result<()> {
+    pub async fn start_integration_sync(
+        &self,
+        guild_id: GuildId,
+        integration_id: IntegrationId,
+    ) -> Result<()> {
         self.wind(204, Request {
             body: None,
             multipart: None,
@@ -3906,12 +3960,14 @@ impl Http {
     /// # use std::sync::Arc;
     /// # use serenity::http::{Http, Typing};
     /// # use serenity::Result;
+    /// # use serenity::model::prelude::*;
     /// #
     /// # fn long_process() {}
     /// # fn main() -> Result<()> {
     /// # let http = Arc::new(Http::new("token"));
     /// // Initiate typing (assuming http is `Arc<Http>`)
-    /// let typing = http.start_typing(7)?;
+    /// let channel_id = ChannelId::new(7);
+    /// let typing = http.start_typing(channel_id)?;
     ///
     /// // Run some long-running process
     /// long_process();
@@ -3922,15 +3978,15 @@ impl Http {
     /// # Ok(())
     /// # }
     /// ```
-    pub fn start_typing(self: &Arc<Self>, channel_id: u64) -> Result<Typing> {
+    pub fn start_typing(self: &Arc<Self>, channel_id: ChannelId) -> Result<Typing> {
         Typing::start(self.clone(), channel_id)
     }
 
     /// Unpins a message from a channel.
     pub async fn unpin_message(
         &self,
-        channel_id: u64,
-        message_id: u64,
+        channel_id: ChannelId,
+        message_id: MessageId,
         audit_log_reason: Option<&str>,
     ) -> Result<()> {
         self.wind(204, Request {
@@ -3966,13 +4022,13 @@ impl Http {
     ///         routing::RouteInfo,
     ///         request::Request,
     ///     },
-    ///     model::channel::Message,
+    ///     model::prelude::*,
     /// };
     ///
     /// let bytes = vec![
     ///     // payload bytes here
     /// ];
-    /// let channel_id = 381880193700069377;
+    /// let channel_id = ChannelId::new(381880193700069377);
     /// let route_info = RouteInfo::CreateMessage { channel_id };
     ///
     /// let mut request = Request::new(route_info);
@@ -4005,6 +4061,7 @@ impl Http {
     ///
     /// ```rust,no_run
     /// # use serenity::http::Http;
+    /// # use serenity::model::prelude::*;
     /// #
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// #     let http = Http::new("token");
@@ -4016,7 +4073,7 @@ impl Http {
     /// let bytes = vec![
     ///     // payload bytes here
     /// ];
-    /// let channel_id = 381880193700069377;
+    /// let channel_id = ChannelId::new(381880193700069377);
     /// let route_info = RouteInfo::CreateMessage { channel_id };
     ///
     /// let mut request = Request::new(route_info);
