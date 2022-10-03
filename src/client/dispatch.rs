@@ -113,6 +113,7 @@ async fn handle_event(
 /// Can return `None` if an event is unknown.
 fn update_cache_with_event(ctx: Context, event: Event) -> Option<(FullEvent, Option<FullEvent>)> {
     let mut extra_event = None;
+    #[cfg_attr(not(feature = "cache"), allow(unused_mut))]
     let event = match event {
         Event::ApplicationCommandPermissionsUpdate(event) => {
             FullEvent::ApplicationCommandPermissionsUpdate {

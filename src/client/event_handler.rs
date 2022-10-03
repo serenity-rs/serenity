@@ -12,7 +12,8 @@ use crate::model::prelude::*;
 
 macro_rules! event_handler {
     ( $(
-        $( #[ $meta:meta ] )*
+        $( #[doc = $doc:literal] )*
+        $( #[cfg(feature = $feature:literal)] )?
         async fn $method_name:ident(&self, $variant_name:ident { $(
             $arg_name:ident: $arg_type:ty
         ),* $(,)? } );
@@ -20,7 +21,7 @@ macro_rules! event_handler {
         /// The core trait for handling events by serenity.
         #[async_trait]
         pub trait EventHandler: Send + Sync { $(
-            $( #[ $meta ] )*
+            $( #[doc = $doc] )* $( #[cfg(feature = $feature)] )?
             async fn $method_name(&self, $( $arg_name: $arg_type ),* ) {
                 // Suppress unused argument warnings
                 drop(( $( $arg_name ),* ));
@@ -31,7 +32,7 @@ macro_rules! event_handler {
         #[non_exhaustive]
         #[allow(clippy::large_enum_variant)] // TODO: do some boxing to fix this
         pub enum FullEvent { $(
-            $( #[ $meta ] )*
+            $( #[doc = $doc] )* $( #[cfg(feature = $feature)] )?
             $variant_name {
                 $( $arg_name: $arg_type ),*
             },
@@ -49,18 +50,15 @@ macro_rules! event_handler {
             #[must_use]
             pub fn snake_case_name(&self) -> &'static str {
                 match self { $(
+                    $( #[cfg(feature = $feature)] )?
                     Self::$variant_name { .. } => stringify!($method_name),
                 )* }
             }
 
             /// Runs the given [`EventHandler`]'s code for this event.
             pub async fn dispatch(self, handler: &dyn EventHandler) {
-                // We need to apply #[$meta] to get the feature-gates. This also pulls in the doc
-                // comments, unfortunately.
-                #[allow(unused_doc_comments)]
-
                 match self { $(
-                    $( #[$meta] )*
+                    $( #[cfg(feature = $feature)] )?
                     Self::$variant_name { $( $arg_name ),* } => {
                         handler.$method_name( $( $arg_name ),* ).await;
                     }
