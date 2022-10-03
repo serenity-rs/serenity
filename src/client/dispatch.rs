@@ -133,37 +133,26 @@ pub(crate) async fn dispatch<'rec>(
     }
 
     match (event_handler, raw_event_handler) {
-        (None, None) => {
-            event.update_cache(&context);
-        },
-        (Some(handler), None) => match event {
-            DispatchEvent::Model(Event::MessageCreate(mut event)) => {
-                update_cache(&context, &mut event);
-
-                spawn_named("dispatch::event_handler::message", async move {
-                    handler.message(context, event.message).await;
-                });
-            },
-            other => {
-                handle_event(context, other, handler).await;
-            },
-        },
-        (None, Some(raw_handler)) => {
+        (None, raw_handler) => {
             event.update_cache(&context);
 
-            if let DispatchEvent::Model(event) = event {
-                raw_handler.raw_event(context, event).await;
+            if let Some(raw_handler) = raw_handler {
+                if let DispatchEvent::Model(event) = event {
+                    raw_handler.raw_event(context, event).await;
+                }
             }
         },
-        // We call this function again, passing `None` for each event handler
-        // and passing no framework, as we dispatch once we are done right here.
-        (Some(handler), Some(raw_handler)) => {
-            if let DispatchEvent::Model(event) = &event {
-                raw_handler.raw_event(context.clone(), event.clone()).await;
+        (Some(handler), raw_handler) => {
+            if let Some(raw_handler) = raw_handler {
+                if let DispatchEvent::Model(event) = &event {
+                    raw_handler.raw_event(context.clone(), event.clone()).await;
+                }
             }
 
             match event {
-                DispatchEvent::Model(Event::MessageCreate(event)) => {
+                DispatchEvent::Model(Event::MessageCreate(mut event)) => {
+                    update_cache(&context, &mut event);
+
                     spawn_named("dispatch::event_handler::message", async move {
                         handler.message(context, event.message).await;
                     });
