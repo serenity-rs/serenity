@@ -123,6 +123,7 @@ pub(crate) async fn dispatch<'rec>(
     event_handler: Option<Arc<dyn EventHandler>>,
     raw_event_handler: Option<Arc<dyn RawEventHandler>>,
 ) {
+    #[cfg(feature = "framework")]
     let mut framework_dispatch_future = None;
     #[cfg(feature = "framework")]
     if let DispatchEvent::Model(Event::MessageCreate(event)) = &event {
@@ -148,6 +149,7 @@ pub(crate) async fn dispatch<'rec>(
         },
     }
 
+    #[cfg(feature = "framework")]
     if let Some(x) = framework_dispatch_future {
         spawn_named("dispatch::framework::message", x);
     }
