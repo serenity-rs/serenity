@@ -1,4 +1,4 @@
-edition = "2018"
+edition = "2021"
 match_block_trailing_comma = true
 newline_style = "Unix"
 use_field_init_shorthand = true
