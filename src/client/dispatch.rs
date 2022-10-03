@@ -26,86 +26,6 @@ pub(crate) enum DispatchEvent {
     Model(Event),
 }
 
-impl DispatchEvent {
-    fn update_cache(&mut self, context: &Context) {
-        match self {
-            Self::Model(Event::ChannelCreate(event)) => {
-                update_cache(context, event);
-            },
-            Self::Model(Event::ChannelDelete(event)) => {
-                update_cache(context, event);
-            },
-            Self::Model(Event::ChannelUpdate(event)) => {
-                update_cache(context, event);
-            },
-            Self::Model(Event::GuildCreate(event)) => {
-                update_cache(context, event);
-            },
-            Self::Model(Event::GuildDelete(event)) => {
-                update_cache(context, event);
-            },
-            Self::Model(Event::GuildEmojisUpdate(event)) => {
-                update_cache(context, event);
-            },
-            Self::Model(Event::GuildMemberAdd(event)) => {
-                update_cache(context, event);
-            },
-            Self::Model(Event::GuildMemberRemove(event)) => {
-                update_cache(context, event);
-            },
-            Self::Model(Event::GuildMemberUpdate(event)) => {
-                update_cache(context, event);
-            },
-            Self::Model(Event::GuildMembersChunk(event)) => {
-                update_cache(context, event);
-            },
-            Self::Model(Event::GuildRoleCreate(event)) => {
-                update_cache(context, event);
-            },
-            Self::Model(Event::GuildRoleDelete(event)) => {
-                update_cache(context, event);
-            },
-            Self::Model(Event::GuildRoleUpdate(event)) => {
-                update_cache(context, event);
-            },
-            Self::Model(Event::GuildStickersUpdate(event)) => {
-                update_cache(context, event);
-            },
-            Self::Model(Event::MessageCreate(event)) => {
-                update_cache(context, event);
-            },
-            Self::Model(Event::MessageUpdate(event)) => {
-                update_cache(context, event);
-            },
-            Self::Model(Event::PresencesReplace(event)) => {
-                update_cache(context, event);
-            },
-            Self::Model(Event::PresenceUpdate(event)) => {
-                update_cache(context, event);
-            },
-            Self::Model(Event::Ready(event)) => {
-                update_cache(context, event);
-            },
-            Self::Model(Event::UserUpdate(event)) => {
-                update_cache(context, event);
-            },
-            Self::Model(Event::VoiceStateUpdate(event)) => {
-                update_cache(context, event);
-            },
-            Self::Model(Event::ThreadCreate(event)) => {
-                update_cache(context, event);
-            },
-            Self::Model(Event::ThreadUpdate(event)) => {
-                update_cache(context, event);
-            },
-            Self::Model(Event::ThreadDelete(event)) => {
-                update_cache(context, event);
-            },
-            _ => (),
-        }
-    }
-}
-
 #[cfg(feature = "cache")]
 fn update_cache<E: CacheUpdate>(context: &Context, event: &mut E) -> Option<E::Output> {
     context.cache.update(event)
@@ -117,7 +37,7 @@ fn update_cache<E>(_: &Context, _: &mut E) -> Option<()> {
 }
 
 pub(crate) async fn dispatch<'rec>(
-    mut event: DispatchEvent,
+    event: DispatchEvent,
     context: Context,
     #[cfg(feature = "framework")] framework: Option<Arc<dyn Framework + Send + Sync>>,
     event_handler: Option<Arc<dyn EventHandler>>,
@@ -140,14 +60,7 @@ pub(crate) async fn dispatch<'rec>(
         }
     }
 
-    match event_handler {
-        None => {
-            event.update_cache(&context);
-        },
-        Some(handler) => {
-            handle_event(context, event, handler).await;
-        },
-    }
+    handle_event(context, event, event_handler).await;
 
     #[cfg(feature = "framework")]
     if let Some(x) = framework_dispatch_future {
@@ -162,7 +75,7 @@ pub(crate) async fn dispatch<'rec>(
 async fn handle_event(
     context: Context,
     event: DispatchEvent,
-    event_handler: Arc<dyn EventHandler>,
+    event_handler: Option<Arc<dyn EventHandler>>,
 ) {
     // Handle ClientEvent or return back Event
     let model_event = match event {
@@ -170,25 +83,25 @@ async fn handle_event(
         DispatchEvent::Client(event) => {
             match event {
                 ClientEvent::ShardStageUpdate(event) => {
-                    spawn_named("dispatch::event_handler::shard_stage_update", async move {
-                        event_handler.shard_stage_update(context, event).await;
-                    });
+                    if let Some(event_handler) = event_handler {
+                        spawn_named("dispatch::event_handler::shard_stage_update", async move {
+                            event_handler.shard_stage_update(context, event).await;
+                        });
+                    }
                 },
             }
             return;
         },
     };
 
+    let full_events = update_cache_with_event(context, model_event);
     // Handle Event, this is done to prevent indenting twice (once to destructure DispatchEvent, then to destructure Event)
-    if let Some((event, extra_event)) = update_cache_with_event(context, model_event) {
+    if let (Some((event, extra_event)), Some(handler)) = (full_events, event_handler) {
         if let Some(event) = extra_event {
-            let event_handler = event_handler.clone();
-            spawn_named(
-                event.snake_case_name(),
-                async move { event.dispatch(&*event_handler).await },
-            );
+            let handler = handler.clone();
+            spawn_named(event.snake_case_name(), async move { event.dispatch(&*handler).await });
         }
-        spawn_named(event.snake_case_name(), async move { event.dispatch(&*event_handler).await });
+        spawn_named(event.snake_case_name(), async move { event.dispatch(&*handler).await });
     }
 }
 
