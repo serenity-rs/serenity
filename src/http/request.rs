@@ -24,7 +24,7 @@ pub type RequestBuilder<'a> = Request<'a>;
 #[derive(Clone, Debug)]
 pub struct Request<'a> {
     pub(super) body: Option<Vec<u8>>,
-    pub(super) multipart: Option<Multipart<'a>>,
+    pub(super) multipart: Option<Multipart>,
     pub(super) headers: Option<Headers>,
     pub(super) route: RouteInfo<'a>,
 }
@@ -46,7 +46,7 @@ impl<'a> Request<'a> {
         self
     }
 
-    pub fn multipart(&mut self, multipart: Option<Multipart<'a>>) -> &mut Self {
+    pub fn multipart(&mut self, multipart: Option<Multipart>) -> &mut Self {
         self.multipart = multipart;
 
         self
@@ -66,14 +66,14 @@ impl<'a> Request<'a> {
 
     #[instrument(skip(token))]
     pub fn build(
-        mut self,
+        self,
         client: &Client,
         token: &str,
         proxy: Option<&Url>,
     ) -> Result<ReqwestRequestBuilder> {
         let Request {
             body,
-            ref mut multipart,
+            multipart,
             headers: ref request_headers,
             route: ref route_info,
         } = self;
