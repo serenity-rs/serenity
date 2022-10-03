@@ -10,9 +10,23 @@ use crate::model::application::interaction::Interaction;
 use crate::model::guild::automod::{ActionExecution, Rule};
 use crate::model::prelude::*;
 
-/// The core trait for handling events by serenity.
-#[async_trait]
-pub trait EventHandler: Send + Sync {
+macro_rules! event_handler {
+    ( $(
+        $( #[ $meta:meta ] )*
+        async fn $method_name:ident(&self, $(
+            $arg_name:ident: $arg_type:ty
+        ),* $(,)? ) {}
+    )* ) => {
+        /// The core trait for handling events by serenity.
+        #[async_trait]
+        pub trait EventHandler: Send + Sync { $(
+            $( #[ $meta ] )*
+            async fn $method_name(&self, $( $arg_name: $arg_type ),* ) {}
+        )* }
+    };
+}
+
+event_handler! {
     /// Dispatched when the permissions of an application command was updated.
     ///
     /// Provides said permission's data.
@@ -318,7 +332,7 @@ pub trait EventHandler: Send + Sync {
     }
 
     /// This event is legacy, and likely no longer sent by discord.
-    async fn presence_replace(&self, _ctx: Context, _: Vec<Presence>) {}
+    async fn presence_replace(&self, _ctx: Context, _presences: Vec<Presence>) {}
 
     /// Dispatched when a user's presence is updated (e.g off -> on).
     ///
@@ -334,15 +348,15 @@ pub trait EventHandler: Send + Sync {
     async fn ready(&self, _ctx: Context, _data_about_bot: Ready) {}
 
     /// Dispatched upon reconnection.
-    async fn resume(&self, _ctx: Context, _: ResumedEvent) {}
+    async fn resume(&self, _ctx: Context, _event: ResumedEvent) {}
 
     /// Dispatched when a shard's connection stage is updated
     ///
     /// Provides the context of the shard and the event information about the update.
-    async fn shard_stage_update(&self, _ctx: Context, _: ShardStageUpdateEvent) {}
+    async fn shard_stage_update(&self, _ctx: Context, _event: ShardStageUpdateEvent) {}
 
     /// Dispatched when a user starts typing.
-    async fn typing_start(&self, _ctx: Context, _: TypingStartEvent) {}
+    async fn typing_start(&self, _ctx: Context, _event: TypingStartEvent) {}
 
     /// Dispatched when the bot's data is updated.
     ///
@@ -352,7 +366,7 @@ pub trait EventHandler: Send + Sync {
     /// Dispatched when a guild's voice server was updated (or changed to another one).
     ///
     /// Provides the voice server's data.
-    async fn voice_server_update(&self, _ctx: Context, _: VoiceServerUpdateEvent) {}
+    async fn voice_server_update(&self, _ctx: Context, _event: VoiceServerUpdateEvent) {}
 
     /// Dispatched when a user joins, leaves or moves to a voice channel.
     ///
