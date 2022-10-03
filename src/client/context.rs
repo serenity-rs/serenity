@@ -1,3 +1,4 @@
+use std::fmt;
 use std::sync::Arc;
 
 use futures::channel::mpsc::UnboundedSender as Sender;
@@ -44,6 +45,16 @@ pub struct Context {
     pub http: Arc<Http>,
     #[cfg(feature = "cache")]
     pub cache: Arc<Cache>,
+}
+
+// Used by the #[instrument] macro on client::dispatch::handle_event
+impl fmt::Debug for Context {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.debug_struct("Context")
+            .field("shard", &self.shard)
+            .field("shard_id", &self.shard_id)
+            .finish()
+    }
 }
 
 impl Context {
