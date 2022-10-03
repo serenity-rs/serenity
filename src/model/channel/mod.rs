@@ -38,7 +38,7 @@ use crate::utils::parse_channel;
 
 #[deprecated = "use CreateAttachment instead"]
 #[cfg(feature = "model")]
-pub type AttachmentType<'a> = crate::builder::CreateAttachment<'a>;
+pub type AttachmentType<'a> = crate::builder::CreateAttachment;
 
 /// A container for any channel.
 #[derive(Clone, Debug, Serialize)]
