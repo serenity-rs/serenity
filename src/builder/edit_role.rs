@@ -175,7 +175,7 @@ impl<'a> EditRole<'a> {
     }
 
     /// Set the role icon to a custom image.
-    pub fn icon(mut self, icon: &CreateAttachment<'_>) -> Self {
+    pub fn icon(mut self, icon: &CreateAttachment) -> Self {
         self.icon = Some(icon.to_base64());
         self.unicode_emoji = None;
         self
