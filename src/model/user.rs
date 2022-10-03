@@ -843,10 +843,10 @@ impl User {
     /// May also return an [`Error::Http`] if the user cannot be sent a direct message.
     ///
     /// Returns an [`Error::Json`] if there is an error deserializing the API response.
-    pub async fn direct_message<'a>(
+    pub async fn direct_message(
         &self,
         cache_http: impl CacheHttp,
-        builder: CreateMessage<'a>,
+        builder: CreateMessage,
     ) -> Result<Message> {
         self.create_dm_channel(&cache_http).await?.send_message(cache_http, builder).await
     }
@@ -854,11 +854,7 @@ impl User {
     /// This is an alias of [`Self::direct_message`].
     #[allow(clippy::missing_errors_doc)]
     #[inline]
-    pub async fn dm<'a>(
-        &self,
-        cache_http: impl CacheHttp,
-        builder: CreateMessage<'a>,
-    ) -> Result<Message> {
+    pub async fn dm(&self, cache_http: impl CacheHttp, builder: CreateMessage) -> Result<Message> {
         self.direct_message(cache_http, builder).await
     }
 

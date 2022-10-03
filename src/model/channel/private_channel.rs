@@ -154,11 +154,11 @@ impl PrivateChannel {
     /// See [`EditMessage::execute`] for a list of possible errors, and their corresponding
     /// reasons.
     #[inline]
-    pub async fn edit_message<'a>(
+    pub async fn edit_message(
         &self,
         http: impl AsRef<Http>,
         message_id: impl Into<MessageId>,
-        builder: EditMessage<'a>,
+        builder: EditMessage,
     ) -> Result<Message> {
         self.id.edit_message(http, message_id, builder).await
     }
@@ -289,11 +289,11 @@ impl PrivateChannel {
     /// See [`CreateMessage::execute`] for a list of possible errors, and their corresponding
     /// reasons.
     #[inline]
-    pub async fn send_files<'a>(
+    pub async fn send_files(
         self,
         cache_http: impl CacheHttp,
-        files: impl IntoIterator<Item = CreateAttachment<'a>>,
-        builder: CreateMessage<'a>,
+        files: impl IntoIterator<Item = CreateAttachment>,
+        builder: CreateMessage,
     ) -> Result<Message> {
         self.id.send_files(cache_http, files, builder).await
     }
@@ -308,10 +308,10 @@ impl PrivateChannel {
     /// See [`CreateMessage::execute`] for a list of possible errors, and their corresponding
     /// reasons.
     #[inline]
-    pub async fn send_message<'a>(
+    pub async fn send_message(
         &self,
         cache_http: impl CacheHttp,
-        builder: CreateMessage<'a>,
+        builder: CreateMessage,
     ) -> Result<Message> {
         self.id.send_message(cache_http, builder).await
     }
