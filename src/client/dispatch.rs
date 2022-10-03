@@ -71,8 +71,9 @@ impl DispatchEvent {
             Self::Model(Event::GuildStickersUpdate(event)) => {
                 update_cache(context, event);
             },
-            // Already handled by the framework check macro
-            Self::Model(Event::MessageCreate(_)) => {},
+            Self::Model(Event::MessageCreate(event)) => {
+                update_cache(context, event);
+            },
             Self::Model(Event::MessageUpdate(event)) => {
                 update_cache(context, event);
             },
@@ -142,17 +143,8 @@ pub(crate) async fn dispatch<'rec>(
         None => {
             event.update_cache(&context);
         },
-        Some(handler) => match event {
-            DispatchEvent::Model(Event::MessageCreate(mut event)) => {
-                update_cache(&context, &mut event);
-
-                spawn_named("dispatch::event_handler::message", async move {
-                    handler.message(context, event.message).await;
-                });
-            },
-            other => {
-                handle_event(context, other, handler).await;
-            },
+        Some(handler) => {
+            handle_event(context, event, handler).await;
         },
     }
 
@@ -174,13 +166,14 @@ async fn handle_event(
     let model_event = match event {
         DispatchEvent::Model(event) => event,
         DispatchEvent::Client(event) => {
-            return match event {
+            match event {
                 ClientEvent::ShardStageUpdate(event) => {
                     spawn_named("dispatch::event_handler::shard_stage_update", async move {
                         event_handler.shard_stage_update(context, event).await;
                     });
                 },
             }
+            return;
         },
     };
 
@@ -399,8 +392,13 @@ async fn handle_event(
                 event_handler.invite_delete(context, event).await;
             });
         },
-        // Already handled by the framework check macro
-        Event::MessageCreate(_) => {},
+        Event::MessageCreate(mut event) => {
+            update_cache(&context, &mut event);
+
+            spawn_named("dispatch::event_handler::message", async move {
+                event_handler.message(context, event.message).await;
+            });
+        },
         Event::MessageDeleteBulk(event) => {
             spawn_named("dispatch::event_handler::message_delete_bulk", async move {
                 event_handler
