@@ -19,18 +19,18 @@ pub struct Multipart<'a> {
 }
 
 impl<'a> Multipart<'a> {
-    pub(crate) fn build_form(&mut self) -> Result<Form> {
+    pub(crate) fn build_form(self) -> Result<Form> {
         let mut multipart = Form::new();
 
-        for (file_num, file) in self.files.iter_mut().enumerate() {
+        for (file_num, file) in self.files.into_iter().enumerate() {
             // For endpoints that require a single file (e.g. create sticker),
             // it will error if the part name is not `file`.
             // https://github.com/discord/discord-api-docs/issues/2064#issuecomment-691650970
             let part_name =
                 if file_num == 0 { "file".to_string() } else { format!("file{}", file_num) };
 
-            let mut part = Part::bytes(file.data.to_vec());
-            let filename = file.filename.clone();
+            let mut part = Part::bytes(file.data);
+            let filename = file.filename;
             part = guess_mime_str(part, &filename)?;
             part = part.file_name(filename);
             multipart = multipart.part(part_name, part);

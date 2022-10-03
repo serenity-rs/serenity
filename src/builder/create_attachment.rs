@@ -1,4 +1,3 @@
-use std::borrow::Cow;
 use std::path::Path;
 
 use tokio::fs::File;
@@ -28,17 +27,19 @@ pub(crate) struct ExistingAttachment {
 #[derive(Clone, Debug)]
 #[non_exhaustive]
 pub struct CreateAttachment<'a> {
-    pub data: Cow<'a, [u8]>,
+    pub data: Vec<u8>,
     pub filename: String,
+    pub _ok: &'a (),
 }
 
 impl<'a> CreateAttachment<'a> {
     /// Builds an [`CreateAttachment`] from the raw attachment data.
     #[must_use]
-    pub fn bytes(data: &'a [u8], filename: impl Into<String>) -> CreateAttachment<'a> {
+    pub fn bytes(data: impl Into<Vec<u8>>, filename: impl Into<String>) -> CreateAttachment<'a> {
         CreateAttachment {
-            data: Cow::Borrowed(data),
+            data: data.into(),
             filename: filename.into(),
+            _ok: &(),
         }
     }
 
@@ -61,8 +62,9 @@ impl<'a> CreateAttachment<'a> {
         })?;
 
         Ok(CreateAttachment {
-            data: Cow::Owned(data),
+            data,
             filename: filename.to_string_lossy().to_string(),
+            _ok: &(),
         })
     }
 
@@ -80,8 +82,9 @@ impl<'a> CreateAttachment<'a> {
         file.try_clone().await?.read_to_end(&mut data).await?;
 
         Ok(CreateAttachment {
-            data: Cow::Owned(data),
+            data,
             filename: filename.into(),
+            _ok: &(),
         })
     }
 
@@ -103,8 +106,9 @@ impl<'a> CreateAttachment<'a> {
             .ok_or_else(|| Error::Url(url.to_string()))?;
 
         Ok(CreateAttachment {
-            data: Cow::Owned(data),
+            data,
             filename: filename.to_string(),
+            _ok: &(),
         })
     }
 

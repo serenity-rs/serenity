@@ -66,14 +66,14 @@ impl<'a> Request<'a> {
 
     #[instrument(skip(token))]
     pub fn build(
-        mut self,
+        self,
         client: &Client,
         token: &str,
         proxy: Option<&Url>,
     ) -> Result<ReqwestRequestBuilder> {
         let Request {
             body,
-            ref mut multipart,
+            multipart,
             headers: ref request_headers,
             route: ref route_info,
         } = self;
