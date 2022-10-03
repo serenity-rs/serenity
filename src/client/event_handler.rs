@@ -438,5 +438,5 @@ event_handler! {
 #[async_trait]
 pub trait RawEventHandler: Send + Sync {
     /// Dispatched when any event occurs
-    async fn raw_event(&self, ctx: Context, ev: Event);
+    async fn raw_event(&self, _ctx: Context, _ev: Event) {}
 }
