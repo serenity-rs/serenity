@@ -352,11 +352,7 @@ impl Message {
     /// Returns a [`ModelError::MessageTooLong`] if the message contents are too long.
     ///
     /// [Manage Messages]: Permissions::MANAGE_MESSAGES
-    pub async fn edit<'a>(
-        &mut self,
-        cache_http: impl CacheHttp,
-        builder: EditMessage<'a>,
-    ) -> Result<()> {
+    pub async fn edit(&mut self, cache_http: impl CacheHttp, builder: EditMessage) -> Result<()> {
         #[cfg(feature = "cache")]
         {
             if let Some(cache) = cache_http.cache() {
