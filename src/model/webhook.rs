@@ -307,11 +307,11 @@ impl Webhook {
     ///
     /// Or may return an [`Error::Json`] if there is an error deserialising Discord's response.
     #[inline]
-    pub async fn execute<'a>(
+    pub async fn execute(
         &self,
         http: impl AsRef<Http>,
         wait: bool,
-        builder: ExecuteWebhook<'a>,
+        builder: ExecuteWebhook,
     ) -> Result<Option<Message>> {
         let token = self.token.as_ref().ok_or(ModelError::NoTokenSet)?;
         builder.execute(http, self.id, token, wait).await
