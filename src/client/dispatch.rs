@@ -132,35 +132,27 @@ pub(crate) async fn dispatch<'rec>(
         }
     }
 
-    match (event_handler, raw_event_handler) {
-        (None, raw_handler) => {
+    if let Some(raw_handler) = raw_event_handler {
+        if let DispatchEvent::Model(event) = &event {
+            raw_handler.raw_event(context.clone(), event.clone()).await;
+        }
+    }
+
+    match event_handler {
+        None => {
             event.update_cache(&context);
-
-            if let Some(raw_handler) = raw_handler {
-                if let DispatchEvent::Model(event) = event {
-                    raw_handler.raw_event(context, event).await;
-                }
-            }
         },
-        (Some(handler), raw_handler) => {
-            if let Some(raw_handler) = raw_handler {
-                if let DispatchEvent::Model(event) = &event {
-                    raw_handler.raw_event(context.clone(), event.clone()).await;
-                }
-            }
+        Some(handler) => match event {
+            DispatchEvent::Model(Event::MessageCreate(mut event)) => {
+                update_cache(&context, &mut event);
 
-            match event {
-                DispatchEvent::Model(Event::MessageCreate(mut event)) => {
-                    update_cache(&context, &mut event);
-
-                    spawn_named("dispatch::event_handler::message", async move {
-                        handler.message(context, event.message).await;
-                    });
-                },
-                other => {
-                    handle_event(context, other, handler).await;
-                },
-            }
+                spawn_named("dispatch::event_handler::message", async move {
+                    handler.message(context, event.message).await;
+                });
+            },
+            other => {
+                handle_event(context, other, handler).await;
+            },
         },
     }
 
