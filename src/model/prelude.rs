@@ -10,26 +10,32 @@
 //! use serenity::model::prelude::*;
 //! ```
 
-pub use super::application::interaction::{
-    MessageFlags as InteractionApplicationCommandCallbackDataFlags,
+#[doc(inline)]
+pub use super::{
+    application::interaction::application_command::*,
+    application::interaction::message_component::*,
+    application::interaction::modal::*,
+    application::interaction::ping::*,
+    application::interaction::{MessageFlags as InteractionMessageFlags, *},
+    application::oauth::*,
+    application::*,
+    channel::{MessageFlags, *},
+    colour::*,
+    connection::*,
+    // We have to explicitly mention EventType here for some reason or importing it won't work
+    event::{EventType, *},
+    gateway::*,
+    guild::audit_log::*,
+    guild::automod::{EventType as AutomodEventType, *},
+    guild::*,
+    id::*,
+    invite::*,
+    mention::*,
+    misc::*,
+    permissions::*,
+    sticker::*,
+    user::*,
+    voice::*,
+    webhook::*,
     *,
 };
-pub use super::application::oauth::*;
-pub use super::application::*;
-pub use super::channel::{MessageFlags, *};
-pub use super::colour::*;
-pub use super::connection::*;
-pub use super::event::*;
-pub use super::gateway::*;
-pub use super::guild::audit_log::*;
-pub use super::guild::*;
-pub use super::id::*;
-pub use super::invite::*;
-pub use super::mention::*;
-pub use super::misc::*;
-pub use super::permissions::*;
-pub use super::sticker::*;
-pub use super::user::*;
-pub use super::voice::*;
-pub use super::webhook::*;
-pub use super::*;
