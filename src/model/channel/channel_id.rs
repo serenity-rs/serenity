@@ -361,7 +361,7 @@ impl ChannelId {
         self,
         http: impl AsRef<Http>,
         message_id: impl Into<MessageId>,
-        builder: EditMessage<'_>,
+        builder: EditMessage,
     ) -> Result<Message> {
         builder.execute(http, self, message_id.into()).await
     }
@@ -715,11 +715,11 @@ impl ChannelId {
     /// reasons.
     ///
     /// [`File`]: tokio::fs::File
-    pub async fn send_files<'a>(
+    pub async fn send_files(
         self,
         cache_http: impl CacheHttp,
-        files: impl IntoIterator<Item = CreateAttachment<'a>>,
-        builder: CreateMessage<'a>,
+        files: impl IntoIterator<Item = CreateAttachment>,
+        builder: CreateMessage,
     ) -> Result<Message> {
         builder
             .files(files)
@@ -744,7 +744,7 @@ impl ChannelId {
     pub async fn send_message(
         self,
         cache_http: impl CacheHttp,
-        builder: CreateMessage<'_>,
+        builder: CreateMessage,
     ) -> Result<Message> {
         builder
             .execute(

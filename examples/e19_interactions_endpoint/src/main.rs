@@ -5,9 +5,7 @@ use serenity::model::application::interaction::*;
 
 type Error = Box<dyn std::error::Error + Send + Sync + 'static>;
 
-fn handle_command(
-    interaction: ApplicationCommandInteraction,
-) -> CreateInteractionResponse<'static> {
+fn handle_command(interaction: ApplicationCommandInteraction) -> CreateInteractionResponse {
     CreateInteractionResponse::new().interaction_response_data(
         CreateInteractionResponseData::new().content(format!(
             "Hello from interactions webhook HTTP server! <@{}>",
