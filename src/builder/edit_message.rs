@@ -169,7 +169,7 @@ impl<'a> EditMessage<'a> {
         // At time of writing, only `SUPPRESS_EMBEDS` can be set/unset when editing messages. See
         // for details: https://discord.com/developers/docs/resources/channel#edit-message-jsonform-params
         let flags =
-            suppress.then(|| MessageFlags::SUPPRESS_EMBEDS).unwrap_or_else(MessageFlags::empty);
+            suppress.then_some(MessageFlags::SUPPRESS_EMBEDS).unwrap_or_else(MessageFlags::empty);
 
         self.flags = Some(flags);
         self
