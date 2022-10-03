@@ -41,7 +41,8 @@ macro_rules! event_handler {
         impl FullEvent {
             /// Returns the name of this event as a snake case string
             ///
-            /// ```rust
+            /// ```rust,no_run
+            /// # use serenity::client::{Context, FullEvent};
             /// # fn _foo(ctx: Context) {
             /// let event = FullEvent::CacheReady { ctx, guilds: vec![] };
             /// assert_eq!(event.snake_case_name(), "cache_ready");
