@@ -50,7 +50,7 @@ impl EditProfile {
     /// current_user.edit(http, EditProfile::new().avatar(&avatar)).await?;
     /// # Ok(()) }
     /// ```
-    pub fn avatar(mut self, avatar: &CreateAttachment<'_>) -> Self {
+    pub fn avatar(mut self, avatar: &CreateAttachment) -> Self {
         self.avatar = Some(Some(avatar.to_base64()));
         self
     }

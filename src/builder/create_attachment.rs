@@ -1,4 +1,3 @@
-use std::borrow::Cow;
 use std::path::Path;
 
 use tokio::fs::File;
@@ -27,17 +26,17 @@ pub(crate) struct ExistingAttachment {
 /// [`send_files`]: crate::model::id::ChannelId::send_files
 #[derive(Clone, Debug)]
 #[non_exhaustive]
-pub struct CreateAttachment<'a> {
-    pub data: Cow<'a, [u8]>,
+pub struct CreateAttachment {
+    pub data: Vec<u8>,
     pub filename: String,
 }
 
-impl<'a> CreateAttachment<'a> {
+impl CreateAttachment {
     /// Builds an [`CreateAttachment`] from the raw attachment data.
     #[must_use]
-    pub fn bytes(data: &'a [u8], filename: impl Into<String>) -> CreateAttachment<'a> {
+    pub fn bytes(data: impl Into<Vec<u8>>, filename: impl Into<String>) -> CreateAttachment {
         CreateAttachment {
-            data: Cow::Borrowed(data),
+            data: data.into(),
             filename: filename.into(),
         }
     }
@@ -48,7 +47,7 @@ impl<'a> CreateAttachment<'a> {
     ///
     /// [`Error::Io`] if reading the file fails.
 
-    pub async fn path(path: impl AsRef<Path>) -> Result<CreateAttachment<'static>> {
+    pub async fn path(path: impl AsRef<Path>) -> Result<CreateAttachment> {
         let mut file = File::open(path.as_ref()).await?;
         let mut data = Vec::new();
         file.read_to_end(&mut data).await?;
@@ -61,7 +60,7 @@ impl<'a> CreateAttachment<'a> {
         })?;
 
         Ok(CreateAttachment {
-            data: Cow::Owned(data),
+            data,
             filename: filename.to_string_lossy().to_string(),
         })
     }
@@ -72,15 +71,12 @@ impl<'a> CreateAttachment<'a> {
     ///
     /// [`Error::Io`] error if reading the file fails.
 
-    pub async fn file(
-        file: &File,
-        filename: impl Into<String>,
-    ) -> Result<CreateAttachment<'static>> {
+    pub async fn file(file: &File, filename: impl Into<String>) -> Result<CreateAttachment> {
         let mut data = Vec::new();
         file.try_clone().await?.read_to_end(&mut data).await?;
 
         Ok(CreateAttachment {
-            data: Cow::Owned(data),
+            data,
             filename: filename.into(),
         })
     }
@@ -91,7 +87,7 @@ impl<'a> CreateAttachment<'a> {
     ///
     /// [`Error::Url`] if the URL is invalid, [`Error::Http`] if downloading the data fails.
     #[cfg(feature = "http")]
-    pub async fn url(http: impl AsRef<Http>, url: &str) -> Result<CreateAttachment<'static>> {
+    pub async fn url(http: impl AsRef<Http>, url: &str) -> Result<CreateAttachment> {
         let url = Url::parse(url).map_err(|_| Error::Url(url.to_string()))?;
 
         let response = http.as_ref().client.get(url.clone()).send().await?;
@@ -103,7 +99,7 @@ impl<'a> CreateAttachment<'a> {
             .ok_or_else(|| Error::Url(url.to_string()))?;
 
         Ok(CreateAttachment {
-            data: Cow::Owned(data),
+            data,
             filename: filename.to_string(),
         })
     }
