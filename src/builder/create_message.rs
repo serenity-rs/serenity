@@ -49,7 +49,7 @@ use crate::utils::check_overflow;
 /// [`Http::send_message`]: crate::http::client::Http::send_message
 #[derive(Clone, Debug, Default, Serialize)]
 #[must_use]
-pub struct CreateMessage<'a> {
+pub struct CreateMessage {
     tts: bool,
     embeds: Vec<CreateEmbed>,
     sticker_ids: Vec<StickerId>,
@@ -66,12 +66,12 @@ pub struct CreateMessage<'a> {
 
     // The following fields are handled separately.
     #[serde(skip)]
-    files: Vec<CreateAttachment<'a>>,
+    files: Vec<CreateAttachment>,
     #[serde(skip)]
     reactions: Vec<ReactionType>,
 }
 
-impl<'a> CreateMessage<'a> {
+impl CreateMessage {
     pub fn new() -> Self {
         Self::default()
     }
@@ -228,7 +228,7 @@ impl<'a> CreateMessage<'a> {
     /// **Note**: Requires the [Attach Files] permission.
     ///
     /// [Attach Files]: Permissions::ATTACH_FILES
-    pub fn add_file(mut self, file: CreateAttachment<'a>) -> Self {
+    pub fn add_file(mut self, file: CreateAttachment) -> Self {
         self.files.push(file);
         self
     }
@@ -238,7 +238,7 @@ impl<'a> CreateMessage<'a> {
     /// **Note**: Requires the [Attach Files] permission.
     ///
     /// [Attach Files]: Permissions::ATTACH_FILES
-    pub fn add_files(mut self, files: impl IntoIterator<Item = CreateAttachment<'a>>) -> Self {
+    pub fn add_files(mut self, files: impl IntoIterator<Item = CreateAttachment>) -> Self {
         self.files.extend(files);
         self
     }
@@ -251,7 +251,7 @@ impl<'a> CreateMessage<'a> {
     /// **Note**: Requires the [Attach Files] permission.
     ///
     /// [Attach Files]: Permissions::ATTACH_FILES
-    pub fn files(mut self, files: impl IntoIterator<Item = CreateAttachment<'a>>) -> Self {
+    pub fn files(mut self, files: impl IntoIterator<Item = CreateAttachment>) -> Self {
         self.files = files.into_iter().collect();
         self
     }

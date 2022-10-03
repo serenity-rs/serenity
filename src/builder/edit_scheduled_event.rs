@@ -175,7 +175,7 @@ impl<'a> EditScheduledEvent<'a> {
     }
 
     /// Sets the cover image for the scheduled event.
-    pub fn image(mut self, image: &CreateAttachment<'_>) -> Self {
+    pub fn image(mut self, image: &CreateAttachment) -> Self {
         self.image = Some(image.to_base64());
         self
     }
