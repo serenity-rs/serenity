@@ -4,10 +4,7 @@ use crate::builder::EditSticker;
 use crate::http::Http;
 #[cfg(feature = "model")]
 use crate::internal::prelude::*;
-use crate::model::id::{GuildId, StickerId, StickerPackId};
-#[cfg(feature = "model")]
 use crate::model::prelude::*;
-use crate::model::user::User;
 use crate::model::utils::comma_separated_string;
 
 #[cfg(feature = "model")]
