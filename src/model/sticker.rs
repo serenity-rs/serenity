@@ -10,13 +10,131 @@ use crate::model::prelude::*;
 use crate::model::user::User;
 use crate::model::utils::comma_separated_string;
 
-pub mod sticker_id;
-pub mod sticker_item;
-pub mod sticker_pack;
+#[cfg(feature = "model")]
+impl StickerId {
+    /// Delete a guild sticker.
+    ///
+    /// **Note**: The [Manage Emojis and Stickers] permission is required.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`Error::Http`] if the current user lacks permission.
+    ///
+    /// [Manage Emojis and Stickers]: crate::model::permissions::Permissions::MANAGE_EMOJIS_AND_STICKERS
+    pub async fn delete(self, http: impl AsRef<Http>, guild_id: impl Into<GuildId>) -> Result<()> {
+        guild_id.into().delete_sticker(http, self).await
+    }
 
-pub use self::sticker_id::*;
-pub use self::sticker_item::*;
-pub use self::sticker_pack::*;
+    /// Requests the sticker via the REST API to get a [`Sticker`] with all
+    /// details.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`Error::Http`] if a [`Sticker`] with that [`StickerId`] does not exist, or is
+    /// otherwise unavailable.
+    pub async fn to_sticker(self, http: impl AsRef<Http>) -> Result<Sticker> {
+        http.as_ref().get_sticker(self).await
+    }
+
+    /// Edits the sticker.
+    ///
+    /// **Note**: Requires the [Manage Emojis and Stickers] permission.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`Error::Http`] if the current user lacks permission, or if invalid data is given.
+    ///
+    /// [Manage Emojis and Stickers]: Permissions::MANAGE_EMOJIS_AND_STICKERS
+    pub async fn edit(
+        self,
+        http: impl AsRef<Http>,
+        guild_id: impl Into<GuildId>,
+        builder: EditSticker<'_>,
+    ) -> Result<Sticker> {
+        guild_id.into().edit_sticker(http, self, builder).await
+    }
+}
+
+/// The smallest amount of data required to render a sticker.
+///
+/// [Discord docs](https://discord.com/developers/docs/resources/sticker#sticker-item-object).
+#[derive(Clone, Debug, Deserialize, Serialize)]
+#[non_exhaustive]
+pub struct StickerItem {
+    /// The unique ID given to this sticker.
+    pub id: StickerId,
+    /// The name of the sticker.
+    pub name: String,
+    /// The type of sticker format.
+    pub format_type: StickerFormatType,
+}
+
+#[cfg(feature = "model")]
+impl StickerItem {
+    /// Requests the sticker via the REST API to get a [`Sticker`] with all
+    /// details.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`Error::Http`] if a [`Sticker`] with that [`StickerId`] does
+    /// not exist, or is otherwise unavailable.
+    #[inline]
+    pub async fn to_sticker(&self, http: impl AsRef<Http>) -> Result<Sticker> {
+        self.id.to_sticker(http).await
+    }
+
+    /// Retrieves the URL to the sticker image.
+    ///
+    /// **Note**: This will only be `None` if the format_type is unknown.
+    #[inline]
+    #[must_use]
+    pub fn image_url(&self) -> Option<String> {
+        sticker_url(self.id, self.format_type)
+    }
+}
+
+/// A sticker sent with a message.
+///
+/// Bots currently can only receive messages with stickers, not send.
+///
+/// [Discord docs](https://discord.com/developers/docs/resources/sticker#sticker-pack-object).
+#[derive(Clone, Debug, Deserialize, Serialize)]
+#[non_exhaustive]
+pub struct StickerPack {
+    /// The unique ID given to this sticker sticker pack.
+    pub id: StickerPackId,
+    /// The stickers in the pack
+    pub stickers: Vec<Sticker>,
+    /// The name of the sticker pack
+    pub name: String,
+    /// The unique ID given to the pack's SKU.
+    pub sku_id: SkuId,
+    /// ID of a sticker in the pack which is shown as the pack's icon.
+    pub cover_sticker_id: Option<StickerId>,
+    /// Description of the sticker pack.
+    pub description: String,
+    /// The unique ID given to the sticker pack's banner image.
+    pub banner_asset_id: StickerPackBannerId,
+}
+
+#[cfg(feature = "model")]
+impl StickerPack {
+    /// Returns the sticker that is shown as the pack's icon
+    #[must_use]
+    pub fn cover_sticker(&self) -> Option<&Sticker> {
+        self.cover_sticker_id.and_then(|id| self.stickers.iter().find(|s| s.id == id))
+    }
+
+    #[must_use]
+    pub fn banner_url(&self) -> String {
+        banner_url(self.banner_asset_id)
+    }
+}
+
+#[cfg(feature = "model")]
+fn banner_url(banner_asset_id: StickerPackBannerId) -> String {
+    cdn!("/app-assets/710982414301790216/store/{}.webp?size=1024", banner_asset_id.0)
+}
 
 /// A sticker sent with a message.
 ///
