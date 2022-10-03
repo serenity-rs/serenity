@@ -335,9 +335,9 @@ impl ShardRunner {
             event,
             context,
             #[cfg(feature = "framework")]
-            &self.framework,
-            &self.event_handler,
-            &self.raw_event_handler,
+            self.framework.clone(),
+            self.event_handler.clone(),
+            self.raw_event_handler.clone(),
         )
         .await;
     }
