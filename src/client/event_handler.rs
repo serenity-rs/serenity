@@ -45,7 +45,7 @@ macro_rules! event_handler {
             /// # use serenity::client::{Context, FullEvent};
             /// # fn _foo(ctx: Context, event: FullEvent) {
             /// if let FullEvent::Message { .. } = &event {
-            ///     assert_eq!(event.snake_case_name(), "cache_ready");
+            ///     assert_eq!(event.snake_case_name(), "message");
             /// }
             /// # }
             /// ```
