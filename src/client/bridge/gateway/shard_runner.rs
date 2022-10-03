@@ -14,7 +14,7 @@ use super::{ShardClientMessage, ShardId, ShardManagerMessage, ShardRunnerMessage
 #[cfg(feature = "voice")]
 use crate::client::bridge::voice::VoiceGatewayManager;
 use crate::client::dispatch::{dispatch, DispatchEvent};
-use crate::client::{EventHandler, RawEventHandler};
+use crate::client::{Context, EventHandler, RawEventHandler};
 #[cfg(feature = "collector")]
 use crate::collector::{
     ComponentInteractionFilter,
@@ -323,16 +323,21 @@ impl ShardRunner {
     #[inline]
     #[instrument(skip(self, event))]
     async fn dispatch(&self, event: DispatchEvent) {
+        let context = Context::new(
+            Arc::clone(&self.data),
+            self.runner_tx.clone(),
+            self.shard.shard_info().id,
+            Arc::clone(&self.cache_and_http.http),
+            #[cfg(feature = "cache")]
+            Arc::clone(&self.cache_and_http.cache),
+        );
         dispatch(
             event,
+            context,
             #[cfg(feature = "framework")]
             &self.framework,
-            &self.data,
             &self.event_handler,
             &self.raw_event_handler,
-            &self.runner_tx,
-            self.shard.shard_info().id,
-            &self.cache_and_http,
         )
         .await;
     }
