@@ -1,6 +1,6 @@
 use std::sync::Arc;
 
-use tracing::{debug, instrument};
+use tracing::debug;
 
 #[cfg(feature = "gateway")]
 use super::bridge::gateway::event::ClientEvent;
@@ -18,14 +18,6 @@ use crate::model::guild::Member;
 #[cfg(feature = "cache")]
 use crate::model::id::GuildId;
 
-// Once we can use `Box` as part of a pattern, we will reconsider boxing.
-#[allow(clippy::large_enum_variant)]
-#[non_exhaustive]
-pub(crate) enum DispatchEvent {
-    Client(ClientEvent),
-    Model(Event),
-}
-
 #[cfg(feature = "cache")]
 fn update_cache<E: CacheUpdate>(context: &Context, event: &mut E) -> Option<E::Output> {
     context.cache.update(event)
@@ -36,8 +28,8 @@ fn update_cache<E>(_: &Context, _: &mut E) -> Option<()> {
     None
 }
 
-pub(crate) async fn dispatch<'rec>(
-    event: DispatchEvent,
+pub(crate) async fn dispatch_model<'rec>(
+    event: Event,
     context: Context,
     #[cfg(feature = "framework")] framework: Option<Arc<dyn Framework + Send + Sync>>,
     event_handler: Option<Arc<dyn EventHandler>>,
@@ -46,7 +38,7 @@ pub(crate) async fn dispatch<'rec>(
     #[cfg(feature = "framework")]
     let mut framework_dispatch_future = None;
     #[cfg(feature = "framework")]
-    if let DispatchEvent::Model(Event::MessageCreate(event)) = &event {
+    if let Event::MessageCreate(event) = &event {
         if let Some(framework) = framework {
             let (context, message) = (context.clone(), event.message.clone());
             framework_dispatch_future =
@@ -55,46 +47,10 @@ pub(crate) async fn dispatch<'rec>(
     }
 
     if let Some(raw_handler) = raw_event_handler {
-        if let DispatchEvent::Model(event) = &event {
-            raw_handler.raw_event(context.clone(), event.clone()).await;
-        }
+        raw_handler.raw_event(context.clone(), event.clone()).await;
     }
 
-    handle_event(context, event, event_handler).await;
-
-    #[cfg(feature = "framework")]
-    if let Some(x) = framework_dispatch_future {
-        spawn_named("dispatch::framework::message", x);
-    }
-}
-
-// Once we can use `Box` as part of a pattern, we will reconsider boxing.
-#[allow(clippy::too_many_arguments)]
-#[cfg_attr(feature = "cache", allow(clippy::used_underscore_binding))]
-#[instrument(skip(event, event_handler))]
-async fn handle_event(
-    context: Context,
-    event: DispatchEvent,
-    event_handler: Option<Arc<dyn EventHandler>>,
-) {
-    // Handle ClientEvent or return back Event
-    let model_event = match event {
-        DispatchEvent::Model(event) => event,
-        DispatchEvent::Client(event) => {
-            match event {
-                ClientEvent::ShardStageUpdate(event) => {
-                    if let Some(event_handler) = event_handler {
-                        spawn_named("dispatch::event_handler::shard_stage_update", async move {
-                            event_handler.shard_stage_update(context, event).await;
-                        });
-                    }
-                },
-            }
-            return;
-        },
-    };
-
-    let full_events = update_cache_with_event(context, model_event);
+    let full_events = update_cache_with_event(context, event);
     // Handle Event, this is done to prevent indenting twice (once to destructure DispatchEvent, then to destructure Event)
     if let (Some((event, extra_event)), Some(handler)) = (full_events, event_handler) {
         if let Some(event) = extra_event {
@@ -102,6 +58,27 @@ async fn handle_event(
             spawn_named(event.snake_case_name(), async move { event.dispatch(&*handler).await });
         }
         spawn_named(event.snake_case_name(), async move { event.dispatch(&*handler).await });
+    }
+
+    #[cfg(feature = "framework")]
+    if let Some(x) = framework_dispatch_future {
+        spawn_named("dispatch::framework::message", x);
+    }
+}
+
+pub(crate) async fn dispatch_client<'rec>(
+    event: ClientEvent,
+    context: Context,
+    event_handler: Option<Arc<dyn EventHandler>>,
+) {
+    match event {
+        ClientEvent::ShardStageUpdate(event) => {
+            if let Some(event_handler) = event_handler {
+                spawn_named("dispatch::event_handler::shard_stage_update", async move {
+                    event_handler.shard_stage_update(context, event).await;
+                });
+            }
+        },
     }
 }
 
