@@ -1,9 +1,11 @@
-//! Tools related to Interactions Endpoint URL Discord feature
+//! Contains tools related to Discord's Interactions Endpoint URL feature.
 //!
-//! > You can optionally configure an interactions endpoint to receive interactions via HTTP POSTs
-//! > rather than over Gateway with a bot user.
+//! "You can optionally configure an interactions endpoint to receive interactions via HTTP POSTs
+//! rather than over Gateway with a bot user."
 //!
-//! https://discord.com/developers/docs/tutorials/upgrading-to-application-commands#adding-an-interactions-endpoint-url
+//! <https://discord.com/developers/docs/tutorials/upgrading-to-application-commands#adding-an-interactions-endpoint-url>
+//!
+//! See [`Verifier`] for example usage.
 
 /// Parses a hex string into an array of `[u8]`
 fn parse_hex<const N: usize>(s: &str) -> Option<[u8; N]> {
