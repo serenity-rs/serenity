@@ -63,7 +63,7 @@ pub struct Message {
     pub kind: MessageType,
     /// A partial amount of data about the user's member data, if this message
     /// was sent in a guild.
-    pub member: Option<PartialMember>,
+    pub member: Option<Box<PartialMember>>,
     /// Indicator of whether the message mentions everyone.
     pub mention_everyone: bool,
     /// Array of [`Role`]s' Ids mentioned in the message.
@@ -120,7 +120,7 @@ pub struct Message {
     /// Sent if the message is a response to an [`Interaction`].
     ///
     /// [`Interaction`]: crate::model::application::interaction::Interaction
-    pub interaction: Option<MessageInteraction>,
+    pub interaction: Option<Box<MessageInteraction>>,
     /// The components of this message
     #[serde(default)]
     pub components: Vec<ActionRow>,
@@ -553,7 +553,7 @@ impl Message {
             message_id: self.id,
             user_id,
             guild_id: self.guild_id,
-            member: self.member.clone(),
+            member: self.member.as_deref().cloned(),
         })
     }
 

@@ -53,7 +53,7 @@ pub struct MessageComponentInteraction {
     pub version: u8,
     /// The message this interaction was triggered by, if
     /// it is a component.
-    pub message: Message,
+    pub message: Box<Message>,
     /// Permissions the app or bot has within the channel the interaction was sent from.
     pub app_permissions: Option<Permissions>,
     /// The selected language of the invoking user.
