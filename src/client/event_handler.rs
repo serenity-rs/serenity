@@ -22,9 +22,51 @@ macro_rules! event_handler {
         pub trait EventHandler: Send + Sync { $(
             $( #[ $meta ] )*
             async fn $method_name(&self, $( $arg_name: $arg_type ),* ) {
-                let _ = ( $( $arg_name ),* );
+                // Suppress unused argument warnings
+                drop(( $( $arg_name ),* ));
             }
         )* }
+
+        /// This enum stores every possible event that an [`EventHandler`] can receive.
+        #[non_exhaustive]
+        #[allow(clippy::large_enum_variant)] // TODO: do some boxing to fix this
+        pub enum FullEvent { $(
+            $( #[ $meta ] )*
+            $variant_name {
+                $( $arg_name: $arg_type ),*
+            },
+        )* }
+
+        impl FullEvent {
+            /// Returns the name of this event as a snake case string
+            ///
+            /// ```rust
+            /// # fn _foo(ctx: Context) {
+            /// let event = FullEvent::CacheReady { ctx, guilds: vec![] };
+            /// assert_eq!(event.snake_case_name(), "cache_ready");
+            /// # }
+            /// ```
+            #[must_use]
+            pub fn snake_case_name(&self) -> &'static str {
+                match self { $(
+                    Self::$variant_name { .. } => stringify!($method_name),
+                )* }
+            }
+
+            /// Runs the given [`EventHandler`]'s code for this event.
+            pub async fn dispatch(self, handler: &dyn EventHandler) {
+                // We need to apply #[$meta] to get the feature-gates. This also pulls in the doc
+                // comments, unfortunately.
+                #[allow(unused_doc_comments)]
+
+                match self { $(
+                    $( #[$meta] )*
+                    Self::$variant_name { $( $arg_name ),* } => {
+                        handler.$method_name( $( $arg_name ),* ).await;
+                    }
+                )* }
+            }
+        }
     };
 }
 
@@ -72,22 +114,22 @@ event_handler! {
     /// Dispatched when a channel is created.
     ///
     /// Provides said channel's data.
-    async fn channel_create(&self, ChannelCreate { ctx: Context, channel: &GuildChannel });
+    async fn channel_create(&self, ChannelCreate { ctx: Context, channel: GuildChannel });
 
     /// Dispatched when a category is created.
     ///
     /// Provides said category's data.
-    async fn category_create(&self, CategoryCreate { ctx: Context, category: &GuildChannel });
+    async fn category_create(&self, CategoryCreate { ctx: Context, category: GuildChannel });
 
     /// Dispatched when a category is deleted.
     ///
     /// Provides said category's data.
-    async fn category_delete(&self, CategoryDelete { ctx: Context, category: &GuildChannel });
+    async fn category_delete(&self, CategoryDelete { ctx: Context, category: GuildChannel });
 
     /// Dispatched when a channel is deleted.
     ///
     /// Provides said channel's data.
-    async fn channel_delete(&self, ChannelDelete { ctx: Context, channel: &GuildChannel, messages: Option<Vec<Message>> });
+    async fn channel_delete(&self, ChannelDelete { ctx: Context, channel: GuildChannel, messages: Option<Vec<Message>> });
 
     /// Dispatched when a pin is added, deleted.
     ///
