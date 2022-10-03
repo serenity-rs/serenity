@@ -11,14 +11,14 @@ use crate::utils::check_overflow;
 
 #[derive(Clone, Debug, Serialize)]
 #[must_use]
-pub struct CreateInteractionResponse<'a> {
+pub struct CreateInteractionResponse {
     #[serde(rename = "type")]
     kind: InteractionResponseType,
     #[serde(skip_serializing_if = "Option::is_none")]
-    data: Option<CreateInteractionResponseData<'a>>,
+    data: Option<CreateInteractionResponseData>,
 }
 
-impl<'a> CreateInteractionResponse<'a> {
+impl CreateInteractionResponse {
     /// Equivalent to [`Self::default`].
     pub fn new() -> Self {
         Self::default()
@@ -74,14 +74,14 @@ impl<'a> CreateInteractionResponse<'a> {
     }
 
     /// Sets the data for the message. See [`CreateInteractionResponseData`] for details on fields.
-    pub fn interaction_response_data(mut self, data: CreateInteractionResponseData<'a>) -> Self {
+    pub fn interaction_response_data(mut self, data: CreateInteractionResponseData) -> Self {
         self.data = Some(data);
         self
     }
 }
 
-impl<'a> Default for CreateInteractionResponse<'a> {
-    fn default() -> CreateInteractionResponse<'a> {
+impl Default for CreateInteractionResponse {
+    fn default() -> CreateInteractionResponse {
         Self {
             kind: InteractionResponseType::ChannelMessageWithSource,
             data: None,
@@ -91,7 +91,7 @@ impl<'a> Default for CreateInteractionResponse<'a> {
 
 #[derive(Clone, Debug, Default, Serialize)]
 #[must_use]
-pub struct CreateInteractionResponseData<'a> {
+pub struct CreateInteractionResponseData {
     embeds: Vec<CreateEmbed>,
     #[serde(skip_serializing_if = "Option::is_none")]
     tts: Option<bool>,
@@ -109,10 +109,10 @@ pub struct CreateInteractionResponseData<'a> {
     title: Option<String>,
 
     #[serde(skip)]
-    files: Vec<CreateAttachment<'a>>,
+    files: Vec<CreateAttachment>,
 }
 
-impl<'a> CreateInteractionResponseData<'a> {
+impl CreateInteractionResponseData {
     /// Equivalent to [`Self::default`].
     pub fn new() -> Self {
         Self::default()
@@ -129,13 +129,13 @@ impl<'a> CreateInteractionResponseData<'a> {
     }
 
     /// Appends a file to the message.
-    pub fn add_file(mut self, file: CreateAttachment<'a>) -> Self {
+    pub fn add_file(mut self, file: CreateAttachment) -> Self {
         self.files.push(file);
         self
     }
 
     /// Appends a list of files to the message.
-    pub fn add_files(mut self, files: impl IntoIterator<Item = CreateAttachment<'a>>) -> Self {
+    pub fn add_files(mut self, files: impl IntoIterator<Item = CreateAttachment>) -> Self {
         self.files.extend(files);
         self
     }
@@ -144,7 +144,7 @@ impl<'a> CreateInteractionResponseData<'a> {
     ///
     /// Calling this multiple times will overwrite the file list. To append files, call
     /// [`Self::add_file`] or [`Self::add_files`] instead.
-    pub fn files(mut self, files: impl IntoIterator<Item = CreateAttachment<'a>>) -> Self {
+    pub fn files(mut self, files: impl IntoIterator<Item = CreateAttachment>) -> Self {
         self.files = files.into_iter().collect();
         self
     }

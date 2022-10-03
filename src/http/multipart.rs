@@ -8,8 +8,8 @@ use crate::internal::prelude::*;
 /// Holder for multipart body. Contains files, multipart fields, and
 /// payload_json for creating requests with attachments.
 #[derive(Clone, Debug)]
-pub struct Multipart<'a> {
-    pub files: Vec<CreateAttachment<'a>>,
+pub struct Multipart {
+    pub files: Vec<CreateAttachment>,
     /// Multipart text fields that are sent with the form data as individual
     /// fields. If a certain endpoint does not support passing JSON body via
     /// `payload_json`, this must be used instead.
@@ -18,7 +18,7 @@ pub struct Multipart<'a> {
     pub payload_json: Option<String>,
 }
 
-impl<'a> Multipart<'a> {
+impl Multipart {
     pub(crate) fn build_form(self) -> Result<Form> {
         let mut multipart = Form::new();
 
@@ -40,7 +40,7 @@ impl<'a> Multipart<'a> {
             multipart = multipart.text(name.clone(), value.clone());
         }
 
-        if let Some(payload_json) = self.payload_json.clone() {
+        if let Some(payload_json) = self.payload_json {
             multipart = multipart.text("payload_json", payload_json);
         }
 

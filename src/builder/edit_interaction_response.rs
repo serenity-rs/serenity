@@ -17,7 +17,7 @@ use crate::utils::check_overflow;
 
 #[derive(Clone, Debug, Default, Serialize)]
 #[must_use]
-pub struct EditInteractionResponse<'a> {
+pub struct EditInteractionResponse {
     #[serde(skip_serializing_if = "Option::is_none")]
     embeds: Option<Vec<CreateEmbed>>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -30,10 +30,10 @@ pub struct EditInteractionResponse<'a> {
     attachments: Option<Vec<ExistingAttachment>>,
 
     #[serde(skip)]
-    files: Vec<CreateAttachment<'a>>,
+    files: Vec<CreateAttachment>,
 }
 
-impl<'a> EditInteractionResponse<'a> {
+impl EditInteractionResponse {
     /// Equivalent to [`Self::default`].
     pub fn new() -> Self {
         Self::default()
@@ -142,7 +142,7 @@ impl<'a> EditInteractionResponse<'a> {
     ///
     /// If this is called one or more times, existing attachments will reset. To keep them, provide
     /// their IDs to [`Self::keep_existing_attachment`].
-    pub fn new_attachment(mut self, attachment: CreateAttachment<'a>) -> Self {
+    pub fn new_attachment(mut self, attachment: CreateAttachment) -> Self {
         self.files.push(attachment);
         self
     }
