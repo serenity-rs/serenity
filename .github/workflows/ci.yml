@@ -4,7 +4,7 @@ on: [push, pull_request]
 
 env:
   rust_min: 1.64.0
-  rust_nightly: nightly-2022-06-23
+  rust_nightly: nightly-2022-10-01
 
 jobs:
   test:
