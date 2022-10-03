@@ -50,7 +50,7 @@ pub struct ApplicationCommandInteraction {
     /// Id of the application this interaction is for.
     pub application_id: ApplicationId,
     /// The data of the interaction which was triggered.
-    pub data: Box<CommandData>,
+    pub data: CommandData,
     /// The guild Id this interaction was sent from, if there is one.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub guild_id: Option<GuildId>,
