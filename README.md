@@ -104,17 +104,13 @@ tokio = { version = "1.21.2", features = ["macros", "rt-multi-thread"] }
 
 ## MSRV Policy
 
-Serenity's minimum supported Rust version (MSRV) is Rust 1.53.
+Serenity's minimum supported Rust version (MSRV) is Rust 1.64.
 
 We opt to keep MSRV stable on the `current` branch. This means it will remain
 unchanged between minor releases. Occasionally, dependencies may violate SemVer
 and update their own MSRV in a breaking way. As a result, pinning their
 versions will become necessary to successfully build Serenity using an older
-Rust release. (**NOTE**: This is currently the case; building using Rust 1.53
-requires pinning `dashmap = "=5.2.0"`, `indexmap = "=1.8.2"`, and `time =
-"=0.3.9"`. If the `simd_json` feature is enabled, you must additionally pin
-`halfbrown = "=0.1.12"` and `value-trait = "=0.2.10"`. Without dependency
-pinning, **the de facto MSRV is Rust 1.59**.)
+Rust release.
 
 The `next` branch tracks the latest Rust release as its MSRV. This allows for
 swift development as new languages features are stabilized, and reduces
@@ -254,5 +250,5 @@ a Rust-native cloud development platform that allows deploying Serenity bots for
 [repo:andesite]: https://github.com/natanbc/andesite
 [repo:lavaplayer]: https://github.com/sedmelluq/lavaplayer
 [logo]: https://raw.githubusercontent.com/serenity-rs/serenity/current/logo.png
-[rust-version-badge]: https://img.shields.io/badge/rust-1.53.0+-93450a.svg?style=flat-square
-[rust-version-link]: https://blog.rust-lang.org/2021/06/17/Rust-1.53.0.html
+[rust-version-badge]: https://img.shields.io/badge/rust-1.64.0+-93450a.svg?style=flat-square
+[rust-version-link]: https://blog.rust-lang.org/2022/09/22/Rust-1.64.0.html
