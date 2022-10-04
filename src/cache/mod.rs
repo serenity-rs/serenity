@@ -199,44 +199,45 @@ impl<K: Eq + Hash, V> MaybeMap<K, V> {
 #[derive(Debug)]
 #[non_exhaustive]
 pub struct Cache {
+    // Temp cache:
+    // ---
+    /// Cache of channels that have been fetched via to_channel.
+    ///
+    /// The TTL for each value is configured in CacheSettings.
+    #[cfg(feature = "temp_cache")]
+    pub(crate) temp_channels: DashCache<ChannelId, GuildChannel, FxBuildHasher>,
+    /// Cache of users who have been fetched from `to_user`.
+    ///
+    /// The TTL for each value is configured in CacheSettings.
+    #[cfg(feature = "temp_cache")]
+    pub(crate) temp_users: DashCache<UserId, Arc<User>, FxBuildHasher>,
+
+    // Channels cache:
+    // ---
     /// A map of channels in [`Guild`]s that the current user has received data
     /// for.
     ///
     /// When a [`Event::GuildDelete`] is received and processed by the cache,
     /// the relevant channels are also removed from this map.
     pub(crate) channels: MaybeMap<ChannelId, GuildChannel>,
-    /// Cache of channels that have been fetched via to_channel.
-    ///
-    /// Each value has a maximum TTL of 1 hour.
-    #[cfg(feature = "temp_cache")]
-    pub(crate) temp_channels: DashCache<ChannelId, GuildChannel, FxBuildHasher>,
-    /// A map of guilds with full data available. This includes data like
-    /// [`Role`]s and [`Emoji`]s that are not available through the REST API.
-    pub(crate) guilds: MaybeMap<GuildId, Guild>,
-    pub(crate) messages: MessageCache,
-    /// A map of users' presences. This is updated in real-time. Note that
-    /// status updates are often "eaten" by the gateway, and this should not
-    /// be treated as being entirely 100% accurate.
-    pub(crate) presences: MaybeMap<UserId, Presence>,
     /// A map of direct message channels that the current user has open with
     /// other users.
     pub(crate) private_channels: MaybeMap<ChannelId, PrivateChannel>,
-    /// Information about running shards
-    pub(crate) shard_data: RwLock<CachedShardData>,
+
+    // Guilds cache:
+    // ---
+    /// A map of guilds with full data available. This includes data like
+    /// [`Role`]s and [`Emoji`]s that are not available through the REST API.
+    pub(crate) guilds: MaybeMap<GuildId, Guild>,
     /// A list of guilds which are "unavailable".
     ///
     /// Additionally, guilds are always unavailable for bot users when a Ready
     /// is received. Guilds are "sent in" over time through the receiving of
     /// [`Event::GuildCreate`]s.
     pub(crate) unavailable_guilds: MaybeMap<GuildId, ()>,
-    /// The current user "logged in" and for which events are being received
-    /// for.
-    ///
-    /// The current user contains information that a regular [`User`] does not,
-    /// such as whether it is a bot, whether the user is verified, etc.
-    ///
-    /// Refer to the documentation for [`CurrentUser`] for more information.
-    pub(crate) user: RwLock<CurrentUser>,
+
+    // Users cache:
+    // ---
     /// A map of users that the current user sees.
     ///
     /// Users are added to - and updated from - this map via the following
@@ -252,17 +253,33 @@ pub struct Cache {
     /// events such as [`GuildMemberRemove`][`GuildMemberRemoveEvent`], as other
     /// structs such as members or recipients may still exist.
     pub(crate) users: MaybeMap<UserId, User>,
+    /// A map of users' presences. This is updated in real-time. Note that
+    /// status updates are often "eaten" by the gateway, and this should not
+    /// be treated as being entirely 100% accurate.
+    pub(crate) presences: MaybeMap<UserId, Presence>,
+
+    // Messages cache:
+    // ---
+    pub(crate) messages: MessageCache,
     /// Queue of message IDs for each channel.
     ///
     /// This is simply a vecdeque so we can keep track of the order of messages
     /// inserted into the cache. When a maximum number of messages are in a
     /// channel's cache, we can pop the front and remove that ID from the cache.
     pub(crate) message_queue: DashMap<ChannelId, VecDeque<MessageId>, FxBuildHasher>,
-    /// Cache of users who have been fetched from `to_user`.
+
+    // Miscellanous fixed-size data
+    // ---
+    /// Information about running shards
+    pub(crate) shard_data: RwLock<CachedShardData>,
+    /// The current user "logged in" and for which events are being received
+    /// for.
     ///
-    /// Each value has a max TTL of 1 hour.
-    #[cfg(feature = "temp_cache")]
-    pub(crate) temp_users: DashCache<UserId, Arc<User>, FxBuildHasher>,
+    /// The current user contains information that a regular [`User`] does not,
+    /// such as whether it is a bot, whether the user is verified, etc.
+    ///
+    /// Refer to the documentation for [`CurrentUser`] for more information.
+    pub(crate) user: RwLock<CurrentUser>,
     /// The settings for the cache.
     settings: RwLock<Settings>,
 }
@@ -305,19 +322,23 @@ impl Cache {
             temp_users: temp_cache(settings.time_to_live),
 
             channels: MaybeMap(settings.cache_channels.then(|| DashMap::default())),
-            guilds: MaybeMap(settings.cache_guilds.then(|| DashMap::default())),
-            messages: DashMap::default(),
-            presences: MaybeMap(settings.cache_users.then(|| DashMap::default())),
             private_channels: MaybeMap(settings.cache_channels.then(|| DashMap::default())),
+
+            guilds: MaybeMap(settings.cache_guilds.then(|| DashMap::default())),
+            unavailable_guilds: MaybeMap(settings.cache_guilds.then(|| DashMap::default())),
+
+            users: MaybeMap(settings.cache_users.then(|| DashMap::default())),
+            presences: MaybeMap(settings.cache_users.then(|| DashMap::default())),
+
+            messages: DashMap::default(),
+            message_queue: DashMap::default(),
+
             shard_data: RwLock::new(CachedShardData {
                 total: 1,
                 connected: HashSet::new(),
                 has_sent_shards_ready: false,
             }),
-            unavailable_guilds: MaybeMap(settings.cache_guilds.then(|| DashMap::default())),
             user: RwLock::new(CurrentUser::default()),
-            users: MaybeMap(settings.cache_users.then(|| DashMap::default())),
-            message_queue: DashMap::default(),
             settings: RwLock::new(settings),
         }
     }
