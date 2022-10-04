@@ -519,7 +519,7 @@ impl Member {
                 .roles
                 .iter()
                 .filter(|(id, _)| self.roles.contains(id))
-                .map(|(_, v)| v.clone())
+                .map(|(_, role)| role.clone())
                 .collect(),
         )
     }
