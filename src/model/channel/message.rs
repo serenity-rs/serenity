@@ -24,7 +24,7 @@ use crate::http::{CacheHttp, Http};
 use crate::model::application::component::ActionRow;
 use crate::model::application::interaction::MessageInteraction;
 use crate::model::prelude::*;
-#[cfg(all(feature = "cache", feature = "model"))]
+#[cfg(feature = "model")]
 use crate::utils;
 
 /// A representation of a message over a guild's text channel, a group, or a
@@ -476,23 +476,13 @@ impl Message {
         }
     }
 
-    /// Checks the length of a string to ensure that it is within Discord's
-    /// maximum message length limit.
+    /// Checks the length of a message to ensure that it is within Discord's maximum length limit.
     ///
-    /// Returns [`None`] if the message is within the limit, otherwise returns
-    /// [`Some`] with an inner value of how many unicode code points the message
-    /// is over.
+    /// Returns [`None`] if the message is within the limit, otherwise returns [`Some`] with an
+    /// inner value of how many unicode code points the message is over.
     #[must_use]
     pub fn overflow_length(content: &str) -> Option<usize> {
-        // Check if the content is over the maximum number of unicode code
-        // points.
-        let count = content.chars().count();
-
-        if count > constants::MESSAGE_CODE_LIMIT {
-            Some(count - constants::MESSAGE_CODE_LIMIT)
-        } else {
-            None
-        }
+        utils::check_overflow(content.chars().count(), constants::MESSAGE_CODE_LIMIT).err()
     }
 
     /// Pins this message to its channel.

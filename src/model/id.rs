@@ -16,8 +16,7 @@ macro_rules! id_u64 {
                 #[inline]
                 #[must_use]
                 #[track_caller]
-                #[rustversion::attr(since(1.57), const)]
-                pub fn new(id: u64) -> Self {
+                pub const fn new(id: u64) -> Self {
                     match NonZeroU64::new(id) {
                         Some(inner) => Self(inner),
                         None => panic!("Attempted to call Id::new with invalid (0) value")
