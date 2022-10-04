@@ -361,7 +361,7 @@ async fn handle_event(
         },
         Event::GuildCreate(mut event) => {
             let is_new =
-                if_cache!(Some(context.cache.unavailable_guilds.contains(&event.guild.id)));
+                if_cache!(Some(context.cache.unavailable_guilds.get(&event.guild.id).is_some()));
 
             update_cache(&context, &mut event);
 
@@ -369,7 +369,7 @@ async fn handle_event(
             {
                 let context = context.clone();
 
-                if context.cache.unavailable_guilds.is_empty() {
+                if context.cache.unavailable_guilds.len() == 0 {
                     let guild_amount =
                         context.cache.guilds.iter().map(|i| *i.key()).collect::<Vec<GuildId>>();
                     let event_handler = Arc::clone(&event_handler);
