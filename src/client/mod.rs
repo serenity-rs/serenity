@@ -96,7 +96,7 @@ impl ClientBuilder {
             fut: None,
             intents,
             #[cfg(feature = "cache")]
-            cache_settings: Some(CacheSettings::new()),
+            cache_settings: Some(CacheSettings::default()),
             #[cfg(feature = "framework")]
             framework: None,
             #[cfg(feature = "voice")]
