@@ -49,11 +49,7 @@ impl ArgumentConvert for Guild {
         let lookup_by_name = || {
             guilds.iter().find_map(|m| {
                 let guild = m.value();
-                if guild.name.eq_ignore_ascii_case(s) {
-                    Some(guild.clone())
-                } else {
-                    None
-                }
+                guild.name.eq_ignore_ascii_case(s).then(|| guild.clone())
             })
         };
 

@@ -35,22 +35,15 @@ fn lookup_by_global_cache(ctx: impl CacheHttp, s: &str) -> Option<User> {
         let (name, discrim) = crate::utils::parse_user_tag(s)?;
         users.iter().find_map(|m| {
             let user = m.value();
-            if user.discriminator == discrim && user.name.eq_ignore_ascii_case(name) {
-                Some(user.clone())
-            } else {
-                None
-            }
+            (user.discriminator == discrim && user.name.eq_ignore_ascii_case(name))
+                .then(|| user.clone())
         })
     };
 
     let lookup_by_name = || {
         users.iter().find_map(|m| {
             let user = m.value();
-            if user.name == s {
-                Some(user.clone())
-            } else {
-                None
-            }
+            (user.name == s).then(|| user.clone())
         })
     };
 
