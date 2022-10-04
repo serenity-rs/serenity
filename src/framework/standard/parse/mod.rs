@@ -172,7 +172,6 @@ pub fn mention<'a>(stream: &mut Stream<'a>, config: &Configuration) -> Option<&'
     }
 }
 
-#[allow(clippy::needless_lifetimes)] // Clippy and the compiler disagree
 async fn find_prefix<'a>(
     ctx: &Context,
     msg: &Message,
@@ -182,12 +181,7 @@ async fn find_prefix<'a>(
     let try_match = |prefix: &str| {
         let peeked = stream.peek_for_char(prefix.chars().count());
         let peeked = to_lowercase(config, peeked);
-
-        if prefix == peeked {
-            Some(peeked)
-        } else {
-            None
-        }
+        (prefix == peeked).then_some(peeked)
     };
 
     for f in &config.dynamic_prefixes {
