@@ -989,8 +989,10 @@ mod test {
 
     #[test]
     fn test_cache_messages() {
-        let mut settings = Settings::default();
-        settings.max_messages = 2;
+        let settings = Settings {
+            max_messages: 2,
+            ..Default::default()
+        };
         let cache = Cache::new_with_settings(settings);
 
         // Test inserting one message into a channel's message cache.
