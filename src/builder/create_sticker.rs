@@ -66,10 +66,7 @@ impl<'a> CreateSticker<'a> {
 
     #[cfg(feature = "http")]
     async fn _execute(self, http: &Http, guild_id: GuildId) -> Result<Sticker> {
-        let mut map = Vec::with_capacity(3);
-        map.push(("name".to_string(), self.name));
-        map.push(("tags".to_string(), self.tags));
-        map.push(("description".to_string(), self.description));
+        let map = vec![("name", self.name), ("tags", self.tags), ("description", self.description)];
 
         http.create_sticker(guild_id, map, self.file, self.audit_log_reason).await
     }

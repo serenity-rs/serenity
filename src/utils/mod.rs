@@ -37,9 +37,8 @@ use crate::model::prelude::*;
 
 #[cfg(all(feature = "builder", feature = "http"))]
 pub(crate) fn check_overflow(len: usize, max: usize) -> StdResult<(), usize> {
-    let overflow = len.saturating_sub(max);
-    if overflow > 0 {
-        Err(overflow)
+    if len > max {
+        Err(len - max)
     } else {
         Ok(())
     }

@@ -1665,9 +1665,12 @@ impl Guild {
         case_sensitive: bool,
         sorted: bool,
     ) -> Vec<(&Member, String)> {
-        fn starts_with(prefix: &str, case_sensitive: bool, name: &str) -> bool {
-            case_sensitive && name.starts_with(prefix)
-                || !case_sensitive && starts_with_case_insensitive(name, prefix)
+        fn starts_with(name: &str, prefix: &str, case_sensitive: bool) -> bool {
+            if case_sensitive {
+                name.starts_with(prefix)
+            } else {
+                name.to_lowercase().starts_with(&prefix.to_lowercase())
+            }
         }
 
         let mut members = self
@@ -1676,17 +1679,12 @@ impl Guild {
             .filter_map(|member| {
                 let username = &member.user.name;
 
-                if starts_with(prefix, case_sensitive, username) {
+                if starts_with(username, prefix, case_sensitive) {
                     Some((member, username.clone()))
                 } else {
                     match &member.nick {
-                        Some(nick) => {
-                            if starts_with(prefix, case_sensitive, nick) {
-                                Some((member, nick.clone()))
-                            } else {
-                                None
-                            }
-                        },
+                        Some(nick) => starts_with(nick, prefix, case_sensitive)
+                            .then(|| (member, nick.clone())),
                         None => None,
                     }
                 }
@@ -1739,28 +1737,18 @@ impl Guild {
         case_sensitive: bool,
         sorted: bool,
     ) -> Vec<(&Member, String)> {
-        fn contains(substring: &str, case_sensitive: bool, name: &str) -> bool {
-            case_sensitive && name.contains(substring)
-                || !case_sensitive && contains_case_insensitive(name, substring)
-        }
-
         let mut members = self
             .members
             .values()
             .filter_map(|member| {
                 let username = &member.user.name;
 
-                if contains(substring, case_sensitive, username) {
+                if contains(username, substring, case_sensitive) {
                     Some((member, username.clone()))
                 } else {
                     match &member.nick {
-                        Some(nick) => {
-                            if contains(substring, case_sensitive, nick) {
-                                Some((member, nick.clone()))
-                            } else {
-                                None
-                            }
-                        },
+                        Some(nick) => contains(nick, substring, case_sensitive)
+                            .then(|| (member, nick.clone())),
                         None => None,
                     }
                 }
@@ -1813,14 +1801,7 @@ impl Guild {
             .values()
             .filter_map(|member| {
                 let name = &member.user.name;
-
-                if (case_sensitive && name.contains(substring))
-                    || contains_case_insensitive(name, substring)
-                {
-                    Some((member, name.to_string()))
-                } else {
-                    None
-                }
+                contains(name, substring, case_sensitive).then(|| (member, name.clone()))
             })
             .collect::<Vec<(&Member, String)>>();
 
@@ -1873,14 +1854,7 @@ impl Guild {
             .values()
             .filter_map(|member| {
                 let nick = member.nick.as_ref().unwrap_or(&member.user.name);
-
-                if case_sensitive && nick.contains(substring)
-                    || !case_sensitive && contains_case_insensitive(nick, substring)
-                {
-                    Some((member, nick.clone()))
-                } else {
-                    None
-                }
+                contains(nick, substring, case_sensitive).then(|| (member, nick.clone()))
             })
             .collect::<Vec<(&Member, String)>>();
 
@@ -2559,14 +2533,12 @@ impl Guild {
 
 /// Checks if a `&str` contains another `&str`.
 #[cfg(feature = "model")]
-fn contains_case_insensitive(to_look_at: &str, to_find: &str) -> bool {
-    to_look_at.to_lowercase().contains(&to_find.to_lowercase())
-}
-
-/// Checks if a `&str` starts with another `&str`.
-#[cfg(feature = "model")]
-fn starts_with_case_insensitive(to_look_at: &str, to_find: &str) -> bool {
-    to_look_at.to_lowercase().starts_with(&to_find.to_lowercase())
+fn contains(haystack: &str, needle: &str, case_sensitive: bool) -> bool {
+    if case_sensitive {
+        haystack.contains(needle)
+    } else {
+        haystack.to_lowercase().contains(&needle.to_lowercase())
+    }
 }
 
 /// Takes a `&str` as `origin` and tests if either
