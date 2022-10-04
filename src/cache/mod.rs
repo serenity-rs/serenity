@@ -321,14 +321,14 @@ impl Cache {
             #[cfg(feature = "temp_cache")]
             temp_users: temp_cache(settings.time_to_live),
 
-            channels: MaybeMap(settings.cache_channels.then(|| DashMap::default())),
-            private_channels: MaybeMap(settings.cache_channels.then(|| DashMap::default())),
+            channels: MaybeMap(settings.cache_channels.then(DashMap::default)),
+            private_channels: MaybeMap(settings.cache_channels.then(DashMap::default)),
 
-            guilds: MaybeMap(settings.cache_guilds.then(|| DashMap::default())),
-            unavailable_guilds: MaybeMap(settings.cache_guilds.then(|| DashMap::default())),
+            guilds: MaybeMap(settings.cache_guilds.then(DashMap::default)),
+            unavailable_guilds: MaybeMap(settings.cache_guilds.then(DashMap::default)),
 
-            users: MaybeMap(settings.cache_users.then(|| DashMap::default())),
-            presences: MaybeMap(settings.cache_users.then(|| DashMap::default())),
+            users: MaybeMap(settings.cache_users.then(DashMap::default)),
+            presences: MaybeMap(settings.cache_users.then(DashMap::default)),
 
             messages: DashMap::default(),
             message_queue: DashMap::default(),
