@@ -1072,17 +1072,12 @@ impl GuildChannel {
             ChannelType::News | ChannelType::Text => Ok(guild
                 .members
                 .iter()
-                .filter_map(|e| {
-                    if self
-                        .permissions_for_user(cache, e.0)
+                .filter(|e| {
+                    self.permissions_for_user(cache, e.0)
                         .map(|p| p.contains(Permissions::VIEW_CHANNEL))
                         .unwrap_or(false)
-                    {
-                        Some(e.1.clone())
-                    } else {
-                        None
-                    }
                 })
+                .map(|e| e.1.clone())
                 .collect::<Vec<Member>>()),
             _ => Err(Error::from(ModelError::InvalidChannelType)),
         }
