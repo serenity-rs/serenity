@@ -39,7 +39,8 @@ use std::sync::Arc;
 use std::time::Duration;
 
 use dashmap::mapref::entry::Entry;
-use dashmap::mapref::one::Ref;
+use dashmap::mapref::multiple::RefMulti;
+use dashmap::mapref::one::{Ref, RefMut};
 use dashmap::{DashMap, DashSet};
 use fxhash::FxBuildHasher;
 #[cfg(feature = "temp_cache")]
@@ -158,6 +159,30 @@ pub(crate) struct CachedShardData {
     pub has_sent_shards_ready: bool,
 }
 
+#[derive(Debug)]
+pub(crate) struct MaybeMap<K: Eq + Hash, V>(Option<DashMap<K, V, FxBuildHasher>>);
+impl<K: Eq + Hash, V> MaybeMap<K, V> {
+    pub fn iter(&self) -> impl Iterator<Item = RefMulti<'_, K, V, FxBuildHasher>> {
+        Option::iter(&self.0).flat_map(DashMap::iter)
+    }
+
+    pub fn get(&self, k: &K) -> Option<Ref<'_, K, V, FxBuildHasher>> {
+        self.0.as_ref()?.get(k)
+    }
+
+    pub fn get_mut(&self, k: &K) -> Option<RefMut<'_, K, V, FxBuildHasher>> {
+        self.0.as_ref()?.get_mut(k)
+    }
+
+    pub fn insert(&self, k: K, v: V) -> Option<V> {
+        self.0.as_ref()?.insert(k, v)
+    }
+
+    pub fn remove(&self, k: &K) -> Option<(K, V)> {
+        self.0.as_ref()?.remove(k)
+    }
+}
+
 /// A cache containing data received from [`Shard`]s.
 ///
 /// Using the cache allows to avoid REST API requests via the [`http`] module
@@ -183,7 +208,7 @@ pub struct Cache {
     pub(crate) temp_channels: DashCache<ChannelId, GuildChannel, FxBuildHasher>,
     /// A map of guilds with full data available. This includes data like
     /// [`Role`]s and [`Emoji`]s that are not available through the REST API.
-    pub(crate) guilds: DashMap<GuildId, Guild, FxBuildHasher>,
+    pub(crate) guilds: MaybeMap<GuildId, Guild>,
     pub(crate) messages: MessageCache,
     /// A map of users' presences. This is updated in real-time. Note that
     /// status updates are often "eaten" by the gateway, and this should not
@@ -276,7 +301,7 @@ impl Cache {
             temp_users: temp_cache(settings.time_to_live),
 
             channels: DashMap::default(),
-            guilds: DashMap::default(),
+            guilds: MaybeMap(settings.cache_guilds.then(|| DashMap::default())),
             messages: DashMap::default(),
             presences: DashMap::default(),
             private_channels: DashMap::with_capacity_and_hasher(128, FxBuildHasher::default()),
@@ -493,7 +518,7 @@ impl Cache {
 
     /// Returns the number of cached guilds.
     pub fn guild_count(&self) -> usize {
-        self.guilds.len()
+        self.guilds.0.as_ref().map_or(0, |g| g.len())
     }
 
     /// Retrieves a reference to a [`Guild`]'s channel. Unlike [`Self::channel`],
