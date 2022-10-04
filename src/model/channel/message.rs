@@ -454,10 +454,7 @@ impl Message {
     /// inner value of how many unicode code points the message is over.
     #[must_use]
     pub fn overflow_length(content: &str) -> Option<usize> {
-        match utils::check_overflow(content.chars().count(), constants::MESSAGE_CODE_LIMIT) {
-            Ok(()) => None,
-            Err(overflow) => Some(overflow),
-        }
+        utils::check_overflow(content.chars().count(), constants::MESSAGE_CODE_LIMIT).err()
     }
 
     /// Pins this message to its channel.

@@ -509,15 +509,15 @@ fn nested_group_command_search<'rec, 'a: 'rec>(
                     .checks
                     .iter()
                     .chain(group.options.checks.iter())
-                    .filter_map(|check| check.display_in_help.then(|| check.name.to_string()))
+                    .filter(|check| check.display_in_help)
+                    .map(|check| check.name.to_string())
                     .collect();
 
                 let sub_command_names: Vec<String> = options
                     .sub_commands
                     .iter()
-                    .filter_map(|cmd| {
-                        cmd.options.help_available.then(|| cmd.options.names[0].to_string())
-                    })
+                    .filter(|cmd| cmd.options.help_available)
+                    .map(|cmd| cmd.options.names[0].to_string())
                     .collect();
 
                 return Ok(CustomisedHelpData::SingleCommand {

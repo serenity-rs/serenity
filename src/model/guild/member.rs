@@ -518,7 +518,8 @@ impl Member {
                 .guild(self.guild_id)?
                 .roles
                 .iter()
-                .filter_map(|(id, role)| self.roles.contains(id).then(|| role.clone()))
+                .filter(|(id, _)| self.roles.contains(id))
+                .map(|(_, role)| role.clone())
                 .collect(),
         )
     }
