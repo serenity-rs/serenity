@@ -261,21 +261,19 @@ impl Cache {
     #[instrument]
     pub fn new_with_settings(settings: Settings) -> Self {
         #[cfg(feature = "temp_cache")]
-        fn temp_cache<K, V>() -> DashCache<K, V, FxBuildHasher>
+        fn temp_cache<K, V>(ttl: Duration) -> DashCache<K, V, FxBuildHasher>
         where
             K: Hash + Eq + Send + Sync + 'static,
             V: Clone + Send + Sync + 'static,
         {
-            DashCache::builder()
-                .time_to_live(Duration::from_secs(60 * 60))
-                .build_with_hasher(FxBuildHasher::default())
+            DashCache::builder().time_to_live(ttl).build_with_hasher(FxBuildHasher::default())
         }
 
         Self {
             #[cfg(feature = "temp_cache")]
-            temp_channels: temp_cache(),
+            temp_channels: temp_cache(settings.time_to_live),
             #[cfg(feature = "temp_cache")]
-            temp_users: temp_cache(),
+            temp_users: temp_cache(settings.time_to_live),
 
             channels: DashMap::default(),
             guilds: DashMap::default(),
