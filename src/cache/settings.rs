@@ -9,7 +9,7 @@ use std::time::Duration;
 /// ```rust
 /// use serenity::cache::Settings as CacheSettings;
 ///
-/// let mut settings = CacheSettings::new();
+/// let mut settings = CacheSettings::default();
 /// settings.max_messages = 10;
 /// ```
 #[derive(Clone, Debug)]

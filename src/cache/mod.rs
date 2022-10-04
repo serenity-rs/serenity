@@ -299,8 +299,8 @@ impl Cache {
     /// ```rust
     /// use serenity::cache::{Cache, Settings};
     ///
-    /// let mut settings = Settings::new();
-    /// settings.max_messages(10);
+    /// let mut settings = Settings::default();
+    /// settings.max_messages = 10;
     ///
     /// let cache = Cache::new_with_settings(settings);
     /// ```
@@ -989,8 +989,8 @@ mod test {
 
     #[test]
     fn test_cache_messages() {
-        let mut settings = Settings::new();
-        settings.max_messages(2);
+        let mut settings = Settings::default();
+        settings.max_messages = 2;
         let cache = Cache::new_with_settings(settings);
 
         // Test inserting one message into a channel's message cache.
