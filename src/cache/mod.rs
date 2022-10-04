@@ -260,9 +260,38 @@ impl Cache {
     /// ```
     #[instrument]
     pub fn new_with_settings(settings: Settings) -> Self {
+        #[cfg(feature = "temp_cache")]
+        fn temp_cache<K, V>() -> DashCache<K, V, FxBuildHasher>
+        where
+            K: Hash + Eq + Send + Sync + 'static,
+            V: Clone + Send + Sync + 'static,
+        {
+            DashCache::builder()
+                .time_to_live(Duration::from_secs(60 * 60))
+                .build_with_hasher(FxBuildHasher::default())
+        }
+
         Self {
+            #[cfg(feature = "temp_cache")]
+            temp_channels: temp_cache(),
+            #[cfg(feature = "temp_cache")]
+            temp_users: temp_cache(),
+
+            channels: DashMap::default(),
+            guilds: DashMap::default(),
+            messages: DashMap::default(),
+            presences: DashMap::default(),
+            private_channels: DashMap::with_capacity_and_hasher(128, FxBuildHasher::default()),
             settings: RwLock::new(settings),
-            ..Default::default()
+            shard_data: RwLock::new(CachedShardData {
+                total: 1,
+                connected: HashSet::new(),
+                has_sent_shards_ready: false,
+            }),
+            unavailable_guilds: DashSet::default(),
+            user: RwLock::new(CurrentUser::default()),
+            users: DashMap::default(),
+            message_queue: DashMap::default(),
         }
     }
 
@@ -895,39 +924,7 @@ impl Cache {
 
 impl Default for Cache {
     fn default() -> Self {
-        #[cfg(feature = "temp_cache")]
-        fn temp_cache<K, V>() -> DashCache<K, V, FxBuildHasher>
-        where
-            K: Hash + Eq + Send + Sync + 'static,
-            V: Clone + Send + Sync + 'static,
-        {
-            DashCache::builder()
-                .time_to_live(Duration::from_secs(60 * 60))
-                .build_with_hasher(FxBuildHasher::default())
-        }
-
-        Self {
-            #[cfg(feature = "temp_cache")]
-            temp_channels: temp_cache(),
-            #[cfg(feature = "temp_cache")]
-            temp_users: temp_cache(),
-
-            channels: DashMap::default(),
-            guilds: DashMap::default(),
-            messages: DashMap::default(),
-            presences: DashMap::default(),
-            private_channels: DashMap::with_capacity_and_hasher(128, FxBuildHasher::default()),
-            settings: RwLock::new(Settings::default()),
-            shard_data: RwLock::new(CachedShardData {
-                total: 1,
-                connected: HashSet::new(),
-                has_sent_shards_ready: false,
-            }),
-            unavailable_guilds: DashSet::default(),
-            user: RwLock::new(CurrentUser::default()),
-            users: DashMap::default(),
-            message_queue: DashMap::default(),
-        }
+        Self::new_with_settings(Settings::default())
     }
 }
 
