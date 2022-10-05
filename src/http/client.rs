@@ -1,5 +1,7 @@
 #![allow(clippy::missing_errors_doc)]
 
+use std::borrow::Cow;
+use std::convert::TryFrom;
 use std::fmt;
 use std::num::NonZeroU64;
 use std::str::FromStr;
@@ -186,9 +188,11 @@ fn reason_into_header(reason: &str) -> Headers {
 
     // "The X-Audit-Log-Reason header supports 1-512 URL-encoded UTF-8 characters."
     // https://discord.com/developers/docs/resources/audit-log#audit-log-entry-object
-    let header_value =
-        HeaderValue::from_str(&utf8_percent_encode(reason, NON_ALPHANUMERIC).to_string())
-            .expect("Invalid header value even after percent encode");
+    let header_value = match Cow::from(utf8_percent_encode(reason, NON_ALPHANUMERIC)) {
+        Cow::Borrowed(value) => HeaderValue::from_str(value),
+        Cow::Owned(value) => HeaderValue::try_from(value),
+    }
+    .expect("Invalid header value even after percent encode");
 
     headers.insert("X-Audit-Log-Reason", header_value);
     headers
