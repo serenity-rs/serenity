@@ -186,6 +186,8 @@ fn parse_token(token: impl AsRef<str>) -> String {
 fn reason_into_header(reason: &str) -> Headers {
     let mut headers = Headers::new();
 
+    // "The X-Audit-Log-Reason header supports 1-512 URL-encoded UTF-8 characters."
+    // https://discord.com/developers/docs/resources/audit-log#audit-log-entry-object
     let header_value = match Cow::from(utf8_percent_encode(reason, NON_ALPHANUMERIC)) {
         Cow::Borrowed(value) => HeaderValue::from_str(value),
         Cow::Owned(value) => HeaderValue::try_from(value),
