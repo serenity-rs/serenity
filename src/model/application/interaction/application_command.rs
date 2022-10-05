@@ -1,10 +1,8 @@
 use std::collections::HashMap;
-use std::fmt;
 
-use serde::de::{Deserializer, Error as DeError, IgnoredAny, MapAccess};
-use serde::ser::{SerializeStruct, Serializer};
+use serde::de::{Deserializer, Error as DeError};
+use serde::ser::{Error as _, Serializer};
 use serde::{Deserialize, Serialize};
-use serde_value::{DeserializerError, Value};
 
 #[cfg(feature = "model")]
 use crate::builder::{
@@ -533,164 +531,105 @@ impl CommandDataOption {
     }
 }
 
+#[derive(Deserialize, Serialize)]
+struct RawCommandDataOption {
+    name: String,
+    #[serde(rename = "type")]
+    kind: CommandOptionType,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    value: Option<serde_json::Value>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    options: Option<Vec<RawCommandDataOption>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    focused: Option<bool>,
+}
+
+fn option_from_raw<E: DeError>(raw: RawCommandDataOption) -> StdResult<CommandDataOption, E> {
+    macro_rules! value {
+        () => {
+            serde_json::from_value(raw.value.ok_or_else(|| DeError::missing_field("value"))?)
+                .map_err(DeError::custom)?
+        };
+    }
+
+    let value = match raw.kind {
+        _ if raw.focused == Some(true) => CommandDataOptionValue::Autocomplete {
+            kind: raw.kind,
+            value: value!(),
+        },
+        CommandOptionType::Boolean => CommandDataOptionValue::Boolean(value!()),
+        CommandOptionType::Integer => CommandDataOptionValue::Integer(value!()),
+        CommandOptionType::Number => CommandDataOptionValue::Number(value!()),
+        CommandOptionType::String => CommandDataOptionValue::String(value!()),
+        CommandOptionType::SubCommand => {
+            let options = raw.options.ok_or_else(|| DeError::missing_field("options"))?;
+            let options = options.into_iter().map(option_from_raw).collect::<StdResult<_, E>>()?;
+            CommandDataOptionValue::SubCommand(options)
+        },
+        CommandOptionType::SubCommandGroup => {
+            let options = raw.options.ok_or_else(|| DeError::missing_field("options"))?;
+            let options = options.into_iter().map(option_from_raw).collect::<StdResult<_, E>>()?;
+            CommandDataOptionValue::SubCommandGroup(options)
+        },
+        CommandOptionType::Attachment => CommandDataOptionValue::Attachment(value!()),
+        CommandOptionType::Channel => CommandDataOptionValue::Channel(value!()),
+        CommandOptionType::Mentionable => CommandDataOptionValue::Mentionable(value!()),
+        CommandOptionType::Role => CommandDataOptionValue::Role(value!()),
+        CommandOptionType::User => CommandDataOptionValue::User(value!()),
+        CommandOptionType::Unknown(unknown) => CommandDataOptionValue::Unknown(unknown),
+    };
+
+    Ok(CommandDataOption {
+        name: raw.name,
+        value,
+    })
+}
+
+fn option_to_raw(option: &CommandDataOption) -> StdResult<RawCommandDataOption, serde_json::Error> {
+    let mut raw = RawCommandDataOption {
+        name: option.name.clone(),
+        kind: option.kind(),
+        value: None,
+        options: None,
+        focused: None,
+    };
+
+    match &option.value {
+        CommandDataOptionValue::Autocomplete {
+            kind: _,
+            value,
+        } => {
+            raw.value = Some(serde_json::to_value(value)?);
+            raw.focused = Some(true);
+        },
+        CommandDataOptionValue::Boolean(v) => raw.value = Some(serde_json::to_value(v)?),
+        CommandDataOptionValue::Integer(v) => raw.value = Some(serde_json::to_value(v)?),
+        CommandDataOptionValue::Number(v) => raw.value = Some(serde_json::to_value(v)?),
+        CommandDataOptionValue::String(v) => raw.value = Some(serde_json::to_value(v)?),
+        CommandDataOptionValue::SubCommand(o) | CommandDataOptionValue::SubCommandGroup(o) => {
+            raw.options =
+                Some(o.iter().map(option_to_raw).collect::<StdResult<_, serde_json::Error>>()?);
+        },
+        CommandDataOptionValue::Attachment(v) => raw.value = Some(serde_json::to_value(v)?),
+        CommandDataOptionValue::Channel(v) => raw.value = Some(serde_json::to_value(v)?),
+        CommandDataOptionValue::Mentionable(v) => raw.value = Some(serde_json::to_value(v)?),
+        CommandDataOptionValue::Role(v) => raw.value = Some(serde_json::to_value(v)?),
+        CommandDataOptionValue::User(v) => raw.value = Some(serde_json::to_value(v)?),
+        CommandDataOptionValue::Unknown(_) => {},
+    }
+
+    Ok(raw)
+}
+
 impl<'de> Deserialize<'de> for CommandDataOption {
     fn deserialize<D: Deserializer<'de>>(deserializer: D) -> StdResult<Self, D::Error> {
-        #[derive(Deserialize)]
-        #[serde(field_identifier, rename_all = "snake_case")]
-        enum Field {
-            Name,
-            Type,
-            Value,
-            Options,
-            Focused,
-            Unknown(String),
-        }
-
-        struct Visitor;
-
-        impl<'de> serde::de::Visitor<'de> for Visitor {
-            type Value = CommandDataOption;
-
-            fn expecting(&self, formatter: &mut fmt::Formatter<'_>) -> fmt::Result {
-                formatter.write_str("CommandDataOption")
-            }
-
-            fn visit_map<A: MapAccess<'de>>(self, mut map: A) -> StdResult<Self::Value, A::Error> {
-                let mut name = None;
-                let mut kind = None;
-                let mut value: Option<Value> = None;
-                let mut options = None;
-                let mut focused = None;
-
-                macro_rules! next_value {
-                    ($field:ident, $name:literal) => {
-                        if $field.is_some() {
-                            return Err(DeError::duplicate_field($name));
-                        }
-                        $field = Some(map.next_value()?);
-                    };
-                }
-
-                while let Some(key) = map.next_key()? {
-                    match key {
-                        Field::Name => {
-                            next_value!(name, "name");
-                        },
-                        Field::Type => {
-                            next_value!(kind, "type");
-                        },
-                        Field::Value => {
-                            next_value!(value, "value");
-                        },
-                        Field::Options => {
-                            next_value!(options, "options");
-                        },
-                        Field::Focused => {
-                            next_value!(focused, "focused");
-                        },
-                        Field::Unknown(_) => {
-                            map.next_value::<IgnoredAny>()?;
-                        },
-                    }
-                }
-
-                let name = name.ok_or_else(|| DeError::missing_field("name"))?;
-                let kind = kind.ok_or_else(|| DeError::missing_field("type"))?;
-                let focused = focused.unwrap_or_default();
-
-                macro_rules! value {
-                    () => {
-                        value
-                            .ok_or_else(|| DeError::missing_field("value"))?
-                            .deserialize_into()
-                            .map_err(DeserializerError::into_error)?
-                    };
-                }
-
-                if focused {
-                    return Ok(CommandDataOption {
-                        name,
-                        value: CommandDataOptionValue::Autocomplete {
-                            kind,
-                            value: value!(),
-                        },
-                    });
-                }
-
-                let value = match kind {
-                    CommandOptionType::Boolean => CommandDataOptionValue::Boolean(value!()),
-                    CommandOptionType::Integer => CommandDataOptionValue::Integer(value!()),
-                    CommandOptionType::Number => CommandDataOptionValue::Number(value!()),
-                    CommandOptionType::String => CommandDataOptionValue::String(value!()),
-                    CommandOptionType::SubCommand => {
-                        let options = options.ok_or_else(|| DeError::missing_field("options"))?;
-                        CommandDataOptionValue::SubCommand(options)
-                    },
-                    CommandOptionType::SubCommandGroup => {
-                        let options = options.ok_or_else(|| DeError::missing_field("options"))?;
-                        CommandDataOptionValue::SubCommandGroup(options)
-                    },
-                    CommandOptionType::Attachment => CommandDataOptionValue::Attachment(value!()),
-                    CommandOptionType::Channel => CommandDataOptionValue::Channel(value!()),
-                    CommandOptionType::Mentionable => CommandDataOptionValue::Mentionable(value!()),
-                    CommandOptionType::Role => CommandDataOptionValue::Role(value!()),
-                    CommandOptionType::User => CommandDataOptionValue::User(value!()),
-                    CommandOptionType::Unknown(unknown) => CommandDataOptionValue::Unknown(unknown),
-                };
-
-                Ok(CommandDataOption {
-                    name,
-                    value,
-                })
-            }
-        }
-
-        deserializer.deserialize_map(Visitor)
+        option_from_raw(RawCommandDataOption::deserialize(deserializer)?)
     }
 }
 
 impl Serialize for CommandDataOption {
     fn serialize<S: Serializer>(&self, serializer: S) -> StdResult<S::Ok, S::Error> {
-        let (value_or_options, focused) = match &self.value {
-            CommandDataOptionValue::Autocomplete {
-                ..
-            } => (true, true),
-            CommandDataOptionValue::SubCommand(o) | CommandDataOptionValue::SubCommandGroup(o) => {
-                (!o.is_empty(), false)
-            },
-            CommandDataOptionValue::Unknown(_) => (false, false),
-            _ => (true, false),
-        };
-        let len = 2 + usize::from(value_or_options) + usize::from(focused);
-
-        let mut s = serializer.serialize_struct("CommandDataOption", len)?;
-
-        s.serialize_field("name", &self.name)?;
-        s.serialize_field("type", &self.value.kind())?;
-
-        match &self.value {
-            CommandDataOptionValue::Autocomplete {
-                value, ..
-            } => {
-                s.serialize_field("value", value)?;
-                s.serialize_field("focused", &true)?;
-            },
-            CommandDataOptionValue::Boolean(v) => s.serialize_field("value", v)?,
-            CommandDataOptionValue::Integer(v) => s.serialize_field("value", v)?,
-            CommandDataOptionValue::Number(v) => s.serialize_field("value", v)?,
-            CommandDataOptionValue::String(v) => s.serialize_field("value", v)?,
-            CommandDataOptionValue::Attachment(v) => s.serialize_field("value", v)?,
-            CommandDataOptionValue::Channel(v) => s.serialize_field("value", v)?,
-            CommandDataOptionValue::Mentionable(v) => s.serialize_field("value", v)?,
-            CommandDataOptionValue::Role(v) => s.serialize_field("value", v)?,
-            CommandDataOptionValue::User(v) => s.serialize_field("value", v)?,
-            CommandDataOptionValue::SubCommand(o) | CommandDataOptionValue::SubCommandGroup(o) => {
-                s.serialize_field("options", o)?;
-            },
-            _ => {},
-        }
-
-        s.end()
+        option_to_raw(self).map_err(S::Error::custom)?.serialize(serializer)
     }
 }
 
