@@ -291,7 +291,7 @@ mod tests {
     fn from_unix_timestamp() {
         let timestamp = Timestamp::from_unix_timestamp(1462015105).unwrap();
         assert_eq!(timestamp.unix_timestamp(), 1462015105);
-        if cfg!(all(feature = "chrono", not(feature = "time"))) {
+        if cfg!(feature = "chrono") {
             assert_eq!(timestamp.to_string(), "2016-04-30T11:18:25.000Z");
         } else {
             assert_eq!(timestamp.to_string(), "2016-04-30T11:18:25Z");
