@@ -493,6 +493,7 @@ mod tests {
     use std::time::Duration;
 
     use super::*;
+    use crate::json::{assert_json, json};
 
     #[test]
     fn rule_trigger_serde() -> crate::Result<()> {
@@ -502,43 +503,43 @@ mod tests {
             trigger: Trigger,
         }
 
-        assert_eq!(
-            crate::json::to_string(&Rule {
+        assert_json(
+            &Rule {
                 trigger: Trigger::Keyword(vec![String::from("foo"), String::from("bar")]),
-            })?,
-            r#"{"trigger_type":1,"trigger_metadata":{"keyword_filter":["foo","bar"]}}"#,
+            },
+            json!({"trigger_type": 1, "trigger_metadata": {"keyword_filter": ["foo", "bar"]}}),
         );
 
-        assert_eq!(
-            crate::json::to_string(&Rule {
-                trigger: Trigger::HarmfulLink
-            })?,
-            r#"{"trigger_type":2,"trigger_metadata":{}}"#,
+        assert_json(
+            &Rule {
+                trigger: Trigger::HarmfulLink,
+            },
+            json!({"trigger_type": 2, "trigger_metadata": {}}),
         );
 
-        assert_eq!(
-            crate::json::to_string(&Rule {
-                trigger: Trigger::Spam
-            })?,
-            r#"{"trigger_type":3,"trigger_metadata":{}}"#,
+        assert_json(
+            &Rule {
+                trigger: Trigger::Spam,
+            },
+            json!({"trigger_type": 3, "trigger_metadata": {}}),
         );
 
-        assert_eq!(
-            crate::json::to_string(&Rule {
+        assert_json(
+            &Rule {
                 trigger: Trigger::KeywordPreset(vec![
                     KeywordPresetType::Profanity,
                     KeywordPresetType::SexualContent,
                     KeywordPresetType::Slurs,
                 ]),
-            })?,
-            r#"{"trigger_type":4,"trigger_metadata":{"presets":[1,2,3]}}"#,
+            },
+            json!({"trigger_type": 4, "trigger_metadata": {"presets": [1,2,3]}}),
         );
 
-        assert_eq!(
-            crate::json::to_string(&Rule {
-                trigger: Trigger::Unknown(123)
-            })?,
-            r#"{"trigger_type":123,"trigger_metadata":{}}"#,
+        assert_json(
+            &Rule {
+                trigger: Trigger::Unknown(123),
+            },
+            json!({"trigger_type": 123, "trigger_metadata": {}}),
         );
 
         Ok(())
@@ -546,19 +547,19 @@ mod tests {
 
     #[test]
     fn action_serde() -> crate::Result<()> {
-        assert_eq!(crate::json::to_string(&Action::BlockMessage)?, r#"{"type":1}"#);
+        assert_json(&Action::BlockMessage, json!({"type": 1}));
 
-        assert_eq!(
-            crate::json::to_string(&Action::Alert(ChannelId::new(123)))?,
-            r#"{"type":2,"metadata":{"channel_id":"123"}}"#
+        assert_json(
+            &Action::Alert(ChannelId::new(123)),
+            json!({"type": 2, "metadata": {"channel_id": "123"}}),
         );
 
-        assert_eq!(
-            crate::json::to_string(&Action::Timeout(Duration::from_secs(1024)))?,
-            r#"{"type":3,"metadata":{"duration_seconds":1024}}"#
+        assert_json(
+            &Action::Timeout(Duration::from_secs(1024)),
+            json!({"type": 3, "metadata": {"duration_seconds": 1024}}),
         );
 
-        assert_eq!(crate::json::to_string(&Action::Unknown(123))?, r#"{"type":123}"#);
+        assert_json(&Action::Unknown(123), json!({"type": 123}));
 
         Ok(())
     }
