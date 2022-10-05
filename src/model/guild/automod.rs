@@ -3,13 +3,11 @@
 //! [Discord docs](https://discord.com/developers/docs/resources/auto-moderation)
 
 use std::borrow::Cow;
-use std::fmt;
 use std::time::Duration;
 
-use serde::de::{Deserializer, Error, IgnoredAny, MapAccess};
-use serde::ser::{SerializeStruct, Serializer};
+use serde::de::{Deserializer, Error};
+use serde::ser::Serializer;
 use serde::{Deserialize, Serialize};
-use serde_value::{DeserializerError, Value};
 
 use crate::model::id::{ChannelId, GuildId, MessageId, RoleId, RuleId, UserId};
 
@@ -319,18 +317,21 @@ pub struct ActionExecution {
 }
 
 /// Helper struct for the (de)serialization of `Action`.
-#[derive(Deserialize, Serialize)]
-#[serde(rename = "ActionMetadata")]
-struct Alert {
-    channel_id: ChannelId,
+#[derive(Default, Deserialize, Serialize)]
+struct RawActionMetadata {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    channel_id: Option<ChannelId>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    duration_seconds: Option<u64>,
 }
 
 /// Helper struct for the (de)serialization of `Action`.
 #[derive(Deserialize, Serialize)]
-#[serde(rename = "ActionMetadata")]
-struct Timeout {
-    #[serde(rename = "duration_seconds")]
-    duration: u64,
+struct RawAction {
+    #[serde(rename = "type")]
+    kind: ActionType,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    metadata: Option<RawActionMetadata>,
 }
 
 // The manual implementation is required because serde doesn't support integer tags for
@@ -340,95 +341,55 @@ struct Timeout {
 // enums](https://github.com/serde-rs/serde/pull/2056).
 impl<'de> Deserialize<'de> for Action {
     fn deserialize<D: Deserializer<'de>>(deserializer: D) -> Result<Self, D::Error> {
-        #[derive(Deserialize)]
-        #[serde(field_identifier, rename_all = "snake_case")]
-        enum Field {
-            Type,
-            Metadata,
-            Unknown(String),
-        }
-
-        struct Visitor;
-
-        impl<'de> serde::de::Visitor<'de> for Visitor {
-            type Value = Action;
-
-            fn expecting(&self, formatter: &mut fmt::Formatter<'_>) -> fmt::Result {
-                formatter.write_str("automod rule action")
-            }
-
-            fn visit_map<A: MapAccess<'de>>(self, mut map: A) -> Result<Self::Value, A::Error> {
-                let mut kind = None;
-                let mut metadata = None;
-
-                while let Some(key) = map.next_key()? {
-                    match key {
-                        Field::Type => {
-                            if kind.is_some() {
-                                return Err(Error::duplicate_field("type"));
-                            }
-                            kind = Some(map.next_value()?);
-                        },
-                        Field::Metadata => {
-                            if metadata.is_some() {
-                                return Err(Error::duplicate_field("metadata"));
-                            }
-                            metadata = Some(map.next_value::<Value>()?);
-                        },
-                        Field::Unknown(_) => {
-                            map.next_value::<IgnoredAny>()?;
-                        },
-                    }
-                }
-                let kind = kind.ok_or_else(|| Error::missing_field("type"))?;
-                match kind {
-                    ActionType::BlockMessage => Ok(Action::BlockMessage),
-                    ActionType::Alert => {
-                        let alert: Alert = metadata
-                            .ok_or_else(|| Error::missing_field("metadata"))?
-                            .deserialize_into()
-                            .map_err(DeserializerError::into_error)?;
-                        Ok(Action::Alert(alert.channel_id))
-                    },
-                    ActionType::Timeout => {
-                        let timeout: Timeout = metadata
-                            .ok_or_else(|| Error::missing_field("metadata"))?
-                            .deserialize_into()
-                            .map_err(DeserializerError::into_error)?;
-                        Ok(Action::Timeout(Duration::from_secs(timeout.duration)))
-                    },
-                    ActionType::Unknown(unknown) => Ok(Action::Unknown(unknown)),
-                }
-            }
-        }
-
-        deserializer.deserialize_any(Visitor)
+        let action = RawAction::deserialize(deserializer)?;
+        Ok(match action.kind {
+            ActionType::BlockMessage => Action::BlockMessage,
+            ActionType::Alert => Action::Alert(
+                action
+                    .metadata
+                    .ok_or_else(|| Error::missing_field("metadata"))?
+                    .channel_id
+                    .ok_or_else(|| Error::missing_field("channel_id"))?,
+            ),
+            ActionType::Timeout => Action::Timeout(Duration::from_secs(
+                action
+                    .metadata
+                    .ok_or_else(|| Error::missing_field("metadata"))?
+                    .duration_seconds
+                    .ok_or_else(|| Error::missing_field("duration_seconds"))?,
+            )),
+            ActionType::Unknown(unknown) => Action::Unknown(unknown),
+        })
     }
 }
 
 impl Serialize for Action {
     fn serialize<S: Serializer>(&self, serializer: S) -> Result<S::Ok, S::Error> {
-        let has_metadata = matches!(self, Self::Alert(_) | Self::Timeout(_));
-
-        let len = 1 + usize::from(has_metadata);
-        let mut s = serializer.serialize_struct("Action", len)?;
-
-        s.serialize_field("type", &self.kind())?;
-        match *self {
-            Self::Alert(channel_id) => {
-                s.serialize_field("metadata", &Alert {
-                    channel_id,
-                })?;
+        let action = match *self {
+            Action::BlockMessage => RawAction {
+                kind: ActionType::BlockMessage,
+                metadata: None,
             },
-            Self::Timeout(duration) => {
-                s.serialize_field("metadata", &Timeout {
-                    duration: duration.as_secs(),
-                })?;
+            Action::Alert(channel_id) => RawAction {
+                kind: ActionType::Alert,
+                metadata: Some(RawActionMetadata {
+                    channel_id: Some(channel_id),
+                    ..Default::default()
+                }),
             },
-            _ => {},
-        }
-
-        s.end()
+            Action::Timeout(duration) => RawAction {
+                kind: ActionType::Timeout,
+                metadata: Some(RawActionMetadata {
+                    duration_seconds: Some(duration.as_secs()),
+                    ..Default::default()
+                }),
+            },
+            Action::Unknown(n) => RawAction {
+                kind: ActionType::Unknown(n),
+                metadata: None,
+            },
+        };
+        action.serialize(serializer)
     }
 }
 
