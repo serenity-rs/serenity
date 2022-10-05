@@ -71,6 +71,14 @@ async fn message(ctx: &Context, msg: Message) -> Result<(), serenity::Error> {
                 .add_existing_attachment(msg.attachments[0].id),
         )
         .await?;
+    } else if msg.content == "auditlog" {
+        // Test special characters in audit log reason
+        msg.channel_id
+            .edit(
+                ctx,
+                EditChannel::new().name("new-channel-name").audit_log_reason("hello\nworld\n🙂"),
+            )
+            .await?;
     } else {
         return Ok(());
     }
